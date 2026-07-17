@@ -1,13 +1,11 @@
 import react from '@vitejs/plugin-react';
-import { readFileSync } from 'node:fs';
-import path, { resolve } from 'node:path';
+import { resolve } from 'node:path';
 import process from 'node:process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const tzOffset = 7 * 36e5;
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
-process.env.VITE_APP_BUILD_TIMESTAMP = Date.now()
+process.env.VITE_APP_BUILD_TIMESTAMP = Date.now().toString()
 
 function requireEnv(env: Record<string, string>, key: string): string {
   const value = env[key];
