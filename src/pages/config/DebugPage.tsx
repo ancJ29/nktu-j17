@@ -3,6 +3,9 @@
 import { appConfig } from '@/config';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { useProductStore } from '@/stores/useProductStore';
+import { useLookupLabels } from '@/hooks';
+import { findProductUnitIssues, type UnitIntegrityReport } from '@/utils/unitIntegrity';
 import { getEffectivePermissions } from '@/utils/permission';
 import { cacheGet } from '@/utils/appCache';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
@@ -11,6 +14,7 @@ import type { EmployeeExtra } from '@/types';
 import { FieldLabel } from '@credo/base-ui/components';
 import {
   ActionIcon,
+  Button,
   Card,
   Code,
   Collapse,
@@ -32,7 +36,7 @@ import {
   IconChevronRight,
   IconCopy,
 } from '@tabler/icons-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 
 function decodeJwtPayload(token: string | null | undefined): Record<string, unknown> | null {
@@ -162,6 +166,9 @@ export function DebugPage() {
         <DebugJson data={refreshTokenPayload ?? {}} />
       </CollapsibleDebugSection>
 
+      {/* Product unit integrity */}
+      <UnitIntegritySection />
+
       {/* App Info */}
       <DebugSection title="App Info">
         <DebugRow label="Config version" value={config.version ?? '-'} />
@@ -170,6 +177,85 @@ export function DebugPage() {
         <DebugRow label="Build timestamp" value={config.build?.buildTimestampReadable ?? '-'} />
       </DebugSection>
     </Stack>
+  );
+}
+
+function UnitIntegritySection() {
+  const unitLabels = useLookupLabels('unit');
+  const [report, setReport] = useState<UnitIntegrityReport | null>(null);
+  const [isRunning, setIsRunning] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async () => {
+    setIsRunning(true);
+    setError(null);
+    try {
+      await useProductStore.getState().forceRefresh();
+      setReport(findProductUnitIssues(useProductStore.getState().items, unitLabels));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load products');
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <Card withBorder padding="md">
+      <Group justify="space-between" wrap="nowrap" mb="xs">
+        <FieldLabel size="sm" lts={0.5}>
+          Product Unit Integrity
+        </FieldLabel>
+        <Button size="compact-xs" variant="light" loading={isRunning} onClick={run}>
+          Run check
+        </Button>
+      </Group>
+      <Divider mb="sm" />
+      <Stack gap={6}>
+        <Text size="xs" c="dimmed">
+          Finds products whose unit isn&apos;t a known <Code>unit</Code> lookup value — typically a
+          label written into the value slot by a pre-2026-07-17 Excel import. Read-only; nothing is
+          modified. {unitLabels.size} unit lookup(s) known.
+        </Text>
+        {error && (
+          <Text size="sm" c="red">
+            {error}
+          </Text>
+        )}
+        {report && (
+          <>
+            <DebugRow
+              label="Result"
+              value={
+                report.products.length === 0
+                  ? `Clean — ${report.scanned} product(s) scanned`
+                  : `${report.products.length} of ${report.scanned} product(s) affected`
+              }
+            />
+            {report.distinctValues.length > 0 && (
+              <>
+                <Text size="xs" c="dimmed" mt={4}>
+                  Offending values (fix the unit, not the rows)
+                </Text>
+                {report.distinctValues.map((v) => (
+                  <Group key={v.value} gap="sm" wrap="nowrap">
+                    <Code style={{ fontSize: 13 }}>{v.value}</Code>
+                    <Text size="xs" c="dimmed">
+                      ×{v.productCount}
+                    </Text>
+                    <Text size="xs" c={v.suggestedValue ? 'teal' : 'orange'}>
+                      {v.suggestedValue
+                        ? `→ ${v.suggestedValue}`
+                        : 'no matching lookup — add it under Lookups or retype'}
+                    </Text>
+                  </Group>
+                ))}
+                <DebugJson label="Affected products" data={report.products} />
+              </>
+            )}
+          </>
+        )}
+      </Stack>
+    </Card>
   );
 }
 

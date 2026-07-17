@@ -159,6 +159,7 @@ export function ProductListPage() {
   
   
   const tagLookups = useLookupOptions('product-tag');
+  const unitLookups = useLookupOptions('unit');
 
   useEffect(() => {
     if (!initialized && !error) loadAll();
@@ -280,11 +281,13 @@ export function ProductListPage() {
     try {
       const categoryLabels = Object.fromEntries(categoryLookups.map((o) => [o.value, o.label]));
       const tagLabels = Object.fromEntries(tagLookups.map((o) => [o.value, o.label]));
+      const unitLabels = Object.fromEntries(unitLookups.map((o) => [o.value, o.label]));
       exportProductsToExcel(allProducts, {
         language: i18n.language,
         hasPrice: priceVisible,
         categoryLabels,
         tagLabels,
+        unitLabels,
       });
       logActivity('product.export', undefined, { count: allProducts.length });
     } catch {
@@ -295,7 +298,7 @@ export function ProductListPage() {
     } finally {
       setIsExporting(false);
     }
-  }, [allProducts, categoryLookups, tagLookups, i18n.language, t]);
+  }, [allProducts, categoryLookups, tagLookups, unitLookups, i18n.language, t]);
 
   return (
     <>

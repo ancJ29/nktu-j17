@@ -17,7 +17,7 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import JsBarcode from 'jsbarcode';
-import { useLookupOptions } from '@/hooks';
+import { lookupLabelOf, useLookupLabels, useLookupOptions } from '@/hooks';
 import {
   IconAdjustmentsHorizontal,
   IconBarcode,
@@ -180,6 +180,11 @@ function SetCompositionEditor({
   const { t } = useTranslation();
   const products = useProductStore((s) => s.items);
   const items = form.values.setItems;
+  
+  
+  
+  
+  const unitLabels = useLookupLabels('unit');
 
   
   
@@ -248,7 +253,7 @@ function SetCompositionEditor({
               : picked.unit
                 ? [picked.unit]
                 : []
-            ).map((u) => ({ value: u, label: u }))
+            ).map((u) => ({ value: u, label: lookupLabelOf(unitLabels, u, u) }))
           : [];
         return (
           <Group key={idx} gap="xs" wrap="nowrap" align="flex-end">

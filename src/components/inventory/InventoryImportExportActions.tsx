@@ -51,6 +51,8 @@ type Props = {
   
   readonly items: ReadonlyArray<MasterItem>;
   
+  readonly unitLabels?: ReadonlyMap<string, string>;
+  
   readonly canImport: boolean;
   readonly canExport: boolean;
   
@@ -68,6 +70,7 @@ export function InventoryImportExportActions({
   entityType,
   rows,
   items,
+  unitLabels,
   canImport,
   canExport,
   onAfterImport,
@@ -97,6 +100,7 @@ export function InventoryImportExportActions({
       exportInventoryToExcel(rows, items, {
         language: i18n.language,
         entityType,
+        unitLabels,
       });
       notifications.show({
         color: 'green',
@@ -109,7 +113,7 @@ export function InventoryImportExportActions({
         message: t(`${ns}.notifications.exportError`),
       });
     }
-  }, [rows, items, entityType, i18n.language, t, ns]);
+  }, [rows, items, entityType, unitLabels, i18n.language, t, ns]);
 
   const handleFile = useCallback(
     async (file: File | null) => {
@@ -124,7 +128,7 @@ export function InventoryImportExportActions({
           fileButtonResetRef.current?.();
           return;
         }
-        const { matched, unmatched } = reconcileInventoryRows(parsed, items);
+        const { matched, unmatched } = reconcileInventoryRows(parsed, items, unitLabels);
         if (matched.length === 0) {
           notifications.show({
             color: 'red',
@@ -165,7 +169,7 @@ export function InventoryImportExportActions({
         fileButtonResetRef.current?.();
       }
     },
-    [items, t, ns],
+    [items, unitLabels, t, ns],
   );
 
   const closeModal = useCallback(() => {

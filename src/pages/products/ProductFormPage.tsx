@@ -67,6 +67,7 @@ export function ProductFormPage() {
   
   const categoryOptions = useLookupOptions('product-category');
   const tagOptions = useLookupOptions('product-tag');
+  const unitOptions = useLookupOptions('unit');
 
   
   
@@ -450,12 +451,14 @@ export function ProductFormPage() {
       
       const categories = categoryOptions.map((o) => o.label);
       const tags = tagOptions.map((o) => o.label);
+      const units = unitOptions.map((o) => o.label);
       generateProductExcelTemplate({
         language: i18n.language,
         hasPrice: priceManageable,
         hasBarcode: barcodeEnabled,
         categories,
         tags,
+        units,
       });
       notifications.show({
         color: 'green',
@@ -469,7 +472,7 @@ export function ProductFormPage() {
     } finally {
       setIsDownloading(false);
     }
-  }, [t, i18n.language, categoryOptions, tagOptions]);
+  }, [t, i18n.language, categoryOptions, tagOptions, unitOptions]);
 
   const handleFileSelect = useCallback((selectedFile: File) => {
     fileRef.current = selectedFile;
@@ -507,13 +510,17 @@ export function ProductFormPage() {
       
       
       
+      
       const catLabelToValue = new Map<string, string>();
       for (const o of categoryOptions) catLabelToValue.set(o.label.trim().toLowerCase(), o.value);
       const tagLabelToCanonical = new Map<string, string>();
       for (const o of tagOptions) tagLabelToCanonical.set(o.label.trim().toLowerCase(), o.label);
+      const unitLabelToValue = new Map<string, string>();
+      for (const o of unitOptions) unitLabelToValue.set(o.label.trim().toLowerCase(), o.value);
 
       const unknownCategories = new Set<string>();
       const unknownTags = new Set<string>();
+      const unknownUnits = new Set<string>();
       for (const p of products) {
         const cat = p.category?.trim();
         if (cat && !catLabelToValue.has(cat.toLowerCase())) unknownCategories.add(cat);
@@ -521,9 +528,16 @@ export function ProductFormPage() {
           const tag = raw.trim();
           if (tag && !tagLabelToCanonical.has(tag.toLowerCase())) unknownTags.add(tag);
         }
+        
+        
+        
+        for (const raw of [p.unit, p.minInventoryUnit]) {
+          const unit = raw?.trim();
+          if (unit && !unitLabelToValue.has(unit.toLowerCase())) unknownUnits.add(unit);
+        }
       }
 
-      if (unknownCategories.size > 0 || unknownTags.size > 0) {
+      if (unknownCategories.size > 0 || unknownTags.size > 0 || unknownUnits.size > 0) {
         const lines: string[] = [];
         if (unknownCategories.size > 0) {
           lines.push(
@@ -536,6 +550,13 @@ export function ProductFormPage() {
           lines.push(
             t('products.bulkImport.unknownTagMessage', {
               labels: Array.from(unknownTags).join(', '),
+            }),
+          );
+        }
+        if (unknownUnits.size > 0) {
+          lines.push(
+            t('products.bulkImport.unknownUnitMessage', {
+              labels: Array.from(unknownUnits).join(', '),
             }),
           );
         }
@@ -559,7 +580,14 @@ export function ProductFormPage() {
       let nextCodeNum = totalProducts + 1;
       const items = products.map((p) => {
         const code = p.code?.trim() || buildNextProductCode(nextCodeNum++);
-        const minUnit = (p.minInventoryUnit ?? p.unit ?? '').trim();
+        
+        
+        const resolveUnit = (raw: string | undefined) => {
+          const label = raw?.trim();
+          return label ? (unitLabelToValue.get(label.toLowerCase()) ?? '') : '';
+        };
+        const unit = resolveUnit(p.unit);
+        const minUnit = resolveUnit(p.minInventoryUnit) || unit;
         const minValue =
           typeof p.minInventoryValue === 'number' && p.minInventoryValue > 0
             ? p.minInventoryValue
@@ -579,6 +607,12 @@ export function ProductFormPage() {
           }),
           ...(category && { category }),
           ...(tags.length > 0 && { tags }),
+          
+          
+          
+          
+          
+          ...(unit && { units: [unit] }),
           ...(priceManageable &&
             typeof p.basePrice === 'number' &&
             p.basePrice > 0 && {
@@ -605,7 +639,7 @@ export function ProductFormPage() {
           name: p.name,
           code,
           description: p.description?.trim() ?? '',
-          unit: p.unit?.trim() ?? '',
+          unit,
           price: priceManageable && typeof p.price === 'number' ? p.price : 0,
           extra,
         };
@@ -666,7 +700,7 @@ export function ProductFormPage() {
     } finally {
       setIsBulkLoading(false);
     }
-  }, [t, forceRefresh, navigate, totalProducts, categoryOptions, tagOptions]);
+  }, [t, forceRefresh, navigate, totalProducts, categoryOptions, tagOptions, unitOptions]);
 
   const validateFileType = useCallback((f: File) => {
     const validTypes = [

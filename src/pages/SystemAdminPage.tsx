@@ -65,6 +65,7 @@ import {
   type SeedEmployeesResult,
 } from '@/pages/fake-data/seedFakeEmployees';
 import {
+  ManualProductUnitError,
   seedFakeProducts,
   type ManualProductInput,
   type SeedProductsResult,
@@ -2175,7 +2176,16 @@ function ProductsSection({
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setSeedError(msg);
-      notifications.show({ color: 'red', title: 'Seed failed', message: msg });
+      
+      
+      notifications.show({
+        color: 'red',
+        title: 'Seed failed',
+        message:
+          err instanceof ManualProductUnitError
+            ? `${err.lines.length} row(s) carry an unrecognized unit — see the progress log. Nothing was written.`
+            : msg,
+      });
     } finally {
       setRunning(false);
     }

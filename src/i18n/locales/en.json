@@ -2710,8 +2710,9 @@
       "noValidRows": "No valid products found in the file",
       "sampleDescription": "Download a pre-formatted template to fill in product data",
       "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
-      "unknownLabelTitle": "Unrecognized category or tag",
+      "unknownLabelTitle": "Unrecognized category, tag or unit",
       "unknownTagMessage": "Unrecognized tags: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
+      "unknownUnitMessage": "Unrecognized units: {{labels}}. Use the unit names shown under Lookups (not their codes), or add them there, then re-import.",
       "uploadFile": "Upload Product File"
     },
     "columns": {

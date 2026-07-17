@@ -1,8 +1,10 @@
 
 
+import { cStorageConnector } from '@credo/connectors/connector';
 import { generateId, randomString } from '@credo/kits/string';
 import { loadIndustry, type IndustryName } from '../../../scripts/faker/industry';
-import type { ProductExtra } from '@/types/product';
+import type { Product, ProductExtra } from '@/types/product';
+import { findProductUnitIssues } from '@/utils/unitIntegrity';
 import {
   configureSeedConnectors,
   pick,
@@ -11,6 +13,13 @@ import {
   writeEntityEnvelope,
 } from './_sharedSeed';
 import type { FakeDataSecrets } from './fakeDataSecrets';
+
+export class ManualProductUnitError extends Error {
+  constructor(readonly lines: string[]) {
+    super(`Unrecognized unit(s) in JSON input:\n${lines.join('\n')}`);
+    this.name = 'ManualProductUnitError';
+  }
+}
 
 export type SeedProductsOptions = {
   clientCode: string;
@@ -273,6 +282,59 @@ function buildProductsFromManualInput(
   });
 }
 
+async function fetchUnitLookups(
+  clientCode: string,
+  storageServiceCode: string,
+  log: (line: string) => void,
+): Promise<Map<string, string> | null> {
+  const key = `lookups.${clientCode}`;
+  try {
+    const res = await cStorageConnector.getRecordByKey<{
+      items?: Array<{ category?: string; value?: string; label?: string }>;
+    }>({ serviceCode: storageServiceCode, key });
+    const rows = res?.record?.data?.items ?? [];
+    const map = new Map<string, string>();
+    for (const l of rows) {
+      if (l?.category !== 'unit' || !l.value) continue;
+      map.set(l.value, l.label ?? l.value);
+    }
+    if (map.size === 0) {
+      log(`No 'unit' lookups under ${key} — skipping unit validation.`);
+      return null;
+    }
+    return map;
+  } catch (err) {
+    log(`Could not read ${key} (${(err as Error).message}) — skipping unit validation.`);
+    return null;
+  }
+}
+
+function assertManualUnitsAreValues(
+  items: ProductRecord[],
+  unitLabels: Map<string, string>,
+  log: (line: string) => void,
+): void {
+  const report = findProductUnitIssues(items as unknown as Product[], unitLabels);
+  if (report.products.length === 0) {
+    log(
+      `Unit validation passed (${report.scanned} row(s) against ${unitLabels.size} unit lookup(s)).`,
+    );
+    return;
+  }
+  const lines = report.products.flatMap((p) =>
+    p.issues.map(
+      (i) =>
+        `  ${p.code} — ${i.path} = "${i.value}"` +
+        (i.suggestedValue
+          ? ` → did you mean "${i.suggestedValue}"? (that's the label, not the value)`
+          : ` (no matching unit lookup — add it under Lookups first)`),
+    ),
+  );
+  log(`Unit validation FAILED — ${report.products.length} row(s) rejected. Nothing was written.`);
+  for (const l of lines) log(l);
+  throw new ManualProductUnitError(lines);
+}
+
 export async function seedFakeProducts(opts: SeedProductsOptions): Promise<SeedProductsResult> {
   const { clientCode, industry, count, secrets, items: manualItems, onLog } = opts;
   const log = onLog ?? (() => {});
@@ -283,6 +345,10 @@ export async function seedFakeProducts(opts: SeedProductsOptions): Promise<SeedP
   if (manualItems) {
     log(`Source: JSON input (${manualItems.length} rows)`);
     items = buildProductsFromManualInput(manualItems, clientCode);
+    
+    
+    const unitLabels = await fetchUnitLookups(clientCode, secrets.storageServiceCode, log);
+    if (unitLabels) assertManualUnitsAreValues(items, unitLabels, log);
   } else {
     const { products } = loadIndustry(industry);
     log(`Industry: ${industry} | Source pool: ${products.length} products`);

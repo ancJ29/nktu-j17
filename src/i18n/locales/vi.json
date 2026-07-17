@@ -2710,8 +2710,9 @@
       "noValidRows": "Không tìm thấy sản phẩm hợp lệ trong tệp",
       "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin sản phẩm",
       "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
-      "unknownLabelTitle": "Danh mục hoặc thẻ không hợp lệ",
+      "unknownLabelTitle": "Danh mục, thẻ hoặc đơn vị không hợp lệ",
       "unknownTagMessage": "Thẻ không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
+      "unknownUnitMessage": "Đơn vị không hợp lệ: {{labels}}. Vui lòng dùng đúng tên đơn vị hiển thị trong mục Danh mục dữ liệu (không phải mã), hoặc thêm mới tại đó rồi nhập lại.",
       "uploadFile": "Tải lên tệp sản phẩm"
     },
     "columns": {

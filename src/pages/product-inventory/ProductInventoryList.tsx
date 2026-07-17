@@ -13,7 +13,7 @@ import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { ListPagination } from '@/components/custom/ListPagination';
 import { device } from '@credo/base-ui/utils';
-import { useListScrollRestoration, useLookupOptions } from '@/hooks';
+import { useListScrollRestoration, useLookupLabels, useLookupOptions } from '@/hooks';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useOpenInboundByProduct } from '@/hooks/useOpenInboundByProduct';
@@ -310,6 +310,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   
   
   const categoryLookups = useLookupOptions('product-category');
+  
+  
+  const unitLabels = useLookupLabels('unit');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],
@@ -657,6 +660,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                   entityType="product"
                   rows={allRows}
                   items={products}
+                  unitLabels={unitLabels}
                   canExport={true}
                   canImport={canBulkImport}
                   onAfterImport={forceRefresh}

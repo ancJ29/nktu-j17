@@ -223,6 +223,7 @@ const SAMPLE_ROWS_EN: SampleRow[] = [
 export type BulkProduct = {
   name: string;
   code?: string;
+  
   unit?: string;
   sku?: string;
   barcode?: string;
@@ -237,6 +238,7 @@ export type BulkProduct = {
   basePrice?: number;
   
   minInventoryValue?: number;
+  
   minInventoryUnit?: string;
 };
 
@@ -250,6 +252,8 @@ export type ProductTemplateOptions = {
   categories?: string[];
   
   tags?: string[];
+  
+  units?: string[];
 };
 
 const REQUIRED_PRODUCT_FIELDS: ReadonlyArray<keyof BulkProduct> = ['name'];
@@ -542,6 +546,7 @@ export const generateProductExcelTemplate = ({
   hasBarcode = true,
   categories,
   tags,
+  units,
 }: ProductTemplateOptions = {}) => {
   const isVietnamese = language === 'vi';
 
@@ -603,10 +608,18 @@ export const generateProductExcelTemplate = ({
   
   
   
+  
+  
+  
+  
+  
   const sampleSource = isVietnamese ? PRODUCT_SAMPLE_ROWS_VI : PRODUCT_SAMPLE_ROWS_EN;
   const sampleTagCell = (tags?.length ?? 0) >= 3 ? tags!.slice(0, 3).join('; ') : '';
+  const sampleUnit = (i: number) => (units?.length ? units[i % units.length] : undefined);
   const sampleRows = sampleSource.map((row, i) => ({
     ...row,
+    unit: sampleUnit(i) ?? row.unit,
+    minInventoryUnit: sampleUnit(i) ?? row.minInventoryUnit,
     category: categories?.[i] ?? row.category,
     tags: sampleTagCell,
   }));
@@ -963,11 +976,13 @@ export type ProductExportOptions = {
   categoryLabels?: Record<string, string>;
   
   tagLabels?: Record<string, string>;
+  
+  unitLabels?: Record<string, string>;
 };
 
 export const exportProductsToExcel = (
   products: ReadonlyArray<Product>,
-  { language, hasPrice = true, categoryLabels, tagLabels }: ProductExportOptions = {},
+  { language, hasPrice = true, categoryLabels, tagLabels, unitLabels }: ProductExportOptions = {},
 ) => {
   const isVietnamese = language === 'vi';
 
@@ -1067,7 +1082,7 @@ export const exportProductsToExcel = (
         name: p.name,
         code: p.code,
         sku: e.sku ?? '',
-        unit: p.unit,
+        unit: resolveLabel(p.unit, unitLabels),
         barcode: e.barcode ?? '',
         description: p.description ?? '',
         category: resolveLabel(e.category, categoryLabels),
@@ -1078,7 +1093,7 @@ export const exportProductsToExcel = (
           .map((a) => `${a.key.trim()}=${a.value.trim()}`)
           .join('; '),
         minInventoryValue: typeof min?.value === 'number' && min.value > 0 ? min.value : '',
-        minInventoryUnit: min?.unit ?? '',
+        minInventoryUnit: resolveLabel(min?.unit, unitLabels),
         price: typeof p.price === 'number' && p.price > 0 ? p.price : '',
         basePrice: typeof e.basePrice === 'number' && e.basePrice > 0 ? e.basePrice : '',
         status: p.isActive ? statusActive : statusInactive,

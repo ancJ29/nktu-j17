@@ -31,12 +31,14 @@ export type InventoryExportOptions = {
   language?: string;
   
   entityType: 'product' | 'material';
+  
+  unitLabels?: ReadonlyMap<string, string>;
 };
 
 export const exportInventoryToExcel = (
   rows: ReadonlyArray<InventoryExportRow>,
   items: ReadonlyArray<InventoryExportItem>,
-  { language, entityType }: InventoryExportOptions,
+  { language, entityType, unitLabels }: InventoryExportOptions,
 ): void => {
   const isVietnamese = language === 'vi';
 
@@ -111,7 +113,7 @@ export const exportInventoryToExcel = (
     const cells: Record<ColumnKey, string | number> = {
       itemName: item.name,
       sku: item.extra?.sku ?? '',
-      unit: item.unit,
+      unit: (item.unit && unitLabels?.get(item.unit)) || item.unit,
       onHand: totalsByCode.get(item.code) ?? 0,
       
       
@@ -358,6 +360,8 @@ export type ReconciliationResult = {
 export const reconcileInventoryRows = (
   parsed: ReadonlyArray<ParsedInventoryRow>,
   items: ReadonlyArray<InventoryReconcileItem>,
+  
+  unitLabels?: ReadonlyMap<string, string>,
 ): ReconciliationResult => {
   const byCode = new Map<string, InventoryReconcileItem>();
   const bySku = new Map<string, InventoryReconcileItem>();
@@ -381,9 +385,15 @@ export const reconcileInventoryRows = (
     
     
     
-    const typedUnit = row.unit?.toLowerCase();
+    
+    const typedUnit = row.unit?.trim().toLowerCase();
     const unit =
-      (typedUnit && units.find((u) => u.toLowerCase() === typedUnit)) ?? units[0] ?? hit.unit ?? '';
+      (typedUnit &&
+        (units.find((u) => u.toLowerCase() === typedUnit) ??
+          units.find((u) => unitLabels?.get(u)?.trim().toLowerCase() === typedUnit))) ??
+      units[0] ??
+      hit.unit ??
+      '';
     const locationCode = row.locationCode?.trim() || DEFAULT_LOCATION_CODE;
     matchedByPair.set(`${hit.code}::${locationCode}`, {
       itemCode: hit.code,
