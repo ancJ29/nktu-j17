@@ -1,0 +1,1 @@
+export { FakeDataPage } from './FakeDataPage';

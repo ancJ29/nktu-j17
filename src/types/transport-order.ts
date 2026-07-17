@@ -1,0 +1,135 @@
+
+import type { DateTimeInput } from '@credo/kits/types';
+import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
+
+export type TransportOrderContainerSize = '20' | '40';
+
+export type TransportOrderShipmentType = 'import' | 'export';
+
+export type TransportOrderRoute = {
+  
+  pickup: string;
+  
+  stuffing: string;
+  
+  dropoff: string;
+};
+
+export type TransportOrderTrip = {
+  
+  departure: string;
+  
+  destination: string;
+  
+  date: DateTimeInput;
+  
+  truckId: string;
+  
+  truckPlate: string;
+  
+  driverId: string;
+  
+  driverName: string;
+  
+  laborCost: number;
+};
+
+export type TransportOrderFeeKind = 'service' | 'passthrough';
+
+export type TransportOrderFeePayer = 'company' | 'customer';
+
+export type TransportOrderFee = {
+  
+  label: string;
+  
+  amount: number;
+  
+  vatable: boolean;
+  kind: TransportOrderFeeKind;
+  
+  payer?: TransportOrderFeePayer;
+  
+  invoiceNo: string;
+};
+
+export type TransportOrderDisbursement = {
+  
+  name: string;
+  
+  amount: number;
+  
+  invoiceNo: string;
+};
+
+export type TransportOrderActivityEntry = {
+  timestamp: DateTimeInput;
+  action: string;
+  fromStatus?: string;
+  toStatus?: string;
+  userId?: string;
+  userName?: string;
+  note?: string;
+};
+
+export type TransportOrderCancellation = {
+  at: DateTimeInput;
+  by?: { id: string; name: string };
+  reason?: string;
+  fromStatus: string;
+};
+
+export type TransportOrderExtra = {
+  
+  isDeleted?: boolean;
+  cancellation?: TransportOrderCancellation;
+  createdBy?: string;
+  activityLog?: TransportOrderActivityEntry[];
+  [key: string]: unknown;
+};
+
+export type TransportOrder = PartitionedRecordRow & {
+  
+  orderNumber: string;
+  
+  isMultiTrip?: boolean;
+  
+  trips?: TransportOrderTrip[];
+  
+  entryDate: DateTimeInput;
+  
+  truckId: string;
+  
+  truckPlate: string;
+  
+  driverId: string;
+  
+  driverName: string;
+  
+  billNumber: string;
+  
+  containerNumber: string;
+  containerSize: TransportOrderContainerSize;
+  shipmentType: TransportOrderShipmentType;
+  route: TransportOrderRoute;
+  
+  fees: TransportOrderFee[];
+  
+  disbursements?: TransportOrderDisbursement[];
+  
+  advanceAmount?: number;
+  
+  vatRate: number;
+  
+  transportContractNo: string;
+  
+  customerCode?: string;
+  customerName?: string;
+  
+  status: string;
+  
+  totalAmount: number;
+  notes: string;
+  extra: TransportOrderExtra;
+  createdAt: DateTimeInput;
+  updatedAt: DateTimeInput;
+};

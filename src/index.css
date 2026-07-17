@@ -1,0 +1,75 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* Prevent text size adjustment on orientation change */
+  -webkit-text-size-adjust: 100%;
+  -ms-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  /* Prevent overscroll bounce on iOS */
+  overscroll-behavior: none;
+  /* Smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safe area support for devices with notches */
+#root {
+  min-height: 100vh;
+  /* Safe area insets for iOS */
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+}
+
+/* Prevent tap highlighting on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent user selection on UI elements */
+button,
+a {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* Ensure inputs are properly sized on iOS */
+input,
+textarea,
+select {
+  font-size: 16px;
+}
+
+/* Prevent zoom on input focus on iOS */
+@media screen and (max-width: 768px) {
+
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='number'],
+  input[type='tel'],
+  input[type='url'],
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* PWA specific styles */
+@media (display-mode: standalone) {
+
+  /* Styles specific to PWA mode */
+  body {
+    /* Prevent pull-to-refresh on PWA */
+    overscroll-behavior-y: contain;
+  }
+}

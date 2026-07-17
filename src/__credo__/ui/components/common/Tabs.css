@@ -1,0 +1,84 @@
+.credo-tabs {
+  background-color: transparent;
+}
+
+.credo-tabs-list {
+  border-bottom: 1px solid var(--mantine-color-default-border);
+  gap: 4px;
+  padding: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  position: relative;
+}
+
+.credo-tabs-list::before {
+  display: none;
+}
+
+.credo-tabs-tab {
+  position: relative;
+  background: transparent;
+  border: none;
+  border-radius: 6px 6px 0 0;
+  padding: 10px 14px;
+  margin: 0 0 -1px 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--mantine-color-dimmed);
+  transition:
+    color 140ms ease,
+    background-color 140ms ease;
+}
+
+.credo-tabs-tab::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: transparent;
+  transform: scaleX(0.4);
+  transform-origin: center;
+  opacity: 0;
+  transition:
+    transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 180ms ease,
+    background-color 140ms ease;
+}
+
+.credo-tabs-tab:hover {
+  background-color: var(--mantine-color-default-hover);
+  color: var(--mantine-color-text);
+}
+
+.credo-tabs-tab:hover::after {
+  background: var(--mantine-color-default-border);
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.credo-tabs-tab[data-active] {
+  color: var(--mantine-primary-color-filled);
+  font-weight: 600;
+  background: transparent;
+}
+
+.credo-tabs-tab[data-active]::after {
+  display: none;
+}
+
+.credo-tabs-tab[data-active]:hover {
+  background-color: var(--mantine-color-default-hover);
+}
+
+.credo-tabs-tab[data-active]:hover::after {
+  display: none;
+}
+
+.credo-tabs-tab:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}

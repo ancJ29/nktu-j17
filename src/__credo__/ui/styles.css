@@ -1,0 +1,3 @@
+/* In --local mode, component CSS is imported directly via side-effect imports in each component.
+   This file exists so `import '@credo/ui/styles.css'` resolves in both local and lib modes.
+   In --lib mode, this maps to dist/components.css via package.json exports. */

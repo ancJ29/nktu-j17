@@ -6,13 +6,9 @@ import process from 'node:process';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-process.env.VITE_APP_VERSION = process.env.npm_package_version;
 const tzOffset = 7 * 36e5;
-process.env.VITE_APP_BUILD = new Date(Date.now() + tzOffset)
-  .toISOString()
-  .replaceAll(/[-:]/g, '')
-  .replace('T', '_')
-  .slice(0, -7);
+process.env.VITE_APP_VERSION = process.env.npm_package_version;
+process.env.VITE_APP_BUILD_TIMESTAMP = Date.now()
 
 function requireEnv(env: Record<string, string>, key: string): string {
   const value = env[key];

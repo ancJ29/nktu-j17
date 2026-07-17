@@ -1,0 +1,823 @@
+import {
+  Avatar,
+  Badge,
+  Button,
+  Card,
+  Grid,
+  Group,
+  Loader,
+  Modal,
+  SegmentedControl,
+  Stack,
+  Switch,
+  Table,
+  Text,
+  ThemeIcon,
+  Title,
+} from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import {
+  IconArrowLeft,
+  IconBan,
+  IconCopy,
+  IconEdit,
+  IconFileInvoice,
+  IconInfoCircle,
+  IconListDetails,
+  IconLock,
+  IconPhoto,
+  IconPrinter,
+  IconSend,
+  IconShoppingCartPlus,
+  IconTrash,
+} from '@tabler/icons-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link, useNavigate, useParams } from 'react-router';
+import { device } from '@credo/base-ui/utils';
+import { ROUTES } from '@/constants/routes';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import { CustomerLink } from '@/components/CustomerLink';
+import { EmployeeLink } from '@/components/EmployeeLink';
+import { SalesOrderLink } from '@/components/SalesOrderLink';
+import { DangerAction } from '@/components/DangerAction';
+import { DangerZoneCard } from '@/components/DangerZoneCard';
+import { DetailField } from '@/components/DetailField';
+import { NotFoundState } from '@/components/NotFoundState';
+import { ProductLink } from '@/components/ProductLink';
+import { SectionCard } from '@/components/SectionCard';
+import { COMPANY_INFO } from '@/config/companyInfo';
+import { useCustomerStore } from '@/stores/useCustomerStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
+import { useLookupLabels, lookupLabelOf } from '@/hooks';
+import { formatDateTime } from '@/utils/dateFormat';
+import { formatNumber } from '@/utils/number';
+import { getPricingVatRate, hasImagesForProducts, perms } from '@/utils/permission';
+import { EntityConflictError } from '@/stores/createEntityStore';
+import { useProductStore } from '@/stores/useProductStore';
+import {
+  DEFAULT_QUOTATION_PRINT_OPTIONS,
+  printQuotation,
+  type QuotationPrintData,
+  type QuotationPrintLine,
+  type QuotationOrientation,
+  type QuotationPaperSize,
+} from './quotationPrint';
+import { readVietnameseMoney } from '@/utils/vietnameseNumberToWords';
+import { quotationBundle, useQuotationStore } from './useQuotationStore';
+import { quotationBadgeProps, quotationTotal, type Quotation, type QuotationStatus } from './types';
+
+const isMobile = device.isMobile;
+const canCreate = perms.salesOrder.canCreate();
+const canEdit = perms.salesOrder.canEdit();
+const canDelete = perms.salesOrder.canDelete();
+const canViewAll = perms.salesOrder.canViewAll();
+const canViewSelf = perms.salesOrder.canViewSelf();
+
+function canViewQuotation(q: Quotation): boolean {
+  if (canViewAll) return true;
+  if (!canViewSelf) return false;
+  const me = getCurrentEmployeeId();
+  return !!me && q.extra.assignedStaff === me;
+}
+
+function editRoute(id: string): string {
+  return ROUTES.QUOTATIONS.EDIT.replace(':id', id);
+}
+
+export function QuotationDetail() {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+
+  const [quotation, setQuotation] = useState<Quotation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [sending, setSending] = useState(false);
+  const [cancelling, setCancelling] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [sendModalOpened, { open: openSendModal, close: closeSendModal }] = useDisclosure(false);
+  const [cancelModalOpened, { open: openCancelModal, close: closeCancelModal }] =
+    useDisclosure(false);
+  const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
+    useDisclosure(false);
+  const [printModalOpened, { open: openPrintModal, close: closePrintModal }] = useDisclosure(false);
+  const [paperSize, setPaperSize] = useState<QuotationPaperSize>(
+    DEFAULT_QUOTATION_PRINT_OPTIONS.paperSize,
+  );
+  const [orientation, setOrientation] = useState<QuotationOrientation>(
+    DEFAULT_QUOTATION_PRINT_OPTIONS.orientation,
+  );
+  
+  
+  const [includeVat, setIncludeVat] = useState(true);
+
+  
+  const customers = useCustomerStore((s) => s.items);
+  const customersInitialized = useCustomerStore((s) => s.initialized);
+  const loadCustomers = useCustomerStore((s) => s.loadAll);
+  const unitLabels = useLookupLabels('unit');
+  useEffect(() => {
+    if (!customersInitialized) loadCustomers();
+  }, [customersInitialized, loadCustomers]);
+
+  
+  
+  const products = useProductStore((s) => s.items);
+  const productsInitialized = useProductStore((s) => s.initialized);
+  const loadProducts = useProductStore((s) => s.loadAll);
+  useEffect(() => {
+    if (!productsInitialized) loadProducts();
+  }, [productsInitialized, loadProducts]);
+
+  const showProductPhoto = hasImagesForProducts();
+  const photoByCode = useMemo(() => {
+    const m = new Map<string, string>();
+    if (showProductPhoto) {
+      for (const p of products) {
+        const url = p.extra?.images?.[0]?.url?.trim();
+        if (url) m.set(p.code, url);
+      }
+    }
+    return m;
+  }, [products, showProductPhoto]);
+
+  
+  const employeesInitialized = useEmployeeStore((s) => s.initialized);
+  const loadEmployees = useEmployeeStore((s) => s.loadAll);
+  useEffect(() => {
+    if (!employeesInitialized) loadEmployees();
+  }, [employeesInitialized, loadEmployees]);
+
+  const load = useCallback(async () => {
+    if (!id) return;
+    setLoading(true);
+    try {
+      const cached = useQuotationStore.getState().getById(id) as Quotation | undefined;
+      const target = cached ?? (await quotationBundle.fetchById(id)).item;
+      const visible = !!target && !target.extra.isDeleted && canViewQuotation(target);
+      setQuotation(visible ? target : null);
+    } catch {
+      setQuotation(null);
+      notifications.show({ color: 'red', message: t('quotations.notifications.fetchError') });
+    } finally {
+      setLoading(false);
+    }
+  }, [id, t]);
+
+  useEffect(() => {
+    
+    load();
+  }, [load]);
+
+  const status: QuotationStatus = quotation?.extra.status ?? 'draft';
+  const isReady = status === 'sent';
+  const isCancelled = status === 'cancelled';
+  const isConverted = status === 'converted';
+  const isDraft = status === 'draft';
+  const lines = useMemo(() => quotation?.extra.lines ?? [], [quotation]);
+  const total = useMemo(() => quotationTotal(lines), [lines]);
+
+  
+  
+  
+  
+  
+  
+  
+  const flipStatus = useCallback(
+    async (next: QuotationStatus): Promise<Quotation> => {
+      const write = (target: Quotation) =>
+        quotationBundle.updateSafely({
+          id: target.id,
+          version: target.version,
+          
+          patch: {
+            extra: {
+              ...target.extra,
+              status: next,
+              ...(next === 'sent' && { sentAt: Date.now() }),
+            },
+          },
+        }) as Promise<Quotation>;
+      try {
+        return await write(quotation!);
+      } catch (err) {
+        if (err instanceof EntityConflictError && err.latest) {
+          const latest = err.latest as Quotation;
+          const from = latest.extra.status ?? 'draft';
+          if (from === next) return latest; 
+          const stillValid =
+            next === 'sent' ? from === 'draft' : from === 'draft' || from === 'sent';
+          if (stillValid) return await write(latest);
+          setQuotation(latest);
+        }
+        throw err;
+      }
+    },
+    [quotation],
+  );
+
+  const handleSend = useCallback(async () => {
+    if (!quotation) return;
+    setSending(true);
+    try {
+      setQuotation(await flipStatus('sent'));
+      notifications.show({
+        color: 'green',
+        message: t('quotations.notifications.sendSuccess'),
+      });
+      closeSendModal();
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        notifications.show({
+          color: 'yellow',
+          title: t('common.conflict.title'),
+          message: t('common.conflict.message'),
+          autoClose: 8000,
+        });
+        closeSendModal();
+      } else {
+        notifications.show({
+          color: 'red',
+          message: t('quotations.notifications.sendError'),
+          autoClose: 8000,
+        });
+      }
+    } finally {
+      setSending(false);
+    }
+  }, [quotation, flipStatus, t, closeSendModal]);
+
+  const handleCancel = useCallback(async () => {
+    if (!quotation) return;
+    setCancelling(true);
+    try {
+      setQuotation(await flipStatus('cancelled'));
+      notifications.show({
+        color: 'green',
+        message: t('quotations.notifications.cancelSuccess'),
+      });
+      closeCancelModal();
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        notifications.show({
+          color: 'yellow',
+          title: t('common.conflict.title'),
+          message: t('common.conflict.message'),
+          autoClose: 8000,
+        });
+        closeCancelModal();
+      } else {
+        notifications.show({
+          color: 'red',
+          message: t('quotations.notifications.cancelError'),
+          autoClose: 8000,
+        });
+      }
+    } finally {
+      setCancelling(false);
+    }
+  }, [quotation, flipStatus, t, closeCancelModal]);
+
+  const handleDelete = useCallback(async () => {
+    if (!quotation) return;
+    setDeleting(true);
+    try {
+      await quotationBundle.deleteSafely({ id: quotation.id, version: quotation.version });
+      notifications.show({
+        color: 'green',
+        message: t('quotations.notifications.deleteSuccess'),
+      });
+      navigate(ROUTES.QUOTATIONS.LIST);
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        notifications.show({
+          color: 'yellow',
+          title: t('common.conflict.title'),
+          message: t('common.conflict.message'),
+          autoClose: 8000,
+        });
+        closeDeleteModal();
+      } else {
+        notifications.show({
+          color: 'red',
+          message: t('quotations.notifications.deleteError'),
+          autoClose: 8000,
+        });
+      }
+    } finally {
+      setDeleting(false);
+    }
+  }, [quotation, t, navigate, closeDeleteModal]);
+
+  
+  
+  
+  
+  const buildNoteData = useCallback((): QuotationPrintData => {
+    const q = quotation!;
+    const cust = q.extra.customerCode
+      ? customers.find((c) => c.code === q.extra.customerCode)
+      : undefined;
+    const noteLines: QuotationPrintLine[] = (q.extra.lines ?? []).map((l) => ({
+      name: l.productName || l.productCode,
+      unit: lookupLabelOf(unitLabels, l.unit),
+      quantity: l.quantity,
+      unitPrice: l.unitPrice,
+      lineTotal: l.quantity * l.unitPrice,
+      photoUrl: photoByCode.get(l.productCode),
+    }));
+    const subtotal = quotationTotal(q.extra.lines ?? []);
+    const vatRate = includeVat ? getPricingVatRate() : 0;
+    const vatAmount = subtotal * vatRate;
+    const grandTotal = subtotal + vatAmount;
+    const d = new Date(q.createdAt);
+    const dateText = `Ngày ${String(d.getDate()).padStart(2, '0')} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
+    return {
+      seller: COMPANY_INFO,
+      code: q.extra.code,
+      dateText,
+      note: q.extra.note,
+      customer: {
+        name: cust?.name || q.extra.customerName || '',
+        address: cust?.address ?? '',
+        taxCode: cust?.extra?.taxCode ?? '',
+        phone: cust?.phone ?? '',
+      },
+      lines: noteLines,
+      subtotal,
+      vatPercent: +(vatRate * 100).toFixed(2),
+      vatAmount,
+      grandTotal,
+      amountInWords: readVietnameseMoney(grandTotal),
+      showPhoto: showProductPhoto,
+      showVat: includeVat,
+    };
+  }, [quotation, customers, photoByCode, showProductPhoto, unitLabels, includeVat]);
+
+  const handlePrint = useCallback(() => {
+    const st = quotation?.extra.status;
+    if (!quotation || (st !== 'sent' && st !== 'converted')) return;
+    const ok = printQuotation(buildNoteData(), { paperSize, orientation });
+    closePrintModal();
+    if (!ok) {
+      notifications.show({
+        color: 'red',
+        message: t('quotations.print.popupBlocked'),
+        autoClose: 8000,
+      });
+    }
+  }, [quotation, buildNoteData, paperSize, orientation, closePrintModal, t]);
+
+  const handleGenerateSalesOrder = useCallback(() => {
+    if (!quotation) return;
+    navigate(ROUTES.SALES_ORDERS.NEW, {
+      state: {
+        copyFrom: {
+          customerCode: quotation.extra.customerCode,
+          customerName: quotation.extra.customerName,
+          notes: quotation.extra.note || '',
+          items: (quotation.extra.lines ?? []).map((l) => ({
+            productCode: l.productCode,
+            productName: l.productName,
+            quantity: l.quantity,
+            unit: l.unit ?? '',
+            unitPrice: l.unitPrice,
+          })),
+          quotationLink: { id: quotation.id, code: quotation.extra.code },
+        },
+      },
+    });
+  }, [quotation, navigate]);
+
+  if (loading) {
+    return (
+      <Group justify="center" py="xl">
+        <Loader />
+      </Group>
+    );
+  }
+  if (!quotation || !id) {
+    return (
+      <NotFoundState
+        title={t('common.notFound.title')}
+        message={t('common.notFound.message')}
+        backTo={ROUTES.QUOTATIONS.LIST}
+        backLabel={t('common.notFound.backToList')}
+      />
+    );
+  }
+
+  const badge = quotationBadgeProps(status);
+
+  
+  const generateSalesOrderButton = canCreate && (
+    <Button
+      color="blue"
+      size="compact-sm"
+      leftSection={<IconShoppingCartPlus size={14} />}
+      onClick={handleGenerateSalesOrder}
+    >
+      {t('quotations.actions.generateSalesOrder')}
+    </Button>
+  );
+
+  return (
+    <>
+      <Stack gap={isMobile ? 'md' : 'lg'}>
+        {!isMobile && (
+          <Group justify="space-between">
+            <Button
+              onClick={() => window.history.back()}
+              variant="subtle"
+              size="compact-sm"
+              leftSection={<IconArrowLeft size={16} />}
+            >
+              {t('__new__.01-common.actions.back')}
+            </Button>
+            <Group gap="sm">
+              {(isReady || isConverted) && (
+                <Button
+                  variant="light"
+                  color="gray"
+                  size="compact-sm"
+                  leftSection={<IconPrinter size={14} />}
+                  onClick={openPrintModal}
+                >
+                  {t('quotations.actions.exportPdf')}
+                </Button>
+              )}
+              {isReady && generateSalesOrderButton}
+              {canEdit && isDraft && (
+                <Button
+                  color="green"
+                  size="compact-sm"
+                  leftSection={<IconSend size={14} />}
+                  onClick={openSendModal}
+                >
+                  {t('quotations.actions.markReady')}
+                </Button>
+              )}
+              {canEdit && !isCancelled && !isConverted && (
+                <Button
+                  variant="light"
+                  color="red"
+                  size="compact-sm"
+                  leftSection={<IconBan size={14} />}
+                  onClick={openCancelModal}
+                >
+                  {t('quotations.actions.cancelQuotation')}
+                </Button>
+              )}
+              {canCreate && (
+                <Button
+                  variant="light"
+                  color="gray"
+                  size="compact-sm"
+                  leftSection={<IconCopy size={14} />}
+                  onClick={() =>
+                    navigate(ROUTES.QUOTATIONS.NEW, { state: { copyFrom: quotation } })
+                  }
+                >
+                  {t('quotations.actions.copy')}
+                </Button>
+              )}
+              {canEdit && isDraft && (
+                <Button
+                  component={Link}
+                  to={editRoute(quotation.id)}
+                  variant="light"
+                  size="compact-sm"
+                  leftSection={<IconEdit size={14} />}
+                >
+                  {t('__new__.01-common.actions.edit')}
+                </Button>
+              )}
+            </Group>
+          </Group>
+        )}
+
+        <Card
+          withBorder
+          radius="md"
+          padding={isMobile ? 'md' : 'lg'}
+          style={{
+            background:
+              'linear-gradient(180deg, var(--mantine-color-body), var(--mantine-color-default-hover))',
+          }}
+        >
+          <Group gap={isMobile ? 'sm' : 'lg'} wrap="nowrap" align="flex-start">
+            <ThemeIcon size={isMobile ? 56 : 80} radius={12} variant="light" color="primary">
+              <IconFileInvoice size={isMobile ? 28 : 40} stroke={1.5} />
+            </ThemeIcon>
+            <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
+              <Group gap="sm" wrap="wrap" align="center">
+                <Title order={isMobile ? 5 : 3} lh={1.2} ff="monospace">
+                  {quotation.extra.code}
+                </Title>
+                <Badge color={badge.color} variant={badge.variant}>
+                  {t(`quotations.status.${status}`)}
+                </Badge>
+              </Group>
+              {quotation.extra.customerCode ? (
+                <CustomerLink
+                  code={quotation.extra.customerCode}
+                  name={quotation.extra.customerName}
+                  size="md"
+                />
+              ) : (
+                <Text size="sm" c="dimmed">
+                  {quotation.extra.customerName ?? '—'}
+                </Text>
+              )}
+            </Stack>
+          </Group>
+        </Card>
+
+        <Grid gutter="md">
+          <Grid.Col span={{ base: 12, md: 8 }}>
+            <SectionCard
+              icon={<IconListDetails size={14} />}
+              title={t('quotations.form.linesLabel')}
+            >
+              {lines.length === 0 ? (
+                <Text size="sm" c="dimmed" fs="italic">
+                  —
+                </Text>
+              ) : (
+                <Table striped withRowBorders={false}>
+                  <Table.Thead>
+                    <Table.Tr>
+                      <Table.Th>{t('quotations.form.productLabel')}</Table.Th>
+                      <Table.Th style={{ textAlign: 'right' }}>
+                        {t('quotations.form.quantityLabel')}
+                      </Table.Th>
+                      <Table.Th style={{ textAlign: 'right' }}>
+                        {t('quotations.form.priceLabel')}
+                      </Table.Th>
+                      <Table.Th style={{ textAlign: 'right' }}>
+                        {t('quotations.form.amountLabel')}
+                      </Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {lines.map((l, i) => (
+                      <Table.Tr key={`${l.productCode}-${i}`}>
+                        <Table.Td>
+                          <Group gap="sm" wrap="nowrap">
+                            {showProductPhoto && (
+                              <Avatar
+                                src={photoByCode.get(l.productCode) ?? null}
+                                radius="sm"
+                                size={40}
+                                color="gray"
+                              >
+                                <IconPhoto size={18} />
+                              </Avatar>
+                            )}
+                            <div style={{ minWidth: 0 }}>
+                              <ProductLink code={l.productCode} name={l.productName} size="sm" />
+                              <Text size="xs" c="dimmed" ff="monospace">
+                                {l.productCode}
+                              </Text>
+                            </div>
+                          </Group>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'right' }}>
+                          <Text>{formatNumber(l.quantity)}</Text>
+                          {l.unit && (
+                            <Text size="xs" c="dimmed">
+                              {lookupLabelOf(unitLabels, l.unit)}
+                            </Text>
+                          )}
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'right' }}>
+                          <Text>{formatNumber(l.unitPrice)}</Text>
+                        </Table.Td>
+                        <Table.Td style={{ textAlign: 'right' }}>
+                          <Text fw={600}>{formatNumber(l.quantity * l.unitPrice)}</Text>
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                  <Table.Tfoot>
+                    <Table.Tr>
+                      <Table.Td colSpan={3} style={{ textAlign: 'right', fontWeight: 600 }}>
+                        {t('quotations.form.totalLabel')}
+                      </Table.Td>
+                      <Table.Td style={{ textAlign: 'right' }}>
+                        <Text fw={700}>{formatNumber(total)}</Text>
+                      </Table.Td>
+                    </Table.Tr>
+                  </Table.Tfoot>
+                </Table>
+              )}
+            </SectionCard>
+          </Grid.Col>
+
+          <Grid.Col span={{ base: 12, md: 4 }}>
+            <Stack gap="md">
+              <SectionCard
+                icon={<IconInfoCircle size={14} />}
+                title={t('quotations.form.headerSection')}
+              >
+                <Stack gap="md">
+                  {quotation.extra.assignedStaff && (
+                    <DetailField label={t('salesOrders.columns.assignedStaff')}>
+                      <EmployeeLink id={quotation.extra.assignedStaff} />
+                    </DetailField>
+                  )}
+                  {quotation.extra.note && (
+                    <DetailField label={t('quotations.form.note')}>
+                      <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+                        {quotation.extra.note}
+                      </Text>
+                    </DetailField>
+                  )}
+                  <DetailField label={t('common.labels.createdAt')}>
+                    {formatDateTime(quotation.createdAt)}
+                  </DetailField>
+                  <DetailField label={t('common.labels.updatedAt')}>
+                    {formatDateTime(quotation.updatedAt)}
+                  </DetailField>
+                </Stack>
+              </SectionCard>
+
+              {/* Mobile actions — mirror the desktop header actions. */}
+              {isMobile && canEdit && isDraft && (
+                <Button
+                  color="green"
+                  leftSection={<IconSend size={16} />}
+                  fullWidth
+                  onClick={openSendModal}
+                >
+                  {t('quotations.actions.markReady')}
+                </Button>
+              )}
+              {isMobile && (isReady || isConverted) && (
+                <Button
+                  variant="light"
+                  color="gray"
+                  leftSection={<IconPrinter size={16} />}
+                  fullWidth
+                  onClick={openPrintModal}
+                >
+                  {t('quotations.actions.exportPdf')}
+                </Button>
+              )}
+              {/* No mobile "generate sales order": it routes to the SO form,
+                  which is desktop-only (mobile deep-links get bounced to the SO
+                  list) — a dead-end CTA per the no-create/edit-on-mobile rule.
+                  Status actions (mark-ready / cancel) and print stay. */}
+              {isMobile && canEdit && !isCancelled && !isConverted && (
+                <Button
+                  variant="light"
+                  color="red"
+                  leftSection={<IconBan size={16} />}
+                  fullWidth
+                  onClick={openCancelModal}
+                >
+                  {t('quotations.actions.cancelQuotation')}
+                </Button>
+              )}
+
+              {isConverted && (
+                <Card withBorder radius="md" padding="md">
+                  <Stack gap="xs">
+                    <Group gap="sm" wrap="nowrap">
+                      <ThemeIcon size={32} radius="md" variant="light" color="blue">
+                        <IconShoppingCartPlus size={16} />
+                      </ThemeIcon>
+                      <Text size="sm" c="dimmed">
+                        {t('quotations.convertedNote')}
+                      </Text>
+                    </Group>
+                    {quotation.extra.generatedSalesOrderId && (
+                      <SalesOrderLink
+                        id={quotation.extra.generatedSalesOrderId}
+                        fallbackLabel={quotation.extra.generatedSalesOrderNumber}
+                      />
+                    )}
+                  </Stack>
+                </Card>
+              )}
+
+              {(isReady || isCancelled) && (
+                <Card withBorder radius="md" padding="md">
+                  <Group gap="sm" wrap="nowrap">
+                    <ThemeIcon
+                      size={32}
+                      radius="md"
+                      variant="light"
+                      color={isCancelled ? 'red' : 'gray'}
+                    >
+                      {isCancelled ? <IconBan size={16} /> : <IconLock size={16} />}
+                    </ThemeIcon>
+                    <Text size="sm" c="dimmed">
+                      {t(isCancelled ? 'quotations.cancelledNote' : 'quotations.lockedNote')}
+                    </Text>
+                  </Group>
+                </Card>
+              )}
+
+              {canDelete && (isDraft || isCancelled) && (
+                <DangerZoneCard title={t('__new__.01-common.dangerZone.title')}>
+                  <DangerAction
+                    title={t('quotations.dangerZone.deleteItem')}
+                    description={t('quotations.dangerZone.deleteItemDesc')}
+                    buttonLabel={t('__new__.01-common.actions.remove')}
+                    buttonIcon={<IconTrash size={14} />}
+                    onClick={openDeleteModal}
+                    buttonColor="red"
+                  />
+                </DangerZoneCard>
+              )}
+            </Stack>
+          </Grid.Col>
+        </Grid>
+      </Stack>
+
+      <ConfirmModal
+        opened={sendModalOpened}
+        onClose={closeSendModal}
+        onConfirm={handleSend}
+        title={t('quotations.sendConfirm.title')}
+        message={t('quotations.sendConfirm.message')}
+        confirmLabel={t('quotations.actions.markReady')}
+        confirmColor="green"
+        loading={sending}
+      />
+      <ConfirmModal
+        opened={cancelModalOpened}
+        onClose={closeCancelModal}
+        onConfirm={handleCancel}
+        title={t('quotations.cancelConfirm.title')}
+        message={t('quotations.cancelConfirm.message')}
+        confirmLabel={t('quotations.actions.cancelQuotation')}
+        loading={cancelling}
+      />
+      <ConfirmModal
+        opened={deleteModalOpened}
+        onClose={closeDeleteModal}
+        onConfirm={handleDelete}
+        title={t('quotations.deleteConfirm.title')}
+        message={t('quotations.deleteConfirm.message')}
+        loading={deleting}
+      />
+
+      {/* PDF export options — paper size + orientation, then print. */}
+      <Modal
+        opened={printModalOpened}
+        onClose={closePrintModal}
+        title={t('quotations.print.optionsTitle')}
+        size="sm"
+      >
+        <Stack gap="md">
+          <Stack gap={6}>
+            <Text size="sm" fw={500}>
+              {t('quotations.print.paperSize')}
+            </Text>
+            <SegmentedControl
+              fullWidth
+              value={paperSize}
+              onChange={(v) => setPaperSize(v as QuotationPaperSize)}
+              data={[
+                { value: 'A4', label: 'A4' },
+                { value: 'A5', label: 'A5' },
+              ]}
+            />
+          </Stack>
+          <Stack gap={6}>
+            <Text size="sm" fw={500}>
+              {t('quotations.print.orientation')}
+            </Text>
+            <SegmentedControl
+              fullWidth
+              value={orientation}
+              onChange={(v) => setOrientation(v as QuotationOrientation)}
+              data={[
+                { value: 'portrait', label: t('quotations.print.portrait') },
+                { value: 'landscape', label: t('quotations.print.landscape') },
+              ]}
+            />
+          </Stack>
+          <Switch
+            label={t('quotations.print.includeVat')}
+            checked={includeVat}
+            onChange={(e) => setIncludeVat(e.currentTarget.checked)}
+          />
+          <Group justify="flex-end" gap="sm">
+            <Button variant="default" size="sm" onClick={closePrintModal}>
+              {t('__new__.01-common.actions.cancel')}
+            </Button>
+            <Button size="sm" leftSection={<IconPrinter size={14} />} onClick={handlePrint}>
+              {t('quotations.actions.exportPdf')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+    </>
+  );
+}

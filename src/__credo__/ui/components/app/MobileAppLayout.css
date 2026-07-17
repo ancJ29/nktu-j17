@@ -1,0 +1,86 @@
+/* Mobile Header Button */
+.credo-mobile-headerButton {
+  -webkit-tap-highlight-color: transparent;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.credo-mobile-headerButton:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* Main Content */
+.credo-mobile-main {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bottom Navigation */
+.credo-mobile-bottomNav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Navigation Item */
+.credo-mobile-navItem {
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+
+.credo-mobile-navItem:active {
+  transform: scale(0.96);
+  opacity: 0.85;
+}
+
+/* Icon Wrapper */
+.credo-mobile-navIconWrapper {
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.credo-mobile-navItem[data-active] .credo-mobile-navIconWrapper {
+  transform: translateY(-2px);
+}
+
+/* Active Indicator Line */
+/* .credo-mobile-navItem[data-active]::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32px;
+  height: 3px;
+  background: var(--active-gradient);
+  border-radius: 0 0 3px 3px;
+  animation: credo-mobile-slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+} */
+
+@keyframes credo-mobile-slideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Hover State */
+@media (hover: hover) {
+  .credo-mobile-navItem:hover:not([data-active]) .credo-mobile-navIconWrapper {
+    background-color: var(--hover-bg);
+  }
+
+  .credo-mobile-headerButton:hover {
+    background-color: rgba(255, 255, 255, 0.25);
+  }
+}

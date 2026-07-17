@@ -1,0 +1,3876 @@
+{
+  "__new__": {
+    "01-common": {
+      "actions": {
+        "addEntry": "Add Item",
+        "back": "Go back",
+        "cancel": "Cancel",
+        "clearFilters": "Clear all filters",
+        "clearSearch": "Clear search",
+        "copy": "Copy",
+        "copyLink": "Copy link",
+        "disable": "Disable",
+        "edit": "Edit",
+        "enable": "Enable",
+        "exportExcel": "Export Excel",
+        "generate": "Generate",
+        "open": "Open",
+        "openInMaps": "Open in Maps",
+        "remove": "Remove",
+        "save": "Save Changes",
+        "view": "View"
+      },
+      "cache": {
+        "hoursAgo": "{{count}}h ago",
+        "minutesAgo": "{{count}}m ago",
+        "refresh": "Refresh data"
+      },
+      "dangerZone": {
+        "disableButton": "Deactivate",
+        "enableButton": "Activate",
+        "title": "Danger Zone"
+      },
+      "empty": {
+        "noDescription": "No description {{item}}",
+        "noNote": "No description"
+      },
+      "hints": {
+        "openInMaps": "View on Google Maps"
+      },
+      "labels": {
+        "active": "Active",
+        "note": "Note (optional)",
+        "orderDate": "Order Date"
+      }
+    },
+    "07-entities": {
+      "customers": {
+        "dangerZone": {
+          "deleteItem": "Delete Customer",
+          "deleteItemDesc": "Hide this customer from the system. The record is kept for audit.",
+          "disableButton": "Deactivate",
+          "disableConfirm": "Are you sure you want to deactivate this customer?",
+          "disableItem": "Deactivate Customer",
+          "disableItemDesc": "Mark this customer as inactive — it stays in lists but reads as inactive",
+          "enableConfirm": "Are you sure you want to activate this customer?",
+          "enableItem": "Activate Customer",
+          "enableItemDesc": "Mark this customer as active again"
+        },
+        "list": {
+          "searchPlaceholder": "Search by name, code, email, phone..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "deliveryRequests": {
+        "list": {
+          "searchPlaceholder": "Search requests..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "employees": {
+        "dangerZone": {
+          "changePassword": "Set Password",
+          "changePasswordButton": "Set Password",
+          "confirmPassword": "Confirm Password",
+          "copyCredentials": "Copy login info",
+          "deleteEmployee": "Delete Employee",
+          "deleteEmployeeDesc": "Permanently remove this employee from the system",
+          "disableButton": "Lock",
+          "disableConfirm": "Are you sure you want to lock this employee account?",
+          "disableEmployee": "Lock Employee Account",
+          "disableEmployeeDesc": "Temporarily disable this employee's access to the system",
+          "disableError": "Failed to update employee status",
+          "disableSsoWarningTitle": "Disabled, but the login may still work",
+          "disableSuccess": "Employee account locked",
+          "enableButton": "Unlock",
+          "enableConfirm": "Are you sure you want to unlock this employee account?",
+          "enableEmployee": "Unlock Employee Account",
+          "enableEmployeeDesc": "Re-enable this employee's access to the system",
+          "enableSsoWarningTitle": "Enabled, but they may not be able to sign in",
+          "enableSuccess": "Employee account unlocked",
+          "generatePassword": "Generate",
+          "loginIdentifier": "Login identifier",
+          "newPassword": "New Password",
+          "passwordChangeError": "Failed to change password",
+          "passwordChangeSuccess": "Password changed successfully",
+          "passwordChangeWarning": "The new password is active and the employee can sign in with it, but it could not be saved on their record. Copy it now — it will not be shown again.",
+          "passwordChangeWarningTitle": "Password changed, but not recorded",
+          "passwordMismatch": "Passwords do not match",
+          "passwordPolicy": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)",
+          "passwordRequired": "Password is required"
+        },
+        "list": {
+          "searchPlaceholder": "Search by name, code, email..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "goodsReceipts": {
+        "actions": {
+          "cancel": "Cancel Receipt",
+          "confirmReceived": "Confirm Received",
+          "print": "Print"
+        },
+        "list": {
+          "searchPlaceholder": "Search by receipt #, vendor, reference..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "inventory": {
+        "materials": {
+          "list": {
+            "searchPlaceholder": "Search by material or location..."
+          },
+          "title": "__keep__"
+        },
+        "products": {
+          "list": {
+            "searchPlaceholder": "Search by product or location..."
+          },
+          "title": "__keep__"
+        }
+      },
+      "locations": {
+        "dangerZone": {
+          "deleteConfirm": "Are you sure you want to delete this location? Inventory rows referencing it will be left orphaned.",
+          "deleteItem": "Delete location",
+          "deleteItemDesc": "Permanently remove this location from the system.",
+          "disableConfirm": "Are you sure you want to deactivate this location?",
+          "disableItem": "Deactivate location",
+          "enableConfirm": "Are you sure you want to activate this location?",
+          "enableItem": "Activate location"
+        },
+        "list": {
+          "searchPlaceholder": "Search by name, code, address..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "lookups": {
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "materials": {
+        "actions": {
+          "enterInventory": "Enter inventory"
+        },
+        "dangerZone": {
+          "deleteItem": "Delete Material",
+          "deleteItemDesc": "Permanently remove this material from the system",
+          "disableButton": "Deactivate",
+          "disableConfirm": "Are you sure you want to deactivate this material?",
+          "disableItem": "Deactivate Material",
+          "disableItemDesc": "Hide the material from lists without deleting it",
+          "enableConfirm": "Are you sure you want to activate this material?",
+          "enableItem": "Activate Material",
+          "enableItemDesc": "Make this material available again"
+        },
+        "list": {
+          "searchPlaceholder": "Search by name, code, unit, SKU..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "productInventory": {
+        "fromOrders": "Held by"
+      },
+      "products": {
+        "actions": {
+          "enterInventory": "Enter inventory"
+        },
+        "dangerZone": {
+          "deleteBlockedHasStock": "Cannot delete — this product still has stock on hand. Adjust inventory to zero first.",
+          "deleteItem": "Delete Product",
+          "deleteItemDesc": "Permanently remove this product from the system",
+          "disableConfirm": "Are you sure you want to deactivate this product?",
+          "disableItem": "Deactivate Product",
+          "disableItemDesc": "Hide this product from listings without deleting it",
+          "enableConfirm": "Are you sure you want to activate this product?",
+          "enableItem": "Activate Product",
+          "enableItemDesc": "Make this product visible in listings again"
+        },
+        "labels": {
+          "basePriceLabel": "Base price"
+        },
+        "list": {
+          "searchPlaceholder": "Search by name, code, unit..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "salesOrders": {
+        "actions": {
+          "cancelOrder": "Cancel Order",
+          "copy": "Copy Order",
+          "createAdditionalDR": "Create Additional Delivery Request",
+          "createDR": "Create Delivery Request",
+          "createReturnShipment": "Create Return Shipment",
+          "switchToExternalDelivery": "Switch to external delivery",
+          "switchToInternalDelivery": "Switch to internal delivery"
+        },
+        "list": {
+          "accountingExportButton": "Export (accounting)",
+          "filterExternalDelivery": "External delivery",
+          "filterInternalDelivery": "Internal delivery",
+          "searchPlaceholder": "Search orders..."
+        },
+        "notifications": {
+          "exportEmpty": "Nothing to export — adjust the filters and try again.",
+          "exportError": "Failed to export sales orders.",
+          "exportSuccess_one": "Exported {{count}} order.",
+          "exportSuccess_other": "Exported {{count}} orders."
+        },
+        "singular": "__keep__",
+        "stages": {
+          "cancelled": "Cancelled",
+          "completed": "Completed",
+          "draft": "Draft",
+          "exceptional": "Exception",
+          "inProgress": "In Progress",
+          "new": "New"
+        },
+        "title": "__keep__"
+      },
+      "trucks": {
+        "dangerZone": {
+          "deleteConfirm": "Are you sure you want to delete this truck? Its operation logs are kept but the truck disappears from the fleet.",
+          "deleteItem": "Delete Truck",
+          "deleteItemDesc": "Hide this truck from the fleet. The record is kept for audit.",
+          "disableConfirm": "Are you sure you want to deactivate this truck?",
+          "disableItem": "Deactivate Truck",
+          "disableItemDesc": "Hide the truck from active lists without deleting it",
+          "enableConfirm": "Are you sure you want to activate this truck?",
+          "enableItem": "Activate Truck",
+          "enableItemDesc": "Put this truck back into service"
+        }
+      },
+      "vendors": {
+        "dangerZone": {
+          "deleteItem": "Delete Vendor",
+          "deleteItemDesc": "Hide this vendor from the system. The record is kept for audit.",
+          "disableButton": "Pause",
+          "disableConfirm": "Are you sure you want to pause cooperation with this vendor?",
+          "disableItem": "Pause Cooperation",
+          "disableItemDesc": "Mark this vendor as paused — it stays in lists but reads as not cooperating",
+          "enableConfirm": "Are you sure you want to resume cooperation with this vendor?",
+          "enableItem": "Resume Cooperation",
+          "enableItemDesc": "Mark this vendor as cooperating again"
+        },
+        "list": {
+          "searchPlaceholder": "Search by name, code, email, phone..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      }
+    }
+  },
+  "__removed__": {
+    "materialInventory": {
+      "inbound": {
+        "fromDrafts_one": "From {{count}} draft receipt",
+        "fromDrafts_other": "From {{count}} draft receipts",
+        "moreDrafts_one": "+{{count}} more receipt",
+        "moreDrafts_other": "+{{count}} more receipts",
+        "unmappedWarning_one": "{{count}} line skipped — unit not on material",
+        "unmappedWarning_other": "{{count}} lines skipped — unit not on material"
+      }
+    }
+  },
+  "assets": {
+    "form": {
+      "createButton": "Create Asset",
+      "notesPlaceholder": "Location, custodian, maintenance reminders, etc."
+    },
+    "notifications": {
+      "createError": "Failed to create asset",
+      "createSuccess": "Asset created",
+      "deleteError": "Failed to delete asset",
+      "deleteSuccess": "Asset deleted",
+      "disableSuccess": "Asset deactivated",
+      "driverLinkWarning": "Truck saved, but linking the driver's record failed. Re-open and save to retry.",
+      "enableSuccess": "Asset activated",
+      "fetchError": "Failed to load assets",
+      "toggleError": "Failed to change asset status",
+      "updateError": "Failed to update asset",
+      "updateSuccess": "Asset updated"
+    },
+    "truck": {
+      "addItem": "Add Truck",
+      "columns": {
+        "capacity": "Capacity",
+        "compliance": "Next expiry",
+        "driver": "Driver",
+        "plate": "Plate"
+      },
+      "detail": {
+        "activitiesError": "Failed to load activities.",
+        "activitiesLoadMore": "Load more",
+        "activitiesNoEntries": "No activities recorded for this truck yet.",
+        "activityVerbs": {
+          "create": "Created",
+          "delete": "Deleted",
+          "disable": "Disabled",
+          "enable": "Enabled",
+          "update": "Updated"
+        },
+        "basicTitle": "Basic information",
+        "driverTitle": "Driver information",
+        "inspectionTitle": "Inspection certificate",
+        "insuranceTitle": "Insurance",
+        "operationTitle": "Operation information",
+        "recentActivities": "Recent Activities",
+        "registrationTitle": "Vehicle registration",
+        "specTitle": "Vehicle specifications",
+        "statCapacity": "Capacity",
+        "statPlate": "Plate",
+        "tabs": {
+          "activity": "Activity",
+          "documents": "Documents & Insurance",
+          "driverOperation": "Driver & Operation",
+          "maintenance": "Maintenance",
+          "overview": "Overview",
+          "refuel": "Refuel logs",
+          "trips": "Trips"
+        }
+      },
+      "editItem": "Edit Truck",
+      "emptyMessage": "Add your first truck to start the fleet register.",
+      "emptyTitle": "No trucks yet",
+      "expiry": {
+        "badge": "Badge",
+        "expired": "Expired",
+        "inspection": "Inspection",
+        "insurance": "Insurance",
+        "registration": "Registration"
+      },
+      "fleetExport": {
+        "button": "Export fleet fuel logs",
+        "empty": "No refuel logs for the selected period",
+        "error": "Failed to export fleet fuel logs"
+      },
+      "form": {
+        "badgeExpiryLabel": "Badge expiry",
+        "baseLocationLabel": "Base location",
+        "baseLocationPlaceholder": "Home depot",
+        "basicSection": "Basic information",
+        "boxDimensionsLabel": "Cargo box (L × W × H, mm)",
+        "boxHeightPlaceholder": "Height",
+        "boxLengthPlaceholder": "Length",
+        "boxTypeLabel": "Box type",
+        "boxTypePlaceholder": "e.g. Closed / Flatbed / Reefer",
+        "boxVolumeLabel": "Box volume (m³)",
+        "boxVolumePlaceholder": "e.g. 18.5",
+        "boxWidthPlaceholder": "Width",
+        "capacityLabel": "Capacity (t)",
+        "capacityPlaceholder": "Payload",
+        "chassisNumberLabel": "Chassis number",
+        "chassisNumberPlaceholder": "Chassis / VIN no.",
+        "codeAwaitingType": "Select a truck type first",
+        "codePlaceholder": "e.g. TRK-0001",
+        "descriptionPlaceholder": "Optional description",
+        "driverNameLabel": "Driver name",
+        "driverNamePlaceholder": "Assigned driver",
+        "driverPhoneLabel": "Driver phone",
+        "driverPhonePlaceholder": "Contact number",
+        "driverSection": "Driver information",
+        "engineNumberLabel": "Engine number",
+        "engineNumberPlaceholder": "Engine no.",
+        "fromDriverProfile": "From the driver's profile",
+        "inspectionExpiryLabel": "Inspection expiry",
+        "inspectionSection": "Inspection Certificate",
+        "insuranceAdd": "Add insurance",
+        "insuranceCompanyLabel": "Insurance company",
+        "insuranceCompanyPlaceholder": "Insurer name",
+        "insuranceEmpty": "No insurance policies added yet.",
+        "insuranceExpiryLabel": "Valid until",
+        "insuranceLineLabel": "Policy",
+        "insuranceSection": "Insurance",
+        "insuranceTypeLabel": "Insurance type",
+        "insuranceTypePlaceholder": "e.g. Civil liability, Physical damage, Cargo",
+        "licenseClassLabel": "License class",
+        "licenseClassPlaceholder": "e.g. FC",
+        "licenseNumberLabel": "License number",
+        "licenseNumberPlaceholder": "Driving license no.",
+        "makeModelLabel": "Make",
+        "makeModelPlaceholder": "e.g. Volvo",
+        "modelLabel": "Model",
+        "modelPlaceholder": "e.g. FH16",
+        "namePlaceholder": "e.g. Volvo FH16 — Fleet 12",
+        "noDrivers": "No drivers available",
+        "operationSection": "Operation information",
+        "plateLabel": "Plate number",
+        "platePlaceholder": "e.g. 51C-123.45",
+        "regionLabel": "Region",
+        "regionPlaceholder": "Operating area",
+        "registrationCopyExpiryHint": "Expiry of the certified copy (e.g. when a bank holds the original)",
+        "registrationCopyExpiryLabel": "Copy certificate expiry",
+        "registrationSection": "Vehicle Registration Certificate",
+        "registrationTypeCopy": "Copy",
+        "registrationTypeLabel": "Registration certificate",
+        "registrationTypeOriginal": "Original",
+        "specSection": "Vehicle specifications",
+        "tireSizeLabel": "Tire size",
+        "tireSizePlaceholder": "e.g. 11.00R20",
+        "typeLabel": "Truck type",
+        "typePlaceholder": "Select truck type",
+        "yearLabel": "Year",
+        "yearPlaceholder": "e.g. 2021"
+      },
+      "noItems": "No trucks found",
+      "searchPlaceholder": "Search trucks…",
+      "title": "Trucks",
+      "validation": {
+        "capacityInvalid": "Capacity cannot be negative",
+        "dimensionInvalid": "Dimension cannot be negative",
+        "plateNumberRequired": "Plate number is required",
+        "typeRequired": "Please select a truck type",
+        "volumeInvalid": "Volume cannot be negative",
+        "yearInvalid": "Enter a valid year"
+      }
+    }
+  },
+  "attachments": {
+    "dropHere": "Drop files to upload",
+    "empty": "No attachments yet",
+    "hint": "PNG, PDF, JPG. Max {{max}}MB each.",
+    "invalidType": "{{name}}: unsupported file type",
+    "screenshot": "Screenshot",
+    "screenshotCropHint": "Drag to crop the area you want, then click Upload",
+    "screenshotHint": "Take a screenshot first (PrtScn or Cmd+Shift+4), then paste here",
+    "screenshotInstruction": "Press Ctrl+V to paste a screenshot",
+    "screenshotPaste": "Paste",
+    "screenshotTitle": "Paste Screenshot",
+    "title": "Attachments",
+    "tooLarge": "{{name}}: exceeds {{max}}MB limit",
+    "upload": "Upload Files",
+    "uploadError": "Failed to upload {{name}}",
+    "uploadSuccess": "{{count}} file(s) uploaded",
+    "uploading": "Uploading..."
+  },
+  "auth": {
+    "forgotPassword": {
+      "backToLoginLink": "Back to login",
+      "emailPlaceholder": "Enter your email",
+      "error": {
+        "failed": "Failed to send reset link. Please try again."
+      },
+      "sendResetLinkButton": "Send Reset Link",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password",
+      "successMessage": "We have sent a password reset link to your email address. Please check your inbox and follow the instructions.",
+      "successTitle": "Check Your Email",
+      "title": "Forgot Password",
+      "validation": {
+        "emailInvalid": "Invalid email"
+      }
+    },
+    "login": {
+      "createAccountLink": "Create one",
+      "error": {
+        "failed": "Login failed. Please try again."
+      },
+      "forgotPasswordLink": "Forgot password?",
+      "noAccountPrefix": "Don't have an account? ",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "rememberMe": "Remember me",
+      "signInButton": "Sign In",
+      "subtitle": "Sign in to your account",
+      "useLoginLinkButton": "Use Login Link",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "validation": {
+        "passwordRequired": "Password is required",
+        "usernameRequired": "Username is required"
+      }
+    },
+    "magicLink": {
+      "backToLogin": "Back to login",
+      "cameraPermissionDenied": "Camera permission denied. Please allow camera access.",
+      "clickToUpload": "Click to upload QR image",
+      "codePlaceholder": "Login Code",
+      "enterCodeDescription": "Enter the login code you received",
+      "enterCodeManually": "Enter Code Manually",
+      "invalidImageFormat": "Invalid image format. Please try another image.",
+      "invalidQrCode": "Invalid QR code. Please try again.",
+      "linkExpired": "This login link has expired. Please ask your admin to issue a new one.",
+      "noQrCodeFound": "No QR code found in the image.",
+      "or": "or",
+      "orEnterCode": "Or enter the login code you received",
+      "pasteFromClipboard": "Paste from clipboard",
+      "processing": "Processing image...",
+      "redirecting": "Redirecting...",
+      "scanQrCode": "Scan QR Code",
+      "scanning": "Scanning for QR code...",
+      "subtitle": "Scan a QR code or enter a login code to sign in",
+      "success": "Login successful!",
+      "title": "Login via Link",
+      "uploadQrImage": "Upload QR Image",
+      "verificationFailed": "Verification failed. Please try again.",
+      "verifyCode": "Verify Login Code",
+      "verifying": "Verifying login code..."
+    },
+    "register": {
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "createAccountButton": "Create Account",
+      "emailPlaceholder": "Enter your email",
+      "error": {
+        "failed": "Registration failed. Please try again."
+      },
+      "hasAccountPrefix": "Already have an account? ",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "signInLink": "Sign in",
+      "subtitle": "Register for a new account",
+      "title": "Create Account",
+      "usernameLabel": "Username",
+      "usernamePlaceholder": "Enter your username",
+      "validation": {
+        "emailInvalid": "Invalid email",
+        "passwordMinLength": "Password must be at least 6 characters",
+        "passwordsNotMatch": "Passwords do not match",
+        "usernameMinLength": "Username must be at least 3 characters"
+      }
+    },
+    "resetPassword": {
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your new password",
+      "error": {
+        "failed": "Failed to reset password. Please try again."
+      },
+      "invalidTokenMessage": "This password reset link is invalid or has expired. Please request a new one.",
+      "invalidTokenTitle": "Invalid Link",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "Enter your new password",
+      "requestNewLinkLink": "Request new link",
+      "resetPasswordButton": "Reset Password",
+      "signInButton": "Sign In",
+      "subtitle": "Enter your new password below",
+      "successMessage": "Your password has been successfully reset. You can now sign in with your new password.",
+      "successTitle": "Password Reset",
+      "title": "Reset Password",
+      "validation": {
+        "invalidToken": "Invalid reset token",
+        "passwordMinLength": "Password must be at least 6 characters",
+        "passwordsNotMatch": "Passwords do not match"
+      }
+    },
+    "session": {
+      "expiredMessage": "Your session has expired. Please sign in again.",
+      "expiredTitle": "Session expired"
+    }
+  },
+  "chat": {
+    "empty": "No messages yet",
+    "placeholder": "Type a message..."
+  },
+  "common": {
+    "bulkImport": {
+      "created": "Created",
+      "downloadSample": "Download Sample",
+      "downloadSuccess": "Sample template downloaded",
+      "dragAndDrop": "Drag & drop file here",
+      "errorsTitle": "Rows that could not be imported",
+      "failed": "Failed",
+      "orClickToSelect": "or click to select a file",
+      "partialSuccess": "{{success}}/{{total}} imported",
+      "results": "Import Results",
+      "rowLabel": "Row {{n}}",
+      "sampleTemplate": "Sample Excel Template",
+      "success": "Success",
+      "supportedFormats": "Supported formats: .csv, .xlsx, .xls",
+      "total": "Total",
+      "updated": "Updated"
+    },
+    "columns": {
+      "actions": "Actions",
+      "available": "Available",
+      "beginOfPeriod": "Begin of period",
+      "beginOfPeriodTooltip": "Opening on-hand at the start of the current month (UTC+7). Seeded once per month on first load; can be overridden via Excel import.",
+      "beginOfPeriodWithPeriod": "Begin of period ({{period}})",
+      "contactPerson": "Contact Person",
+      "createdDate": "Created Date",
+      "fixedRemain": "Fixed remain",
+      "fixedRemainTooltip": "On-hand minus outgoing (reserved). Drives the secondary status badge.",
+      "lastUpdated": "Last updated",
+      "locationCount": "{{count}} locations",
+      "minStock": "Min stock",
+      "minStockTooltip": "Warehouse-side minimum stock threshold. On-hand at or below this triggers low-stock coloring.",
+      "onHand": "On hand",
+      "price": "Price",
+      "secondaryStatus": "Status",
+      "secondaryStatusTooltip": "Out of stock when Fixed remain ≤ 0, Must order when ≤ Min stock, OK otherwise.",
+      "totalAmount": "Total Amount"
+    },
+    "conflict": {
+      "listMessage": "Another user just changed this list. The data has been refreshed — please review and submit again.",
+      "message": "Another user modified this record while you were editing. The form has been reloaded with the latest data — please re-apply your changes.",
+      "title": "This record was just updated"
+    },
+    "datePreset": {
+      "custom": "Custom",
+      "lastMonth": "Last month",
+      "lastWeek": "Last week",
+      "nextMonth": "Next month",
+      "nextWeek": "Next week",
+      "thisMonth": "This month",
+      "thisWeek": "This week",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "yesterday": "Yesterday"
+    },
+    "desktopOnly": {
+      "message": "This feature is available on desktop only. Please switch to a computer to continue.",
+      "title": "Desktop Only"
+    },
+    "detail": {
+      "alsoKnownAs": "Also known as",
+      "currentStatus": "Current",
+      "empty": "—",
+      "inventoryTab": {
+        "addFirst": "Add inventory",
+        "locationCount": "{{count}} location(s)",
+        "refresh": "Tap to refresh"
+      },
+      "lineTotal": "Line Total",
+      "notes": {
+        "addButton": "Add note",
+        "addError": "Failed to add note",
+        "addPlaceholder": "Type a note for the team...",
+        "addSuccess": "Note added",
+        "byOn": "by {{author}} · {{date}}",
+        "empty": "No notes yet. Add the first one for your team.",
+        "removeAria": "Remove note",
+        "removeError": "Failed to remove note",
+        "removeSuccess": "Note removed",
+        "saveLabel": "Save note",
+        "title": "Internal notes"
+      },
+      "pending": "Pending"
+    },
+    "filters": {
+      "active": "Active",
+      "all": "All",
+      "apply": "Apply Filters",
+      "inactive": "Inactive",
+      "more": "More",
+      "selectDateRange": "Select date range",
+      "statusCount": "{{count}} statuses"
+    },
+    "form": {
+      "isActiveLabel": "Active",
+      "phonePlaceholder": "Phone number",
+      "unitPricePlaceholder": "Price"
+    },
+    "labels": {
+      "accounting": "Accounting",
+      "address": "Address",
+      "addresses": "Addresses",
+      "assignedTo": "Assigned to",
+      "bankAccount": "Bank Accounts",
+      "barcode": "Barcode",
+      "basicInfo": "Basic Information",
+      "category": "Category",
+      "closed": "Closed",
+      "code": "Code",
+      "confirmOk": "Yes, generate",
+      "contact": "Contact",
+      "copied": "Copied",
+      "createdAt": "Created",
+      "customer": "Customers",
+      "defaultLocation": "Default location",
+      "deliveryAddress": "Delivery Address",
+      "department": "Department",
+      "description": "Description",
+      "email": "Email",
+      "home": "Home",
+      "inventory": "Inventory",
+      "language": "Language",
+      "linkCopied": "Link copied — share with anyone on the team.",
+      "linkCopyError": "Failed to copy the link.",
+      "location": "Location",
+      "name": "Name",
+      "onHand": "On hand",
+      "phone": "Phone",
+      "position": "Position",
+      "primaryContact": "Primary contact",
+      "product": "Product",
+      "productCode": "Product Code",
+      "productInventory": "Product Inventory",
+      "productName": "Product Name",
+      "quantity": "Qty",
+      "reference": "Reference",
+      "salesOrder": "Sales Order",
+      "set": "Set",
+      "shortName": "Short Name",
+      "sku": "SKU",
+      "status": "Status",
+      "taxCode": "Tax Code",
+      "type": "Type",
+      "unit": "Unit",
+      "unitPrice": "Unit Price",
+      "units": "Units",
+      "updatedAt": "Last updated",
+      "vendor": "Vendor"
+    },
+    "notFound": {
+      "backToList": "Back to list",
+      "message": "The record you're looking for doesn't exist or may have been removed.",
+      "title": "Record not found"
+    },
+    "secondaryStatus": {
+      "all": "All",
+      "filterPlaceholder": "Filter by status",
+      "mustOrder": "Must order",
+      "ok": "OK",
+      "outOfStock": "Out of stock"
+    },
+    "status": {
+      "active": "Active",
+      "archived": "Archived",
+      "inactive": "Inactive"
+    },
+    "validation": {
+      "codeNoWhitespace": "Code cannot contain whitespace",
+      "codeRequired": "Code is required",
+      "codeSpecialCharacters": "Code can only contain letters and numbers",
+      "formInvalid": "Please fix the highlighted fields before submitting",
+      "nameRequired": "Name is required",
+      "quantityRequired": "Quantity must be greater than 0",
+      "unitRequired": "Unit is required"
+    }
+  },
+  "configuration": {
+    "appConfig": "App Config",
+    "debug": "Debug",
+    "fakeData": "Fake Data",
+    "materials": "Materials",
+    "title": "Configuration"
+  },
+  "cropDiaries": {
+    "addItem": "Add Entry",
+    "applyTemplateButton": "Apply",
+    "applyTemplatePlaceholder": "Apply a template…",
+    "columns": {
+      "activity": "Activity",
+      "crop": "Crop",
+      "entryDate": "Date",
+      "template": "Template"
+    },
+    "deleteConfirm": {
+      "message": "Delete \"{{activity}}\"? This cannot be undone.",
+      "title": "Delete diary entry?"
+    },
+    "editItem": "Edit Entry",
+    "emptyMessage": "Log an activity for a crop, or apply a template.",
+    "emptyTitle": "No diary entries yet",
+    "filterCropPlaceholder": "Crop",
+    "form": {
+      "activityLabel": "Activity",
+      "activityPlaceholder": "e.g. Irrigation",
+      "createButton": "Create Entry",
+      "cropLabel": "Crop",
+      "cropPlaceholder": "Select a crop",
+      "entryDateLabel": "Date",
+      "noCrops": "No crops available",
+      "notesPlaceholder": "Details, quantities, observations…",
+      "primarySection": "Diary entry"
+    },
+    "materialSummaryEmpty": "No materials logged yet",
+    "materialSummaryTitle": "Materials used",
+    "materialTable": {
+      "material": "Material",
+      "quantity": "Quantity",
+      "times": "Times",
+      "unit": "Unit"
+    },
+    "materialsLabel": "Materials",
+    "noItems": "No diary entries found",
+    "notifications": {
+      "applyTemplateError": "Could not apply template",
+      "applyTemplateSuccess": "Added {{count}} diary entries from template",
+      "createError": "Failed to create diary entry",
+      "createSuccess": "Diary entry created",
+      "deleteError": "Failed to delete diary entry",
+      "deleteSuccess": "Diary entry deleted",
+      "fetchError": "Failed to load diary entries",
+      "updateError": "Failed to update diary entry",
+      "updateSuccess": "Diary entry updated"
+    },
+    "searchPlaceholder": "Search diary…",
+    "sectionEmpty": "No diary entries for this crop yet.",
+    "sectionTitle": "Diary",
+    "title": "Crop Diary",
+    "validation": {
+      "activityRequired": "Activity is required",
+      "cropRequired": "Crop is required",
+      "entryDateRequired": "Date is required"
+    }
+  },
+  "cropDiaryTemplates": {
+    "addItem": "Add Template",
+    "columns": {
+      "days": "Days",
+      "steps": "Steps"
+    },
+    "dayCount": "{{count}} days",
+    "dayCount_one": "{{count}} day",
+    "dayCount_other": "{{count}} days",
+    "dayLabel": "Day {{day}}",
+    "daysTitle": "Day-by-day plan",
+    "detail": {
+      "infoTitle": "Information",
+      "statDays": "Days"
+    },
+    "editItem": "Edit Template",
+    "emptyMessage": "Create a checklist of activities to apply to a crop.",
+    "emptyTitle": "No templates yet",
+    "excel": {
+      "colActivity": "Activity",
+      "colDay": "Day",
+      "colMaterial": "Material",
+      "colQuantity": "Quantity",
+      "colUnit": "Unit",
+      "import": "Import Excel",
+      "importError": "Could not import the Excel file",
+      "importSuccess": "Imported {{count}} days from Excel",
+      "nothingToExport": "Add at least one day before exporting",
+      "sample": "Download template",
+      "sampleActivityPlain": "Water",
+      "sampleActivityWithMaterial": "Sow seeds",
+      "sampleMaterial": "Material name",
+      "sampleMemo": "5L per plant",
+      "sheetName": "Plan",
+      "unknownMaterials": "Unknown materials (not in master data): {{names}}"
+    },
+    "form": {
+      "activityLabel": "Activity",
+      "activityPlaceholder": "e.g. Irrigation",
+      "addMaterial": "Add material",
+      "addStep": "Add step",
+      "codePlaceholder": "e.g. TPL-001",
+      "createButton": "Create Template",
+      "daysSection": "Day-by-day plan",
+      "descriptionLabel": "Description",
+      "descriptionPlaceholder": "When to use this template",
+      "materialPlaceholder": "Select material",
+      "materialsLabel": "Materials",
+      "memoPlaceholder": "e.g. 5L per plant",
+      "namePlaceholder": "e.g. Seedling week 1",
+      "primarySection": "Template details",
+      "quantityPlaceholder": "Qty",
+      "removeMaterial": "Remove material",
+      "removeStep": "Remove step",
+      "stepActivityHeader": "Activity",
+      "stepActivityPlaceholder": "e.g. Irrigation",
+      "stepNotesHeader": "Default notes",
+      "stepNotesPlaceholder": "e.g. 5L per plant",
+      "totalDatesLabel": "Total days",
+      "totalDatesPlaceholder": "e.g. 14",
+      "unitPlaceholder": "Unit"
+    },
+    "noItems": "No templates found",
+    "noMaterials": "No materials",
+    "notifications": {
+      "createError": "Failed to create template",
+      "createSuccess": "Template created",
+      "fetchError": "Failed to load templates",
+      "updateError": "Failed to update template",
+      "updateSuccess": "Template updated"
+    },
+    "searchPlaceholder": "Search templates…",
+    "stepCount": "{{count}} steps",
+    "stepCount_one": "{{count}} step",
+    "stepCount_other": "{{count}} steps",
+    "stepsTitle": "Steps",
+    "title": "Diary Templates",
+    "validation": {
+      "activityRequired": "Add at least one day with an activity",
+      "stepsRequired": "Add at least one step with an activity",
+      "totalDatesRequired": "Total days must be at least 1"
+    }
+  },
+  "crops": {
+    "actions": {
+      "harvest": "Harvest",
+      "plant": "Plant"
+    },
+    "addItem": "Add Crop",
+    "backToGreenhouse": "Back to greenhouse",
+    "columns": {
+      "greenhouse": "Greenhouse",
+      "harvestedAt": "Harvested",
+      "plantedAt": "Planted",
+      "window": "Planned window"
+    },
+    "detail": {
+      "cultivationTitle": "Cultivation",
+      "infoTitle": "Information",
+      "lifecycleTitle": "Lifecycle",
+      "statSeeds": "Seeds",
+      "tab": {
+        "details": "Details",
+        "diary": "Diary",
+        "materials": "Materials used"
+      }
+    },
+    "editItem": "Edit Crop",
+    "emptyMessage": "Plan a crop and assign it to a greenhouse.",
+    "emptyTitle": "No crops yet",
+    "filterStatusPlaceholder": "Status",
+    "form": {
+      "codeAutoLabel": "Code",
+      "codePlaceholder": "e.g. CROP-001",
+      "createButton": "Create Crop",
+      "diaryTemplateLabel": "Diary template",
+      "diaryTemplatePlaceholder": "Select a template",
+      "fromDateLabel": "Start date",
+      "greenhouseLabel": "Greenhouse",
+      "greenhousePlaceholder": "Select a greenhouse",
+      "growingMediumLabel": "Growing medium",
+      "growingMediumPlaceholder": "Coco peat, rockwool, ...",
+      "namePlaceholder": "e.g. Tomato — Batch A",
+      "noGreenhouses": "No greenhouses available",
+      "notesPlaceholder": "Seed batch, expected yield, etc.",
+      "numberOfSeedsLabel": "Number of seeds",
+      "numberOfSeedsPlaceholder": "e.g. 200",
+      "picLabel": "PIC",
+      "picPlaceholder": "Select an employee",
+      "plantTypeLabel": "Plant type",
+      "plantTypePlaceholder": "PI 52 / Nagami / Mật ...",
+      "primarySection": "Crop details",
+      "secondarySection": "Cultivation details",
+      "statusLabel": "Initial status",
+      "toDateLabel": "End date",
+      "totalDatesLabel": "Total days",
+      "totalDatesPlaceholder": "e.g. 30"
+    },
+    "growingSummary": "{{count}} growing",
+    "history": {
+      "fromMonth": "From month",
+      "toMonth": "To month"
+    },
+    "noItems": "No crops found",
+    "notifications": {
+      "createError": "Failed to create crop",
+      "createSuccess": "Crop created",
+      "fetchError": "Failed to load crops",
+      "harvestError": "Could not harvest crop",
+      "harvestSuccess": "Crop harvested — greenhouse is now free",
+      "occupied": "Greenhouse already has a growing crop ({{code}})",
+      "plantError": "Could not plant crop",
+      "plantSuccess": "Crop planted — greenhouse is now occupied",
+      "updateError": "Failed to update crop",
+      "updateSuccess": "Crop updated"
+    },
+    "searchPlaceholder": "Search crops…",
+    "sectionEmptyActive": "No active crops in this greenhouse yet.",
+    "sectionEmptyHarvested": "No harvested crops in the selected range.",
+    "sectionTitle": "Crops",
+    "status": {
+      "growing": "Growing",
+      "harvested": "Harvested",
+      "planned": "Planned"
+    },
+    "tab": {
+      "active": "Active",
+      "harvested": "Harvested"
+    },
+    "title": "Crops",
+    "validation": {
+      "diaryTemplateRequired": "Diary template is required",
+      "fromRequired": "Start date is required",
+      "greenhouseRequired": "Greenhouse is required",
+      "numberOfSeedsRequired": "Number of seeds is required",
+      "overlap": "Overlaps crop \"{{code}}\" already scheduled in this greenhouse",
+      "toBeforeFrom": "End date must be on or after the start date",
+      "toRequired": "End date is required",
+      "totalDatesRequired": "Total days must be at least 1"
+    }
+  },
+  "customers": {
+    "addItem": "Add Customer",
+    "columns": {
+      "tags": "Tags"
+    },
+    "contacts": {
+      "addContact": "Add contact",
+      "emptyHint": "No additional contacts yet.",
+      "section": "Contacts"
+    },
+    "deleteConfirm": {
+      "message": "Hide this customer? It will no longer appear in lists. The record stays in the system for audit.",
+      "title": "Delete Customer"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this customer yet.",
+      "activityVerbs": {
+        "addNote": "Added a note to",
+        "create": "Created",
+        "delete": "Deleted",
+        "removeNote": "Removed a note from",
+        "toggleStatus": "Changed status of",
+        "update": "Updated"
+      },
+      "billingAddress": "Billing address",
+      "noShippingAddresses": "No shipping addresses on file.",
+      "receivingHours": "Receiving",
+      "recentActivities": "Recent Activities",
+      "shippingAddress": "Shipping address",
+      "tab": {
+        "activity": "Activity",
+        "details": "Details"
+      }
+    },
+    "detailTitle": "Customer Details",
+    "editItem": "Edit Customer",
+    "exportNotReady": "Excel export is not yet available.",
+    "filterCustomerTypeAll": "All types",
+    "form": {
+      "accountManagerLabel": "Account Manager",
+      "accountManagerPlaceholder": "Staff in charge",
+      "addressPlaceholder": "Full billing address",
+      "becameCustomerDateLabel": "Customer Since",
+      "codePlaceholder": "Customer code",
+      "contactNameLabel": "Name",
+      "contactPersonLabel": "Primary Contact",
+      "contactPersonPlaceholder": "Primary contact name",
+      "contactRoleLabel": "Role / Title",
+      "createButton": "Create Customer",
+      "creditLimitLabel": "Credit Limit",
+      "creditLimitPlaceholder": "e.g. 80000000",
+      "customerTypeLabel": "Customer Type",
+      "customerTypePlaceholder": "e.g. Dealer, Retail",
+      "defaultDiscountLabel": "Default Discount (%)",
+      "deliveryHoursLabel": "Receiving Hours",
+      "deliveryHoursPlaceholder": "e.g. 7:30 - 16:30 (Mon - Fri)",
+      "deliveryMethodLabel": "Delivery Method",
+      "deliveryMethodPlaceholder": "e.g. Direct delivery",
+      "emailPlaceholder": "Email address",
+      "googleMapUrlLabel": "Google Maps URL",
+      "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
+      "namePlaceholder": "Customer name",
+      "notesPlaceholder": "Additional notes",
+      "paymentTermsLabel": "Payment Terms",
+      "paymentTermsPlaceholder": "e.g. NET 30 days",
+      "priceListLabel": "Price List",
+      "priceListPlaceholder": "e.g. Tier 1 dealer price",
+      "section": {
+        "contacts": "Additional Contacts",
+        "salesPolicy": "Sales Policy"
+      },
+      "shippingAddressLabel": "Shipping Address",
+      "shippingAddressesAdd": "Add shipping address",
+      "shortNamePlaceholder": "Abbreviated name",
+      "sourceLabel": "Customer Source",
+      "sourcePlaceholder": "e.g. Referral, Website",
+      "tagsLabel": "Tags / Group",
+      "tagsPlaceholder": "Add tags",
+      "taxCodeLabel": "Tax Code",
+      "taxCodePlaceholder": "Tax identification number",
+      "updateButton": "Update Customer",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "https://..."
+    },
+    "noItems": "No customers found",
+    "notSet": "Not set",
+    "notifications": {
+      "createError": "Failed to create customer",
+      "createSuccess": "Customer created successfully",
+      "deleteError": "Failed to delete customer",
+      "deleteSuccess": "Customer deleted successfully",
+      "disableSuccess": "Customer deactivated.",
+      "enableSuccess": "Customer activated.",
+      "fetchError": "Failed to load customers",
+      "toggleError": "Failed to change customer status.",
+      "updateError": "Failed to update customer",
+      "updateSuccess": "Customer updated successfully"
+    }
+  },
+  "delivery": {
+    "title": "Delivery"
+  },
+  "deliveryRequests": {
+    "addItem": "New Request",
+    "bulkCreate": {
+      "alreadyHasDR": "This order already has a delivery request",
+      "createButton": "Create {{count}} deliveries",
+      "dateLabel": "Scheduled date (optional)",
+      "datePlaceholder": "Pick a date",
+      "dateRequiredLabel": "Scheduled date",
+      "driverLabel": "Driver",
+      "driverPlaceholder": "Pick a driver",
+      "linkWarning": "Created, but couldn't link {{count}} delivery request(s) back to their sales order. They still appear on the order page.",
+      "noCustomersWithOpenSO": "No customers have open sales orders to deliver.",
+      "noEligibleOrders": "Every sales order already has a delivery request.",
+      "noEligibleOrdersForCustomer": "This customer has no sales orders without a delivery request.",
+      "noOrders": "No sales orders in the current view. Adjust the filters and try again.",
+      "openButton": "Create deliveries",
+      "partial": "Created {{ok}}, but {{fail}} failed. Refresh and retry the rest.",
+      "partialTitle": "Deliveries partially created",
+      "saveFailed": "Could not create any of the {{count}} delivery request(s). Refresh and try again.",
+      "saveFailedTitle": "Create deliveries failed",
+      "saveSuccess": "Created {{count}} delivery request(s), assigned to {{driver}}.",
+      "selectAll": "Select all",
+      "selectCustomerFirst": "Select a customer to see their open sales orders.",
+      "selectedCount": "{{count}} selected",
+      "title": "Create delivery requests",
+      "titleWithCount": "Create delivery requests ({{count}} orders)"
+    },
+    "columns": {
+      "completedDate": "Completed Date",
+      "deliveryAddress": "Delivery Address",
+      "direction": "Type",
+      "items": "Items",
+      "party": "Party",
+      "reference": "Reference",
+      "requestNumber": "Request Number",
+      "scheduledDate": "Scheduled Date"
+    },
+    "configErrors": {
+      "description": "The Delivery Requests module has been disabled because its configuration is invalid. Fix these issues in App Config and reload:",
+      "title": "Delivery Requests configuration is invalid"
+    },
+    "datePreset": {
+      "custom": "Custom"
+    },
+    "delete": {
+      "actionButton": "Delete Request",
+      "confirmMessage": "Delete this delivery request? This can't be undone. Delivery requests don't affect inventory.",
+      "confirmTitle": "Delete Delivery Request"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this delivery request yet.",
+      "activityMemo": {
+        "addressChanged": "Address changed",
+        "customer": "Customer",
+        "fieldLocation": "Location",
+        "fieldQuantity": "Qty",
+        "fieldUnit": "Unit",
+        "fieldUnitPrice": "Price",
+        "googleMapUrlChanged": "Map link changed",
+        "itemsAdded_one": "{{count}} item added",
+        "itemsAdded_other": "{{count}} items added",
+        "itemsChanged_one": "{{count}} item changed",
+        "itemsChanged_other": "{{count}} items changed",
+        "itemsRemoved_one": "{{count}} item removed",
+        "itemsRemoved_other": "{{count}} items removed",
+        "lineCount_one": "{{count}} line",
+        "lineCount_other": "{{count}} lines",
+        "notesChanged": "Notes changed",
+        "salesOrder": "Sales order",
+        "scheduledDate": "Scheduled date",
+        "vendor": "Vendor"
+      },
+      "activityVerbs": {
+        "create": "Created delivery request",
+        "delete": "Deleted delivery request",
+        "statusChange": "Changed status of",
+        "update": "Edited delivery request",
+        "updateInline": "Updated fields on"
+      },
+      "closedAt": "Closed At",
+      "copyContact": "Copy contact info",
+      "delivered": "Delivered",
+      "deliveredOf": "{{delivered}} of {{ordered}} {{unit}}",
+      "directionLabel": "Type",
+      "driverLabel": "Driver",
+      "expectedPickup": "Expected pickup: {{date}}",
+      "itemsTitle": "Delivery Items",
+      "itemsTitleReceive": "Items to Receive",
+      "noDriverAssigned": "No driver assigned",
+      "noItems": "No items on this request — header-only delivery.",
+      "noItemsReceive": "No items on this request — header-only receipt.",
+      "photosTitle": "Delivery Photos",
+      "photosTitleReceive": "Receipt Photos",
+      "pickupAddressLabel": "Pickup Address",
+      "received": "Received",
+      "recentActivities": "Recent Activities",
+      "tabActivity": "Delivery History",
+      "tabActivityLog": "Activity",
+      "tabPhotos": "Photos",
+      "vendorLabel": "Vendor"
+    },
+    "detailTitle": "Request Details",
+    "editItem": "Edit Request",
+    "filterDriver": "Driver",
+    "filterParty": "Party",
+    "form": {
+      "addItem": "Add Item",
+      "createButton": "Create Request",
+      "customerNameLabel": "Customer Name",
+      "customerNamePlaceholder": "Auto-filled from sales order, or type to override",
+      "deliveryAddressPlaceholder": "Enter delivery address",
+      "directionInbound": "Receive",
+      "directionInboundDesc": "Goods coming in from a vendor — pick from the vendor list or type a name for a one-off vendor. No sales order needed.",
+      "directionLabel": "Type",
+      "directionOutbound": "Deliver",
+      "directionOutboundDesc": "Goods going out to a customer — optionally linked to a sales order.",
+      "driverLabel": "Driver",
+      "driverPlaceholder": "Select driver (optional)",
+      "googleMapUrlLabel": "Google Maps URL",
+      "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
+      "isUrgentDesc": "Urgent deliveries are highlighted in red on the list",
+      "isUrgentLabel": "Urgent Delivery",
+      "itemsTitle": "Delivery Items",
+      "itemsTitleReceive": "Items to Receive",
+      "noItemsHint": "No items — submitting will create a header-only delivery. Add items via this form or later via Edit.",
+      "noItemsHintReceive": "No items — submitting will create a header-only receipt. Add items via this form or later via Edit.",
+      "notesPlaceholder": "Optional notes",
+      "pickupAddressLabel": "Pickup Address",
+      "pickupAddressPlaceholder": "Enter pickup address",
+      "requestNumberAutoPlaceholder": "Auto-generated on save",
+      "requestNumberLabel": "Request Number",
+      "salesOrderOptionalDesc": "Optional — leave empty to dispatch without an SO link.",
+      "salesOrderPlaceholder": "Select sales order",
+      "scheduledDateLabel": "Scheduled Date",
+      "scheduledDateLabelReceive": "Expected Receive Date",
+      "scheduledDatePlaceholder": "Select date",
+      "unregisteredVendorLabel": "Unregistered vendor",
+      "updateButton": "Update Request",
+      "vendorLabel": "Vendor",
+      "vendorPickOrTypeDesc": "Pick from the list, or type a name for a one-off vendor.",
+      "vendorPlaceholder": "Pick a vendor or type a name",
+      "vendorTypePlaceholder": "Type the vendor name"
+    },
+    "kind": {
+      "return": "Return",
+      "sample": "Sample"
+    },
+    "noItems": "No delivery requests found",
+    "notifications": {
+      "accessDenied": "You don't have permission to view this delivery request.",
+      "createError": "Failed to create request",
+      "createSuccess": "Request created successfully",
+      "deleteError": "Failed to delete delivery request",
+      "deleteSuccess": "Delivery request deleted.",
+      "drsAutoReleasedFailedTitle": "Could not auto-release some linked delivery requests",
+      "drsAutoReleasedSuccess": "Auto-released {{count}}/{{total}} delivery request(s) to {{status}}",
+      "fetchError": "Failed to load delivery requests",
+      "formDesktopOnly": "Delivery request create / edit is desktop-only. Open the page on a larger screen.",
+      "linkSalesOrderFailed": "Delivery request created, but the sales-order's linked-DR list couldn't be updated. Reopen the order to resync if needed.",
+      "photosRequiredMessage": "Capture at least one delivery-proof photo before completing this delivery request.",
+      "photosRequiredMessageReceive": "Capture at least one receipt photo before completing this receive request.",
+      "photosRequiredTitle": "Photo required",
+      "soAutoAdvancedFailedTitle": "Could not advance the linked sales order",
+      "soAutoAdvancedSuccess": "All items delivered — {{orderNumber}} advanced to {{status}}",
+      "soAutoShippedFailedTitle": "Could not auto-ship the linked sales order",
+      "soAutoShippedSuccess": "Dispatched — {{orderNumber}} auto-shipped to {{status}}",
+      "updateError": "Failed to update request",
+      "updateSuccess": "Request updated successfully"
+    },
+    "receiveSource": {
+      "sample": "Sample from customer",
+      "sampleDesc": "Collect a sample from a customer.",
+      "vendor": "From vendor",
+      "vendorDesc": "Receive goods from a vendor."
+    },
+    "reorder": {
+      "dateLabel": "Delivery date",
+      "datePlaceholder": "Pick a date",
+      "dragHint": "Drag to reorder",
+      "driverLabel": "Driver",
+      "driverPlaceholder": "Pick a driver",
+      "moveDown": "Move down",
+      "moveUp": "Move up",
+      "noMatching": "No deliveries match this date + driver. Reschedule a request or assign the driver first.",
+      "openButton": "Reorder deliveries",
+      "partial": "Saved {{ok}}, but {{fail}} failed. Refresh and retry the rest.",
+      "partialTitle": "Reorder partially saved",
+      "pickPrompt": "Pick a delivery date and driver to load matching delivery requests.",
+      "preview": "First stop's display number will be {{preview}}. Drag the rows, or use the arrows, to set the order — then Save.",
+      "saveButton": "Save order",
+      "saveFailed": "Could not update {{count}} delivery request(s). Refresh and try again.",
+      "saveFailedTitle": "Reorder failed",
+      "saveSuccess": "Updated display order on {{count}} delivery request(s).",
+      "title": "Reorder deliveries"
+    },
+    "return": {
+      "createButton": "Create return",
+      "itemsTitle": "Items to return",
+      "locationLabel": "Receiving location",
+      "locationPlaceholder": "Select location",
+      "locationRequired": "Receiving location is required",
+      "noQuantity": "Enter a quantity for at least one item.",
+      "noReturnable": "This order has no delivered items available to return.",
+      "restockDone": "Stock updated for {{count}} item(s).",
+      "restockFailedMessage": "{{count}} item(s) could not be added back to stock. Adjust them manually from the inventory page.",
+      "restockFailedTitle": "Return completed, stock not fully updated",
+      "returnAll": "Return all",
+      "returnableHint": "max {{count}}",
+      "scheduledDateLabel": "Expected receive date",
+      "title": "Create return shipment",
+      "updateInventoryDesc": "Add returned goods back to stock when this return completes.",
+      "updateInventoryLabel": "Update inventory"
+    },
+    "stats": {
+      "totalThisMonth": "This month"
+    },
+    "statusChange": {
+      "confirmMessage": "Move this request from {{from}} to {{to}}?",
+      "confirmTitle": "Confirm status change",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "Add an optional note that will appear on the activity timeline.",
+      "photoRequiredHint": "Take at least one delivery photo to complete this request.",
+      "photoSectionTitle": "Delivery photo",
+      "takePhotoButton": "Take photo"
+    },
+    "title": "Delivery Requests",
+    "urgent": "Urgent",
+    "validation": {
+      "customerNameRequired": "Customer name is required",
+      "driverRequired": "Please select a person in charge",
+      "itemsRequired": "At least one item is required",
+      "productCodeRequired": "Product code is required",
+      "productNameRequired": "Product name is required",
+      "salesOrderRequired": "Sales order is required",
+      "unitPriceRequired": "Unit price must not be negative",
+      "vendorRequired": "Vendor is required"
+    }
+  },
+  "employees": {
+    "addEmployee": "Add Employee",
+    "bulkImport": {
+      "import": "Import Employees",
+      "missingColumnMessage": "The file is missing required column(s): {{columns}}. Please use the latest template — click \"Download Sample\" above.",
+      "missingColumnTitle": "File format not supported",
+      "noValidRows": "No valid employees found in the file",
+      "sampleDescription": "Download a pre-formatted template to fill in employee data",
+      "ssoWarningMessage": "All {{total}} employees were imported, but {{failed}} of them could not be given a login account and cannot sign in yet. Open each one and reset their password to try again.",
+      "ssoWarningTitle": "Imported, but some cannot sign in",
+      "title": "Bulk Import",
+      "uploadFile": "Upload Employee File"
+    },
+    "columns": {
+      "name": "Name",
+      "personalPhone": "Personal Phone",
+      "phoneLabelPersonal": "Personal",
+      "phoneLabelWork": "Work"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this employee? This action cannot be undone.",
+      "title": "Delete Employee"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this employee yet.",
+      "activityAction": "Action",
+      "activityActor": "By",
+      "activityDate": "Date",
+      "activityDetail": "Detail",
+      "activityLogin": {
+        "password": "Signed in with password",
+        "qr": "Signed in via QR code"
+      },
+      "activityVerbs": {
+        "create": "Created",
+        "delete": "Deleted",
+        "disable": "Disabled",
+        "enable": "Enabled",
+        "generateLoginToken": "Issued login token for",
+        "passwordChange": "Changed password for",
+        "update": "Updated",
+        "updatePermissions": "Updated permissions for"
+      },
+      "contactsCardTitle": "Contacts",
+      "personalPhone": "Personal Phone",
+      "profileImage": "Profile Image",
+      "profileImageChange": "Change profile image",
+      "profileImageCropHint": "Drag to reposition, scroll or use the buttons to zoom.",
+      "profileImageDragOrClick": "Drag an image here, or click to browse",
+      "profileImageDropHere": "Drop to upload",
+      "profileImageHint": "JPG, PNG, WebP, GIF. Max {{max}}MB.",
+      "profileImageRemove": "Remove",
+      "profileImageRemoveSuccess": "Profile image removed",
+      "profileImageReselect": "Choose another",
+      "profileImageUpload": "Upload",
+      "profileImageUploadError": "Failed to upload profile image",
+      "profileImageUploadSuccess": "Profile image updated",
+      "profileImageUploading": "Uploading...",
+      "quickActions": "Quick Actions",
+      "recentActivities": "Recent Activities",
+      "timesheet": "Timesheet",
+      "timesheetComingSoon": "Coming soon",
+      "timesheetComingSoonDesc": "Time tracking and attendance records for this employee will appear here."
+    },
+    "driver": {
+      "idIssueDate": "Issued date",
+      "idIssuePlace": "Issued place",
+      "idNumber": "ID number",
+      "identityCard": "Identity card",
+      "license": "Driving license",
+      "licenseClass": "Class",
+      "licenseExpiry": "Expiry date",
+      "licenseIssueDate": "Issued date",
+      "licenseIssuePlace": "Issued place",
+      "licenseNumber": "License number",
+      "linkedTruck": "Linked truck",
+      "noTruck": "No truck linked",
+      "sectionTitle": "Driver profile",
+      "tab": "Driver",
+      "truckPlaceholder": "Select a truck",
+      "viewTruck": "View truck"
+    },
+    "editEmployee": "Edit Employee",
+    "employeeDetails": "Employee Details",
+    "emptyMessage": "Try adjusting your filters or add your first employee to get started.",
+    "emptyTitle": "No employees yet",
+    "fields": {
+      "address": "Address",
+      "dateOfBirth": "Date of birth",
+      "startDate": "Start date"
+    },
+    "filterButton": "Filter",
+    "filterDepartmentAll": "All Departments",
+    "filterInactive": "Inactive",
+    "filterPositionAll": "All Positions",
+    "form": {
+      "codePlaceholder": "Employee code",
+      "createButton": "Create Employee",
+      "emailPlaceholder": "Employee email",
+      "nameLabel": "Name",
+      "namePlaceholder": "Employee name",
+      "positionPlaceholder": "Job position",
+      "updateButton": "Update Employee"
+    },
+    "loginToken": {
+      "button": "Login Token",
+      "copied": "Link Copied!",
+      "copyLink": "Copy Login Link",
+      "copyQr": "Copy QR Image",
+      "copyQrError": "Failed to copy QR image",
+      "description": "Generate a login QR code for {{name}}",
+      "expiryNotice": "This code expires in {{minutes}} minutes and can only be used once.",
+      "generateError": "Failed to generate login token",
+      "qrCopied": "QR Copied!",
+      "regenerate": "Generate New Token",
+      "title": "Generate Login Token"
+    },
+    "noEmployees": "No employees found",
+    "notifications": {
+      "createError": "Failed to create employee",
+      "createSuccess": "Employee created successfully",
+      "deleteError": "Failed to delete employee",
+      "deleteSuccess": "Employee deleted successfully",
+      "fetchError": "Failed to load employees",
+      "listConflictMessage": "Another user just changed the employee list. Code updated to {{code}}. Please review and submit again.",
+      "ssoWarning": "Employee created, but login setup failed: {{reason}}. Set their password manually before sharing credentials.",
+      "truckLinkWarning": "Employee saved, but linking the truck failed. Re-open and save to retry.",
+      "updateError": "Failed to update employee",
+      "updateSuccess": "Employee updated successfully"
+    },
+    "org": {
+      "addOption": "Add",
+      "cannotRemove": "Can't remove — still in use by:",
+      "departments": "Departments",
+      "description": "Manage your departments, positions, and their permissions.",
+      "driverDepartments": "Driver Departments",
+      "driverDepartmentsHint": "Employees in these departments are treated as drivers and get the driver tab (identity card, license, linked truck, training logs).",
+      "driverDepartmentsPlaceholder": "Select driver departments",
+      "noDepartments": "No departments configured. Add departments above first.",
+      "optionValue": "Value",
+      "permissionOverlays": "Department Permissions",
+      "positions": "Positions",
+      "readOnly": "You can view these settings but do not have permission to change them.",
+      "refAssignedEmployees": "{{count}} assigned employee(s)",
+      "refCheckingEmployees": "Checking assigned employees…",
+      "refDriverDepartment": "Driver departments",
+      "refGoodsReceiptPic": "Goods receipt assigned staff",
+      "refSalesOrderPic": "Sales order assigned staff",
+      "refSalesOrderStatus": "Sales order status: {{status}}",
+      "refTransportOrderStatus": "Transport order status: {{status}}",
+      "saveFailed": "Failed to save organization settings",
+      "saved": "Organization settings saved",
+      "title": "Organization",
+      "valueLockedHint": "The value can't change once created — it links employees and other settings."
+    },
+    "title": "Employees",
+    "validation": {
+      "codeRequired": "Code is required",
+      "emailInvalid": "Please enter a valid email address",
+      "nameRequired": "Name is required",
+      "phoneInvalid": "Phone must be 10–15 characters (digits, spaces, +, -, parentheses)"
+    }
+  },
+  "error": {
+    "forbidden": {
+      "goToHomeButton": "Go to Home",
+      "inlineTitle": "Restricted access",
+      "message": "You don't have permission to view this page. Contact your administrator if you believe this is a mistake.",
+      "title": "403"
+    },
+    "generic": {
+      "goToHomeLink": "Go to Home",
+      "message": "We're sorry, an unexpected error occurred. Please try again.",
+      "title": "Something went wrong",
+      "tryAgainButton": "Try Again"
+    },
+    "notFound": {
+      "goToHomeButton": "Go to Home",
+      "message": "The page you're looking for doesn't exist or has been moved.",
+      "title": "404"
+    },
+    "reload": "Reload",
+    "staleChunk": {
+      "message": "The app was updated while this page was open. Reload to continue.",
+      "title": "A new version is available"
+    },
+    "unexpected": {
+      "message": "This page couldn't be opened. Reload to try again — if it keeps happening, contact your administrator.",
+      "title": "Something went wrong"
+    }
+  },
+  "fakeData": {
+    "changeSecrets": "Change secrets",
+    "clientCode": "Client code",
+    "configureSecrets": "Configure secrets",
+    "customers": {
+      "confirmBody": "This will OVERWRITE all existing customer records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
+      "confirmTitle": "Overwrite all customers?",
+      "count": "Customer count",
+      "countHelp": "Names use industry-aware customer-type pools (food: restaurants/cafes; mechanical: factories/contractors). Codes are sequential (CST-NNNN).",
+      "description": "Replaces ALL existing customer records for this client. Used as the source of truth for sales orders.",
+      "title": "Seed Customers"
+    },
+    "employees": {
+      "confirmBody": "This will OVERWRITE all existing employee records for client \"{{clientCode}}\" with {{count}} new row(s) and create matching SSO users. Continue?",
+      "confirmBodyRandom": "This will OVERWRITE all existing employee records for client \"{{clientCode}}\" — generating 2-5 employees per department from App Config and creating matching SSO users. Continue?",
+      "confirmTitle": "Overwrite all employees?",
+      "count": "Employee count",
+      "description": "Replaces ALL existing employee records for this client and creates matching SSO users.",
+      "jsonEmpty": "Provide at least one employee row.",
+      "jsonHelp": "Array of rows. Fields (all optional): name, firstName, lastName, department, phone, personalPhone, email, position, code, gender. Persisted per client in localStorage.",
+      "jsonInvalid": "Invalid JSON: {{error}}",
+      "jsonLabel": "Employees JSON",
+      "jsonNotArray": "JSON root must be an array of employee rows.",
+      "parsedRows": "Parsed rows",
+      "randomCoverage": "Random mode walks every department configured in App Config and seeds 2-5 employees per department. The total count is determined at run time.",
+      "skipSso": "Skip SSO user creation",
+      "skipSsoHelp": "When on, only the employee records are written — no SSO login accounts are created.",
+      "source": "Data source",
+      "title": "Seed Employees"
+    },
+    "failures": "SSO failures",
+    "goodsReceipts": {
+      "confirmBody": "This will write {{count}} new goods-receipt record(s) for client \"{{clientCode}}\" spread across the last {{daysBack}} day(s). Existing receipts in the same date partitions will be OVERWRITTEN. Continue?",
+      "confirmTitle": "Seed goods receipts?",
+      "count": "Receipt count",
+      "countHelp": "How many GR records to generate. They will be spread randomly across the chosen day window.",
+      "daysBack": "Spread over (days)",
+      "daysBackHelp": "Date window to scatter receipts in. Defaults to 14 days to match the list page query window.",
+      "description": "Seeds partitioned goods-receipt records for the last N days. Picks vendors and locations from existing master data, items from the chosen industry pool. Status mix: ~60% draft, ~30% received, ~10% cancelled.",
+      "inventoryWarning": "This bypasses the BFF, so receipts marked \"received\" do NOT bump inventory. Use the UI Confirm action to test the inventory side-effect chain.",
+      "title": "Seed Goods Receipts"
+    },
+    "industry": {
+      "description": "Selects the source JSON (scripts/faker/data/*.json) used by lookups, products and materials. Fixed codes from the JSON keep order references stable across reruns.",
+      "label": "Industry",
+      "lookups": "Lookup entries",
+      "materials": "Materials in pool",
+      "products": "Products in pool",
+      "title": "Industry catalog"
+    },
+    "log": "Progress log",
+    "lookupsSeed": {
+      "confirmBody": "This will OVERWRITE all lookup rows for client \"{{clientCode}}\" with {{count}} new entr(y/ies) across every category. Continue?",
+      "confirmTitle": "Overwrite all lookups?",
+      "description": "Replaces ALL existing lookup rows for this client across every category (product-category, product-tag, unit, material-category, material-unit).",
+      "jsonEmpty": "Provide at least one lookup row.",
+      "jsonHelp": "Array of rows. Required: category, value (or label). Optional: label (defaults to value), sortOrder (auto). Categories: product-category, product-tag, unit, material-category, material-unit. Persisted per client in localStorage.",
+      "jsonInvalid": "Invalid JSON: {{error}}",
+      "jsonLabel": "Lookups JSON",
+      "jsonMissingFields": "Every row must include \"category\" and either \"value\" or \"label\".",
+      "jsonNotArray": "JSON root must be an array of lookup rows.",
+      "parsedRows": "Parsed rows",
+      "title": "Seed Meta-data (Lookups)"
+    },
+    "materialInventory": {
+      "confirmBody": "This will OVERWRITE all existing material-inventory rows for client \"{{clientCode}}\" with up to {{count}} new row(s). Continue?",
+      "confirmTitle": "Overwrite all material inventory?",
+      "count": "Row count",
+      "countHelp": "Number of (material, location) pairs to seed. Capped at materials × locations.",
+      "description": "Replaces ALL existing material-inventory rows. Materials and locations must already exist (fetched live from BFF). Reservations are intentionally left empty.",
+      "maxQty": "Max base-unit qty",
+      "maxQtyHelp": "Per-row on-hand is sampled uniformly from 0 to this number, in the material's base unit.",
+      "multiUnitSplit": "Allow multi-unit split",
+      "multiUnitSplitHelp": "When the material has unit conversions, also place some stock in a non-base unit (e.g. some KG, some BAG_5KG).",
+      "overwriteWarning": "Inventory rows replace the entire material-inventory envelope — there is no merge. Existing rows for this client are dropped.",
+      "title": "Seed Material Inventory"
+    },
+    "materials": {
+      "confirmBody": "This will OVERWRITE all existing material records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
+      "confirmTitle": "Overwrite all materials?",
+      "count": "Material count",
+      "countHelp": "Takes the first N rows from the industry JSON (max {{max}}).",
+      "description": "Replaces ALL existing material records with the selected industry catalog. Codes are fixed (e.g. MAT-FLOUR-WHEAT-T00) so downstream references stay stable.",
+      "title": "Seed Materials"
+    },
+    "missingSecrets": "Provide the trusted service credentials to enable seeding.",
+    "productInventory": {
+      "confirmBody": "This will OVERWRITE all existing product-inventory rows for client \"{{clientCode}}\" with up to {{count}} new row(s). Continue?",
+      "confirmTitle": "Overwrite all product inventory?",
+      "count": "Row count",
+      "countHelp": "Number of (product, location) pairs to seed. Capped at products × locations.",
+      "description": "Replaces ALL existing product-inventory rows. Products and locations must already exist (fetched live from BFF). Reservations are intentionally left empty.",
+      "maxQty": "Max base-unit qty",
+      "maxQtyHelp": "Per-row on-hand is sampled uniformly from 0 to this number, in the product's base unit.",
+      "multiUnitSplit": "Allow multi-unit split",
+      "multiUnitSplitHelp": "When the product has unit conversions, also place some stock in a non-base unit (e.g. some KG, some BAG_5KG).",
+      "overwriteWarning": "Inventory rows replace the entire product-inventory envelope — there is no merge. Existing rows for this client are dropped.",
+      "title": "Seed Product Inventory"
+    },
+    "products": {
+      "confirmBody": "This will OVERWRITE all existing product records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
+      "confirmTitle": "Overwrite all products?",
+      "count": "Product count",
+      "countHelp": "Takes the first N rows from the industry JSON (max {{max}}).",
+      "description": "Replaces ALL existing product records with the selected industry catalog. Codes are fixed (e.g. PRD-NOODLE-SHRIMP) so downstream references stay stable.",
+      "title": "Seed Products"
+    },
+    "purge": {
+      "button": "Delete all data (except employees)",
+      "confirmBody": "This will permanently DELETE every fake-data record for client \"{{clientCode}}\" — products, materials, customers, vendors, lookups, sales orders, delivery requests, goods receipts, and all inventory rows. Employees and locations will be kept. This cannot be undone. Continue?",
+      "confirmOk": "Yes, delete everything",
+      "confirmTitle": "Delete all data except employees?",
+      "description": "Removes every fake-data prefix scoped to this client. Employees and locations are preserved so admins keep their logins and the seeders can still use existing locations.",
+      "runSuccess": "Purge complete.",
+      "summaryRemoved": "Removed: {{count}} record(s)",
+      "title": "Purge data (except employees)",
+      "warning": "Destructive action. This deletes ALL master data, transactional data, and inventory for this client. There is no undo."
+    },
+    "runError": "Seeding failed: {{error}}",
+    "runSuccess": "Seeding complete.",
+    "salesOrders": {
+      "confirmBody": "This will write {{count}} new sales-order record(s) for client \"{{clientCode}}\" spread across the last {{daysBack}} day(s). Existing orders in the same date partitions will be OVERWRITTEN. Continue?",
+      "confirmTitle": "Seed sales orders?",
+      "count": "Order count",
+      "countHelp": "How many SO records to generate. They will be spread randomly across the chosen day window.",
+      "daysBack": "Spread over (days)",
+      "daysBackHelp": "Date window to scatter orders in. Defaults to 14 days to match the list page query window.",
+      "description": "Seeds partitioned sales-order records for the last N days. Pulls customers, products, employees and locations LIVE from the BFF and uses your configured statuses / delivery methods / tags. Stage mix: ~25% NEW, ~45% IN_PROGRESS, ~25% COMPLETED, ~5% EXCEPTIONAL — plus a ~5% cancellation flag overlay.",
+      "inventoryWarning": "This bypasses the BFF transition engine, so orders that land in a reservesStock / shipsStock status do NOT touch product-inventory. Use the UI status transitions to test the inventory chain.",
+      "title": "Seed Sales Orders"
+    },
+    "secretsHelp": "Stored in sessionStorage only — cleared when you close this tab.",
+    "secretsTitle": "Seed credentials",
+    "source": "Data source",
+    "sourceJson": "From JSON",
+    "sourceRandom": "Random",
+    "subtitle": "Seed fake records for the current client — dev/test only.",
+    "summary": "Result",
+    "summaryRecords": "Records: {{count}}",
+    "summarySso": "SSO: created {{created}}, failed {{failed}}",
+    "title": "Fake Data Generator",
+    "transactionalPurge": {
+      "button": "Delete transactional data",
+      "confirmBody": "This will permanently DELETE every goods-receipt, sales-order, and delivery-request record for client \"{{clientCode}}\" across all date partitions. Master data and inventory rows will be kept. This cannot be undone. Continue?",
+      "confirmOk": "Yes, delete transactional data",
+      "confirmTitle": "Delete transactional data?",
+      "description": "Removes date-partitioned transactional records only: goods receipts, sales orders, delivery requests. Master data (employees, products, materials, customers, vendors, lookups, locations) and inventory rows are preserved so the operator can replay flows without re-seeding.",
+      "runSuccess": "Transactional data deleted.",
+      "summaryRemoved": "Removed: {{count}} record(s)",
+      "title": "Delete transactional data",
+      "warning": "Destructive action. This deletes ALL goods receipts, sales orders, and delivery requests for this client. There is no undo."
+    },
+    "vendors": {
+      "confirmBody": "This will OVERWRITE all existing vendor records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
+      "confirmTitle": "Overwrite all vendors?",
+      "count": "Vendor count",
+      "countHelp": "Names use industry-aware company-type pools (food vs mechanical). Codes are sequential (VND-NNNN).",
+      "description": "Replaces ALL existing vendor records for this client. Vendors are required by the Goods Receipts seeder.",
+      "title": "Seed Vendors"
+    }
+  },
+  "goodsReceipts": {
+    "addItem": "New Receipt",
+    "clearFilters": "Clear all filters",
+    "columns": {
+      "assignedTo": "PIC",
+      "date": "Date",
+      "dateLabelExpected": "Expected",
+      "dateLabelReceived": "Received",
+      "items": "Items",
+      "itemsCount_one": "{{count}} line",
+      "itemsCount_other": "{{count}} lines",
+      "locationName": "Location",
+      "receiptNumber": "Receipt #",
+      "receivedDate": "Received Date",
+      "reference": "Reference",
+      "totalQuantity": "Total Qty"
+    },
+    "confirm": {
+      "cancelMessage": "Cancel this goods receipt? This cannot be undone.",
+      "cancelTitle": "Cancel Receipt",
+      "confirmMessage": "Confirm goods received? This will lock the receipt for editing.",
+      "confirmTitle": "Confirm Receipt",
+      "inventoryInProgress": "Updating inventory — please keep this page open until it finishes.",
+      "repostMessage": "Add the stock for {{count}} line(s) that were never posted to inventory.",
+      "repostTitle": "Post Missing Inventory",
+      "repostWarning": "Only do this if the stock is genuinely missing from inventory. Lines already posted by this receipt are skipped automatically, but a receipt confirmed before mid-2026 carries no posting record — re-posting one of those would double-count. Check the inventory page if unsure."
+    },
+    "datePreset": {
+      "custom": "Custom"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this receipt yet.",
+      "activityMemo": {
+        "cancelledFrom": "Cancelled from",
+        "fieldQuantity": "Qty",
+        "inventoryApplied_one": "{{count}} inventory row updated",
+        "inventoryApplied_other": "{{count}} inventory rows updated",
+        "inventoryPartial": "{{failed}} of {{attempted}} inventory rows failed to update",
+        "inventoryReversalPartial": "{{failed}} of {{attempted}} inventory rows failed to reverse",
+        "inventoryReversed_one": "{{count}} inventory row reversed",
+        "inventoryReversed_other": "{{count}} inventory rows reversed",
+        "inventoryUnchanged": "No inventory side-effect",
+        "itemsAdded_one": "{{count}} item added",
+        "itemsAdded_other": "{{count}} items added",
+        "itemsChanged_one": "{{count}} item changed",
+        "itemsChanged_other": "{{count}} items changed",
+        "itemsRemoved_one": "{{count}} item removed",
+        "itemsRemoved_other": "{{count}} items removed",
+        "lineCount_one": "{{count}} line",
+        "lineCount_other": "{{count}} lines",
+        "vendor": "Vendor"
+      },
+      "activityVerbs": {
+        "cancel": "Cancelled receipt",
+        "confirmReceived": "Confirmed receipt",
+        "create": "Created receipt",
+        "repostInventory": "Posted missing inventory for",
+        "update": "Edited receipt",
+        "updateInline": "Updated line on"
+      },
+      "auditAt": "at {{datetime}}",
+      "auditBy": "by",
+      "auditCreatedBy": "Created by",
+      "auditLastUpdatedBy": "Last updated by",
+      "cancelledAt": "Cancelled At",
+      "cardAudit": "Activity & People",
+      "cardGeneral": "General Info",
+      "cardInventoryEffect": "Inventory Effect",
+      "cardInventoryEffectReversed": "Inventory Effect (Reversed)",
+      "copiedFrom": "Copied from",
+      "editQuantityTitle": "Edit quantity",
+      "from": "From",
+      "headerTimestamps": "Updated {{updated}} · Created {{created}}",
+      "heroLabel": "Total Received",
+      "heroLineUnit": "line(s)",
+      "inventoryEffectViewAction": "View on inventory page",
+      "inventoryNotPostedWarning": "{{count}} line(s) on this receipt never reached inventory — the stock update did not finish. Post them now to bring stock in line with this receipt.",
+      "itemsSubtotal": "Subtotal",
+      "itemsTitle": "Items Received",
+      "lineNoStockTracking": "no stock tracking",
+      "lineNotPosted": "not posted",
+      "lineOrphaned": "product missing",
+      "noAssignedTo": "Not assigned",
+      "noLocation": "No location",
+      "noNotes": "No notes",
+      "noReference": "—",
+      "noVendor": "No vendor",
+      "receivedAt": "Received At",
+      "recentActivities": "Recent Activities",
+      "repostInventoryAction": "Post missing inventory",
+      "statusCancelledNote": "This receipt was cancelled",
+      "stickyActionsLabel": "Receipt actions",
+      "tabActivityLog": "Activity",
+      "tabInfo": "Info",
+      "tabItems": "Items",
+      "tabReceipt": "Receipt",
+      "viewItems": "View items"
+    },
+    "detailTitle": "Receipt Details",
+    "editItem": "Edit Receipt",
+    "filterLocation": "Location",
+    "form": {
+      "assignedToPlaceholder": "Select operator",
+      "copyingFrom": "Copying from {{receiptNumber}}",
+      "createButton": "Create",
+      "downloadTemplateButton": "Download template",
+      "dropExcelHint": "Drop an Excel file here to import the product list",
+      "importItemsButton": "Import from Excel",
+      "itemsTitle": "Items",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Select location",
+      "notesPlaceholder": "Internal notes (optional)",
+      "receiptNumberAutoPlaceholder": "Auto-generated on save",
+      "receiptNumberLabel": "Receipt Number",
+      "receivedDateLabel": "Received Date",
+      "referenceLabel": "Reference",
+      "referencePlaceholder": "Vendor invoice / PO no.",
+      "updateButton": "Update",
+      "vendorPlaceholder": "Select vendor"
+    },
+    "itemTypes": {
+      "material": "Material"
+    },
+    "noItems": "No goods receipts yet.",
+    "notifications": {
+      "cancelError": "Failed to cancel receipt.",
+      "cancelSuccess": "Receipt cancelled.",
+      "confirmError": "Failed to confirm receipt.",
+      "confirmSuccess": "Receipt confirmed.",
+      "createError": "Failed to create receipt.",
+      "createSuccess": "Receipt created.",
+      "defaultLocationMissing": "Default location not loaded yet — please retry in a moment.",
+      "fetchError": "Failed to load goods receipts.",
+      "importEmpty": "No items found in the file.",
+      "importError": "Failed to read the file.",
+      "importMissingColumn": "Missing required column(s): {{columns}}. Download the latest template.",
+      "importMissingColumnTitle": "Invalid template",
+      "importNoMatchTitle": "No matching SKUs",
+      "importPartialTitle": "Imported {{added}} item(s)",
+      "importSuccess": "Imported {{count}} item(s).",
+      "importUnmatched": "Skipped {{count}} unknown SKU(s): {{skus}}",
+      "inventoryAborted": "The receipt was confirmed, but the inventory update did not finish. Use \"Post missing inventory\" on this receipt to complete it.",
+      "inventoryPartial": "Inventory partially updated",
+      "inventoryPartialBody": "{{failed}} of {{attempted}} line(s) failed to update inventory. Reconcile from the inventory page.",
+      "mobileFormBlocked": "Receipt creation and editing are desktop-only. Mobile lets you correct item quantities and confirm.",
+      "repostError": "Failed to post inventory. Nothing was changed for the remaining lines — you can retry.",
+      "repostSuccess": "Posted {{posted}} line(s) to inventory.",
+      "updateError": "Failed to update receipt.",
+      "updateSuccess": "Receipt updated."
+    },
+    "stats": {
+      "total": "Total"
+    },
+    "statuses": {
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "received": "Received"
+    },
+    "title": "Goods Receipts",
+    "validation": {
+      "itemCodeUnitDuplicate": "This item is already on another line with the same unit",
+      "itemsRequired": "At least one item is required",
+      "locationRequired": "Location is required",
+      "receivedDateRequired": "Received date is required",
+      "vendorRequired": "Vendor is required"
+    }
+  },
+  "greenhouses": {
+    "addItem": "Add Greenhouse",
+    "areaValue": "{{value}} m²",
+    "columns": {
+      "area": "Area",
+      "crops": "Crops"
+    },
+    "detail": {
+      "infoTitle": "Information",
+      "statActiveCrops": "Active crops",
+      "statArea": "Area"
+    },
+    "editItem": "Edit Greenhouse",
+    "emptyMessage": "Add your first greenhouse to start tracking crops.",
+    "emptyTitle": "No greenhouses yet",
+    "form": {
+      "areaLabel": "Area",
+      "areaPlaceholder": "Floor area",
+      "codePlaceholder": "e.g. GH-A",
+      "createButton": "Create Greenhouse",
+      "descriptionPlaceholder": "Optional description",
+      "namePlaceholder": "e.g. North Polytunnel",
+      "notesPlaceholder": "Climate setup, location on the farm, etc.",
+      "primarySection": "Greenhouse details"
+    },
+    "noItems": "No greenhouses found",
+    "notifications": {
+      "createError": "Failed to create greenhouse",
+      "createSuccess": "Greenhouse created",
+      "fetchError": "Failed to load greenhouses",
+      "updateError": "Failed to update greenhouse",
+      "updateSuccess": "Greenhouse updated"
+    },
+    "searchPlaceholder": "Search greenhouses…",
+    "title": "Greenhouses",
+    "validation": {
+      "areaInvalid": "Area cannot be negative"
+    }
+  },
+  "home": {
+    "columns": {
+      "assignedDriver": "Assigned To",
+      "assignedStaff": "Assigned Staff",
+      "customer": "Customer",
+      "orderDate": "Order Date",
+      "orderNumber": "Order No.",
+      "poNumber": "PO No.",
+      "requestNumber": "Request No.",
+      "status": "Status"
+    },
+    "empty": "No data",
+    "error": "Failed to load data",
+    "expand": "Expand",
+    "sections": {
+      "newOrders": "New / Processing Orders",
+      "readyToDeliver": "Ready to Deliver",
+      "todaySchedule": "Today's Schedule"
+    },
+    "viewAll": "View all"
+  },
+  "inventory": {
+    "title": "Inventory"
+  },
+  "locations": {
+    "addItem": "Add Location",
+    "columns": {
+      "kind": "Kind"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this location? This action cannot be undone.",
+      "title": "Delete location"
+    },
+    "editItem": "Edit Location",
+    "emptyMessage": "Add your first location — warehouses, shelves, or pickup points.",
+    "emptyTitle": "No locations yet",
+    "form": {
+      "addressPlaceholder": "Street, city, country",
+      "codePlaceholder": "Location code",
+      "contactNameLabel": "Contact name",
+      "contactPhoneLabel": "Contact phone",
+      "contactSection": "Contact",
+      "createButton": "Create Location",
+      "descriptionPlaceholder": "Short description (optional)",
+      "kindLabel": "Kind",
+      "kindPlaceholder": "e.g. warehouse, shelf, store-front",
+      "namePlaceholder": "Location name",
+      "notesPlaceholder": "Operating hours, access instructions...",
+      "operationsSection": "Operations",
+      "primarySection": "Primary details",
+      "updateButton": "Update Location"
+    },
+    "noItems": "No locations found",
+    "notifications": {
+      "createError": "Failed to create location",
+      "createSuccess": "Location created successfully",
+      "deleteError": "Failed to delete location",
+      "deleteSuccess": "Location deleted successfully",
+      "disableSuccess": "Location deactivated",
+      "enableSuccess": "Location activated",
+      "fetchError": "Failed to load locations",
+      "listConflictMessage": "Another user just changed the location list. Code updated to {{code}}. Please review and submit again.",
+      "toggleError": "Failed to update location status",
+      "updateError": "Failed to update location",
+      "updateSuccess": "Location updated successfully"
+    },
+    "title": "Locations"
+  },
+  "lookups": {
+    "addItem": "Add",
+    "categories": {
+      "maintenanceType": "Maintenance Type",
+      "materialCategory": "Material Category",
+      "materialUnit": "Material Unit",
+      "productCategory": "Product Category",
+      "productTag": "Product Tag",
+      "productUnit": "Product Unit",
+      "truckType": "Truck Type",
+      "unit": "Unit of Measure"
+    },
+    "columns": {
+      "label": "Label",
+      "sortOrder": "Order",
+      "value": "Value"
+    },
+    "deleteConfirm": {
+      "message": "This soft-deletes \"{{label}}\". Historical records keep using this label; you can restore later by re-enabling.",
+      "title": "Remove entry?"
+    },
+    "form": {
+      "label": "Label",
+      "labelHelp": "Display text shown in menus.",
+      "sortOrder": "Sort order",
+      "sortOrderHelp": "Lower numbers appear first.",
+      "value": "Value (code)",
+      "valueHelp": "Short stable identifier — avoid spaces."
+    },
+    "noItems": "No entries yet.",
+    "notifications": {
+      "createSuccess": "Entry added",
+      "deleteSuccess": "Entry removed",
+      "disableSuccess": "Entry disabled",
+      "enableSuccess": "Entry enabled",
+      "updateSuccess": "Entry updated",
+      "writeError": "Save failed"
+    },
+    "reorderHint": "Drag the handle to reorder entries.",
+    "subtitle": "Manage dropdown options and reference values used across the app.",
+    "title": "Common Lookup",
+    "validation": {
+      "labelRequired": "Label is required",
+      "valueDuplicate": "Another active entry already uses this value",
+      "valueRequired": "Value is required"
+    }
+  },
+  "materialInventory": {
+    "columns": {
+      "availableTooltip": "On hand minus reserved. Materials are not yet reservable from sales orders.",
+      "forecasted": "Forecasted",
+      "forecastedTooltip": "On hand + incoming − outgoing. Wired when PO module lands.",
+      "incoming": "Incoming",
+      "incomingTooltip": "Pending purchase-order receipts. Wired when PO module lands.",
+      "material": "Material",
+      "outgoing": "Outgoing",
+      "outgoingTooltip": "Pending outgoing commitments. Not wired yet.",
+      "overcommittedTooltip": "Reserved {{reserved}} exceeds on-hand {{onHand}}."
+    },
+    "defaultLocationBadge": "default",
+    "emptyMessage": "Add an entry — pick a material and location, set the starting on-hand.",
+    "emptyTitle": "No inventory rows yet",
+    "exportButton": "Export",
+    "filterByLocation": "Filter by location",
+    "filterInactive": "Archived",
+    "filterStock": {
+      "all": "All",
+      "negative": "Back-ordered",
+      "noStock": "No stock",
+      "outOfStock": "Out of stock",
+      "placeholder": "All stock levels",
+      "title": "Stock"
+    },
+    "form": {
+      "backOrderWarning": "Negative on-hand allowed — useful for back-orders. Verify intent.",
+      "currentOnHand": "Current on hand",
+      "deltaLabel": "Delta",
+      "deltaPlaceholder": "e.g. 5 or -3",
+      "locationPlaceholder": "Pick a location",
+      "materialLabel": "Material",
+      "materialPlaceholder": "Pick a material",
+      "multiUnitInitialHint": "Enter the opening quantity in the selected unit; on-hand is derived in the base unit.",
+      "newOnHand": "New on hand",
+      "newOnHandLabel": "New on hand",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "Reason — receipt, consumption, damage...",
+      "onHandLabel": "Initial on hand",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Why is stock changing?",
+      "submitAdjust": "Apply adjustment",
+      "submitRepack": "Apply repack",
+      "submitStockTake": "Save count",
+      "varianceLabel": "Variance"
+    },
+    "importButton": "Import",
+    "importModal": {
+      "confirm": "Replace inventory",
+      "existing": "{{count}} existing",
+      "fileSummary": "File: {{filename}} — {{parsed}} row(s) parsed.",
+      "matched": "{{count}} matched",
+      "title": "Replace material inventory from file",
+      "unmatched": "{{count}} unmatched",
+      "unmatchedHint": "Unmatched: {{skus}}{{more}}",
+      "warningBody": "The {{matched}} matching row(s) will be upserted by (material, location) — on-hand and unit on those rows get overwritten; reservations, notes, and other extra fields are preserved. {{existing}} existing row(s) not in the file are left unchanged.",
+      "warningTitle": "Destructive action"
+    },
+    "inbound": {
+      "detailLabel": "Inbound",
+      "forecastedHelp": "Available + inbound from open draft receipts.",
+      "fromDrafts": "From {{count}} draft receipt",
+      "moreDrafts": "+{{count}} more receipt",
+      "unmappedWarning": "{{count}} line skipped — unit not on material"
+    },
+    "kpis": {
+      "negative": "{{count}} back-ordered",
+      "outOfStock": "{{count}} out of stock",
+      "totalMaterials": "{{count}} materials"
+    },
+    "modal": {
+      "createTitle": "Add inventory entry",
+      "updateTitle": "Update inventory"
+    },
+    "mode": {
+      "delta": "Adjust (delta)",
+      "repack": "Repack",
+      "snapshot": "Stock-take (absolute)"
+    },
+    "notifications": {
+      "adjustError": "Failed to apply adjustment",
+      "adjustSuccess": "On-hand updated",
+      "conversionError": "No conversion path between these units",
+      "createError": "Failed to add entry",
+      "createSuccess": "Entry added",
+      "deleteError": "Failed to delete row",
+      "deleteSuccess": "Row deleted",
+      "duplicatePair": "An entry already exists for this material + location",
+      "exportEmpty": "No inventory rows to export",
+      "exportError": "Failed to export inventory",
+      "exportSuccess": "Exported {{count}} row(s)",
+      "fetchError": "Failed to load inventory",
+      "importError": "Failed to import inventory",
+      "importMissingColumn": "Missing required column(s): {{columns}}. Use the latest exported file as a template.",
+      "importMissingColumnTitle": "File is missing a required column",
+      "importNoIdentity": "The file must include either an SKU column or a Material Code column so rows can be matched against master data.",
+      "importNoMatched": "None of the {{count}} parsed row(s) matched a known material.",
+      "importNoMatchedTitle": "No matching materials in master data",
+      "importNoValid": "No valid rows found in the file",
+      "importParseError": "Failed to read the Excel file. Try saving it again as .xlsx.",
+      "importPartial": "Imported {{created}} added + {{updated}} updated of {{total}} row(s); {{failed}} failed.",
+      "importPartialTitle": "Imported with errors",
+      "importSuccess": "Imported: {{created}} added, {{updated}} updated.",
+      "repackError": "Failed to apply repack",
+      "repackSuccess": "Repack applied",
+      "stockTakeError": "Failed to save count",
+      "stockTakeSuccess": "Stock-take saved"
+    },
+    "reason": {
+      "correction": "Correction",
+      "damage": "Damage / loss",
+      "issue": "Issue (−)",
+      "other": "Other",
+      "receive": "Receive (+)"
+    },
+    "repack": {
+      "balanced": "Repack balances in base-unit terms.",
+      "fromQtyLabel": "From quantity",
+      "fromUnitLabel": "From unit",
+      "reason": {
+        "breakage": "Breakage",
+        "damage": "Damage",
+        "other": "Other",
+        "spillage": "Spillage"
+      },
+      "toQtyLabel": "To quantity",
+      "toUnitLabel": "To unit",
+      "writeOffHint": "Quantity lost during repack (in base unit).",
+      "writeOffOptional": "Write-off (optional)",
+      "writeOffQtyLabel": "Write-off ({{unit}})",
+      "writeOffReasonLabel": "Reason"
+    },
+    "stockState": {
+      "negative": "back-ordered"
+    },
+    "title": "Material Inventory",
+    "validation": {
+      "bad": "Invalid input",
+      "deltaRequired": "Delta is required",
+      "insufficientStock": "Not enough stock of '{{unit}}'",
+      "materialRequired": "Material is required",
+      "noConversionPath": "No conversion defined between this unit and the base unit. Add a conversion rule on the material first.",
+      "onHandRequired": "On-hand value is required",
+      "positiveRequired": "Must be greater than zero",
+      "repackInvalid": "Repack is invalid",
+      "unknownUnit": "Unit '{{unit}}' is not on this material",
+      "valueRequired": "Value is required"
+    }
+  },
+  "materials": {
+    "addItem": "Add Material",
+    "bulkImport": {
+      "import": "Import Materials",
+      "missingColumnMessage": "The file is missing required column(s): {{columns}}. Please use the latest template — click \"Download Sample\" above.",
+      "missingColumnTitle": "File format not supported",
+      "noValidRows": "No valid materials found in the file",
+      "sampleDescription": "Download a pre-formatted template to fill in material data",
+      "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
+      "unknownLabelTitle": "Unrecognized category",
+      "uploadFile": "Upload Material File"
+    },
+    "columns": {
+      "minimumStock": "Min"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this material? This action cannot be undone.",
+      "title": "Delete Material"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this material yet.",
+      "activityVerbs": {
+        "create": "Created material",
+        "delete": "Deleted material",
+        "disable": "Deactivated material",
+        "enable": "Activated material",
+        "inventory": {
+          "adjust": "Adjusted stock for",
+          "create": "Added stock entry for",
+          "repack": "Repacked stock for",
+          "stockTake": "Recorded stock-take for"
+        },
+        "update": "Updated material",
+        "updateImages": "Updated images for"
+      },
+      "classificationGroup": "Classification",
+      "costPrice": "Cost price",
+      "imagesEmpty": "No images yet",
+      "imagesEmptyDesc": "Images help operators spot materials quickly on the shelf.",
+      "inventoryTab": {
+        "empty": "No inventory records for this material.",
+        "title": "Stock on Hand",
+        "totalOnHand": "{{count}} {{unit}} total"
+      },
+      "noPhotoHint": "No photo",
+      "packagingSpec": "Packaging specification",
+      "priceUnit": "per {{unit}}",
+      "recentActivities": "Recent Activities",
+      "statLocations": "Locations",
+      "statTotalOnHand": "On hand",
+      "tab": {
+        "activity": "Activity",
+        "details": "Details",
+        "images": "Images"
+      }
+    },
+    "editItem": "Edit Material",
+    "emptyMessage": "Try adjusting your filters or add your first material to get started.",
+    "emptyTitle": "No materials yet",
+    "filterActive": "Active",
+    "filterCategoryAll": "All categories",
+    "filterInactive": "Inactive",
+    "filterStockAll": "All stock levels",
+    "filterStockInStock": "In stock",
+    "filterStockLowStock": "Below minimum",
+    "filterStockOutOfStock": "Out of stock",
+    "filterStockTitle": "Stock",
+    "form": {
+      "addUnitConversion": "Add conversion",
+      "alternativeNamesLabel": "Also known as",
+      "alternativeNamesPlaceholder": "Enter alternative name and press Enter",
+      "barcodePlaceholder": "e.g. 8934567890123",
+      "categoryLabel": "Category",
+      "categoryPlaceholder": "Pick a category",
+      "conversionBaseUnit": "Base unit",
+      "createButton": "Create Material",
+      "descriptionPlaceholder": "Material description",
+      "isActiveLabel": "Active",
+      "memoLabel": "Internal note",
+      "memoPlaceholder": "Operator remarks (not customer-facing)",
+      "minimumStockHint": "Low-stock alert threshold, in the base unit.",
+      "minimumStockLabel": "Minimum stock",
+      "minimumStockPlaceholder": "e.g. 100",
+      "namePlaceholder": "Material name",
+      "packagingSpecLabel": "Packaging specification",
+      "packagingSpecPlaceholder": "e.g. 25kg/bag; 40 bags/pallet",
+      "priceLabel": "Cost price",
+      "pricePlaceholder": "0",
+      "skuPlaceholder": "Stock-keeping unit",
+      "unitConversionsHint": "\"1 unit = quantity × baseUnit\" (e.g. 1 box = 12 pcs).",
+      "unitConversionsLabel": "Unit conversions",
+      "unitLabel": "Unit",
+      "unitPickerPlaceholder": "Pick a unit",
+      "unitPlaceholder": "e.g. pcs, kg, roll",
+      "unitsHint": "Add secondary units to enable packaging-aware inventory.",
+      "unitsLabel": "Units (multi-unit)",
+      "unitsPrimaryHint": "The first unit is the primary/base unit.",
+      "unitsSection": "Units & classification",
+      "updateButton": "Update Material"
+    },
+    "inventoryPrompt": {
+      "confirm": "Enter inventory",
+      "message": "Material created. Would you like to enter its inventory now?",
+      "title": "Enter inventory now?"
+    },
+    "noItems": "No materials found",
+    "notifications": {
+      "createError": "Failed to create material",
+      "createSuccess": "Material created successfully",
+      "deleteError": "Failed to delete material",
+      "deleteSuccess": "Material deleted successfully",
+      "disableSuccess": "Material deactivated",
+      "enableSuccess": "Material activated",
+      "fetchError": "Failed to load materials",
+      "listConflictMessage": "Another user just changed the material list. Code updated to {{code}}. Please review and submit again.",
+      "toggleError": "Failed to change material status",
+      "updateError": "Failed to update material",
+      "updateSuccess": "Material updated successfully"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "summary": {
+      "lowStock": "{{count}} low stock",
+      "negative": "{{count}} back-ordered",
+      "tracked": "{{count}} tracked"
+    },
+    "tab": {
+      "bulk": "Bulk import",
+      "single": "Single material"
+    },
+    "title": "Materials",
+    "validation": {
+      "skuDuplicate": "Another material already uses this SKU",
+      "unitConversionConflict": "Conversion ratios are inconsistent — fix conflicting rules",
+      "unitsNotConnected": "Add conversion rules so every unit is reachable"
+    }
+  },
+  "menu": {
+    "installApp": "Install App",
+    "logout": "Logout",
+    "profile": "Profile",
+    "refreshConfig": "Reload Config",
+    "reloadPage": "Reload Page",
+    "settings": "Settings"
+  },
+  "nav": {
+    "assets": "Assets",
+    "employeeOrg": "Organization",
+    "farm": "Farm",
+    "lookups": "Meta-data",
+    "lookupsV2": "Meta-data",
+    "materialsCatalog": "Materials Catalog",
+    "partners": "Partners",
+    "productCatalog": "Product Catalog",
+    "report": "Reports",
+    "warehouse": "Warehouse"
+  },
+  "operationLogs": {
+    "addItem": "Add Refuel",
+    "allMonths": "All months",
+    "deleteConfirm": {
+      "message": "Delete the log dated {{date}}? This cannot be undone.",
+      "title": "Delete refuel log?"
+    },
+    "driverTraining": {
+      "addItem": "Add training",
+      "columns": {
+        "course": "Course",
+        "date": "Date",
+        "result": "Result",
+        "trainer": "Trainer"
+      },
+      "editItem": "Edit training",
+      "empty": "No training logs for {{year}} yet.",
+      "form": {
+        "coursePlaceholder": "e.g. Defensive driving",
+        "notePlaceholder": "Optional note",
+        "resultPlaceholder": "e.g. Pass",
+        "trainerPlaceholder": "Trainer / provider"
+      },
+      "sectionTitle": "Training logs"
+    },
+    "exportExcel": "Export Excel",
+    "form": {
+      "createButton": "Add Log",
+      "selectDriver": "Select driver"
+    },
+    "maintenance": {
+      "addItem": "Add maintenance",
+      "columns": {
+        "accountsReceived": "Accounts received",
+        "condition": "Condition",
+        "date": "Date",
+        "item": "Item",
+        "laborCost": "Labor cost",
+        "odometer": "Odometer",
+        "outstanding": "Outstanding",
+        "quantity": "Quantity",
+        "supplier": "Supplier",
+        "total": "Total",
+        "totalAmount": "Total amount",
+        "type": "Type",
+        "unitPrice": "Unit price"
+      },
+      "editItem": "Edit maintenance",
+      "empty": "No maintenance logs for {{year}} yet.",
+      "form": {
+        "conditionPlaceholder": "e.g. New / Used",
+        "itemPlaceholder": "e.g. Oil change, brake pads",
+        "notePlaceholder": "Optional note",
+        "outstandingHint": "Total − Paid (auto)",
+        "supplierPlaceholder": "Garage / vendor",
+        "typePlaceholder": "Select maintenance type"
+      },
+      "sectionTitle": "Maintenance"
+    },
+    "monthLabel": "Month",
+    "notifications": {
+      "createError": "Failed to save entry",
+      "createSuccess": "Entry saved",
+      "deleteError": "Failed to delete entry",
+      "deleteSuccess": "Entry deleted",
+      "fetchError": "Failed to load logs",
+      "updateError": "Failed to update entry",
+      "updateSuccess": "Entry updated"
+    },
+    "refuel": {
+      "abnormalTooltip": "Consumption is higher than normal",
+      "addItem": "Add refuel log",
+      "columns": {
+        "consumption": "L/100km",
+        "date": "Date",
+        "distance": "Distance (km)",
+        "driver": "Driver",
+        "litres": "Litres",
+        "odometerNew": "New ODO (km)",
+        "odometerOld": "Old ODO (km)",
+        "total": "Amount",
+        "unitPrice": "Unit price"
+      },
+      "editItem": "Edit refuel log",
+      "empty": "No refuel logs for {{year}} yet.",
+      "form": {
+        "driverPlaceholder": "Driver name",
+        "notePlaceholder": "Optional note"
+      },
+      "sectionTitle": "Refuel logs",
+      "summary": {
+        "avgConsumption": "Avg consumption",
+        "totalCost": "Total cost",
+        "totalDistance": "Total distance",
+        "totalLitres": "Total litres"
+      }
+    },
+    "trip": {
+      "addItem": "Add trip",
+      "columns": {
+        "date": "Date",
+        "destination": "Route / Destination",
+        "driver": "Driver",
+        "odometer": "Odometer"
+      },
+      "editItem": "Edit trip",
+      "empty": "No trips for {{year}} yet.",
+      "form": {
+        "destinationPlaceholder": "e.g. HCM — Da Lat",
+        "driverPlaceholder": "Driver name",
+        "notePlaceholder": "Optional note"
+      },
+      "sectionTitle": "Trips"
+    },
+    "validation": {
+      "dateRequired": "Date is required",
+      "litresInvalid": "Litres cannot be negative",
+      "quantityInvalid": "Quantity cannot be negative",
+      "unitPriceInvalid": "Unit price cannot be negative"
+    },
+    "yearLabel": "Year"
+  },
+  "photos": {
+    "capture": "Capture",
+    "dragOrClick": "Drag photos here, or click to browse",
+    "dropHere": "Drop to upload",
+    "empty": "No photos uploaded yet",
+    "hint": "JPG, PNG, WebP, GIF. Max {{max}}MB each.",
+    "hintCompressed": "JPG, PNG, WebP, GIF. Auto-compressed to ~{{kb}}KB each.",
+    "invalidType": "{{name}}: unsupported file type",
+    "keep": "Use Photo",
+    "loadingLocation": "Loading location...",
+    "permissionDenied": "Camera access denied",
+    "retake": "Retake",
+    "takenAtDeliveryBadge": "Taken at delivery",
+    "tooLarge": "{{name}}: exceeds {{max}}MB limit",
+    "tryAgain": "Try Again",
+    "uploadError": "Failed to upload {{name}}",
+    "uploadSuccess": "{{count}} photo(s) uploaded",
+    "uploading": "Uploading..."
+  },
+  "productInventory": {
+    "beginOfPeriod": {
+      "buttonLabel": "Begin of period",
+      "currentBegin": "Current begin of period",
+      "deltaLabel": "Adjustment (+/-)",
+      "error": "Failed to update begin-of-period stock",
+      "modeDelta": "Adjust (+/-)",
+      "modeSnapshot": "Set value",
+      "negative": "Begin-of-period stock can't be negative",
+      "newBegin": "New begin of period",
+      "saved": "Begin-of-period stock updated",
+      "snapshotLabel": "Begin-of-period stock ({{period}})",
+      "title": "Begin of period — {{period}}"
+    },
+    "columns": {
+      "availableTooltip": "On hand minus reserved by open sales orders. Negative = over-committed.",
+      "forecasted": "Forecasted",
+      "forecastedTooltip": "Available + incoming inbound from open goods receipts.",
+      "incoming": "Incoming",
+      "incomingTooltip": "Inbound stock from open (draft) goods receipts. Excludes received and cancelled.",
+      "outgoing": "Outgoing",
+      "outgoingTooltip": "Reserved by open sales orders. Released when shipped or cancelled.",
+      "overcommittedTooltip": "Reserved {{reserved}} exceeds on-hand {{onHand}}. Replenish or release reservations."
+    },
+    "composeSet": {
+      "blockedTitle": "Can't compose yet — resolve the issues below",
+      "componentCol": "Component",
+      "currentCol": "Current",
+      "customerLabel": "Customer (optional)",
+      "customerPlaceholder": "Pick a customer",
+      "description": "Assemble bundled sets from their components. Decreases each component's on-hand and increases the set's on-hand at the chosen location.",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Pick a location",
+      "noRowAtLocation": "No inventory row at this location — create one first.",
+      "note": "Composed {{qty}} × {{code}}",
+      "openButton": "Compose set",
+      "parentMissing": "Parent set has no row here",
+      "parentWillCreate": "Will create inventory row",
+      "partialFailureMessage": "{{written}} write(s) succeeded before failing: {{error}}. Refresh and review affected rows.",
+      "partialFailureTitle": "Compose partially failed",
+      "quantityLabel": "Quantity to compose",
+      "requiredCol": "Required",
+      "resultCol": "Result",
+      "salesOrderEmpty": "No open orders for this customer",
+      "salesOrderLabel": "Sales order (optional)",
+      "salesOrderPlaceholder": "Pick an open order",
+      "setLabel": "Set product",
+      "setPlaceholder": "Pick a set product",
+      "shortBadge": "short {{short}}",
+      "soNeeded": "This order needs {{qty}} {{unit}}",
+      "submit": "Compose {{qty}} set(s)",
+      "success": "Composed {{qty}} × {{code}}",
+      "title": "Compose set",
+      "unknownProduct": "Component product not found in master data.",
+      "validation": {
+        "componentShort": "{{code}}: short {{short}} {{unit}}",
+        "componentUnknown": "{{code}}: component product not found",
+        "parentMissing": "Set product {{code}} has no inventory row at this location",
+        "pickLocation": "Pick a location",
+        "pickSet": "Pick a set product",
+        "positiveQty": "Enter a positive quantity"
+      }
+    },
+    "decomposeSet": {
+      "blockedTitle": "Can't decompose yet — resolve the issues below",
+      "componentCol": "Component",
+      "currentCol": "Current",
+      "description": "Disassemble pre-built sets back into their components. Decreases the set's on-hand and increases each component's on-hand at the chosen location.",
+      "locationLabel": "Location",
+      "locationPlaceholder": "Pick a location",
+      "note": "Decomposed {{qty}} × {{code}}",
+      "openButton": "Decompose set",
+      "parentMissing": "Parent set has no row here",
+      "partialFailureMessage": "{{written}} write(s) succeeded before failing: {{error}}. Refresh and review affected rows.",
+      "partialFailureTitle": "Decompose partially failed",
+      "quantityLabel": "Quantity to decompose",
+      "resultCol": "Result",
+      "returnCol": "Returned",
+      "setLabel": "Set product",
+      "setPlaceholder": "Pick a set product",
+      "shortBadge": "short {{short}}",
+      "submit": "Decompose {{qty}} set(s)",
+      "success": "Decomposed {{qty}} × {{code}}",
+      "title": "Decompose set",
+      "validation": {
+        "componentRowMissing": "{{code}}: no inventory row at this location — create one first",
+        "componentUnknown": "{{code}}: component product not found",
+        "parentMissing": "Set product {{code}} has no inventory row at this location",
+        "parentShort": "Set {{code}} has only {{short}} {{unit}} less than requested at this location",
+        "pickLocation": "Pick a location",
+        "pickSet": "Pick a set product",
+        "positiveQty": "Enter a positive quantity"
+      }
+    },
+    "defaultLocationBadge": "default",
+    "emptyMessage": "Add an entry — pick a product and location, set the starting on-hand.",
+    "emptyTitle": "No inventory rows yet",
+    "exportButton": "Export",
+    "filterByLocation": "Filter by location",
+    "filterInactive": "Archived",
+    "filterStock": {
+      "all": "All",
+      "lowStock": "Below minimum",
+      "negative": "Back-ordered",
+      "noStock": "No stock",
+      "outOfStock": "Out of stock",
+      "placeholder": "All stock levels",
+      "title": "Stock"
+    },
+    "form": {
+      "backOrderWarning": "Negative on-hand allowed — useful for back-orders. Verify intent.",
+      "currentOnHand": "Current on hand",
+      "deltaLabel": "Delta",
+      "deltaPlaceholder": "e.g. 5 or -3",
+      "locationPlaceholder": "Pick a location",
+      "newOnHand": "New on hand",
+      "newOnHandLabel": "New on hand",
+      "noteLabel": "Note (optional)",
+      "notePlaceholder": "Reason — receipt, count adjustment, damage...",
+      "onHandLabel": "Initial on hand",
+      "productPlaceholder": "Pick a product",
+      "submitAdjust": "Apply adjustment",
+      "submitRepack": "Apply repack",
+      "submitStockTake": "Save count",
+      "varianceLabel": "Variance"
+    },
+    "importButton": "Import",
+    "importModal": {
+      "confirm": "Replace inventory",
+      "existing": "{{count}} existing",
+      "fileSummary": "File: {{filename}} — {{parsed}} row(s) parsed.",
+      "matched": "{{count}} matched",
+      "title": "Replace product inventory from file",
+      "unmatched": "{{count}} unmatched",
+      "unmatchedHint": "Unmatched: {{skus}}{{more}}",
+      "warningBody": "The {{matched}} matching row(s) will be upserted by (product, location) — on-hand and unit on those rows get overwritten; reservations, notes, and other extra fields are preserved. {{existing}} existing row(s) not in the file are left unchanged.",
+      "warningTitle": "Destructive action"
+    },
+    "inbound": {
+      "detailLabel": "Inbound",
+      "forecastedHelp": "Available + inbound from open draft receipts.",
+      "fromDrafts_one": "From {{count}} draft receipt",
+      "fromDrafts_other": "From {{count}} draft receipts",
+      "moreDrafts_one": "+{{count}} more receipt",
+      "moreDrafts_other": "+{{count}} more receipts",
+      "unmappedWarning_one": "{{count}} line skipped — unit not on product",
+      "unmappedWarning_other": "{{count}} lines skipped — unit not on product"
+    },
+    "kpis": {
+      "lowStock": "{{count}} below min",
+      "negative": "{{count}} back-ordered",
+      "outOfStock": "{{count}} out of stock",
+      "secondaryMustOrder": "{{count}} back-ordered",
+      "secondaryOutOfStock": "{{count}} out of stock",
+      "totalProducts": "{{count}} products"
+    },
+    "modal": {
+      "createTitle": "Add inventory entry",
+      "updateTitle": "Update inventory"
+    },
+    "mode": {
+      "delta": "Adjust (delta)",
+      "repack": "Repack",
+      "snapshot": "Stock-take (absolute)"
+    },
+    "notifications": {
+      "adjustError": "Failed to apply adjustment",
+      "adjustSuccess": "On-hand updated",
+      "conversionError": "No conversion path between these units",
+      "createError": "Failed to add entry",
+      "createSuccess": "Entry added",
+      "deleteError": "Failed to delete row",
+      "deleteSuccess": "Row deleted",
+      "duplicatePair": "An entry already exists for this product + location",
+      "exportEmpty": "No inventory rows to export",
+      "exportError": "Failed to export inventory",
+      "exportSuccess": "Exported {{count}} row(s)",
+      "fetchError": "Failed to load inventory",
+      "importError": "Failed to import inventory",
+      "importMissingColumn": "Missing required column(s): {{columns}}. Use the latest exported file as a template.",
+      "importMissingColumnTitle": "File is missing a required column",
+      "importNoIdentity": "The file must include either an SKU column or a Product Code column so rows can be matched against master data.",
+      "importNoMatched": "None of the {{count}} parsed row(s) matched a known product.",
+      "importNoMatchedTitle": "No matching products in master data",
+      "importNoValid": "No valid rows found in the file",
+      "importParseError": "Failed to read the Excel file. Try saving it again as .xlsx.",
+      "importPartial": "Imported {{created}} added + {{updated}} updated of {{total}} row(s); {{failed}} failed.",
+      "importPartialTitle": "Imported with errors",
+      "importSuccess": "Imported: {{created}} added, {{updated}} updated.",
+      "repackError": "Failed to apply repack",
+      "repackSuccess": "Repack applied",
+      "stockTakeError": "Failed to save count",
+      "stockTakeSuccess": "Stock-take saved"
+    },
+    "outgoing": {
+      "fromOrders_one": "Held by {{count}} sales order",
+      "fromOrders_other": "Held by {{count}} sales orders",
+      "moreOrders_one": "+{{count}} more order",
+      "moreOrders_other": "+{{count}} more orders"
+    },
+    "repack": {
+      "balanced": "Repack balances in base-unit terms.",
+      "fromQtyLabel": "From quantity",
+      "fromUnitLabel": "From unit",
+      "reason": {
+        "breakage": "Breakage",
+        "damage": "Damage",
+        "other": "Other",
+        "spillage": "Spillage"
+      },
+      "toQtyLabel": "To quantity",
+      "toUnitLabel": "To unit",
+      "writeOffHint": "Quantity lost during repack (in base unit).",
+      "writeOffOptional": "Write-off (optional)",
+      "writeOffQtyLabel": "Write-off ({{unit}})",
+      "writeOffReasonLabel": "Reason"
+    },
+    "stockState": {
+      "low": "low",
+      "negative": "back-ordered"
+    },
+    "validation": {
+      "bad": "Invalid input",
+      "deltaRequired": "Delta is required",
+      "insufficientStock": "Not enough stock of '{{unit}}'",
+      "noConversionPath": "No conversion defined between this unit and the base unit. Add a conversion rule on the product first.",
+      "onHandRequired": "On-hand value is required",
+      "positiveRequired": "Must be greater than zero",
+      "productRequired": "Product is required",
+      "repackInvalid": "Repack is invalid",
+      "unknownUnit": "Unit '{{unit}}' is not on this product",
+      "valueRequired": "Value is required"
+    }
+  },
+  "products": {
+    "addItem": "Add Product",
+    "barcode": {
+      "invalid": "Can't render this barcode"
+    },
+    "bulkImport": {
+      "import": "Import Products",
+      "missingColumnMessage": "The file is missing required column(s): {{columns}}. Please use the latest template — click \"Download Sample\" above.",
+      "missingColumnTitle": "File format not supported",
+      "noValidRows": "No valid products found in the file",
+      "sampleDescription": "Download a pre-formatted template to fill in product data",
+      "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
+      "unknownLabelTitle": "Unrecognized category or tag",
+      "unknownTagMessage": "Unrecognized tags: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
+      "uploadFile": "Upload Product File"
+    },
+    "columns": {
+      "minimumInventory": "Min"
+    },
+    "columnsExtra": {
+      "attributes": "Attributes",
+      "tags": "Tags"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this product? This action cannot be undone.",
+      "title": "Delete Product"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this product yet.",
+      "activityVerbs": {
+        "create": "Created",
+        "delete": "Deleted",
+        "disable": "Disabled",
+        "enable": "Enabled",
+        "inventory": {
+          "adjust": "Adjusted stock for",
+          "beginOfPeriod": "Set begin-of-period stock for",
+          "create": "Added stock entry for",
+          "import": "Imported stock for",
+          "repack": "Repacked stock for",
+          "stockTake": "Recorded stock-take for"
+        },
+        "update": "Updated",
+        "updateClassification": "Updated classification for",
+        "updateDescription": "Updated description for",
+        "updateImages": "Updated images for",
+        "updateTechSpecs": "Updated tech specs for"
+      },
+      "attrCardTitle": "Classification & attributes",
+      "attributesEmpty": "No attributes",
+      "barcodeFormat": "Format",
+      "belowMinimum": "Below minimum",
+      "headerInventoryLabel": "Stock",
+      "imagesEmpty": "No images yet",
+      "imagesEmptyDesc": "Add images via the edit form to showcase this product.",
+      "inventoryTab": {
+        "empty": "No inventory records for this product.",
+        "noInventoryNote": "This product is not inventory-managed — stock isn't tracked.",
+        "title": "Stock on Hand",
+        "totalOnHand": "{{count}} {{unit}} total"
+      },
+      "minInventoryTitle": "Minimum stock",
+      "noInventoryBadge": "No inventory",
+      "noPhotoHint": "No photo",
+      "recentActivities": "Recent Activities",
+      "setBadge": "Set",
+      "setComponentRow": "{{quantity}} × {{productName}} ({{unit}})",
+      "setCompositionEmpty": "This product has no set components.",
+      "setCompositionTitle": "Set composition",
+      "statusActive": "On sale",
+      "statusInactive": "Inactive",
+      "suggestedPriceLabel": "Suggested price",
+      "tab": {
+        "activity": "Activity",
+        "details": "Details",
+        "images": "Images"
+      },
+      "tagsEmpty": "No tags",
+      "techSpecCardTitle": "Technical specs",
+      "techSpecsEmpty": "No technical specs",
+      "updatedByOn": "Updated by <user/> on {{date}}"
+    },
+    "editItem": "Edit Product",
+    "emptyMessage": "Try adjusting your filters or add your first product to get started.",
+    "emptyTitle": "No products yet",
+    "filterActive": "Active",
+    "filterCategoryAll": "All categories",
+    "filterInactive": "Inactive",
+    "filterStockAll": "All stock levels",
+    "filterStockInStock": "In stock",
+    "filterStockLowStock": "Below minimum",
+    "filterStockNotManaged": "Not inventory-managed",
+    "filterStockOutOfStock": "Out of stock",
+    "filterStockTitle": "Stock",
+    "form": {
+      "alternativeNamesDesc": "Other names customers or staff use to refer to this product. Press Enter to add.",
+      "alternativeNamesLabel": "Alternative names",
+      "alternativeNamesPlaceholder": "Type a name and press Enter...",
+      "attributeAdd": "Add attribute",
+      "attributeKeyPlaceholder": "Property name (e.g. Color)",
+      "attributeValuePlaceholder": "Value (e.g. Walnut)",
+      "attributesDesc": "Free-form key/value pairs. Both fields are required for the row to be saved.",
+      "attributesLabel": "Custom attributes",
+      "barcodePlaceholder": "EAN / UPC / custom",
+      "categoryPlaceholder": "e.g. Furniture, Electronics",
+      "classificationSection": "Classification",
+      "createButton": "Create Product",
+      "descriptionPlaceholder": "Product description",
+      "isActiveLabel": "Active",
+      "minimumInventoryDesc": "Alert operators when stock falls at or below this level.",
+      "minimumInventoryUnitPlaceholder": "Unit (e.g. pcs, box)",
+      "namePlaceholder": "Product name",
+      "noInventoryDescription": "Sold freely without stock tracking — hidden from inventory and goods receipts.",
+      "noInventoryLabel": "Not inventory-managed",
+      "priceLabel": "Selling price",
+      "pricePlaceholder": "0",
+      "primaryDetails": "Primary details",
+      "setCompositionTitle": "Set composition",
+      "setItemAdd": "Add component",
+      "setItemProductPlaceholder": "Pick a product",
+      "setItemsDesc": "Components sold together as a bundle. Each component must be a real (non-set) product. Leave empty for a normal product.",
+      "sizeLabel": "Size",
+      "sizePlaceholder": "e.g. M, 42, 120×60 cm",
+      "skuPlaceholder": "Stock-keeping unit",
+      "suggestedPriceDescription": "Default unit price when added to a new sales order.",
+      "suggestedPriceLabel": "Suggested price",
+      "tagsLabel": "Tags",
+      "tagsPlaceholder": "Type a tag and press Enter...",
+      "unitConversionAdd": "Add conversion",
+      "unitConversionFrom": "From",
+      "unitConversionTo": "To",
+      "unitPlaceholder": "e.g. pcs, kg, box",
+      "updateButton": "Update Product"
+    },
+    "inventoryPrompt": {
+      "confirm": "Enter inventory",
+      "message": "Product created. Would you like to enter its inventory now?",
+      "title": "Enter inventory now?"
+    },
+    "noItems": "No products found",
+    "notifications": {
+      "createError": "Failed to create product",
+      "createSuccess": "Product created successfully",
+      "deleteError": "Failed to delete product",
+      "deleteSuccess": "Product deleted successfully",
+      "disableSuccess": "Product deactivated",
+      "enableSuccess": "Product activated",
+      "exportError": "Failed to export product list",
+      "fetchError": "Failed to load products",
+      "listConflictMessage": "Another user just changed the product list. Code updated to {{code}}. Please review and submit again.",
+      "toggleError": "Failed to update product status",
+      "updateError": "Failed to update product",
+      "updateSuccess": "Product updated successfully"
+    },
+    "status": {
+      "active": "Active"
+    },
+    "tab": {
+      "bulk": "Bulk import",
+      "single": "Single product"
+    },
+    "validation": {
+      "pairUnitRequired": "Unit is required when value is set",
+      "pairValueRequired": "Value is required when unit is set",
+      "setItemMissingProduct": "Pick a product for every set component",
+      "setItemMissingUnit": "Pick a unit for every set component",
+      "setItemNested": "A set component cannot itself be a set",
+      "setItemQuantity": "Component quantity must be greater than zero",
+      "setItemSelfRef": "A set cannot contain itself",
+      "skuDuplicate": "Another product already uses this SKU",
+      "unitConversionConflict": "Conversion ratios are inconsistent — fix conflicting rules",
+      "unitsNotConnected": "Add conversion rules so every unit is reachable"
+    }
+  },
+  "profile": {
+    "account": "Account",
+    "language": "Language",
+    "languageDesc": "Choose your preferred display language",
+    "navbarExpanded": "Sidebar Expanded",
+    "navbarExpandedDesc": "Keep the navigation sidebar expanded by default",
+    "perm": {
+      "actionsGroup": "Actions",
+      "canCreate": "Add",
+      "canDelete": "Delete",
+      "canEdit": "Edit",
+      "canView": "View",
+      "custom": "Custom",
+      "customHint": "This employee differs from the department default",
+      "disableAll": "Disable all",
+      "enableAll": "Enable all",
+      "flags": {
+        "canBulkImport": "Bulk Import via Excel",
+        "canConfirmReceived": "Confirm Received",
+        "canEditDeliveryPackageSize": "Edit Delivery Package Size",
+        "canIssueMagicLink": "Issue Magic Link",
+        "canManageInventory": "Manage Inventory",
+        "canManagePhotos": "Manage Photos",
+        "canManagePrice": "Manage Price",
+        "canManualRelease": "Manual Release",
+        "canModify": "Modify Permissions",
+        "canReorder": "Sort Deliveries",
+        "canSetPassword": "Set Password",
+        "canTakePhoto": "Take Photo",
+        "canToggleStatus": "Toggle Status",
+        "canTransitionStatus": "Change Status",
+        "canViewActivityLog": "View Activity Log",
+        "canViewAll": "View all records",
+        "canViewPrice": "View Price",
+        "canViewSelf": "View own records",
+        "canViewSetComponentInventory": "View component inventory of sets"
+      },
+      "modules": {
+        "asset": "Asset",
+        "crop": "Crop",
+        "cropDiary": "Crop Diary",
+        "cropDiaryTemplate": "Diary Template",
+        "customer": "Customer",
+        "deliveryRequest": "Delivery Request",
+        "employee": "Employee",
+        "goodsReceipt": "Goods Receipt",
+        "greenhouse": "Greenhouse",
+        "location": "Location",
+        "lookupV2": "Lookup",
+        "material": "Material",
+        "materialInventory": "Material Inventory",
+        "permissionManagement": "Permission Management",
+        "product": "Product",
+        "productInventory": "Product Inventory",
+        "salesOrder": "Sales Order",
+        "transportOrder": "Transport Order",
+        "truck": "Truck",
+        "vendor": "Vendor"
+      },
+      "noExtra": "No additional permissions for this module",
+      "queryGroup": "Query"
+    },
+    "permissions": "Permissions",
+    "preferences": "Preferences",
+    "preferencesComingSoon": "More options coming soon",
+    "preferencesComingSoonDesc": "Additional personal preferences will appear here as they become available.",
+    "title": "Profile"
+  },
+  "pwa": {
+    "appAvailableOffline": "App is now available offline!",
+    "clickToUpdate": "Click here to update now.",
+    "install": "Install",
+    "installDescription": "Install this app on your device for a better experience",
+    "installTitle": "Install C-Mngt App",
+    "maybeLater": "Maybe later",
+    "newVersionAvailable": "New Version Available",
+    "offlineReady": "Ready to work offline",
+    "reloadAutomatically": "The app will reload automatically.",
+    "reloadIn3Seconds": "The app will reload in 3 seconds.",
+    "safari": {
+      "closeCompletelyInstructions": "Close Safari completely (swipe up then swipe app away), then reopen from home screen.",
+      "dontShowAgain": "Don't show again",
+      "installDescription": "Add C-Mngt to your home screen for quick access and offline use",
+      "installTitle": "Install C-Mngt App",
+      "ios": {
+        "step1": "Tap the Share button in Safari toolbar",
+        "step2": "Scroll down and tap 'Add to Home Screen'",
+        "step3": "Tap 'Add' to install the app"
+      },
+      "mac": {
+        "step1": "Click File menu in Safari",
+        "step2": "Select 'Add to Dock' from the menu",
+        "step3": "The app will be added to your Dock for easy access"
+      },
+      "remindLater": "Remind me later"
+    },
+    "updating": "Updating..."
+  },
+  "quotations": {
+    "actions": {
+      "cancelQuotation": "Cancel",
+      "copy": "Copy",
+      "exportPdf": "Export PDF",
+      "generateSalesOrder": "Generate sales order",
+      "markReady": "Mark as ready",
+      "new": "New quotation"
+    },
+    "cancelConfirm": {
+      "message": "Cancel this quotation? It will be locked and can no longer be edited or marked ready.",
+      "title": "Cancel this quotation?"
+    },
+    "cancelledNote": "This quotation has been cancelled.",
+    "columns": {
+      "date": "Date"
+    },
+    "convertedNote": "A sales order has been generated from this quotation.",
+    "copiedFrom": "Copied from {{code}} — adjust and save as a new draft.",
+    "countLabel_one": "{{count}} quotation",
+    "countLabel_other": "{{count}} quotations",
+    "dangerZone": {
+      "deleteItem": "Delete quotation",
+      "deleteItemDesc": "Permanently remove this quotation"
+    },
+    "dateKind": {
+      "created": "Created",
+      "po": "PO date",
+      "sent": "Sent"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this quotation? This action cannot be undone.",
+      "title": "Delete quotation"
+    },
+    "editTitle": "Edit quotation",
+    "emptyState": "No quotations in this period.",
+    "filter": {
+      "allStatuses": "All",
+      "lastMonths_one": "Last {{count}} month",
+      "lastMonths_other": "Last {{count}} months",
+      "searchPlaceholder": "Search code or customer"
+    },
+    "form": {
+      "addLine": "Add product",
+      "amountLabel": "Amount",
+      "belowSuggestedPriceHint": "Below suggested price ({{price}})",
+      "customerLabel": "Customer",
+      "customerPlaceholder": "Select customer (optional)",
+      "headerSection": "Quotation",
+      "linesLabel": "Products",
+      "noLines": "No products yet. Add products, quantities and prices.",
+      "note": "Note",
+      "priceLabel": "Unit price",
+      "productLabel": "Product",
+      "productPlaceholder": "Select product",
+      "quantityLabel": "Quantity",
+      "totalLabel": "Total",
+      "unitLabel": "Unit"
+    },
+    "fromQuotation": "From quotation",
+    "lockedNote": "This quotation is marked ready and locked. Copy it to make changes.",
+    "newTitle": "New quotation",
+    "notifications": {
+      "cancelError": "Failed to cancel quotation",
+      "cancelSuccess": "Quotation cancelled",
+      "createError": "Failed to create quotation",
+      "createSuccess": "Quotation created",
+      "deleteError": "Failed to delete quotation",
+      "deleteSuccess": "Quotation deleted",
+      "duplicateCode": "Code already in use, please try again",
+      "fetchError": "Failed to load quotations",
+      "sendError": "Failed to mark quotation ready",
+      "sendSuccess": "Quotation marked ready",
+      "updateError": "Failed to update quotation",
+      "updateSuccess": "Quotation updated"
+    },
+    "print": {
+      "includeVat": "Include VAT",
+      "landscape": "Landscape",
+      "optionsTitle": "Export options",
+      "orientation": "Orientation",
+      "paperSize": "Paper size",
+      "popupBlocked": "Pop-up blocked. Allow pop-ups for this site, then try again.",
+      "portrait": "Portrait"
+    },
+    "sendConfirm": {
+      "message": "Once marked ready, this quotation is locked and can no longer be edited. Continue?",
+      "title": "Mark this quotation as ready?"
+    },
+    "status": {
+      "cancelled": "Cancelled",
+      "converted": "Converted",
+      "draft": "Draft",
+      "sent": "Ready"
+    },
+    "title": "Quotations",
+    "validation": {
+      "linesRequired": "Add at least one product."
+    }
+  },
+  "report": {
+    "back": "Back to reports",
+    "byCustomer": {
+      "col": "Customer",
+      "heading": "Top customers"
+    },
+    "byMethod": {
+      "heading": "Delivery method"
+    },
+    "byProduct": {
+      "col": "Product",
+      "heading": "Best-selling products",
+      "qty": "Quantity"
+    },
+    "byStaff": {
+      "col": "Salesperson",
+      "heading": "Revenue by salesperson",
+      "orders": "Orders",
+      "revenue": "Revenue",
+      "share": "Share"
+    },
+    "comingSoon": "Reports for this client are coming soon.",
+    "common": {
+      "currency": "VND (₫)",
+      "exVat": "Revenue excludes VAT",
+      "period": "Reporting period",
+      "print": "Print report",
+      "sample": "SAMPLE DATA"
+    },
+    "kpi": {
+      "avgOrder": "Avg. per order",
+      "customers": "Customers served",
+      "newCustomers": "new customers",
+      "orders": "Orders",
+      "revenue": "Total revenue",
+      "vsPrev": "vs. previous period"
+    },
+    "menu": {
+      "heading": "Choose a report",
+      "subtitle": "Pick a report type to view the details."
+    },
+    "status": {
+      "cancelled": "Cancelled",
+      "delivered": "Delivered",
+      "heading": "Order fulfillment",
+      "processing": "Processing"
+    },
+    "title": "Reports",
+    "trend": {
+      "avg": "Average",
+      "heading": "Revenue over time",
+      "peak": "Peak",
+      "perDay": "/day"
+    },
+    "types": {
+      "delivery": {
+        "desc": "On-time rate, delays, and performance by driver.",
+        "title": "Delivery report"
+      },
+      "inventory": {
+        "desc": "Stock value, items to reorder, and out-of-stock items.",
+        "title": "Inventory report"
+      },
+      "monthly": {
+        "desc": "Total sales for a month — by salesperson, customer and product.",
+        "title": "Monthly sales"
+      },
+      "weekly": {
+        "desc": "Total sales for a week — by salesperson, customer and product.",
+        "title": "Weekly sales"
+      }
+    },
+    "units": {
+      "billion": "bn ₫",
+      "customersShort": "cust.",
+      "million": "M ₫",
+      "orders": "orders",
+      "pieces": "pcs"
+    },
+    "wip": {
+      "desc": "This report is under development and will be available soon.",
+      "title": "Under development"
+    }
+  },
+  "salesOrders": {
+    "activity": {
+      "cancelAfterShipNote": "Stock was already shipped — cancellation does not reverse it. Manual adjustment may be needed.",
+      "inventoryAutoReleased": "Auto-released reservations on cancel",
+      "inventoryManualReleased": "Manually released reservations",
+      "inventoryReleaseFailed": "Inventory release failed",
+      "inventoryReserved": "Reserved stock",
+      "inventoryShipped": "Shipped (deducted on-hand)"
+    },
+    "addItem": "New Order",
+    "billing": {
+      "invoiceIssued": "Issued",
+      "invoiceIssuedLabel": "Invoice issued",
+      "invoiceLabel": "Invoice",
+      "invoiceNotIssued": "Not issued",
+      "invoicedBadge": "Invoiced",
+      "isPaidLabel": "Paid",
+      "needShippingFeeLabel": "Need shipping fee",
+      "needVatLabel": "Need VAT",
+      "off": "Off",
+      "on": "On",
+      "paid": "Paid",
+      "paidAmountDescription": "Amount paid so far (for partial payment). Ignored when \"Paid\" is on.",
+      "paidAmountLabel": "Paid amount",
+      "paidAmountPlaceholder": "0",
+      "paidLabel": "Payment",
+      "paidRemaining": "Paid {{paid}} · Remaining {{remaining}}",
+      "partial": "Partial",
+      "partialPaidShort": "Paid {{amount}}",
+      "section": "Billing & Payment",
+      "shippingFeeLabel": "Shipping fee",
+      "shippingFeePlaceholder": "0",
+      "totalInclLabel": "Total (incl.)",
+      "unpaid": "Unpaid",
+      "vatAmountLabel": "VAT amount",
+      "vatRateLabel": "VAT rate",
+      "vatTag": "VAT",
+      "vatTagLabel": "VAT tag",
+      "vatTagPlaceholder": "e.g. 10%, Exempt"
+    },
+    "cancel": {
+      "actionButton": "Cancel Order",
+      "confirmMessage": "Cancel this order while in \"{{status}}\"? Inventory side-effects must be reconciled manually if any apply.",
+      "confirmTitle": "Cancel Order",
+      "previewAfterShip": "This order has already shipped. Cancelling it will NOT return the stock — adjust inventory manually if a return is needed.",
+      "previewReleaseReserved_one": "On cancel, {{count}} reserved row will be released automatically.",
+      "previewReleaseReserved_other": "On cancel, {{count}} reserved rows will be released automatically.",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Why is this order being cancelled?",
+      "statusBadge": "Cancelled"
+    },
+    "cheatMarker": {
+      "label": "Auto-completed",
+      "tooltip": "Completed by the NKTU dashboard reconcile (bypassing the full-delivery check), not the normal flow. Visible to root only."
+    },
+    "columns": {
+      "assignedStaff": "Assigned Staff",
+      "deliveryDate": "Delivery Date",
+      "labels": "Labels",
+      "orderDate": "Order Date",
+      "orderNumber": "Order Number"
+    },
+    "configErrors": {
+      "description": "The Sales Orders module has been disabled because its configuration is invalid. Fix these issues in App Config and reload:",
+      "title": "Sales Orders configuration is invalid"
+    },
+    "datePreset": {
+      "custom": "Custom"
+    },
+    "delete": {
+      "actionButton": "Delete Order",
+      "confirmMessage": "Delete this order? This can't be undone. Any reserved stock is released back, and any shipped stock is added back to inventory.",
+      "confirmTitle": "Delete Order"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this order yet.",
+      "activityMemo": {
+        "autoAdvanceOnCreate": "(auto-advance on create)",
+        "autoReleaseFailed": "Auto-release failed — manual release pending",
+        "cancelledFrom": "Cancelled from",
+        "customer": "Customer",
+        "driverNoteChanged": "Driver note changed",
+        "editedKeys": "Fields",
+        "fieldLocation": "Location",
+        "fieldQuantity": "Qty",
+        "fieldUnit": "Unit",
+        "fieldUnitPrice": "Price",
+        "fromTo": "{{from}} → {{to}}",
+        "fullyReleased": "Reservation fully released",
+        "inventoryAction": {
+          "autoShipOnCompletion": "Auto-ship on completion",
+          "release": "Released reservation",
+          "reserve": "Reserved stock",
+          "ship": "Shipped (deducted on-hand)"
+        },
+        "itemMemoChanged": "Item note changed",
+        "itemsAdded_one": "{{count}} item added",
+        "itemsAdded_other": "{{count}} items added",
+        "itemsChanged_one": "{{count}} item changed",
+        "itemsChanged_other": "{{count}} items changed",
+        "itemsRemoved_one": "{{count}} item removed",
+        "itemsRemoved_other": "{{count}} items removed",
+        "lineCount_one": "{{count}} line",
+        "lineCount_other": "{{count}} lines",
+        "notesChanged": "Notes changed",
+        "reason": "Reason",
+        "reservationDiffRows_one": "{{count}} inventory row adjusted",
+        "reservationDiffRows_other": "{{count}} inventory rows adjusted",
+        "reservationReleased": "Reservation released on cancel",
+        "reservationUnchanged": "No reservation was held",
+        "rowsReleased_one": "{{count}} row released",
+        "rowsReleased_other": "{{count}} rows released",
+        "warehouseNoteChanged": "Warehouse note changed"
+      },
+      "activityVerbs": {
+        "cancel": "Cancelled order",
+        "create": "Created order",
+        "delete": "Deleted order",
+        "manualRelease": "Released reservation",
+        "statusChange": "Changed status of",
+        "update": "Edited order",
+        "updateInline": "Updated fields on"
+      },
+      "additionalDeliveryRequestInfoTitle": "Additional Delivery Request",
+      "assignedStaff": "Assigned Staff",
+      "available": "Available",
+      "availableActions": "Available Actions",
+      "availableOk": "{{available}} {{unit}} available",
+      "availableShort": "only {{available}} {{unit}}",
+      "availableShortBadge": "short",
+      "belowSuggestedPrice": "below suggested {{price}}",
+      "copyDeliveryNoteImage": "Copy as image",
+      "copyImageCopied": "Image copied. Paste it into your chat app.",
+      "copyImageDownloaded": "Image saved. You can now attach it in your chat app.",
+      "copyImageFailed": "Could not generate the image. Please try again.",
+      "createdBy": "Created By",
+      "deliveryDate": "Delivery Date",
+      "deliveryMethod": "Delivery Method",
+      "deliveryPackageSize": "Package Size",
+      "deliveryPackageSizePlaceholder": "Select or type a package size",
+      "deliveryRequests": "Deliveries",
+      "drInfoAdditionalBadge": "Additional",
+      "drInfoCode": "Request No.",
+      "drInfoTitle": "Delivery Request",
+      "driverNote": "Driver note",
+      "expectedDelivery": "Expected delivery: {{date}}",
+      "extraQuantityHint": "+{{extra}} spare · ships {{physical}}",
+      "fromLocation": "From location",
+      "itemMemo": "Memo",
+      "itemsTitle": "Order Items",
+      "noDRsCreatable": "No delivery requests yet. Use \"Create Delivery Request\" once the order is ready.",
+      "noDRsReadonly": "No delivery requests for this order yet.",
+      "photosFromDR": "Photos from delivery requests",
+      "photosOfOrder": "Order photos",
+      "printDeliveryNote": "Print delivery note",
+      "printIncludePrice": "Print prices",
+      "printOptionsTitle": "Print options",
+      "printOrientation": "Orientation",
+      "printOrientationLandscape": "Landscape",
+      "printOrientationPortrait": "Portrait",
+      "printPaperSize": "Paper size",
+      "printPopupBlocked": "The browser blocked the print window. Please allow pop-ups and try again.",
+      "productPhotosEmpty": "No products in this order yet.",
+      "productPhotosEmptyForProduct": "No photos available",
+      "quantity": "Quantity",
+      "recentActivities": "Recent Activities",
+      "returnShipmentInfoTitle": "Return Shipment",
+      "tabActivity": "Order History",
+      "tabActivityLog": "Activity",
+      "tabAttachments": "Files",
+      "tabChat": "Chat",
+      "tabOverview": "Overview",
+      "tabPhotos": "Photos",
+      "tabProductPhotos": "Product Photos",
+      "tags": "Tags",
+      "viewItems": "View items",
+      "warehouseNote": "Warehouse note"
+    },
+    "editItem": "Edit Order",
+    "filterActive": "Active",
+    "filterClosed": "Closed",
+    "filterStaff": "Assigned Staff",
+    "filterUrgentOnly": "Urgent only",
+    "finance": {
+      "exemptError": "Couldn't update the order. Please try again.",
+      "exemptLabel": "No financial data needed",
+      "grandTotalLabel": "Total payment",
+      "missingLabel": "No amount",
+      "subtotalLabel": "Goods amount",
+      "totalsCount": "Records",
+      "totalsMissing": "{{count}} record(s) missing amount",
+      "vatLabel": "VAT",
+      "viewFinance": "Finance",
+      "viewOps": "Operations"
+    },
+    "form": {
+      "addItem": "Add Item",
+      "assignedStaffLabel": "Assigned Staff",
+      "assignedStaffPlaceholder": "Select assigned staff",
+      "availabilityChildNeedOk": "{{available}} {{unit}} on hand · need {{required}}",
+      "availabilityChildOk": "{{available}} {{unit}} on hand",
+      "availabilityOk": "{{available}} {{unit}} available at {{location}}",
+      "availabilityShort": "{{available}} {{unit}} at {{location}} — {{short}} short",
+      "availabilityUnknown": "Availability unknown",
+      "belowSuggestedPriceHint": "Below suggested {{price}}",
+      "createButton": "Create Order",
+      "customerNameLabel": "Customer Name",
+      "customerNamePlaceholder": "Enter customer name",
+      "customerPONumberLabel": "Customer PO Number",
+      "customerPONumberPlaceholder": "Customer's PO reference (optional)",
+      "customerPlaceholder": "Select a customer",
+      "deliveryAddressPlaceholder": "Select delivery address",
+      "deliveryDateLabel": "Delivery Date",
+      "deliveryDatePlaceholder": "Select delivery date",
+      "deliveryMethodLabel": "Delivery Method",
+      "deliveryMethodPlaceholder": "Select delivery method",
+      "downloadTemplateButton": "Download template",
+      "driverNoteLabel": "Driver note",
+      "driverNotePlaceholder": "Note for the driver (copied to the delivery request)",
+      "dropExcelHint": "Drop an Excel file here to import the product list",
+      "extraQuantityLabel": "Extra qty",
+      "extraQuantityPlaceholder": "Extra",
+      "fromLocationLabel": "From location",
+      "fromLocationPlaceholder": "Pick warehouse",
+      "googleMapUrlLabel": "Google Maps URL",
+      "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
+      "importItemsButton": "Import from Excel",
+      "isIndividualCustomerDesc": "Order for a one-off customer not in the registry",
+      "isIndividualCustomerLabel": "Individual customer",
+      "isInternalDeliveryDesc": "Delivered by our own staff (not a 3rd-party carrier)",
+      "isInternalDeliveryLabel": "Internal delivery",
+      "isUrgentDesc": "Urgent orders are highlighted and shown at the top of the list",
+      "isUrgentLabel": "Urgent Order",
+      "itemMemoLabel": "Memo",
+      "itemMemoPlaceholder": "Item memo (optional)",
+      "itemsTitle": "Order Items",
+      "lockedByReservation": "This order is reserving stock. Cancel back to draft to edit line items.",
+      "notesPlaceholder": "Optional notes",
+      "orderDateLabel": "Order Date",
+      "orderDatePlaceholder": "Select order date",
+      "orderNumberAutoPlaceholder": "Auto-generated on save",
+      "orderNumberLabel": "Order Number",
+      "savedAddressLabel": "Use saved address",
+      "savedAddressPlaceholder": "Pick a saved billing or shipping address",
+      "setComponentAvailableLine": "{{name}} ({{code}}): {{available}} {{unit}} on hand · need {{required}}",
+      "setComponentBadge": "Component",
+      "setComponentChildLabel": "Component of {{setName}}",
+      "setComponentShortSuffix": "short {{short}}",
+      "setComponentsAvailableTitle": "Need to compose {{count}} more {{unit}}",
+      "setExplodeButton": "Explode set",
+      "setExplodeTooltip": "Detach this set's components into independent lines (set price will be removed).",
+      "setParentBadge": "Set",
+      "setParentSubtotal": "Set total",
+      "shortageAlertLine": "{{productName}}: need {{requested}} {{unit}} from {{location}} but only {{available}} available ({{short}} short)",
+      "shortageAlertTitle": "Some lines exceed available stock",
+      "tagsLabel": "Tags",
+      "tagsPlaceholder": "Select tags",
+      "totalAmountLabel": "Total Amount",
+      "updateButton": "Update Order",
+      "warehouseNoteLabel": "Warehouse note",
+      "warehouseNotePlaceholder": "Note for warehouse staff"
+    },
+    "inventoryLinkage": {
+      "stateReleased": "Stock released",
+      "stateReserved": "Stock reserved",
+      "stateShipped": "Stock deducted",
+      "tooltipReleased": "Reservations were released at {{at}}.",
+      "tooltipReserved": "This order currently holds {{count}} reservation row(s). Cancel or ship to release.",
+      "tooltipShipped": "On-hand was deducted at {{at}} via {{status}}."
+    },
+    "manualRelease": {
+      "actionButton": "Release Stock Manually",
+      "confirmMessage": "Release the inventory reservations still held by this cancelled order? This cannot be undone, but you can re-reserve by re-activating the order.",
+      "confirmTitle": "Release reserved stock",
+      "snapshotHeading": "Will release:",
+      "stuckBannerMessage": "This order was cancelled but its inventory reservations were not released automatically. Release them now to free the stock for other orders.",
+      "stuckBannerTitle": "Stock still reserved"
+    },
+    "noItems": "No sales orders found",
+    "notifications": {
+      "accessDenied": "You don't have permission to view this order.",
+      "cancelAutoReleaseFailed": "Order was cancelled, but the auto-release of reserved stock failed. Use \"Release Stock Manually\" to retry.",
+      "cancelFromShippedBlocked": "Cannot cancel an order that has already shipped. Adjust inventory manually if a return is needed.",
+      "cancellationSetSuccess": "Order cancelled.",
+      "createAutoAdvanceFailedBody": "Order stays in the initial status. Open the detail page to transition manually.",
+      "createAutoAdvanceFailedTitle": "Order created, but status change failed",
+      "createError": "Failed to create order",
+      "createSuccess": "Order created successfully",
+      "deleteBlockedCompleted": "Completed orders can't be deleted.",
+      "deleteError": "Failed to delete order",
+      "deleteLinkedDRsFailed": "Order deleted, but {{count}} linked delivery request(s) couldn't be removed. Delete them manually.",
+      "deleteSuccess": "Order deleted.",
+      "directShipBlocked": "Confirm the order before marking it ready — reservation must be in place first.",
+      "fetchError": "Failed to load sales orders",
+      "formDesktopOnly": "Sales order create / edit is desktop-only. Open the page on a larger screen.",
+      "importEmpty": "No items found in the file.",
+      "importError": "Failed to read the file.",
+      "importMissingColumn": "Missing required column(s): {{columns}}. Download the latest template.",
+      "importMissingColumnByName": "Couldn't find the item-name and quantity columns. Make sure the sheet has a \"Tên hàng\" / \"Item name\" column and a \"Số lượng\" / \"Quantity\" column.",
+      "importMissingColumnTitle": "Invalid template",
+      "importNoMatchByNameTitle": "No matching item names",
+      "importNoMatchTitle": "No matching SKUs",
+      "importPartialTitle": "Imported {{added}} item(s)",
+      "importSuccess": "Imported {{count}} item(s).",
+      "importUnmatched": "Skipped {{count}} unknown SKU(s): {{skus}}",
+      "importUnmatchedByName": "Skipped {{count}} unrecognized item name(s): {{names}}",
+      "manualReleaseNoSnapshot": "Cannot release: no reservation snapshot recorded for this order.",
+      "manualReleaseSuccess": "Reservations released.",
+      "planFailureDiffUnderflow": "{{sku}}: row holds {{currentReserved}} {{unit}} reserved but the edit would release {{requestedRelease}} {{unit}}. Inventory may have been adjusted out-of-band — reconcile and retry.",
+      "planFailureNoRow": "{{productName}}: no inventory row at {{locationCode}}. Add stock there or pick a different location.",
+      "planFailureReleaseOverflow": "{{sku}}: would release more than is reserved. Inventory may have been changed externally.",
+      "planFailureReservationMismatch": "{{sku}}: reserved {{reserved}} doesn't match requested {{requested}}. Re-confirm the order.",
+      "planFailureShortage": "{{sku}}: need {{requested}}, only {{available}} available.",
+      "planFailureUnknownProduct": "Unknown product {{sku}} on order — remove the line.",
+      "planFailureUnknownUnit": "{{sku}}: unit {{unit}} is not declared on the product.",
+      "planFailureUnsupportedTransition": "Transition {{from}} → {{to}} is not supported.",
+      "reservationFailedDirty": "Inventory writes left rows in an inconsistent state: {{rows}}. Manual reconciliation needed.",
+      "reservationFailedRolledBack": "Inventory write failed and was rolled back: {{error}}",
+      "reservationFailedTitle": "Inventory update failed",
+      "reservationPlanFailedTitle": "Cannot apply this status change",
+      "setExpanded": "Added {{count}} component line(s) for set {{setName}}.",
+      "setExploded": "Set expanded into {{count}} independent line(s).",
+      "shortageBlockLine": "{{productName}}: only {{available}} available (need {{requested}})",
+      "shortageBlockTitle": "Insufficient stock to confirm this order",
+      "statusChangeError": "Failed to update order status",
+      "statusChangeSuccess": "Order status updated",
+      "updateError": "Failed to update order",
+      "updateSuccess": "Order updated successfully"
+    },
+    "stats": {
+      "total": "Total",
+      "totalThisMonth": "This Month"
+    },
+    "statusChange": {
+      "confirmMessage": "Change order status from \"{{from}}\" to \"{{to}}\"?",
+      "confirmTitle": "Change Status",
+      "notePlaceholder": "Add a note about this status change"
+    },
+    "title": "Sales Orders",
+    "urgent": "Urgent",
+    "vacuousCompletion": {
+      "label": "Check: auto-completed",
+      "tooltip": "This order has no line items but sits in the completion status — it was auto-completed without any delivery (a bug, now fixed). The status is terminal, so it must be repaired manually. Visible to root only."
+    },
+    "validation": {
+      "customerNameRequired": "Customer name is required",
+      "customerRequired": "Customer is required",
+      "orderNumberRequired": "Order number is required",
+      "productCodeDuplicate": "This product is already on another line",
+      "productCodeRequired": "Product code is required",
+      "productNameRequired": "Product name is required",
+      "unitPriceRequired": "Unit price must not be negative"
+    }
+  },
+  "transportOrders": {
+    "actions": {
+      "cancel": "Cancel order"
+    },
+    "billing": {
+      "advance": "Advance",
+      "balanceDue": "Balance due",
+      "contractNo": "Transport contract No.",
+      "grandTotal": "Grand total",
+      "nonBillableTotal": "Settled by customer",
+      "passthroughSubtotal": "Paid-on-behalf subtotal",
+      "serviceSubtotal": "Service subtotal",
+      "vatAmount": "VAT ({{rate}}%)",
+      "vatRate": "VAT rate"
+    },
+    "cancel": {
+      "confirmMessage": "Cancel this transport order? It stays on record with a cancelled badge.",
+      "confirmTitle": "Cancel Transport Order",
+      "reasonLabel": "Reason (optional)",
+      "reasonPlaceholder": "Why is this transport order being cancelled?",
+      "statusBadge": "Cancelled"
+    },
+    "columns": {
+      "bill": "B/L · Booking",
+      "container": "Container",
+      "date": "Date",
+      "orderNumber": "Order No.",
+      "route": "Route",
+      "truck": "Truck"
+    },
+    "confirmDelete": {
+      "message": "This transport order will be removed from the list. This cannot be undone.",
+      "title": "Delete transport order"
+    },
+    "copiedFrom": "Copied from {{code}} — adjust and save as a new order.",
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this transport order yet.",
+      "activityMemo": {
+        "cancelledFrom": "Cancelled from",
+        "container": "Container",
+        "deletedFrom": "Deleted from",
+        "disbursements_one": "{{count}} disbursement",
+        "disbursements_other": "{{count}} disbursements",
+        "fees_one": "{{count}} fee line",
+        "fees_other": "{{count}} fee lines",
+        "fieldAdvanceAmount": "Advance",
+        "fieldBillNumber": "B/L no.",
+        "fieldContainerNumber": "Container no.",
+        "fieldContainerSize": "Container size",
+        "fieldContractNo": "Contract no.",
+        "fieldCustomer": "Customer",
+        "fieldDisbursementCount": "Disbursements",
+        "fieldDriver": "Driver",
+        "fieldEntryDate": "Date",
+        "fieldFeeCount": "Fee lines",
+        "fieldRoute": "Route",
+        "fieldShipmentType": "Shipment type",
+        "fieldTotalAmount": "Subtotal",
+        "fieldTripCount": "Trips",
+        "fieldTripLaborTotal": "Total driver pay",
+        "fieldTruck": "Truck",
+        "fieldVatRate": "VAT rate",
+        "fromTo": "{{from}} → {{to}}",
+        "notesChanged": "Note changed",
+        "reason": "Reason",
+        "route": "Route",
+        "total": "Total",
+        "trips_one": "{{count}} trip",
+        "trips_other": "{{count}} trips"
+      },
+      "activityVerbs": {
+        "cancel": "Cancelled transport order",
+        "create": "Created transport order",
+        "delete": "Deleted transport order",
+        "statusChange": "Changed status of",
+        "update": "Edited transport order",
+        "updateInline": "Updated fields on"
+      },
+      "createdBy": "Created by",
+      "info": "Information",
+      "recentActivities": "Recent Activities",
+      "tabActivity": "Order History",
+      "tabActivityLog": "Activity"
+    },
+    "edit": "Edit Transport Order",
+    "fees": {
+      "add": "Add fee",
+      "amount": "Amount",
+      "invoiceNo": "Invoice No.",
+      "kind": "Type",
+      "kindPassthrough": "Paid on behalf",
+      "kindService": "Service fee",
+      "label": "Fee",
+      "notBilled": "not billed",
+      "payer": "Payer",
+      "payerCompany": "Us",
+      "payerCustomer": "Customer",
+      "title": "Service Fees",
+      "vatable": "VAT"
+    },
+    "filters": {
+      "createdDate": "Created date",
+      "hideCancelled": "Hide cancelled"
+    },
+    "form": {
+      "containerSize": "Container size",
+      "customer": "Customer",
+      "driver": "Driver",
+      "jobSection": "Job details",
+      "multiTrip": "Multi-trip",
+      "multiTripHint": "The job runs several legs — each with its own route, date, truck, driver and driver pay.",
+      "noTrucks": "No trucks found. Add trucks under Assets → Trucks.",
+      "shipmentType": "Type"
+    },
+    "locked": {
+      "notice": "This order has entered a manifest and is locked — it can no longer be edited or deleted."
+    },
+    "new": "New Transport Order",
+    "noResults": "No transport orders found",
+    "notifications": {
+      "cancelled": "Transport order cancelled",
+      "createError": "Failed to create transport order",
+      "created": "Transport order created",
+      "deleted": "Transport order deleted",
+      "loadError": "Failed to load transport orders",
+      "mobileFormBlocked": "Transport-order editing is available on desktop only.",
+      "saveError": "Failed to save changes",
+      "updateError": "Failed to update transport order",
+      "updated": "Transport order updated"
+    },
+    "route": {
+      "dropoff": "Drop-off",
+      "pickup": "Pickup",
+      "stuffing": "Stuffing / Unstuffing",
+      "title": "Service Route"
+    },
+    "search": "Search order / truck / driver / bill / container…",
+    "shipmentType": {
+      "export": "Export",
+      "import": "Import"
+    },
+    "stats": {
+      "total": "Total"
+    },
+    "statusChange": {
+      "confirmMessage": "Change order status from \"{{from}}\" to \"{{to}}\"?",
+      "confirmTitle": "Change Status",
+      "lockWarning": "This locks the order: it can no longer be edited, deleted, or moved to another status.",
+      "notePlaceholder": "Add a note about this status change"
+    },
+    "title": "Transport Orders",
+    "trips": {
+      "add": "Add trip",
+      "badge": "{{n}} trips",
+      "departure": "From",
+      "destination": "To",
+      "laborCost": "Driver pay",
+      "laborTotal": "Total driver pay",
+      "title": "Trips"
+    },
+    "validation": {
+      "customerRequired": "Customer is required",
+      "driverRequired": "Driver is required",
+      "entryDateRequired": "Date is required",
+      "truckRequired": "Truck is required"
+    }
+  },
+  "vendors": {
+    "addItem": "Add Vendor",
+    "bank": {
+      "addAccount": "Add bank account",
+      "emptyHint": "No bank accounts on file."
+    },
+    "columns": {
+      "tags": "Tags"
+    },
+    "contacts": {
+      "addContact": "Add contact",
+      "emptyHint": "No additional contacts yet.",
+      "section": "Contacts"
+    },
+    "deleteConfirm": {
+      "message": "Hide this vendor? It will no longer appear in lists. The record stays in the system for audit.",
+      "title": "Delete Vendor"
+    },
+    "detail": {
+      "activitiesError": "Failed to load activities.",
+      "activitiesLoadMore": "Load more",
+      "activitiesNoEntries": "No activities recorded for this vendor yet.",
+      "activityVerbs": {
+        "addNote": "Added a note to",
+        "create": "Created",
+        "delete": "Deleted",
+        "removeNote": "Removed a note from",
+        "toggleStatus": "Changed status of",
+        "update": "Updated"
+      },
+      "billingAddress": "Billing address",
+      "noPickupAddresses": "No pickup addresses on file.",
+      "pickupAddress": "Pickup address",
+      "receivingHours": "Pickup hours",
+      "recentActivities": "Recent Activities",
+      "tab": {
+        "activity": "Activity",
+        "details": "Details"
+      }
+    },
+    "detailTitle": "Vendor Details",
+    "editItem": "Edit Vendor",
+    "exportNotReady": "Excel export is not yet available.",
+    "filterVendorTypeAll": "All types",
+    "form": {
+      "accountHolderLabel": "Account Holder",
+      "accountManagerLabel": "Account Manager",
+      "accountManagerPlaceholder": "Staff in charge",
+      "accountNumberLabel": "Account Number",
+      "addressPlaceholder": "Full address",
+      "bankLabel": "Bank",
+      "bankPlaceholder": "e.g. Vietcombank, ACB",
+      "codePlaceholder": "Vendor code",
+      "contactNameLabel": "Name",
+      "contactPersonLabel": "Primary Contact",
+      "contactPersonPlaceholder": "Primary contact name",
+      "contactRoleLabel": "Role / Title",
+      "contactZaloLabel": "Zalo",
+      "contactZaloPlaceholder": "Personal Zalo (leave empty if same as phone)",
+      "createButton": "Create Vendor",
+      "deliveryHoursLabel": "Pickup Hours",
+      "deliveryHoursPlaceholder": "e.g. 7:30 - 16:30 (Mon - Fri)",
+      "emailPlaceholder": "Email address",
+      "googleMapUrlLabel": "Google Maps URL",
+      "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
+      "invoiceAddressLabel": "Invoice Address (if different)",
+      "invoiceEmailLabel": "Invoice Email",
+      "invoiceNameLabel": "Name on Invoice",
+      "invoiceRecipientLabel": "Invoice Recipient",
+      "isActiveLabel": "Active",
+      "isDomesticDescription": "Turn off for an overseas vendor",
+      "isDomesticLabel": "Domestic vendor",
+      "namePlaceholder": "Vendor name",
+      "notesPlaceholder": "Additional notes",
+      "originLabel": "Origin",
+      "payableCreditLimitLabel": "Payable Credit Limit",
+      "payableCreditLimitPlaceholder": "e.g. 50000000",
+      "paymentTermsLabel": "Payment Terms",
+      "paymentTermsPlaceholder": "e.g. NET 30 days",
+      "phonePlaceholder": "Phone number",
+      "pickupAddressLabel": "Pickup Address",
+      "pickupAddressesAdd": "Add pickup address",
+      "section": {
+        "contacts": "Additional Contacts",
+        "invoiceInfo": "Invoice Info"
+      },
+      "shortNamePlaceholder": "Abbreviated name",
+      "taxCodeLabel": "Tax Code",
+      "taxCodePlaceholder": "Tax identification number",
+      "updateButton": "Update Vendor",
+      "vendorTypeLabel": "Vendor Type",
+      "vendorTypePlaceholder": "e.g. Material, Service, Transport",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "https://...",
+      "zaloLabel": "Zalo (company)",
+      "zaloPlaceholder": "Number or Zalo OA"
+    },
+    "noItems": "No vendors found",
+    "notSet": "Not set",
+    "notifications": {
+      "createError": "Failed to create vendor",
+      "createSuccess": "Vendor created successfully",
+      "deleteError": "Failed to delete vendor",
+      "deleteSuccess": "Vendor deleted successfully",
+      "disableSuccess": "Vendor paused",
+      "enableSuccess": "Vendor activated",
+      "fetchError": "Failed to load vendors",
+      "toggleError": "Failed to change vendor status",
+      "updateError": "Failed to update vendor",
+      "updateSuccess": "Vendor updated successfully"
+    },
+    "origin": {
+      "china": "China",
+      "domestic": "Domestic",
+      "overseas": "Overseas",
+      "vietnam": "Vietnam"
+    },
+    "status": {
+      "cooperating": "Cooperating",
+      "paused": "Paused"
+    }
+  },
+  "warehouseDeliveryNote": {
+    "title": "Delivery Notes"
+  },
+  "warehouseDoc": {
+    "actions": {
+      "confirm": "Confirm",
+      "copy": "Copy"
+    },
+    "addItem": "New document",
+    "columns": {
+      "date": "Date",
+      "itemsCount_one": "{{count}} item",
+      "itemsCount_other": "{{count}} items",
+      "lines": "Items",
+      "totalQuantity": "Total qty"
+    },
+    "confirmModal": {
+      "message_in": "Confirming will add these quantities to material inventory. This can't be undone.",
+      "message_out": "Confirming will deduct these quantities from material inventory (stock may go negative). This can't be undone.",
+      "title": "Confirm this document?"
+    },
+    "copiedFrom": "Copied from {{code}} — adjust and save as a new document.",
+    "dangerZone": {
+      "deleteItem": "Delete document",
+      "deleteItemDesc": "Permanently remove this document"
+    },
+    "deleteConfirm": {
+      "message": "Are you sure you want to delete this document? This action cannot be undone.",
+      "title": "Delete document"
+    },
+    "editItem": "Edit document",
+    "emptyMessage": "Adjust the date range or create your first document.",
+    "emptyTitle": "No documents yet",
+    "form": {
+      "addLine": "Add item",
+      "headerSection": "Document",
+      "linesLabel": "Line items",
+      "materialLabel": "Material",
+      "materialPlaceholder": "Select material",
+      "noLines": "No line items yet. Add materials and quantities.",
+      "notePlaceholder": "Optional note or reference",
+      "quantityLabel": "Quantity",
+      "unitLabel": "Unit"
+    },
+    "lockedNote": "This document is confirmed and locked — its lines have been posted to inventory.",
+    "notifications": {
+      "confirmError": "Failed to confirm document",
+      "confirmSuccess": "Document confirmed",
+      "createError": "Failed to create document",
+      "createSuccess": "Document created",
+      "deleteError": "Failed to delete document",
+      "deleteSuccess": "Document deleted",
+      "duplicateCode": "Code already in use",
+      "duplicateCodeMessage": "This document code is already taken. Please adjust the date or try again.",
+      "fetchError": "Failed to load documents",
+      "updateError": "Failed to update document",
+      "updateSuccess": "Document updated"
+    },
+    "searchPlaceholder": "Search by code or note...",
+    "status": {
+      "confirmed": "Confirmed",
+      "draft": "Draft"
+    },
+    "validation": {
+      "dateRequired": "Date is required"
+    }
+  },
+  "warehouseReceipt": {
+    "title": "Warehouse Receipts"
+  }
+}

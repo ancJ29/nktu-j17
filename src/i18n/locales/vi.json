@@ -1,0 +1,3876 @@
+{
+  "__new__": {
+    "01-common": {
+      "actions": {
+        "addEntry": "Thêm dòng",
+        "back": "Quay lại",
+        "cancel": "Hủy",
+        "clearFilters": "Xóa bộ lọc",
+        "clearSearch": "Xóa tìm kiếm",
+        "copy": "Sao chép",
+        "copyLink": "Sao chép link",
+        "disable": "Tắt",
+        "edit": "Sửa",
+        "enable": "Bật",
+        "exportExcel": "Xuất Excel",
+        "generate": "Tạo",
+        "open": "Mở",
+        "openInMaps": "Mở Maps",
+        "remove": "Xóa",
+        "save": "Lưu thay đổi",
+        "view": "Xem"
+      },
+      "cache": {
+        "hoursAgo": "{{count}} giờ trước",
+        "minutesAgo": "{{count}} phút trước",
+        "refresh": "Làm mới dữ liệu"
+      },
+      "dangerZone": {
+        "disableButton": "Ngừng",
+        "enableButton": "Kích hoạt",
+        "title": "Khu vực nguy hiểm"
+      },
+      "empty": {
+        "noDescription": "Không có mô tả {{item}}",
+        "noNote": "Chưa có ghi chú"
+      },
+      "hints": {
+        "openInMaps": "Xem trên Google Maps"
+      },
+      "labels": {
+        "active": "Đang hoạt động",
+        "note": "Ghi chú",
+        "orderDate": "Ngày đặt hàng"
+      }
+    },
+    "07-entities": {
+      "customers": {
+        "dangerZone": {
+          "deleteItem": "Xóa khách hàng",
+          "deleteItemDesc": "Ẩn khách hàng khỏi hệ thống. Dữ liệu vẫn được giữ lại để tra cứu.",
+          "disableButton": "Ngừng kích hoạt",
+          "disableConfirm": "Bạn có chắc muốn ngừng kích hoạt khách hàng này?",
+          "disableItem": "Ngừng kích hoạt khách hàng",
+          "disableItemDesc": "Đánh dấu khách hàng này là không hoạt động — vẫn hiển thị trong danh sách nhưng ở trạng thái ngừng",
+          "enableConfirm": "Bạn có chắc muốn kích hoạt lại khách hàng này?",
+          "enableItem": "Kích hoạt khách hàng",
+          "enableItemDesc": "Đánh dấu khách hàng này hoạt động trở lại"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo tên, mã, SĐT..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "deliveryRequests": {
+        "list": {
+          "searchPlaceholder": "Tìm kiếm yêu cầu..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "employees": {
+        "dangerZone": {
+          "changePassword": "Đặt Mật Khẩu",
+          "changePasswordButton": "Đặt Mật Khẩu",
+          "confirmPassword": "Xác nhận mật khẩu",
+          "copyCredentials": "Sao chép thông tin đăng nhập",
+          "deleteEmployee": "Xóa Nhân Viên",
+          "deleteEmployeeDesc": "Xóa vĩnh viễn nhân viên khỏi hệ thống",
+          "disableButton": "Khoá",
+          "disableConfirm": "Bạn có chắc chắn muốn khoá tài khoản nhân viên này?",
+          "disableEmployee": "Khoá Tài Khoản Nhân Viên",
+          "disableEmployeeDesc": "Tạm thời vô hiệu hóa quyền truy cập của nhân viên vào hệ thống",
+          "disableError": "Không thể cập nhật trạng thái nhân viên",
+          "disableSsoWarningTitle": "Đã vô hiệu hoá, nhưng tài khoản đăng nhập có thể vẫn dùng được",
+          "disableSuccess": "Đã khoá tài khoản nhân viên",
+          "enableButton": "Mở Khoá",
+          "enableConfirm": "Bạn có chắc chắn muốn mở khoá tài khoản nhân viên này?",
+          "enableEmployee": "Mở Khoá Tài Khoản Nhân Viên",
+          "enableEmployeeDesc": "Kích hoạt lại quyền truy cập của nhân viên vào hệ thống",
+          "enableSsoWarningTitle": "Đã kích hoạt, nhưng nhân viên có thể chưa đăng nhập được",
+          "enableSuccess": "Đã mở khoá tài khoản nhân viên",
+          "generatePassword": "Tạo ngẫu nhiên",
+          "loginIdentifier": "Tên đăng nhập",
+          "newPassword": "Mật khẩu mới",
+          "passwordChangeError": "Không thể đổi mật khẩu",
+          "passwordChangeSuccess": "Đổi mật khẩu thành công",
+          "passwordChangeWarning": "Mật khẩu mới đã có hiệu lực và nhân viên có thể đăng nhập, nhưng chưa lưu được vào hồ sơ. Hãy sao chép ngay — mật khẩu sẽ không hiển thị lại.",
+          "passwordChangeWarningTitle": "Đã đổi mật khẩu, nhưng chưa lưu vào hồ sơ",
+          "passwordMismatch": "Mật khẩu không khớp",
+          "passwordPolicy": "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@$!%*?&)",
+          "passwordRequired": "Vui lòng nhập mật khẩu"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo tên, mã..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "goodsReceipts": {
+        "actions": {
+          "cancel": "Hủy phiếu",
+          "confirmReceived": "Xác nhận nhập kho",
+          "print": "In phiếu"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo mã phiếu, NCC, tham chiếu..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "inventory": {
+        "materials": {
+          "list": {
+            "searchPlaceholder": "Tìm theo nguyên liệu hoặc vị trí..."
+          },
+          "title": "__keep__"
+        },
+        "products": {
+          "list": {
+            "searchPlaceholder": "Tìm theo sản phẩm hoặc vị trí..."
+          },
+          "title": "__keep__"
+        }
+      },
+      "locations": {
+        "dangerZone": {
+          "deleteConfirm": "Bạn có chắc chắn muốn xóa vị trí này? Các dòng tồn kho tham chiếu sẽ bị mồ côi.",
+          "deleteItem": "Xóa vị trí",
+          "deleteItemDesc": "Xóa vĩnh viễn vị trí khỏi hệ thống.",
+          "disableConfirm": "Bạn có chắc chắn muốn ngừng vị trí này?",
+          "disableItem": "Ngừng vị trí",
+          "enableConfirm": "Bạn có chắc chắn muốn kích hoạt vị trí này?",
+          "enableItem": "Kích hoạt vị trí"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo tên, mã, địa chỉ..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "lookups": {
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "materials": {
+        "actions": {
+          "enterInventory": "Nhập tồn kho"
+        },
+        "dangerZone": {
+          "deleteItem": "Xóa vật tư",
+          "deleteItemDesc": "Xóa vĩnh viễn vật tư khỏi hệ thống",
+          "disableButton": "Ngừng nhập",
+          "disableConfirm": "Bạn có chắc muốn ngừng nhập vật tư này?",
+          "disableItem": "Ngừng nhập vật tư",
+          "disableItemDesc": "Ẩn vật tư khỏi danh sách nhưng không xóa",
+          "enableConfirm": "Bạn có chắc muốn kích hoạt vật tư này?",
+          "enableItem": "Kích hoạt vật tư",
+          "enableItemDesc": "Cho phép nhập lại vật tư này"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo tên, mã, đơn vị, SKU..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "productInventory": {
+        "fromOrders": "Đang giữ"
+      },
+      "products": {
+        "actions": {
+          "enterInventory": "Nhập tồn kho"
+        },
+        "dangerZone": {
+          "deleteBlockedHasStock": "Không thể xóa — sản phẩm vẫn còn tồn kho. Hãy điều chỉnh tồn kho về 0 trước.",
+          "deleteItem": "Xóa sản phẩm",
+          "deleteItemDesc": "Xóa vĩnh viễn sản phẩm khỏi hệ thống",
+          "disableConfirm": "Bạn có chắc chắn muốn ngừng sản phẩm này?",
+          "disableItem": "Ngừng bán sản phẩm",
+          "disableItemDesc": "Ẩn sản phẩm khỏi danh sách nhưng không xóa",
+          "enableConfirm": "Bạn có chắc chắn muốn kích hoạt sản phẩm này?",
+          "enableItem": "Kích hoạt sản phẩm",
+          "enableItemDesc": "Hiển thị lại sản phẩm trong danh sách"
+        },
+        "labels": {
+          "basePriceLabel": "Giá gốc"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo tên, mã ..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      },
+      "salesOrders": {
+        "actions": {
+          "cancelOrder": "Hủy đơn",
+          "copy": "Sao chép đơn",
+          "createAdditionalDR": "Tạo yêu cầu giao nhận bổ sung",
+          "createDR": "Tạo yêu cầu giao nhận",
+          "createReturnShipment": "Tạo phiếu trả hàng",
+          "switchToExternalDelivery": "Giao ngoài",
+          "switchToInternalDelivery": "Giao nội bộ"
+        },
+        "list": {
+          "accountingExportButton": "Xuất kế toán",
+          "filterExternalDelivery": "Giao ngoài",
+          "filterInternalDelivery": "Giao nội bộ",
+          "searchPlaceholder": "Tìm kiếm đơn hàng..."
+        },
+        "notifications": {
+          "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
+          "exportError": "Xuất đơn hàng thất bại.",
+          "exportSuccess_one": "Đã xuất {{count}} đơn hàng.",
+          "exportSuccess_other": "Đã xuất {{count}} đơn hàng."
+        },
+        "singular": "__keep__",
+        "stages": {
+          "cancelled": "Đã hủy",
+          "completed": "Hoàn tất",
+          "draft": "Nháp",
+          "exceptional": "Ngoại lệ",
+          "inProgress": "Đang xử lý",
+          "new": "Mới"
+        },
+        "title": "__keep__"
+      },
+      "trucks": {
+        "dangerZone": {
+          "deleteConfirm": "Bạn có chắc muốn xóa xe này? Nhật ký vận hành vẫn được giữ lại, nhưng xe sẽ không còn trong đội xe.",
+          "deleteItem": "Xóa xe",
+          "deleteItemDesc": "Ẩn xe khỏi đội xe. Dữ liệu vẫn được giữ lại để tra cứu.",
+          "disableConfirm": "Bạn có chắc muốn ngừng hoạt động xe này?",
+          "disableItem": "Ngừng hoạt động xe",
+          "disableItemDesc": "Ẩn xe khỏi danh sách đang hoạt động nhưng không xóa",
+          "enableConfirm": "Bạn có chắc muốn kích hoạt lại xe này?",
+          "enableItem": "Kích hoạt xe",
+          "enableItemDesc": "Đưa xe trở lại hoạt động"
+        }
+      },
+      "vendors": {
+        "dangerZone": {
+          "deleteItem": "Xóa nhà cung cấp",
+          "deleteItemDesc": "Ẩn nhà cung cấp khỏi hệ thống. Dữ liệu vẫn được giữ lại để tra cứu.",
+          "disableButton": "Tạm ngưng",
+          "disableConfirm": "Bạn có chắc muốn tạm ngưng hợp tác với nhà cung cấp này?",
+          "disableItem": "Tạm ngưng hợp tác",
+          "disableItemDesc": "Đánh dấu tạm ngưng — nhà cung cấp vẫn hiển thị trong danh sách",
+          "enableConfirm": "Bạn có chắc muốn kích hoạt lại hợp tác với nhà cung cấp này?",
+          "enableItem": "Kích hoạt hợp tác",
+          "enableItemDesc": "Đánh dấu nhà cung cấp hợp tác trở lại"
+        },
+        "list": {
+          "searchPlaceholder": "Tìm theo tên, mã, SĐT..."
+        },
+        "singular": "__keep__",
+        "title": "__keep__"
+      }
+    }
+  },
+  "__removed__": {
+    "materialInventory": {
+      "inbound": {
+        "fromDrafts_one": "Từ {{count}} phiếu nháp",
+        "fromDrafts_other": "Từ {{count}} phiếu nháp",
+        "moreDrafts_one": "+{{count}} phiếu khác",
+        "moreDrafts_other": "+{{count}} phiếu khác",
+        "unmappedWarning_one": "{{count}} dòng bị bỏ — đơn vị không có trên vật tư",
+        "unmappedWarning_other": "{{count}} dòng bị bỏ — đơn vị không có trên vật tư"
+      }
+    }
+  },
+  "assets": {
+    "form": {
+      "createButton": "Tạo tài sản",
+      "notesPlaceholder": "Vị trí, người quản lý, nhắc bảo trì, v.v."
+    },
+    "notifications": {
+      "createError": "Không tạo được tài sản",
+      "createSuccess": "Đã tạo tài sản",
+      "deleteError": "Không xóa được tài sản",
+      "deleteSuccess": "Đã xóa tài sản",
+      "disableSuccess": "Đã ngừng hoạt động tài sản",
+      "driverLinkWarning": "Đã lưu xe, nhưng liên kết hồ sơ tài xế thất bại. Mở lại và lưu để thử lại.",
+      "enableSuccess": "Đã kích hoạt tài sản",
+      "fetchError": "Không tải được tài sản",
+      "toggleError": "Không đổi được trạng thái tài sản",
+      "updateError": "Không cập nhật được tài sản",
+      "updateSuccess": "Đã cập nhật tài sản"
+    },
+    "truck": {
+      "addItem": "Thông tin xe",
+      "columns": {
+        "capacity": "Tải trọng",
+        "compliance": "Sắp hết hạn",
+        "driver": "Tài xế",
+        "plate": "Biển số"
+      },
+      "detail": {
+        "activitiesError": "Không tải được lịch sử hoạt động.",
+        "activitiesLoadMore": "Tải thêm",
+        "activitiesNoEntries": "Chưa có hoạt động nào cho xe này.",
+        "activityVerbs": {
+          "create": "Đã tạo",
+          "delete": "Đã xóa",
+          "disable": "Đã vô hiệu hóa",
+          "enable": "Đã kích hoạt",
+          "update": "Đã cập nhật"
+        },
+        "basicTitle": "Thông tin cơ bản",
+        "driverTitle": "Thông tin tài xế",
+        "inspectionTitle": "Giấy đăng kiểm",
+        "insuranceTitle": "Bảo hiểm",
+        "operationTitle": "Thông tin vận hành",
+        "recentActivities": "Hoạt động gần đây",
+        "registrationTitle": "Giấy đăng ký xe",
+        "specTitle": "Thông số xe",
+        "statCapacity": "Tải trọng",
+        "statPlate": "Biển số",
+        "tabs": {
+          "activity": "Hoạt động",
+          "documents": "Giấy tờ & Bảo hiểm",
+          "driverOperation": "Tài xế & Vận hành",
+          "maintenance": "Bảo trì",
+          "overview": "Tổng quan",
+          "refuel": "Nhật ký đổ dầu",
+          "trips": "Chuyến đi"
+        }
+      },
+      "editItem": "Điều chỉnh thông tin",
+      "emptyMessage": "Thêm xe đầu tiên để bắt đầu danh mục đội xe.",
+      "emptyTitle": "Chưa có xe",
+      "expiry": {
+        "badge": "Phù hiệu",
+        "expired": "Hết hạn",
+        "inspection": "Đăng kiểm",
+        "insurance": "Bảo hiểm",
+        "registration": "Đăng ký"
+      },
+      "fleetExport": {
+        "button": "Xuất nhật ký dầu đội xe",
+        "empty": "Không có nhật ký đổ dầu trong kỳ đã chọn",
+        "error": "Xuất nhật ký dầu đội xe thất bại"
+      },
+      "form": {
+        "badgeExpiryLabel": "Thời hạn phù hiệu",
+        "baseLocationLabel": "Vị trí gốc",
+        "baseLocationPlaceholder": "Bến/kho chính",
+        "basicSection": "Thông tin cơ bản",
+        "boxDimensionsLabel": "Kích thước lòng thùng (D × R × C, mm)",
+        "boxHeightPlaceholder": "Cao",
+        "boxLengthPlaceholder": "Dài",
+        "boxTypeLabel": "Loại thùng",
+        "boxTypePlaceholder": "vd. Kín / Bửng / Đông lạnh",
+        "boxVolumeLabel": "Thể tích thùng (m³)",
+        "boxVolumePlaceholder": "vd. 18.5",
+        "boxWidthPlaceholder": "Rộng",
+        "capacityLabel": "Tải trọng (t)",
+        "capacityPlaceholder": "Trọng tải",
+        "chassisNumberLabel": "Số khung",
+        "chassisNumberPlaceholder": "Số khung / VIN",
+        "codeAwaitingType": "Chọn loại xe trước",
+        "codePlaceholder": "vd. TRK-0001",
+        "descriptionPlaceholder": "Mô tả (tùy chọn)",
+        "driverNameLabel": "Tên tài xế",
+        "driverNamePlaceholder": "Tài xế phụ trách",
+        "driverPhoneLabel": "SĐT tài xế",
+        "driverPhonePlaceholder": "Số liên hệ",
+        "driverSection": "Thông tin tài xế",
+        "engineNumberLabel": "Số máy",
+        "engineNumberPlaceholder": "Số máy",
+        "fromDriverProfile": "Từ hồ sơ tài xế",
+        "inspectionExpiryLabel": "Thời hạn đăng kiểm",
+        "inspectionSection": "Giấy đăng kiểm",
+        "insuranceAdd": "Thêm bảo hiểm",
+        "insuranceCompanyLabel": "Công ty bảo hiểm",
+        "insuranceCompanyPlaceholder": "Tên công ty bảo hiểm",
+        "insuranceEmpty": "Chưa có bảo hiểm nào.",
+        "insuranceExpiryLabel": "Có hiệu lực đến",
+        "insuranceLineLabel": "Bảo hiểm",
+        "insuranceSection": "Bảo hiểm",
+        "insuranceTypeLabel": "Loại bảo hiểm",
+        "insuranceTypePlaceholder": "vd. Trách nhiệm dân sự, Vật chất, Hàng hóa",
+        "licenseClassLabel": "Hạng giấy phép",
+        "licenseClassPlaceholder": "vd. FC",
+        "licenseNumberLabel": "Số giấy phép",
+        "licenseNumberPlaceholder": "Số GPLX",
+        "makeModelLabel": "Hãng xe",
+        "makeModelPlaceholder": "vd. Volvo",
+        "modelLabel": "Model",
+        "modelPlaceholder": "vd. FH16",
+        "namePlaceholder": "vd. Volvo FH16 — Đội 12",
+        "noDrivers": "Không có tài xế",
+        "operationSection": "Thông tin vận hành",
+        "plateLabel": "Số xe",
+        "platePlaceholder": "vd. 51C-123.45",
+        "regionLabel": "Khu vực",
+        "regionPlaceholder": "Khu vực hoạt động",
+        "registrationCopyExpiryHint": "Thời hạn của bản sao có xác nhận (vd. khi ngân hàng giữ bản chính)",
+        "registrationCopyExpiryLabel": "Hạn giấy đăng ký (bản sao)",
+        "registrationSection": "Giấy đăng ký xe",
+        "registrationTypeCopy": "Bản sao",
+        "registrationTypeLabel": "Loại giấy đăng ký",
+        "registrationTypeOriginal": "Bản chính",
+        "specSection": "Thông số xe",
+        "tireSizeLabel": "Size lốp",
+        "tireSizePlaceholder": "vd. 11.00R20",
+        "typeLabel": "Loại xe",
+        "typePlaceholder": "Chọn loại xe",
+        "yearLabel": "Năm SX",
+        "yearPlaceholder": "vd. 2021"
+      },
+      "noItems": "Không tìm thấy xe",
+      "searchPlaceholder": "Tìm xe tải…",
+      "title": "Quản lý xe",
+      "validation": {
+        "capacityInvalid": "Tải trọng không được âm",
+        "dimensionInvalid": "Kích thước không được âm",
+        "plateNumberRequired": "Vui lòng nhập biển số xe",
+        "typeRequired": "Vui lòng chọn loại xe",
+        "volumeInvalid": "Thể tích không được âm",
+        "yearInvalid": "Nhập năm hợp lệ"
+      }
+    }
+  },
+  "attachments": {
+    "dropHere": "Thả tệp vào đây để tải lên",
+    "empty": "Chưa có tệp đính kèm",
+    "hint": "PNG, PDF, JPG. Tối đa {{max}}MB mỗi tệp.",
+    "invalidType": "{{name}}: định dạng không hỗ trợ",
+    "screenshot": "Chụp màn hình",
+    "screenshotCropHint": "Kéo để chọn vùng cần cắt, sau đó nhấn Tải lên",
+    "screenshotHint": "Chụp màn hình trước (PrtScn hoặc Cmd+Shift+4), sau đó dán tại đây",
+    "screenshotInstruction": "Nhấn Ctrl+V để dán ảnh chụp màn hình",
+    "screenshotPaste": "Dán",
+    "screenshotTitle": "Dán ảnh chụp màn hình",
+    "title": "Tệp đính kèm",
+    "tooLarge": "{{name}}: vượt quá giới hạn {{max}}MB",
+    "upload": "Tải tệp lên",
+    "uploadError": "Tải lên thất bại {{name}}",
+    "uploadSuccess": "Đã tải lên {{count}} tệp",
+    "uploading": "Đang tải..."
+  },
+  "auth": {
+    "forgotPassword": {
+      "backToLoginLink": "Quay lại đăng nhập",
+      "emailPlaceholder": "Nhập email",
+      "error": {
+        "failed": "Gửi liên kết thất bại. Vui lòng thử lại."
+      },
+      "sendResetLinkButton": "Gửi liên kết đặt lại",
+      "subtitle": "Nhập địa chỉ email để nhận liên kết đặt lại mật khẩu",
+      "successMessage": "Chúng tôi đã gửi liên kết đặt lại mật khẩu đến email của bạn. Vui lòng kiểm tra hộp thư và làm theo hướng dẫn.",
+      "successTitle": "Kiểm tra email",
+      "title": "Quên mật khẩu",
+      "validation": {
+        "emailInvalid": "Email không hợp lệ"
+      }
+    },
+    "login": {
+      "createAccountLink": "Tạo tài khoản",
+      "error": {
+        "failed": "Đăng nhập thất bại. Vui lòng thử lại."
+      },
+      "forgotPasswordLink": "Quên mật khẩu?",
+      "noAccountPrefix": "Chưa có tài khoản? ",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "rememberMe": "Ghi nhớ đăng nhập",
+      "signInButton": "Đăng nhập",
+      "subtitle": "Đăng nhập vào tài khoản của bạn",
+      "useLoginLinkButton": "Dùng liên kết đăng nhập",
+      "usernameLabel": "Tên đăng nhập",
+      "usernamePlaceholder": "Nhập tên đăng nhập",
+      "validation": {
+        "passwordRequired": "Vui lòng nhập mật khẩu",
+        "usernameRequired": "Vui lòng nhập tên đăng nhập"
+      }
+    },
+    "magicLink": {
+      "backToLogin": "Quay lại đăng nhập",
+      "cameraPermissionDenied": "Quyền truy cập camera bị từ chối. Vui lòng cho phép truy cập camera.",
+      "clickToUpload": "Nhấn để tải lên hình QR",
+      "codePlaceholder": "Mã Đăng Nhập",
+      "enterCodeDescription": "Nhập mã đăng nhập bạn đã nhận được",
+      "enterCodeManually": "Nhập Mã Thủ Công",
+      "invalidImageFormat": "Định dạng hình ảnh không hợp lệ. Vui lòng thử hình khác.",
+      "invalidQrCode": "Mã QR không hợp lệ. Vui lòng thử lại.",
+      "linkExpired": "Liên kết đăng nhập đã hết hạn. Vui lòng yêu cầu quản trị viên cấp lại.",
+      "noQrCodeFound": "Không tìm thấy mã QR trong hình ảnh.",
+      "or": "hoặc",
+      "orEnterCode": "Hoặc nhập mã đăng nhập bạn đã nhận được",
+      "pasteFromClipboard": "Dán từ clipboard",
+      "processing": "Đang xử lý hình ảnh...",
+      "redirecting": "Đang chuyển hướng...",
+      "scanQrCode": "Quét Mã QR",
+      "scanning": "Đang quét mã QR...",
+      "subtitle": "Quét mã QR hoặc nhập mã đăng nhập để đăng nhập",
+      "success": "Đăng nhập thành công!",
+      "title": "Đăng Nhập Bằng Liên Kết",
+      "uploadQrImage": "Tải Lên Hình QR",
+      "verificationFailed": "Xác thực thất bại. Vui lòng thử lại.",
+      "verifyCode": "Xác Thực Mã Đăng Nhập",
+      "verifying": "Đang xác thực mã đăng nhập..."
+    },
+    "register": {
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+      "createAccountButton": "Tạo tài khoản",
+      "emailPlaceholder": "Nhập email",
+      "error": {
+        "failed": "Đăng ký thất bại. Vui lòng thử lại."
+      },
+      "hasAccountPrefix": "Đã có tài khoản? ",
+      "passwordLabel": "Mật khẩu",
+      "passwordPlaceholder": "Nhập mật khẩu",
+      "signInLink": "Đăng nhập",
+      "subtitle": "Đăng ký tài khoản mới",
+      "title": "Tạo tài khoản",
+      "usernameLabel": "Tên đăng nhập",
+      "usernamePlaceholder": "Nhập tên đăng nhập",
+      "validation": {
+        "emailInvalid": "Email không hợp lệ",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
+        "passwordsNotMatch": "Mật khẩu không khớp",
+        "usernameMinLength": "Tên đăng nhập phải có ít nhất 3 ký tự"
+      }
+    },
+    "resetPassword": {
+      "confirmPasswordLabel": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu mới",
+      "error": {
+        "failed": "Đặt lại mật khẩu thất bại. Vui lòng thử lại."
+      },
+      "invalidTokenMessage": "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng yêu cầu liên kết mới.",
+      "invalidTokenTitle": "Liên kết không hợp lệ",
+      "newPasswordLabel": "Mật khẩu mới",
+      "newPasswordPlaceholder": "Nhập mật khẩu mới",
+      "requestNewLinkLink": "Yêu cầu liên kết mới",
+      "resetPasswordButton": "Đặt lại mật khẩu",
+      "signInButton": "Đăng nhập",
+      "subtitle": "Nhập mật khẩu mới bên dưới",
+      "successMessage": "Mật khẩu đã được đặt lại thành công. Bạn có thể đăng nhập bằng mật khẩu mới.",
+      "successTitle": "Đặt lại mật khẩu thành công",
+      "title": "Đặt lại mật khẩu",
+      "validation": {
+        "invalidToken": "Token đặt lại không hợp lệ",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự",
+        "passwordsNotMatch": "Mật khẩu không khớp"
+      }
+    },
+    "session": {
+      "expiredMessage": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
+      "expiredTitle": "Phiên đã hết hạn"
+    }
+  },
+  "chat": {
+    "empty": "Chưa có tin nhắn nào",
+    "placeholder": "Nhập tin nhắn..."
+  },
+  "common": {
+    "bulkImport": {
+      "created": "Đã tạo",
+      "downloadSample": "Tải mẫu",
+      "downloadSuccess": "Đã tải mẫu thành công",
+      "dragAndDrop": "Kéo & thả tệp vào đây",
+      "errorsTitle": "Các dòng không thể nhập",
+      "failed": "Thất bại",
+      "orClickToSelect": "hoặc nhấp để chọn tệp",
+      "partialSuccess": "{{success}}/{{total}} đã nhập",
+      "results": "Kết quả nhập",
+      "rowLabel": "Dòng {{n}}",
+      "sampleTemplate": "Mẫu Excel",
+      "success": "Thành công",
+      "supportedFormats": "Định dạng hỗ trợ: .csv, .xlsx, .xls",
+      "total": "Tổng",
+      "updated": "Đã cập nhật"
+    },
+    "columns": {
+      "actions": "Thao tác",
+      "available": "Có sẵn",
+      "beginOfPeriod": "Tồn đầu kỳ",
+      "beginOfPeriodTooltip": "Tồn kho đầu tháng hiện tại (UTC+7). Tự động ghi nhận lần đầu trong tháng; có thể chỉnh sửa qua Excel import.",
+      "beginOfPeriodWithPeriod": "Tồn đầu kỳ",
+      "contactPerson": "Người liên hệ",
+      "createdDate": "Ngày tạo",
+      "fixedRemain": "Tồn còn lại",
+      "fixedRemainTooltip": "Tồn kho trừ đi lượng đã giữ chỗ, cộng thêm hàng về đang chờ. Là cơ sở cho cột trạng thái.",
+      "lastUpdated": "Cập nhật lần cuối",
+      "locationCount": "{{count}} vị trí",
+      "minStock": "Tồn kho tối thiểu",
+      "minStockTooltip": "Ngưỡng tồn kho tối thiểu trong kho. Tồn kho bằng hoặc dưới ngưỡng này sẽ kích hoạt cảnh báo tồn thấp.",
+      "onHand": "Tồn kho",
+      "price": "Giá",
+      "secondaryStatus": "Trạng thái",
+      "secondaryStatusTooltip": "Hết hàng khi Tồn còn lại ≤ 0; Cần nhập khi ≤ Tồn tối thiểu; còn lại là OK.",
+      "totalAmount": "Tổng tiền"
+    },
+    "conflict": {
+      "listMessage": "Một người khác vừa thay đổi danh sách. Dữ liệu đã được tải lại — vui lòng kiểm tra và gửi lại.",
+      "message": "Một người khác vừa chỉnh sửa bản ghi này. Dữ liệu đã được tải lại — vui lòng áp dụng lại thay đổi của bạn nếu cần.",
+      "title": "Bản ghi vừa được cập nhật"
+    },
+    "datePreset": {
+      "custom": "Tùy chỉnh",
+      "lastMonth": "Tháng trước",
+      "lastWeek": "Tuần trước",
+      "nextMonth": "Tháng sau",
+      "nextWeek": "Tuần sau",
+      "thisMonth": "Tháng này",
+      "thisWeek": "Tuần này",
+      "today": "Hôm nay",
+      "tomorrow": "Ngày mai",
+      "yesterday": "Hôm qua"
+    },
+    "desktopOnly": {
+      "message": "Tính năng này chỉ hỗ trợ trên máy tính. Vui lòng chuyển sang máy tính để tiếp tục.",
+      "title": "Chỉ dùng trên máy tính"
+    },
+    "detail": {
+      "alsoKnownAs": "Còn gọi là",
+      "currentStatus": "Hiện tại",
+      "empty": "—",
+      "inventoryTab": {
+        "addFirst": "Thêm tồn kho",
+        "locationCount": "{{count}} vị trí",
+        "refresh": "Bấm vào thông tin tồn kho để cập nhật"
+      },
+      "lineTotal": "Thành tiền",
+      "notes": {
+        "addButton": "Thêm ghi chú",
+        "addError": "Không thêm được ghi chú",
+        "addPlaceholder": "Nhập ghi chú cho cả nhóm...",
+        "addSuccess": "Đã thêm ghi chú",
+        "byOn": "bởi {{author}} · {{date}}",
+        "empty": "Chưa có ghi chú nào. Hãy thêm ghi chú đầu tiên cho nhóm.",
+        "removeAria": "Xoá ghi chú",
+        "removeError": "Không xoá được ghi chú",
+        "removeSuccess": "Đã xoá ghi chú",
+        "saveLabel": "Lưu ghi chú",
+        "title": "Ghi chú nội bộ"
+      },
+      "pending": "Đang chờ"
+    },
+    "filters": {
+      "active": "Hoạt động",
+      "all": "Tất cả",
+      "apply": "Áp dụng",
+      "inactive": "Ngừng",
+      "more": "Thêm",
+      "selectDateRange": "Chọn khoảng thời gian",
+      "statusCount": "{{count}} trạng thái"
+    },
+    "form": {
+      "isActiveLabel": "Hoạt động",
+      "phonePlaceholder": "Số điện thoại",
+      "unitPricePlaceholder": "Giá"
+    },
+    "labels": {
+      "accounting": "Kế toán",
+      "address": "Địa chỉ",
+      "addresses": "Địa chỉ",
+      "assignedTo": "Người phụ trách",
+      "bankAccount": "Tài khoản ngân hàng",
+      "barcode": "Mã vạch",
+      "basicInfo": "Thông tin cơ bản",
+      "category": "Danh mục",
+      "closed": "Đã đóng",
+      "code": "Mã",
+      "confirmOk": "Đồng ý, tạo",
+      "contact": "Liên lạc",
+      "copied": "Đã sao chép",
+      "createdAt": "Ngày tạo",
+      "customer": "Khách hàng",
+      "defaultLocation": "Vị trí mặc định",
+      "deliveryAddress": "Địa chỉ giao hàng",
+      "department": "Phòng ban",
+      "description": "Mô tả",
+      "email": "Email",
+      "home": "Trang chủ",
+      "inventory": "Tồn kho",
+      "language": "Ngôn ngữ",
+      "linkCopied": "Đã sao chép link — gửi cho team để cùng xem.",
+      "linkCopyError": "Sao chép link thất bại.",
+      "location": "Vị trí",
+      "name": "Tên",
+      "onHand": "Tồn kho",
+      "phone": "Điện thoại",
+      "position": "Chức vụ",
+      "primaryContact": "Liên hệ chính",
+      "product": "Sản phẩm",
+      "productCode": "Mã SP",
+      "productInventory": "Tồn kho sản phẩm",
+      "productName": "Tên SP",
+      "quantity": "SL",
+      "reference": "Tham chiếu",
+      "salesOrder": "Đơn hàng",
+      "set": "Bộ",
+      "shortName": "Tên viết tắt",
+      "sku": "SKU",
+      "status": "Trạng thái",
+      "taxCode": "Mã số thuế",
+      "type": "Nhóm",
+      "unit": "ĐVT",
+      "unitPrice": "Đơn giá",
+      "units": "Đơn vị",
+      "updatedAt": "Cập nhật lần cuối",
+      "vendor": "Nhà cung cấp"
+    },
+    "notFound": {
+      "backToList": "Quay lại danh sách",
+      "message": "Không tìm thấy dữ liệu bạn đang tìm kiếm. Có thể đã bị xóa hoặc không tồn tại.",
+      "title": "Không tìm thấy dữ liệu"
+    },
+    "secondaryStatus": {
+      "all": "Tất cả",
+      "filterPlaceholder": "Lọc theo trạng thái",
+      "mustOrder": "Cần nhập",
+      "ok": "OK",
+      "outOfStock": "Hết hàng"
+    },
+    "status": {
+      "active": "Hoạt động",
+      "archived": "Đã lưu trữ",
+      "inactive": "Ngừng"
+    },
+    "validation": {
+      "codeNoWhitespace": "Mã không được chứa khoảng trắng",
+      "codeRequired": "Vui lòng nhập mã",
+      "codeSpecialCharacters": "Mã chỉ được chứa chữ cái và số",
+      "formInvalid": "Vui lòng sửa các trường được đánh dấu trước khi gửi",
+      "nameRequired": "Vui lòng nhập tên",
+      "quantityRequired": "Số lượng phải lớn hơn 0",
+      "unitRequired": "Vui lòng nhập đơn vị"
+    }
+  },
+  "configuration": {
+    "appConfig": "Cấu hình ứng dụng",
+    "debug": "Gỡ lỗi",
+    "fakeData": "Dữ liệu giả",
+    "materials": "Vật tư",
+    "title": "Cấu hình"
+  },
+  "cropDiaries": {
+    "addItem": "Thêm mục",
+    "applyTemplateButton": "Áp dụng",
+    "applyTemplatePlaceholder": "Áp dụng mẫu…",
+    "columns": {
+      "activity": "Hoạt động",
+      "crop": "Vụ mùa",
+      "entryDate": "Ngày",
+      "template": "Mẫu"
+    },
+    "deleteConfirm": {
+      "message": "Xóa \"{{activity}}\"? Hành động này không thể hoàn tác.",
+      "title": "Xóa mục nhật ký?"
+    },
+    "editItem": "Sửa mục",
+    "emptyMessage": "Ghi lại hoạt động cho vụ mùa, hoặc áp dụng mẫu.",
+    "emptyTitle": "Chưa có mục nhật ký",
+    "filterCropPlaceholder": "Vụ mùa",
+    "form": {
+      "activityLabel": "Hoạt động",
+      "activityPlaceholder": "VD: Tưới nước",
+      "createButton": "Tạo mục",
+      "cropLabel": "Vụ mùa",
+      "cropPlaceholder": "Chọn vụ mùa",
+      "entryDateLabel": "Ngày",
+      "noCrops": "Không có vụ mùa",
+      "notesPlaceholder": "Chi tiết, số lượng, quan sát…",
+      "primarySection": "Mục nhật ký"
+    },
+    "materialSummaryEmpty": "Chưa ghi nhận vật tư",
+    "materialSummaryTitle": "Vật tư đã dùng",
+    "materialTable": {
+      "material": "Vật tư",
+      "quantity": "Số lượng",
+      "times": "Số lần",
+      "unit": "ĐVT"
+    },
+    "materialsLabel": "Vật tư",
+    "noItems": "Không tìm thấy mục nhật ký",
+    "notifications": {
+      "applyTemplateError": "Không thể áp dụng mẫu",
+      "applyTemplateSuccess": "Đã thêm {{count}} mục nhật ký từ mẫu",
+      "createError": "Không tạo được mục nhật ký",
+      "createSuccess": "Đã tạo mục nhật ký",
+      "deleteError": "Không xóa được mục nhật ký",
+      "deleteSuccess": "Đã xóa mục nhật ký",
+      "fetchError": "Không tải được nhật ký",
+      "updateError": "Không cập nhật được mục nhật ký",
+      "updateSuccess": "Đã cập nhật mục nhật ký"
+    },
+    "searchPlaceholder": "Tìm nhật ký…",
+    "sectionEmpty": "Vụ mùa này chưa có mục nhật ký nào.",
+    "sectionTitle": "Nhật ký",
+    "title": "Nhật ký vụ mùa",
+    "validation": {
+      "activityRequired": "Vui lòng nhập hoạt động",
+      "cropRequired": "Vui lòng chọn vụ mùa",
+      "entryDateRequired": "Vui lòng chọn ngày"
+    }
+  },
+  "cropDiaryTemplates": {
+    "addItem": "Thêm mẫu",
+    "columns": {
+      "days": "Số ngày",
+      "steps": "Các bước"
+    },
+    "dayCount": "{{count}} ngày",
+    "dayCount_one": "{{count}} ngày",
+    "dayCount_other": "{{count}} ngày",
+    "dayLabel": "Ngày {{day}}",
+    "daysTitle": "Kế hoạch theo ngày",
+    "detail": {
+      "infoTitle": "Thông tin",
+      "statDays": "Số ngày"
+    },
+    "editItem": "Sửa mẫu",
+    "emptyMessage": "Tạo danh sách hoạt động để áp dụng cho vụ mùa.",
+    "emptyTitle": "Chưa có mẫu nào",
+    "excel": {
+      "colActivity": "Hoạt động",
+      "colDay": "Ngày",
+      "colMaterial": "Nguyên liệu",
+      "colQuantity": "Số lượng",
+      "colUnit": "Đơn vị",
+      "import": "Nhập Excel",
+      "importError": "Không nhập được tệp Excel",
+      "importSuccess": "Đã nhập {{count}} ngày từ Excel",
+      "nothingToExport": "Thêm ít nhất một ngày trước khi xuất",
+      "sample": "Tải mẫu",
+      "sampleActivityPlain": "Tưới nước",
+      "sampleActivityWithMaterial": "Gieo hạt",
+      "sampleMaterial": "Tên vật tư",
+      "sampleMemo": "5L mỗi cây",
+      "sheetName": "Kế hoạch",
+      "unknownMaterials": "Nguyên liệu không có trong dữ liệu gốc: {{names}}"
+    },
+    "form": {
+      "activityLabel": "Hoạt động",
+      "activityPlaceholder": "vd. Tưới nước",
+      "addMaterial": "Thêm nguyên liệu",
+      "addStep": "Thêm bước",
+      "codePlaceholder": "VD: TPL-001",
+      "createButton": "Tạo mẫu",
+      "daysSection": "Kế hoạch theo ngày",
+      "descriptionLabel": "Mô tả",
+      "descriptionPlaceholder": "Khi nào dùng mẫu này",
+      "materialPlaceholder": "Chọn nguyên liệu",
+      "materialsLabel": "Nguyên liệu",
+      "memoPlaceholder": "vd. 5L mỗi cây",
+      "namePlaceholder": "VD: Tuần 1 cây giống",
+      "primarySection": "Thông tin mẫu",
+      "quantityPlaceholder": "SL",
+      "removeMaterial": "Xóa nguyên liệu",
+      "removeStep": "Xóa bước",
+      "stepActivityHeader": "Hoạt động",
+      "stepActivityPlaceholder": "VD: Tưới nước",
+      "stepNotesHeader": "Ghi chú mặc định",
+      "stepNotesPlaceholder": "VD: 5L mỗi cây",
+      "totalDatesLabel": "Tổng số ngày",
+      "totalDatesPlaceholder": "vd. 14",
+      "unitPlaceholder": "Đơn vị"
+    },
+    "noItems": "Không tìm thấy mẫu",
+    "noMaterials": "Không có nguyên liệu",
+    "notifications": {
+      "createError": "Không tạo được mẫu",
+      "createSuccess": "Đã tạo mẫu",
+      "fetchError": "Không tải được mẫu",
+      "updateError": "Không cập nhật được mẫu",
+      "updateSuccess": "Đã cập nhật mẫu"
+    },
+    "searchPlaceholder": "Tìm mẫu…",
+    "stepCount": "{{count}} bước",
+    "stepCount_one": "{{count}} bước",
+    "stepCount_other": "{{count}} bước",
+    "stepsTitle": "Các bước",
+    "title": "Mẫu nhật ký",
+    "validation": {
+      "activityRequired": "Thêm ít nhất một ngày có hoạt động",
+      "stepsRequired": "Thêm ít nhất một bước có hoạt động",
+      "totalDatesRequired": "Tổng số ngày phải lớn hơn 0"
+    }
+  },
+  "crops": {
+    "actions": {
+      "harvest": "Thu hoạch",
+      "plant": "Trồng"
+    },
+    "addItem": "Thêm vụ mùa",
+    "backToGreenhouse": "Quay lại nhà màng",
+    "columns": {
+      "greenhouse": "Nhà màng",
+      "harvestedAt": "Ngày thu hoạch",
+      "plantedAt": "Ngày trồng",
+      "window": "Lịch dự kiến"
+    },
+    "detail": {
+      "cultivationTitle": "Canh tác",
+      "infoTitle": "Thông tin",
+      "lifecycleTitle": "Vòng đời",
+      "statSeeds": "Hạt giống",
+      "tab": {
+        "details": "Chi tiết",
+        "diary": "Nhật ký",
+        "materials": "Vật tư đã dùng"
+      }
+    },
+    "editItem": "Sửa vụ mùa",
+    "emptyMessage": "Lên kế hoạch vụ mùa và gán vào một nhà màng.",
+    "emptyTitle": "Chưa có vụ mùa",
+    "filterStatusPlaceholder": "Trạng thái",
+    "form": {
+      "codeAutoLabel": "Mã",
+      "codePlaceholder": "vd. CROP-001",
+      "createButton": "Tạo vụ mùa",
+      "diaryTemplateLabel": "Mẫu nhật ký",
+      "diaryTemplatePlaceholder": "Chọn mẫu",
+      "fromDateLabel": "Ngày bắt đầu",
+      "greenhouseLabel": "Nhà màng",
+      "greenhousePlaceholder": "Chọn nhà màng",
+      "growingMediumLabel": "Giá thể",
+      "growingMediumPlaceholder": "Xơ dừa, bông khoáng, ...",
+      "namePlaceholder": "vd. Cà chua — Lứa A",
+      "noGreenhouses": "Không có nhà màng",
+      "notesPlaceholder": "Lứa giống, sản lượng dự kiến, v.v.",
+      "numberOfSeedsLabel": "Số lượng giống",
+      "numberOfSeedsPlaceholder": "vd. 200",
+      "picLabel": "Người phụ trách",
+      "picPlaceholder": "Chọn nhân viên",
+      "plantTypeLabel": "Loại cây",
+      "plantTypePlaceholder": "PI 52 / Nagami / Mật ...",
+      "primarySection": "Thông tin vụ mùa",
+      "secondarySection": "Thông tin canh tác",
+      "statusLabel": "Trạng thái ban đầu",
+      "toDateLabel": "Ngày kết thúc",
+      "totalDatesLabel": "Tổng số ngày",
+      "totalDatesPlaceholder": "vd. 30"
+    },
+    "growingSummary": "{{count}} đang trồng",
+    "history": {
+      "fromMonth": "Từ tháng",
+      "toMonth": "Đến tháng"
+    },
+    "noItems": "Không tìm thấy vụ mùa",
+    "notifications": {
+      "createError": "Không tạo được vụ mùa",
+      "createSuccess": "Đã tạo vụ mùa",
+      "fetchError": "Không tải được vụ mùa",
+      "harvestError": "Không thể thu hoạch vụ mùa",
+      "harvestSuccess": "Đã thu hoạch — nhà màng đã trống",
+      "occupied": "Nhà màng đã có vụ mùa đang trồng ({{code}})",
+      "plantError": "Không thể trồng vụ mùa",
+      "plantSuccess": "Đã trồng — nhà màng hiện đang được sử dụng",
+      "updateError": "Không cập nhật được vụ mùa",
+      "updateSuccess": "Đã cập nhật vụ mùa"
+    },
+    "searchPlaceholder": "Tìm vụ mùa…",
+    "sectionEmptyActive": "Chưa có vụ mùa đang canh tác trong nhà màng này.",
+    "sectionEmptyHarvested": "Không có vụ mùa đã thu hoạch trong khoảng thời gian đã chọn.",
+    "sectionTitle": "Vụ mùa",
+    "status": {
+      "growing": "Đang trồng",
+      "harvested": "Đã thu hoạch",
+      "planned": "Đã lên kế hoạch"
+    },
+    "tab": {
+      "active": "Đang canh tác",
+      "harvested": "Đã thu hoạch"
+    },
+    "title": "Vụ mùa",
+    "validation": {
+      "diaryTemplateRequired": "Vui lòng chọn mẫu nhật ký",
+      "fromRequired": "Vui lòng chọn ngày bắt đầu",
+      "greenhouseRequired": "Vui lòng chọn nhà màng",
+      "numberOfSeedsRequired": "Vui lòng nhập số lượng giống",
+      "overlap": "Trùng lịch với vụ mùa \"{{code}}\" đã có trong nhà màng này",
+      "toBeforeFrom": "Ngày kết thúc phải bằng hoặc sau ngày bắt đầu",
+      "toRequired": "Vui lòng chọn ngày kết thúc",
+      "totalDatesRequired": "Tổng số ngày phải từ 1 trở lên"
+    }
+  },
+  "customers": {
+    "addItem": "Thêm khách hàng",
+    "columns": {
+      "tags": "Tag"
+    },
+    "contacts": {
+      "addContact": "Thêm người liên hệ",
+      "emptyHint": "Chưa có người liên hệ bổ sung.",
+      "section": "Người liên hệ"
+    },
+    "deleteConfirm": {
+      "message": "Ẩn khách hàng này? Khách hàng sẽ không xuất hiện trong các danh sách. Dữ liệu vẫn được giữ lại để tra cứu.",
+      "title": "Xóa khách hàng"
+    },
+    "detail": {
+      "activitiesError": "Không thể tải hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho khách hàng này.",
+      "activityVerbs": {
+        "addNote": "Đã thêm ghi chú cho",
+        "create": "Đã tạo",
+        "delete": "Đã xóa",
+        "removeNote": "Đã xóa ghi chú khỏi",
+        "toggleStatus": "Đã thay đổi trạng thái của",
+        "update": "Đã cập nhật"
+      },
+      "billingAddress": "Địa chỉ chính",
+      "noShippingAddresses": "Chưa có địa chỉ giao hàng.",
+      "receivingHours": "Nhận hàng",
+      "recentActivities": "Hoạt động gần đây",
+      "shippingAddress": "Địa chỉ giao hàng",
+      "tab": {
+        "activity": "Hoạt động",
+        "details": "Thông tin"
+      }
+    },
+    "detailTitle": "Chi tiết khách hàng",
+    "editItem": "Cập nhật khách hàng",
+    "exportNotReady": "Chức năng xuất Excel chưa khả dụng.",
+    "filterCustomerTypeAll": "Tất cả nhóm",
+    "form": {
+      "accountManagerLabel": "Nhân viên phụ trách",
+      "accountManagerPlaceholder": "Người phụ trách",
+      "addressPlaceholder": "Địa chỉ chính đầy đủ",
+      "becameCustomerDateLabel": "Ngày trở thành khách hàng",
+      "codePlaceholder": "Mã khách hàng",
+      "contactNameLabel": "Họ tên",
+      "contactPersonLabel": "Người liên hệ chính",
+      "contactPersonPlaceholder": "Tên người liên hệ chính",
+      "contactRoleLabel": "Vai trò / Chức danh",
+      "createButton": "Tạo khách hàng",
+      "creditLimitLabel": "Hạn mức công nợ",
+      "creditLimitPlaceholder": "VD: 80000000",
+      "customerTypeLabel": "Nhóm khách hàng",
+      "customerTypePlaceholder": "VD: Đại lý, Bán lẻ",
+      "defaultDiscountLabel": "Chiết khấu mặc định (%)",
+      "deliveryHoursLabel": "Giờ nhận hàng",
+      "deliveryHoursPlaceholder": "VD: 7:30 - 16:30 (T2 - T6)",
+      "deliveryMethodLabel": "Phương thức giao hàng",
+      "deliveryMethodPlaceholder": "VD: Giao tận kho",
+      "emailPlaceholder": "Địa chỉ email",
+      "googleMapUrlLabel": "Link Google Maps",
+      "googleMapUrlPlaceholder": "Dán link Google Maps (không bắt buộc)",
+      "namePlaceholder": "Tên khách hàng",
+      "notesPlaceholder": "Ghi chú thêm",
+      "paymentTermsLabel": "Điều kiện thanh toán",
+      "paymentTermsPlaceholder": "VD: NET 30 ngày",
+      "priceListLabel": "Bảng giá",
+      "priceListPlaceholder": "VD: Giá đại lý cấp 1",
+      "section": {
+        "contacts": "Người liên hệ bổ sung",
+        "salesPolicy": "Chính sách bán hàng"
+      },
+      "shippingAddressLabel": "Địa chỉ giao hàng",
+      "shippingAddressesAdd": "Thêm địa chỉ giao hàng",
+      "shortNamePlaceholder": "Tên rút gọn",
+      "sourceLabel": "Nguồn khách hàng",
+      "sourcePlaceholder": "VD: Giới thiệu, Website",
+      "tagsLabel": "Nhóm / Tag",
+      "tagsPlaceholder": "Thêm tag",
+      "taxCodeLabel": "Mã số thuế",
+      "taxCodePlaceholder": "Mã số thuế",
+      "updateButton": "Cập nhật khách hàng",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "https://..."
+    },
+    "noItems": "Không tìm thấy khách hàng",
+    "notSet": "Chưa cập nhật",
+    "notifications": {
+      "createError": "Không thể tạo khách hàng",
+      "createSuccess": "Tạo khách hàng thành công",
+      "deleteError": "Không thể xóa khách hàng",
+      "deleteSuccess": "Xóa khách hàng thành công",
+      "disableSuccess": "Đã ngừng kích hoạt khách hàng.",
+      "enableSuccess": "Đã kích hoạt khách hàng.",
+      "fetchError": "Không thể tải danh sách khách hàng",
+      "toggleError": "Không thể thay đổi trạng thái khách hàng.",
+      "updateError": "Không thể cập nhật khách hàng",
+      "updateSuccess": "Cập nhật khách hàng thành công"
+    }
+  },
+  "delivery": {
+    "title": "Giao hàng"
+  },
+  "deliveryRequests": {
+    "addItem": "Tạo yêu cầu giao nhận",
+    "bulkCreate": {
+      "alreadyHasDR": "Đơn này đã có phiếu giao hàng",
+      "createButton": "Tạo {{count}} phiếu giao",
+      "dateLabel": "Ngày giao dự kiến (tuỳ chọn)",
+      "datePlaceholder": "Chọn ngày",
+      "dateRequiredLabel": "Ngày giao dự kiến",
+      "driverLabel": "Tài xế",
+      "driverPlaceholder": "Chọn tài xế",
+      "linkWarning": "Đã tạo, nhưng không liên kết được {{count}} phiếu giao về đơn bán. Phiếu vẫn hiển thị trên trang đơn bán.",
+      "noCustomersWithOpenSO": "Không có khách hàng nào có đơn hàng để giao hàng.",
+      "noEligibleOrders": "Tất cả đơn bán đều đã có phiếu giao hàng.",
+      "noEligibleOrdersForCustomer": "Khách hàng này không có đơn bán nào chưa có phiếu giao.",
+      "noOrders": "Không có đơn bán nào trong danh sách hiện tại. Hãy điều chỉnh bộ lọc và thử lại.",
+      "openButton": "Tạo yêu cầu giao hàng",
+      "partial": "Đã tạo {{ok}}, nhưng {{fail}} bị lỗi. Hãy làm mới và thử lại phần còn lại.",
+      "partialTitle": "Tạo yêu cầu giao nhận chưa hoàn tất",
+      "saveFailed": "Không tạo được yêu cầu giao nhận nào trong {{count}} yêu cầu. Hãy làm mới và thử lại.",
+      "saveFailedTitle": "Tạo yêu cầu giao nhận thất bại",
+      "saveSuccess": "Đã tạo {{count}} yêu cầu giao nhận, gán cho {{driver}}.",
+      "selectAll": "Chọn tất cả",
+      "selectCustomerFirst": "Chọn khách hàng để xem các đơn hàng đang có.",
+      "selectedCount": "Đã chọn {{count}}",
+      "title": "Tạo yêu cầu giao nhận",
+      "titleWithCount": "Tạo yêu cầu giao hàng ({{count}} đơn)"
+    },
+    "columns": {
+      "completedDate": "Ngày hoàn thành",
+      "deliveryAddress": "Địa chỉ giao",
+      "direction": "Nhóm",
+      "items": "Sản phẩm",
+      "party": "Khách hàng / NCC",
+      "reference": "Tham chiếu",
+      "requestNumber": "Mã",
+      "scheduledDate": "Ngày dự kiến"
+    },
+    "configErrors": {
+      "description": "Mô-đun yêu cầu giao nhận đã bị tắt vì cấu hình không hợp lệ. Sửa các vấn đề sau trong Cấu hình ứng dụng và tải lại:",
+      "title": "Cấu hình yêu cầu giao nhận không hợp lệ"
+    },
+    "datePreset": {
+      "custom": "Tùy chọn"
+    },
+    "delete": {
+      "actionButton": "Xóa yêu cầu giao nhận",
+      "confirmMessage": "Xóa yêu cầu giao nhận này? Không thể hoàn tác. yêu cầu giao nhận không ảnh hưởng đến tồn kho.",
+      "confirmTitle": "Xóa yêu cầu giao nhận"
+    },
+    "detail": {
+      "activitiesError": "Không tải được hoạt động.",
+      "activitiesLoadMore": "Xem thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào trên phiếu giao này.",
+      "activityMemo": {
+        "addressChanged": "Đã đổi địa chỉ",
+        "customer": "Khách hàng",
+        "fieldLocation": "Vị trí",
+        "fieldQuantity": "SL",
+        "fieldUnit": "ĐVT",
+        "fieldUnitPrice": "Giá",
+        "googleMapUrlChanged": "Đã đổi liên kết bản đồ",
+        "itemsAdded_one": "Thêm {{count}} dòng",
+        "itemsAdded_other": "Thêm {{count}} dòng",
+        "itemsChanged_one": "Sửa {{count}} dòng",
+        "itemsChanged_other": "Sửa {{count}} dòng",
+        "itemsRemoved_one": "Xóa {{count}} dòng",
+        "itemsRemoved_other": "Xóa {{count}} dòng",
+        "lineCount_one": "{{count}} dòng",
+        "lineCount_other": "{{count}} dòng",
+        "notesChanged": "Đã đổi ghi chú",
+        "salesOrder": "Đơn hàng",
+        "scheduledDate": "Ngày giao",
+        "vendor": "Nhà cung cấp"
+      },
+      "activityVerbs": {
+        "create": "Tạo yêu cầu giao nhận",
+        "delete": "Đã xóa yêu cầu giao nhận",
+        "statusChange": "Đổi trạng thái",
+        "update": "Sửa yêu cầu giao nhận",
+        "updateInline": "Cập nhật thông tin trên"
+      },
+      "closedAt": "Ngày đóng",
+      "copyContact": "Sao chép thông tin liên hệ",
+      "delivered": "Đã giao",
+      "deliveredOf": "{{delivered}} trên {{ordered}} {{unit}}",
+      "directionLabel": "Nhóm",
+      "driverLabel": "Người phụ trách",
+      "expectedPickup": "Dự kiến giao: {{date}}",
+      "itemsTitle": "Danh sách sản phẩm giao",
+      "itemsTitleReceive": "Danh sách sản phẩm nhận",
+      "noDriverAssigned": "Không có người phụ trách",
+      "noItems": "Phiếu giao này không có chi tiết sản phẩm.",
+      "noItemsReceive": "Phiếu nhận này không có chi tiết sản phẩm.",
+      "photosTitle": "Ảnh giao hàng",
+      "photosTitleReceive": "Ảnh nhận hàng",
+      "pickupAddressLabel": "Địa chỉ nhận hàng",
+      "received": "Đã nhận",
+      "recentActivities": "Hoạt động gần đây",
+      "tabActivity": "Lịch sử giao hàng",
+      "tabActivityLog": "Hoạt động",
+      "tabPhotos": "Ảnh",
+      "vendorLabel": "Nhà cung cấp"
+    },
+    "detailTitle": "Chi tiết yêu cầu",
+    "editItem": "Điều chỉnh yêu cầu",
+    "filterDriver": "Người phụ trách",
+    "filterParty": "Khách hàng / NCC",
+    "form": {
+      "addItem": "Thêm sản phẩm",
+      "createButton": "Tạo yêu cầu giao hàng",
+      "customerNameLabel": "Tên khách hàng",
+      "customerNamePlaceholder": "Tự động từ đơn hàng, hoặc nhập tay",
+      "deliveryAddressPlaceholder": "Nhập địa chỉ giao hàng",
+      "directionInbound": "Nhận hàng",
+      "directionInboundDesc": "Nhận hàng từ nhà cung cấp — chọn từ danh sách NCC hoặc nhập tay tên NCC vãng lai. Không cần đơn hàng.",
+      "directionLabel": "Loại phiếu",
+      "directionOutbound": "Giao hàng",
+      "directionOutboundDesc": "Giao hàng cho khách — có thể liên kết với đơn hàng (tùy chọn).",
+      "driverLabel": "Người phụ trách",
+      "driverPlaceholder": "Chọn người phụ trách (không bắt buộc)",
+      "googleMapUrlLabel": "Liên kết Google Maps",
+      "googleMapUrlPlaceholder": "Dán liên kết Google Maps (không bắt buộc)",
+      "isUrgentDesc": "Phiếu giao gấp được tô đỏ nổi bật trong danh sách",
+      "isUrgentLabel": "Giao gấp",
+      "itemsTitle": "Danh sách sản phẩm giao",
+      "itemsTitleReceive": "Danh sách sản phẩm nhận",
+      "noItemsHint": "Chưa có sản phẩm — lưu sẽ tạo phiếu giao không chi tiết. Có thể thêm sản phẩm tại đây hoặc qua nút Sửa sau này.",
+      "noItemsHintReceive": "Chưa có sản phẩm — lưu sẽ tạo phiếu nhận không chi tiết. Có thể thêm sản phẩm tại đây hoặc qua nút Sửa sau này.",
+      "notesPlaceholder": "Ghi chú (không bắt buộc)",
+      "pickupAddressLabel": "Địa chỉ nhận hàng",
+      "pickupAddressPlaceholder": "Nhập địa chỉ nhận hàng",
+      "requestNumberAutoPlaceholder": "Tự động tạo khi lưu",
+      "requestNumberLabel": "Mã",
+      "salesOrderOptionalDesc": "Tùy chọn — bỏ trống để tạo phiếu giao không liên kết đơn hàng.",
+      "salesOrderPlaceholder": "Chọn đơn hàng",
+      "scheduledDateLabel": "Ngày giao dự kiến",
+      "scheduledDateLabelReceive": "Ngày nhận dự kiến",
+      "scheduledDatePlaceholder": "Chọn ngày",
+      "unregisteredVendorLabel": "NCC chưa đăng ký",
+      "updateButton": "Cập nhật yêu cầu",
+      "vendorLabel": "Nhà cung cấp",
+      "vendorPickOrTypeDesc": "Chọn từ danh sách, hoặc nhập tay tên NCC vãng lai.",
+      "vendorPlaceholder": "Chọn NCC hoặc nhập tên",
+      "vendorTypePlaceholder": "Nhập tên nhà cung cấp"
+    },
+    "kind": {
+      "return": "Trả hàng",
+      "sample": "Lấy mẫu"
+    },
+    "noItems": "Không có yêu cầu giao hàng nào",
+    "notifications": {
+      "accessDenied": "Bạn không có quyền xem yêu cầu giao hàng này.",
+      "createError": "Không thể tạo yêu cầu",
+      "createSuccess": "Tạo yêu cầu thành công",
+      "deleteError": "Xóa yêu cầu giao nhận thất bại",
+      "deleteSuccess": "Đã xóa yêu cầu giao nhận.",
+      "drsAutoReleasedFailedTitle": "Không thể tự động chuyển một số yêu cầu giao nhận liên kết",
+      "drsAutoReleasedSuccess": "Đã tự động chuyển {{count}}/{{total}} yêu cầu giao nhận sang {{status}}",
+      "fetchError": "Không thể tải danh sách yêu cầu giao hàng",
+      "formDesktopOnly": "Tạo / sửa yêu cầu giao nhận chỉ dùng được trên máy tính. Vui lòng mở lại trên màn hình lớn.",
+      "linkSalesOrderFailed": "Phiếu giao đã được tạo, nhưng không cập nhật được danh sách phiếu giao trên đơn hàng. Mở lại đơn hàng để đồng bộ nếu cần.",
+      "photosRequiredMessage": "Phải chụp ít nhất một ảnh giao hàng trước khi hoàn tất phiếu giao này.",
+      "photosRequiredMessageReceive": "Phải chụp ít nhất một ảnh nhận hàng trước khi hoàn tất phiếu nhận này.",
+      "photosRequiredTitle": "Cần ảnh giao hàng",
+      "soAutoAdvancedFailedTitle": "Không thể tiến hành đơn hàng liên kết",
+      "soAutoAdvancedSuccess": "Tất cả sản phẩm đã giao — {{orderNumber}} đã tiến hành đến {{status}}",
+      "soAutoShippedFailedTitle": "Không thể tự động xuất kho đơn hàng liên kết",
+      "soAutoShippedSuccess": "Đã xuất kho — {{orderNumber}} tự động chuyển sang {{status}}",
+      "updateError": "Không thể cập nhật yêu cầu",
+      "updateSuccess": "Cập nhật yêu cầu thành công"
+    },
+    "receiveSource": {
+      "sample": "Lấy mẫu từ khách",
+      "sampleDesc": "Lấy mẫu từ khách hàng.",
+      "vendor": "Từ nhà cung cấp",
+      "vendorDesc": "Nhận hàng từ nhà cung cấp."
+    },
+    "reorder": {
+      "dateLabel": "Ngày giao",
+      "datePlaceholder": "Chọn ngày",
+      "dragHint": "Kéo để sắp xếp",
+      "driverLabel": "Người phụ trách",
+      "driverPlaceholder": "Chọn người phụ trách",
+      "moveDown": "Xuống dưới",
+      "moveUp": "Lên trên",
+      "noMatching": "Không có phiếu nào khớp ngày + người phụ trách. Đổi lịch hoặc gán người phụ trách trước.",
+      "openButton": "Sắp xếp thứ tự giao",
+      "partial": "Đã lưu {{ok}}, còn {{fail}} thất bại. Tải lại và thử phần còn lại.",
+      "partialTitle": "Lưu thứ tự một phần",
+      "pickPrompt": "Chọn ngày giao và người phụ trách để tải các phiếu phù hợp.",
+      "preview": "Số hiển thị của điểm đầu sẽ là {{preview}}. Kéo các dòng hoặc dùng mũi tên để sắp thứ tự, rồi Lưu.",
+      "saveButton": "Lưu thứ tự",
+      "saveFailed": "Không cập nhật được {{count}} phiếu. Tải lại và thử lại.",
+      "saveFailedTitle": "Lưu thứ tự thất bại",
+      "saveSuccess": "Đã cập nhật số hiển thị cho {{count}} phiếu giao.",
+      "title": "Sắp xếp thứ tự giao"
+    },
+    "return": {
+      "createButton": "Tạo phiếu trả",
+      "itemsTitle": "Hàng cần trả",
+      "locationLabel": "Kho nhận",
+      "locationPlaceholder": "Chọn kho",
+      "locationRequired": "Vui lòng chọn kho nhận",
+      "noQuantity": "Nhập số lượng cho ít nhất một mặt hàng.",
+      "noReturnable": "Đơn hàng này chưa có hàng đã giao để trả lại.",
+      "restockDone": "Đã cập nhật tồn kho cho {{count}} mặt hàng.",
+      "restockFailedMessage": "{{count}} mặt hàng chưa cộng lại được vào tồn kho. Vui lòng điều chỉnh thủ công ở trang tồn kho.",
+      "restockFailedTitle": "Đã hoàn tất phiếu trả, tồn kho chưa cập nhật đủ",
+      "returnAll": "Trả tất cả",
+      "returnableHint": "tối đa {{count}}",
+      "scheduledDateLabel": "Ngày nhận dự kiến",
+      "title": "Tạo phiếu trả hàng",
+      "updateInventoryDesc": "Cộng hàng trả lại vào tồn kho khi hoàn tất phiếu trả.",
+      "updateInventoryLabel": "Cập nhật tồn kho"
+    },
+    "stats": {
+      "totalThisMonth": "Tháng này"
+    },
+    "statusChange": {
+      "confirmMessage": "Chuyển phiếu này từ {{from}} sang {{to}}?",
+      "confirmTitle": "Xác nhận đổi trạng thái",
+      "noteLabel": "Ghi chú (tùy chọn)",
+      "notePlaceholder": "Thêm ghi chú sẽ xuất hiện trong lịch sử hoạt động.",
+      "photoRequiredHint": "Chụp ít nhất một ảnh giao hàng để hoàn tất phiếu này.",
+      "photoSectionTitle": "Ảnh giao hàng",
+      "takePhotoButton": "Chụp ảnh"
+    },
+    "title": "Yêu cầu giao hàng",
+    "urgent": "Gấp",
+    "validation": {
+      "customerNameRequired": "Vui lòng nhập tên khách hàng",
+      "driverRequired": "Vui lòng chọn người phụ trách",
+      "itemsRequired": "Cần ít nhất một sản phẩm",
+      "productCodeRequired": "Vui lòng nhập mã SP",
+      "productNameRequired": "Vui lòng nhập tên SP",
+      "salesOrderRequired": "Vui lòng chọn đơn hàng",
+      "unitPriceRequired": "Đơn giá không được âm",
+      "vendorRequired": "Vui lòng chọn nhà cung cấp"
+    }
+  },
+  "employees": {
+    "addEmployee": "Thêm nhân viên",
+    "bulkImport": {
+      "import": "Nhập nhân viên",
+      "missingColumnMessage": "Tệp thiếu cột bắt buộc: {{columns}}. Vui lòng sử dụng mẫu mới nhất — nhấn \"Tải mẫu\" ở trên.",
+      "missingColumnTitle": "Định dạng tệp không hỗ trợ",
+      "noValidRows": "Không tìm thấy nhân viên hợp lệ trong tệp",
+      "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin nhân viên",
+      "ssoWarningMessage": "Đã nhập đủ {{total}} nhân viên, nhưng {{failed}} người chưa được tạo tài khoản đăng nhập nên chưa thể đăng nhập. Vui lòng mở từng người và đặt lại mật khẩu để thử lại.",
+      "ssoWarningTitle": "Đã nhập, nhưng một số chưa đăng nhập được",
+      "title": "Nhập hàng loạt",
+      "uploadFile": "Tải lên tệp nhân viên"
+    },
+    "columns": {
+      "name": "Họ tên",
+      "personalPhone": "SĐT Cá Nhân",
+      "phoneLabelPersonal": "Cá nhân",
+      "phoneLabelWork": "Công việc"
+    },
+    "deleteConfirm": {
+      "message": "Bạn có chắc chắn muốn xóa nhân viên này? Hành động này không thể hoàn tác.",
+      "title": "Xóa nhân viên"
+    },
+    "detail": {
+      "activitiesError": "Không thể tải lịch sử hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào được ghi nhận cho nhân viên này.",
+      "activityAction": "Hành động",
+      "activityActor": "Bởi",
+      "activityDate": "Ngày",
+      "activityDetail": "Chi tiết",
+      "activityLogin": {
+        "password": "Đăng nhập bằng mật khẩu",
+        "qr": "Đăng nhập bằng mã QR"
+      },
+      "activityVerbs": {
+        "create": "Đã tạo",
+        "delete": "Đã xóa",
+        "disable": "Đã vô hiệu hóa",
+        "enable": "Đã kích hoạt",
+        "generateLoginToken": "Đã tạo liên kết đăng nhập cho",
+        "passwordChange": "Đã đổi mật khẩu cho",
+        "update": "Đã cập nhật",
+        "updatePermissions": "Đã cập nhật quyền hạn cho"
+      },
+      "contactsCardTitle": "Liên hệ",
+      "personalPhone": "SĐT Cá Nhân",
+      "profileImage": "Ảnh đại diện",
+      "profileImageChange": "Đổi ảnh đại diện",
+      "profileImageCropHint": "Kéo để di chuyển, lăn chuột hoặc dùng nút để phóng to/thu nhỏ.",
+      "profileImageDragOrClick": "Kéo ảnh vào đây, hoặc bấm để chọn",
+      "profileImageDropHere": "Thả để tải lên",
+      "profileImageHint": "JPG, PNG, WebP, GIF. Tối đa {{max}}MB.",
+      "profileImageRemove": "Xoá",
+      "profileImageRemoveSuccess": "Đã xoá ảnh đại diện",
+      "profileImageReselect": "Chọn ảnh khác",
+      "profileImageUpload": "Tải lên",
+      "profileImageUploadError": "Không thể tải ảnh đại diện",
+      "profileImageUploadSuccess": "Đã cập nhật ảnh đại diện",
+      "profileImageUploading": "Đang tải lên...",
+      "quickActions": "Thao tác nhanh",
+      "recentActivities": "Hoạt động gần đây",
+      "timesheet": "Bảng chấm công",
+      "timesheetComingSoon": "Sắp ra mắt",
+      "timesheetComingSoonDesc": "Dữ liệu chấm công và điểm danh của nhân viên này sẽ hiển thị tại đây."
+    },
+    "driver": {
+      "idIssueDate": "Ngày cấp",
+      "idIssuePlace": "Nơi cấp",
+      "idNumber": "Số CCCD",
+      "identityCard": "Căn cước công dân",
+      "license": "Giấy phép lái xe",
+      "licenseClass": "Hạng",
+      "licenseExpiry": "Ngày hết hạn",
+      "licenseIssueDate": "Ngày cấp",
+      "licenseIssuePlace": "Nơi cấp",
+      "licenseNumber": "Số GPLX",
+      "linkedTruck": "Xe phụ trách",
+      "noTruck": "Chưa gắn xe",
+      "sectionTitle": "Hồ sơ tài xế",
+      "tab": "Hồ sơ tài xế",
+      "truckPlaceholder": "Chọn xe",
+      "viewTruck": "Xem xe"
+    },
+    "editEmployee": "Cập nhật nhân viên",
+    "employeeDetails": "Chi tiết nhân viên",
+    "emptyMessage": "Thử điều chỉnh bộ lọc hoặc thêm nhân viên đầu tiên để bắt đầu.",
+    "emptyTitle": "Chưa có nhân viên",
+    "fields": {
+      "address": "Địa chỉ",
+      "dateOfBirth": "Ngày sinh",
+      "startDate": "Ngày vào làm"
+    },
+    "filterButton": "Lọc",
+    "filterDepartmentAll": "Tất cả các Bộ phận",
+    "filterInactive": "Ngừng hoạt động",
+    "filterPositionAll": "Tất cả Chức vụ",
+    "form": {
+      "codePlaceholder": "Mã nhân viên",
+      "createButton": "Tạo nhân viên",
+      "emailPlaceholder": "Email nhân viên",
+      "nameLabel": "Họ tên",
+      "namePlaceholder": "Tên nhân viên",
+      "positionPlaceholder": "Chức vụ",
+      "updateButton": "Cập nhật nhân viên"
+    },
+    "loginToken": {
+      "button": "Mã đăng nhập",
+      "copied": "Đã sao chép!",
+      "copyLink": "Sao chép liên kết",
+      "copyQr": "Sao chép mã QR",
+      "copyQrError": "Không thể sao chép mã QR",
+      "description": "Tạo mã QR đăng nhập cho {{name}}",
+      "expiryNotice": "Mã có hiệu lực trong {{minutes}} phút và chỉ sử dụng được một lần.",
+      "generateError": "Không thể tạo mã đăng nhập",
+      "qrCopied": "Đã sao chép QR!",
+      "regenerate": "Tạo mã mới",
+      "title": "Tạo mã đăng nhập"
+    },
+    "noEmployees": "Không tìm thấy nhân viên",
+    "notifications": {
+      "createError": "Không thể tạo nhân viên",
+      "createSuccess": "Tạo nhân viên thành công",
+      "deleteError": "Không thể xóa nhân viên",
+      "deleteSuccess": "Xóa nhân viên thành công",
+      "fetchError": "Không thể tải danh sách nhân viên",
+      "listConflictMessage": "Một quản trị viên khác vừa thay đổi danh sách nhân viên. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "ssoWarning": "Đã tạo nhân viên, nhưng cài đặt đăng nhập thất bại: {{reason}}. Vui lòng đặt mật khẩu thủ công trước khi chia sẻ thông tin đăng nhập.",
+      "truckLinkWarning": "Đã lưu nhân viên, nhưng liên kết xe thất bại. Mở lại và lưu để thử lại.",
+      "updateError": "Không thể cập nhật nhân viên",
+      "updateSuccess": "Cập nhật nhân viên thành công"
+    },
+    "org": {
+      "addOption": "Thêm",
+      "cannotRemove": "Không thể xóa — vẫn đang được dùng bởi:",
+      "departments": "Phòng ban",
+      "description": "Quản lý phòng ban, chức vụ và phân quyền của chúng.",
+      "driverDepartments": "Phòng ban tài xế",
+      "driverDepartmentsHint": "Nhân viên thuộc các phòng ban này được xem là tài xế và có thẻ tài xế (CCCD, bằng lái, xe liên kết, nhật ký đào tạo).",
+      "driverDepartmentsPlaceholder": "Chọn phòng ban tài xế",
+      "noDepartments": "Chưa có phòng ban nào. Vui lòng thêm phòng ban ở trên trước.",
+      "optionValue": "Giá trị",
+      "permissionOverlays": "Phân quyền theo phòng ban",
+      "positions": "Chức vụ",
+      "readOnly": "Bạn có thể xem nhưng không có quyền thay đổi các thiết lập này.",
+      "refAssignedEmployees": "{{count}} nhân viên đang thuộc phòng ban",
+      "refCheckingEmployees": "Đang kiểm tra nhân viên thuộc phòng ban…",
+      "refDriverDepartment": "Phòng ban tài xế",
+      "refGoodsReceiptPic": "Người phụ trách phiếu nhập kho",
+      "refSalesOrderPic": "Người phụ trách đơn hàng",
+      "refSalesOrderStatus": "Trạng thái đơn hàng: {{status}}",
+      "refTransportOrderStatus": "Trạng thái đơn vận chuyển: {{status}}",
+      "saveFailed": "Lưu cơ cấu tổ chức thất bại",
+      "saved": "Đã lưu cơ cấu tổ chức",
+      "title": "Cơ cấu tổ chức",
+      "valueLockedHint": "Không thể thay đổi giá trị sau khi tạo — nó liên kết nhân viên và các thiết lập khác."
+    },
+    "title": "Nhân viên",
+    "validation": {
+      "codeRequired": "Vui lòng nhập mã nhân viên",
+      "emailInvalid": "Vui lòng nhập email hợp lệ",
+      "nameRequired": "Vui lòng nhập họ tên",
+      "phoneInvalid": "Số điện thoại phải có 10–15 ký tự (số, khoảng trắng, +, -, ngoặc đơn)"
+    }
+  },
+  "error": {
+    "forbidden": {
+      "goToHomeButton": "Về trang chủ",
+      "inlineTitle": "Truy cập bị hạn chế",
+      "message": "Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là sai sót.",
+      "title": "403"
+    },
+    "generic": {
+      "goToHomeLink": "Về trang chủ",
+      "message": "Rất tiếc, đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+      "title": "Đã xảy ra lỗi",
+      "tryAgainButton": "Thử lại"
+    },
+    "notFound": {
+      "goToHomeButton": "Về trang chủ",
+      "message": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển.",
+      "title": "404"
+    },
+    "reload": "Tải lại",
+    "staleChunk": {
+      "message": "Ứng dụng đã được cập nhật trong lúc trang này đang mở. Vui lòng tải lại để tiếp tục.",
+      "title": "Đã có phiên bản mới"
+    },
+    "unexpected": {
+      "message": "Không mở được trang này. Vui lòng tải lại; nếu vẫn lỗi, hãy liên hệ quản trị viên.",
+      "title": "Đã xảy ra lỗi"
+    }
+  },
+  "fakeData": {
+    "changeSecrets": "Thay đổi bảo mật",
+    "clientCode": "Mã khách hàng",
+    "configureSecrets": "Cấu hình bảo mật",
+    "customers": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả khách hàng của \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
+      "confirmTitle": "Ghi đè tất cả khách hàng?",
+      "count": "Số khách hàng",
+      "countHelp": "Tên công ty lấy từ pool theo ngành (food: nhà hàng/quán cafe; mechanical: nhà máy/nhà thầu). Mã sinh tự động (CST-NNNN).",
+      "description": "Ghi đè TẤT CẢ khách hàng hiện có. Dùng làm nguồn dữ liệu cho đơn bán hàng.",
+      "title": "Tạo khách hàng giả"
+    },
+    "employees": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả bản ghi nhân viên hiện có của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới và tạo tài khoản SSO tương ứng. Tiếp tục?",
+      "confirmBodyRandom": "Thao tác này sẽ GHI ĐÈ lên tất cả hồ sơ nhân viên hiện có cho khách hàng {{clientCode}} — tạo ra 2-5 nhân viên mỗi phòng ban từ Cấu hình ứng dụng và tạo người dùng SSO tương ứng. Bạn muốn tiếp tục?",
+      "confirmTitle": "Ghi đè tất cả nhân viên?",
+      "count": "Số lượng nhân viên",
+      "description": "Ghi đè TẤT CẢ nhân viên hiện có và tạo tài khoản SSO tương ứng.",
+      "jsonEmpty": "Cần có ít nhất một dòng.",
+      "jsonHelp": "Mảng các dòng. Các trường (đều tùy chọn): name, firstName, lastName, department, phone, personalPhone, email, position, code, gender. Lưu vào localStorage theo khách hàng.",
+      "jsonInvalid": "JSON không hợp lệ: {{error}}",
+      "jsonLabel": "JSON nhân viên",
+      "jsonNotArray": "JSON phải là một mảng.",
+      "parsedRows": "Số dòng đã phân tích",
+      "randomCoverage": "Chế độ ngẫu nhiên sẽ duyệt qua từng phòng ban được cấu hình trong Cấu hình ứng dụng và chọn ngẫu nhiên từ 2 đến 5 nhân viên mỗi phòng ban. Tổng số lượng sẽ được xác định trong quá trình chạy.",
+      "skipSso": "Bỏ qua tạo SSO",
+      "skipSsoHelp": "Khi bật, chỉ ghi bản ghi nhân viên — không tạo tài khoản SSO.",
+      "source": "Nguồn dữ liệu",
+      "title": "Tạo nhân viên giả"
+    },
+    "failures": "Lỗi SSO",
+    "goodsReceipts": {
+      "confirmBody": "Thao tác này sẽ tạo {{count}} phiếu nhập kho mới cho khách hàng \"{{clientCode}}\" trải đều trong {{daysBack}} ngày gần nhất. Các phiếu hiện có cùng ngày sẽ bị GHI ĐÈ. Tiếp tục?",
+      "confirmTitle": "Tạo phiếu nhập kho?",
+      "count": "Số phiếu",
+      "countHelp": "Số phiếu nhập kho cần tạo. Sẽ trải ngẫu nhiên trong khoảng ngày đã chọn.",
+      "daysBack": "Trải trong (ngày)",
+      "daysBackHelp": "Khoảng ngày để trải các phiếu. Mặc định 14 ngày — khớp với khoảng query của trang danh sách.",
+      "description": "Tạo phiếu nhập kho phân vùng theo ngày trong N ngày gần nhất. Lấy vendor / kho từ master data hiện có, vật tư từ pool sản phẩm + vật tư của ngành. Tỉ lệ trạng thái: ~60% draft, ~30% received, ~10% cancelled.",
+      "inventoryWarning": "Bypass BFF — phiếu trạng thái \"received\" KHÔNG cập nhật tồn kho. Dùng nút Xác nhận trên UI để kiểm thử side-effect cập nhật tồn kho.",
+      "title": "Tạo phiếu nhập kho"
+    },
+    "industry": {
+      "description": "Chọn file JSON nguồn (scripts/faker/data/*.json) dùng cho lookups, sản phẩm và vật tư. Mã cố định trong JSON giữ cho liên kết đơn hàng ổn định qua mỗi lần chạy lại.",
+      "label": "Ngành",
+      "lookups": "Số lookup",
+      "materials": "Số vật tư",
+      "products": "Số sản phẩm",
+      "title": "Danh mục theo ngành"
+    },
+    "log": "Nhật ký",
+    "lookupsSeed": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả lookup của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới ở tất cả danh mục. Tiếp tục?",
+      "confirmTitle": "Ghi đè tất cả lookups?",
+      "description": "Ghi đè TẤT CẢ các dòng lookup hiện có cho mọi danh mục (product-category, product-tag, unit, material-category, material-unit).",
+      "jsonEmpty": "Cần có ít nhất một dòng.",
+      "jsonHelp": "Mảng dòng. Bắt buộc: category, value (hoặc label). Tùy chọn: label (mặc định = value), sortOrder (tự động). Categories: product-category, product-tag, unit, material-category, material-unit. Lưu vào localStorage theo khách hàng.",
+      "jsonInvalid": "JSON không hợp lệ: {{error}}",
+      "jsonLabel": "JSON lookups",
+      "jsonMissingFields": "Mỗi dòng cần có \"category\" và một trong \"value\" hoặc \"label\".",
+      "jsonNotArray": "JSON phải là một mảng.",
+      "parsedRows": "Số dòng đã phân tích",
+      "title": "Tạo dữ liệu meta-data"
+    },
+    "materialInventory": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ toàn bộ tồn kho vật tư của khách hàng \"{{clientCode}}\" bằng tối đa {{count}} dòng mới. Tiếp tục?",
+      "confirmTitle": "Ghi đè tồn kho vật tư?",
+      "count": "Số dòng",
+      "countHelp": "Số cặp (vật tư, vị trí) sẽ tạo. Giới hạn bởi vật tư × vị trí.",
+      "description": "Ghi đè TẤT CẢ tồn kho vật tư hiện có. Vật tư và vị trí phải tồn tại trước (lấy trực tiếp từ BFF). Lượng đặt giữ luôn để trống.",
+      "maxQty": "Tồn tối đa (đơn vị gốc)",
+      "maxQtyHelp": "Tồn của từng dòng được lấy ngẫu nhiên từ 0 đến giá trị này, theo đơn vị gốc của vật tư.",
+      "multiUnitSplit": "Cho phép tách đa đơn vị",
+      "multiUnitSplitHelp": "Nếu vật tư có quy đổi đơn vị, đặt thêm tồn ở đơn vị khác (ví dụ KG + BAO_5KG).",
+      "overwriteWarning": "Dữ liệu tồn kho sẽ thay thế toàn bộ envelope material-inventory — không gộp. Các dòng hiện có của khách hàng này sẽ bị xóa.",
+      "title": "Tạo tồn kho vật tư giả"
+    },
+    "materials": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả vật tư của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
+      "confirmTitle": "Ghi đè tất cả vật tư?",
+      "count": "Số lượng vật tư",
+      "countHelp": "Lấy N dòng đầu từ JSON của ngành (tối đa {{max}}).",
+      "description": "Ghi đè TẤT CẢ vật tư hiện có bằng danh mục của ngành đã chọn. Mã cố định (ví dụ MAT-FLOUR-WHEAT-T00) để các tham chiếu sau này ổn định.",
+      "title": "Tạo vật tư giả"
+    },
+    "missingSecrets": "Cần nhập thông tin khóa bảo mật để tiếp tục.",
+    "productInventory": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ toàn bộ tồn kho sản phẩm của khách hàng \"{{clientCode}}\" bằng tối đa {{count}} dòng mới. Tiếp tục?",
+      "confirmTitle": "Ghi đè tồn kho sản phẩm?",
+      "count": "Số dòng",
+      "countHelp": "Số cặp (sản phẩm, vị trí) sẽ tạo. Giới hạn bởi sản phẩm × vị trí.",
+      "description": "Ghi đè TẤT CẢ tồn kho sản phẩm hiện có. Sản phẩm và vị trí phải tồn tại trước (lấy trực tiếp từ BFF). Lượng đặt giữ luôn để trống.",
+      "maxQty": "Tồn tối đa (đơn vị gốc)",
+      "maxQtyHelp": "Tồn của từng dòng được lấy ngẫu nhiên từ 0 đến giá trị này, theo đơn vị gốc của sản phẩm.",
+      "multiUnitSplit": "Cho phép tách đa đơn vị",
+      "multiUnitSplitHelp": "Nếu sản phẩm có quy đổi đơn vị, đặt thêm tồn ở đơn vị khác (ví dụ KG + BAO_5KG).",
+      "overwriteWarning": "Dữ liệu tồn kho sẽ thay thế toàn bộ envelope product-inventory — không gộp. Các dòng hiện có của khách hàng này sẽ bị xóa.",
+      "title": "Tạo tồn kho sản phẩm giả"
+    },
+    "products": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả sản phẩm của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
+      "confirmTitle": "Ghi đè tất cả sản phẩm?",
+      "count": "Số lượng sản phẩm",
+      "countHelp": "Lấy N dòng đầu từ JSON của ngành (tối đa {{max}}).",
+      "description": "Ghi đè TẤT CẢ sản phẩm hiện có bằng danh mục của ngành đã chọn. Mã cố định (ví dụ PRD-NOODLE-SHRIMP) để các tham chiếu sau này ổn định.",
+      "title": "Tạo sản phẩm giả"
+    },
+    "purge": {
+      "button": "Xóa toàn bộ dữ liệu (trừ nhân viên)",
+      "confirmBody": "Thao tác này sẽ XÓA VĨNH VIỄN toàn bộ dữ liệu giả của khách hàng \"{{clientCode}}\" — sản phẩm, vật tư, khách hàng, nhà cung cấp, lookups, đơn bán, yêu cầu giao hàng, phiếu nhập kho, và toàn bộ tồn kho. Nhân viên và vị trí kho sẽ được giữ lại. Không thể hoàn tác. Tiếp tục?",
+      "confirmOk": "Đồng ý, xóa hết",
+      "confirmTitle": "Xóa toàn bộ dữ liệu trừ nhân viên?",
+      "description": "Xóa mọi prefix dữ liệu giả thuộc về client này. Nhân viên và vị trí kho được giữ lại để admin không bị mất quyền đăng nhập và các seeder vẫn dùng được vị trí có sẵn.",
+      "runSuccess": "Đã xóa.",
+      "summaryRemoved": "Đã xóa: {{count}} bản ghi",
+      "title": "Xóa dữ liệu (trừ nhân viên)",
+      "warning": "Hành động phá hủy. Sẽ xóa TẤT CẢ master data, dữ liệu giao dịch và tồn kho của client này. Không thể hoàn tác."
+    },
+    "runError": "Lỗi: {{error}}",
+    "runSuccess": "Hoàn tất.",
+    "salesOrders": {
+      "confirmBody": "Thao tác này sẽ tạo {{count}} đơn bán mới cho khách hàng \"{{clientCode}}\" trong khoảng thời gian {{daysBack}} ngày qua. Các đơn bán trong cùng ngày sẽ bị GHI ĐÈ. Tiếp tục?",
+      "confirmTitle": "Tạo đơn hàng?",
+      "count": "Số đơn hàng",
+      "countHelp": "Số đơn hàng mới sẽ được phân bố ngẫu nhiên trong khoảng thời gian {{daysBack}} ngày.",
+      "daysBack": "Phân bố trong khoảng thời gian (ngày)",
+      "daysBackHelp": "Khoảng thời gian để phân bố đơn hàng. Mặc định là 14 ngày để khớp với khoảng thời gian truy vấn của trang danh sách.",
+      "description": "Tạo đơn hàng phân tách theo ngày. Lấy khách hàng, sản phẩm, nhân viên và vị trí từ BFF và sử dụng trạng thái / phương thức giao hàng / tag được cấu hình. Tỷ lệ mix: ~25% NEW, ~45% IN_PROGRESS, ~25% COMPLETED, ~5% EXCEPTIONAL — plus a ~5% cancellation flag overlay.",
+      "inventoryWarning": "Đơn bán trong trạng thái reservesStock / shipsStock sẽ không ảnh hưởng đến tồn kho. Sử dụng trạng thái chuyển đổi trên UI để kiểm tra chuỗi tồn kho.",
+      "title": "Tạo đơn hàng giả"
+    },
+    "secretsHelp": "Chỉ lưu trong sessionStorage — sẽ xóa khi đóng tab.",
+    "secretsTitle": "Thông tin bảo mật",
+    "source": "Nguồn dữ liệu",
+    "sourceJson": "Từ JSON",
+    "sourceRandom": "Ngẫu nhiên",
+    "subtitle": "Tạo dữ liệu mẫu cho khách hàng hiện tại — chỉ dùng cho dev/test.",
+    "summary": "Kết quả",
+    "summaryRecords": "Số bản ghi: {{count}}",
+    "summarySso": "SSO: tạo {{created}}, thất bại {{failed}}",
+    "title": "Công cụ tạo dữ liệu giả",
+    "transactionalPurge": {
+      "button": "Xóa dữ liệu giao dịch",
+      "confirmBody": "Thao tác này sẽ XÓA VĨNH VIỄN tất cả phiếu nhập kho, đơn hàng và yêu cầu giao hàng cho khách hàng \"{{clientCode}}\" trong tất cả các ngày phân tách. Dữ liệu master và tồn kho sẽ được giữ lại. Không thể hoàn tác. Tiếp tục?",
+      "confirmOk": "Đồng ý, xóa dữ liệu giao dịch",
+      "confirmTitle": "Xóa dữ liệu giao dịch?",
+      "description": "Xóa các bản ghi giao dịch phân tách theo ngày: phiếu nhập kho, đơn hàng và yêu cầu giao hàng. Dữ liệu master (nhân viên, sản phẩm, vật tư, khách hàng, nhà cung cấp, lookups, vị trí) và tồn kho sẽ được giữ lại để operator có thể replay flows mà không cần seed lại.",
+      "runSuccess": "Dữ liệu giao dịch đã xóa.",
+      "summaryRemoved": "Đã xóa: {{count}} bản ghi",
+      "title": "Xóa dữ liệu giao dịch",
+      "warning": "Hành động phá hủy. Sẽ xóa TẤT CẢ phiếu nhập kho, đơn hàng và yêu cầu giao hàng cho khách hàng này. Không thể hoàn tác."
+    },
+    "vendors": {
+      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả nhà cung cấp của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
+      "confirmTitle": "Ghi đè tất cả nhà cung cấp?",
+      "count": "Số nhà cung cấp",
+      "countHelp": "Tên công ty lấy từ pool theo ngành (food / mechanical). Mã sinh tự động (VND-NNNN).",
+      "description": "Ghi đè TẤT CẢ nhà cung cấp hiện có. Cần seed nhà cung cấp trước khi tạo phiếu nhập kho.",
+      "title": "Tạo nhà cung cấp giả"
+    }
+  },
+  "goodsReceipts": {
+    "addItem": "Tạo phiếu nhập",
+    "clearFilters": "Xóa hết bộ lọc",
+    "columns": {
+      "assignedTo": "Phụ trách",
+      "date": "Ngày",
+      "dateLabelExpected": "Dự kiến",
+      "dateLabelReceived": "Đã nhận",
+      "items": "Vật tư",
+      "itemsCount_one": "{{count}} vật tư",
+      "itemsCount_other": "{{count}} vật tư",
+      "locationName": "Kho",
+      "receiptNumber": "Mã phiếu",
+      "receivedDate": "Ngày nhận",
+      "reference": "Tham chiếu",
+      "totalQuantity": "Tổng SL"
+    },
+    "confirm": {
+      "cancelMessage": "Hủy phiếu nhập này? Thao tác không thể hoàn tác.",
+      "cancelTitle": "Hủy phiếu",
+      "confirmMessage": "Xác nhận đã nhận hàng? Phiếu sẽ bị khóa, không thể chỉnh sửa.",
+      "confirmTitle": "Xác nhận nhập kho",
+      "inventoryInProgress": "Đang cập nhật tồn kho — vui lòng giữ trang này mở cho đến khi hoàn tất.",
+      "repostMessage": "Ghi nhận tồn kho cho {{count}} dòng chưa được cập nhật.",
+      "repostTitle": "Cập nhật tồn kho còn thiếu",
+      "repostWarning": "Chỉ thực hiện khi tồn kho thực sự chưa được cộng. Các dòng đã ghi nhận từ phiếu này sẽ tự động bỏ qua, nhưng phiếu xác nhận trước giữa năm 2026 không lưu dấu ghi nhận — cập nhật lại các phiếu đó sẽ cộng trùng. Hãy kiểm tra trang tồn kho nếu chưa chắc chắn."
+    },
+    "datePreset": {
+      "custom": "Tùy chỉnh"
+    },
+    "detail": {
+      "activitiesError": "Không tải được danh sách hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho phiếu này.",
+      "activityMemo": {
+        "cancelledFrom": "Hủy từ",
+        "fieldQuantity": "SL",
+        "inventoryApplied_one": "Cập nhật {{count}} dòng tồn kho",
+        "inventoryApplied_other": "Cập nhật {{count}} dòng tồn kho",
+        "inventoryPartial": "{{failed}}/{{attempted}} dòng tồn kho cập nhật thất bại",
+        "inventoryReversalPartial": "{{failed}}/{{attempted}} dòng tồn kho đảo thất bại",
+        "inventoryReversed_one": "Đảo {{count}} dòng tồn kho",
+        "inventoryReversed_other": "Đảo {{count}} dòng tồn kho",
+        "inventoryUnchanged": "Không tác động tồn kho",
+        "itemsAdded_one": "Thêm {{count}} dòng hàng",
+        "itemsAdded_other": "Thêm {{count}} dòng hàng",
+        "itemsChanged_one": "Sửa {{count}} dòng hàng",
+        "itemsChanged_other": "Sửa {{count}} dòng hàng",
+        "itemsRemoved_one": "Xóa {{count}} dòng hàng",
+        "itemsRemoved_other": "Xóa {{count}} dòng hàng",
+        "lineCount_one": "{{count}} dòng",
+        "lineCount_other": "{{count}} dòng",
+        "vendor": "Nhà cung cấp"
+      },
+      "activityVerbs": {
+        "cancel": "Đã hủy phiếu",
+        "confirmReceived": "Đã xác nhận nhập",
+        "create": "Đã tạo phiếu",
+        "repostInventory": "Đã cập nhật tồn kho còn thiếu cho",
+        "update": "Đã sửa phiếu",
+        "updateInline": "Đã cập nhật dòng trên"
+      },
+      "auditAt": "lúc {{datetime}}",
+      "auditBy": "bởi",
+      "auditCreatedBy": "Tạo bởi",
+      "auditLastUpdatedBy": "Cập nhật cuối",
+      "cancelledAt": "Hủy lúc",
+      "cardAudit": "Lịch sử & người thao tác",
+      "cardGeneral": "Thông tin chung",
+      "cardInventoryEffect": "Cập nhật tồn kho",
+      "cardInventoryEffectReversed": "Cập nhật tồn kho (đã đảo)",
+      "copiedFrom": "Sao chép từ",
+      "editQuantityTitle": "Sửa số lượng",
+      "from": "Từ",
+      "headerTimestamps": "Cập nhật {{updated}} · Tạo {{created}}",
+      "heroLabel": "Tổng nhập",
+      "heroLineUnit": "dòng",
+      "inventoryEffectViewAction": "Xem trên trang tồn kho",
+      "inventoryNotPostedWarning": "{{count}} dòng trên phiếu này chưa được ghi vào tồn kho — quá trình cập nhật chưa chạy xong. Cập nhật ngay để tồn kho khớp với phiếu.",
+      "itemsSubtotal": "Tổng cộng",
+      "itemsTitle": "Hàng nhập",
+      "lineNoStockTracking": "không theo dõi tồn",
+      "lineNotPosted": "chưa ghi nhận",
+      "lineOrphaned": "thiếu sản phẩm",
+      "noAssignedTo": "Chưa phân công",
+      "noLocation": "Chưa có kho",
+      "noNotes": "Chưa có ghi chú",
+      "noReference": "—",
+      "noVendor": "Chưa có nhà cung cấp",
+      "receivedAt": "Nhận lúc",
+      "recentActivities": "Hoạt động gần đây",
+      "repostInventoryAction": "Cập nhật tồn kho còn thiếu",
+      "statusCancelledNote": "Phiếu này đã bị hủy",
+      "stickyActionsLabel": "Thao tác phiếu",
+      "tabActivityLog": "Hoạt động",
+      "tabInfo": "Thông tin",
+      "tabItems": "Hàng nhập",
+      "tabReceipt": "Phiếu",
+      "viewItems": "Xem hàng nhập"
+    },
+    "detailTitle": "Chi tiết phiếu nhập",
+    "editItem": "Sửa phiếu nhập",
+    "filterLocation": "Kho",
+    "form": {
+      "assignedToPlaceholder": "Chọn người phụ trách",
+      "copyingFrom": "Sao chép từ phiếu {{receiptNumber}}",
+      "createButton": "Tạo",
+      "downloadTemplateButton": "Tải mẫu Excel",
+      "dropExcelHint": "Kéo thả tệp Excel vào đây để nhập danh sách sản phẩm",
+      "importItemsButton": "Nhập từ Excel",
+      "itemsTitle": "Danh sách hàng nhập",
+      "locationLabel": "Kho",
+      "locationPlaceholder": "Chọn kho",
+      "notesPlaceholder": "Ghi chú nội bộ (tùy chọn)",
+      "receiptNumberAutoPlaceholder": "Tự động tạo khi lưu",
+      "receiptNumberLabel": "Mã phiếu",
+      "receivedDateLabel": "Ngày nhận",
+      "referenceLabel": "Tham chiếu",
+      "referencePlaceholder": "Số HĐ NCC / số PO",
+      "updateButton": "Cập nhật",
+      "vendorPlaceholder": "Chọn nhà cung cấp"
+    },
+    "itemTypes": {
+      "material": "Vật tư"
+    },
+    "noItems": "Chưa có phiếu nhập nào.",
+    "notifications": {
+      "cancelError": "Hủy phiếu thất bại.",
+      "cancelSuccess": "Đã hủy phiếu.",
+      "confirmError": "Xác nhận phiếu thất bại.",
+      "confirmSuccess": "Đã xác nhận phiếu.",
+      "createError": "Tạo phiếu thất bại.",
+      "createSuccess": "Đã tạo phiếu.",
+      "defaultLocationMissing": "Chưa tải xong vị trí mặc định — vui lòng thử lại sau giây lát.",
+      "fetchError": "Tải danh sách phiếu nhập thất bại.",
+      "importEmpty": "Không tìm thấy dòng hàng nào trong file.",
+      "importError": "Đọc file thất bại.",
+      "importMissingColumn": "Thiếu cột bắt buộc: {{columns}}. Vui lòng tải lại mẫu mới.",
+      "importMissingColumnTitle": "File mẫu không hợp lệ",
+      "importNoMatchTitle": "Không khớp SKU nào",
+      "importPartialTitle": "Đã nhập {{added}} dòng",
+      "importSuccess": "Đã nhập {{count}} dòng.",
+      "importUnmatched": "Đã bỏ qua {{count}} SKU không khớp: {{skus}}",
+      "inventoryAborted": "Phiếu đã được xác nhận, nhưng cập nhật tồn kho chưa chạy xong. Hãy dùng \"Cập nhật tồn kho còn thiếu\" trên phiếu này để hoàn tất.",
+      "inventoryPartial": "Cập nhật tồn kho chưa hoàn tất",
+      "inventoryPartialBody": "{{failed}}/{{attempted}} dòng cập nhật tồn kho thất bại. Vui lòng đối soát từ trang tồn kho.",
+      "mobileFormBlocked": "Tạo và sửa phiếu chỉ làm trên máy tính. Trên điện thoại bạn chỉ sửa số lượng và xác nhận.",
+      "repostError": "Cập nhật tồn kho thất bại. Các dòng còn lại chưa thay đổi — bạn có thể thử lại.",
+      "repostSuccess": "Đã ghi nhận {{posted}} dòng vào tồn kho.",
+      "updateError": "Cập nhật phiếu thất bại.",
+      "updateSuccess": "Đã cập nhật phiếu."
+    },
+    "stats": {
+      "total": "Tổng"
+    },
+    "statuses": {
+      "cancelled": "Đã hủy",
+      "draft": "Nháp",
+      "received": "Đã nhận"
+    },
+    "title": "Phiếu nhập kho",
+    "validation": {
+      "itemCodeUnitDuplicate": "Vật tư này đã có ở dòng khác với cùng đơn vị",
+      "itemsRequired": "Phải có ít nhất một dòng hàng",
+      "locationRequired": "Vui lòng chọn kho",
+      "receivedDateRequired": "Vui lòng chọn ngày nhận",
+      "vendorRequired": "Vui lòng chọn nhà cung cấp"
+    }
+  },
+  "greenhouses": {
+    "addItem": "Thêm nhà màng",
+    "areaValue": "{{value}} m²",
+    "columns": {
+      "area": "Diện tích",
+      "crops": "Vụ mùa"
+    },
+    "detail": {
+      "infoTitle": "Thông tin",
+      "statActiveCrops": "Đang canh tác",
+      "statArea": "Diện tích"
+    },
+    "editItem": "Sửa nhà màng",
+    "emptyMessage": "Thêm nhà màng đầu tiên để bắt đầu theo dõi vụ mùa.",
+    "emptyTitle": "Chưa có nhà màng",
+    "form": {
+      "areaLabel": "Diện tích",
+      "areaPlaceholder": "Diện tích nhà màng",
+      "codePlaceholder": "vd. GH-A",
+      "createButton": "Tạo nhà màng",
+      "descriptionPlaceholder": "Mô tả (tùy chọn)",
+      "namePlaceholder": "vd. Nhà màng phía Bắc",
+      "notesPlaceholder": "Cấu hình khí hậu, vị trí trong nông trại, v.v.",
+      "primarySection": "Thông tin nhà màng"
+    },
+    "noItems": "Không tìm thấy nhà màng",
+    "notifications": {
+      "createError": "Không tạo được nhà màng",
+      "createSuccess": "Đã tạo nhà màng",
+      "fetchError": "Không tải được nhà màng",
+      "updateError": "Không cập nhật được nhà màng",
+      "updateSuccess": "Đã cập nhật nhà màng"
+    },
+    "searchPlaceholder": "Tìm nhà màng…",
+    "title": "Nhà màng",
+    "validation": {
+      "areaInvalid": "Diện tích không được âm"
+    }
+  },
+  "home": {
+    "columns": {
+      "assignedDriver": "Người Phụ Trách",
+      "assignedStaff": "Nhân viên phụ trách",
+      "customer": "Khách Hàng",
+      "orderDate": "Ngày Đặt Hàng",
+      "orderNumber": "Mã Đơn Hàng",
+      "poNumber": "Số PO",
+      "requestNumber": "Mã Yêu Cầu",
+      "status": "Trạng Thái"
+    },
+    "empty": "Không có dữ liệu",
+    "error": "Không tải được dữ liệu",
+    "expand": "Mở rộng",
+    "sections": {
+      "newOrders": "Đơn Hàng Mới / Đang Xử Lý",
+      "readyToDeliver": "Hàng chờ giao",
+      "todaySchedule": "Lịch Trình Hôm Nay"
+    },
+    "viewAll": "Xem tất cả"
+  },
+  "inventory": {
+    "title": "Kho hàng"
+  },
+  "locations": {
+    "addItem": "Thêm vị trí",
+    "columns": {
+      "kind": "Nhóm"
+    },
+    "deleteConfirm": {
+      "message": "Bạn có chắc chắn muốn xóa vị trí này? Hành động này không thể hoàn tác.",
+      "title": "Xóa vị trí"
+    },
+    "editItem": "Cập nhật vị trí",
+    "emptyMessage": "Thêm vị trí đầu tiên — kho, kệ, hoặc điểm nhận hàng.",
+    "emptyTitle": "Chưa có vị trí",
+    "form": {
+      "addressPlaceholder": "Đường, thành phố, quốc gia",
+      "codePlaceholder": "Mã vị trí",
+      "contactNameLabel": "Người liên hệ",
+      "contactPhoneLabel": "SĐT liên hệ",
+      "contactSection": "Liên hệ",
+      "createButton": "Tạo vị trí",
+      "descriptionPlaceholder": "Mô tả ngắn (tùy chọn)",
+      "kindLabel": "Nhóm",
+      "kindPlaceholder": "vd: kho, kệ, cửa hàng",
+      "namePlaceholder": "Tên vị trí",
+      "notesPlaceholder": "Giờ hoạt động, hướng dẫn ra vào...",
+      "operationsSection": "Vận hành",
+      "primarySection": "Thông tin chính",
+      "updateButton": "Cập nhật vị trí"
+    },
+    "noItems": "Không tìm thấy vị trí",
+    "notifications": {
+      "createError": "Không thể tạo vị trí",
+      "createSuccess": "Tạo vị trí thành công",
+      "deleteError": "Không thể xóa vị trí",
+      "deleteSuccess": "Xóa vị trí thành công",
+      "disableSuccess": "Đã ngừng vị trí",
+      "enableSuccess": "Đã kích hoạt vị trí",
+      "fetchError": "Không thể tải danh sách vị trí",
+      "listConflictMessage": "Một người khác vừa thay đổi danh sách vị trí. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "toggleError": "Không thể cập nhật trạng thái vị trí",
+      "updateError": "Không thể cập nhật vị trí",
+      "updateSuccess": "Cập nhật vị trí thành công"
+    },
+    "title": "Vị trí"
+  },
+  "lookups": {
+    "addItem": "Thêm",
+    "categories": {
+      "maintenanceType": "Loại bảo trì",
+      "materialCategory": "Danh mục vật tư",
+      "materialUnit": "Đơn vị vật tư",
+      "productCategory": "Danh mục sản phẩm",
+      "productTag": "Tag sản phẩm",
+      "productUnit": "Đơn vị sản phẩm",
+      "truckType": "Loại xe",
+      "unit": "Đơn vị tính"
+    },
+    "columns": {
+      "label": "Nhãn",
+      "sortOrder": "Thứ tự",
+      "value": "Mã"
+    },
+    "deleteConfirm": {
+      "message": "Sẽ ẩn \"{{label}}\" (soft-delete). Dữ liệu cũ vẫn dùng nhãn này. Có thể bật lại sau.",
+      "title": "Xóa mục này?"
+    },
+    "form": {
+      "label": "Nhãn hiển thị",
+      "labelHelp": "Hiển thị trong dropdown.",
+      "sortOrder": "Thứ tự sắp xếp",
+      "sortOrderHelp": "Số nhỏ hơn xuất hiện trước.",
+      "value": "Mã (value)",
+      "valueHelp": "Mã định danh ngắn, không dấu cách."
+    },
+    "noItems": "Chưa có mục nào.",
+    "notifications": {
+      "createSuccess": "Đã thêm",
+      "deleteSuccess": "Đã xóa",
+      "disableSuccess": "Đã tắt",
+      "enableSuccess": "Đã bật",
+      "updateSuccess": "Đã cập nhật",
+      "writeError": "Lưu thất bại"
+    },
+    "reorderHint": "Kéo biểu tượng để sắp xếp lại thứ tự.",
+    "subtitle": "Quản lý các giá trị dropdown / danh mục tham chiếu trong ứng dụng.",
+    "title": "Danh mục",
+    "validation": {
+      "labelRequired": "Cần nhập nhãn",
+      "valueDuplicate": "Đã có mục khác đang dùng mã này",
+      "valueRequired": "Cần nhập mã"
+    }
+  },
+  "materialInventory": {
+    "columns": {
+      "availableTooltip": "Tồn kho trừ phần đã đặt giữ. Vật tư chưa được giữ chỗ từ đơn bán.",
+      "forecasted": "Dự báo",
+      "forecastedTooltip": "Tồn + nhập − xuất. Sẽ bật khi có module PO.",
+      "incoming": "Nhập kế tiếp",
+      "incomingTooltip": "Các phiếu nhập PO đang chờ. Sẽ bật khi có module PO.",
+      "material": "Nguyên liệu",
+      "outgoing": "Xuất kế tiếp",
+      "outgoingTooltip": "Các cam kết xuất kho đang chờ. Chưa được kết nối.",
+      "overcommittedTooltip": "Đã đặt giữ {{reserved}} vượt tồn {{onHand}}."
+    },
+    "defaultLocationBadge": "mặc định",
+    "emptyMessage": "Thêm dòng — chọn nguyên liệu và vị trí, nhập số tồn kho ban đầu.",
+    "emptyTitle": "Chưa có dòng tồn kho",
+    "exportButton": "Xuất Excel",
+    "filterByLocation": "Lọc theo vị trí",
+    "filterInactive": "Ngừng nhập",
+    "filterStock": {
+      "all": "Tất cả",
+      "negative": "Đặt trước",
+      "noStock": "Chưa có tồn kho",
+      "outOfStock": "Hết hàng",
+      "placeholder": "Tất cả mức tồn",
+      "title": "Tồn kho"
+    },
+    "form": {
+      "backOrderWarning": "Cho phép tồn kho âm — hữu ích cho back-order. Xác nhận ý định.",
+      "currentOnHand": "Tồn kho hiện tại",
+      "deltaLabel": "Chênh lệch",
+      "deltaPlaceholder": "vd: 5 hoặc -3",
+      "locationPlaceholder": "Chọn vị trí",
+      "materialLabel": "Nguyên liệu",
+      "materialPlaceholder": "Chọn nguyên liệu",
+      "multiUnitInitialHint": "Nhập số lượng ban đầu theo đơn vị đã chọn; tồn kho được quy về đơn vị gốc.",
+      "newOnHand": "Tồn kho mới",
+      "newOnHandLabel": "Tồn kho mới",
+      "noteLabel": "Ghi chú (tùy chọn)",
+      "notePlaceholder": "Lý do — nhập hàng, tiêu hao, hư hỏng...",
+      "onHandLabel": "Tồn kho ban đầu",
+      "reasonLabel": "Lý do",
+      "reasonPlaceholder": "Vì sao tồn kho thay đổi?",
+      "submitAdjust": "Điều chỉnh tồn kho",
+      "submitRepack": "Áp dụng đóng gói lại",
+      "submitStockTake": "Lưu kiểm kho",
+      "varianceLabel": "Chênh lệch"
+    },
+    "importButton": "Nhập Excel",
+    "importModal": {
+      "confirm": "Thay thế tồn kho",
+      "existing": "{{count}} dòng hiện tại",
+      "fileSummary": "Tệp: {{filename}} — đã đọc {{parsed}} dòng.",
+      "matched": "Khớp {{count}}",
+      "title": "Thay thế tồn kho nguyên liệu từ tệp",
+      "unmatched": "Không khớp {{count}}",
+      "unmatchedHint": "Không khớp: {{skus}}{{more}}",
+      "warningBody": "{{matched}} dòng khớp sẽ được ghi đè theo cặp (nguyên liệu, vị trí) — tồn kho và đơn vị trên dòng đó sẽ bị ghi đè; các thông tin đặt giữ, ghi chú và dữ liệu phụ khác được giữ lại. {{existing}} dòng hiện có không nằm trong tệp được giữ nguyên.",
+      "warningTitle": "Thao tác có thể mất dữ liệu"
+    },
+    "inbound": {
+      "detailLabel": "Hàng về",
+      "forecastedHelp": "Có sẵn + hàng về từ phiếu nhập nháp.",
+      "fromDrafts": "Từ {{count}} phiếu nháp",
+      "moreDrafts": "+{{count}} phiếu khác",
+      "unmappedWarning": "{{count}} dòng bị bỏ — đơn vị không có trên vật tư"
+    },
+    "kpis": {
+      "negative": "{{count}} âm",
+      "outOfStock": "{{count}} hết hàng",
+      "totalMaterials": "{{count}} vật tư"
+    },
+    "modal": {
+      "createTitle": "Thêm dòng tồn kho",
+      "updateTitle": "Cập nhật tồn kho"
+    },
+    "mode": {
+      "delta": "Điều chỉnh (chênh lệch)",
+      "repack": "Đóng gói lại",
+      "snapshot": "Kiểm kho (cập nhật)"
+    },
+    "notifications": {
+      "adjustError": "Không thể áp dụng",
+      "adjustSuccess": "Đã cập nhật tồn kho",
+      "conversionError": "Không có đường quy đổi giữa các đơn vị này",
+      "createError": "Không thể thêm dòng",
+      "createSuccess": "Đã thêm dòng",
+      "deleteError": "Không thể xóa",
+      "deleteSuccess": "Đã xóa",
+      "duplicatePair": "Đã có dòng cho cặp nguyên liệu + vị trí này",
+      "exportEmpty": "Không có dòng tồn kho để xuất",
+      "exportError": "Không thể xuất tồn kho",
+      "exportSuccess": "Đã xuất {{count}} dòng",
+      "fetchError": "Không thể tải tồn kho",
+      "importError": "Không thể nhập tồn kho",
+      "importMissingColumn": "Thiếu cột bắt buộc: {{columns}}. Hãy dùng tệp xuất gần nhất làm mẫu.",
+      "importMissingColumnTitle": "Tệp thiếu cột bắt buộc",
+      "importNoIdentity": "Tệp phải có cột SKU hoặc Mã nguyên liệu để khớp với dữ liệu chủ.",
+      "importNoMatched": "Không có dòng nào trong {{count}} dòng khớp với nguyên liệu đã có.",
+      "importNoMatchedTitle": "Không khớp nguyên liệu nào",
+      "importNoValid": "Không có dòng hợp lệ trong tệp",
+      "importParseError": "Không đọc được tệp Excel. Hãy lưu lại dưới dạng .xlsx và thử lại.",
+      "importPartial": "Đã nhập {{created}} thêm mới + {{updated}} cập nhật / {{total}} dòng; {{failed}} lỗi.",
+      "importPartialTitle": "Nhập có lỗi",
+      "importSuccess": "Đã nhập: thêm mới {{created}}, cập nhật {{updated}}.",
+      "repackError": "Không thể đóng gói lại",
+      "repackSuccess": "Đã đóng gói lại",
+      "stockTakeError": "Không thể lưu kiểm kho",
+      "stockTakeSuccess": "Đã lưu kiểm kho"
+    },
+    "reason": {
+      "correction": "Điều chỉnh",
+      "damage": "Hư hỏng / hao hụt",
+      "issue": "Xuất (−)",
+      "other": "Khác",
+      "receive": "Nhập (+)"
+    },
+    "repack": {
+      "balanced": "Đóng gói lại cân bằng theo đơn vị gốc.",
+      "fromQtyLabel": "Số lượng nguồn",
+      "fromUnitLabel": "Đơn vị nguồn",
+      "reason": {
+        "breakage": "Vỡ",
+        "damage": "Hư hỏng",
+        "other": "Khác",
+        "spillage": "Rơi vãi"
+      },
+      "toQtyLabel": "Số lượng đích",
+      "toUnitLabel": "Đơn vị đích",
+      "writeOffHint": "Số lượng hao hụt khi đóng gói (theo đơn vị gốc).",
+      "writeOffOptional": "Hao hụt (tùy chọn)",
+      "writeOffQtyLabel": "Hao hụt ({{unit}})",
+      "writeOffReasonLabel": "Lý do"
+    },
+    "stockState": {
+      "negative": "âm"
+    },
+    "title": "Tồn kho nguyên liệu",
+    "validation": {
+      "bad": "Giá trị không hợp lệ",
+      "deltaRequired": "Cần nhập chênh lệch",
+      "insufficientStock": "Không đủ tồn kho của '{{unit}}'",
+      "materialRequired": "Cần chọn nguyên liệu",
+      "noConversionPath": "Chưa có quy đổi giữa đơn vị này và đơn vị gốc. Thêm quy đổi trên vật tư trước.",
+      "onHandRequired": "Cần nhập số tồn kho",
+      "positiveRequired": "Phải lớn hơn 0",
+      "repackInvalid": "Đóng gói lại không hợp lệ",
+      "unknownUnit": "Đơn vị '{{unit}}' không có trên vật tư này",
+      "valueRequired": "Cần nhập giá trị"
+    }
+  },
+  "materials": {
+    "addItem": "Thêm vật tư",
+    "bulkImport": {
+      "import": "Nhập vật tư",
+      "missingColumnMessage": "Tệp thiếu cột bắt buộc: {{columns}}. Vui lòng dùng mẫu mới nhất — bấm \"Tải mẫu\" ở trên.",
+      "missingColumnTitle": "Định dạng tệp không hợp lệ",
+      "noValidRows": "Không tìm thấy vật tư hợp lệ trong tệp",
+      "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin vật tư",
+      "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
+      "unknownLabelTitle": "Danh mục không hợp lệ",
+      "uploadFile": "Tải lên tệp vật tư"
+    },
+    "columns": {
+      "minimumStock": "Tối thiểu"
+    },
+    "deleteConfirm": {
+      "message": "Bạn có chắc chắn muốn xóa vật tư này? Hành động này không thể hoàn tác.",
+      "title": "Xóa vật tư"
+    },
+    "detail": {
+      "activitiesError": "Không tải được lịch sử hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho vật tư này.",
+      "activityVerbs": {
+        "create": "Đã tạo vật tư",
+        "delete": "Đã xóa vật tư",
+        "disable": "Đã ngừng nhập vật tư",
+        "enable": "Đã kích hoạt vật tư",
+        "inventory": {
+          "adjust": "Đã điều chỉnh tồn kho cho",
+          "create": "Đã thêm tồn kho cho",
+          "repack": "Đã đóng gói lại tồn kho cho",
+          "stockTake": "Đã kiểm kê tồn kho cho"
+        },
+        "update": "Đã cập nhật vật tư",
+        "updateImages": "Đã cập nhật hình ảnh cho"
+      },
+      "classificationGroup": "Phân loại",
+      "costPrice": "Giá vốn",
+      "imagesEmpty": "Chưa có ảnh",
+      "imagesEmptyDesc": "Ảnh giúp nhận diện vật tư nhanh trên kệ.",
+      "inventoryTab": {
+        "empty": "Chưa có dòng tồn kho cho vật tư này.",
+        "title": "Tồn kho hiện có",
+        "totalOnHand": "{{count}} {{unit}} tổng"
+      },
+      "noPhotoHint": "Chưa có ảnh",
+      "packagingSpec": "Quy cách đóng gói",
+      "priceUnit": "/ {{unit}}",
+      "recentActivities": "Hoạt động gần đây",
+      "statLocations": "Vị trí",
+      "statTotalOnHand": "Tồn kho",
+      "tab": {
+        "activity": "Hoạt động",
+        "details": "Thông tin",
+        "images": "Hình ảnh"
+      }
+    },
+    "editItem": "Cập nhật vật tư",
+    "emptyMessage": "Thử điều chỉnh bộ lọc hoặc thêm vật tư đầu tiên để bắt đầu.",
+    "emptyTitle": "Chưa có vật tư nào",
+    "filterActive": "Đang nhập",
+    "filterCategoryAll": "Tất cả danh mục",
+    "filterInactive": "Ngừng nhập",
+    "filterStockAll": "Tất cả mức tồn",
+    "filterStockInStock": "Còn hàng",
+    "filterStockLowStock": "Dưới tối thiểu",
+    "filterStockOutOfStock": "Hết hàng",
+    "filterStockTitle": "Tồn kho",
+    "form": {
+      "addUnitConversion": "Thêm quy đổi",
+      "alternativeNamesLabel": "Còn gọi là",
+      "alternativeNamesPlaceholder": "Nhập tên gọi khác và bấm Enter",
+      "barcodePlaceholder": "vd: 8934567890123",
+      "categoryLabel": "Danh mục",
+      "categoryPlaceholder": "Chọn danh mục",
+      "conversionBaseUnit": "Đơn vị gốc",
+      "createButton": "Tạo vật tư",
+      "descriptionPlaceholder": "Mô tả vật tư",
+      "isActiveLabel": "Đang nhập",
+      "memoLabel": "Ghi chú nội bộ",
+      "memoPlaceholder": "Ghi chú của nhân viên (không hiển thị cho khách)",
+      "minimumStockHint": "Ngưỡng cảnh báo sắp hết, tính theo đơn vị gốc.",
+      "minimumStockLabel": "Tồn tối thiểu",
+      "minimumStockPlaceholder": "vd: 100",
+      "namePlaceholder": "Tên vật tư",
+      "packagingSpecLabel": "Quy cách đóng gói",
+      "packagingSpecPlaceholder": "vd: 25kg/bao; 40 bao/pallet",
+      "priceLabel": "Giá vốn",
+      "pricePlaceholder": "0",
+      "skuPlaceholder": "Mã SKU",
+      "unitConversionsHint": "\"1 unit = quantity × baseUnit\" (vd: 1 thùng = 12 cái).",
+      "unitConversionsLabel": "Quy đổi đơn vị",
+      "unitLabel": "Đơn vị",
+      "unitPickerPlaceholder": "Chọn đơn vị",
+      "unitPlaceholder": "vd: cái, kg, cuộn",
+      "unitsHint": "Thêm đơn vị phụ để bật tồn kho đa gói.",
+      "unitsLabel": "Đơn vị (đa đơn vị)",
+      "unitsPrimaryHint": "Đơn vị đầu tiên là đơn vị chính.",
+      "unitsSection": "Đơn vị & phân loại",
+      "updateButton": "Cập nhật vật tư"
+    },
+    "inventoryPrompt": {
+      "confirm": "Nhập tồn kho",
+      "message": "Vật tư đã được tạo. Bạn có muốn nhập tồn kho ngay không?",
+      "title": "Nhập tồn kho ngay?"
+    },
+    "noItems": "Không tìm thấy vật tư",
+    "notifications": {
+      "createError": "Không thể tạo vật tư",
+      "createSuccess": "Tạo vật tư thành công",
+      "deleteError": "Không thể xóa vật tư",
+      "deleteSuccess": "Xóa vật tư thành công",
+      "disableSuccess": "Đã ngừng nhập vật tư",
+      "enableSuccess": "Đã kích hoạt vật tư",
+      "fetchError": "Không thể tải danh sách vật tư",
+      "listConflictMessage": "Một người khác vừa thay đổi danh sách vật tư. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "toggleError": "Không thể đổi trạng thái vật tư",
+      "updateError": "Không thể cập nhật vật tư",
+      "updateSuccess": "Cập nhật vật tư thành công"
+    },
+    "status": {
+      "active": "Đang nhập",
+      "inactive": "Ngừng nhập"
+    },
+    "summary": {
+      "lowStock": "{{count}} sắp hết",
+      "negative": "{{count}} âm kho",
+      "tracked": "{{count}} theo dõi tồn"
+    },
+    "tab": {
+      "bulk": "Nhập hàng loạt",
+      "single": "Vật tư"
+    },
+    "title": "Vật tư",
+    "validation": {
+      "skuDuplicate": "Tồn tại vật tư khác đã dùng mã SKU này",
+      "unitConversionConflict": "Các tỉ lệ quy đổi không nhất quán — hãy kiểm tra lại",
+      "unitsNotConnected": "Hãy thêm quy đổi để mọi đơn vị đều liên thông"
+    }
+  },
+  "menu": {
+    "installApp": "Cài đặt ứng dụng",
+    "logout": "Đăng xuất",
+    "profile": "Hồ sơ",
+    "refreshConfig": "Tải lại cấu hình",
+    "reloadPage": "Tải lại trang",
+    "settings": "Cài đặt"
+  },
+  "nav": {
+    "assets": "Tài sản",
+    "employeeOrg": "Cơ cấu tổ chức",
+    "farm": "Nông trại",
+    "lookups": "Danh mục",
+    "lookupsV2": "Danh mục",
+    "materialsCatalog": "Danh mục vật tư",
+    "partners": "Khách hàng / NCC",
+    "productCatalog": "Danh mục hàng hóa",
+    "report": "Báo cáo",
+    "warehouse": "Kho"
+  },
+  "operationLogs": {
+    "addItem": "Thêm đổ dầu",
+    "allMonths": "Tất cả các tháng",
+    "deleteConfirm": {
+      "message": "Xóa nhật ký ngày {{date}}? Không thể hoàn tác.",
+      "title": "Xóa nhật ký đổ dầu?"
+    },
+    "driverTraining": {
+      "addItem": "Thêm buổi đào tạo",
+      "columns": {
+        "course": "Khóa học",
+        "date": "Ngày",
+        "result": "Kết quả",
+        "trainer": "Người huấn luyện"
+      },
+      "editItem": "Sửa buổi đào tạo",
+      "empty": "Chưa có nhật ký đào tạo năm {{year}}.",
+      "form": {
+        "coursePlaceholder": "vd. Lái xe an toàn",
+        "notePlaceholder": "Ghi chú (tùy chọn)",
+        "resultPlaceholder": "vd. Đạt",
+        "trainerPlaceholder": "Người / đơn vị huấn luyện"
+      },
+      "sectionTitle": "Nhật ký đào tạo"
+    },
+    "exportExcel": "Xuất Excel",
+    "form": {
+      "createButton": "Thêm nhật ký",
+      "selectDriver": "Chọn tài xế"
+    },
+    "maintenance": {
+      "addItem": "Thêm bảo trì",
+      "columns": {
+        "accountsReceived": "Đã thanh toán",
+        "condition": "Tình trạng",
+        "date": "Ngày",
+        "item": "Hạng mục",
+        "laborCost": "Tiền công",
+        "odometer": "Số km",
+        "outstanding": "Công nợ",
+        "quantity": "Số lượng",
+        "supplier": "Nhà cung cấp",
+        "total": "Tổng cộng",
+        "totalAmount": "Thành tiền",
+        "type": "Loại",
+        "unitPrice": "Đơn giá"
+      },
+      "editItem": "Sửa bảo trì",
+      "empty": "Chưa có lịch sử bảo trì năm {{year}}.",
+      "form": {
+        "conditionPlaceholder": "vd. Mới / Đã qua sử dụng",
+        "itemPlaceholder": "vd. Thay nhớt, má phanh",
+        "notePlaceholder": "Ghi chú (tùy chọn)",
+        "outstandingHint": "Tổng cộng − Đã thanh toán (tự động)",
+        "supplierPlaceholder": "Gara / nhà cung cấp",
+        "typePlaceholder": "Chọn loại bảo trì"
+      },
+      "sectionTitle": "Bảo trì"
+    },
+    "monthLabel": "Tháng",
+    "notifications": {
+      "createError": "Không lưu được",
+      "createSuccess": "Đã lưu",
+      "deleteError": "Không xóa được",
+      "deleteSuccess": "Đã xóa",
+      "fetchError": "Không tải được nhật ký",
+      "updateError": "Không cập nhật được",
+      "updateSuccess": "Đã cập nhật"
+    },
+    "refuel": {
+      "abnormalTooltip": "Mức tiêu hao cao hơn bình thường",
+      "addItem": "Thêm nhật ký đổ dầu",
+      "columns": {
+        "consumption": "L/100km",
+        "date": "Ngày",
+        "distance": "Quãng đường (km)",
+        "driver": "Lái xe",
+        "litres": "Số lít",
+        "odometerNew": "ODO mới (km)",
+        "odometerOld": "ODO cũ (km)",
+        "total": "Thành tiền",
+        "unitPrice": "Đơn giá"
+      },
+      "editItem": "Sửa nhật ký đổ dầu",
+      "empty": "Chưa có nhật ký đổ dầu năm {{year}}.",
+      "form": {
+        "driverPlaceholder": "Tên lái xe",
+        "notePlaceholder": "Ghi chú (tùy chọn)"
+      },
+      "sectionTitle": "Nhật ký đổ dầu",
+      "summary": {
+        "avgConsumption": "Tiêu hao TB",
+        "totalCost": "Tổng chi phí",
+        "totalDistance": "Tổng quãng đường",
+        "totalLitres": "Tổng số lít"
+      }
+    },
+    "trip": {
+      "addItem": "Thêm chuyến",
+      "columns": {
+        "date": "Ngày",
+        "destination": "Tuyến / Điểm đến",
+        "driver": "Lái xe",
+        "odometer": "Số km"
+      },
+      "editItem": "Sửa chuyến",
+      "empty": "Chưa có chuyến đi năm {{year}}.",
+      "form": {
+        "destinationPlaceholder": "vd. HCM — Đà Lạt",
+        "driverPlaceholder": "Tên lái xe",
+        "notePlaceholder": "Ghi chú (tùy chọn)"
+      },
+      "sectionTitle": "Chuyến đi"
+    },
+    "validation": {
+      "dateRequired": "Bắt buộc nhập ngày",
+      "litresInvalid": "Số lít không được âm",
+      "quantityInvalid": "Số lượng không được âm",
+      "unitPriceInvalid": "Đơn giá không được âm"
+    },
+    "yearLabel": "Năm"
+  },
+  "photos": {
+    "capture": "Chụp",
+    "dragOrClick": "Kéo ảnh vào đây, hoặc nhấp để chọn",
+    "dropHere": "Thả để tải lên",
+    "empty": "Chưa có ảnh nào",
+    "hint": "JPG, PNG, WebP, GIF. Tối đa {{max}}MB mỗi ảnh.",
+    "hintCompressed": "JPG, PNG, WebP, GIF. Tự động nén xuống ~{{kb}}KB mỗi ảnh.",
+    "invalidType": "{{name}}: định dạng không hỗ trợ",
+    "keep": "Dùng ảnh",
+    "loadingLocation": "Đang tải vị trí...",
+    "permissionDenied": "Không có quyền truy cập camera",
+    "retake": "Chụp lại",
+    "takenAtDeliveryBadge": "Chụp khi giao hàng",
+    "tooLarge": "{{name}}: vượt quá giới hạn {{max}}MB",
+    "tryAgain": "Thử lại",
+    "uploadError": "Tải lên thất bại {{name}}",
+    "uploadSuccess": "Đã tải lên {{count}} ảnh",
+    "uploading": "Đang tải..."
+  },
+  "productInventory": {
+    "beginOfPeriod": {
+      "buttonLabel": "Tồn đầu kỳ",
+      "currentBegin": "Tồn đầu kỳ hiện tại",
+      "deltaLabel": "Điều chỉnh (+/-)",
+      "error": "Không thể cập nhật tồn đầu kỳ",
+      "modeDelta": "Điều chỉnh (+/-)",
+      "modeSnapshot": "Nhập số tuyệt đối",
+      "negative": "Tồn đầu kỳ không thể âm",
+      "newBegin": "Tồn đầu kỳ mới",
+      "saved": "Đã cập nhật tồn đầu kỳ",
+      "snapshotLabel": "Tồn đầu kỳ ({{period}})",
+      "title": "Tồn đầu kỳ — {{period}}"
+    },
+    "columns": {
+      "availableTooltip": "Tồn kho trừ phần đã đặt giữ bởi đơn bán đang mở. Âm = đặt vượt tồn.",
+      "forecasted": "Dự kiến",
+      "forecastedTooltip": "Có sẵn + hàng về từ phiếu nhập đang ở trạng thái nháp.",
+      "incoming": "Hàng về",
+      "incomingTooltip": "Hàng về từ phiếu nhập đang nháp. Không tính phiếu đã nhận hoặc đã huỷ.",
+      "outgoing": "Đã đặt giữ",
+      "outgoingTooltip": "Đã được đơn bán đang mở giữ chỗ. Giải phóng khi xuất hoặc huỷ.",
+      "overcommittedTooltip": "Đã đặt giữ {{reserved}} vượt tồn {{onHand}}. Bổ sung hoặc giải phóng đặt giữ."
+    },
+    "composeSet": {
+      "blockedTitle": "Chưa thể lắp ráp — vui lòng xử lý các vấn đề bên dưới",
+      "componentCol": "Thành phần",
+      "currentCol": "Hiện có",
+      "customerLabel": "Khách hàng (tùy chọn)",
+      "customerPlaceholder": "Chọn khách hàng",
+      "description": "Lắp ráp bộ sản phẩm từ các thành phần. Giảm tồn kho từng thành phần và tăng tồn kho bộ tại vị trí được chọn.",
+      "locationLabel": "Vị trí",
+      "locationPlaceholder": "Chọn vị trí",
+      "noRowAtLocation": "Chưa có dòng tồn kho tại vị trí này — vui lòng tạo trước.",
+      "note": "Đã lắp {{qty}} × {{code}}",
+      "openButton": "Lắp ráp bộ",
+      "parentMissing": "Bộ chưa có dòng tồn kho tại đây",
+      "parentWillCreate": "Sẽ tạo dòng tồn kho",
+      "partialFailureMessage": "{{written}} thao tác thành công trước khi lỗi: {{error}}. Vui lòng làm mới và kiểm tra các dòng bị ảnh hưởng.",
+      "partialFailureTitle": "Lắp ráp thất bại một phần",
+      "quantityLabel": "Số lượng cần lắp ráp",
+      "requiredCol": "Cần",
+      "resultCol": "Sau lắp",
+      "salesOrderEmpty": "Khách hàng này không có đơn hàng đang mở",
+      "salesOrderLabel": "Đơn hàng (tùy chọn)",
+      "salesOrderPlaceholder": "Chọn đơn hàng đang mở",
+      "setLabel": "Bộ sản phẩm",
+      "setPlaceholder": "Chọn bộ sản phẩm",
+      "shortBadge": "thiếu {{short}}",
+      "soNeeded": "Đơn hàng này cần {{qty}} {{unit}}",
+      "submit": "Lắp {{qty}} bộ",
+      "success": "Đã lắp {{qty}} × {{code}}",
+      "title": "Lắp ráp bộ",
+      "unknownProduct": "Không tìm thấy sản phẩm thành phần trong dữ liệu chuẩn.",
+      "validation": {
+        "componentShort": "{{code}}: thiếu {{short}} {{unit}}",
+        "componentUnknown": "{{code}}: không tìm thấy sản phẩm thành phần",
+        "parentMissing": "Bộ {{code}} chưa có dòng tồn kho tại vị trí này",
+        "pickLocation": "Chọn vị trí",
+        "pickSet": "Chọn bộ sản phẩm",
+        "positiveQty": "Nhập số lượng dương"
+      }
+    },
+    "decomposeSet": {
+      "blockedTitle": "Chưa thể tháo bộ — vui lòng xử lý các vấn đề bên dưới",
+      "componentCol": "Thành phần",
+      "currentCol": "Hiện có",
+      "description": "Tháo các bộ sản phẩm đã lắp về dạng thành phần. Giảm tồn kho bộ và tăng tồn kho từng thành phần tại vị trí được chọn.",
+      "locationLabel": "Vị trí",
+      "locationPlaceholder": "Chọn vị trí",
+      "note": "Đã tháo {{qty}} × {{code}}",
+      "openButton": "Tháo bộ",
+      "parentMissing": "Bộ chưa có dòng tồn kho tại đây",
+      "partialFailureMessage": "{{written}} thao tác thành công trước khi lỗi: {{error}}. Vui lòng làm mới và kiểm tra các dòng bị ảnh hưởng.",
+      "partialFailureTitle": "Tháo bộ thất bại một phần",
+      "quantityLabel": "Số lượng cần tháo",
+      "resultCol": "Sau tháo",
+      "returnCol": "Hoàn trả",
+      "setLabel": "Bộ sản phẩm",
+      "setPlaceholder": "Chọn bộ sản phẩm",
+      "shortBadge": "thiếu {{short}}",
+      "submit": "Tháo {{qty}} bộ",
+      "success": "Đã tháo {{qty}} × {{code}}",
+      "title": "Tháo bộ",
+      "validation": {
+        "componentRowMissing": "{{code}}: chưa có dòng tồn kho tại vị trí này — vui lòng tạo trước",
+        "componentUnknown": "{{code}}: không tìm thấy sản phẩm thành phần",
+        "parentMissing": "Bộ {{code}} chưa có dòng tồn kho tại vị trí này",
+        "parentShort": "Bộ {{code}} chỉ còn {{short}} {{unit}} ít hơn số lượng yêu cầu tại vị trí này",
+        "pickLocation": "Chọn vị trí",
+        "pickSet": "Chọn bộ sản phẩm",
+        "positiveQty": "Nhập số lượng dương"
+      }
+    },
+    "defaultLocationBadge": "mặc định",
+    "emptyMessage": "Thêm dòng — chọn sản phẩm và vị trí, nhập số tồn kho ban đầu.",
+    "emptyTitle": "Chưa có dòng tồn kho",
+    "exportButton": "Xuất Excel",
+    "filterByLocation": "Lọc theo vị trí",
+    "filterInactive": "Ngừng cung cấp",
+    "filterStock": {
+      "all": "Tất cả",
+      "lowStock": "Dưới mức tối thiểu",
+      "negative": "Đặt trước",
+      "noStock": "Chưa có tồn kho",
+      "outOfStock": "Hết hàng",
+      "placeholder": "Tất cả mức tồn",
+      "title": "Tồn kho"
+    },
+    "form": {
+      "backOrderWarning": "Cho phép tồn kho âm — dùng cho đặt trước. Vui lòng xác nhận.",
+      "currentOnHand": "Tồn kho hiện tại",
+      "deltaLabel": "Chênh lệch",
+      "deltaPlaceholder": "vd: 5 hoặc -3",
+      "locationPlaceholder": "Chọn vị trí",
+      "newOnHand": "Tồn kho mới",
+      "newOnHandLabel": "Tồn kho mới",
+      "noteLabel": "Ghi chú (tùy chọn)",
+      "notePlaceholder": "Lý do — nhập hàng, kiểm kho, hư hỏng...",
+      "onHandLabel": "Tồn kho ban đầu",
+      "productPlaceholder": "Chọn sản phẩm",
+      "submitAdjust": "Điều chỉnh tồn kho",
+      "submitRepack": "Áp dụng đóng gói lại",
+      "submitStockTake": "Lưu kiểm kho",
+      "varianceLabel": "Chênh lệch"
+    },
+    "importButton": "Nhập Excel",
+    "importModal": {
+      "confirm": "Thay thế tồn kho",
+      "existing": "{{count}} dòng hiện tại",
+      "fileSummary": "Tệp: {{filename}} — đã đọc {{parsed}} dòng.",
+      "matched": "Khớp {{count}}",
+      "title": "Thay thế tồn kho sản phẩm từ tệp",
+      "unmatched": "Không khớp {{count}}",
+      "unmatchedHint": "Không khớp: {{skus}}{{more}}",
+      "warningBody": "{{matched}} dòng khớp sẽ được ghi đè theo cặp (sản phẩm, vị trí) — tồn kho và đơn vị trên dòng đó sẽ bị ghi đè; các thông tin đặt giữ, ghi chú và dữ liệu phụ khác được giữ lại. {{existing}} dòng hiện có không nằm trong tệp được giữ nguyên.",
+      "warningTitle": "Thao tác có thể mất dữ liệu"
+    },
+    "inbound": {
+      "detailLabel": "Hàng về",
+      "forecastedHelp": "Có sẵn + hàng về từ phiếu nhập nháp.",
+      "fromDrafts_one": "Từ {{count}} phiếu nháp",
+      "fromDrafts_other": "Từ {{count}} phiếu nháp",
+      "moreDrafts_one": "+{{count}} phiếu khác",
+      "moreDrafts_other": "+{{count}} phiếu khác",
+      "unmappedWarning_one": "{{count}} dòng bị bỏ — đơn vị không có trên sản phẩm",
+      "unmappedWarning_other": "{{count}} dòng bị bỏ — đơn vị không có trên sản phẩm"
+    },
+    "kpis": {
+      "lowStock": "{{count}} dưới mức tối thiểu",
+      "negative": "{{count}} âm",
+      "outOfStock": "{{count}} hết hàng",
+      "secondaryMustOrder": "{{count}} cần nhập",
+      "secondaryOutOfStock": "{{count}} hết hàng",
+      "totalProducts": "{{count}} sản phẩm"
+    },
+    "modal": {
+      "createTitle": "Thêm tồn kho",
+      "updateTitle": "Cập nhật tồn kho"
+    },
+    "mode": {
+      "delta": "Điều chỉnh (chênh lệch)",
+      "repack": "Đóng gói lại",
+      "snapshot": "Kiểm kho (cập nhật)"
+    },
+    "notifications": {
+      "adjustError": "Không thể áp dụng",
+      "adjustSuccess": "Đã cập nhật tồn kho",
+      "conversionError": "Không có quy đổi giữa các đơn vị này",
+      "createError": "Không thể thêm dòng",
+      "createSuccess": "Đã thêm dòng",
+      "deleteError": "Không thể xóa",
+      "deleteSuccess": "Đã xóa",
+      "duplicatePair": "Đã có dòng cho cặp sản phẩm + vị trí này",
+      "exportEmpty": "Không có dòng tồn kho để xuất",
+      "exportError": "Không thể xuất tồn kho",
+      "exportSuccess": "Đã xuất {{count}} dòng",
+      "fetchError": "Không thể tải tồn kho",
+      "importError": "Không thể nhập tồn kho",
+      "importMissingColumn": "Thiếu cột bắt buộc: {{columns}}. Hãy dùng tệp xuất gần nhất làm mẫu.",
+      "importMissingColumnTitle": "Tệp thiếu cột bắt buộc",
+      "importNoIdentity": "Tệp phải có cột SKU hoặc Mã sản phẩm để khớp với dữ liệu chủ.",
+      "importNoMatched": "Không có dòng nào trong {{count}} dòng khớp với sản phẩm đã có.",
+      "importNoMatchedTitle": "Không khớp sản phẩm nào",
+      "importNoValid": "Không có dòng hợp lệ trong tệp",
+      "importParseError": "Không đọc được tệp Excel. Hãy lưu lại dưới dạng .xlsx và thử lại.",
+      "importPartial": "Đã nhập {{created}} thêm mới + {{updated}} cập nhật / {{total}} dòng; {{failed}} lỗi.",
+      "importPartialTitle": "Nhập có lỗi",
+      "importSuccess": "Đã nhập: thêm mới {{created}}, cập nhật {{updated}}.",
+      "repackError": "Không thể đóng gói lại",
+      "repackSuccess": "Đã đóng gói lại",
+      "stockTakeError": "Không thể lưu kiểm kho",
+      "stockTakeSuccess": "Đã lưu kiểm kho"
+    },
+    "outgoing": {
+      "fromOrders_one": "Đang được {{count}} đơn bán giữ",
+      "fromOrders_other": "Đang được {{count}} đơn bán giữ",
+      "moreOrders_one": "+{{count}} đơn khác",
+      "moreOrders_other": "+{{count}} đơn khác"
+    },
+    "repack": {
+      "balanced": "Đóng gói lại cân bằng theo đơn vị gốc.",
+      "fromQtyLabel": "Số lượng xuất",
+      "fromUnitLabel": "Đơn vị xuất",
+      "reason": {
+        "breakage": "Vỡ",
+        "damage": "Hư hỏng",
+        "other": "Khác",
+        "spillage": "Đổ/rơi vãi"
+      },
+      "toQtyLabel": "Số lượng nhập",
+      "toUnitLabel": "Đơn vị nhập",
+      "writeOffHint": "Số lượng mất trong quá trình đóng gói lại (theo đơn vị gốc).",
+      "writeOffOptional": "Hao hụt (tùy chọn)",
+      "writeOffQtyLabel": "Hao hụt ({{unit}})",
+      "writeOffReasonLabel": "Lý do"
+    },
+    "stockState": {
+      "low": "thấp",
+      "negative": "âm"
+    },
+    "validation": {
+      "bad": "Dữ liệu không hợp lệ",
+      "deltaRequired": "Cần nhập chênh lệch",
+      "insufficientStock": "Không đủ hàng '{{unit}}'",
+      "noConversionPath": "Chưa có quy đổi giữa đơn vị này và đơn vị gốc. Thêm quy đổi trong sản phẩm trước.",
+      "onHandRequired": "Cần nhập số tồn kho",
+      "positiveRequired": "Phải lớn hơn 0",
+      "productRequired": "Cần chọn sản phẩm",
+      "repackInvalid": "Đóng gói lại không hợp lệ",
+      "unknownUnit": "Đơn vị '{{unit}}' không có trên sản phẩm này",
+      "valueRequired": "Cần nhập giá trị"
+    }
+  },
+  "products": {
+    "addItem": "Thêm sản phẩm",
+    "barcode": {
+      "invalid": "Không thể hiển thị mã vạch này"
+    },
+    "bulkImport": {
+      "import": "Nhập sản phẩm",
+      "missingColumnMessage": "Tệp thiếu cột bắt buộc: {{columns}}. Vui lòng dùng mẫu mới nhất — bấm \"Tải mẫu\" ở trên.",
+      "missingColumnTitle": "Định dạng tệp không hợp lệ",
+      "noValidRows": "Không tìm thấy sản phẩm hợp lệ trong tệp",
+      "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin sản phẩm",
+      "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
+      "unknownLabelTitle": "Danh mục hoặc thẻ không hợp lệ",
+      "unknownTagMessage": "Thẻ không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
+      "uploadFile": "Tải lên tệp sản phẩm"
+    },
+    "columns": {
+      "minimumInventory": "Tối thiểu"
+    },
+    "columnsExtra": {
+      "attributes": "Thuộc tính",
+      "tags": "Thẻ"
+    },
+    "deleteConfirm": {
+      "message": "Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.",
+      "title": "Xóa sản phẩm"
+    },
+    "detail": {
+      "activitiesError": "Không tải được lịch sử hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho sản phẩm này.",
+      "activityVerbs": {
+        "create": "Đã tạo",
+        "delete": "Đã xóa",
+        "disable": "Đã vô hiệu hóa",
+        "enable": "Đã kích hoạt",
+        "inventory": {
+          "adjust": "Đã điều chỉnh tồn kho cho",
+          "beginOfPeriod": "Đã đặt tồn đầu kỳ cho",
+          "create": "Đã thêm tồn kho cho",
+          "import": "Đã nhập tồn kho cho",
+          "repack": "Đã đóng gói lại tồn kho cho",
+          "stockTake": "Đã kiểm kê tồn kho cho"
+        },
+        "update": "Đã cập nhật",
+        "updateClassification": "Đã cập nhật phân loại cho",
+        "updateDescription": "Đã cập nhật mô tả cho",
+        "updateImages": "Đã cập nhật hình ảnh cho",
+        "updateTechSpecs": "Đã cập nhật thông số kỹ thuật cho"
+      },
+      "attrCardTitle": "Phân loại & thuộc tính",
+      "attributesEmpty": "Chưa có thuộc tính",
+      "barcodeFormat": "Định dạng",
+      "belowMinimum": "Dưới mức tối thiểu",
+      "headerInventoryLabel": "Tồn kho",
+      "imagesEmpty": "Chưa có hình ảnh",
+      "imagesEmptyDesc": "Thêm hình ảnh trong form chỉnh sửa để trưng bày sản phẩm này.",
+      "inventoryTab": {
+        "empty": "Chưa có bản ghi tồn kho cho sản phẩm này.",
+        "noInventoryNote": "Sản phẩm này không quản lý tồn kho — không theo dõi số lượng.",
+        "title": "Tồn kho",
+        "totalOnHand": "Tổng cộng: {{count}} {{unit}}"
+      },
+      "minInventoryTitle": "Tồn kho tối thiểu",
+      "noInventoryBadge": "Không tồn kho",
+      "noPhotoHint": "Chưa có ảnh",
+      "recentActivities": "Hoạt động gần đây",
+      "setBadge": "Bộ",
+      "setComponentRow": "{{quantity}} × {{productName}} ({{unit}})",
+      "setCompositionEmpty": "Sản phẩm này không có thành phần.",
+      "setCompositionTitle": "Thành phần bộ",
+      "statusActive": "Đang bán",
+      "statusInactive": "Ngừng bán",
+      "suggestedPriceLabel": "Giá đề xuất",
+      "tab": {
+        "activity": "Hoạt động",
+        "details": "Chi tiết",
+        "images": "Hình ảnh"
+      },
+      "tagsEmpty": "Chưa có thẻ",
+      "techSpecCardTitle": "Thông số kỹ thuật",
+      "techSpecsEmpty": "Chưa có thông số kỹ thuật",
+      "updatedByOn": "Cập nhật bởi <user/> vào {{date}}"
+    },
+    "editItem": "Cập nhật sản phẩm",
+    "emptyMessage": "Thử điều chỉnh bộ lọc hoặc thêm sản phẩm đầu tiên để bắt đầu.",
+    "emptyTitle": "Chưa có sản phẩm",
+    "filterActive": "Đang bán",
+    "filterCategoryAll": "Tất cả danh mục",
+    "filterInactive": "Ngừng cung cấp",
+    "filterStockAll": "Tất cả",
+    "filterStockInStock": "Còn hàng",
+    "filterStockLowStock": "Dưới mức tối thiểu",
+    "filterStockNotManaged": "Không quản lý tồn kho",
+    "filterStockOutOfStock": "Hết hàng",
+    "filterStockTitle": "Tồn kho",
+    "form": {
+      "alternativeNamesDesc": "Các tên gọi khác mà khách hàng hoặc nhân viên dùng để chỉ sản phẩm này. Nhấn Enter để thêm.",
+      "alternativeNamesLabel": "Tên gọi khác",
+      "alternativeNamesPlaceholder": "Nhập tên và nhấn Enter...",
+      "attributeAdd": "Thêm thuộc tính",
+      "attributeKeyPlaceholder": "Tên thuộc tính (vd: Màu sắc)",
+      "attributeValuePlaceholder": "Giá trị (vd: Gỗ óc chó)",
+      "attributesDesc": "Cặp khóa/giá trị tự do. Cả hai ô đều phải có giá trị thì hàng mới được lưu.",
+      "attributesLabel": "Thuộc tính tùy chỉnh",
+      "barcodePlaceholder": "EAN / UPC / tùy chỉnh",
+      "categoryPlaceholder": "vd: Nội thất, Điện tử",
+      "classificationSection": "Phân loại",
+      "createButton": "Tạo sản phẩm",
+      "descriptionPlaceholder": "Mô tả sản phẩm",
+      "isActiveLabel": "Đang bán",
+      "minimumInventoryDesc": "Cảnh báo khi tồn kho chạm hoặc xuống dưới mức này.",
+      "minimumInventoryUnitPlaceholder": "Đơn vị (vd: cái, hộp)",
+      "namePlaceholder": "Tên sản phẩm",
+      "noInventoryDescription": "Bán tự do, không theo dõi tồn kho — ẩn khỏi tồn kho và phiếu nhập hàng.",
+      "noInventoryLabel": "Không quản lý tồn kho",
+      "priceLabel": "Giá bán",
+      "pricePlaceholder": "0",
+      "primaryDetails": "Thông tin chính",
+      "setCompositionTitle": "Thành phần bộ",
+      "setItemAdd": "Thêm thành phần",
+      "setItemProductPlaceholder": "Chọn sản phẩm",
+      "setItemsDesc": "Các sản phẩm thành phần bán kèm trong một bộ. Mỗi thành phần phải là sản phẩm thường (không phải bộ). Để trống nếu đây không phải bộ.",
+      "sizeLabel": "Kích thước",
+      "sizePlaceholder": "vd: M, 42, 120×60 cm",
+      "skuPlaceholder": "Mã SKU",
+      "suggestedPriceDescription": "Đơn giá mặc định khi thêm vào đơn bán hàng mới.",
+      "suggestedPriceLabel": "Giá đề xuất",
+      "tagsLabel": "Thẻ",
+      "tagsPlaceholder": "Nhập thẻ và nhấn Enter...",
+      "unitConversionAdd": "Thêm quy đổi",
+      "unitConversionFrom": "Từ",
+      "unitConversionTo": "Đến",
+      "unitPlaceholder": "vd: cái, kg, hộp",
+      "updateButton": "Cập nhật sản phẩm"
+    },
+    "inventoryPrompt": {
+      "confirm": "Nhập tồn kho",
+      "message": "Sản phẩm đã được tạo. Bạn có muốn nhập tồn kho ngay không?",
+      "title": "Nhập tồn kho ngay?"
+    },
+    "noItems": "Không tìm thấy sản phẩm",
+    "notifications": {
+      "createError": "Không thể tạo sản phẩm",
+      "createSuccess": "Tạo sản phẩm thành công",
+      "deleteError": "Không thể xóa sản phẩm",
+      "deleteSuccess": "Xóa sản phẩm thành công",
+      "disableSuccess": "Đã ngừng sản phẩm",
+      "enableSuccess": "Đã kích hoạt sản phẩm",
+      "exportError": "Không thể xuất danh sách sản phẩm",
+      "fetchError": "Không thể tải danh sách sản phẩm",
+      "listConflictMessage": "Một người khác vừa thay đổi danh sách sản phẩm. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "toggleError": "Không thể cập nhật trạng thái sản phẩm",
+      "updateError": "Không thể cập nhật sản phẩm",
+      "updateSuccess": "Cập nhật sản phẩm thành công"
+    },
+    "status": {
+      "active": "Đang bán"
+    },
+    "tab": {
+      "bulk": "Nhập hàng loạt",
+      "single": "Một sản phẩm"
+    },
+    "validation": {
+      "pairUnitRequired": "Vui lòng nhập đơn vị khi đã có giá trị",
+      "pairValueRequired": "Vui lòng nhập giá trị khi đã chọn đơn vị",
+      "setItemMissingProduct": "Hãy chọn sản phẩm cho mọi thành phần",
+      "setItemMissingUnit": "Hãy chọn đơn vị cho mọi thành phần",
+      "setItemNested": "Một thành phần không thể là một bộ khác",
+      "setItemQuantity": "Số lượng thành phần phải lớn hơn 0",
+      "setItemSelfRef": "Một bộ không thể chứa chính nó",
+      "skuDuplicate": "Một sản phẩm khác đã dùng mã SKU này",
+      "unitConversionConflict": "Các tỉ lệ quy đổi không nhất quán — hãy kiểm tra lại",
+      "unitsNotConnected": "Hãy thêm quy đổi để mọi đơn vị đều liên thông"
+    }
+  },
+  "profile": {
+    "account": "Tài khoản",
+    "language": "Ngôn ngữ",
+    "languageDesc": "Chọn ngôn ngữ hiển thị",
+    "navbarExpanded": "Thanh điều hướng mở rộng",
+    "navbarExpandedDesc": "Giữ thanh điều hướng luôn mở rộng",
+    "perm": {
+      "actionsGroup": "Thao tác",
+      "canCreate": "Tạo",
+      "canDelete": "Xóa",
+      "canEdit": "Sửa",
+      "canView": "Xem",
+      "custom": "Tùy chỉnh",
+      "customHint": "Nhân viên này khác với mặc định của phòng ban",
+      "disableAll": "Tắt tất cả",
+      "enableAll": "Bật tất cả",
+      "flags": {
+        "canBulkImport": "Nhập hàng loạt qua Excel",
+        "canConfirmReceived": "Xác nhận nhập kho",
+        "canEditDeliveryPackageSize": "Sửa kích thước kiện hàng",
+        "canIssueMagicLink": "Tạo liên kết đăng nhập",
+        "canManageInventory": "Quản lý tồn kho",
+        "canManagePhotos": "Quản lý ảnh",
+        "canManagePrice": "Quản lý giá",
+        "canManualRelease": "Giải phóng tồn kho thủ công",
+        "canModify": "Thay đổi quyền hạn",
+        "canReorder": "Sắp xếp giao hàng",
+        "canSetPassword": "Đặt mật khẩu",
+        "canTakePhoto": "Chụp ảnh",
+        "canToggleStatus": "Bật/tắt trạng thái",
+        "canTransitionStatus": "Chuyển trạng thái",
+        "canViewActivityLog": "Xem nhật ký hoạt động",
+        "canViewAll": "Xem tất cả dữ liệu",
+        "canViewPrice": "Xem giá",
+        "canViewSelf": "Xem dữ liệu được phân công",
+        "canViewSetComponentInventory": "Xem tồn kho thành phần của bộ"
+      },
+      "modules": {
+        "asset": "Tài sản",
+        "crop": "Vụ mùa",
+        "cropDiary": "Nhật ký vụ mùa",
+        "cropDiaryTemplate": "Mẫu nhật ký",
+        "customer": "Khách hàng",
+        "deliveryRequest": "Yêu cầu giao hàng",
+        "employee": "Nhân viên",
+        "goodsReceipt": "Phiếu nhập kho",
+        "greenhouse": "Nhà màng",
+        "location": "Vị trí",
+        "lookupV2": "Danh mục",
+        "material": "Vật tư",
+        "materialInventory": "Tồn kho vật tư",
+        "permissionManagement": "Quản lý quyền hạn",
+        "product": "Sản phẩm",
+        "productInventory": "Tồn kho sản phẩm",
+        "salesOrder": "Đơn hàng",
+        "transportOrder": "Đơn vận chuyển",
+        "truck": "Xe tải",
+        "vendor": "Nhà cung cấp"
+      },
+      "noExtra": "Không có quyền bổ sung cho module này",
+      "queryGroup": "Truy vấn"
+    },
+    "permissions": "Quyền hạn",
+    "preferences": "Tùy chọn",
+    "preferencesComingSoon": "Tùy chọn khác sắp ra mắt",
+    "preferencesComingSoonDesc": "Các tùy chọn cá nhân khác sẽ xuất hiện tại đây khi sẵn sàng.",
+    "title": "Hồ sơ"
+  },
+  "pwa": {
+    "appAvailableOffline": "Ứng dụng đã sẵn sàng hoạt động ngoại tuyến!",
+    "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
+    "install": "Cài đặt",
+    "installDescription": "Cài đặt ứng dụng này trên thiết bị để có trải nghiệm tốt hơn",
+    "installTitle": "Cài đặt ứng dụng C-Mngt",
+    "maybeLater": "Để sau",
+    "newVersionAvailable": "Có phiên bản mới",
+    "offlineReady": "Sẵn sàng hoạt động ngoại tuyến",
+    "reloadAutomatically": "Ứng dụng sẽ tự động tải lại.",
+    "reloadIn3Seconds": "Ứng dụng sẽ tải lại sau 3 giây.",
+    "safari": {
+      "closeCompletelyInstructions": "Đóng hoàn toàn Safari (vuốt lên rồi vuốt ứng dụng đi), sau đó mở lại từ màn hình chính.",
+      "dontShowAgain": "Không hiển thị lại",
+      "installDescription": "Thêm C-Mngt vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
+      "installTitle": "Cài đặt ứng dụng C-Mngt",
+      "ios": {
+        "step1": "Nhấn nút Chia sẻ trên thanh công cụ Safari",
+        "step2": "Cuộn xuống và nhấn 'Thêm vào màn hình chính'",
+        "step3": "Nhấn 'Thêm' để cài đặt ứng dụng"
+      },
+      "mac": {
+        "step1": "Nhấn menu Tập tin trong Safari",
+        "step2": "Chọn 'Thêm vào Dock'",
+        "step3": "Ứng dụng sẽ được thêm vào Dock để truy cập nhanh"
+      },
+      "remindLater": "Nhắc lại sau"
+    },
+    "updating": "Đang cập nhật..."
+  },
+  "quotations": {
+    "actions": {
+      "cancelQuotation": "Hủy",
+      "copy": "Sao chép",
+      "exportPdf": "Xuất PDF",
+      "generateSalesOrder": "Tạo đơn hàng",
+      "markReady": "Đánh dấu sẵn sàng",
+      "new": "Báo giá mới"
+    },
+    "cancelConfirm": {
+      "message": "Hủy báo giá này? Báo giá sẽ bị khóa, không thể chỉnh sửa hay đánh dấu sẵn sàng.",
+      "title": "Hủy báo giá này?"
+    },
+    "cancelledNote": "Báo giá này đã bị hủy.",
+    "columns": {
+      "date": "Ngày"
+    },
+    "convertedNote": "Đã tạo đơn hàng từ báo giá này.",
+    "copiedFrom": "Sao chép từ {{code}} — chỉnh sửa và lưu thành bản nháp mới.",
+    "countLabel_one": "{{count}} báo giá",
+    "countLabel_other": "{{count}} báo giá",
+    "dangerZone": {
+      "deleteItem": "Xóa báo giá",
+      "deleteItemDesc": "Xóa vĩnh viễn báo giá này"
+    },
+    "dateKind": {
+      "created": "Ngày tạo",
+      "po": "Ngày đặt hàng",
+      "sent": "Ngày gửi"
+    },
+    "deleteConfirm": {
+      "message": "Bạn có chắc muốn xóa báo giá này? Hành động này không thể hoàn tác.",
+      "title": "Xóa báo giá"
+    },
+    "editTitle": "Sửa báo giá",
+    "emptyState": "Chưa có báo giá trong khoảng thời gian này.",
+    "filter": {
+      "allStatuses": "Tất cả",
+      "lastMonths_one": "{{count}} tháng gần đây",
+      "lastMonths_other": "{{count}} tháng gần đây",
+      "searchPlaceholder": "Tìm theo mã hoặc khách hàng"
+    },
+    "form": {
+      "addLine": "Thêm sản phẩm",
+      "amountLabel": "Thành tiền",
+      "belowSuggestedPriceHint": "Thấp hơn giá đề xuất ({{price}})",
+      "customerLabel": "Khách hàng",
+      "customerPlaceholder": "Chọn khách hàng (tùy chọn)",
+      "headerSection": "Báo giá",
+      "linesLabel": "Sản phẩm",
+      "noLines": "Chưa có sản phẩm. Thêm sản phẩm, số lượng và đơn giá.",
+      "note": "Diễn giải",
+      "priceLabel": "Đơn giá",
+      "productLabel": "Sản phẩm",
+      "productPlaceholder": "Chọn sản phẩm",
+      "quantityLabel": "Số lượng",
+      "totalLabel": "Tổng cộng",
+      "unitLabel": "Đơn vị"
+    },
+    "fromQuotation": "Từ báo giá",
+    "lockedNote": "Báo giá đã sẵn sàng và bị khóa. Sao chép để chỉnh sửa.",
+    "newTitle": "Báo giá mới",
+    "notifications": {
+      "cancelError": "Hủy báo giá thất bại",
+      "cancelSuccess": "Đã hủy báo giá",
+      "createError": "Tạo báo giá thất bại",
+      "createSuccess": "Đã tạo báo giá",
+      "deleteError": "Xóa báo giá thất bại",
+      "deleteSuccess": "Đã xóa báo giá",
+      "duplicateCode": "Mã đã tồn tại, vui lòng thử lại",
+      "fetchError": "Tải báo giá thất bại",
+      "sendError": "Đánh dấu sẵn sàng thất bại",
+      "sendSuccess": "Đã đánh dấu báo giá sẵn sàng",
+      "updateError": "Cập nhật báo giá thất bại",
+      "updateSuccess": "Đã cập nhật báo giá"
+    },
+    "print": {
+      "includeVat": "Bao gồm VAT",
+      "landscape": "Ngang",
+      "optionsTitle": "Tùy chọn xuất",
+      "orientation": "Hướng giấy",
+      "paperSize": "Khổ giấy",
+      "popupBlocked": "Cửa sổ bật lên bị chặn. Cho phép pop-up cho trang này rồi thử lại.",
+      "portrait": "Dọc"
+    },
+    "sendConfirm": {
+      "message": "Sau khi đánh dấu sẵn sàng, báo giá sẽ bị khóa và không thể chỉnh sửa. Tiếp tục?",
+      "title": "Đánh dấu báo giá này sẵn sàng?"
+    },
+    "status": {
+      "cancelled": "Đã hủy",
+      "converted": "Đã tạo đơn",
+      "draft": "Nháp",
+      "sent": "Sẵn sàng"
+    },
+    "title": "Báo giá",
+    "validation": {
+      "linesRequired": "Thêm ít nhất một sản phẩm."
+    }
+  },
+  "report": {
+    "back": "Quay lại danh sách báo cáo",
+    "byCustomer": {
+      "col": "Khách hàng",
+      "heading": "Khách hàng mua nhiều nhất"
+    },
+    "byMethod": {
+      "heading": "Phương thức giao hàng"
+    },
+    "byProduct": {
+      "col": "Sản phẩm",
+      "heading": "Sản phẩm bán chạy",
+      "qty": "Sản lượng"
+    },
+    "byStaff": {
+      "col": "Nhân viên",
+      "heading": "Doanh số theo nhân viên kinh doanh",
+      "orders": "Số đơn",
+      "revenue": "Doanh số",
+      "share": "Tỷ trọng"
+    },
+    "comingSoon": "Báo cáo cho khách hàng này sẽ sớm ra mắt.",
+    "common": {
+      "currency": "VND (₫)",
+      "exVat": "Doanh số chưa bao gồm VAT",
+      "period": "Kỳ báo cáo",
+      "print": "In báo cáo",
+      "sample": "DỮ LIỆU MẪU"
+    },
+    "kpi": {
+      "avgOrder": "Giá trị TB / đơn",
+      "customers": "Khách hàng đã mua",
+      "newCustomers": "khách mới",
+      "orders": "Số đơn hàng",
+      "revenue": "Tổng doanh số",
+      "vsPrev": "so với kỳ trước"
+    },
+    "menu": {
+      "heading": "Chọn loại báo cáo",
+      "subtitle": "Chọn một loại báo cáo để xem chi tiết."
+    },
+    "status": {
+      "cancelled": "Đã hủy",
+      "delivered": "Đã giao",
+      "heading": "Tình hình đơn hàng",
+      "processing": "Đang xử lý"
+    },
+    "title": "Báo cáo",
+    "trend": {
+      "avg": "Trung bình",
+      "heading": "Doanh số theo thời gian",
+      "peak": "Cao nhất",
+      "perDay": "/ngày"
+    },
+    "types": {
+      "delivery": {
+        "desc": "Tỷ lệ đúng hẹn, đơn trễ, hiệu suất theo tài xế.",
+        "title": "Báo cáo giao hàng"
+      },
+      "inventory": {
+        "desc": "Giá trị tồn, mặt hàng cần nhập, mặt hàng hết hàng.",
+        "title": "Báo cáo tồn kho"
+      },
+      "monthly": {
+        "desc": "Tổng doanh số trong tháng — theo nhân viên, khách hàng và sản phẩm.",
+        "title": "Doanh số theo tháng"
+      },
+      "weekly": {
+        "desc": "Tổng doanh số trong tuần — theo nhân viên, khách hàng và sản phẩm.",
+        "title": "Doanh số theo tuần"
+      }
+    },
+    "units": {
+      "billion": "tỷ ₫",
+      "customersShort": "KH",
+      "million": "triệu ₫",
+      "orders": "đơn",
+      "pieces": "con"
+    },
+    "wip": {
+      "desc": "Báo cáo này đang được phát triển và sẽ sớm ra mắt.",
+      "title": "Đang phát triển"
+    }
+  },
+  "salesOrders": {
+    "activity": {
+      "cancelAfterShipNote": "Đơn đã trừ tồn kho — hủy không hoàn lại tồn. Cần điều chỉnh thủ công nếu phát sinh trả hàng.",
+      "inventoryAutoReleased": "Tự động giải phóng tồn khi hủy",
+      "inventoryManualReleased": "Giải phóng tồn thủ công",
+      "inventoryReleaseFailed": "Giải phóng tồn thất bại",
+      "inventoryReserved": "Đã giữ tồn kho",
+      "inventoryShipped": "Đã trừ tồn kho"
+    },
+    "addItem": "Tạo đơn hàng",
+    "billing": {
+      "invoiceIssued": "Đã xuất",
+      "invoiceIssuedLabel": "Đã xuất hóa đơn",
+      "invoiceLabel": "Hóa đơn",
+      "invoiceNotIssued": "Chưa xuất",
+      "invoicedBadge": "Đã xuất HĐ",
+      "isPaidLabel": "Đã thanh toán",
+      "needShippingFeeLabel": "Tính phí vận chuyển",
+      "needVatLabel": "Tính VAT",
+      "off": "Tắt",
+      "on": "Bật",
+      "paid": "Đã thanh toán",
+      "paidAmountDescription": "Số tiền đã trả (cho thanh toán một phần). Bỏ qua khi đã bật \"Đã thanh toán\".",
+      "paidAmountLabel": "Số tiền đã trả",
+      "paidAmountPlaceholder": "0",
+      "paidLabel": "Thanh toán",
+      "paidRemaining": "Đã trả {{paid}} · Còn lại {{remaining}}",
+      "partial": "Trả một phần",
+      "partialPaidShort": "Đã trả {{amount}}",
+      "section": "Hóa đơn & Thanh toán",
+      "shippingFeeLabel": "Phí vận chuyển",
+      "shippingFeePlaceholder": "0",
+      "totalInclLabel": "Thành tiền",
+      "unpaid": "Chưa thanh toán",
+      "vatAmountLabel": "Thuế VAT",
+      "vatRateLabel": "Thuế suất VAT",
+      "vatTag": "VAT",
+      "vatTagLabel": "Nhãn VAT",
+      "vatTagPlaceholder": "VD: 10%, Miễn thuế"
+    },
+    "cancel": {
+      "actionButton": "Hủy đơn",
+      "confirmMessage": "Hủy đơn hàng này khi đang ở trạng thái \"{{status}}\"? Mọi thay đổi tồn kho cần đối soát thủ công nếu có.",
+      "confirmTitle": "Hủy đơn hàng",
+      "previewAfterShip": "Đơn này đã trừ tồn kho. Hủy đơn KHÔNG hoàn lại tồn — vui lòng điều chỉnh thủ công nếu cần.",
+      "previewReleaseReserved_one": "Khi hủy, {{count}} dòng tồn đang giữ sẽ tự động được giải phóng.",
+      "previewReleaseReserved_other": "Khi hủy, {{count}} dòng tồn đang giữ sẽ tự động được giải phóng.",
+      "reasonLabel": "Lý do (không bắt buộc)",
+      "reasonPlaceholder": "Vì sao hủy đơn này?",
+      "statusBadge": "Đã hủy"
+    },
+    "cheatMarker": {
+      "label": "Tự động hoàn tất",
+      "tooltip": "Được hoàn tất bởi tiến trình rà soát ở trang chủ NKTU (bỏ qua kiểm tra giao đủ), không phải luồng thông thường. Chỉ root mới thấy."
+    },
+    "columns": {
+      "assignedStaff": "Nhân viên",
+      "deliveryDate": "Ngày giao",
+      "labels": "Nhãn",
+      "orderDate": "Ngày đặt",
+      "orderNumber": "Số đơn hàng"
+    },
+    "configErrors": {
+      "description": "Module Đơn hàng đã bị tắt do cấu hình không hợp lệ. Vui lòng sửa các lỗi sau trong Cấu hình ứng dụng rồi tải lại:",
+      "title": "Cấu hình Đơn hàng không hợp lệ"
+    },
+    "datePreset": {
+      "custom": "Tùy chọn"
+    },
+    "delete": {
+      "actionButton": "Xóa đơn hàng",
+      "confirmMessage": "Xóa đơn hàng này? Không thể hoàn tác. Tồn kho đang giữ sẽ được giải phóng, và tồn kho đã xuất sẽ được cộng trả lại.",
+      "confirmTitle": "Xóa đơn hàng"
+    },
+    "detail": {
+      "activitiesError": "Không tải được lịch sử hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho đơn hàng này.",
+      "activityMemo": {
+        "autoAdvanceOnCreate": "(tự động chuyển trạng thái khi tạo)",
+        "autoReleaseFailed": "Tự động giải phóng thất bại — cần giải phóng thủ công",
+        "cancelledFrom": "Hủy từ",
+        "customer": "Khách hàng",
+        "driverNoteChanged": "Đã đổi ghi chú cho tài xế",
+        "editedKeys": "Trường",
+        "fieldLocation": "Kho",
+        "fieldQuantity": "Số lượng",
+        "fieldUnit": "Đơn vị",
+        "fieldUnitPrice": "Đơn giá",
+        "fromTo": "{{from}} → {{to}}",
+        "fullyReleased": "Đã giải phóng toàn bộ tồn giữ",
+        "inventoryAction": {
+          "autoShipOnCompletion": "Tự động xuất kho khi hoàn tất",
+          "release": "Đã giải phóng tồn giữ",
+          "reserve": "Đã giữ hàng",
+          "ship": "Đã xuất kho (trừ tồn)"
+        },
+        "itemMemoChanged": "Đã thay đổi ghi chú dòng hàng",
+        "itemsAdded_one": "Thêm {{count}} dòng",
+        "itemsAdded_other": "Thêm {{count}} dòng",
+        "itemsChanged_one": "Sửa {{count}} dòng",
+        "itemsChanged_other": "Sửa {{count}} dòng",
+        "itemsRemoved_one": "Bỏ {{count}} dòng",
+        "itemsRemoved_other": "Bỏ {{count}} dòng",
+        "lineCount_one": "{{count}} dòng",
+        "lineCount_other": "{{count}} dòng",
+        "notesChanged": "Đã sửa ghi chú",
+        "reason": "Lý do",
+        "reservationDiffRows_one": "Đã điều chỉnh {{count}} dòng tồn kho",
+        "reservationDiffRows_other": "Đã điều chỉnh {{count}} dòng tồn kho",
+        "reservationReleased": "Đã giải phóng tồn giữ khi hủy",
+        "reservationUnchanged": "Không có tồn giữ để xử lý",
+        "rowsReleased_one": "Đã giải phóng {{count}} dòng",
+        "rowsReleased_other": "Đã giải phóng {{count}} dòng",
+        "warehouseNoteChanged": "Đã đổi ghi chú cho kho"
+      },
+      "activityVerbs": {
+        "cancel": "Đã hủy đơn",
+        "create": "Đã tạo đơn",
+        "delete": "Đã xóa đơn",
+        "manualRelease": "Đã giải phóng tồn giữ",
+        "statusChange": "Đã đổi trạng thái",
+        "update": "Đã sửa đơn",
+        "updateInline": "Đã cập nhật thông tin"
+      },
+      "additionalDeliveryRequestInfoTitle": "Yêu Cầu Giao Nhận Bổ sung",
+      "assignedStaff": "Nhân viên phụ trách",
+      "available": "Có sẵn",
+      "availableActions": "Hành động khả dụng",
+      "availableOk": "{{available}} {{unit}} còn",
+      "availableShort": "chỉ {{available}} {{unit}}",
+      "availableShortBadge": "thiếu",
+      "belowSuggestedPrice": "thấp hơn giá đề xuất {{price}}",
+      "copyDeliveryNoteImage": "Sao chép ảnh",
+      "copyImageCopied": "Đã sao chép ảnh. Dán vào ứng dụng chat của bạn.",
+      "copyImageDownloaded": "Đã lưu ảnh. Bạn có thể đính kèm vào ứng dụng chat.",
+      "copyImageFailed": "Không thể tạo ảnh. Vui lòng thử lại.",
+      "createdBy": "Người tạo",
+      "deliveryDate": "Ngày giao hàng",
+      "deliveryMethod": "Hình thức giao",
+      "deliveryPackageSize": "Kích thước kiện hàng",
+      "deliveryPackageSizePlaceholder": "Chọn hoặc nhập kích thước kiện hàng",
+      "deliveryRequests": "yêu cầu giao nhận",
+      "drInfoAdditionalBadge": "Bổ sung",
+      "drInfoCode": "Mã Yêu Cầu",
+      "drInfoTitle": "Yêu Cầu Giao Nhận",
+      "driverNote": "Ghi chú cho tài xế",
+      "expectedDelivery": "Dự kiến giao: {{date}}",
+      "extraQuantityHint": "+{{extra}} dư · giao {{physical}}",
+      "fromLocation": "Lấy từ kho",
+      "itemMemo": "Ghi chú",
+      "itemsTitle": "Danh sách sản phẩm",
+      "noDRsCreatable": "Chưa có yêu cầu giao hàng. Sử dụng \"Tạo yêu cầu giao hàng\" khi đơn hàng đã sẵn sàng.",
+      "noDRsReadonly": "Chưa có yêu cầu giao hàng cho đơn hàng này.",
+      "photosFromDR": "Ảnh từ yêu cầu giao nhận",
+      "photosOfOrder": "Ảnh đơn hàng",
+      "printDeliveryNote": "In yêu cầu giao nhận",
+      "printIncludePrice": "In kèm giá",
+      "printOptionsTitle": "Tùy chọn in",
+      "printOrientation": "Hướng giấy",
+      "printOrientationLandscape": "Ngang",
+      "printOrientationPortrait": "Dọc",
+      "printPaperSize": "Khổ giấy",
+      "printPopupBlocked": "Trình duyệt đã chặn cửa sổ in. Vui lòng cho phép pop-up và thử lại.",
+      "productPhotosEmpty": "Đơn hàng chưa có sản phẩm nào.",
+      "productPhotosEmptyForProduct": "Chưa có ảnh",
+      "quantity": "Số lượng",
+      "recentActivities": "Hoạt động gần đây",
+      "returnShipmentInfoTitle": "Phiếu Trả Hàng",
+      "tabActivity": "Lịch sử đơn hàng",
+      "tabActivityLog": "Hoạt động",
+      "tabAttachments": "Tệp",
+      "tabChat": "Chat",
+      "tabOverview": "Tổng quan",
+      "tabPhotos": "Ảnh",
+      "tabProductPhotos": "Ảnh sản phẩm",
+      "tags": "Nhãn",
+      "viewItems": "Xem sản phẩm",
+      "warehouseNote": "Ghi chú cho kho"
+    },
+    "editItem": "Điều chỉnh đơn hàng",
+    "filterActive": "Đang mở",
+    "filterClosed": "Đã đóng",
+    "filterStaff": "Nhân viên",
+    "filterUrgentOnly": "Đơn gấp",
+    "finance": {
+      "exemptError": "Không cập nhật được đơn hàng. Vui lòng thử lại.",
+      "exemptLabel": "Không cần số liệu kế toán",
+      "grandTotalLabel": "Tổng tiền thanh toán",
+      "missingLabel": "Thiếu số liệu",
+      "subtotalLabel": "Tổng tiền hàng",
+      "totalsCount": "Số dòng",
+      "totalsMissing": "{{count}} đơn thiếu số liệu",
+      "vatLabel": "Tiền thuế GTGT",
+      "viewFinance": "Kế toán",
+      "viewOps": "Vận hành"
+    },
+    "form": {
+      "addItem": "Thêm sản phẩm",
+      "assignedStaffLabel": "Nhân viên phụ trách",
+      "assignedStaffPlaceholder": "Chọn nhân viên",
+      "availabilityChildNeedOk": "Còn {{available}} {{unit}} · cần {{required}}",
+      "availabilityChildOk": "Còn {{available}} {{unit}}",
+      "availabilityOk": "Còn {{available}} {{unit}} tại {{location}}",
+      "availabilityShort": "{{available}} {{unit}} tại {{location}} — thiếu {{short}}",
+      "availabilityUnknown": "Chưa rõ tồn kho",
+      "belowSuggestedPriceHint": "Thấp hơn giá đề xuất {{price}}",
+      "createButton": "Tạo đơn hàng",
+      "customerNameLabel": "Tên khách hàng",
+      "customerNamePlaceholder": "Nhập tên khách hàng",
+      "customerPONumberLabel": "Số PO của khách",
+      "customerPONumberPlaceholder": "Số PO tham chiếu của khách (không bắt buộc)",
+      "customerPlaceholder": "Chọn khách hàng",
+      "deliveryAddressPlaceholder": "Chọn địa chỉ giao hàng",
+      "deliveryDateLabel": "Ngày giao hàng",
+      "deliveryDatePlaceholder": "Chọn ngày giao hàng",
+      "deliveryMethodLabel": "Hình thức giao",
+      "deliveryMethodPlaceholder": "Chọn hình thức giao",
+      "downloadTemplateButton": "Tải mẫu",
+      "driverNoteLabel": "Ghi chú cho tài xế",
+      "driverNotePlaceholder": "Ghi chú cho tài xế (tự động sao chép sang yêu cầu giao hàng)",
+      "dropExcelHint": "Kéo thả tệp Excel vào đây để nhập danh sách sản phẩm",
+      "extraQuantityLabel": "SL giao dư",
+      "extraQuantityPlaceholder": "Dư",
+      "fromLocationLabel": "Lấy từ kho",
+      "fromLocationPlaceholder": "Chọn kho",
+      "googleMapUrlLabel": "Link Google Maps",
+      "googleMapUrlPlaceholder": "Dán link Google Maps (không bắt buộc)",
+      "importItemsButton": "Nhập từ Excel",
+      "isIndividualCustomerDesc": "Đơn cho khách lẻ không có trong danh sách",
+      "isIndividualCustomerLabel": "Khách lẻ",
+      "isInternalDeliveryDesc": "Tự giao bằng nhân viên nội bộ (không qua đơn vị vận chuyển)",
+      "isInternalDeliveryLabel": "Tự giao",
+      "isUrgentDesc": "Đơn gấp sẽ được tô nổi và hiển thị đầu danh sách",
+      "isUrgentLabel": "Đơn hàng gấp",
+      "itemMemoLabel": "PO",
+      "itemMemoPlaceholder": "Ghi chú dòng (tùy chọn)",
+      "itemsTitle": "Danh sách sản phẩm",
+      "lockedByReservation": "Đơn này đang giữ tồn kho. Hủy để trở về bản nháp để sửa dòng sản phẩm.",
+      "notesPlaceholder": "Ghi chú (không bắt buộc)",
+      "orderDateLabel": "Ngày đặt hàng",
+      "orderDatePlaceholder": "Chọn ngày đặt hàng",
+      "orderNumberAutoPlaceholder": "Tự động tạo khi lưu",
+      "orderNumberLabel": "Số đơn hàng",
+      "savedAddressLabel": "Dùng địa chỉ đã lưu",
+      "savedAddressPlaceholder": "Chọn địa chỉ thanh toán hoặc giao hàng đã lưu",
+      "setComponentAvailableLine": "{{name}} ({{code}}): tồn {{available}} {{unit}} · cần {{required}}",
+      "setComponentBadge": "Thành phần",
+      "setComponentChildLabel": "Thành phần của {{setName}}",
+      "setComponentShortSuffix": "thiếu {{short}}",
+      "setComponentsAvailableTitle": "Cần lắp thêm {{count}} {{unit}}",
+      "setExplodeButton": "Tách bộ",
+      "setExplodeTooltip": "Tách các thành phần của bộ thành các dòng độc lập (giá bộ sẽ bị xóa).",
+      "setParentBadge": "Bộ",
+      "setParentSubtotal": "Tổng bộ",
+      "shortageAlertLine": "{{productName}}: cần {{requested}} {{unit}} tại {{location}} nhưng chỉ còn {{available}} (thiếu {{short}})",
+      "shortageAlertTitle": "Có sản phẩm thiếu tồn kho",
+      "tagsLabel": "Nhãn",
+      "tagsPlaceholder": "Chọn nhãn",
+      "totalAmountLabel": "Tổng tiền",
+      "updateButton": "Cập nhật đơn hàng",
+      "warehouseNoteLabel": "Ghi chú cho kho",
+      "warehouseNotePlaceholder": "Ghi chú cho nhân viên kho"
+    },
+    "inventoryLinkage": {
+      "stateReleased": "Đã giải phóng",
+      "stateReserved": "Đang giữ tồn",
+      "stateShipped": "Đã trừ tồn",
+      "tooltipReleased": "Tồn đã được giải phóng lúc {{at}}.",
+      "tooltipReserved": "Đơn đang giữ {{count}} dòng tồn kho. Hủy đơn hoặc xác nhận xuất để giải phóng.",
+      "tooltipShipped": "Tồn kho đã được trừ lúc {{at}} qua trạng thái {{status}}."
+    },
+    "manualRelease": {
+      "actionButton": "Giải phóng tồn thủ công",
+      "confirmMessage": "Giải phóng phần tồn kho đang bị đơn đã hủy này giữ? Thao tác này không thể hoàn tác, nhưng có thể giữ lại bằng cách kích hoạt lại đơn.",
+      "confirmTitle": "Giải phóng tồn đang giữ",
+      "snapshotHeading": "Sẽ giải phóng:",
+      "stuckBannerMessage": "Đơn này đã hủy nhưng phần tồn đang giữ chưa được giải phóng tự động. Hãy giải phóng để các đơn khác có thể dùng tồn này.",
+      "stuckBannerTitle": "Tồn vẫn đang bị giữ"
+    },
+    "noItems": "Không có đơn hàng nào",
+    "notifications": {
+      "accessDenied": "Bạn không có quyền xem đơn hàng này.",
+      "cancelAutoReleaseFailed": "Đã hủy đơn, nhưng tự động giải phóng tồn kho thất bại. Vui lòng dùng nút \"Giải phóng tồn thủ công\" để thử lại.",
+      "cancelFromShippedBlocked": "Không thể hủy đơn hàng đã được giao. Điều chỉnh tồn kho thủ công nếu cần trả hàng.",
+      "cancellationSetSuccess": "Đã hủy đơn hàng.",
+      "createAutoAdvanceFailedBody": "Đơn vẫn ở trạng thái khởi đầu. Mở trang chi tiết để chuyển trạng thái thủ công.",
+      "createAutoAdvanceFailedTitle": "Đơn đã tạo, nhưng không chuyển trạng thái được",
+      "createError": "Không thể tạo đơn hàng",
+      "createSuccess": "Tạo đơn hàng thành công",
+      "deleteBlockedCompleted": "Không thể xóa đơn hàng đã hoàn tất.",
+      "deleteError": "Xóa đơn hàng thất bại",
+      "deleteLinkedDRsFailed": "Đã xóa đơn hàng, nhưng {{count}} yêu cầu giao nhận liên kết chưa xóa được. Vui lòng xóa thủ công.",
+      "deleteSuccess": "Đã xóa đơn hàng.",
+      "directShipBlocked": "Xác nhận đơn hàng trước khi đánh dấu sẵn sàng — phải giữ tồn kho trước.",
+      "fetchError": "Không thể tải danh sách đơn hàng",
+      "formDesktopOnly": "Tạo / sửa đơn hàng chỉ dùng được trên máy tính. Vui lòng mở lại trên màn hình lớn.",
+      "importEmpty": "Không có sản phẩm nào trong file.",
+      "importError": "Không thể đọc file.",
+      "importMissingColumn": "Thiếu cột bắt buộc: {{columns}}. Hãy tải lại mẫu mới nhất.",
+      "importMissingColumnByName": "Không tìm thấy cột tên hàng và số lượng. Đảm bảo file có cột \"Tên hàng\" và cột \"Số lượng\".",
+      "importMissingColumnTitle": "Mẫu không hợp lệ",
+      "importNoMatchByNameTitle": "Không khớp tên hàng nào",
+      "importNoMatchTitle": "Không tìm thấy SKU nào khớp",
+      "importPartialTitle": "Đã nhập {{added}} sản phẩm",
+      "importSuccess": "Đã nhập {{count}} sản phẩm.",
+      "importUnmatched": "Bỏ qua {{count}} SKU không xác định: {{skus}}",
+      "importUnmatchedByName": "Đã bỏ qua {{count}} tên hàng không nhận dạng được: {{names}}",
+      "manualReleaseNoSnapshot": "Không thể giải phóng: không có dữ liệu giữ tồn cho đơn này.",
+      "manualReleaseSuccess": "Đã giải phóng tồn kho.",
+      "planFailureDiffUnderflow": "{{sku}}: dòng đang giữ {{currentReserved}} {{unit}} nhưng chỉnh sửa muốn giải phóng {{requestedRelease}} {{unit}}. Tồn kho có thể đã bị điều chỉnh bên ngoài — đối soát rồi thử lại.",
+      "planFailureNoRow": "{{productName}}: không có dòng tồn kho tại {{locationCode}}. Thêm tồn kho hoặc chọn vị trí khác.",
+      "planFailureReleaseOverflow": "{{sku}}: sẽ giải phóng nhiều hơn so với đã giữ. Tồn kho có thể đã bị thay đổi bên ngoài.",
+      "planFailureReservationMismatch": "{{sku}}: đã giữ {{reserved}} không khớp với yêu cầu {{requested}}. Xác nhận lại đơn hàng.",
+      "planFailureShortage": "{{sku}}: cần {{requested}}, chỉ còn {{available}} có sẵn.",
+      "planFailureUnknownProduct": "Sản phẩm {{sku}} không khả dụng trên đơn hàng — xóa dòng này.",
+      "planFailureUnknownUnit": "{{sku}}: đơn vị {{unit}} không khả dụng trên sản phẩm.",
+      "planFailureUnsupportedTransition": "Chuyển trạng thái {{from}} → {{to}} không được hỗ trợ.",
+      "reservationFailedDirty": "Viết tồn kho để giữ dòng tồn kho trong trạng thái không đồng nhất: {{rows}}. Cần điều chỉnh thủ công.",
+      "reservationFailedRolledBack": "Viết tồn kho thất bại và đã được quay lại: {{error}}",
+      "reservationFailedTitle": "Không thể cập nhật tồn kho",
+      "reservationPlanFailedTitle": "Không thể áp dụng thay đổi trạng thái này",
+      "setExpanded": "Đã thêm {{count}} dòng thành phần cho bộ {{setName}}.",
+      "setExploded": "Đã tách bộ thành {{count}} dòng độc lập.",
+      "shortageBlockLine": "{{productName}}: chỉ còn {{available}} (cần {{requested}})",
+      "shortageBlockTitle": "Không đủ tồn kho để xác nhận đơn hàng này",
+      "statusChangeError": "Không thể cập nhật trạng thái",
+      "statusChangeSuccess": "Đã cập nhật trạng thái",
+      "updateError": "Không thể cập nhật đơn hàng",
+      "updateSuccess": "Cập nhật đơn hàng thành công"
+    },
+    "stats": {
+      "total": "Tổng cộng",
+      "totalThisMonth": "Tháng này"
+    },
+    "statusChange": {
+      "confirmMessage": "Chuyển trạng thái từ \"{{from}}\" sang \"{{to}}\"?",
+      "confirmTitle": "Thay đổi trạng thái",
+      "notePlaceholder": "Thêm ghi chú cho thay đổi này"
+    },
+    "title": "Đơn hàng",
+    "urgent": "Gấp",
+    "vacuousCompletion": {
+      "label": "Cần kiểm tra",
+      "tooltip": "Đơn này không có dòng sản phẩm nào nhưng đang ở trạng thái hoàn tất — nó đã bị tự động hoàn tất dù chưa hề giao hàng (lỗi, nay đã sửa). Trạng thái này là cuối cùng nên phải xử lý thủ công. Chỉ root mới thấy."
+    },
+    "validation": {
+      "customerNameRequired": "Vui lòng nhập tên khách hàng",
+      "customerRequired": "Vui lòng chọn khách hàng",
+      "orderNumberRequired": "Vui lòng nhập số đơn hàng",
+      "productCodeDuplicate": "Sản phẩm này đã có ở dòng khác",
+      "productCodeRequired": "Vui lòng nhập mã SP",
+      "productNameRequired": "Vui lòng nhập tên SP",
+      "unitPriceRequired": "Đơn giá không được âm"
+    }
+  },
+  "transportOrders": {
+    "actions": {
+      "cancel": "Hủy đơn"
+    },
+    "billing": {
+      "advance": "Tạm ứng",
+      "balanceDue": "Còn lại",
+      "contractNo": "Số HĐ vận chuyển",
+      "grandTotal": "Tổng cộng",
+      "nonBillableTotal": "Khách tự thanh toán",
+      "passthroughSubtotal": "Cộng chi hộ",
+      "serviceSubtotal": "Cộng phí dịch vụ",
+      "vatAmount": "VAT ({{rate}}%)",
+      "vatRate": "Thuế suất VAT"
+    },
+    "cancel": {
+      "confirmMessage": "Hủy đơn vận chuyển này? Đơn vẫn được lưu với nhãn đã hủy.",
+      "confirmTitle": "Hủy đơn vận chuyển",
+      "reasonLabel": "Lý do (không bắt buộc)",
+      "reasonPlaceholder": "Vì sao hủy đơn vận chuyển này?",
+      "statusBadge": "Đã hủy"
+    },
+    "columns": {
+      "bill": "Số B/L · B/K",
+      "container": "Số cont",
+      "date": "Ngày",
+      "orderNumber": "Số đơn",
+      "route": "Tuyến",
+      "truck": "Số xe"
+    },
+    "confirmDelete": {
+      "message": "Đơn vận chuyển sẽ bị xóa khỏi danh sách. Không thể hoàn tác.",
+      "title": "Xóa đơn vận chuyển"
+    },
+    "copiedFrom": "Sao chép từ {{code}} — điều chỉnh và lưu thành đơn mới.",
+    "detail": {
+      "activitiesError": "Không tải được hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho đơn vận chuyển này.",
+      "activityMemo": {
+        "cancelledFrom": "Hủy từ trạng thái",
+        "container": "Container",
+        "deletedFrom": "Xóa từ trạng thái",
+        "disbursements_one": "{{count}} khoản chi hộ",
+        "disbursements_other": "{{count}} khoản chi hộ",
+        "fees_one": "{{count}} dòng phí",
+        "fees_other": "{{count}} dòng phí",
+        "fieldAdvanceAmount": "Tạm ứng",
+        "fieldBillNumber": "Số B/L",
+        "fieldContainerNumber": "Số container",
+        "fieldContainerSize": "Loại container",
+        "fieldContractNo": "Số hợp đồng",
+        "fieldCustomer": "Khách hàng",
+        "fieldDisbursementCount": "Chi hộ",
+        "fieldDriver": "Tài xế",
+        "fieldEntryDate": "Ngày",
+        "fieldFeeCount": "Dòng phí",
+        "fieldRoute": "Tuyến",
+        "fieldShipmentType": "Loại hình",
+        "fieldTotalAmount": "Tạm tính",
+        "fieldTripCount": "Số chặng",
+        "fieldTripLaborTotal": "Tổng lương chuyến",
+        "fieldTruck": "Xe",
+        "fieldVatRate": "Thuế suất VAT",
+        "fromTo": "{{from}} → {{to}}",
+        "notesChanged": "Ghi chú đã thay đổi",
+        "reason": "Lý do",
+        "route": "Tuyến",
+        "total": "Tổng",
+        "trips_one": "{{count}} chặng",
+        "trips_other": "{{count}} chặng"
+      },
+      "activityVerbs": {
+        "cancel": "Đã hủy đơn vận chuyển",
+        "create": "Đã tạo đơn vận chuyển",
+        "delete": "Đã xóa đơn vận chuyển",
+        "statusChange": "Đã đổi trạng thái",
+        "update": "Đã sửa đơn vận chuyển",
+        "updateInline": "Đã cập nhật thông tin"
+      },
+      "createdBy": "Người tạo",
+      "info": "Thông tin",
+      "recentActivities": "Hoạt động gần đây",
+      "tabActivity": "Lịch sử đơn",
+      "tabActivityLog": "Hoạt động"
+    },
+    "edit": "Sửa đơn vận chuyển",
+    "fees": {
+      "add": "Thêm phí",
+      "amount": "Số tiền",
+      "invoiceNo": "Số hoá đơn",
+      "kind": "Loại phí",
+      "kindPassthrough": "Chi hộ",
+      "kindService": "Phí dịch vụ",
+      "label": "Tên phí",
+      "notBilled": "không thu",
+      "payer": "Người thanh toán",
+      "payerCompany": "Công ty",
+      "payerCustomer": "Khách hàng",
+      "title": "Phí dịch vụ",
+      "vatable": "VAT"
+    },
+    "filters": {
+      "createdDate": "Ngày tạo",
+      "hideCancelled": "Ẩn đơn đã hủy"
+    },
+    "form": {
+      "containerSize": "Loại cont",
+      "customer": "Khách hàng",
+      "driver": "Tài xế",
+      "jobSection": "Thông tin chuyến",
+      "multiTrip": "Nhiều chặng",
+      "multiTripHint": "Đơn chạy nhiều chặng — mỗi chặng có điểm đi/đến, ngày, xe, tài xế và lương riêng.",
+      "noTrucks": "Chưa có xe. Thêm thông tin xe tại Tài sản → Xe tải.",
+      "shipmentType": "Loại hình"
+    },
+    "locked": {
+      "notice": "Đơn đã lên bảng kê và bị khóa — không thể chỉnh sửa hoặc xóa."
+    },
+    "new": "Tạo đơn vận chuyển",
+    "noResults": "Không tìm thấy đơn vận chuyển",
+    "notifications": {
+      "cancelled": "Đã hủy đơn vận chuyển",
+      "createError": "Tạo đơn vận chuyển thất bại",
+      "created": "Đã tạo đơn vận chuyển",
+      "deleted": "Đã xóa đơn vận chuyển",
+      "loadError": "Không tải được đơn vận chuyển",
+      "mobileFormBlocked": "Chỉnh sửa đơn vận chuyển chỉ khả dụng trên máy tính.",
+      "saveError": "Lưu thay đổi thất bại",
+      "updateError": "Cập nhật đơn vận chuyển thất bại",
+      "updated": "Đã cập nhật đơn vận chuyển"
+    },
+    "route": {
+      "dropoff": "Nơi hạ",
+      "pickup": "Nơi lấy",
+      "stuffing": "Nơi đóng/rút hàng",
+      "title": "Tuyến dịch vụ"
+    },
+    "search": "Tìm số đơn / số xe / tài xế / B/L / cont…",
+    "shipmentType": {
+      "export": "Xuất",
+      "import": "Nhập"
+    },
+    "stats": {
+      "total": "Tổng"
+    },
+    "statusChange": {
+      "confirmMessage": "Chuyển trạng thái đơn từ \"{{from}}\" sang \"{{to}}\"?",
+      "confirmTitle": "Thay đổi trạng thái",
+      "lockWarning": "Đơn sẽ bị khóa: không thể sửa, xóa hoặc chuyển trạng thái khác.",
+      "notePlaceholder": "Thêm ghi chú cho thay đổi này"
+    },
+    "title": "Đơn vận chuyển",
+    "trips": {
+      "add": "Thêm chặng",
+      "badge": "{{n}} chặng",
+      "departure": "Điểm đi",
+      "destination": "Điểm đến",
+      "laborCost": "Lương chuyến",
+      "laborTotal": "Tổng lương chuyến",
+      "title": "Danh sách chặng"
+    },
+    "validation": {
+      "customerRequired": "Vui lòng chọn khách hàng",
+      "driverRequired": "Vui lòng chọn tài xế",
+      "entryDateRequired": "Vui lòng chọn ngày",
+      "truckRequired": "Vui lòng chọn xe"
+    }
+  },
+  "vendors": {
+    "addItem": "Thêm nhà cung cấp",
+    "bank": {
+      "addAccount": "Thêm tài khoản ngân hàng",
+      "emptyHint": "Chưa có tài khoản ngân hàng."
+    },
+    "columns": {
+      "tags": "Tag"
+    },
+    "contacts": {
+      "addContact": "Thêm người liên hệ khác",
+      "emptyHint": "Chưa có người liên hệ bổ sung.",
+      "section": "Người liên hệ"
+    },
+    "deleteConfirm": {
+      "message": "Ẩn nhà cung cấp này? Nhà cung cấp sẽ không xuất hiện trong các danh sách. Dữ liệu vẫn được giữ lại để tra cứu.",
+      "title": "Xóa nhà cung cấp"
+    },
+    "detail": {
+      "activitiesError": "Không tải được lịch sử hoạt động.",
+      "activitiesLoadMore": "Tải thêm",
+      "activitiesNoEntries": "Chưa có hoạt động nào cho nhà cung cấp này.",
+      "activityVerbs": {
+        "addNote": "Đã thêm ghi chú cho",
+        "create": "Đã tạo",
+        "delete": "Đã xóa",
+        "removeNote": "Đã xóa ghi chú của",
+        "toggleStatus": "Đổi trạng thái",
+        "update": "Đã cập nhật"
+      },
+      "billingAddress": "Địa chỉ chính",
+      "noPickupAddresses": "Chưa có địa chỉ lấy hàng.",
+      "pickupAddress": "Địa chỉ lấy hàng",
+      "receivingHours": "Giờ lấy hàng",
+      "recentActivities": "Hoạt động gần đây",
+      "tab": {
+        "activity": "Hoạt động",
+        "details": "Thông tin"
+      }
+    },
+    "detailTitle": "Chi tiết nhà cung cấp",
+    "editItem": "Cập nhật nhà cung cấp",
+    "exportNotReady": "Chức năng xuất Excel chưa khả dụng.",
+    "filterVendorTypeAll": "Tất cả nhóm",
+    "form": {
+      "accountHolderLabel": "Chủ tài khoản",
+      "accountManagerLabel": "Nhân viên phụ trách",
+      "accountManagerPlaceholder": "Người phụ trách",
+      "accountNumberLabel": "Số tài khoản",
+      "addressPlaceholder": "Địa chỉ đầy đủ",
+      "bankLabel": "Ngân hàng",
+      "bankPlaceholder": "VD: Vietcombank, ACB",
+      "codePlaceholder": "Mã nhà cung cấp",
+      "contactNameLabel": "Họ tên",
+      "contactPersonLabel": "Người liên hệ chính",
+      "contactPersonPlaceholder": "Tên người liên hệ chính",
+      "contactRoleLabel": "Vai trò / Chức vụ",
+      "contactZaloLabel": "Zalo",
+      "contactZaloPlaceholder": "Zalo cá nhân (để trống nếu trùng SĐT)",
+      "createButton": "Tạo nhà cung cấp",
+      "deliveryHoursLabel": "Giờ lấy hàng",
+      "deliveryHoursPlaceholder": "VD: 7:30 - 16:30 (T2 - T6)",
+      "emailPlaceholder": "Địa chỉ email",
+      "googleMapUrlLabel": "Đường dẫn Google Maps",
+      "googleMapUrlPlaceholder": "Dán đường dẫn Google Maps (không bắt buộc)",
+      "invoiceAddressLabel": "Địa chỉ xuất hóa đơn (nếu khác)",
+      "invoiceEmailLabel": "Email nhận hóa đơn",
+      "invoiceNameLabel": "Tên trên hóa đơn",
+      "invoiceRecipientLabel": "Người nhận hóa đơn",
+      "isActiveLabel": "Đang hợp tác",
+      "isDomesticDescription": "Tắt nếu là nhà cung cấp nước ngoài",
+      "isDomesticLabel": "NCC trong nước",
+      "namePlaceholder": "Tên nhà cung cấp",
+      "notesPlaceholder": "Ghi chú thêm",
+      "originLabel": "Xuất xứ",
+      "payableCreditLimitLabel": "Hạn mức công nợ phải trả",
+      "payableCreditLimitPlaceholder": "VD: 50000000",
+      "paymentTermsLabel": "Điều kiện thanh toán",
+      "paymentTermsPlaceholder": "VD: NET 30 ngày",
+      "phonePlaceholder": "Số điện thoại",
+      "pickupAddressLabel": "Địa chỉ lấy hàng",
+      "pickupAddressesAdd": "Thêm địa chỉ lấy hàng",
+      "section": {
+        "contacts": "Người liên hệ bổ sung",
+        "invoiceInfo": "Thông tin hóa đơn"
+      },
+      "shortNamePlaceholder": "Tên rút gọn",
+      "taxCodeLabel": "Mã số thuế",
+      "taxCodePlaceholder": "Mã số thuế",
+      "updateButton": "Cập nhật nhà cung cấp",
+      "vendorTypeLabel": "Nhóm NCC",
+      "vendorTypePlaceholder": "VD: Nguyên vật liệu, Dịch vụ, Vận chuyển",
+      "websiteLabel": "Website",
+      "websitePlaceholder": "https://...",
+      "zaloLabel": "Zalo công ty",
+      "zaloPlaceholder": "Số Zalo / Zalo OA"
+    },
+    "noItems": "Không tìm thấy nhà cung cấp",
+    "notSet": "Chưa cập nhật",
+    "notifications": {
+      "createError": "Không thể tạo nhà cung cấp",
+      "createSuccess": "Tạo nhà cung cấp thành công",
+      "deleteError": "Không thể xóa nhà cung cấp",
+      "deleteSuccess": "Xóa nhà cung cấp thành công",
+      "disableSuccess": "Đã tạm ngưng hợp tác với nhà cung cấp",
+      "enableSuccess": "Đã kích hoạt hợp tác với nhà cung cấp",
+      "fetchError": "Không thể tải danh sách nhà cung cấp",
+      "toggleError": "Không thể đổi trạng thái nhà cung cấp",
+      "updateError": "Không thể cập nhật nhà cung cấp",
+      "updateSuccess": "Cập nhật nhà cung cấp thành công"
+    },
+    "origin": {
+      "china": "Trung Quốc",
+      "domestic": "Trong nước",
+      "overseas": "Nước ngoài",
+      "vietnam": "Việt Nam"
+    },
+    "status": {
+      "cooperating": "Đang hợp tác",
+      "paused": "Tạm ngưng"
+    }
+  },
+  "warehouseDeliveryNote": {
+    "title": "Phiếu xuất kho"
+  },
+  "warehouseDoc": {
+    "actions": {
+      "confirm": "Xác nhận",
+      "copy": "Sao chép"
+    },
+    "addItem": "Tạo phiếu",
+    "columns": {
+      "date": "Ngày",
+      "itemsCount_one": "{{count}} vật tư",
+      "itemsCount_other": "{{count}} vật tư",
+      "lines": "Vật tư",
+      "totalQuantity": "Tổng SL"
+    },
+    "confirmModal": {
+      "message_in": "Xác nhận sẽ cộng số lượng vào tồn kho vật tư. Không thể hoàn tác.",
+      "message_out": "Xác nhận sẽ trừ số lượng khỏi tồn kho vật tư (tồn kho có thể âm). Không thể hoàn tác.",
+      "title": "Xác nhận phiếu này?"
+    },
+    "copiedFrom": "Sao chép từ {{code}} — chỉnh sửa và lưu thành phiếu mới.",
+    "dangerZone": {
+      "deleteItem": "Xóa phiếu",
+      "deleteItemDesc": "Xóa vĩnh viễn phiếu này"
+    },
+    "deleteConfirm": {
+      "message": "Bạn có chắc muốn xóa phiếu này? Hành động này không thể hoàn tác.",
+      "title": "Xóa phiếu"
+    },
+    "editItem": "Sửa phiếu",
+    "emptyMessage": "Điều chỉnh khoảng ngày hoặc tạo phiếu đầu tiên.",
+    "emptyTitle": "Chưa có phiếu",
+    "form": {
+      "addLine": "Thêm",
+      "headerSection": "Thông tin phiếu",
+      "linesLabel": "Danh sách vật tư",
+      "materialLabel": "Vật tư",
+      "materialPlaceholder": "Chọn vật tư",
+      "noLines": "Chưa có vật tư. Thêm vật tư và số lượng.",
+      "notePlaceholder": "Ghi chú hoặc tham chiếu (tùy chọn)",
+      "quantityLabel": "Số lượng",
+      "unitLabel": "Đơn vị"
+    },
+    "lockedNote": "Phiếu đã xác nhận và bị khóa — số lượng đã được cập nhật vào tồn kho.",
+    "notifications": {
+      "confirmError": "Xác nhận phiếu thất bại",
+      "confirmSuccess": "Đã xác nhận phiếu",
+      "createError": "Tạo phiếu thất bại",
+      "createSuccess": "Đã tạo phiếu",
+      "deleteError": "Xóa phiếu thất bại",
+      "deleteSuccess": "Đã xóa phiếu",
+      "duplicateCode": "Mã đã được sử dụng",
+      "duplicateCodeMessage": "Mã phiếu này đã tồn tại. Vui lòng đổi ngày hoặc thử lại.",
+      "fetchError": "Tải danh sách phiếu thất bại",
+      "updateError": "Cập nhật phiếu thất bại",
+      "updateSuccess": "Đã cập nhật phiếu"
+    },
+    "searchPlaceholder": "Tìm theo mã hoặc ghi chú...",
+    "status": {
+      "confirmed": "Đã xác nhận",
+      "draft": "Nháp"
+    },
+    "validation": {
+      "dateRequired": "Vui lòng chọn ngày"
+    }
+  },
+  "warehouseReceipt": {
+    "title": "Phiếu nhập kho"
+  }
+}

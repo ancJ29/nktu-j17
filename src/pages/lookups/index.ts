@@ -1,0 +1,1 @@
+export { LookupsPage } from './LookupsPage';

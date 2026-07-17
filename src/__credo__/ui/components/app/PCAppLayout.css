@@ -1,0 +1,149 @@
+/* Active indicator - white triangle pointing right */
+.credo-pc-activeTag {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 10px 15px 10px 0;
+  border-color: transparent white transparent transparent;
+}
+
+/* Navigation button */
+.credo-pc-navButton {
+  display: block;
+  width: 100%;
+  font-weight: 400;
+  height: 50px;
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: 0;
+  border-style: solid;
+  border-width: 0 0 0.5px 0;
+  border-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: background-color 0.2s ease;
+  background-color: transparent;
+}
+
+.credo-pc-navButton.credo-pc-active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.credo-pc-navButton:not(.credo-pc-active):hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.credo-pc-navGroup {
+  padding: 0;
+  padding-left: var(--mantine-spacing-sm);
+  margin: 0;
+  position: relative;
+  justify-content: space-between !important;
+  height: 100%;
+}
+
+.credo-pc-navLabel {
+  font-weight: 600;
+  font-size: var(--mantine-font-size-sm);
+  color: white;
+}
+
+/* Chevron for expandable menus */
+.credo-pc-chevron {
+  transition: transform 200ms ease;
+  margin-right: var(--mantine-spacing-lg);
+  transform: rotate(0deg);
+  color: white;
+}
+
+.credo-pc-chevron.credo-pc-expanded {
+  transform: rotate(180deg);
+}
+
+/* Sub navigation button */
+.credo-pc-subNavButton {
+  display: block;
+  width: 100%;
+  font-weight: 400;
+  height: 50px;
+  padding-left: var(--mantine-spacing-lg);
+  padding-right: 0;
+  border-style: solid;
+  border-width: 0 0 0.5px 0;
+  border-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+  transition: background-color 0.2s ease;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.credo-pc-subNavButton.credo-pc-active {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.credo-pc-subNavButton:not(.credo-pc-active):hover {
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.credo-pc-subNavGroup {
+  justify-content: flex-start;
+  position: relative;
+  margin-left: var(--mantine-spacing-xl);
+  height: 100%;
+}
+
+.credo-pc-subNavLabel {
+  font-weight: 600;
+  font-size: var(--mantine-font-size-sm);
+  color: white;
+}
+
+/* Icon-only mode (collapsed with icons visible) */
+.credo-pc-navButton.credo-pc-iconOnly {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* ---------------------------------------------------------------------------
+ * Light variant — white sidebar. Active accents + borders read from CSS vars
+ * (--credo-nav-*) set inline on the navbar root from the resolved mainColor.
+ * Text colors fall back to `inherit` so they pick up the Box `c` (neutral.8),
+ * with active rows overridden to the mainColor accent.
+ * ------------------------------------------------------------------------- */
+[data-variant='light'] .credo-pc-activeTag {
+  border-color: transparent var(--credo-nav-accent) transparent transparent;
+}
+
+[data-variant='light'] .credo-pc-navButton,
+[data-variant='light'] .credo-pc-subNavButton {
+  border-color: var(--credo-nav-border);
+}
+
+[data-variant='light'] .credo-pc-subNavButton {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+[data-variant='light'] .credo-pc-navButton.credo-pc-active,
+[data-variant='light'] .credo-pc-subNavButton.credo-pc-active {
+  background-color: var(--credo-nav-active-bg);
+}
+
+[data-variant='light'] .credo-pc-navButton:not(.credo-pc-active):hover,
+[data-variant='light'] .credo-pc-subNavButton:not(.credo-pc-active):hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+[data-variant='light'] .credo-pc-navLabel,
+[data-variant='light'] .credo-pc-subNavLabel,
+[data-variant='light'] .credo-pc-chevron {
+  color: inherit;
+}
+
+[data-variant='light'] .credo-pc-navButton.credo-pc-active .credo-pc-navLabel,
+[data-variant='light'] .credo-pc-subNavButton.credo-pc-active .credo-pc-subNavLabel {
+  color: var(--credo-nav-active-text);
+}

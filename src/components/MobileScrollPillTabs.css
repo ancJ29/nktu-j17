@@ -1,0 +1,132 @@
+/*
+ * Mobile scroll-tab rail — horizontally-scrollable, editorial-underline style.
+ *
+ * No pill chrome on individual tabs (kept reading as "row of buttons" in the
+ * pill variant). Instead, each tab is just icon + label, and the active tab
+ * is signalled by a primary-color underline drawn under the label. The whole
+ * rail sits in a frosted-glass sticky container that fades into page content.
+ *
+ * The class names retain the `mspt-` prefix even though the visual is no
+ * longer pill-shaped — the component name (`MobileScrollPillTabs`) is the
+ * stable API; renaming the file would churn imports elsewhere.
+ */
+
+.mspt-shell {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  /* Bleed past the page's xs padding so the rail spans edge-to-edge. */
+  margin-inline: calc(var(--mantine-spacing-xs) * -1);
+  /* Frosted body bg so scrolled content fades behind the rail. */
+  background: color-mix(in srgb, var(--mantine-color-body) 82%, transparent);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+  /* Hairline that anchors the rail to the page below it. Almost
+     invisible against light bg, gentle separator in dark mode. */
+  box-shadow: inset 0 -1px 0
+    color-mix(in srgb, var(--mantine-color-default-border) 55%, transparent);
+}
+
+.mspt-scroll {
+  position: relative;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--mantine-spacing-xs);
+  padding-inline: var(--mantine-spacing-xs);
+  /* Hide native scrollbar; horizontal scroll has a partial-pill peek as
+     its own affordance. */
+  scrollbar-width: none;
+}
+.mspt-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Each tab: icon + label inline. Active state is a colored underline drawn
+   via ::after, animated in via opacity + scaleX from the left edge. */
+.mspt-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  /* Generous vertical padding builds the 44px touch target without adding
+     visible chrome. Horizontal padding stays compact to keep labels close. */
+  padding: 12px 10px 10px;
+  background: none;
+  border: none;
+  color: var(--mantine-color-dimmed);
+  font-size: var(--mantine-font-size-sm);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 120ms ease-out;
+}
+
+.mspt-tab:hover:not([data-active='true']) {
+  color: var(--mantine-color-text);
+}
+
+.mspt-tab:active {
+  transform: scale(0.97);
+}
+
+.mspt-tab[data-active='true'] {
+  color: var(--mantine-primary-color-filled);
+  font-weight: 600;
+}
+
+/* Underline indicator — 2px primary-color line that sits just under the
+   text, with 2px insets so it doesn't visually butt into the next tab. */
+.mspt-tab::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--mantine-primary-color-filled);
+  /* Inactive: invisible. Active: grows in from the left in ~180ms. */
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    opacity 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 240ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mspt-tab[data-active='true']::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* Focus ring — keyboard nav stays accessible. Uses an offset outline so
+   the focus indicator doesn't collide with the underline. */
+.mspt-tab:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--mantine-primary-color-filled) 70%, transparent);
+  outline-offset: -4px;
+  border-radius: 6px;
+}
+
+.mspt-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mspt-tab[data-active='true'] .mspt-icon {
+  opacity: 1;
+}
+
+.mspt-label {
+  display: inline-block;
+}
