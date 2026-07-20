@@ -29,6 +29,7 @@ import {
   IconPhoto,
   IconPrinter,
   IconSend,
+  IconShare,
   IconShoppingCartPlus,
   IconTrash,
 } from '@tabler/icons-react';
@@ -54,7 +55,12 @@ import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
 import { useLookupLabels, lookupLabelOf } from '@/hooks';
 import { formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
-import { getPricingVatRate, hasImagesForProducts, perms } from '@/utils/permission';
+import {
+  getPricingVatRate,
+  hasImagesForProducts,
+  isPdfSharingEnabled,
+  perms,
+} from '@/utils/permission';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useProductStore } from '@/stores/useProductStore';
 import {
@@ -65,6 +71,7 @@ import {
   type QuotationOrientation,
   type QuotationPaperSize,
 } from './quotationPrint';
+import { shareQuotationPdf } from './quotationPdf';
 import { readVietnameseMoney } from '@/utils/vietnameseNumberToWords';
 import { quotationBundle, useQuotationStore } from './useQuotationStore';
 import { quotationBadgeProps, quotationTotal, type Quotation, type QuotationStatus } from './types';
@@ -75,6 +82,8 @@ const canEdit = perms.salesOrder.canEdit();
 const canDelete = perms.salesOrder.canDelete();
 const canViewAll = perms.salesOrder.canViewAll();
 const canViewSelf = perms.salesOrder.canViewSelf();
+
+const canSharePdf = isPdfSharingEnabled();
 
 function canViewQuotation(q: Quotation): boolean {
   if (canViewAll) return true;
@@ -97,6 +106,7 @@ export function QuotationDetail() {
   const [sending, setSending] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [sharing, setSharing] = useState(false);
   const [sendModalOpened, { open: openSendModal, close: closeSendModal }] = useDisclosure(false);
   const [cancelModalOpened, { open: openCancelModal, close: closeCancelModal }] =
     useDisclosure(false);
@@ -371,6 +381,36 @@ export function QuotationDetail() {
     }
   }, [quotation, buildNoteData, paperSize, orientation, closePrintModal, t]);
 
+  
+  
+  
+  
+  
+  const handleShare = useCallback(async () => {
+    const st = quotation?.extra.status;
+    if (!quotation || (st !== 'sent' && st !== 'converted')) return;
+    setSharing(true);
+    try {
+      const result = await shareQuotationPdf(buildNoteData(), { paperSize, orientation });
+      closePrintModal();
+      if (result === 'downloaded') {
+        notifications.show({
+          color: 'blue',
+          message: t('quotations.share.downloadedFallback'),
+          autoClose: 6000,
+        });
+      }
+    } catch {
+      notifications.show({
+        color: 'red',
+        message: t('quotations.share.error'),
+        autoClose: 8000,
+      });
+    } finally {
+      setSharing(false);
+    }
+  }, [quotation, buildNoteData, paperSize, orientation, closePrintModal, t]);
+
   const handleGenerateSalesOrder = useCallback(() => {
     if (!quotation) return;
     navigate(ROUTES.SALES_ORDERS.NEW, {
@@ -447,6 +487,17 @@ export function QuotationDetail() {
                   onClick={openPrintModal}
                 >
                   {t('quotations.actions.exportPdf')}
+                </Button>
+              )}
+              {canSharePdf && (isReady || isConverted) && (
+                <Button
+                  variant="light"
+                  color="teal"
+                  size="compact-sm"
+                  leftSection={<IconShare size={14} />}
+                  onClick={openPrintModal}
+                >
+                  {t('quotations.actions.sharePdf')}
                 </Button>
               )}
               {isReady && generateSalesOrderButton}
@@ -667,6 +718,17 @@ export function QuotationDetail() {
                   {t('quotations.actions.exportPdf')}
                 </Button>
               )}
+              {isMobile && canSharePdf && (isReady || isConverted) && (
+                <Button
+                  variant="light"
+                  color="teal"
+                  leftSection={<IconShare size={16} />}
+                  fullWidth
+                  onClick={openPrintModal}
+                >
+                  {t('quotations.actions.sharePdf')}
+                </Button>
+              )}
               {/* No mobile "generate sales order": it routes to the SO form,
                   which is desktop-only (mobile deep-links get bounced to the SO
                   list) — a dead-end CTA per the no-create/edit-on-mobile rule.
@@ -722,7 +784,7 @@ export function QuotationDetail() {
                 </Card>
               )}
 
-              {canDelete && (isDraft || isCancelled) && (
+              {!isMobile && canDelete && (isDraft || isCancelled) && (
                 <DangerZoneCard title={t('__new__.01-common.dangerZone.title')}>
                   <DangerAction
                     title={t('quotations.dangerZone.deleteItem')}
@@ -809,12 +871,29 @@ export function QuotationDetail() {
             onChange={(e) => setIncludeVat(e.currentTarget.checked)}
           />
           <Group justify="flex-end" gap="sm">
-            <Button variant="default" size="sm" onClick={closePrintModal}>
+            <Button variant="default" size="sm" onClick={closePrintModal} disabled={sharing}>
               {t('__new__.01-common.actions.cancel')}
             </Button>
-            <Button size="sm" leftSection={<IconPrinter size={14} />} onClick={handlePrint}>
+            <Button
+              size="sm"
+              variant="light"
+              leftSection={<IconPrinter size={14} />}
+              onClick={handlePrint}
+              disabled={sharing}
+            >
               {t('quotations.actions.exportPdf')}
             </Button>
+            {canSharePdf && (
+              <Button
+                size="sm"
+                color="teal"
+                leftSection={<IconShare size={14} />}
+                onClick={handleShare}
+                loading={sharing}
+              >
+                {t('quotations.actions.sharePdf')}
+              </Button>
+            )}
           </Group>
         </Stack>
       </Modal>

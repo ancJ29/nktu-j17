@@ -100,7 +100,7 @@ export function SalesOrderDeliveryRequestInfo({
               />
 
               <InfoRow
-                label={t('common.labels.status')}
+                label={t('__new__.01-common.labels.status')}
                 value={
                   <Badge color={status.color} variant="filled" size="sm">
                     {status.label}

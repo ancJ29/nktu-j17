@@ -139,9 +139,9 @@ export function LocationListPage() {
               searchPlaceholder={t('__new__.07-entities.locations.list.searchPlaceholder')}
               status={filter}
               onStatusChange={setFilter}
-              statusTitle={t('common.labels.status')}
+              statusTitle={t('__new__.01-common.labels.status')}
               statusLabels={{
-                all: t('common.filters.all'),
+                all: t('__new__.01-common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
                 inactive: t('common.filters.inactive'),
               }}
@@ -155,7 +155,7 @@ export function LocationListPage() {
               status={filter}
               onStatusChange={setFilter}
               statusLabels={{
-                all: t('common.filters.all'),
+                all: t('__new__.01-common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
                 inactive: t('common.filters.inactive'),
               }}

@@ -132,9 +132,9 @@ export function GreenhouseListPage() {
             searchPlaceholder={t('greenhouses.searchPlaceholder')}
             status={filter}
             onStatusChange={setFilter}
-            statusTitle={t('common.labels.status')}
+            statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.status.active'),
               inactive: t('common.filters.inactive'),
             }}
@@ -148,7 +148,7 @@ export function GreenhouseListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.status.active'),
               inactive: t('common.filters.inactive'),
             }}

@@ -194,7 +194,7 @@ export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialD
         : []),
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         ta: 'right' as const,
         render: (item: Material) => (
           <Group gap="xs" wrap="nowrap" justify="flex-end" align="baseline">

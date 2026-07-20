@@ -340,9 +340,9 @@ export function MaterialListPage() {
             searchPlaceholder={t('__new__.07-entities.materials.list.searchPlaceholder')}
             status={filter}
             onStatusChange={setFilter}
-            statusTitle={t('common.labels.status')}
+            statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('materials.filterActive'),
               inactive: t('common.filters.inactive'),
             }}
@@ -357,7 +357,7 @@ export function MaterialListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('materials.filterActive'),
               inactive: t('common.filters.inactive'),
             }}

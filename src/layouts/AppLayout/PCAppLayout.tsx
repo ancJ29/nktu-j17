@@ -147,7 +147,7 @@ export function PCAppLayout() {
         currentLanguage: i18n.language,
         onLanguageChange: handleLanguageChange,
       }}
-      showLanguageSwitcher={featureFlags.languageSwitcher}
+      showLanguageSwitcher={featureFlags.common.languageSwitcher}
       onRefresh={handleRefresh}
       showRefreshConfig={showRefreshConfig}
       onRefreshConfig={() => {

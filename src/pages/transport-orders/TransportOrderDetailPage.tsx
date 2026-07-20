@@ -1,6 +1,7 @@
 import {
   Alert,
   Badge,
+  Box,
   Button,
   Card,
   Divider,
@@ -13,6 +14,7 @@ import {
   Tabs,
   Text,
   Textarea,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -22,7 +24,10 @@ import {
   IconEdit,
   IconFileText,
   IconHistory,
+  IconInfoCircle,
   IconLock,
+  IconReceipt,
+  IconRoute,
   IconTrash,
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -37,6 +42,7 @@ import {
   InlineTextareaField,
 } from '@credo/base-ui/components';
 import { ConfirmModal } from '@/components/ConfirmModal';
+import { SectionCard } from '@/components/SectionCard';
 import { StatusChangeModal } from '@/components/StatusChangeModal';
 import { DateField } from '@/components/DateField';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
@@ -81,6 +87,9 @@ import {
   readFeeLines,
 } from './transportOrderPricing';
 import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activityMemo';
+import { useContainerSizeLabel } from './containerSize';
+import { truckNameWithPlate } from './truckDisplay';
+import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -130,6 +139,9 @@ export function TransportOrderDetailPage() {
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
+  
+  
+  const containerSizeLabel = useContainerSizeLabel();
 
   useEffect(() => {
     if (!trucksInit) loadTrucks();
@@ -415,7 +427,10 @@ export function TransportOrderDetailPage() {
 
   const truckSelectData = trucks
     .filter((tr) => tr.isActive && !tr.extra?.isDeleted)
-    .map((tr) => ({ value: tr.id, label: `${tr.name}${tr.code ? ` (${tr.code})` : ''}` }));
+    .map((tr) => ({
+      value: tr.id,
+      label: `${truckNameWithPlate(tr.name, tr.extra?.plateNumber)}${tr.code ? ` (${tr.code})` : ''}`,
+    }));
   const driverSelectData = employees
     .filter(driverEmployeeFilter)
     .map((e) => ({ value: e.id, label: e.name }));
@@ -432,7 +447,7 @@ export function TransportOrderDetailPage() {
       data={truckSelectData}
       placeholder={t('transportOrders.columns.truck')}
       labels={inlineEditLabels}
-      renderValueDisplay={(v) => <TruckLink id={v} fallbackLabel={order.truckPlate} />}
+      renderValueDisplay={(v) => <TruckLink id={v} fallbackLabel={order.truckPlate} showPlate />}
     />
   );
 
@@ -488,12 +503,51 @@ export function TransportOrderDetailPage() {
     />
   );
 
+  
+  
+  
+  
+  
   const containerNumberField = (
-    <InlineTextField
+    <InlineEditField<string>
       canEdit={canEditMeta}
       value={order.containerNumber ?? ''}
-      onSave={async (next) => handleMetaPatch({ containerNumber: next.trim() })}
       labels={inlineEditLabels}
+      submitOnEnter
+      onSave={async (next) => {
+        const normalized = normalizeContainerNumber(next);
+        if (!isValidContainerNumber(normalized)) {
+          notifications.show({
+            color: 'red',
+            message: t('transportOrders.validation.containerNumberPattern'),
+          });
+          throw new Error('invalid container number');
+        }
+        await handleMetaPatch({ containerNumber: normalized });
+      }}
+      renderDisplay={(v) =>
+        v ? (
+          <Text size="sm">{v}</Text>
+        ) : (
+          <Text size="sm" c="dimmed" fs="italic">
+            —
+          </Text>
+        )
+      }
+      renderEditor={({ value: v, onChange }) => (
+        <TextInput
+          value={v}
+          onChange={(e) => onChange(e.currentTarget.value.toUpperCase())}
+          error={
+            isValidContainerNumber(v)
+              ? undefined
+              : t('transportOrders.validation.containerNumberPattern')
+          }
+          placeholder="RFCU9876543"
+          data-autofocus
+          autoFocus
+        />
+      )}
     />
   );
 
@@ -527,10 +581,7 @@ export function TransportOrderDetailPage() {
 
   
   const tripsCard = order.isMultiTrip && (
-    <Card withBorder padding="md" radius="md">
-      <Text fw={600} mb="sm">
-        {t('transportOrders.trips.title')}
-      </Text>
+    <SectionCard icon={<IconRoute size={14} />} title={t('transportOrders.trips.title')}>
       <Table>
         <Table.Thead>
           <Table.Tr>
@@ -551,7 +602,7 @@ export function TransportOrderDetailPage() {
               {/* Linked, not printed — same rule as the order-level truck/driver,
                   and each leg carries its own plate/name snapshot to fall back on. */}
               <Table.Td>
-                <TruckLink id={trip.truckId} fallbackLabel={trip.truckPlate} />
+                <TruckLink id={trip.truckId} fallbackLabel={trip.truckPlate} showPlate />
               </Table.Td>
               <Table.Td>{trip.driverId ? <EmployeeLink id={trip.driverId} /> : '—'}</Table.Td>
               <Table.Td ta="right">{canViewPrice ? formatMoney(trip.laborCost) : '—'}</Table.Td>
@@ -564,26 +615,24 @@ export function TransportOrderDetailPage() {
           pays out, not part of what the customer is billed. */}
       {canViewPrice && (
         <>
-          <Divider my="sm" />
+          <Divider />
           <Group justify="space-between">
             <Text fw={700}>{t('transportOrders.trips.laborTotal')}</Text>
             <Text fw={700}>{formatMoney(tripLaborTotal)}</Text>
           </Group>
         </>
       )}
-    </Card>
+    </SectionCard>
   );
 
   const overviewContent = (
     <Stack gap="lg">
       {tripsCard}
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-        <Card withBorder padding="md" radius="md">
-          <Text fw={600} mb="sm">
-            {t('transportOrders.detail.info')}
-          </Text>
-          <Stack gap={6}>
-            {/* Inline-editable: the fields that arrive or change AFTER the job is
+        <SectionCard icon={<IconInfoCircle size={14} />} title={t('transportOrders.detail.info')}>
+          <Box>
+            <Stack gap={6}>
+              {/* Inline-editable: the fields that arrive or change AFTER the job is
               booked. Money (fees / disbursements / vatRate) is deliberately NOT
               here — `totalAmount` is FE-derived and only the form's
               `buildTransportOrderWrite` recomputes it.
@@ -593,84 +642,82 @@ export function TransportOrderDetailPage() {
               here entirely and the Trips card below carries them per leg —
               showing leg 1's truck as though it were *the* truck would misread a
               3-leg job anyway. */}
-            {!order.isMultiTrip && (
-              <>
-                {infoRow(t('transportOrders.columns.date'), entryDateField)}
-                {/* Truck / driver are stored as ids and customer as its registry
+              {!order.isMultiTrip && (
+                <>
+                  {infoRow(t('transportOrders.columns.date'), entryDateField)}
+                  {/* Truck / driver are stored as ids and customer as its registry
                   `code`, each with a denormalized snapshot; link through to the live
                   record, falling back to the snapshot when the register is off or
                   still loading. */}
-                {infoRow(t('transportOrders.columns.truck'), truckField)}
-                {infoRow(t('transportOrders.form.driver'), driverField)}
-              </>
-            )}
-            {infoRow(t('transportOrders.columns.bill'), billNumberField)}
-            {infoRow(t('transportOrders.columns.container'), containerNumberField)}
-            {infoRow(
-              t('transportOrders.form.containerSize'),
-              order.containerSize ? `${order.containerSize}ft` : '',
-            )}
-            {infoRow(
-              t('transportOrders.form.shipmentType'),
-              order.shipmentType ? t(`transportOrders.shipmentType.${order.shipmentType}`) : '',
-            )}
-            {/* Customer stays read-only — it's the billing party, and changing it
-              belongs with the fee review on the form (SO does the same). */}
-            {(order.customerCode || order.customerName) &&
-              infoRow(
-                t('transportOrders.form.customer'),
-                <CustomerLink code={order.customerCode} fallbackLabel={order.customerName} />,
+                  {infoRow(t('transportOrders.columns.truck'), truckField)}
+                  {infoRow(t('transportOrders.form.driver'), driverField)}
+                </>
               )}
-            {infoRow(t('transportOrders.billing.contractNo'), contractNoField)}
-          </Stack>
-          {/* Same rule as above: a multi-trip job's `route` is derived from the legs
+              {infoRow(t('transportOrders.columns.bill'), billNumberField)}
+              {infoRow(t('transportOrders.columns.container'), containerNumberField)}
+              {infoRow(
+                t('transportOrders.form.containerSize'),
+                containerSizeLabel(order.containerSize),
+              )}
+              {infoRow(
+                t('transportOrders.form.shipmentType'),
+                order.shipmentType ? t(`transportOrders.shipmentType.${order.shipmentType}`) : '',
+              )}
+              {/* Customer stays read-only — it's the billing party, and changing it
+              belongs with the fee review on the form (SO does the same). */}
+              {(order.customerCode || order.customerName) &&
+                infoRow(
+                  t('transportOrders.form.customer'),
+                  <CustomerLink code={order.customerCode} fallbackLabel={order.customerName} />,
+                )}
+              {infoRow(t('transportOrders.billing.contractNo'), contractNoField)}
+            </Stack>
+            {/* Same rule as above: a multi-trip job's `route` is derived from the legs
             (first departure → last destination), so it isn't editable here — and
             the leg list states it better than a collapsed 3-field triple. */}
-          {!order.isMultiTrip && (
-            <>
-              <Divider my="sm" />
-              <Text fw={600} mb="sm">
-                {t('transportOrders.route.title')}
-              </Text>
-              <Stack gap={6}>
-                {infoRow(t('transportOrders.route.pickup'), routeField('pickup'))}
-                {infoRow(t('transportOrders.route.stuffing'), routeField('stuffing'))}
-                {infoRow(t('transportOrders.route.dropoff'), routeField('dropoff'))}
-              </Stack>
-            </>
-          )}
-          <Divider my="sm" />
-          <Text c="dimmed" size="sm" mb={4}>
-            {t('__new__.01-common.labels.note')}
-          </Text>
-          <InlineTextareaField
-            canEdit={canEditMeta}
-            value={order.notes ?? ''}
-            onSave={async (next) => handleMetaPatch({ notes: next.trim() })}
-            labels={inlineEditLabels}
-            minRows={2}
-          />
-          <Divider my="sm" />
-          {/* Provenance — `extra.createdBy` was written since day one and never shown. */}
-          <Stack gap={6}>
-            {order.extra?.createdBy &&
-              infoRow(
-                t('transportOrders.detail.createdBy'),
-                <EmployeeLink id={order.extra.createdBy} />,
-              )}
-            {infoRow(t('common.labels.createdAt'), formatDateTime(order.createdAt))}
-            {infoRow(t('common.labels.updatedAt'), formatDateTime(order.updatedAt))}
-          </Stack>
-        </Card>
+            {!order.isMultiTrip && (
+              <>
+                <Divider my="sm" />
+                <Text fw={600} mb="sm">
+                  {t('transportOrders.route.title')}
+                </Text>
+                <Stack gap={6}>
+                  {infoRow(t('transportOrders.route.pickup'), routeField('pickup'))}
+                  {infoRow(t('transportOrders.route.stuffing'), routeField('stuffing'))}
+                  {infoRow(t('transportOrders.route.dropoff'), routeField('dropoff'))}
+                </Stack>
+              </>
+            )}
+            <Divider my="sm" />
+            <Text c="dimmed" size="sm" mb={4}>
+              {t('__new__.01-common.labels.note')}
+            </Text>
+            <InlineTextareaField
+              canEdit={canEditMeta}
+              value={order.notes ?? ''}
+              onSave={async (next) => handleMetaPatch({ notes: next.trim() })}
+              labels={inlineEditLabels}
+              minRows={2}
+            />
+            <Divider my="sm" />
+            {/* Provenance — `extra.createdBy` was written since day one and never shown. */}
+            <Stack gap={6}>
+              {order.extra?.createdBy &&
+                infoRow(
+                  t('transportOrders.detail.createdBy'),
+                  <EmployeeLink id={order.extra.createdBy} />,
+                )}
+              {infoRow(t('common.labels.createdAt'), formatDateTime(order.createdAt))}
+              {infoRow(t('common.labels.updatedAt'), formatDateTime(order.updatedAt))}
+            </Stack>
+          </Box>
+        </SectionCard>
 
         <Stack gap="lg">
           {/* One fee card since the 2026-07-16 merge — the old PHÍ CHI HỘ card is
               gone, its rows are `prepaid` + non-vatable lines in here. Read through
               `readFeeLines` so a pre-merge order shows them without a migration. */}
-          <Card withBorder padding="md" radius="md">
-            <Text fw={600} mb="sm">
-              {t('transportOrders.fees.title')}
-            </Text>
+          <SectionCard icon={<IconReceipt size={14} />} title={t('transportOrders.fees.title')}>
             <Table>
               <Table.Tbody>
                 {feeLines.map((f, i) => {
@@ -685,6 +732,12 @@ export function TransportOrderDetailPage() {
                           <Text size="sm" c={billed ? undefined : 'dimmed'}>
                             {f.label}
                           </Text>
+                          {/* Operator note on the line — free text, only when set. */}
+                          {f.memo && (
+                            <Text size="xs" c="dimmed" fs="italic">
+                              {f.memo}
+                            </Text>
+                          )}
                           {/* Kind first: it's what tells the reader whether this is
                               our charge or a third party's cost — the same split the
                               two subtotals below are drawn on. */}
@@ -777,7 +830,7 @@ export function TransportOrderDetailPage() {
                 )}
               </Stack>
             )}
-          </Card>
+          </SectionCard>
         </Stack>
       </SimpleGrid>
     </Stack>

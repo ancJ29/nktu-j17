@@ -3,8 +3,8 @@
 import { byClient } from '@/config/client';
 import type { CompanyInfo } from '@/config/companyInfo';
 import type { Orientation, PaperSize } from '@/utils/printDocument';
-import { printDefaultQuotation } from './quotationPrintDefault';
-import { printNktuQuotation } from './quotationPrintNktu';
+import { buildDefaultQuotationStaticHtml, printDefaultQuotation } from './quotationPrintDefault';
+import { buildNktuQuotationStaticHtml, printNktuQuotation } from './quotationPrintNktu';
 
 export type QuotationPaperSize = PaperSize;
 export type QuotationOrientation = Orientation;
@@ -64,9 +64,21 @@ export type QuotationPrintData = {
 
 const printQuotationForClient = byClient({ nktu: printNktuQuotation }, printDefaultQuotation);
 
+const buildQuotationStaticHtmlForClient = byClient(
+  { nktu: buildNktuQuotationStaticHtml },
+  buildDefaultQuotationStaticHtml,
+);
+
 export function printQuotation(
   data: QuotationPrintData,
   options: QuotationPrintOptions = DEFAULT_QUOTATION_PRINT_OPTIONS,
 ): boolean {
   return printQuotationForClient(data, options);
+}
+
+export function buildQuotationStaticHtml(
+  data: QuotationPrintData,
+  options: QuotationPrintOptions = DEFAULT_QUOTATION_PRINT_OPTIONS,
+): string {
+  return buildQuotationStaticHtmlForClient(data, options);
 }

@@ -139,7 +139,11 @@ const lookupV2Gate = gate('lookupV2');
 
 const employeeDetailNav = {
   detailNav: (t: (key: string) => string) => [
-    { icon: IconName.Users, label: t('employees.title'), path: ROUTES.EMPLOYEES.LIST },
+    {
+      icon: IconName.Users,
+      label: t('__new__.07-entities.employees.title'),
+      path: ROUTES.EMPLOYEES.LIST,
+    },
   ],
 };
 

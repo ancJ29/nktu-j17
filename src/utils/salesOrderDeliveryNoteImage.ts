@@ -1,13 +1,12 @@
 
 
+import { downloadBlob, PX_PER_MM } from './pdfExport';
 import {
   buildDeliveryNoteParts,
   DEFAULT_PRINT_OPTIONS,
   type DeliveryNoteData,
   type DeliveryNotePrintOptions,
 } from './salesOrderDeliveryNote';
-
-const PX_PER_MM = 96 / 25.4;
 
 const PAD_PX = 16;
 
@@ -67,20 +66,6 @@ export async function renderDeliveryNoteImageBlob(
       'image/png',
     );
   });
-}
-
-function downloadBlob(blob: Blob, fileName: string): void {
-  const url = URL.createObjectURL(blob);
-  try {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  } finally {
-    URL.revokeObjectURL(url);
-  }
 }
 
 export type CopyImageResult = 'copied' | 'downloaded';

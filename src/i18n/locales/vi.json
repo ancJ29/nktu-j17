@@ -34,13 +34,17 @@
         "noDescription": "Không có mô tả {{item}}",
         "noNote": "Chưa có ghi chú"
       },
+      "filters": {
+        "all": "Tất cả"
+      },
       "hints": {
         "openInMaps": "Xem trên Google Maps"
       },
       "labels": {
         "active": "Đang hoạt động",
         "note": "Ghi chú",
-        "orderDate": "Ngày đặt hàng"
+        "orderDate": "Ngày đặt hàng",
+        "status": "Trạng thái"
       }
     },
     "07-entities": {
@@ -101,11 +105,14 @@
           "passwordPolicy": "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@$!%*?&)",
           "passwordRequired": "Vui lòng nhập mật khẩu"
         },
+        "filter": {
+          "inactive": "Ngừng hoạt động"
+        },
         "list": {
           "searchPlaceholder": "Tìm theo tên, mã..."
         },
         "singular": "__keep__",
-        "title": "__keep__"
+        "title": "Nhân viên"
       },
       "goodsReceipts": {
         "actions": {
@@ -401,7 +408,7 @@
         "namePlaceholder": "vd. Volvo FH16 — Đội 12",
         "noDrivers": "Không có tài xế",
         "operationSection": "Thông tin vận hành",
-        "plateLabel": "Số xe",
+        "plateLabel": "Biển số xe",
         "platePlaceholder": "vd. 51C-123.45",
         "regionLabel": "Khu vực",
         "regionPlaceholder": "Khu vực hoạt động",
@@ -580,6 +587,7 @@
       "results": "Kết quả nhập",
       "rowLabel": "Dòng {{n}}",
       "sampleTemplate": "Mẫu Excel",
+      "skipped": "Đã bỏ qua",
       "success": "Thành công",
       "supportedFormats": "Định dạng hỗ trợ: .csv, .xlsx, .xls",
       "total": "Tổng",
@@ -653,7 +661,6 @@
     },
     "filters": {
       "active": "Hoạt động",
-      "all": "Tất cả",
       "apply": "Áp dụng",
       "inactive": "Ngừng",
       "more": "Thêm",
@@ -707,7 +714,6 @@
       "set": "Bộ",
       "shortName": "Tên viết tắt",
       "sku": "SKU",
-      "status": "Trạng thái",
       "taxCode": "Mã số thuế",
       "type": "Nhóm",
       "unit": "ĐVT",
@@ -1430,7 +1436,6 @@
     },
     "filterButton": "Lọc",
     "filterDepartmentAll": "Tất cả các Bộ phận",
-    "filterInactive": "Ngừng hoạt động",
     "filterPositionAll": "Tất cả Chức vụ",
     "form": {
       "codePlaceholder": "Mã nhân viên",
@@ -1492,7 +1497,6 @@
       "title": "Cơ cấu tổ chức",
       "valueLockedHint": "Không thể thay đổi giá trị sau khi tạo — nó liên kết nhân viên và các thiết lập khác."
     },
-    "title": "Nhân viên",
     "validation": {
       "codeRequired": "Vui lòng nhập mã nhân viên",
       "emailInvalid": "Vui lòng nhập email hợp lệ",
@@ -1968,6 +1972,7 @@
   "lookups": {
     "addItem": "Thêm",
     "categories": {
+      "containerSize": "Loại cont",
       "maintenanceType": "Loại bảo trì",
       "materialCategory": "Danh mục vật tư",
       "materialUnit": "Đơn vị vật tư",
@@ -2709,6 +2714,9 @@
       "missingColumnTitle": "Định dạng tệp không hợp lệ",
       "noValidRows": "Không tìm thấy sản phẩm hợp lệ trong tệp",
       "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin sản phẩm",
+      "skippedDuplicateCode": "Mã sản phẩm đã tồn tại — đã bỏ qua",
+      "skippedDuplicateSku": "Mã SKU đã tồn tại — đã bỏ qua",
+      "skippedTitle": "Các dòng bị bỏ qua do trùng lặp",
       "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
       "unknownLabelTitle": "Danh mục, thẻ hoặc đơn vị không hợp lệ",
       "unknownTagMessage": "Thẻ không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
@@ -2980,7 +2988,8 @@
       "exportPdf": "Xuất PDF",
       "generateSalesOrder": "Tạo đơn hàng",
       "markReady": "Đánh dấu sẵn sàng",
-      "new": "Báo giá mới"
+      "new": "Báo giá mới",
+      "sharePdf": "Chia sẻ PDF"
     },
     "cancelConfirm": {
       "message": "Hủy báo giá này? Báo giá sẽ bị khóa, không thể chỉnh sửa hay đánh dấu sẵn sàng.",
@@ -3061,6 +3070,11 @@
     "sendConfirm": {
       "message": "Sau khi đánh dấu sẵn sàng, báo giá sẽ bị khóa và không thể chỉnh sửa. Tiếp tục?",
       "title": "Đánh dấu báo giá này sẵn sàng?"
+    },
+    "share": {
+      "downloadedFallback": "Trình duyệt này không hỗ trợ chia sẻ — đã tải PDF về máy.",
+      "error": "Không thể tạo PDF. Vui lòng thử lại.",
+      "generating": "Đang tạo PDF…"
     },
     "status": {
       "cancelled": "Đã hủy",
@@ -3326,6 +3340,9 @@
       "quantity": "Số lượng",
       "recentActivities": "Hoạt động gần đây",
       "returnShipmentInfoTitle": "Phiếu Trả Hàng",
+      "shareDeliveryNotePdf": "Chia sẻ PDF",
+      "sharePdfDownloaded": "Trình duyệt này không hỗ trợ chia sẻ — đã tải PDF về máy.",
+      "sharePdfFailed": "Không thể tạo PDF. Vui lòng thử lại.",
       "tabActivity": "Lịch sử đơn hàng",
       "tabActivityLog": "Hoạt động",
       "tabAttachments": "Tệp",
@@ -3525,6 +3542,7 @@
       "nonBillableTotal": "Khách tự thanh toán",
       "passthroughSubtotal": "Cộng chi hộ",
       "serviceSubtotal": "Cộng phí dịch vụ",
+      "title": "Thanh toán",
       "vatAmount": "VAT ({{rate}}%)",
       "vatRate": "Thuế suất VAT"
     },
@@ -3537,11 +3555,12 @@
     },
     "columns": {
       "bill": "Số B/L · B/K",
+      "billContainer": "Số B/L · Cont",
       "container": "Số cont",
       "date": "Ngày",
       "orderNumber": "Số đơn",
       "route": "Tuyến",
-      "truck": "Số xe"
+      "truck": "Xe"
     },
     "confirmDelete": {
       "message": "Đơn vận chuyển sẽ bị xóa khỏi danh sách. Không thể hoàn tác.",
@@ -3608,6 +3627,7 @@
       "kindPassthrough": "Chi hộ",
       "kindService": "Phí dịch vụ",
       "label": "Tên phí",
+      "memo": "Ghi chú",
       "notBilled": "không thu",
       "payer": "Người thanh toán",
       "payerCompany": "Công ty",
@@ -3624,6 +3644,7 @@
       "customer": "Khách hàng",
       "driver": "Tài xế",
       "jobSection": "Thông tin chuyến",
+      "metaSection": "Thông tin khác",
       "multiTrip": "Nhiều chặng",
       "multiTripHint": "Đơn chạy nhiều chặng — mỗi chặng có điểm đi/đến, ngày, xe, tài xế và lương riêng.",
       "noTrucks": "Chưa có xe. Thêm thông tin xe tại Tài sản → Xe tải.",
@@ -3646,10 +3667,13 @@
       "updated": "Đã cập nhật đơn vận chuyển"
     },
     "route": {
+      "collapse": "Thu gọn",
       "dropoff": "Nơi hạ",
+      "expand": "Xem các chặng",
       "pickup": "Nơi lấy",
       "stuffing": "Nơi đóng/rút hàng",
-      "title": "Tuyến dịch vụ"
+      "title": "Tuyến dịch vụ",
+      "tripTotal": "(tổng {{count}} chặng)"
     },
     "search": "Tìm số đơn / số xe / tài xế / B/L / cont…",
     "shipmentType": {
@@ -3676,6 +3700,7 @@
       "title": "Danh sách chặng"
     },
     "validation": {
+      "containerNumberPattern": "Số cont phải đúng định dạng, ví dụ RFCU9876543 (3 chữ cái, U/J/Z, rồi 7 chữ số)",
       "customerRequired": "Vui lòng chọn khách hàng",
       "driverRequired": "Vui lòng chọn tài xế",
       "entryDateRequired": "Vui lòng chọn ngày",

@@ -1,6 +1,6 @@
 import { useMemo, type Ref } from 'react';
 import { useNavigate } from 'react-router';
-import { Badge, Box, Group, Stack, Text } from '@mantine/core';
+import { Badge, Box, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { TransportOrder } from '@/types';
@@ -8,6 +8,7 @@ import { DataTable } from '@credo/base-ui/components';
 import { formatDate } from '@/utils/dateFormat';
 import { SortHeader } from '@/components/SortHeader';
 import { findStatus } from './transportOrderStatuses';
+import { TransportRouteCell } from './TransportRouteCell';
 
 type Props = {
   readonly orders: TransportOrder[];
@@ -34,7 +35,11 @@ export function TransportOrderDataTable({
         key: 'orderNumber',
         header: t('transportOrders.columns.orderNumber'),
         width: '150px',
-        render: (item: TransportOrder) => <Text fz="md">{item.orderNumber}</Text>,
+        render: (item: TransportOrder) => (
+          <Text fz="md" fw={500}>
+            {item.orderNumber}
+          </Text>
+        ),
       },
       {
         key: 'entryDate',
@@ -50,28 +55,20 @@ export function TransportOrderDataTable({
         render: (item: TransportOrder) => <Text fz="sm">{formatDate(item.entryDate)}</Text>,
       },
       {
-        key: 'truck',
-        header: t('transportOrders.columns.truck'),
+        key: 'billContainer',
+        header: t('transportOrders.columns.billContainer'),
         width: '160px',
-        
         
         
         
         render: (item: TransportOrder) => (
           <Stack gap={2}>
-            <Group gap={6} wrap="nowrap">
-              <Text fz="sm" fw={500} lineClamp={1}>
-                {item.truckPlate || '—'}
-              </Text>
-              {item.isMultiTrip && (
-                <Badge size="xs" variant="light" color="gray">
-                  {t('transportOrders.trips.badge', { n: (item.trips ?? []).length })}
-                </Badge>
-              )}
-            </Group>
-            {item.driverName && (
+            <Text fz="sm" lineClamp={1}>
+              {item.billNumber || '—'}
+            </Text>
+            {item.containerNumber && (
               <Text size="xs" c="dimmed" lineClamp={1}>
-                {item.driverName}
+                {item.containerNumber}
               </Text>
             )}
           </Stack>
@@ -82,7 +79,7 @@ export function TransportOrderDataTable({
         header: t('common.labels.customer'),
         width: '200px',
         render: (item: TransportOrder) => (
-          <Text fz="sm" lineClamp={2}>
+          <Text fz="md" lineClamp={2}>
             {item.customerName || '—'}
           </Text>
         ),
@@ -91,15 +88,12 @@ export function TransportOrderDataTable({
         key: 'route',
         header: t('transportOrders.columns.route'),
         
-        render: (item: TransportOrder) => (
-          <Text fz="sm" lineClamp={2}>
-            {[item.route?.pickup, item.route?.dropoff].filter(Boolean).join(' → ') || '—'}
-          </Text>
-        ),
+        
+        render: (item: TransportOrder) => <TransportRouteCell order={item} />,
       },
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         ta: 'center' as const,
         width: '150px',
         render: (item: TransportOrder) => {

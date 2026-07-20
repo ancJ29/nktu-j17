@@ -132,7 +132,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             value: statusFilter || null,
             onChange: (v: string | null) => setStatusFilter(v ?? ''),
             data: statusData,
-            placeholder: t('common.labels.status'),
+            placeholder: t('__new__.01-common.labels.status'),
             w: 160,
           } satisfies SelectFilter,
         ]
@@ -152,9 +152,9 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     ...(postEnabled
       ? [
           {
-            title: t('common.labels.status'),
+            title: t('__new__.01-common.labels.status'),
             value: statusFilter || 'all',
-            options: [{ value: 'all', label: t('common.filters.all') }, ...statusData],
+            options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusData],
             onChange: (v: string) => setStatusFilter(v === 'all' ? '' : v),
           } satisfies MobileFilterDef,
         ]
@@ -162,7 +162,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     {
       title: t('common.labels.assignedTo'),
       value: picFilter || 'all',
-      options: [{ value: 'all', label: t('common.filters.all') }, ...picData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...picData],
       onChange: (v: string) => setPicFilter(v === 'all' ? '' : v),
       visible: picData.length > 0,
     },
@@ -221,7 +221,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             status="all"
             onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('common.filters.all'), active: '', inactive: '' }}
+            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -242,7 +242,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             status="all"
             onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('common.filters.all'), active: '', inactive: '' }}
+            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={dateFilter} presetLabels={presetLabels} />
@@ -256,7 +256,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
           <Group gap="xs">
             {statusFilter && (
               <FilterPill onClose={() => setStatusFilter('')}>
-                {t('common.labels.status')}:{' '}
+                {t('__new__.01-common.labels.status')}:{' '}
                 {statusData.find((s) => s.value === statusFilter)?.label ?? statusFilter}
               </FilterPill>
             )}

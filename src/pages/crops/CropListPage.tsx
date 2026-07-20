@@ -239,7 +239,7 @@ export function CropListPage() {
             status="all"
             onStatusChange={() => {}}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.status.active'),
               inactive: t('common.status.inactive'),
             }}
@@ -248,9 +248,12 @@ export function CropListPage() {
               showStatusFilter
                 ? [
                     {
-                      title: t('common.labels.status'),
+                      title: t('__new__.01-common.labels.status'),
                       value: filter,
-                      options: [{ value: 'all', label: t('common.filters.all') }, ...statusOptions],
+                      options: [
+                        { value: 'all', label: t('__new__.01-common.filters.all') },
+                        ...statusOptions,
+                      ],
                       onChange: (v) => setFilter(v as CropFilterStatus),
                     },
                   ]
@@ -266,7 +269,7 @@ export function CropListPage() {
             status="all"
             onStatusChange={() => {}}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.status.active'),
               inactive: t('common.status.inactive'),
             }}

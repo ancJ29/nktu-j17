@@ -444,8 +444,18 @@ export type DisplaySettings = z.infer<typeof DisplaySettingsSchema>;
 
 const FeaturesSchema = z
   .object({
-    darkMode: z.boolean().default(false),
-    languageSwitcher: z.boolean().default(true),
+    common: z.object({
+      darkMode: z.boolean().default(false),
+      languageSwitcher: z.boolean().default(true),
+      
+      
+      
+      enablePdfSharing: z.boolean().default(false),
+      
+      
+      
+      enableStats: z.boolean().default(false),
+    }),
     employees: EmployeesFeaturesSchema,
     permissionManagement: PermissionManagementFeaturesSchema,
     activityLog: ActivityLogFeaturesSchema,
@@ -471,8 +481,12 @@ const FeaturesSchema = z
     farm: ModuleFeaturesSchema,
   })
   .default({
-    darkMode: false,
-    languageSwitcher: true,
+    common: {
+      darkMode: false,
+      languageSwitcher: true,
+      enablePdfSharing: false,
+      enableStats: false,
+    },
     employees: EmployeesFeaturesSchema.parse({}),
     permissionManagement: PermissionManagementFeaturesSchema.parse({}),
     activityLog: ActivityLogFeaturesSchema.parse({}),
@@ -545,6 +559,7 @@ export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
 
 export const defaultAppConfig = CMngtAppConfigSchema.parse({
   version: '1.0.0',
+  schemaVersion: 2,
   app: {
     name: getEnvVar('VITE_APP_NAME'),
     description: getEnvVar('VITE_APP_DESCRIPTION'),

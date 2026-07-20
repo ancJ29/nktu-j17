@@ -102,7 +102,7 @@ export function CropDiaryTemplateListPage() {
             status="all"
             onStatusChange={() => {}}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.status.active'),
               inactive: t('common.status.inactive'),
             }}
@@ -117,7 +117,7 @@ export function CropDiaryTemplateListPage() {
             status="all"
             onStatusChange={() => {}}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.status.active'),
               inactive: t('common.status.inactive'),
             }}

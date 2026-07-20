@@ -272,9 +272,19 @@ export function buildDeliveryNoteParts(
   return { css, docHtml, contentWidthMm };
 }
 
-export function buildDeliveryNoteHtml(
+const PRINT_SCRIPT = `  <script>
+    window.addEventListener('load', function () {
+      window.focus();
+      window.print();
+    });
+    window.onafterprint = function () { window.close(); };
+  </script>
+`;
+
+function buildDoc(
   data: DeliveryNoteData,
-  options: DeliveryNotePrintOptions = DEFAULT_PRINT_OPTIONS,
+  options: DeliveryNotePrintOptions,
+  bodyTail: string,
 ): string {
   const { css, docHtml } = buildDeliveryNoteParts(data, options);
   return `<!doctype html>
@@ -286,15 +296,22 @@ export function buildDeliveryNoteHtml(
 </head>
 <body>
 ${docHtml}
-  <script>
-    window.addEventListener('load', function () {
-      window.focus();
-      window.print();
-    });
-    window.onafterprint = function () { window.close(); };
-  </script>
-</body>
+${bodyTail}</body>
 </html>`;
+}
+
+export function buildDeliveryNoteHtml(
+  data: DeliveryNoteData,
+  options: DeliveryNotePrintOptions = DEFAULT_PRINT_OPTIONS,
+): string {
+  return buildDoc(data, options, PRINT_SCRIPT);
+}
+
+export function buildDeliveryNoteStaticHtml(
+  data: DeliveryNoteData,
+  options: DeliveryNotePrintOptions = DEFAULT_PRINT_OPTIONS,
+): string {
+  return buildDoc(data, options, '');
 }
 
 export function printSalesOrderDeliveryNote(

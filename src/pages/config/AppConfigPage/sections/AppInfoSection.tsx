@@ -6,16 +6,24 @@ export const AppInfoSection = memo(function AppInfoSection({
   app,
   version,
   languageSwitcher,
+  enablePdfSharing,
+  enableStats,
   onChange,
   onVersionChange,
   onLanguageSwitcherChange,
+  onEnablePdfSharingChange,
+  onEnableStatsChange,
 }: {
   app: AppInfo;
   version: string;
   languageSwitcher: boolean;
+  enablePdfSharing: boolean;
+  enableStats: boolean;
   onChange: (app: AppInfo) => void;
   onVersionChange: (v: string) => void;
   onLanguageSwitcherChange: (v: boolean) => void;
+  onEnablePdfSharingChange: (v: boolean) => void;
+  onEnableStatsChange: (v: boolean) => void;
 }) {
   return (
     <Stack gap="sm">
@@ -105,6 +113,44 @@ export const AppInfoSection = memo(function AppInfoSection({
         <Switch
           checked={languageSwitcher}
           onChange={(e) => onLanguageSwitcherChange(e.currentTarget.checked)}
+        />
+      </Group>
+      <Group
+        justify="space-between"
+        p="xs"
+        style={{ borderRadius: 'var(--mantine-radius-sm)' }}
+        bg={enablePdfSharing ? undefined : 'var(--mantine-color-default-hover)'}
+      >
+        <Box>
+          <Text fz="sm" fw={500}>
+            Share PDF
+          </Text>
+          <Text fz="xs" c="dimmed">
+            Show the &quot;Share PDF&quot; button on quotations (native share sheet / download)
+          </Text>
+        </Box>
+        <Switch
+          checked={enablePdfSharing}
+          onChange={(e) => onEnablePdfSharingChange(e.currentTarget.checked)}
+        />
+      </Group>
+      <Group
+        justify="space-between"
+        p="xs"
+        style={{ borderRadius: 'var(--mantine-radius-sm)' }}
+        bg={enableStats ? undefined : 'var(--mantine-color-default-hover)'}
+      >
+        <Box>
+          <Text fz="sm" fw={500}>
+            List Stats
+          </Text>
+          <Text fz="xs" c="dimmed">
+            Show the stats panel (per-status count cards) above the filter bar on list pages
+          </Text>
+        </Box>
+        <Switch
+          checked={enableStats}
+          onChange={(e) => onEnableStatsChange(e.currentTarget.checked)}
         />
       </Group>
     </Stack>

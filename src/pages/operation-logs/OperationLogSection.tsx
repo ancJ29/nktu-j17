@@ -406,7 +406,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               </Button>
               <Button type="submit" size="sm" loading={saving}>
                 {editing
-                  ? tr('operationLogs.form.updateButton')
+                  ? tr('__new__.01-common.actions.save')
                   : tr('operationLogs.form.createButton')}
               </Button>
             </Group>

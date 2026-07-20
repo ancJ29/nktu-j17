@@ -7,6 +7,7 @@ const name = 'C-Mngt';
 const baseUrl = 'https://c6769e-r2.cr3do.dev/c-mngt/profile/acme';
 export const minimalAppConfig = CMngtAppConfigSchema.parse({
   version: '1.0.0',
+  schemaVersion: 2,
   app: {
     name,
     logoUrl: `${baseUrl}/acme.svg`,
@@ -44,7 +45,7 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
       {
         id: 'employees',
         path: '/employees',
-        labelKey: 'employees.title',
+        labelKey: '__new__.07-entities.employees.title',
         label: 'Employees',
         icon: 'IconUsers',
       },
@@ -61,7 +62,7 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
       {
         id: 'employees',
         path: '/employees',
-        labelKey: 'employees.title',
+        labelKey: '__new__.07-entities.employees.title',
         label: 'Employees',
         icon: 'IconUsers',
       },
@@ -74,7 +75,10 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
   
   
   features: {
-    languageSwitcher: false,
+    common: {
+      darkMode: false,
+      languageSwitcher: false,
+    },
     employees: {
       enabled: true,
       allowLogin: true,

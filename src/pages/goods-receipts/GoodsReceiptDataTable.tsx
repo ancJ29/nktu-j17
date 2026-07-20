@@ -120,7 +120,7 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
       },
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         ta: 'center' as const,
         width: '160px',
         render: (item: GoodsReceipt) => {

@@ -57,6 +57,26 @@ ${bodyHtml}
 </html>`;
 }
 
+export function buildStaticHtml(opts: {
+  title: string;
+  css: string;
+  bodyHtml: string;
+  lang?: string;
+}): string {
+  const { title, css, bodyHtml, lang = 'vi' } = opts;
+  return `<!doctype html>
+<html lang="${lang}">
+<head>
+<meta charset="utf-8" />
+<title>${escapeHtml(title)}</title>
+<style>${css}</style>
+</head>
+<body>
+${bodyHtml}
+</body>
+</html>`;
+}
+
 export function openPrintWindow(html: string): boolean {
   const win = window.open('', '_blank', 'width=900,height=1000');
   if (!win) return false;

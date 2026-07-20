@@ -9,7 +9,8 @@ export type LookupV2CategoryId =
   | 'material-category'
   | 'product-category'
   | 'truck-type'
-  | 'truck-maintenance-type';
+  | 'truck-maintenance-type'
+  | 'container-size';
 
 export type LookupV2Category = {
   id: LookupV2CategoryId;
@@ -39,9 +40,15 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
     labelKey: 'lookups.categories.maintenanceType',
     defaultSortOrder: 1,
   },
+  
+  
+  
+  { id: 'container-size', labelKey: 'lookups.categories.containerSize', defaultSortOrder: 1 },
 ];
 
 const FLEET_ONLY_CATEGORIES: LookupV2CategoryId[] = ['truck-type', 'truck-maintenance-type'];
+
+const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = ['container-size'];
 
 export function getEnabledLookupV2Categories(): LookupV2Category[] {
   const cfg = appConfig.features?.lookupV2;
@@ -49,9 +56,15 @@ export function getEnabledLookupV2Categories(): LookupV2Category[] {
   
   
   const trucksOn = appConfig.features?.trucks?.enabled ?? false;
-  const available = trucksOn
-    ? LOOKUP_V2_CATEGORIES
-    : LOOKUP_V2_CATEGORIES.filter((c) => !FLEET_ONLY_CATEGORIES.includes(c.id));
+  const transportOrdersOn = appConfig.features?.transportOrders?.enabled ?? false;
+  const available = LOOKUP_V2_CATEGORIES.filter((c) => {
+    
+    
+    
+    if (!trucksOn && FLEET_ONLY_CATEGORIES.includes(c.id)) return false;
+    if (!transportOrdersOn && TRANSPORT_ORDER_ONLY_CATEGORIES.includes(c.id)) return false;
+    return true;
+  });
   if (!cfg?.enabledCategories?.length) return available;
   return available.filter((c) => cfg.enabledCategories.includes(c.id));
 }

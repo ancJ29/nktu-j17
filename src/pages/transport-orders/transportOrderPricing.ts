@@ -15,12 +15,20 @@ type StoredFee = {
   
   payer?: TransportOrderFeePayer | 'prepaid';
   invoiceNo?: string;
+  memo?: string;
 };
 
 function normalizeFeeLine(fee: StoredFee): TransportOrderFee {
   const kind: TransportOrderFeeKind =
     fee.kind ?? (fee.payer === 'customer' ? 'passthrough' : 'service');
-  const base = { label: fee.label, amount: fee.amount, invoiceNo: fee.invoiceNo ?? '' };
+  const base = {
+    label: fee.label,
+    amount: fee.amount,
+    invoiceNo: fee.invoiceNo ?? '',
+    
+    
+    ...(fee.memo ? { memo: fee.memo } : {}),
+  };
   if (kind === 'passthrough') {
     return {
       ...base,

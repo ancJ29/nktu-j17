@@ -198,9 +198,9 @@ export type ImportBatchProductsRequest<TExtra = Record<string, unknown>> = BaseI
 >;
 
 export type ImportBatchProductsResponse<TExtra = Record<string, unknown>> = BaseMutationResponse & {
-  summary: { total: number; created: number; updated: number; errors: number };
+  summary: { total: number; created: number; skipped: number; errors: number };
   created: Product<TExtra>[];
-  updated: Product<TExtra>[];
+  skipped: Array<{ index: number; code: string; reason: 'duplicate-code' | 'duplicate-sku' }>;
   errors: Array<{ index: number; message: string }>;
 };
 

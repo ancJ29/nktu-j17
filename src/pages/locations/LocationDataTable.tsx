@@ -76,7 +76,7 @@ export function LocationDataTable({ locations, isLoading }: LocationDataTablePro
       },
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         render: (item: Location) => (
           <ActiveBadge
             isActive={item.isActive}

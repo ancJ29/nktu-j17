@@ -336,9 +336,9 @@ export function ProductListPage() {
               searchPlaceholder={t('__new__.07-entities.products.list.searchPlaceholder')}
               status={filter}
               onStatusChange={setFilter}
-              statusTitle={t('common.labels.status')}
+              statusTitle={t('__new__.01-common.labels.status')}
               statusLabels={{
-                all: t('common.filters.all'),
+                all: t('__new__.01-common.filters.all'),
                 active: t('products.filterActive'),
                 inactive: t('products.filterInactive'),
               }}
@@ -353,7 +353,7 @@ export function ProductListPage() {
               status={filter}
               onStatusChange={setFilter}
               statusLabels={{
-                all: t('common.filters.all'),
+                all: t('__new__.01-common.filters.all'),
                 active: t('products.filterActive'),
                 inactive: t('products.filterInactive'),
               }}

@@ -50,6 +50,10 @@ export const DEFAULT_USER_SETTINGS: UserSettingsConfig = { syncDebounceDelay: 50
 
 export const DEFAULT_LANGUAGE_SWITCHER = true;
 
+export const DEFAULT_ENABLE_PDF_SHARING = false;
+
+export const DEFAULT_ENABLE_STATS = false;
+
 export const DEFAULT_EMPLOYEE_FEATURES: CMngtEmployeeFeatures = {
   enabled: true,
   email: false,

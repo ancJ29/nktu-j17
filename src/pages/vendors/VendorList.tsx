@@ -133,9 +133,9 @@ export function VendorList({ variant }: VendorListProps) {
             searchPlaceholder={t('__new__.07-entities.vendors.list.searchPlaceholder')}
             status={filter}
             onStatusChange={setFilter}
-            statusTitle={t('common.labels.status')}
+            statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.filters.active'),
               inactive: t('common.filters.inactive'),
             }}
@@ -146,7 +146,7 @@ export function VendorList({ variant }: VendorListProps) {
                       title: t('vendors.form.originLabel'),
                       value: originFilter,
                       options: [
-                        { value: 'all', label: t('common.filters.all') },
+                        { value: 'all', label: t('__new__.01-common.filters.all') },
                         { value: 'domestic', label: t(variant.origin.domestic) },
                         { value: 'overseas', label: t(variant.origin.overseas) },
                       ],
@@ -165,7 +165,7 @@ export function VendorList({ variant }: VendorListProps) {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.filters.active'),
               inactive: t('common.filters.inactive'),
             }}

@@ -224,7 +224,7 @@ export function CropDetailPage() {
 
   const lifecycleCard = (
     <SectionCard icon={<IconRoute size={14} />} title={t('crops.detail.lifecycleTitle')}>
-      <DetailField label={t('common.labels.status')}>
+      <DetailField label={t('__new__.01-common.labels.status')}>
         <CropStatusBadge status={crop.status} />
       </DetailField>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">

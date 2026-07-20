@@ -345,7 +345,7 @@ export function CustomerFormPage() {
   const statusCard = (
     <SectionCard
       icon={<IconAdjustments size={14} />}
-      title={t('common.labels.status')}
+      title={t('__new__.01-common.labels.status')}
       padding="md"
     >
       <Switch

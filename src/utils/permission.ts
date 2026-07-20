@@ -83,6 +83,14 @@ export function isPriceManagementEnabled() {
   return featureFlags?.products?.priceManagement ?? false;
 }
 
+export function isPdfSharingEnabled() {
+  return featureFlags?.common?.enablePdfSharing ?? false;
+}
+
+export function isStatsEnabled() {
+  return featureFlags?.common?.enableStats ?? false;
+}
+
 export function isProductInventoryEnabled() {
   return featureFlags?.productInventory?.enabled ?? false;
 }
@@ -382,7 +390,9 @@ export type ResolvedTagOption = {
 
 export function resolveStatusOptions(
   options:
-    SalesOrderStatusOption[] | DeliveryRequestStatusOption[] | TransportOrderStatusOptionConfig[],
+    | SalesOrderStatusOption[]
+    | DeliveryRequestStatusOption[]
+    | TransportOrderStatusOptionConfig[],
 ): ResolvedStatusOption[] {
   const lang = i18n.resolvedLanguage ?? i18n.language ?? appConfig.defaultLanguage;
   const defaultLang = appConfig.defaultLanguage;

@@ -116,7 +116,7 @@ export function DeliveryRequestDataTable({
       },
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         width: '250px',
         render: (item: DeliveryRequest) => {
           const status = resolveStatus((item.extra as { status?: string })?.status);

@@ -514,7 +514,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('common.filters.all');
+    if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);
@@ -567,9 +567,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     {
-      title: t('common.labels.status'),
+      title: t('__new__.01-common.labels.status'),
       value: filters.statusFilter,
-      options: [{ value: 'all', label: t('common.filters.all') }, ...statusFilterData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusFilterData],
       onChange: filters.setStatusFilter,
       visible: statusFilterData.length > 0,
       multi: true,
@@ -779,7 +779,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             onStatusChange={() => {}}
             hideStatus
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('salesOrders.filterActive'),
               inactive: t('salesOrders.filterClosed'),
             }}
@@ -804,7 +804,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             onStatusChange={() => {}}
             hideStatus
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('salesOrders.filterActive'),
               inactive: t('salesOrders.filterClosed'),
             }}

@@ -54,6 +54,7 @@ export type UserSettingsConfig = {
 
 export type AppConfig = {
   version: string;
+  schemaVersion?: number;
   app: AppInfo;
   auth: AuthFeatures;
   themeConfig: ThemeConfig;

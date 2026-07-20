@@ -2,7 +2,6 @@ import {
   ActionIcon,
   Alert,
   Button,
-  Card,
   Checkbox,
   Divider,
   Group,
@@ -19,13 +18,26 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconArrowLeft, IconCopy, IconPlus, IconTrash } from '@tabler/icons-react';
+import {
+  IconArrowLeft,
+  IconCashBanknote,
+  IconCopy,
+  IconMapPin,
+  IconNote,
+  IconPlus,
+  IconReceipt,
+  IconReceiptTax,
+  IconRoute,
+  IconTrash,
+  IconTruck,
+} from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { device, logger } from '@credo/base-ui/utils';
 import { DateField } from '@/components/DateField';
+import { SectionCard } from '@/components/SectionCard';
 import { EmployeeSelector, CustomerSelector } from '@/components/selectors';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
@@ -54,6 +66,8 @@ import {
   formatMoney,
   readFeeLines,
 } from './transportOrderPricing';
+import { useContainerSizeOptions } from './containerSize';
+import { truckNameWithPlate } from './truckDisplay';
 import {
   getInitialTransportOrderStatus,
   isTransportOrderLocked,
@@ -86,6 +100,7 @@ type FeeRow = {
   kind: TransportOrderFeeKind;
   payer: TransportOrderFeePayer;
   invoiceNo: string;
+  memo: string;
 };
 
 type TripRow = {
@@ -136,6 +151,7 @@ function blankFee(over: Partial<FeeRow> = {}): FeeRow {
     kind: 'service',
     payer: 'company',
     invoiceNo: '',
+    memo: '',
     ...over,
   };
 }
@@ -145,7 +161,11 @@ function initialFees(): FeeRow[] {
 }
 
 function toFeeRows(order: Pick<TransportOrder, 'fees' | 'disbursements'>): FeeRow[] {
-  return readFeeLines(order).map((f) => ({ ...f, payer: f.payer ?? 'company' }));
+  return readFeeLines(order).map((f) => ({
+    ...f,
+    payer: f.payer ?? 'company',
+    memo: f.memo ?? '',
+  }));
 }
 
 function blankTrip(): TripRow {
@@ -281,7 +301,9 @@ export function TransportOrderFormPage() {
         .filter((a) => a.isActive && !a.extra?.isDeleted)
         .map((a) => ({
           value: a.id,
-          label: `${a.name}${a.code ? ` (${a.code})` : ''}`,
+          
+          
+          label: `${truckNameWithPlate(a.name, a.extra?.plateNumber)}${a.code ? ` (${a.code})` : ''}`,
           plate: a.name,
         })),
     [trucks],
@@ -292,6 +314,10 @@ export function TransportOrderFormPage() {
     
     [i18n.language],
   );
+
+  
+  
+  const containerSizeOptions = useContainerSizeOptions();
 
   const form = useForm<FormValues>({
     
@@ -387,12 +413,15 @@ export function TransportOrderFormPage() {
       
       
       const fees: TransportOrderFee[] = values.fees
-        .filter((f) => f.label.trim() || f.amount || f.invoiceNo.trim())
+        .filter((f) => f.label.trim() || f.amount || f.invoiceNo.trim() || f.memo.trim())
         .map((f) => {
           const base = {
             label: f.label.trim(),
             amount: f.amount || 0,
             invoiceNo: f.invoiceNo.trim(),
+            
+            
+            ...(f.memo.trim() ? { memo: f.memo.trim() } : {}),
           };
           return f.kind === 'passthrough'
             ? { ...base, kind: f.kind, vatable: false, payer: f.payer }
@@ -582,23 +611,29 @@ export function TransportOrderFormPage() {
 
   const tripLaborTotal = computeTripLaborTotal(form.values.trips);
 
-  const feeKindSelectData = [
-    { value: 'service', label: t('transportOrders.fees.kindService') },
-    { value: 'passthrough', label: t('transportOrders.fees.kindPassthrough') },
-  ];
+  
+  
+  
+  const currentSize = form.values.containerSize;
+  const containerSizeData =
+    currentSize && !containerSizeOptions.some((o) => o.value === currentSize)
+      ? [...containerSizeOptions, { value: currentSize, label: `${currentSize}ft` }]
+      : containerSizeOptions;
+
   const payerSelectData = [
     { value: 'company', label: t('transportOrders.fees.payerCompany') },
     { value: 'customer', label: t('transportOrders.fees.payerCustomer') },
   ];
 
   
-  const applyFeeKind = (i: number, kind: TransportOrderFeeKind) => {
-    form.setFieldValue(`fees.${i}.kind`, kind);
-    if (kind === 'passthrough') {
-      form.setFieldValue(`fees.${i}.vatable`, false);
-      form.setFieldValue(`fees.${i}.payer`, 'company');
-    }
-  };
+  
+  
+  
+  
+  
+  const feeRowsIndexed = form.values.fees.map((row, i) => ({ row, i }));
+  const serviceFeeRows = feeRowsIndexed.filter(({ row }) => row.kind !== 'passthrough');
+  const passthroughFeeRows = feeRowsIndexed.filter(({ row }) => row.kind === 'passthrough');
 
   
   
@@ -648,18 +683,19 @@ export function TransportOrderFormPage() {
       >
         <Stack gap="lg">
           {/* Job header */}
-          <Card withBorder padding="md" radius="md">
-            <Group justify="space-between" mb="sm" wrap="nowrap">
-              <Text fw={600}>{t('transportOrders.form.jobSection')}</Text>
-              {/* The one switch that reshapes the form: date/truck/driver below and
-                  the Route card give way to the leg list, which then feeds them. */}
+          <SectionCard
+            icon={<IconTruck size={14} />}
+            title={t('transportOrders.form.jobSection')}
+            
+            actions={
               <Switch
                 label={t('transportOrders.form.multiTrip')}
                 description={t('transportOrders.form.multiTripHint')}
                 checked={form.values.isMultiTrip}
                 onChange={(e) => handleMultiTripToggle(e.currentTarget.checked)}
               />
-            </Group>
+            }
+          >
             <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
               {/* Derived from leg 1 on a multi-trip job — hidden rather than shown
                   authored-but-overwritten. */}
@@ -725,14 +761,13 @@ export function TransportOrderFormPage() {
               />
               <Select
                 label={t('transportOrders.form.containerSize')}
-                data={[
-                  { value: '20', label: '20ft' },
-                  { value: '40', label: '40ft' },
-                ]}
-                value={form.values.containerSize}
+                data={containerSizeData}
+                value={form.values.containerSize || null}
                 onChange={(v) =>
                   form.setFieldValue('containerSize', (v as TransportOrderContainerSize) ?? '20')
                 }
+                searchable
+                allowDeselect={false}
               />
               <Select
                 label={t('transportOrders.form.shipmentType')}
@@ -749,7 +784,7 @@ export function TransportOrderFormPage() {
                   first status ("New") on create, so the picker only shows on edit. */}
               {isEdit && (
                 <Select
-                  label={t('common.labels.status')}
+                  label={t('__new__.01-common.labels.status')}
                   data={statusSelectData}
                   value={form.values.status || null}
                   onChange={(v) => form.setFieldValue('status', v ?? '')}
@@ -774,7 +809,7 @@ export function TransportOrderFormPage() {
                 clearable
               />
             </SimpleGrid>
-          </Card>
+          </SectionCard>
 
           {/* Trips — replaces the Route card on a multi-trip job: on an N-leg
               route the legs ARE the route, and the fixed pickup/stuffing/dropoff
@@ -782,9 +817,10 @@ export function TransportOrderFormPage() {
               into `route` (first departure → last destination) so the list column
               still renders. */}
           {form.values.isMultiTrip && (
-            <Card withBorder padding="md" radius="md">
-              <Group justify="space-between" mb="sm">
-                <Text fw={600}>{t('transportOrders.trips.title')}</Text>
+            <SectionCard
+              icon={<IconRoute size={14} />}
+              title={t('transportOrders.trips.title')}
+              actions={
                 <Button
                   size="compact-sm"
                   variant="light"
@@ -793,7 +829,8 @@ export function TransportOrderFormPage() {
                 >
                   {t('transportOrders.trips.add')}
                 </Button>
-              </Group>
+              }
+            >
               <Table>
                 <Table.Thead>
                   <Table.Tr>
@@ -862,19 +899,16 @@ export function TransportOrderFormPage() {
               {/* Σ driver pay, at the foot of the list where the PO asked for it.
                   Deliberately apart from the fee card's totals — this is what the
                   operator pays out, not what the customer is billed. */}
-              <Group justify="flex-end" mt="sm" gap="md">
+              <Group justify="flex-end" gap="md">
                 <Text fw={600}>{t('transportOrders.trips.laborTotal')}</Text>
                 <Text fw={700}>{formatMoney(tripLaborTotal)}</Text>
               </Group>
-            </Card>
+            </SectionCard>
           )}
 
           {/* Route — single-trip only; the leg list above supersedes it. */}
           {!form.values.isMultiTrip && (
-            <Card withBorder padding="md" radius="md">
-              <Text fw={600} mb="sm">
-                {t('transportOrders.route.title')}
-              </Text>
+            <SectionCard icon={<IconMapPin size={14} />} title={t('transportOrders.route.title')}>
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
                 <TextInput
                   label={t('transportOrders.route.pickup')}
@@ -889,15 +923,19 @@ export function TransportOrderFormPage() {
                   {...form.getInputProps('dropoff')}
                 />
               </SimpleGrid>
-            </Card>
+            </SectionCard>
           )}
 
-          {/* Fees — ONE list, with `Loại` carrying the service-vs-chi-hộ split the
-              old two cards used to. `Loại` governs the row: chi hộ can't be VAT-ed
-              and needs a payer; a service fee is always billed and has none. */}
-          <Card withBorder padding="md" radius="md">
-            <Group justify="space-between" mb="sm">
-              <Text fw={600}>{t('transportOrders.fees.title')}</Text>
+          {/* Fees — TWO groups, split by `kind`, each its own card + Add button.
+              The `Loại` picker is gone: a row's kind is the card it lives in.
+              Both feed the one `form.values.fees` array (rendered filtered by kind,
+              edited by real index), so the totals and the write path are unchanged.
+              Service = our own charge (VAT-able, no payer); chi hộ = a third party's
+              cost (never VAT-taxed, `payer` decides collection). */}
+          <SectionCard
+            icon={<IconReceipt size={14} />}
+            title={t('transportOrders.fees.kindService')}
+            actions={
               <Button
                 size="compact-sm"
                 variant="light"
@@ -906,101 +944,149 @@ export function TransportOrderFormPage() {
               >
                 {t('transportOrders.fees.add')}
               </Button>
-            </Group>
+            }
+          >
             <Table>
               <Table.Thead>
                 <Table.Tr>
                   <Table.Th>{t('transportOrders.fees.label')}</Table.Th>
                   <Table.Th w={150}>{t('transportOrders.fees.amount')}</Table.Th>
-                  <Table.Th w={150}>{t('transportOrders.fees.kind')}</Table.Th>
                   <Table.Th w={60} ta="center">
                     {t('transportOrders.fees.vatable')}
                   </Table.Th>
-                  <Table.Th w={150}>{t('transportOrders.fees.payer')}</Table.Th>
                   <Table.Th w={140}>{t('transportOrders.fees.invoiceNo')}</Table.Th>
+                  <Table.Th>{t('transportOrders.fees.memo')}</Table.Th>
                   <Table.Th w={40} />
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {form.values.fees.map((_, i) => {
-                  const row = form.values.fees[i]!;
-                  const isPassthrough = row.kind === 'passthrough';
-                  return (
-                    <Table.Tr key={i}>
-                      <Table.Td>
-                        <TextInput {...form.getInputProps(`fees.${i}.label`)} />
-                      </Table.Td>
-                      <Table.Td>
-                        <NumberInput
-                          thousandSeparator=","
-                          min={0}
-                          {...form.getInputProps(`fees.${i}.amount`)}
-                        />
-                      </Table.Td>
-                      <Table.Td>
-                        <Select
-                          data={feeKindSelectData}
-                          value={row.kind}
-                          onChange={(v) =>
-                            applyFeeKind(i, (v as TransportOrderFeeKind) ?? 'service')
-                          }
-                          allowDeselect={false}
-                        />
-                      </Table.Td>
-                      <Table.Td ta="center">
-                        {/* Chi hộ is re-billed 1:1 and never taxed — the VAT the
-                            third party charged is already on THEIR invoice. So the
-                            box is unavailable, not silently ignored. */}
-                        <Checkbox
-                          checked={!isPassthrough && row.vatable}
-                          disabled={isPassthrough}
-                          onChange={(e) =>
-                            form.setFieldValue(`fees.${i}.vatable`, e.currentTarget.checked)
-                          }
-                        />
-                      </Table.Td>
-                      <Table.Td>
-                        {/* "Who paid it" is only a question about a third party's
-                            cost. On our own service fee it has no answer, so the
-                            cell says so rather than showing a greyed-out "Công ty"
-                            that reads as a claim. */}
-                        {isPassthrough ? (
-                          <Select
-                            data={payerSelectData}
-                            value={row.payer}
-                            onChange={(v) =>
-                              form.setFieldValue(
-                                `fees.${i}.payer`,
-                                (v as TransportOrderFeePayer) ?? 'company',
-                              )
-                            }
-                            allowDeselect={false}
-                          />
-                        ) : (
-                          <Text size="sm" c="dimmed" ta="center">
-                            —
-                          </Text>
-                        )}
-                      </Table.Td>
-                      <Table.Td>
-                        <TextInput {...form.getInputProps(`fees.${i}.invoiceNo`)} />
-                      </Table.Td>
-                      <Table.Td>
-                        <ActionIcon
-                          color="red"
-                          variant="subtle"
-                          onClick={() => form.removeListItem('fees', i)}
-                        >
-                          <IconTrash size={16} />
-                        </ActionIcon>
-                      </Table.Td>
-                    </Table.Tr>
-                  );
-                })}
+                {serviceFeeRows.map(({ i }) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`fees.${i}.label`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput
+                        thousandSeparator=","
+                        min={0}
+                        {...form.getInputProps(`fees.${i}.amount`)}
+                      />
+                    </Table.Td>
+                    <Table.Td ta="center">
+                      <Checkbox
+                        checked={form.values.fees[i]!.vatable}
+                        onChange={(e) =>
+                          form.setFieldValue(`fees.${i}.vatable`, e.currentTarget.checked)
+                        }
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`fees.${i}.invoiceNo`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`fees.${i}.memo`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        onClick={() => form.removeListItem('fees', i)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
               </Table.Tbody>
             </Table>
+          </SectionCard>
 
-            <Group mt="sm" gap="sm" align="flex-end">
+          {/* Chi hộ — a third party's cost. Never VAT-taxed (that VAT is on their
+              invoice); `payer` decides whether we bill it. */}
+          <SectionCard
+            icon={<IconCashBanknote size={14} />}
+            title={t('transportOrders.fees.kindPassthrough')}
+            actions={
+              <Button
+                size="compact-sm"
+                variant="light"
+                leftSection={<IconPlus size={14} />}
+                onClick={() =>
+                  form.insertListItem(
+                    'fees',
+                    blankFee({ kind: 'passthrough', vatable: false, payer: 'company' }),
+                  )
+                }
+              >
+                {t('transportOrders.fees.add')}
+              </Button>
+            }
+          >
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>{t('transportOrders.fees.label')}</Table.Th>
+                  <Table.Th w={150}>{t('transportOrders.fees.amount')}</Table.Th>
+                  <Table.Th w={150}>{t('transportOrders.fees.payer')}</Table.Th>
+                  <Table.Th w={140}>{t('transportOrders.fees.invoiceNo')}</Table.Th>
+                  <Table.Th>{t('transportOrders.fees.memo')}</Table.Th>
+                  <Table.Th w={40} />
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {passthroughFeeRows.map(({ i }) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`fees.${i}.label`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput
+                        thousandSeparator=","
+                        min={0}
+                        {...form.getInputProps(`fees.${i}.amount`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <Select
+                        data={payerSelectData}
+                        value={form.values.fees[i]!.payer}
+                        onChange={(v) =>
+                          form.setFieldValue(
+                            `fees.${i}.payer`,
+                            (v as TransportOrderFeePayer) ?? 'company',
+                          )
+                        }
+                        allowDeselect={false}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`fees.${i}.invoiceNo`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`fees.${i}.memo`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        onClick={() => form.removeListItem('fees', i)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+          </SectionCard>
+
+          {/* Billing summary — VAT rate + advance drive the running total that
+              settles over BOTH groups, so it stands alone rather than under one. */}
+          <SectionCard
+            icon={<IconReceiptTax size={14} />}
+            title={t('transportOrders.billing.title')}
+          >
+            <Group gap="sm" align="flex-end">
               <NumberInput
                 w={160}
                 label={t('transportOrders.billing.vatRate')}
@@ -1058,10 +1144,10 @@ export function TransportOrderFormPage() {
                 </>
               )}
             </Stack>
-          </Card>
+          </SectionCard>
 
           {/* Meta */}
-          <Card withBorder padding="md" radius="md">
+          <SectionCard icon={<IconNote size={14} />} title={t('transportOrders.form.metaSection')}>
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
               <TextInput
                 label={t('transportOrders.billing.contractNo')}
@@ -1069,13 +1155,12 @@ export function TransportOrderFormPage() {
               />
             </SimpleGrid>
             <Textarea
-              mt="sm"
               label={t('__new__.01-common.labels.note')}
               autosize
               minRows={2}
               {...form.getInputProps('notes')}
             />
-          </Card>
+          </SectionCard>
 
           <Group justify="flex-end">
             <Button variant="default" onClick={() => window.history.back()}>

@@ -290,7 +290,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
   
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('common.filters.all');
+    if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
     if (filters.statusFilter.length === 1) {
       const single = findStatus(filters.statusFilter[0] as 'draft' | 'received' | 'cancelled');
       return t(single.labelKey);
@@ -345,9 +345,9 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     {
-      title: t('common.labels.status'),
+      title: t('__new__.01-common.labels.status'),
       value: filters.statusFilter,
-      options: [{ value: 'all', label: t('common.filters.all') }, ...statusFilterData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusFilterData],
       onChange: filters.setStatusFilter,
       visible: statusFilterData.length > 0,
       multi: true,
@@ -482,7 +482,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
             onStatusChange={() => {}}
             hideStatus
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: '',
               inactive: '',
             }}
@@ -507,7 +507,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
             onStatusChange={() => {}}
             hideStatus
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: '',
               inactive: '',
             }}

@@ -153,7 +153,7 @@ export function EmployeeDataTable({
         },
         {
           key: 'status',
-          header: t('common.labels.status'),
+          header: t('__new__.01-common.labels.status'),
           ta: 'center',
           width: '160px',
           render: (emp: Employee) => (

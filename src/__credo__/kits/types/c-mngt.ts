@@ -287,8 +287,12 @@ export type CMngtDisplaySettings = {
 
 export type CMngtAppConfig = AppConfig & {
   features: {
-    darkMode: boolean;
-    languageSwitcher: boolean;
+    common: {
+      darkMode: boolean;
+      languageSwitcher: boolean;
+      enablePdfSharing: boolean;
+      enableStats: boolean;
+    };
     employees: CMngtEmployeeFeatures;
     permissionManagement: CMngtPermissionManagementFeatures;
     activityLog: CMngtActivityLogFeatures;

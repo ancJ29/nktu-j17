@@ -116,13 +116,19 @@ export function ProductInventoryDecomposeSetModal({
     return findRow(setProduct.code, target);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setProduct, target, rows]);
-  const parentPrimaryUnit = setProduct?.unit ?? '';
+  
+  
+  
+  
+  
+  
+  const parentBaseUnit = setProduct ? getItemBaseUnit(setProduct) : '';
   const parentCurrentQty = useMemo(() => {
     if (!setProduct || !parentRow) return 0;
     const baseUnit = getItemBaseUnit(setProduct);
     const breakdown = readRowBreakdown(parentRow, baseUnit);
-    return breakdown[parentPrimaryUnit] ?? 0;
-  }, [setProduct, parentRow, parentPrimaryUnit]);
+    return breakdown[parentBaseUnit] ?? 0;
+  }, [setProduct, parentRow, parentBaseUnit]);
 
   const componentPlans: ComponentPlan[] = useMemo(() => {
     if (!setProduct || qtyNum <= 0) return [];
@@ -184,7 +190,7 @@ export function ProductInventoryDecomposeSetModal({
           t('productInventory.decomposeSet.validation.parentShort', {
             code: setProduct.code,
             short: parentShortage.toLocaleString(),
-            unit: lookupLabelOf(unitLabels, parentPrimaryUnit),
+            unit: lookupLabelOf(unitLabels, parentBaseUnit),
           }),
         );
       }
@@ -214,7 +220,7 @@ export function ProductInventoryDecomposeSetModal({
     parentRow,
     parentShortage,
     componentPlans,
-    parentPrimaryUnit,
+    parentBaseUnit,
     unitLabels,
     t,
   ]);
@@ -253,16 +259,15 @@ export function ProductInventoryDecomposeSetModal({
       
       
       
-      const parentBase = getItemBaseUnit(setProduct);
-      const parentBreakdown = readRowBreakdown(parentRow, parentBase);
+      const parentBreakdown = readRowBreakdown(parentRow, parentBaseUnit);
       const parentResult = applyDelta(setProduct, parentBreakdown, {
-        [parentPrimaryUnit]: -qtyNum,
+        [parentBaseUnit]: -qtyNum,
       });
       if (!parentResult.ok) {
         throw new Error(
           parentResult.reason === 'negative'
-            ? t('productInventory.validation.insufficientStock', { unit: parentPrimaryUnit })
-            : t('productInventory.validation.unknownUnit', { unit: parentPrimaryUnit }),
+            ? t('productInventory.validation.insufficientStock', { unit: parentBaseUnit })
+            : t('productInventory.validation.unknownUnit', { unit: parentBaseUnit }),
         );
       }
       const parentExtra: ProductInventoryExtra = {
@@ -362,14 +367,14 @@ export function ProductInventoryDecomposeSetModal({
     } finally {
       setSubmitting(false);
     }
-  }, [setProduct, parentRow, parentPrimaryUnit, qtyNum, componentPlans, handleClose, t]);
+  }, [setProduct, parentRow, parentBaseUnit, qtyNum, componentPlans, handleClose, t]);
 
   const newParentOnHand =
     parentRow && setProduct && qtyNum > 0
       ? (() => {
           const baseUnit = getItemBaseUnit(setProduct);
           const breakdown = readRowBreakdown(parentRow, baseUnit);
-          const r = applyDelta(setProduct, breakdown, { [parentPrimaryUnit]: -qtyNum });
+          const r = applyDelta(setProduct, breakdown, { [parentBaseUnit]: -qtyNum });
           return r.ok ? r.onHand : null;
         })()
       : null;
@@ -442,7 +447,7 @@ export function ProductInventoryDecomposeSetModal({
                       <Text span fw={700}>
                         {newParentOnHand?.toLocaleString() ?? '?'}
                       </Text>{' '}
-                      {lookupLabelOf(unitLabels, parentPrimaryUnit)}
+                      {lookupLabelOf(unitLabels, parentBaseUnit)}
                       {parentShortage > 0 && (
                         <Text span c="red" fw={600}>
                           {' '}

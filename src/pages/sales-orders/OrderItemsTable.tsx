@@ -6,11 +6,10 @@ import { device } from '@credo/base-ui/utils';
 import { InlineTextareaField, type InlineEditLabels } from '@credo/base-ui/components';
 import type { InventoryLinkageSnapshotEntry, InventoryLinkageState, SalesOrderItem } from '@/types';
 import { DEFAULT_LOCATION_CODE, isDefaultLocation } from '@/types';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupLabels, useOpenInboundByProduct } from '@/hooks';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
-import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import {
   isExtraDeliveryQuantityAllowed,
   isLocationsEnabled,
@@ -24,7 +23,6 @@ import {
   getUnitAvailabilityAtLocation,
   indexInventoryByProduct,
 } from '@/utils/inventoryCommitment';
-import { buildOpenSalesOrderDemand, readOpenSalesOrderDemand } from '@/utils/salesOrderDemand';
 import { ProductLink } from '@/components/ProductLink';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { getProductSuggestedPrice, isBelowSuggestedPrice } from '@/utils/productPricing';
@@ -57,8 +55,6 @@ type OrderItemsTableProps = {
   
   ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[];
   
-  currentSalesOrderId?: string;
-  
   inventoryLinkageState?: InventoryLinkageState;
   
   canEditItemMemo?: boolean;
@@ -76,7 +72,6 @@ export function OrderItemsTable({
   canEditItemMemo = false,
   onItemMemoSave,
   productPhotoOnHover = false,
-  currentSalesOrderId,
 }: OrderItemsTableProps) {
   
   
@@ -126,19 +121,11 @@ export function OrderItemsTable({
   
   
   
-  const salesOrders = useSalesOrderStore((s) => s.items);
-  const salesOrdersInitialized = useSalesOrderStore((s) => s.initialized);
-  const loadSalesOrders = useSalesOrderStore((s) => s.loadAll);
+  const inboundByProduct = useOpenInboundByProduct();
 
   useEffect(() => {
     if (!inventoryInitialized) loadInventory();
   }, [inventoryInitialized, loadInventory]);
-
-  useEffect(() => {
-    
-    
-    if (currentSalesOrderId && !salesOrdersInitialized) loadSalesOrders();
-  }, [currentSalesOrderId, salesOrdersInitialized, loadSalesOrders]);
 
   const productByCode = useMemo(() => {
     const m = new Map<string, (typeof products)[number]>();
@@ -151,18 +138,6 @@ export function OrderItemsTable({
     return m;
   }, [locations]);
   const inventoryByProduct = useMemo(() => indexInventoryByProduct(inventoryRows), [inventoryRows]);
-
-  
-  
-  const openDemand = useMemo(
-    () =>
-      currentSalesOrderId
-        ? buildOpenSalesOrderDemand(salesOrders, productByCode, {
-            excludeSalesOrderId: currentSalesOrderId,
-          })
-        : null,
-    [currentSalesOrderId, salesOrders, productByCode],
-  );
 
   function getSku(productCode: string): string {
     return productByCode.get(productCode)?.extra?.sku ?? '';
@@ -181,19 +156,17 @@ export function OrderItemsTable({
     if (isNoInventoryProduct(product)) return null;
     const target = locationCode || DEFAULT_LOCATION_CODE;
     const summary = getProductLocationAvailability(product, target, inventoryByProduct);
-    if (openDemand) {
-      
-      
-      
-      
-      
-      
-      return summary.onHand - readOpenSalesOrderDemand(openDemand, productCode, target);
-    }
     
     
     
-    return summary.available + getOwnReservedAtLocation(product, target, ownReservedSnapshot);
+    
+    
+    
+    
+    const incoming = inboundByProduct.get(productCode)?.totalBase ?? 0;
+    return (
+      summary.available + getOwnReservedAtLocation(product, target, ownReservedSnapshot) + incoming
+    );
   }
 
   

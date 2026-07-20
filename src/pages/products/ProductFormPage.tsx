@@ -16,7 +16,6 @@ import { device } from '@credo/base-ui/utils';
 import { Tabs } from '@credo/base-ui/components';
 import { useInitFormFromFetch, useLookupOptions } from '@/hooks';
 import { generateInternalBarcode } from '@/utils/barcode';
-import { generateProductSku } from '@/utils/sku';
 import {
   hasBarcodeForProducts,
   hasBulkImportForProducts,
@@ -86,7 +85,8 @@ export function ProductFormPage() {
   const [file, setFile] = useState<File | undefined>();
   const [importResult, setImportResult] = useState<
     | {
-        summary: { total: number; created: number; updated: number; failed: number };
+        summary: { total: number; created: number; skipped: number; failed: number };
+        skipped?: string[];
         errors?: string[];
       }
     | undefined
@@ -123,7 +123,9 @@ export function ProductFormPage() {
       
       
       
-      sku: isEdit ? '' : generateProductSku(),
+      
+      
+      sku: isEdit ? '' : buildNextProductCode(totalProducts + 1),
       
       
       
@@ -206,7 +208,10 @@ export function ProductFormPage() {
   
   useEffect(() => {
     if (isEdit) return;
-    form.setFieldValue('code', buildNextProductCode(totalProducts + 1));
+    const nextCode = buildNextProductCode(totalProducts + 1);
+    form.setFieldValue('code', nextCode);
+    
+    form.setFieldValue('sku', nextCode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, totalProducts]);
 
@@ -308,7 +313,12 @@ export function ProductFormPage() {
             alternativeNames: values.alternativeNames,
           }),
           ...(images.length > 0 && { images }),
-          ...(values.sku.trim() && { sku: values.sku.trim() }),
+          
+          
+          
+          ...((isEdit ? values.sku.trim() : values.code.trim()) && {
+            sku: isEdit ? values.sku.trim() : values.code.trim(),
+          }),
           ...(values.barcode.trim() && { barcode: values.barcode.trim() }),
           ...(values.basePrice > 0 && { basePrice: values.basePrice }),
           ...(values.suggestedPrice > 0 && { suggestedPrice: values.suggestedPrice }),
@@ -419,6 +429,7 @@ export function ProductFormPage() {
           await useProductStore.getState().forceRefresh();
           const newCode = buildNextProductCode(useProductStore.getState().items.length + 1);
           form.setFieldValue('code', newCode);
+          form.setFieldValue('sku', newCode);
           notifications.show({
             color: 'yellow',
             title: t('common.conflict.title'),
@@ -601,7 +612,10 @@ export function ProductFormPage() {
           .map((raw) => tagLabelToCanonical.get(raw.trim().toLowerCase()))
           .filter((v): v is string => Boolean(v));
         const extra: ProductExtra = {
-          ...(p.sku?.trim() && { sku: p.sku.trim() }),
+          
+          
+          
+          sku: code,
           ...(barcodeEnabled && {
             barcode: p.barcode?.trim() || generateInternalBarcode(),
           }),
@@ -648,19 +662,31 @@ export function ProductFormPage() {
       const res = await cMngtConnector.importBatchProducts<ProductExtra>({ items });
       const total = res.summary?.total ?? products.length;
       const created = res.summary?.created ?? 0;
-      const updated = res.summary?.updated ?? 0;
-      const failed = res.summary?.errors ?? Math.max(0, total - created - updated);
-      const errorNames = (res.errors ?? []).map(
-        (e) => `${products[e.index]?.name ?? `row ${e.index + 1}`}: ${e.message}`,
-      );
+      const skippedCount = res.summary?.skipped ?? 0;
+      const failed = res.summary?.errors ?? Math.max(0, total - created - skippedCount);
+      const rowName = (index: number) =>
+        products[index]?.name ?? t('common.bulkImport.rowLabel', { n: index + 1 });
+      
+      
+      const skippedNames = (res.skipped ?? []).map((s) => {
+        const reason =
+          s.reason === 'duplicate-sku'
+            ? t('products.bulkImport.skippedDuplicateSku')
+            : t('products.bulkImport.skippedDuplicateCode');
+        return `${rowName(s.index)}: ${reason}`;
+      });
+      const errorNames = (res.errors ?? []).map((e) => `${rowName(e.index)}: ${e.message}`);
 
       forceRefresh();
       setImportResult({
-        summary: { total, created, updated, failed },
+        summary: { total, created, skipped: skippedCount, failed },
+        skipped: skippedNames.length > 0 ? skippedNames : undefined,
         errors: errorNames.length > 0 ? errorNames : undefined,
       });
 
-      if (failed === 0) {
+      
+      
+      if (failed === 0 && skippedCount === 0) {
         notifications.show({
           color: 'green',
           message: t('products.notifications.createSuccess'),
@@ -670,7 +696,7 @@ export function ProductFormPage() {
         notifications.show({
           color: 'yellow',
           message: t('common.bulkImport.partialSuccess', {
-            success: created + updated,
+            success: created,
             total,
           }),
         });

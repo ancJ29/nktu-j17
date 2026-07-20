@@ -6,6 +6,8 @@ import {
   DEFAULT_DELIVERY_REQUEST_FEATURES,
   DEFAULT_DISPLAY_SETTINGS,
   DEFAULT_EMPLOYEE_FEATURES,
+  DEFAULT_ENABLE_PDF_SHARING,
+  DEFAULT_ENABLE_STATS,
   DEFAULT_GOODS_RECEIPT_FEATURES,
   DEFAULT_TRANSPORT_ORDER_FEATURES,
   DEFAULT_LANGUAGE,
@@ -207,6 +209,8 @@ const LOOKUP_CATEGORY_LABELS: Record<string, string> = {
   'lookups.categories.materialUnit': 'Material Unit',
   'lookups.categories.productUnit': 'Product Unit',
   'lookups.categories.truckType': 'Truck Type',
+  'lookups.categories.containerSize': 'Container Size',
+  'lookups.categories.maintenanceType': 'Maintenance Type',
 };
 
 export function ConfigEditor({
@@ -233,8 +237,12 @@ export function ConfigEditor({
   const [navigation, setNavigation] = useState<NavigationConfig>(DEFAULT_CONFIG.navigation);
   const [userSettings, setUserSettings] = useState<UserSettingsConfig>(DEFAULT_CONFIG.userSettings);
   const [languageSwitcher, setLanguageSwitcher] = useState(
-    DEFAULT_CONFIG.features.languageSwitcher,
+    DEFAULT_CONFIG.features.common.languageSwitcher,
   );
+  const [enablePdfSharing, setEnablePdfSharing] = useState(
+    DEFAULT_CONFIG.features.common.enablePdfSharing,
+  );
+  const [enableStats, setEnableStats] = useState(DEFAULT_CONFIG.features.common.enableStats);
   const [employeeFeatures, setEmployeeFeatures] = useState<CMngtEmployeeFeatures>(
     DEFAULT_CONFIG.features.employees,
   );
@@ -315,6 +323,7 @@ export function ConfigEditor({
   const buildConfigPayload = useCallback(
     (newVersion?: string): CMngtAppConfig => ({
       version: newVersion ?? version,
+      schemaVersion: DEFAULT_CONFIG.schemaVersion,
       app: appInfo,
       auth,
       themeConfig,
@@ -329,8 +338,12 @@ export function ConfigEditor({
       },
       userSettings,
       features: {
-        darkMode: DEFAULT_CONFIG.features.darkMode,
-        languageSwitcher,
+        common: {
+          darkMode: DEFAULT_CONFIG.features.common.darkMode,
+          languageSwitcher,
+          enablePdfSharing,
+          enableStats,
+        },
         employees: employeeFeatures,
         permissionManagement: permMngtFeatures,
         activityLog: activityLogFeatures,
@@ -368,6 +381,8 @@ export function ConfigEditor({
       navigation,
       userSettings,
       languageSwitcher,
+      enablePdfSharing,
+      enableStats,
       employeeFeatures,
       permMngtFeatures,
       activityLogFeatures,
@@ -406,7 +421,13 @@ export function ConfigEditor({
     setDefaultLanguage(cfg.defaultLanguage ?? DEFAULT_CONFIG.defaultLanguage);
     setNavigation(cfg.navigation ?? DEFAULT_CONFIG.navigation);
     setUserSettings({ ...DEFAULT_CONFIG.userSettings, ...cfg.userSettings });
-    setLanguageSwitcher(cfg.features?.languageSwitcher ?? DEFAULT_CONFIG.features.languageSwitcher);
+    setLanguageSwitcher(
+      cfg.features?.common?.languageSwitcher ?? DEFAULT_CONFIG.features.common.languageSwitcher,
+    );
+    setEnablePdfSharing(
+      cfg.features?.common?.enablePdfSharing ?? DEFAULT_CONFIG.features.common.enablePdfSharing,
+    );
+    setEnableStats(cfg.features?.common?.enableStats ?? DEFAULT_CONFIG.features.common.enableStats);
     setEmployeeFeatures({ ...SCHEMA_DEFAULT_EMPLOYEE_FEATURES, ...cfg.features?.employees });
     setPermMngtFeatures({
       ...SCHEMA_DEFAULT_PERM_MNGT_FEATURES,
@@ -670,6 +691,8 @@ export function ConfigEditor({
   const resetAll = useCallback(() => {
     
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
+    setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
+    setEnableStats(DEFAULT_ENABLE_STATS);
     setAuth(DEFAULT_AUTH);
     setEmployeeFeatures(DEFAULT_EMPLOYEE_FEATURES);
     setPermMngtFeatures(SCHEMA_DEFAULT_PERM_MNGT_FEATURES);
@@ -705,6 +728,8 @@ export function ConfigEditor({
   const resetAppInfo = useCallback(() => {
     setAppInfo(DEFAULT_APP_INFO);
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
+    setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
+    setEnableStats(DEFAULT_ENABLE_STATS);
   }, []);
   const resetAuth = useCallback(() => setAuth(DEFAULT_AUTH), []);
   const resetEmployees = useCallback(() => setEmployeeFeatures(DEFAULT_EMPLOYEE_FEATURES), []);
@@ -793,7 +818,9 @@ export function ConfigEditor({
   const sectionIsDefault: Partial<Record<SectionKey, boolean>> = {
     appInfo:
       eqDefault(appInfo, DEFAULT_APP_INFO) &&
-      eqDefault(languageSwitcher, DEFAULT_LANGUAGE_SWITCHER),
+      eqDefault(languageSwitcher, DEFAULT_LANGUAGE_SWITCHER) &&
+      eqDefault(enablePdfSharing, DEFAULT_ENABLE_PDF_SHARING) &&
+      eqDefault(enableStats, DEFAULT_ENABLE_STATS),
     displaySettings: eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS),
     layout: eqDefault(layout, DEFAULT_LAYOUT),
     theme: eqDefault(themeConfig, DEFAULT_THEME),
@@ -920,9 +947,13 @@ export function ConfigEditor({
               app={appInfo}
               version={version}
               languageSwitcher={languageSwitcher}
+              enablePdfSharing={enablePdfSharing}
+              enableStats={enableStats}
               onChange={setAppInfo}
               onVersionChange={setVersion}
               onLanguageSwitcherChange={setLanguageSwitcher}
+              onEnablePdfSharingChange={setEnablePdfSharing}
+              onEnableStatsChange={setEnableStats}
             />
           </CollapsibleSection>
 

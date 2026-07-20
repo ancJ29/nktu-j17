@@ -37,6 +37,7 @@ import { TransportOrderCardList } from './TransportOrderCardList';
 import { TransportOrderDataTable } from './TransportOrderDataTable';
 import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
+import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -195,13 +196,14 @@ export function TransportOrderListPage() {
     { value: 'import', label: t('transportOrders.shipmentType.import') },
     { value: 'export', label: t('transportOrders.shipmentType.export') },
   ];
-  const containerSizeData = [
-    { value: '20', label: '20ft' },
-    { value: '40', label: '40ft' },
-  ];
+  
+  
+  
+  const containerSizeData = useContainerSizeOptions();
+  const containerSizeLabel = useContainerSizeLabel();
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('common.labels.status');
+    if (filters.statusFilter.length === 0) return t('__new__.01-common.labels.status');
     if (filters.statusFilter.length === 1) return statusLabel(filters.statusFilter[0]!);
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -273,7 +275,7 @@ export function TransportOrderListPage() {
     {
       title: t('transportOrders.columns.truck'),
       value: filters.truckFilter ?? 'all',
-      options: [{ value: 'all', label: t('common.filters.all') }, ...truckData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...truckData],
       onChange: (v) => filters.setTruckFilter(v === 'all' ? null : v),
       visible: truckData.length > 0,
     },
@@ -308,7 +310,7 @@ export function TransportOrderListPage() {
       type: 'select',
       key: 'shipmentType',
       title: t('transportOrders.form.shipmentType'),
-      placeholder: t('common.filters.all'),
+      placeholder: t('__new__.01-common.filters.all'),
       value: filters.shipmentFilter === 'all' ? null : filters.shipmentFilter,
       options: shipmentData,
       onChange: (v) => filters.setShipmentFilter((v as 'import' | 'export' | null) ?? 'all'),
@@ -317,7 +319,7 @@ export function TransportOrderListPage() {
       type: 'select',
       key: 'containerSize',
       title: t('transportOrders.form.containerSize'),
-      placeholder: t('common.filters.all'),
+      placeholder: t('__new__.01-common.filters.all'),
       value: filters.containerSizeFilter,
       options: containerSizeData,
       onChange: filters.setContainerSizeFilter,
@@ -393,7 +395,7 @@ export function TransportOrderListPage() {
             status="all"
             onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('common.filters.all'), active: '', inactive: '' }}
+            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -414,7 +416,7 @@ export function TransportOrderListPage() {
             status="all"
             onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('common.filters.all'), active: '', inactive: '' }}
+            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={moreFilters} presetLabels={presetLabels} />
@@ -438,7 +440,7 @@ export function TransportOrderListPage() {
               key={s}
               onClose={() => filters.setStatusFilter(filters.statusFilter.filter((v) => v !== s))}
             >
-              {t('common.labels.status')}: {statusLabel(s)}
+              {t('__new__.01-common.labels.status')}: {statusLabel(s)}
             </FilterPill>
           ))}
           {filters.truckFilter && (
@@ -463,7 +465,7 @@ export function TransportOrderListPage() {
           )}
           {filters.containerSizeFilter && (
             <FilterPill onClose={() => filters.setContainerSizeFilter(null)}>
-              {filters.containerSizeFilter}ft
+              {containerSizeLabel(filters.containerSizeFilter)}
             </FilterPill>
           )}
           {filters.hideCancelled && (

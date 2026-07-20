@@ -115,9 +115,9 @@ export function CustomerListPage() {
             searchPlaceholder={t('__new__.07-entities.customers.list.searchPlaceholder')}
             status={filter}
             onStatusChange={setFilter}
-            statusTitle={t('common.labels.status')}
+            statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.filters.active'),
               inactive: t('common.filters.inactive'),
             }}
@@ -131,7 +131,7 @@ export function CustomerListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.filters.active'),
               inactive: t('common.filters.inactive'),
             }}

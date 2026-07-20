@@ -43,6 +43,7 @@ import {
   IconPhotoScan,
   IconPrinter,
   IconRotate,
+  IconShare,
   IconTrash,
   IconTruck,
   IconTruckDelivery,
@@ -63,6 +64,7 @@ import {
   getPricingVatRate,
   getSalesOrderDeliveryPackageSizeOptions,
   getSalesOrderPicDepartments,
+  isPdfSharingEnabled,
   isPricingManagementEnabled,
   makeEmployeeDepartmentFilter,
   perms,
@@ -87,6 +89,7 @@ import {
 } from '@/utils/salesOrderDeliveryNote';
 import { exportSalesOrderDeliveryNoteToExcel } from '@/utils/salesOrderDeliveryNoteExcel';
 import { copyDeliveryNoteImageToClipboard } from '@/utils/salesOrderDeliveryNoteImage';
+import { shareDeliveryNotePdf } from '@/utils/salesOrderDeliveryNotePdf';
 import { readVietnameseMoney } from '@/utils/vietnameseNumberToWords';
 import { ChatPanel } from '@/components/ChatPanel';
 import { CustomerLink } from '@/components/CustomerLink';
@@ -151,6 +154,9 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   
   
   const showDeliveryNotePrint = variant.showDeliveryNotePrint && showPrice;
+  
+  
+  const canSharePdf = isPdfSharingEnabled();
   const shouldDisplayShippingFee = variant.showShippingFee;
   const shouldDisplayVatTag = variant.showVatTag;
   
@@ -264,6 +270,8 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   
   
   const [copyingImage, setCopyingImage] = useState(false);
+  
+  const [sharingPdf, setSharingPdf] = useState(false);
 
   
   
@@ -375,6 +383,29 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       notifications.show({ color: 'red', message: t('salesOrders.detail.copyImageFailed') });
     } finally {
       setCopyingImage(false);
+    }
+  };
+
+  
+  
+  
+  
+  const handleShareDeliveryNotePdf = async () => {
+    setSharingPdf(true);
+    try {
+      const result = await shareDeliveryNotePdf(buildDeliveryNoteData(), {
+        paperSize,
+        orientation,
+        includePrice,
+      });
+      setPrintOptionsOpened(false);
+      if (result === 'downloaded') {
+        notifications.show({ color: 'blue', message: t('salesOrders.detail.sharePdfDownloaded') });
+      }
+    } catch {
+      notifications.show({ color: 'red', message: t('salesOrders.detail.sharePdfFailed') });
+    } finally {
+      setSharingPdf(false);
     }
   };
 
@@ -1007,7 +1038,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             {t('salesOrders.cancel.actionButton')}
           </Button>
         )}
-        {showDelete && (
+        {!isMobile && showDelete && (
           <Button
             size="sm"
             color="red"
@@ -1181,7 +1212,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       opened={printOptionsOpened}
       onClose={() => setPrintOptionsOpened(false)}
       title={t('salesOrders.detail.printOptionsTitle')}
-      size="sm"
+      size={canSharePdf ? "lg" : "md"}
     >
       <Stack gap="md">
         <Stack gap={6}>
@@ -1221,16 +1252,16 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         />
         <Group justify="flex-end" gap="sm">
           <Button
-            variant="light"
+            variant="subtle"
             size="sm"
-            color="teal"
+            color="primary"
             leftSection={<IconFileSpreadsheet size={14} />}
             onClick={handleExportDeliveryNoteExcel}
           >
             {t('__new__.01-common.actions.exportExcel')}
           </Button>
           <Button
-            variant="light"
+            variant="subtle"
             color="orange"
             size="sm"
             loading={copyingImage}
@@ -1240,17 +1271,31 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             {t('salesOrders.detail.copyDeliveryNoteImage')}
           </Button>
         </Group>
-        <Group justify="flex-end" gap="sm">
-          <Button variant="default" size="sm" onClick={() => setPrintOptionsOpened(false)}>
+        <Group justify="flex-end" wrap="nowrap" gap="sm">
+          <Button variant="light" color="red" size="sm" onClick={() => setPrintOptionsOpened(false)}>
             {t('__new__.01-common.actions.cancel')}
           </Button>
           <Button
             size="sm"
+            color="primary"
+            variant="outline"
             leftSection={<IconPrinter size={14} />}
             onClick={handlePrintDeliveryNote}
           >
             {t('salesOrders.detail.printDeliveryNote')}
           </Button>
+          {canSharePdf && (
+            <Button
+              color="orange"
+              variant="outline"
+              size="sm"
+              loading={sharingPdf}
+              leftSection={<IconShare size={14} />}
+              onClick={handleShareDeliveryNotePdf}
+            >
+              {t('salesOrders.detail.shareDeliveryNotePdf')}
+            </Button>
+          )}
         </Group>
       </Stack>
     </Modal>
@@ -1611,7 +1656,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
                         canEditItemMemo={canEditItemMemo}
                         onItemMemoSave={handleItemMemoPatch}
                         productPhotoOnHover={variant.itemProductPhotoOnHover}
-                        currentSalesOrderId={order.id}
                       />
                     </Box>
                   </Accordion.Panel>
@@ -1708,6 +1752,17 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               onClick={() => setPrintOptionsOpened(true)}
             >
               {t('salesOrders.detail.printDeliveryNote')}
+            </Button>
+          )}
+          {showDeliveryNotePrint && canSharePdf && (
+            <Button
+              variant="subtle"
+              color="teal"
+              size="compact-sm"
+              leftSection={<IconShare size={14} />}
+              onClick={() => setPrintOptionsOpened(true)}
+            >
+              {t('salesOrders.detail.shareDeliveryNotePdf')}
             </Button>
           )}
           {canCreate && (
@@ -1817,7 +1872,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               canEditItemMemo={canEditItemMemo}
               onItemMemoSave={handleItemMemoPatch}
               productPhotoOnHover={variant.itemProductPhotoOnHover}
-              currentSalesOrderId={order.id}
             />
           </TitledCard>
         </Tabs.PanelCard>

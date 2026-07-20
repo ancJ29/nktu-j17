@@ -27,6 +27,7 @@ import { EmployeeDataTable } from './EmployeeDataTable';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { useEmployeeFieldOptions } from './useEmployeeFieldOptions';
 
+const hasEmail = hasEmailForEmployees();
 const hasDepartment = hasDepartmentForEmployees();
 const hasPosition = hasPositionForEmployees();
 const isMobile = device.isMobile;
@@ -85,7 +86,6 @@ export function EmployeeListPage() {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  const hasEmail = hasEmailForEmployees();
   const filters = { status: filter, department: departmentFilter, position: positionFilter };
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
@@ -225,7 +225,7 @@ export function EmployeeListPage() {
       <Stack gap={isMobile ? 'md' : 'lg'}>
         <StickyListChrome>
           <ListPageHeader
-            title={t('employees.title')}
+            title={t('__new__.07-entities.employees.title')}
             cachedAt={cachedAt}
             loading={loading}
             onRefresh={handleForceRefresh}
@@ -244,11 +244,11 @@ export function EmployeeListPage() {
               searchPlaceholder={t('__new__.07-entities.employees.list.searchPlaceholder')}
               status={filter}
               onStatusChange={setFilter}
-              statusTitle={t('common.labels.status')}
+              statusTitle={t('__new__.01-common.labels.status')}
               statusLabels={{
-                all: t('common.filters.all'),
+                all: t('__new__.01-common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
-                inactive: t('employees.filterInactive'),
+                inactive: t('__new__.07-entities.employees.filter.inactive'),
               }}
               filters={mobileFilters.length > 0 ? mobileFilters : undefined}
               onClear={clearFilters}
@@ -261,9 +261,9 @@ export function EmployeeListPage() {
               status={filter}
               onStatusChange={setFilter}
               statusLabels={{
-                all: t('common.filters.all'),
+                all: t('__new__.01-common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
-                inactive: t('employees.filterInactive'),
+                inactive: t('__new__.07-entities.employees.filter.inactive'),
               }}
               filters={desktopFilters.length > 0 ? desktopFilters : undefined}
               onClear={clearFilters}

@@ -189,7 +189,7 @@ export function QuotationList() {
       value: statusFilter || null,
       onChange: (v) => setStatusFilter((v ?? '') as '' | QuotationStatus),
       data: statusData,
-      placeholder: t('common.labels.status'),
+      placeholder: t('__new__.01-common.labels.status'),
       w: 150,
     },
     {
@@ -214,22 +214,22 @@ export function QuotationList() {
 
   const mobileFilters: MobileFilterDef[] = [
     {
-      title: t('common.labels.status'),
+      title: t('__new__.01-common.labels.status'),
       value: statusFilter || 'all',
-      options: [{ value: 'all', label: t('common.filters.all') }, ...statusData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusData],
       onChange: (v) => setStatusFilter((v === 'all' ? '' : v) as '' | QuotationStatus),
     },
     {
       title: t('common.labels.customer'),
       value: customerFilter || 'all',
-      options: [{ value: 'all', label: t('common.filters.all') }, ...customerData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...customerData],
       onChange: (v) => setCustomerFilter(v === 'all' ? '' : v),
       visible: customerData.length > 0,
     },
     {
       title: t('salesOrders.columns.assignedStaff'),
       value: staffFilter || 'all',
-      options: [{ value: 'all', label: t('common.filters.all') }, ...staffData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...staffData],
       onChange: (v) => setStaffFilter(v === 'all' ? '' : v),
       visible: canViewAll && staffData.length > 0,
     },
@@ -274,7 +274,7 @@ export function QuotationList() {
       },
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         width: '130px',
         render: (row: Quotation) => (
           <StatusBadge
@@ -350,7 +350,7 @@ export function QuotationList() {
             status="all"
             onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('common.filters.all'), active: '', inactive: '' }}
+            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -371,7 +371,7 @@ export function QuotationList() {
             status="all"
             onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('common.filters.all'), active: '', inactive: '' }}
+            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={dateFilter} presetLabels={presetLabels} />
@@ -385,7 +385,7 @@ export function QuotationList() {
           <Group gap="xs">
             {statusFilter && (
               <FilterPill onClose={() => setStatusFilter('')}>
-                {t('common.labels.status')}:{' '}
+                {t('__new__.01-common.labels.status')}:{' '}
                 {statusData.find((s) => s.value === statusFilter)?.label ?? statusFilter}
               </FilterPill>
             )}

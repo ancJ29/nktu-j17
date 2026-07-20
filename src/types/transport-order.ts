@@ -2,7 +2,7 @@
 import type { DateTimeInput } from '@credo/kits/types';
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 
-export type TransportOrderContainerSize = '20' | '40';
+export type TransportOrderContainerSize = string;
 
 export type TransportOrderShipmentType = 'import' | 'export';
 
@@ -50,6 +50,8 @@ export type TransportOrderFee = {
   payer?: TransportOrderFeePayer;
   
   invoiceNo: string;
+  
+  memo?: string;
 };
 
 export type TransportOrderDisbursement = {

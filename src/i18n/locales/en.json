@@ -34,13 +34,17 @@
         "noDescription": "No description {{item}}",
         "noNote": "No description"
       },
+      "filters": {
+        "all": "All"
+      },
       "hints": {
         "openInMaps": "View on Google Maps"
       },
       "labels": {
         "active": "Active",
         "note": "Note (optional)",
-        "orderDate": "Order Date"
+        "orderDate": "Order Date",
+        "status": "Status"
       }
     },
     "07-entities": {
@@ -101,11 +105,14 @@
           "passwordPolicy": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)",
           "passwordRequired": "Password is required"
         },
+        "filter": {
+          "inactive": "Inactive"
+        },
         "list": {
           "searchPlaceholder": "Search by name, code, email..."
         },
         "singular": "__keep__",
-        "title": "__keep__"
+        "title": "Employees"
       },
       "goodsReceipts": {
         "actions": {
@@ -580,6 +587,7 @@
       "results": "Import Results",
       "rowLabel": "Row {{n}}",
       "sampleTemplate": "Sample Excel Template",
+      "skipped": "Skipped",
       "success": "Success",
       "supportedFormats": "Supported formats: .csv, .xlsx, .xls",
       "total": "Total",
@@ -653,7 +661,6 @@
     },
     "filters": {
       "active": "Active",
-      "all": "All",
       "apply": "Apply Filters",
       "inactive": "Inactive",
       "more": "More",
@@ -707,7 +714,6 @@
       "set": "Set",
       "shortName": "Short Name",
       "sku": "SKU",
-      "status": "Status",
       "taxCode": "Tax Code",
       "type": "Type",
       "unit": "Unit",
@@ -1430,7 +1436,6 @@
     },
     "filterButton": "Filter",
     "filterDepartmentAll": "All Departments",
-    "filterInactive": "Inactive",
     "filterPositionAll": "All Positions",
     "form": {
       "codePlaceholder": "Employee code",
@@ -1492,7 +1497,6 @@
       "title": "Organization",
       "valueLockedHint": "The value can't change once created — it links employees and other settings."
     },
-    "title": "Employees",
     "validation": {
       "codeRequired": "Code is required",
       "emailInvalid": "Please enter a valid email address",
@@ -1968,6 +1972,7 @@
   "lookups": {
     "addItem": "Add",
     "categories": {
+      "containerSize": "Container Size",
       "maintenanceType": "Maintenance Type",
       "materialCategory": "Material Category",
       "materialUnit": "Material Unit",
@@ -2709,6 +2714,9 @@
       "missingColumnTitle": "File format not supported",
       "noValidRows": "No valid products found in the file",
       "sampleDescription": "Download a pre-formatted template to fill in product data",
+      "skippedDuplicateCode": "Product code already exists — skipped",
+      "skippedDuplicateSku": "SKU already exists — skipped",
+      "skippedTitle": "Rows skipped as duplicates",
       "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
       "unknownLabelTitle": "Unrecognized category, tag or unit",
       "unknownTagMessage": "Unrecognized tags: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
@@ -2980,7 +2988,8 @@
       "exportPdf": "Export PDF",
       "generateSalesOrder": "Generate sales order",
       "markReady": "Mark as ready",
-      "new": "New quotation"
+      "new": "New quotation",
+      "sharePdf": "Share PDF"
     },
     "cancelConfirm": {
       "message": "Cancel this quotation? It will be locked and can no longer be edited or marked ready.",
@@ -3061,6 +3070,11 @@
     "sendConfirm": {
       "message": "Once marked ready, this quotation is locked and can no longer be edited. Continue?",
       "title": "Mark this quotation as ready?"
+    },
+    "share": {
+      "downloadedFallback": "Sharing isn't supported on this browser — the PDF was downloaded instead.",
+      "error": "Couldn't generate the PDF. Please try again.",
+      "generating": "Generating PDF…"
     },
     "status": {
       "cancelled": "Cancelled",
@@ -3326,6 +3340,9 @@
       "quantity": "Quantity",
       "recentActivities": "Recent Activities",
       "returnShipmentInfoTitle": "Return Shipment",
+      "shareDeliveryNotePdf": "Share PDF",
+      "sharePdfDownloaded": "Sharing isn't supported on this browser — the PDF was downloaded instead.",
+      "sharePdfFailed": "Couldn't generate the PDF. Please try again.",
       "tabActivity": "Order History",
       "tabActivityLog": "Activity",
       "tabAttachments": "Files",
@@ -3525,6 +3542,7 @@
       "nonBillableTotal": "Settled by customer",
       "passthroughSubtotal": "Paid-on-behalf subtotal",
       "serviceSubtotal": "Service subtotal",
+      "title": "Billing",
       "vatAmount": "VAT ({{rate}}%)",
       "vatRate": "VAT rate"
     },
@@ -3537,6 +3555,7 @@
     },
     "columns": {
       "bill": "B/L · Booking",
+      "billContainer": "B/L · Container",
       "container": "Container",
       "date": "Date",
       "orderNumber": "Order No.",
@@ -3608,6 +3627,7 @@
       "kindPassthrough": "Paid on behalf",
       "kindService": "Service fee",
       "label": "Fee",
+      "memo": "Note",
       "notBilled": "not billed",
       "payer": "Payer",
       "payerCompany": "Us",
@@ -3624,6 +3644,7 @@
       "customer": "Customer",
       "driver": "Driver",
       "jobSection": "Job details",
+      "metaSection": "Additional info",
       "multiTrip": "Multi-trip",
       "multiTripHint": "The job runs several legs — each with its own route, date, truck, driver and driver pay.",
       "noTrucks": "No trucks found. Add trucks under Assets → Trucks.",
@@ -3646,10 +3667,13 @@
       "updated": "Transport order updated"
     },
     "route": {
+      "collapse": "Collapse trips",
       "dropoff": "Drop-off",
+      "expand": "Expand trips",
       "pickup": "Pickup",
       "stuffing": "Stuffing / Unstuffing",
-      "title": "Service Route"
+      "title": "Service Route",
+      "tripTotal": "(total: {{count}} trips)"
     },
     "search": "Search order / truck / driver / bill / container…",
     "shipmentType": {
@@ -3676,6 +3700,7 @@
       "title": "Trips"
     },
     "validation": {
+      "containerNumberPattern": "Container number must match e.g. RFCU9876543 (3 letters, one of U/J/Z, then 7 digits)",
       "customerRequired": "Customer is required",
       "driverRequired": "Driver is required",
       "entryDateRequired": "Date is required",

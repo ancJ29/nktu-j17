@@ -81,7 +81,7 @@ export function VendorDataTable({ vendors, isLoading, origin, viewportRef }: Ven
         : []),
       {
         key: 'status',
-        header: t('common.labels.status'),
+        header: t('__new__.01-common.labels.status'),
         render: (item: Vendor) => (
           <ActiveBadge
             isActive={item.isActive}

@@ -314,7 +314,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
   
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('common.filters.all');
+    if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);
@@ -404,9 +404,9 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     {
-      title: t('common.labels.status'),
+      title: t('__new__.01-common.labels.status'),
       value: filters.statusFilter,
-      options: [{ value: 'all', label: t('common.filters.all') }, ...statusFilterData],
+      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusFilterData],
       onChange: filters.setStatusFilter,
       visible: statusFilterData.length > 0,
       multi: true,
@@ -416,7 +416,10 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           {
             title: t('deliveryRequests.columns.scheduledDate'),
             value: scheduledDatePreset ?? 'all',
-            options: [{ value: 'all', label: t('common.filters.all') }, ...scheduledDatePresetData],
+            options: [
+              { value: 'all', label: t('__new__.01-common.filters.all') },
+              ...scheduledDatePresetData,
+            ],
             onChange: (v) => setScheduledDatePreset(v === 'all' ? null : v),
             visible: scheduledDatePresetData.length > 0,
           },
@@ -550,7 +553,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             onStatusChange={() => {}}
             hideStatus
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: '',
               inactive: '',
             }}
@@ -575,7 +578,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             onStatusChange={() => {}}
             hideStatus
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: '',
               inactive: '',
             }}

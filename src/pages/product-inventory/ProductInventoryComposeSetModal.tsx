@@ -319,7 +319,14 @@ export function ProductInventoryComposeSetModal({
     return findRow(setProduct.code, target);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setProduct, target, rows]);
-  const parentPrimaryUnit = setProduct?.unit ?? '';
+  
+  
+  
+  
+  
+  
+  
+  const parentBaseUnit = setProduct ? getItemBaseUnit(setProduct) : '';
 
   const blockingReasons = useMemo(() => {
     const reasons: string[] = [];
@@ -443,11 +450,11 @@ export function ProductInventoryComposeSetModal({
       if (parentRow) {
         const baseUnit = getItemBaseUnit(setProduct);
         const breakdown = readRowBreakdown(parentRow, baseUnit);
-        const result = applyDelta(setProduct, breakdown, { [parentPrimaryUnit]: qtyNum });
+        const result = applyDelta(setProduct, breakdown, { [parentBaseUnit]: qtyNum });
         if (!result.ok) {
           throw new Error(
             result.reason === 'unknown-unit'
-              ? t('productInventory.validation.unknownUnit', { unit: parentPrimaryUnit })
+              ? t('productInventory.validation.unknownUnit', { unit: parentBaseUnit })
               : t('productInventory.validation.bad'),
           );
         }
@@ -476,7 +483,7 @@ export function ProductInventoryComposeSetModal({
         const baseUnit = getItemBaseUnit(setProduct);
         const extra: ProductInventoryExtra = {
           unit: baseUnit,
-          onHandByUnit: { [parentPrimaryUnit]: qtyNum },
+          onHandByUnit: { [parentBaseUnit]: qtyNum },
           lastNote: `[compose-set] ${noteSuffix}`,
           lastUpdatedBy: actorId,
         };
@@ -536,7 +543,7 @@ export function ProductInventoryComposeSetModal({
   }, [
     setProduct,
     parentRow,
-    parentPrimaryUnit,
+    parentBaseUnit,
     qtyNum,
     target,
     componentPlans,
@@ -551,7 +558,7 @@ export function ProductInventoryComposeSetModal({
       ? (() => {
           const baseUnit = getItemBaseUnit(setProduct);
           const breakdown = readRowBreakdown(parentRow, baseUnit);
-          const r = applyDelta(setProduct, breakdown, { [parentPrimaryUnit]: qtyNum });
+          const r = applyDelta(setProduct, breakdown, { [parentBaseUnit]: qtyNum });
           return r.ok ? r.onHand : null;
         })()
       : null;
@@ -666,7 +673,7 @@ export function ProductInventoryComposeSetModal({
                       <Text span fw={700}>
                         {newParentOnHand?.toLocaleString() ?? '?'}
                       </Text>{' '}
-                      {lookupLabelOf(unitLabels, parentPrimaryUnit)}
+                      {lookupLabelOf(unitLabels, parentBaseUnit)}
                     </Text>
                   ) : (
                     <Group gap={6} wrap="nowrap">
@@ -678,7 +685,7 @@ export function ProductInventoryComposeSetModal({
                         <Text span fw={700}>
                           {qtyNum.toLocaleString()}
                         </Text>{' '}
-                        {lookupLabelOf(unitLabels, parentPrimaryUnit)}
+                        {lookupLabelOf(unitLabels, parentBaseUnit)}
                       </Text>
                     </Group>
                   )}

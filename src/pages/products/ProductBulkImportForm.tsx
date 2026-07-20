@@ -4,10 +4,10 @@ import type React from 'react';
 import { Badge, Button, Divider, Group, Paper, Progress, Stack, Text } from '@mantine/core';
 import {
   IconCheck,
+  IconCopy,
   IconDownload,
   IconFileSpreadsheet,
   IconPackage,
-  IconPencil,
   IconUpload,
   IconX,
 } from '@tabler/icons-react';
@@ -19,9 +19,13 @@ type ImportResult = {
     
     created: number;
     
-    updated: number;
+    skipped: number;
+    
     failed: number;
   };
+  
+  skipped?: string[];
+  
   errors?: string[];
 };
 
@@ -188,11 +192,13 @@ export function ProductBulkImportForm({
                 </Text>
                 <Progress
                   value={
-                    ((importResult.summary.created + importResult.summary.updated) /
-                      Math.max(1, importResult.summary.total)) *
-                    100
+                    (importResult.summary.created / Math.max(1, importResult.summary.total)) * 100
                   }
-                  color={importResult.summary.failed > 0 ? 'yellow' : 'green'}
+                  color={
+                    importResult.summary.failed > 0 || importResult.summary.skipped > 0
+                      ? 'yellow'
+                      : 'green'
+                  }
                   size="xl"
                   radius="md"
                 />
@@ -203,13 +209,37 @@ export function ProductBulkImportForm({
                   <Badge color="green" variant="light" leftSection={<IconCheck size={14} />}>
                     {t('common.bulkImport.created')}: {importResult.summary.created}
                   </Badge>
-                  <Badge color="teal" variant="light" leftSection={<IconPencil size={14} />}>
-                    {t('common.bulkImport.updated')}: {importResult.summary.updated}
+                  <Badge color="orange" variant="light" leftSection={<IconCopy size={14} />}>
+                    {t('common.bulkImport.skipped')}: {importResult.summary.skipped}
                   </Badge>
                   <Badge color="red" variant="light" leftSection={<IconX size={14} />}>
                     {t('common.bulkImport.failed')}: {importResult.summary.failed}
                   </Badge>
                 </Group>
+                {importResult.skipped && importResult.skipped.length > 0 ? (
+                  <Stack gap={4}>
+                    <Text fw={500} size="sm" c="orange.7">
+                      {t('products.bulkImport.skippedTitle')}
+                    </Text>
+                    {importResult.skipped.map((line, i) => (
+                      <Text key={`skip-${i}`} size="xs" c="dimmed">
+                        • {line}
+                      </Text>
+                    ))}
+                  </Stack>
+                ) : null}
+                {importResult.errors && importResult.errors.length > 0 ? (
+                  <Stack gap={4}>
+                    <Text fw={500} size="sm" c="red.7">
+                      {t('common.bulkImport.errorsTitle')}
+                    </Text>
+                    {importResult.errors.map((line, i) => (
+                      <Text key={`err-${i}`} size="xs" c="dimmed">
+                        • {line}
+                      </Text>
+                    ))}
+                  </Stack>
+                ) : null}
               </Stack>
             </>
           ) : null}

@@ -184,7 +184,7 @@ export function ProductDataTable({
           : []),
         {
           key: 'status',
-          header: t('common.labels.status'),
+          header: t('__new__.01-common.labels.status'),
           ta: 'right',
           render: (item: Product) => (
             <Group gap="xs" wrap="nowrap" justify="flex-end" align="baseline">

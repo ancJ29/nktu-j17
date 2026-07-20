@@ -348,7 +348,7 @@ export function SingleEmployeeForm({
   const statusCard = isEditMode ? (
     <SectionCard
       icon={<IconToggleRight size={14} />}
-      title={t('common.labels.status')}
+      title={t('__new__.01-common.labels.status')}
       padding="md"
     >
       <Switch

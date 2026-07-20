@@ -381,7 +381,7 @@ export function LookupV2Page() {
                   <Table.Th style={{ width: 80 }}>{t('lookups.columns.sortOrder')}</Table.Th>
                   <Table.Th>{t('lookups.columns.label')}</Table.Th>
                   <Table.Th style={{ width: 200 }}>{t('lookups.columns.value')}</Table.Th>
-                  <Table.Th style={{ width: 120 }}>{t('common.labels.status')}</Table.Th>
+                  <Table.Th style={{ width: 120 }}>{t('__new__.01-common.labels.status')}</Table.Th>
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>

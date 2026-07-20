@@ -86,7 +86,7 @@ export function WarehouseDocDataTable({ docs, isLoading, detailRoute, showStatus
         ? [
             {
               key: 'status',
-              header: t('common.labels.status'),
+              header: t('__new__.01-common.labels.status'),
               ta: 'center' as const,
               width: '150px',
               render: (d: WarehouseDocRow) => {

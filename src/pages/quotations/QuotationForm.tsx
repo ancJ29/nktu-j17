@@ -38,6 +38,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
+import { useInitFormFromFetch } from '@/hooks/useInitFormFromFetch';
 import {
   getProductDefaultUnitPrice,
   getProductSuggestedPrice,
@@ -140,7 +141,9 @@ export function QuotationForm() {
   }, [storeInitialized, loadQuotations]);
 
   const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
+  
+  
+  const [seeded, setSeeded] = useState(false);
   
   
   
@@ -159,61 +162,73 @@ export function QuotationForm() {
 
   
   
+  
   const resolveCustomerId = (code: string | undefined): string | undefined =>
-    code ? customers.find((c) => c.code === code)?.id : undefined;
+    code ? useCustomerStore.getState().items.find((c) => c.code === code)?.id : undefined;
 
+  
   
   useEffect(() => {
     if (isMobile || (isEdit ? !perms.salesOrder.canEdit() : !perms.salesOrder.canCreate())) {
       navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
-      return;
     }
-    
-    
-    
-    
-    if ((isEdit || copyFrom) && !customersInitialized) return;
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot route guard
+  }, [isEdit]);
+
+  
+  
+  
+  
+  
+  const fetching = useInitFormFromFetch(
+    form,
+    id,
+    async (id) => {
+      await loadCustomers();
+      const target =
+        (useQuotationStore.getState().getById(id) as Quotation | undefined) ??
+        (await quotationBundle.fetchById(id)).item;
+      if (!target || target.extra.isDeleted) {
+        navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
+        return null;
+      }
+      if (target.extra.status && target.extra.status !== 'draft') {
+        
+        navigate(detailRoute(target.id), { replace: true });
+        return null;
+      }
+      snapshotRef.current = target;
+      setEditCode(target.extra.code);
+      return {
+        customerId: resolveCustomerId(target.extra.customerCode) ?? '',
+        customerName: target.extra.customerName ?? '',
+        assignedStaff: target.extra.assignedStaff ?? '',
+        note: target.extra.note ?? '',
+        lines: (target.extra.lines ?? []).map((l) => ({
+          productCode: l.productCode,
+          productName: l.productName,
+          unit: l.unit ?? '',
+          quantity: l.quantity,
+          unitPrice: l.unitPrice,
+        })),
+      };
+    },
+    () => {
+      notifications.show({ color: 'red', message: t('quotations.notifications.fetchError') });
+      navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
+    },
+  );
+
+  
+  
+  
+  useEffect(() => {
+    if (isEdit) return; 
     let cancelled = false;
     (async () => {
-      if (isEdit && id) {
-        try {
-          const target =
-            (useQuotationStore.getState().getById(id) as Quotation | undefined) ??
-            (await quotationBundle.fetchById(id)).item;
-          if (cancelled) return;
-          if (!target || target.extra.isDeleted) {
-            navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
-            return;
-          }
-          if (target.extra.status && target.extra.status !== 'draft') {
-            
-            navigate(detailRoute(target.id), { replace: true });
-            return;
-          }
-          snapshotRef.current = target;
-          setEditCode(target.extra.code);
-          form.setValues({
-            customerId: resolveCustomerId(target.extra.customerCode) ?? '',
-            customerName: target.extra.customerName ?? '',
-            assignedStaff: target.extra.assignedStaff ?? '',
-            note: target.extra.note ?? '',
-            lines: (target.extra.lines ?? []).map((l) => ({
-              productCode: l.productCode,
-              productName: l.productName,
-              unit: l.unit ?? '',
-              quantity: l.quantity,
-              unitPrice: l.unitPrice,
-            })),
-          });
-        } catch {
-          notifications.show({
-            color: 'red',
-            message: t('quotations.notifications.fetchError'),
-          });
-          navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
-          return;
-        }
-      } else if (copyFrom) {
+      if (copyFrom) {
+        await loadCustomers();
+        if (cancelled) return;
         form.setValues({
           customerId: resolveCustomerId(copyFrom.extra.customerCode) ?? '',
           customerName: copyFrom.extra.customerName ?? '',
@@ -228,17 +243,16 @@ export function QuotationForm() {
           })),
         });
       } else {
-        
         const me = getCurrentEmployeeId();
         if (me) form.setFieldValue('assignedStaff', me);
       }
-      setReady(true);
+      if (!cancelled) setSeeded(true);
     })();
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot load keyed on the route target (+ the customers gate)
-  }, [id, isEdit, customersInitialized]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot copy/create seed
+  }, [isEdit]);
 
   const addLine = () => form.setFieldValue('lines', [...form.values.lines, { ...emptyLine }]);
   const removeLine = (idx: number) =>
@@ -379,7 +393,7 @@ export function QuotationForm() {
     [isEdit, id, customers, t, navigate],
   );
 
-  if (!ready) return null;
+  if (isEdit ? fetching : !seeded) return null;
 
   return (
     <Stack gap="lg">

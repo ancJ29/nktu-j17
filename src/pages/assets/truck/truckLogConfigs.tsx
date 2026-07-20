@@ -369,6 +369,11 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       render: (log) => textCell(log.extra?.condition),
     },
     {
+      header: 'operationLogs.maintenance.columns.odometer',
+      align: 'right',
+      render: (log) => formatNumber(log.extra?.odometer),
+    },
+    {
       header: 'operationLogs.maintenance.columns.unitPrice',
       align: 'right',
       render: (log) => formatNumber(log.extra?.unitPrice),

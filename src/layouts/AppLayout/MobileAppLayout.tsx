@@ -90,7 +90,7 @@ export function MobileAppLayout() {
         currentLanguage: i18n.language,
         onLanguageChange: handleLanguageChange,
       }}
-      showLanguageSwitcher={featureFlags.languageSwitcher}
+      showLanguageSwitcher={featureFlags.common.languageSwitcher}
       morePath={ROUTES.MORE}
       labels={{
         languageTooltip: t('common.labels.language'),

@@ -2,6 +2,7 @@
 
 import {
   buildSelfPrintingHtml,
+  buildStaticHtml,
   contentWidthMm,
   escapeHtml,
   formatVndMoney as money,
@@ -210,6 +211,18 @@ export function buildNktuQuotationHtml(
 ): string {
   const { css, docHtml } = buildParts(data, options);
   return buildSelfPrintingHtml({
+    title: `${DOC_TITLE} ${data.code}`,
+    css,
+    bodyHtml: docHtml,
+  });
+}
+
+export function buildNktuQuotationStaticHtml(
+  data: QuotationPrintData,
+  options: QuotationPrintOptions = DEFAULT_QUOTATION_PRINT_OPTIONS,
+): string {
+  const { css, docHtml } = buildParts(data, options);
+  return buildStaticHtml({
     title: `${DOC_TITLE} ${data.code}`,
     css,
     bodyHtml: docHtml,

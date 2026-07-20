@@ -149,7 +149,7 @@ export const TRUCK_CONFIG: TruckConfig = {
     },
     {
       key: 'status',
-      header: t('common.labels.status'),
+      header: t('__new__.01-common.labels.status'),
       ta: 'right',
       render: (item) => (
         <Group justify="flex-end" wrap="nowrap" pr="sm">

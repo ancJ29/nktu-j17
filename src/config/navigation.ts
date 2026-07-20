@@ -73,7 +73,7 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
   },
   employees: {
     path: ROUTES.EMPLOYEES.LIST,
-    labelKey: 'employees.title',
+    labelKey: '__new__.07-entities.employees.title',
     label: 'Employees',
     defaultIcon: IconName.Users,
   },

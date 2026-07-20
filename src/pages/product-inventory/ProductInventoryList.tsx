@@ -703,9 +703,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.inventory.products.list.searchPlaceholder')}
             hideStatus={true}
-            statusTitle={t('common.labels.status')}
+            statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.filters.active'),
               inactive: t('productInventory.filterInactive'),
             }}
@@ -719,7 +719,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             searchPlaceholder={t('__new__.07-entities.inventory.products.list.searchPlaceholder')}
             hideStatus={true}
             statusLabels={{
-              all: t('common.filters.all'),
+              all: t('__new__.01-common.filters.all'),
               active: t('common.filters.active'),
               inactive: t('productInventory.filterInactive'),
             }}

@@ -514,7 +514,8 @@ export function SingleProductForm({
             
             
             
-            disabled={isEditMode}
+            
+            disabled
             {...form.getInputProps('sku')}
           />
           <Select
@@ -663,7 +664,11 @@ export function SingleProductForm({
   );
 
   const statusCard = isEditMode ? (
-    <SectionCard icon={<IconCategory size={14} />} title={t('common.labels.status')} padding="md">
+    <SectionCard
+      icon={<IconCategory size={14} />}
+      title={t('__new__.01-common.labels.status')}
+      padding="md"
+    >
       <Switch
         label={t('products.form.isActiveLabel')}
         {...form.getInputProps('isActive', { type: 'checkbox' })}
