@@ -15,7 +15,7 @@ import {
   Textarea,
 } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import JsBarcode from 'jsbarcode';
 import { lookupLabelOf, useLookupLabels, useLookupOptions } from '@/hooks';
 import {
@@ -74,6 +74,8 @@ type SingleProductFormProps = {
   readonly form: UseFormReturnType<ProductFormValues>;
   readonly isLoading: boolean;
   readonly isEditMode: boolean;
+  
+  readonly onSkuChange: (value: string) => void;
   readonly onSubmit: (values: ProductFormValues) => void;
   readonly onCancel: () => void;
 };
@@ -459,6 +461,7 @@ export function SingleProductForm({
   form,
   isLoading,
   isEditMode,
+  onSkuChange,
   onSubmit,
   onCancel,
 }: SingleProductFormProps) {
@@ -510,13 +513,19 @@ export function SingleProductForm({
           <TextInput
             label={t('common.labels.sku')}
             placeholder={t('products.form.skuPlaceholder')}
+            description={isEditMode ? undefined : t('products.form.skuCreateDescription')}
             styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
             
             
             
             
-            disabled
+            
+            
+            disabled={isEditMode}
             {...form.getInputProps('sku')}
+            {...(!isEditMode && {
+              onChange: (e: ChangeEvent<HTMLInputElement>) => onSkuChange(e.currentTarget.value),
+            })}
           />
           <Select
             label={t('common.labels.category')}

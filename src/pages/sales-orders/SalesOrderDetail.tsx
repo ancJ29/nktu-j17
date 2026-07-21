@@ -1656,6 +1656,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
                         canEditItemMemo={canEditItemMemo}
                         onItemMemoSave={handleItemMemoPatch}
                         productPhotoOnHover={variant.itemProductPhotoOnHover}
+                        currentOrderNumber={order.orderNumber}
                       />
                     </Box>
                   </Accordion.Panel>
@@ -1872,6 +1873,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               canEditItemMemo={canEditItemMemo}
               onItemMemoSave={handleItemMemoPatch}
               productPhotoOnHover={variant.itemProductPhotoOnHover}
+              currentOrderNumber={order.orderNumber}
             />
           </TitledCard>
         </Tabs.PanelCard>

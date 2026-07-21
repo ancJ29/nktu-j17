@@ -51,7 +51,16 @@ function deriveFromTrips(trips: TransportOrderTrip[]): Partial<MirroredTripField
     truckPlate: first.truckPlate,
     driverId: first.driverId,
     driverName: first.driverName,
-    route: { pickup: first.departure, stuffing: '', dropoff: last.destination },
+    route: {
+      pickup: first.departure,
+      stuffing: '',
+      dropoff: last.destination,
+      
+      
+      
+      ...(first.loadingAt ? { pickupAt: first.loadingAt } : {}),
+      ...(last.unloadingAt ? { dropoffAt: last.unloadingAt } : {}),
+    },
   };
 }
 

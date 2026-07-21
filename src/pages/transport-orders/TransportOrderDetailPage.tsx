@@ -45,6 +45,7 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import { SectionCard } from '@/components/SectionCard';
 import { StatusChangeModal } from '@/components/StatusChangeModal';
 import { DateField } from '@/components/DateField';
+import { DateTimeField } from '@/components/DateTimeField';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import { EmployeeLink } from '@/components/EmployeeLink';
@@ -62,7 +63,12 @@ import {
   perms,
   type ResolvedStatusOption,
 } from '@/utils/permission';
-import { isoToVnDateString, vnDateStringToIso } from '@/utils/dateTimeField';
+import {
+  dateTimeStringToIso,
+  isoToDateTimeString,
+  isoToVnDateString,
+  vnDateStringToIso,
+} from '@/utils/dateTimeField';
 import { appConfig } from '@/config';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import type {
@@ -561,23 +567,62 @@ export function TransportOrderDetailPage() {
   );
 
   
+  const patchRoute = (partial: Partial<typeof order.route>) =>
+    handleMetaPatch({
+      route: {
+        pickup: order.route?.pickup ?? '',
+        stuffing: order.route?.stuffing ?? '',
+        dropoff: order.route?.dropoff ?? '',
+        ...(order.route?.pickupAt ? { pickupAt: order.route.pickupAt } : {}),
+        ...(order.route?.stuffingAt ? { stuffingAt: order.route.stuffingAt } : {}),
+        ...(order.route?.dropoffAt ? { dropoffAt: order.route.dropoffAt } : {}),
+        ...partial,
+      },
+    });
+
   const routeField = (leg: 'pickup' | 'stuffing' | 'dropoff') => (
     <InlineTextField
       canEdit={canEditMeta}
       value={order.route?.[leg] ?? ''}
-      onSave={async (next) =>
-        handleMetaPatch({
-          route: {
-            pickup: order.route?.pickup ?? '',
-            stuffing: order.route?.stuffing ?? '',
-            dropoff: order.route?.dropoff ?? '',
-            [leg]: next.trim(),
-          },
-        })
-      }
+      onSave={async (next) => patchRoute({ [leg]: next.trim() })}
       labels={inlineEditLabels}
     />
   );
+
+  
+  const routeTimeField = (leg: 'pickupAt' | 'stuffingAt' | 'dropoffAt') => (
+    <InlineEditField<string | null>
+      canEdit={canEditMeta}
+      value={isoToDateTimeString(order.route?.[leg])}
+      
+      
+      onSave={async (next) => patchRoute({ [leg]: next ? dateTimeStringToIso(next) : undefined })}
+      labels={inlineEditLabels}
+      renderDisplay={(v) => (
+        <Text size="sm" c="dimmed" fs={v ? undefined : 'italic'}>
+          {v ? formatDateTime(order.route?.[leg]) : '—'}
+        </Text>
+      )}
+      renderEditor={({ value: v, onChange }) => (
+        <DateTimeField
+          value={v}
+          onChange={(next) => onChange((next as string | null) || null)}
+          placeholder={t(`transportOrders.route.${leg}`)}
+          autoFocus
+        />
+      )}
+    />
+  );
+
+  
+  const routeStopRow = (leg: 'pickup' | 'stuffing' | 'dropoff') =>
+    infoRow(
+      t(`transportOrders.route.${leg}`),
+      <Stack gap={0} align="flex-end">
+        {routeField(leg)}
+        {routeTimeField(`${leg}At` as 'pickupAt' | 'stuffingAt' | 'dropoffAt')}
+      </Stack>,
+    );
 
   
   const tripsCard = order.isMultiTrip && (
@@ -587,7 +632,12 @@ export function TransportOrderDetailPage() {
           <Table.Tr>
             <Table.Th>{t('transportOrders.trips.departure')}</Table.Th>
             <Table.Th>{t('transportOrders.trips.destination')}</Table.Th>
-            <Table.Th>{t('transportOrders.columns.date')}</Table.Th>
+            {/* No NGÀY column — the loading estimate carries the leg's day, and
+                the leg's stored `date` is derived from it on the form. A leg with
+                no estimate falls back to showing that date, so a pre-2026-07-21
+                multi-trip order still reads its per-leg day here. */}
+            <Table.Th>{t('transportOrders.trips.loadingAt')}</Table.Th>
+            <Table.Th>{t('transportOrders.trips.unloadingAt')}</Table.Th>
             <Table.Th>{t('transportOrders.columns.truck')}</Table.Th>
             <Table.Th>{t('transportOrders.form.driver')}</Table.Th>
             <Table.Th ta="right">{t('transportOrders.trips.laborCost')}</Table.Th>
@@ -598,7 +648,19 @@ export function TransportOrderDetailPage() {
             <Table.Tr key={i}>
               <Table.Td>{trip.departure || '—'}</Table.Td>
               <Table.Td>{trip.destination || '—'}</Table.Td>
-              <Table.Td>{trip.date ? formatDate(trip.date) : '—'}</Table.Td>
+              {/* Estimates, so they read dimmed — the plan, not what happened.
+                  Read-only like the rest of the leg: `trips` is the source the
+                  order-level mirror derives from, so it is edited on the form. */}
+              <Table.Td c="dimmed">
+                {trip.loadingAt
+                  ? formatDateTime(trip.loadingAt)
+                  : trip.date
+                    ? formatDate(trip.date)
+                    : '—'}
+              </Table.Td>
+              <Table.Td c="dimmed">
+                {trip.unloadingAt ? formatDateTime(trip.unloadingAt) : '—'}
+              </Table.Td>
               {/* Linked, not printed — same rule as the order-level truck/driver,
                   and each leg carries its own plate/name snapshot to fall back on. */}
               <Table.Td>
@@ -682,9 +744,9 @@ export function TransportOrderDetailPage() {
                   {t('transportOrders.route.title')}
                 </Text>
                 <Stack gap={6}>
-                  {infoRow(t('transportOrders.route.pickup'), routeField('pickup'))}
-                  {infoRow(t('transportOrders.route.stuffing'), routeField('stuffing'))}
-                  {infoRow(t('transportOrders.route.dropoff'), routeField('dropoff'))}
+                  {routeStopRow('pickup')}
+                  {routeStopRow('stuffing')}
+                  {routeStopRow('dropoff')}
                 </Stack>
               </>
             )}

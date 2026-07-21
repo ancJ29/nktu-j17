@@ -222,6 +222,7 @@ const SAMPLE_ROWS_EN: SampleRow[] = [
 
 export type BulkProduct = {
   name: string;
+  
   code?: string;
   
   unit?: string;
@@ -437,7 +438,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
 
 type ProductSampleRow = {
   name: string;
-  code: string;
   unit: string;
   sku: string;
   barcode: string;
@@ -453,7 +453,6 @@ type ProductSampleRow = {
 const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
   {
     name: 'Cà phê đen đá',
-    code: 'SP001',
     unit: 'ly',
     sku: 'SKU-COFFEE-01',
     barcode: '8936000000101',
@@ -467,7 +466,6 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
   },
   {
     name: 'Bánh mì thịt nguội',
-    code: 'SP002',
     unit: 'cái',
     sku: 'SKU-SANDWICH-02',
     barcode: '8936000000102',
@@ -481,7 +479,6 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
   },
   {
     name: 'Nước suối Lavie 500ml',
-    code: 'SP003',
     unit: 'chai',
     sku: 'SKU-WATER-03',
     barcode: '8936000000103',
@@ -498,7 +495,6 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
 const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
   {
     name: 'Black Iced Coffee',
-    code: 'PRD001',
     unit: 'cup',
     sku: 'SKU-COFFEE-01',
     barcode: '0123456789012',
@@ -512,7 +508,6 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
   },
   {
     name: 'Ham Sandwich',
-    code: 'PRD002',
     unit: 'piece',
     sku: 'SKU-SANDWICH-02',
     barcode: '0123456789013',
@@ -526,7 +521,6 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
   },
   {
     name: 'Bottled Water 500ml',
-    code: 'PRD003',
     unit: 'bottle',
     sku: 'SKU-WATER-03',
     barcode: '0123456789014',
@@ -556,7 +550,6 @@ export const generateProductExcelTemplate = ({
   const labels: Record<ColumnKey, string> = isVietnamese
     ? {
         name: 'Tên sản phẩm',
-        code: 'Mã sản phẩm',
         unit: 'Đơn vị',
         sku: 'SKU',
         barcode: 'Mã vạch',
@@ -570,7 +563,6 @@ export const generateProductExcelTemplate = ({
       }
     : {
         name: 'Name',
-        code: 'Code',
         unit: 'Unit',
         sku: 'SKU',
         barcode: 'Barcode',
@@ -585,8 +577,10 @@ export const generateProductExcelTemplate = ({
 
   const columns: Column[] = [
     { key: 'name', header: labels.name, width: 28 },
-    { key: 'code', header: labels.code, width: 15 },
     { key: 'unit', header: labels.unit, width: 10 },
+    
+    
+    
     { key: 'sku', header: labels.sku, width: 18 },
     ...(hasBarcode ? [{ key: 'barcode' as const, header: labels.barcode, width: 16 }] : []),
     { key: 'description', header: labels.description, width: 36 },

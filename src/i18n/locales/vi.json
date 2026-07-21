@@ -2832,6 +2832,7 @@
       "setItemsDesc": "Các sản phẩm thành phần bán kèm trong một bộ. Mỗi thành phần phải là sản phẩm thường (không phải bộ). Để trống nếu đây không phải bộ.",
       "sizeLabel": "Kích thước",
       "sizePlaceholder": "vd: M, 42, 120×60 cm",
+      "skuCreateDescription": "Đồng thời là mã sản phẩm. Để trống để hệ thống tự sinh.",
       "skuPlaceholder": "Mã SKU",
       "suggestedPriceDescription": "Đơn giá mặc định khi thêm vào đơn bán hàng mới.",
       "suggestedPriceLabel": "Giá đề xuất",
@@ -2871,6 +2872,7 @@
       "single": "Một sản phẩm"
     },
     "validation": {
+      "codeDuplicate": "Một sản phẩm khác đã dùng mã này",
       "pairUnitRequired": "Vui lòng nhập đơn vị khi đã có giá trị",
       "pairValueRequired": "Vui lòng nhập giá trị khi đã chọn đơn vị",
       "setItemMissingProduct": "Hãy chọn sản phẩm cho mọi thành phần",
@@ -3600,6 +3602,7 @@
         "notesChanged": "Ghi chú đã thay đổi",
         "reason": "Lý do",
         "route": "Tuyến",
+        "scheduleChanged": "Đã đổi thời gian dự kiến",
         "total": "Tổng",
         "trips_one": "{{count}} chặng",
         "trips_other": "{{count}} chặng"
@@ -3669,9 +3672,12 @@
     "route": {
       "collapse": "Thu gọn",
       "dropoff": "Nơi hạ",
+      "dropoffAt": "Giờ hạ dự kiến",
       "expand": "Xem các chặng",
       "pickup": "Nơi lấy",
+      "pickupAt": "Giờ lấy dự kiến",
       "stuffing": "Nơi đóng/rút hàng",
+      "stuffingAt": "Giờ đóng/rút hàng dự kiến",
       "title": "Tuyến dịch vụ",
       "tripTotal": "(tổng {{count}} chặng)"
     },
@@ -3697,7 +3703,9 @@
       "destination": "Điểm đến",
       "laborCost": "Lương chuyến",
       "laborTotal": "Tổng lương chuyến",
-      "title": "Danh sách chặng"
+      "loadingAt": "Đóng hàng dự kiến",
+      "title": "Danh sách chặng",
+      "unloadingAt": "Xuống hàng dự kiến"
     },
     "validation": {
       "containerNumberPattern": "Số cont phải đúng định dạng, ví dụ RFCU9876543 (3 chữ cái, U/J/Z, rồi 7 chữ số)",

@@ -37,6 +37,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { device, logger } from '@credo/base-ui/utils';
 import { DateField } from '@/components/DateField';
+import { DateTimeField } from '@/components/DateTimeField';
 import { SectionCard } from '@/components/SectionCard';
 import { EmployeeSelector, CustomerSelector } from '@/components/selectors';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
@@ -46,7 +47,13 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { getCurrentActorId, getCurrentEmployeeStamp, useInitFormFromFetch } from '@/hooks';
 import { logActivity } from '@/utils/activityLogger';
 import { isDriverDepartment } from '@/utils/permission';
-import { isoToVnDateString, todayInVnDateString, vnDateStringToIso } from '@/utils/dateTimeField';
+import {
+  dateTimeStringToIso,
+  isoToDateTimeString,
+  isoToVnDateString,
+  todayInVnDateString,
+  vnDateStringToIso,
+} from '@/utils/dateTimeField';
 import { buildDailySequentialCode, bumpSequentialCode, businessDateString } from '@/utils/code';
 import { appConfig } from '@/config';
 import type {
@@ -107,6 +114,10 @@ type TripRow = {
   departure: string;
   destination: string;
   date: string | null;
+  
+  loadingAt: string | null;
+  
+  unloadingAt: string | null;
   truckId: string;
   truckPlate: string;
   driverId: string;
@@ -130,6 +141,10 @@ type FormValues = {
   pickup: string;
   stuffing: string;
   dropoff: string;
+  
+  pickupAt: string | null;
+  stuffingAt: string | null;
+  dropoffAt: string | null;
   fees: FeeRow[];
   
   advanceAmount: number;
@@ -168,11 +183,20 @@ function toFeeRows(order: Pick<TransportOrder, 'fees' | 'disbursements'>): FeeRo
   }));
 }
 
+function tripDate(trip: TripRow): string | null {
+  const fromLoading = trip.loadingAt ? isoToVnDateString(dateTimeStringToIso(trip.loadingAt)) : null;
+  return fromLoading ?? trip.date ?? todayInVnDateString();
+}
+
 function blankTrip(): TripRow {
   return {
     departure: '',
     destination: '',
     date: todayInVnDateString(),
+    
+    
+    loadingAt: null,
+    unloadingAt: null,
     truckId: '',
     truckPlate: '',
     driverId: '',
@@ -197,6 +221,9 @@ function blankValues(): FormValues {
     pickup: '',
     stuffing: '',
     dropoff: '',
+    pickupAt: null,
+    stuffingAt: null,
+    dropoffAt: null,
     fees: initialFees(),
     advanceAmount: 0,
     vatRatePercent: DEFAULT_VAT_PERCENT,
@@ -215,6 +242,8 @@ function copiedValues(src: TransportOrder): FormValues {
       departure: trip.departure || '',
       destination: trip.destination || '',
       date: todayInVnDateString(),
+      loadingAt: null,
+      unloadingAt: null,
       truckId: trip.truckId,
       truckPlate: trip.truckPlate,
       driverId: trip.driverId,
@@ -233,6 +262,9 @@ function copiedValues(src: TransportOrder): FormValues {
     pickup: src.route?.pickup || '',
     stuffing: src.route?.stuffing || '',
     dropoff: src.route?.dropoff || '',
+    pickupAt: null,
+    stuffingAt: null,
+    dropoffAt: null,
     
     fees: toFeeRows(src),
     advanceAmount: 0,
@@ -339,8 +371,15 @@ export function TransportOrderFormPage() {
           values.isMultiTrip && !v ? t('transportOrders.validation.truckRequired') : null,
         driverId: (v: string, values: FormValues) =>
           values.isMultiTrip && !v ? t('transportOrders.validation.driverRequired') : null,
-        date: (v: string | null, values: FormValues) =>
-          values.isMultiTrip && !v ? t('transportOrders.validation.entryDateRequired') : null,
+        // `date` lost its rule with its input: the leg no longer authors one (it
+        // falls out of `loadingAt` — see `tripDate`), and a required check on a
+        // field with no visible input is an unfixable save-blocker.
+        //
+        // `loadingAt` deliberately does NOT inherit that required rule. A leg
+        // whose slot isn't booked yet is a real state the dispatcher is in, and
+        // every multi-trip order written before 2026-07-21 has no times at all —
+        // requiring one would lock those orders out of editing. `tripDate` keeps
+        // the date honest in both cases instead.
       },
     },
   });
@@ -369,6 +408,8 @@ export function TransportOrderFormPage() {
           departure: trip.departure || '',
           destination: trip.destination || '',
           date: trip.date ? isoToVnDateString(trip.date) : null,
+          loadingAt: isoToDateTimeString(trip.loadingAt),
+          unloadingAt: isoToDateTimeString(trip.unloadingAt),
           truckId: trip.truckId,
           truckPlate: trip.truckPlate,
           driverId: trip.driverId,
@@ -387,6 +428,9 @@ export function TransportOrderFormPage() {
         pickup: o.route?.pickup || '',
         stuffing: o.route?.stuffing || '',
         dropoff: o.route?.dropoff || '',
+        pickupAt: isoToDateTimeString(o.route?.pickupAt),
+        stuffingAt: isoToDateTimeString(o.route?.stuffingAt),
+        dropoffAt: isoToDateTimeString(o.route?.dropoffAt),
         
         
         fees: toFeeRows(o),
@@ -430,7 +474,14 @@ export function TransportOrderFormPage() {
       const trips: TransportOrderTrip[] = values.trips.map((trip) => ({
         departure: trip.departure.trim(),
         destination: trip.destination.trim(),
-        date: vnDateStringToIso(trip.date),
+        
+        
+        
+        date: vnDateStringToIso(tripDate(trip)),
+        
+        
+        ...(trip.loadingAt ? { loadingAt: dateTimeStringToIso(trip.loadingAt) } : {}),
+        ...(trip.unloadingAt ? { unloadingAt: dateTimeStringToIso(trip.unloadingAt) } : {}),
         truckId: trip.truckId,
         truckPlate: trip.truckPlate.trim(),
         driverId: trip.driverId,
@@ -441,6 +492,14 @@ export function TransportOrderFormPage() {
         pickup: values.pickup.trim(),
         stuffing: values.stuffing.trim(),
         dropoff: values.dropoff.trim(),
+        
+        
+        
+        
+        
+        ...(values.pickupAt ? { pickupAt: dateTimeStringToIso(values.pickupAt) } : {}),
+        ...(values.stuffingAt ? { stuffingAt: dateTimeStringToIso(values.stuffingAt) } : {}),
+        ...(values.dropoffAt ? { dropoffAt: dateTimeStringToIso(values.dropoffAt) } : {}),
       };
       const vatRate = (values.vatRatePercent || 0) / 100;
 
@@ -836,7 +895,12 @@ export function TransportOrderFormPage() {
                   <Table.Tr>
                     <Table.Th>{t('transportOrders.trips.departure')}</Table.Th>
                     <Table.Th>{t('transportOrders.trips.destination')}</Table.Th>
-                    <Table.Th w={150}>{t('transportOrders.columns.date')}</Table.Th>
+                    {/* The warehouse's plan for this leg — day + hour, at each end
+                        of it. There is no NGÀY column: a full loading datetime
+                        already carries the day, so the leg's date is derived from
+                        it (`tripDate`) rather than typed a second time. */}
+                    <Table.Th w={185}>{t('transportOrders.trips.loadingAt')}</Table.Th>
+                    <Table.Th w={185}>{t('transportOrders.trips.unloadingAt')}</Table.Th>
                     <Table.Th w={190}>{t('transportOrders.columns.truck')}</Table.Th>
                     <Table.Th w={190}>{t('transportOrders.form.driver')}</Table.Th>
                     <Table.Th w={150}>{t('transportOrders.trips.laborCost')}</Table.Th>
@@ -853,7 +917,10 @@ export function TransportOrderFormPage() {
                         <TextInput {...form.getInputProps(`trips.${i}.destination`)} />
                       </Table.Td>
                       <Table.Td>
-                        <DateField {...form.getInputProps(`trips.${i}.date`)} />
+                        <DateTimeField {...form.getInputProps(`trips.${i}.loadingAt`)} />
+                      </Table.Td>
+                      <Table.Td>
+                        <DateTimeField {...form.getInputProps(`trips.${i}.unloadingAt`)} />
                       </Table.Td>
                       <Table.Td>
                         <Select
@@ -909,19 +976,40 @@ export function TransportOrderFormPage() {
           {/* Route — single-trip only; the leg list above supersedes it. */}
           {!form.values.isMultiTrip && (
             <SectionCard icon={<IconMapPin size={14} />} title={t('transportOrders.route.title')}>
+              {/* Each stop is a place + the time the warehouse expects the truck
+                  there, stacked in one column so the pair reads as one stop
+                  rather than as two unrelated rows of inputs. */}
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
-                <TextInput
-                  label={t('transportOrders.route.pickup')}
-                  {...form.getInputProps('pickup')}
-                />
-                <TextInput
-                  label={t('transportOrders.route.stuffing')}
-                  {...form.getInputProps('stuffing')}
-                />
-                <TextInput
-                  label={t('transportOrders.route.dropoff')}
-                  {...form.getInputProps('dropoff')}
-                />
+                <Stack gap="xs">
+                  <TextInput
+                    label={t('transportOrders.route.pickup')}
+                    {...form.getInputProps('pickup')}
+                  />
+                  <DateTimeField
+                    label={t('transportOrders.route.pickupAt')}
+                    {...form.getInputProps('pickupAt')}
+                  />
+                </Stack>
+                <Stack gap="xs">
+                  <TextInput
+                    label={t('transportOrders.route.stuffing')}
+                    {...form.getInputProps('stuffing')}
+                  />
+                  <DateTimeField
+                    label={t('transportOrders.route.stuffingAt')}
+                    {...form.getInputProps('stuffingAt')}
+                  />
+                </Stack>
+                <Stack gap="xs">
+                  <TextInput
+                    label={t('transportOrders.route.dropoff')}
+                    {...form.getInputProps('dropoff')}
+                  />
+                  <DateTimeField
+                    label={t('transportOrders.route.dropoffAt')}
+                    {...form.getInputProps('dropoffAt')}
+                  />
+                </Stack>
               </SimpleGrid>
             </SectionCard>
           )}

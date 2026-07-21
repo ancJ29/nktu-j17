@@ -18,8 +18,7 @@ import {
 } from '@/utils/permission';
 import { getLinePhysicalQuantity } from '@/utils/salesOrderItemQuantity';
 import {
-  getOwnReservedAtLocation,
-  getProductLocationAvailability,
+  getSequentialAvailability,
   getUnitAvailabilityAtLocation,
   indexInventoryByProduct,
 } from '@/utils/inventoryCommitment';
@@ -55,6 +54,8 @@ type OrderItemsTableProps = {
   
   ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[];
   
+  currentOrderNumber?: string;
+  
   inventoryLinkageState?: InventoryLinkageState;
   
   canEditItemMemo?: boolean;
@@ -72,6 +73,7 @@ export function OrderItemsTable({
   canEditItemMemo = false,
   onItemMemoSave,
   productPhotoOnHover = false,
+  currentOrderNumber,
 }: OrderItemsTableProps) {
   
   
@@ -155,18 +157,14 @@ export function OrderItemsTable({
     
     if (isNoInventoryProduct(product)) return null;
     const target = locationCode || DEFAULT_LOCATION_CODE;
-    const summary = getProductLocationAvailability(product, target, inventoryByProduct);
     
     
     
     
-    
-    
-    
-    const incoming = inboundByProduct.get(productCode)?.totalBase ?? 0;
-    return (
-      summary.available + getOwnReservedAtLocation(product, target, ownReservedSnapshot) + incoming
-    );
+    return getSequentialAvailability(product, target, inventoryByProduct, {
+      orderNumber: currentOrderNumber,
+      incoming: inboundByProduct.get(productCode)?.totalBase ?? 0,
+    });
   }
 
   

@@ -109,6 +109,12 @@ export function ProductFormPage() {
 
   const [loading, setLoading] = useState(false);
 
+  
+  
+  
+  
+  const skuIsCustomRef = useRef(false);
+
   const form = useForm<ProductFormValues>({
     initialValues: {
       name: '',
@@ -119,7 +125,6 @@ export function ProductFormPage() {
       price: 0,
       isActive: true,
       alternativeNames: [],
-      
       
       
       
@@ -149,14 +154,24 @@ export function ProductFormPage() {
       
       
       
-      sku: (v) => {
+      
+      
+      
+      
+      
+      
+      sku: (v, values) => {
         const sku = v.trim();
-        if (!sku) return null;
         const items = useProductStore.getState().items;
-        const collision = items.find(
-          (p) => p.id !== id && !p.extra?.isDeleted && p.extra?.sku?.trim() === sku,
-        );
-        return collision ? t('products.validation.skuDuplicate') : null;
+        const alive = items.filter((p) => p.id !== id && !p.extra?.isDeleted);
+        if (sku && alive.some((p) => p.extra?.sku?.trim() === sku)) {
+          return t('products.validation.skuDuplicate');
+        }
+        const code = values.code.trim();
+        if (!isEdit && code && alive.some((p) => p.code.trim() === code)) {
+          return t('products.validation.codeDuplicate');
+        }
+        return null;
       },
       units: (v) => (v.length > 0 ? null : t('common.validation.unitRequired')),
       unitConversions: (conversions, values) => {
@@ -206,14 +221,34 @@ export function ProductFormPage() {
   
   
   
+  
   useEffect(() => {
-    if (isEdit) return;
+    if (isEdit || skuIsCustomRef.current) return;
     const nextCode = buildNextProductCode(totalProducts + 1);
     form.setFieldValue('code', nextCode);
     
     form.setFieldValue('sku', nextCode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, totalProducts]);
+
+  
+  
+  
+  const handleSkuChange = useCallback(
+    (value: string) => {
+      if (value.trim() === '') {
+        skuIsCustomRef.current = false;
+        const nextCode = buildNextProductCode(useProductStore.getState().items.length + 1);
+        form.setFieldValue('sku', value);
+        form.setFieldValue('code', nextCode);
+        return;
+      }
+      skuIsCustomRef.current = true;
+      form.setFieldValue('sku', value);
+      form.setFieldValue('code', value.trim());
+    },
+    [form],
+  );
 
   const productToFormValues = useCallback((p: Product): ProductFormValues => {
     const min = p.extra?.minimumInventory;
@@ -427,9 +462,15 @@ export function ProductFormPage() {
           
           
           await useProductStore.getState().forceRefresh();
-          const newCode = buildNextProductCode(useProductStore.getState().items.length + 1);
-          form.setFieldValue('code', newCode);
-          form.setFieldValue('sku', newCode);
+          
+          
+          
+          let newCode = form.values.code;
+          if (!skuIsCustomRef.current) {
+            newCode = buildNextProductCode(useProductStore.getState().items.length + 1);
+            form.setFieldValue('code', newCode);
+            form.setFieldValue('sku', newCode);
+          }
           notifications.show({
             color: 'yellow',
             title: t('common.conflict.title'),
@@ -585,12 +626,15 @@ export function ProductFormPage() {
       
       
       
+      
+      
+      
       const user = useAuthStore.getState().user;
       const updatedBy = user?.email ?? 'unknown';
       const now = Date.now();
       let nextCodeNum = totalProducts + 1;
       const items = products.map((p) => {
-        const code = p.code?.trim() || buildNextProductCode(nextCodeNum++);
+        const code = p.sku?.trim() || buildNextProductCode(nextCodeNum++);
         
         
         const resolveUnit = (raw: string | undefined) => {
@@ -612,6 +656,7 @@ export function ProductFormPage() {
           .map((raw) => tagLabelToCanonical.get(raw.trim().toLowerCase()))
           .filter((v): v is string => Boolean(v));
         const extra: ProductExtra = {
+          
           
           
           
@@ -747,6 +792,7 @@ export function ProductFormPage() {
       form={form}
       isLoading={loading}
       isEditMode={isEdit}
+      onSkuChange={handleSkuChange}
       onSubmit={handleSubmit}
       onCancel={navigateToList}
     />

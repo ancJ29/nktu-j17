@@ -2832,6 +2832,7 @@
       "setItemsDesc": "Components sold together as a bundle. Each component must be a real (non-set) product. Leave empty for a normal product.",
       "sizeLabel": "Size",
       "sizePlaceholder": "e.g. M, 42, 120×60 cm",
+      "skuCreateDescription": "Also becomes the product code. Leave blank to auto-generate.",
       "skuPlaceholder": "Stock-keeping unit",
       "suggestedPriceDescription": "Default unit price when added to a new sales order.",
       "suggestedPriceLabel": "Suggested price",
@@ -2871,6 +2872,7 @@
       "single": "Single product"
     },
     "validation": {
+      "codeDuplicate": "Another product already uses this code",
       "pairUnitRequired": "Unit is required when value is set",
       "pairValueRequired": "Value is required when unit is set",
       "setItemMissingProduct": "Pick a product for every set component",
@@ -3600,6 +3602,7 @@
         "notesChanged": "Note changed",
         "reason": "Reason",
         "route": "Route",
+        "scheduleChanged": "Estimated times changed",
         "total": "Total",
         "trips_one": "{{count}} trip",
         "trips_other": "{{count}} trips"
@@ -3669,9 +3672,12 @@
     "route": {
       "collapse": "Collapse trips",
       "dropoff": "Drop-off",
+      "dropoffAt": "Est. drop-off time",
       "expand": "Expand trips",
       "pickup": "Pickup",
+      "pickupAt": "Est. pickup time",
       "stuffing": "Stuffing / Unstuffing",
+      "stuffingAt": "Est. loading time",
       "title": "Service Route",
       "tripTotal": "(total: {{count}} trips)"
     },
@@ -3697,7 +3703,9 @@
       "destination": "To",
       "laborCost": "Driver pay",
       "laborTotal": "Total driver pay",
-      "title": "Trips"
+      "loadingAt": "Est. loading",
+      "title": "Trips",
+      "unloadingAt": "Est. unloading"
     },
     "validation": {
       "containerNumberPattern": "Container number must match e.g. RFCU9876543 (3 letters, one of U/J/Z, then 7 digits)",

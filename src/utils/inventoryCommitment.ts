@@ -193,3 +193,42 @@ export function getUnitAvailabilityAtLocation(
   }
   return onHand - reserved + own;
 }
+
+export function getSequentialAvailability(
+  product: Product,
+  locationCode: string,
+  byProduct: Map<string, ProductInventoryRow[]>,
+  options: { readonly orderNumber?: string; readonly incoming?: number } = {},
+): number {
+  const rows = (byProduct.get(product.code) ?? []).filter(
+    (r) =>
+      !r.extra?.isDeleted &&
+      
+      (r.locationCode === locationCode ||
+        (isDefaultLocation(r.locationCode) && isDefaultLocation(locationCode))),
+  );
+  const baseUnit = getItemBaseUnit(product);
+  let onHand = 0;
+  
+  
+  const heldByOrder = new Map<string, { orderNumber: string; qty: number }>();
+  for (const row of rows) {
+    onHand += recomputeOnHand(product, readRowBreakdown(row, baseUnit));
+    for (const [salesOrderId, entry] of Object.entries(row.extra?.reservedBySalesOrder ?? {})) {
+      const qty = recomputeOnHand(product, entry.byUnit);
+      if (!qty) continue;
+      const prev = heldByOrder.get(salesOrderId);
+      heldByOrder.set(salesOrderId, {
+        orderNumber: entry.orderNumber,
+        qty: (prev?.qty ?? 0) + qty,
+      });
+    }
+  }
+
+  const current = options.orderNumber;
+  let ahead = 0;
+  for (const held of heldByOrder.values()) {
+    if (current == null || held.orderNumber.localeCompare(current) < 0) ahead += held.qty;
+  }
+  return onHand + (options.incoming ?? 0) - ahead;
+}

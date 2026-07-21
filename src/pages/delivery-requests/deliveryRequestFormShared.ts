@@ -7,7 +7,7 @@
 
 import type { CMngtDeliveryRequestDirection } from '@credo/connectors/types';
 import type { DateTimeInput } from '@credo/kits/types';
-import type { Vendor } from '@/types';
+import type { Customer, Vendor } from '@/types';
 
 export type ItemFormValues = {
   productCode: string;
@@ -118,6 +118,35 @@ export function resolveVendorInboundAddress(vendor: Vendor | undefined | null): 
     return {
       deliveryAddress: vendor.address,
       googleMapUrl: vendor.extra?.addressGoogleMapUrl ?? '',
+    };
+  }
+  return { deliveryAddress: '', googleMapUrl: '' };
+}
+
+/**
+ * Resolve a customer's pickup address + Google Maps URL for an inbound
+ * **customer-sample** DR (the driver still has to drive somewhere to collect
+ * the sample — the sample path used to persist a blank address, leaving the
+ * detail page showing `-` and no map link). Same ladder the SO form uses when
+ * it seeds a delivery address: the first declared shipping address wins,
+ * otherwise the billing `customer.address` (+ its `extra.addressGoogleMapUrl`).
+ * Returns empty strings for an unresolved customer.
+ */
+export function resolveCustomerPickupAddress(customer: Customer | undefined | null): {
+  deliveryAddress: string;
+  googleMapUrl: string;
+} {
+  const firstShipping = customer?.extra?.shippingAddresses?.[0];
+  if (firstShipping) {
+    return {
+      deliveryAddress: firstShipping.address,
+      googleMapUrl: firstShipping.googleMapUrl ?? '',
+    };
+  }
+  if (customer?.address) {
+    return {
+      deliveryAddress: customer.address,
+      googleMapUrl: customer.extra?.addressGoogleMapUrl ?? '',
     };
   }
   return { deliveryAddress: '', googleMapUrl: '' };

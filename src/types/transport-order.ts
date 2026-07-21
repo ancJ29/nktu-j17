@@ -10,9 +10,15 @@ export type TransportOrderRoute = {
   
   pickup: string;
   
+  pickupAt?: DateTimeInput;
+  
   stuffing: string;
   
+  stuffingAt?: DateTimeInput;
+  
   dropoff: string;
+  
+  dropoffAt?: DateTimeInput;
 };
 
 export type TransportOrderTrip = {
@@ -22,6 +28,9 @@ export type TransportOrderTrip = {
   destination: string;
   
   date: DateTimeInput;
+  
+  loadingAt?: DateTimeInput;
+  unloadingAt?: DateTimeInput;
   
   truckId: string;
   

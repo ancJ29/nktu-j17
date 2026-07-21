@@ -45,6 +45,7 @@ import type { Customer, SalesOrder, Vendor } from '@/types';
 import { bulkCreateOutboundDeliveryRequests } from './bulkCreateDeliveryRequests';
 import { createDeliveryRequestRecord } from './createDeliveryRequest';
 import {
+  resolveCustomerPickupAddress,
   resolveVendorInboundAddress,
   toDateTimeInputOrUndefined,
 } from './deliveryRequestFormShared';
@@ -109,7 +110,9 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   
   
   const [oneOffVendor, setOneOffVendor] = useState(false);
-  const [sampleCustomerId, setSampleCustomerId] = useState<string | null>(null);
+  
+  
+  const [sampleCustomer, setSampleCustomer] = useState<Customer | null>(null);
   const [sampleCustomerName, setSampleCustomerName] = useState('');
 
   
@@ -227,7 +230,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
       setVendorName('');
       setVendorCode('');
       setOneOffVendor(false);
-      setSampleCustomerId(null);
+      setSampleCustomer(null);
       setSampleCustomerName('');
     }
   };
@@ -237,7 +240,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     setInboundSource(next);
     
     if (next === 'vendor') {
-      setSampleCustomerId(null);
+      setSampleCustomer(null);
       setSampleCustomerName('');
     } else {
       setVendorName('');
@@ -344,7 +347,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
         ? vendors.find((v) => v.code === vendorCode.trim())
         : undefined;
     const { deliveryAddress, googleMapUrl } = isSample
-      ? { deliveryAddress: '', googleMapUrl: '' }
+      ? resolveCustomerPickupAddress(sampleCustomer)
       : resolveVendorInboundAddress(matchedVendor);
     try {
       const { linkFailed } = await createDeliveryRequestRecord({
@@ -397,6 +400,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     }
   }, [
     inboundSource,
+    sampleCustomer,
     sampleCustomerName,
     vendorName,
     vendorCode,
@@ -508,9 +512,9 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
               placeholder={t('common.labels.customer')}
               withAsterisk
               clearable
-              value={sampleCustomerId}
+              value={sampleCustomer?.id ?? null}
               onChange={(sel) => {
-                setSampleCustomerId(sel?.id ?? null);
+                setSampleCustomer(sel?.customer ?? null);
                 setSampleCustomerName(sel?.name ?? '');
               }}
             />

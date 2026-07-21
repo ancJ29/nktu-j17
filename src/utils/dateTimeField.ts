@@ -35,11 +35,27 @@ export function nowDateTimeString(): string {
  * `YYYY-MM-DD HH:mm:ss` display string. Returns `null` on empty/invalid
  * input so the picker shows its placeholder instead of a broken value.
  */
-export function isoToDateTimeString(iso: string | null | undefined): string | null {
+export function isoToDateTimeString(iso: NullableDateTimeInput): string | null {
   if (!iso) return null;
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
   return formatLocal(d);
+}
+
+/**
+ * The inverse: the picker's `YYYY-MM-DD HH:mm:ss` string → an ISO timestamp for
+ * the wire. Returns `''` for empty/invalid input, so a caller can spread the key
+ * away rather than storing a broken value.
+ *
+ * Callers used to write `new Date(v).toISOString()` inline, which throws a
+ * `RangeError` on an invalid date instead of degrading — this is the safe pair
+ * to `isoToDateTimeString`.
+ */
+export function dateTimeStringToIso(value: string | null | undefined): string {
+  if (!value) return '';
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return '';
+  return d.toISOString();
 }
 
 // ---------------------------------------------------------------------------

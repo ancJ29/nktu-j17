@@ -17,8 +17,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { DateField } from '@/components/DateField';
-import { EmployeeSelector } from '@/components/selectors';
+import { CustomerSelector, EmployeeSelector } from '@/components/selectors';
 import { EntityConflictError } from '@/stores/createEntityStore';
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import {
@@ -28,6 +29,7 @@ import {
 import type { DeliveryRequest, DeliveryRequestExtra, Vendor } from '@/types';
 import { updateDeliveryRequestRecord } from './createDeliveryRequest';
 import {
+  resolveCustomerPickupAddress,
   resolveVendorInboundAddress,
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
@@ -88,6 +90,10 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   
   const inboundKind = (request.extra as DeliveryRequestExtra | undefined)?.inboundKind ?? 'vendor';
   const partyIsCustomer = !isInbound || inboundKind !== 'vendor';
+  
+  
+  
+  const isSample = isInbound && inboundKind === 'customer-sample';
 
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
@@ -95,13 +101,27 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   const vendors = useVendorStore((s) => s.items);
   const vendorsInit = useVendorStore((s) => s.initialized);
   const loadVendors = useVendorStore((s) => s.loadAll);
+  const customers = useCustomerStore((s) => s.items);
+  const customersInit = useCustomerStore((s) => s.initialized);
+  const loadCustomers = useCustomerStore((s) => s.loadAll);
 
+  
   
   
   useEffect(() => {
     if (!employeesInit) loadEmployees();
     if (!partyIsCustomer && !vendorsInit) loadVendors();
-  }, [employeesInit, loadEmployees, partyIsCustomer, vendorsInit, loadVendors]);
+    if (isSample && !customersInit) loadCustomers();
+  }, [
+    employeesInit,
+    loadEmployees,
+    partyIsCustomer,
+    vendorsInit,
+    loadVendors,
+    isSample,
+    customersInit,
+    loadCustomers,
+  ]);
 
   const vendorOptions = useMemo(
     () =>
@@ -193,6 +213,18 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
     }
   };
 
+  
+  
+  
+  
+  const sampleCustomerId = isSample
+    ? (customers.find(
+        (c) =>
+          c.name === form.getValues().customerName ||
+          c.extra?.shortName === form.getValues().customerName,
+      )?.id ?? null)
+    : null;
+
   const addressLabel = isInbound
     ? t('deliveryRequests.form.pickupAddressLabel')
     : t('common.labels.deliveryAddress');
@@ -244,14 +276,35 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
                 readOnly
               />
             ) : null}
-            <TextInput
-              label={t('deliveryRequests.form.customerNameLabel')}
-              placeholder={t('deliveryRequests.form.customerNamePlaceholder')}
-              
-              
-              readOnly={!!request.salesOrderId}
-              {...form.getInputProps('customerName')}
-            />
+            {isSample ? (
+              <CustomerSelector
+                label={t('common.labels.customer')}
+                placeholder={t('common.labels.customer')}
+                value={sampleCustomerId}
+                onChange={(sel) => {
+                  
+                  
+                  
+                  if (!sel) return;
+                  form.setFieldValue('customerName', sel.name);
+                  if (sel.id === sampleCustomerId) return;
+                  const { deliveryAddress, googleMapUrl } = resolveCustomerPickupAddress(
+                    sel.customer,
+                  );
+                  form.setFieldValue('deliveryAddress', deliveryAddress);
+                  form.setFieldValue('googleMapUrl', googleMapUrl);
+                }}
+              />
+            ) : (
+              <TextInput
+                label={t('deliveryRequests.form.customerNameLabel')}
+                placeholder={t('deliveryRequests.form.customerNamePlaceholder')}
+                
+                
+                readOnly={!!request.salesOrderId}
+                {...form.getInputProps('customerName')}
+              />
+            )}
           </>
         )}
 

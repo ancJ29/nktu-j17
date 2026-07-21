@@ -3,6 +3,7 @@ import { ActionIcon, Box, Group, Stack, Text } from '@mantine/core';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { TransportOrder } from '@/types';
+import { formatDateTime } from '@/utils/dateFormat';
 import { useTruckPlate } from './truckDisplay';
 
 function VehicleLines({
@@ -44,14 +45,47 @@ export function TransportRouteCell({ order }: { order: TransportOrder }) {
   const [expanded, setExpanded] = useState(true);
 
   if (!order.isMultiTrip) {
-    const points = [order.route?.pickup, order.route?.stuffing, order.route?.dropoff]
-      .map((p) => p?.trim())
-      .filter(Boolean);
+    const stops = (
+      [
+        [order.route?.pickup, order.route?.pickupAt],
+        [order.route?.stuffing, order.route?.stuffingAt],
+        [order.route?.dropoff, order.route?.dropoffAt],
+      ] as const
+    )
+      .map(([place, at]) => ({ place: typeof place === 'string' ? place.trim() : '', at }))
+      .filter((s) => s.place);
+    
+    
+    
+    
+    const scheduled = stops.some((s) => s.at);
     return (
       <Stack gap={2}>
-        <Text fz="sm" fw={500} lineClamp={2}>
-          {points.join(' → ') || '—'}
-        </Text>
+        {scheduled ? (
+          <Stack gap={0}>
+            {stops.map((s, i) => (
+              <Group key={i} gap={6} wrap="nowrap" align="baseline">
+                <Text fz="sm" fw={500} lineClamp={1}>
+                  {i > 0 && (
+                    <Text span c="dimmed">
+                      {'→ '}
+                    </Text>
+                  )}
+                  {s.place}
+                </Text>
+                {s.at && (
+                  <Text fz="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                    {formatDateTime(s.at)}
+                  </Text>
+                )}
+              </Group>
+            ))}
+          </Stack>
+        ) : (
+          <Text fz="sm" fw={500} lineClamp={2}>
+            {stops.map((s) => s.place).join(' → ') || '—'}
+          </Text>
+        )}
         <VehicleLines
           truckName={order.truckPlate}
           plate={plateOf(order.truckId)}
@@ -93,8 +127,16 @@ export function TransportRouteCell({ order }: { order: TransportOrder }) {
                     '—'}
                 </Text>
               </Group>
-              {/* Truck + driver indented under the leg they belong to. */}
+              {/* The leg's estimated slots, indented with its vehicle — one line
+                  for both ends, since on a leg they read as a span. */}
               <Box pl="md">
+                {(trip.loadingAt || trip.unloadingAt) && (
+                  <Text fz="xs" c="dimmed" lineClamp={1}>
+                    {[trip.loadingAt, trip.unloadingAt]
+                      .map((v) => (v ? formatDateTime(v) : '?'))
+                      .join(' → ')}
+                  </Text>
+                )}
                 <VehicleLines
                   truckName={trip.truckPlate}
                   plate={plateOf(trip.truckId)}

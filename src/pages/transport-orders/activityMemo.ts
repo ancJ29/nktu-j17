@@ -26,6 +26,8 @@ export type TransportOrderFields = {
   tripCount?: TransportOrderFieldDelta;
   tripLaborTotal?: TransportOrderFieldDelta;
   notes?: { changed: true };
+  
+  scheduleChanged?: { changed: true };
 };
 
 export type TransportOrderCreateMemo = {
@@ -51,6 +53,18 @@ export type TransportOrderCreateMemo = {
 export function routeMemo(order: Pick<TransportOrder, 'route'>): string {
   const r = order.route;
   return [r?.pickup, r?.stuffing, r?.dropoff].filter(Boolean).join(' → ');
+}
+
+function scheduleKey(order: Pick<TransportOrder, 'route' | 'trips'>): string {
+  const r = order.route;
+  return [
+    r?.pickupAt,
+    r?.stuffingAt,
+    r?.dropoffAt,
+    ...(order.trips ?? []).flatMap((trip) => [trip.loadingAt, trip.unloadingAt]),
+  ]
+    .map((v) => (v ? String(v) : ''))
+    .join('|');
 }
 
 export function createMemo(order: TransportOrder): TransportOrderCreateMemo {
@@ -132,6 +146,7 @@ export function diffTransportOrder(
   set('tripLaborTotal', delta(orderTripLaborTotal(before), orderTripLaborTotal(after)));
 
   if ((before.notes ?? '') !== (after.notes ?? '')) fields.notes = { changed: true };
+  if (scheduleKey(before) !== scheduleKey(after)) fields.scheduleChanged = { changed: true };
 
   return fields;
 }
