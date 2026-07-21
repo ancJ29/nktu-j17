@@ -11,11 +11,9 @@ type Props = {
   tabs: ReadonlyArray<MobileScrollPillTab>;
   value: string;
   onChange: (value: string) => void;
-  
-  ariaLabel?: string;
 };
 
-export function MobileScrollPillTabs({ tabs, value, onChange, ariaLabel = 'Tabs' }: Props) {
+export function MobileScrollPillTabs({ tabs, value, onChange }: Props) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
@@ -30,7 +28,7 @@ export function MobileScrollPillTabs({ tabs, value, onChange, ariaLabel = 'Tabs'
 
   return (
     <div className="mspt-shell">
-      <div className="mspt-scroll" role="tablist" aria-label={ariaLabel} ref={scrollRef}>
+      <div className="mspt-scroll" role="tablist" ref={scrollRef}>
         {tabs.map((tab) => {
           const active = tab.value === value;
           return (

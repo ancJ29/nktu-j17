@@ -380,12 +380,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
           label={copied ? t('common.labels.copied') : t('deliveryRequests.detail.copyContact')}
           withArrow
         >
-          <ActionIcon
-            variant="light"
-            color={copied ? 'teal' : 'gray'}
-            onClick={copy}
-            aria-label={t('deliveryRequests.detail.copyContact')}
-          >
+          <ActionIcon variant="light" color={copied ? 'teal' : 'gray'} onClick={copy}>
             {copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
           </ActionIcon>
         </Tooltip>

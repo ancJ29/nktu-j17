@@ -24,12 +24,23 @@ export type RefuelLogExtra = {
   [key: string]: unknown;
 };
 
+export type MaintenanceItem = {
+  
+  name: string;
+  
+  unitPrice: number;
+  
+  warrantyMonths?: number;
+};
+
 export type MaintenanceLogExtra = {
   
   maintenanceType?: string;
   maintenanceTypeLabel?: string;
   
   supplier?: string;
+  
+  items?: MaintenanceItem[];
   
   item?: string;
   
@@ -56,6 +67,11 @@ export type MaintenanceLogExtra = {
 };
 
 export type TripLogExtra = {
+  
+  transportOrderId?: string;
+  transportOrderNumber?: string;
+  
+  tripIndex?: number;
   
   destination?: string;
   

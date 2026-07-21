@@ -26,7 +26,10 @@ export type OperationLogPerms = {
   canDelete: boolean;
 };
 
-export type LogFormValues = Record<string, string | number>;
+export type LogFormLine = Record<string, string | number>;
+
+export type LogFormValue = string | number | LogFormLine[];
+export type LogFormValues = Record<string, LogFormValue>;
 
 export type OperationLogContext = {
   assignedDriver?: { id?: string; name: string };
@@ -73,7 +76,7 @@ export type OperationLogConfig = {
   columns: OperationLogColumn[];
   
   emptyForm: LogFormValues;
-  validate: (t: TFn) => Record<string, (value: string | number) => ReactNode>;
+  validate: (t: TFn) => Record<string, (value: unknown) => ReactNode>;
   
   buildExtra: (values: LogFormValues) => Partial<OperationLogExtra>;
   
@@ -84,6 +87,10 @@ export type OperationLogConfig = {
     t: TFn,
     ctx?: OperationLogContext,
   ) => ReactNode;
+  
+  renderExpanded?: (log: OperationLog, t: TFn) => ReactNode;
+  
+  rowLocked?: (log: OperationLog) => boolean;
   
   summary?: (logs: OperationLog[], t: TFn) => ReactNode;
   

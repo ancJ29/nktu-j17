@@ -1136,7 +1136,7 @@ export function ProductDetailPage() {
         minWidth: 0,
       }}
     >
-      <svg ref={barcodeSvgRef} aria-label={`Barcode ${extra.barcode ?? ''}`} />
+      <svg ref={barcodeSvgRef} />
     </Box>
   );
 
@@ -1330,11 +1330,6 @@ export function ProductDetailPage() {
                   variant="default"
                   size="lg"
                   color={product.isActive ? 'orange' : 'green'}
-                  aria-label={
-                    product.isActive
-                      ? t('__new__.01-common.dangerZone.disableButton')
-                      : t('__new__.01-common.dangerZone.enableButton')
-                  }
                   onClick={openToggleModal}
                 >
                   {product.isActive ? <IconBan size={16} /> : <IconCircleCheck size={16} />}
@@ -1368,7 +1363,6 @@ export function ProductDetailPage() {
                 <ActionIcon
                   variant="default"
                   size="lg"
-                  aria-label={t('__new__.01-common.actions.remove')}
                   onClick={openDeleteModal}
                   disabled={isDeleteBlocked}
                 >

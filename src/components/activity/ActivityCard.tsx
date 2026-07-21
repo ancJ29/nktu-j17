@@ -138,49 +138,21 @@ type SimpleVerbKey = 'create' | 'update' | 'delete' | 'enable' | 'disable';
 type VendorVerbKey = 'create' | 'update' | 'delete' | 'toggleStatus' | 'addNote' | 'removeNote';
 type CustomerVerbKey = 'create' | 'update' | 'delete' | 'toggleStatus' | 'addNote' | 'removeNote';
 type EmployeeVerbKey =
-  | SimpleVerbKey
-  | 'updatePermissions'
-  | 'passwordChange'
-  | 'generateLoginToken';
+  SimpleVerbKey | 'updatePermissions' | 'passwordChange' | 'generateLoginToken';
 type ProductVerbKey =
-  | SimpleVerbKey
-  | 'updateDescription'
-  | 'updateTechSpecs'
-  | 'updateClassification'
-  | 'updateImages';
+  SimpleVerbKey | 'updateDescription' | 'updateTechSpecs' | 'updateClassification' | 'updateImages';
 type ProductInventoryVerbKey =
-  | 'create'
-  | 'adjust'
-  | 'stockTake'
-  | 'repack'
-  | 'import'
-  | 'beginOfPeriod';
+  'create' | 'adjust' | 'stockTake' | 'repack' | 'import' | 'beginOfPeriod';
 type MaterialInventoryVerbKey = 'create' | 'adjust' | 'stockTake' | 'repack';
 type MaterialVerbKey = SimpleVerbKey | 'updateImages';
 type SalesOrderVerbKey =
-  | 'create'
-  | 'update'
-  | 'updateInline'
-  | 'statusChange'
-  | 'cancel'
-  | 'manualRelease'
-  | 'delete';
+  'create' | 'update' | 'updateInline' | 'statusChange' | 'cancel' | 'manualRelease' | 'delete';
 type DeliveryRequestVerbKey = 'create' | 'update' | 'updateInline' | 'statusChange' | 'delete';
 type GoodsReceiptVerbKey =
-  | 'create'
-  | 'update'
-  | 'updateInline'
-  | 'confirmReceived'
-  | 'repostInventory'
-  | 'cancel';
+  'create' | 'update' | 'updateInline' | 'confirmReceived' | 'repostInventory' | 'cancel';
 
 type TransportOrderVerbKey =
-  | 'create'
-  | 'update'
-  | 'updateInline'
-  | 'statusChange'
-  | 'cancel'
-  | 'delete';
+  'create' | 'update' | 'updateInline' | 'statusChange' | 'cancel' | 'delete';
 
 type EntityTargetType =
   | 'employee'

@@ -1212,7 +1212,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       opened={printOptionsOpened}
       onClose={() => setPrintOptionsOpened(false)}
       title={t('salesOrders.detail.printOptionsTitle')}
-      size={canSharePdf ? "lg" : "md"}
+      size={canSharePdf ? 'lg' : 'md'}
     >
       <Stack gap="md">
         <Stack gap={6}>
@@ -1272,7 +1272,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
           </Button>
         </Group>
         <Group justify="flex-end" wrap="nowrap" gap="sm">
-          <Button variant="light" color="red" size="sm" onClick={() => setPrintOptionsOpened(false)}>
+          <Button
+            variant="light"
+            color="red"
+            size="sm"
+            onClick={() => setPrintOptionsOpened(false)}
+          >
             {t('__new__.01-common.actions.cancel')}
           </Button>
           <Button
@@ -1607,7 +1612,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             tabs={mobileTabs}
             value={mobileTab}
             onChange={setMobileTab}
-            ariaLabel={t('salesOrders.detail.itemsTitle')}
           />
 
           <Tabs.Panel value="overview">

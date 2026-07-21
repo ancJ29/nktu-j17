@@ -400,7 +400,6 @@ export function CustomerFormPage() {
                       variant="subtle"
                       color="red"
                       onClick={() => form.removeListItem('shippingAddresses', index)}
-                      aria-label={t('__new__.01-common.actions.remove')}
                     >
                       <IconTrash size={14} />
                     </ActionIcon>
@@ -491,7 +490,6 @@ export function CustomerFormPage() {
                         variant="subtle"
                         color="red"
                         onClick={() => form.removeListItem('contacts', index)}
-                        aria-label={t('__new__.01-common.actions.remove')}
                       >
                         <IconTrash size={14} />
                       </ActionIcon>

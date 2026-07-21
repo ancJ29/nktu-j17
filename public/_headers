@@ -1,22 +1,9 @@
-# Cloudflare Pages cache policy.
-#
-# The rule that matters: the HTML shell must never be served from a cache
-# without revalidating, because it is the only thing that knows the current
-# content-hashed chunk names. A stale shell asks for chunks a new deploy has
-# already deleted ("Failed to fetch dynamically imported module"), and a reload
-# cannot fix that while some cache keeps handing back the same stale shell —
-# NKTU, 2026-07-14: operators sat on the error page until the cached document
-# aged out on its own. Hashed assets are the mirror image: the name changes
-# whenever the content does, so they can be cached forever.
-
 /
   Cache-Control: public, max-age=0, must-revalidate
 
 /index.html
   Cache-Control: public, max-age=0, must-revalidate
 
-# The service worker decides what gets served from CacheStorage — if it is
-# itself frozen at the old build, so is everything it serves.
 /sw.js
   Cache-Control: public, max-age=0, must-revalidate
 
@@ -26,19 +13,8 @@
 /manifest.webmanifest
   Cache-Control: public, max-age=0, must-revalidate
 
-# Content-hashed: a new build means a new filename, so these can never go stale.
-#
-# DANGER: this header is applied by PATH, not by what the response actually is.
-# Pages answers a not-yet-propagated asset with the SPA shell at status 200, and
-# `immutable` then pins that HTML page under a .js URL for a YEAR — every user
-# breaks and no reload can fix it (NKTU, 2026-07-14). It is safe ONLY because
-# `scripts/verify-deploy.sh` runs at the end of every deploy and purges any such
-# entry. Do not keep this line without that check.
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=28800, immutable
 
-# The update poll's source of truth. It was `max-age=300`, which put a 5-minute
-# floor on how fast any client could notice a deploy — the poll cannot report an
-# update it is being served from cache.
 /build-info.json
   Cache-Control: no-store

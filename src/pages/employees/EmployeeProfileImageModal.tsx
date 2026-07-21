@@ -369,7 +369,6 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
                   size="lg"
                   onClick={() => setZoom((z) => Math.max(z - 0.1, 1))}
                   disabled={zoom <= 1 || busy}
-                  aria-label="Zoom out"
                 >
                   <IconMinus size={18} />
                 </ActionIcon>
@@ -378,7 +377,6 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
                   size="lg"
                   onClick={() => setZoom((z) => Math.min(z + 0.1, 3))}
                   disabled={zoom >= 3 || busy}
-                  aria-label="Zoom in"
                 >
                   <IconPlus size={18} />
                 </ActionIcon>

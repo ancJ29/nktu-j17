@@ -135,7 +135,6 @@ function SortableDeliveryRow({
       <Box
         {...attributes}
         {...listeners}
-        aria-label={t('deliveryRequests.reorder.dragHint')}
         title={t('deliveryRequests.reorder.dragHint')}
         style={{
           display: 'flex',
@@ -176,7 +175,6 @@ function SortableDeliveryRow({
           variant="light"
           size={TOUCH_TARGET}
           disabled={disabled || index === 0}
-          aria-label={t('deliveryRequests.reorder.moveUp')}
           onClick={() => onMove(index, index - 1)}
         >
           <IconChevronUp size={20} />
@@ -185,7 +183,6 @@ function SortableDeliveryRow({
           variant="light"
           size={TOUCH_TARGET}
           disabled={disabled || isLast}
-          aria-label={t('deliveryRequests.reorder.moveDown')}
           onClick={() => onMove(index, index + 1)}
         >
           <IconChevronDown size={20} />

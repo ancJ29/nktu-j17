@@ -755,7 +755,6 @@ export function TruckAssetFormPage() {
                                 variant="subtle"
                                 color="red"
                                 onClick={() => form.removeListItem('insurances', index)}
-                                aria-label={t('__new__.01-common.actions.remove')}
                               >
                                 <IconTrash size={14} />
                               </ActionIcon>

@@ -1,25 +1,40 @@
+import type { ReactNode } from 'react';
 import {
+  ActionIcon,
+  Button,
   Card,
+  Group,
   NumberInput,
   Select,
   SimpleGrid,
   Stack,
+  Table,
   Text,
   TextInput,
   Textarea,
 } from '@mantine/core';
-import { IconGasStation, IconRoad, IconTool } from '@tabler/icons-react';
+import type { UseFormReturnType } from '@mantine/form';
+import { IconGasStation, IconPlus, IconRoad, IconTool, IconTrash } from '@tabler/icons-react';
 import { DatePickerField } from '@/components/DatePickerField';
 import { formatDate } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import { computeRefuelTotals, formatConsumption, refuelConsumption } from '@/utils/refuelStats';
-import type { MaintenanceLogExtra, RefuelLogExtra, TripLogExtra } from '@/types';
+import type { MaintenanceItem, MaintenanceLogExtra, RefuelLogExtra, TripLogExtra } from '@/types';
 import {
   datePart,
   todayString,
+  type LogFormLine,
+  type LogFormValue,
   type LogFormValues,
   type OperationLogConfig,
+  type TFn,
 } from '@/pages/operation-logs/operationLogConfig';
+import {
+  maintenanceItemsTotal,
+  readMaintenanceItems,
+  warrantyExpiry,
+  warrantySummary,
+} from './maintenanceItems';
 import { exportRefuelLogsToExcel } from '@/utils/excelParser';
 import { LogDriverField } from './LogDriverField';
 
@@ -167,7 +182,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
   renderFields: (form, t, ctx) => {
     
     
-    const syncTotal = (litres: number | string, unitPrice: number | string) => {
+    const syncTotal = (litres: LogFormValue, unitPrice: LogFormValue) => {
       const lit = Number(litres);
       const price = Number(unitPrice);
       if (litres !== '' && unitPrice !== '' && lit >= 0 && price >= 0) {
@@ -176,7 +191,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     };
     
     
-    const syncDistance = (before: number | string, after: number | string) => {
+    const syncDistance = (before: LogFormValue, after: LogFormValue) => {
       const b = Number(before);
       const a = Number(after);
       if (before !== '' && after !== '' && a >= b) {
@@ -323,6 +338,33 @@ function maintenanceOutstanding(e: MaintenanceLogExtra | undefined): number | un
   return total - (e?.accountsReceived ?? 0);
 }
 
+function monthsLabel(t: TFn, months: number): string {
+  return t('operationLogs.maintenance.months', { count: months });
+}
+
+function blankMaintenanceItem(): LogFormLine {
+  return { name: '', unitPrice: '', warrantyMonths: '' };
+}
+
+function itemRows(form: UseFormReturnType<LogFormValues>): LogFormLine[] {
+  return (Array.isArray(form.values.items) ? form.values.items : []) as LogFormLine[];
+}
+
+function draftItemsTotal(rows: LogFormLine[]): number {
+  return rows.reduce((sum, r) => sum + (Number(r.unitPrice) || 0), 0);
+}
+
+function detailStat(label: string, value: ReactNode) {
+  return (
+    <Stack gap={2}>
+      <Text size="xs" c="dimmed">
+        {label}
+      </Text>
+      <Text size="sm">{value}</Text>
+    </Stack>
+  );
+}
+
 export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
   logType: 'maintenance',
   icon: <IconTool size={14} />,
@@ -338,17 +380,17 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     maintenanceType: '',
     maintenanceTypeLabel: '',
     supplier: '',
-    item: '',
     condition: '',
     odometer: '',
-    unitPrice: '',
-    quantity: '',
-    totalAmount: '',
     laborCost: '',
-    grandTotal: '',
     accountsReceived: '',
     note: '',
+    
+    
+    items: [blankMaintenanceItem()],
   },
+  
+  
   columns: [
     dateColumn('operationLogs.maintenance.columns.date'),
     {
@@ -361,37 +403,8 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       render: (log) => textCell(log.extra?.supplier),
     },
     {
-      header: 'operationLogs.maintenance.columns.item',
-      render: (log) => textCell(log.extra?.item),
-    },
-    {
-      header: 'operationLogs.maintenance.columns.condition',
-      render: (log) => textCell(log.extra?.condition),
-    },
-    {
-      header: 'operationLogs.maintenance.columns.odometer',
-      align: 'right',
-      render: (log) => formatNumber(log.extra?.odometer),
-    },
-    {
-      header: 'operationLogs.maintenance.columns.unitPrice',
-      align: 'right',
-      render: (log) => formatNumber(log.extra?.unitPrice),
-    },
-    {
-      header: 'operationLogs.maintenance.columns.quantity',
-      align: 'right',
-      render: (log) => formatNumber(log.extra?.quantity),
-    },
-    {
-      header: 'operationLogs.maintenance.columns.totalAmount',
-      align: 'right',
-      render: (log) => formatNumber(log.extra?.totalAmount),
-    },
-    {
-      header: 'operationLogs.maintenance.columns.laborCost',
-      align: 'right',
-      render: (log) => formatNumber(log.extra?.laborCost),
+      header: 'operationLogs.maintenance.columns.warranty',
+      render: (log) => textCell(warrantySummary(readMaintenanceItems(log.extra), (m) => `${m}`)),
     },
     {
       header: 'operationLogs.maintenance.columns.total',
@@ -401,87 +414,82 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       render: (log) => formatNumber(log.extra?.grandTotal ?? log.extra?.cost),
     },
     {
-      header: 'operationLogs.maintenance.columns.accountsReceived',
-      align: 'right',
-      render: (log) => formatNumber(log.extra?.accountsReceived),
-    },
-    {
       header: 'operationLogs.maintenance.columns.outstanding',
       align: 'right',
       emphasize: true,
       render: (log) => formatNumber(maintenanceOutstanding(log.extra)),
     },
-    { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
-    unitPrice: (v) =>
-      v === '' || Number(v) >= 0 ? null : t('operationLogs.validation.unitPriceInvalid'),
-    quantity: (v) =>
-      v === '' || Number(v) >= 0 ? null : t('operationLogs.validation.quantityInvalid'),
   }),
-  buildExtra: (values): Partial<MaintenanceLogExtra> => ({
-    ...(String(values.maintenanceType).trim() && {
-      maintenanceType: String(values.maintenanceType).trim(),
-      
-      ...(String(values.maintenanceTypeLabel).trim() && {
-        maintenanceTypeLabel: String(values.maintenanceTypeLabel).trim(),
+  buildExtra: (values): Partial<MaintenanceLogExtra> => {
+    
+    
+    const items: MaintenanceItem[] = (Array.isArray(values.items) ? values.items : [])
+      .map((r) => r as LogFormLine)
+      .filter((r) => String(r.name).trim() !== '' || r.unitPrice !== '')
+      .map((r) => ({
+        name: String(r.name).trim(),
+        unitPrice: r.unitPrice === '' ? 0 : Number(r.unitPrice),
+        ...(r.warrantyMonths !== '' &&
+          Number(r.warrantyMonths) > 0 && { warrantyMonths: Number(r.warrantyMonths) }),
+      }));
+    
+    
+    
+    const totalAmount = maintenanceItemsTotal(items);
+    const laborCost = values.laborCost === '' ? 0 : Number(values.laborCost);
+    return {
+      ...(String(values.maintenanceType).trim() && {
+        maintenanceType: String(values.maintenanceType).trim(),
+        
+        ...(String(values.maintenanceTypeLabel).trim() && {
+          maintenanceTypeLabel: String(values.maintenanceTypeLabel).trim(),
+        }),
       }),
-    }),
-    ...(String(values.supplier).trim() && { supplier: String(values.supplier).trim() }),
-    ...(String(values.item).trim() && { item: String(values.item).trim() }),
-    ...(String(values.condition).trim() && { condition: String(values.condition).trim() }),
-    ...(values.odometer !== '' && { odometer: Number(values.odometer) }),
-    ...(values.unitPrice !== '' && { unitPrice: Number(values.unitPrice) }),
-    ...(values.quantity !== '' && { quantity: Number(values.quantity) }),
-    ...(values.totalAmount !== '' && { totalAmount: Number(values.totalAmount) }),
-    ...(values.laborCost !== '' && { laborCost: Number(values.laborCost) }),
-    ...(values.grandTotal !== '' && { grandTotal: Number(values.grandTotal) }),
-    ...(values.accountsReceived !== '' && { accountsReceived: Number(values.accountsReceived) }),
-    ...(String(values.note).trim() && { note: String(values.note).trim() }),
-  }),
+      ...(String(values.supplier).trim() && { supplier: String(values.supplier).trim() }),
+      ...(items.length > 0 && { items }),
+      ...(String(values.condition).trim() && { condition: String(values.condition).trim() }),
+      ...(values.odometer !== '' && { odometer: Number(values.odometer) }),
+      totalAmount,
+      ...(values.laborCost !== '' && { laborCost }),
+      grandTotal: totalAmount + laborCost,
+      ...(values.accountsReceived !== '' && { accountsReceived: Number(values.accountsReceived) }),
+      ...(String(values.note).trim() && { note: String(values.note).trim() }),
+    };
+  },
   toForm: (log): LogFormValues => {
     const e = log.extra ?? {};
+    const items = readMaintenanceItems(e).map<LogFormLine>((it) => ({
+      name: it.name,
+      unitPrice: it.unitPrice,
+      warrantyMonths: it.warrantyMonths ?? '',
+    }));
     return {
       logDate: datePart(log.logDate),
       maintenanceType: e.maintenanceType ?? '',
       maintenanceTypeLabel: e.maintenanceTypeLabel ?? '',
       supplier: e.supplier ?? '',
-      item: e.item ?? '',
       condition: e.condition ?? '',
       odometer: e.odometer ?? '',
-      unitPrice: e.unitPrice ?? '',
-      quantity: e.quantity ?? '',
-      totalAmount: e.totalAmount ?? '',
       laborCost: e.laborCost ?? '',
-      
-      grandTotal: e.grandTotal ?? e.cost ?? '',
       accountsReceived: e.accountsReceived ?? '',
       note: e.note ?? '',
+      
+      
+      items: items.length > 0 ? items : [blankMaintenanceItem()],
     };
   },
   renderFields: (form, t, ctx) => {
     
     
-    const syncGrandTotal = (totalAmount: number | string, laborCost: number | string) => {
-      if (totalAmount === '' && laborCost === '') {
-        form.setFieldValue('grandTotal', '');
-        return;
-      }
-      const parts = totalAmount === '' ? 0 : Number(totalAmount);
-      const labor = laborCost === '' ? 0 : Number(laborCost);
-      form.setFieldValue('grandTotal', parts + labor);
-    };
-    
-    const syncTotalAmount = (unitPrice: number | string, quantity: number | string) => {
-      if (unitPrice === '' || quantity === '') return;
-      const up = Number(unitPrice);
-      const qty = Number(quantity);
-      if (up < 0 || qty < 0) return;
-      const parts = Math.round(up * qty);
-      form.setFieldValue('totalAmount', parts);
-      syncGrandTotal(parts, form.values.laborCost);
-    };
+    const rows = itemRows(form);
+    const totalAmount = draftItemsTotal(rows);
+    const laborCost = form.values.laborCost === '' ? 0 : Number(form.values.laborCost);
+    const grandTotal = totalAmount + laborCost;
+    const outstanding =
+      grandTotal - (form.values.accountsReceived === '' ? 0 : Number(form.values.accountsReceived));
     
     
     const typeOptions = ctx?.maintenanceTypeOptions ?? [];
@@ -493,13 +501,6 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             { value: currentType, label: String(form.values.maintenanceTypeLabel) || currentType },
           ]
         : typeOptions;
-    
-    
-    const outstanding =
-      form.values.grandTotal === ''
-        ? ''
-        : Number(form.values.grandTotal) -
-          (form.values.accountsReceived === '' ? 0 : Number(form.values.accountsReceived));
     return (
       <>
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
@@ -531,12 +532,80 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             {...form.getInputProps('supplier')}
           />
         </SimpleGrid>
-        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-          <TextInput
-            label={t('operationLogs.maintenance.columns.item')}
-            placeholder={t('operationLogs.maintenance.form.itemPlaceholder')}
-            {...form.getInputProps('item')}
-          />
+        {/* Hạng mục — the priced, individually-warrantied lines of this visit.
+            Same add/remove idiom as the transport-order fee table. */}
+        <Stack gap="xs">
+          <Group justify="space-between" align="center">
+            <Text size="sm" fw={500}>
+              {t('operationLogs.maintenance.columns.item')}
+            </Text>
+            <Button
+              size="compact-sm"
+              variant="light"
+              leftSection={<IconPlus size={14} />}
+              onClick={() => form.insertListItem('items', blankMaintenanceItem())}
+            >
+              {t('operationLogs.maintenance.form.addItemLine')}
+            </Button>
+          </Group>
+          <Table>
+            <Table.Thead>
+              <Table.Tr>
+                <Table.Th>{t('operationLogs.maintenance.form.itemName')}</Table.Th>
+                <Table.Th w={160}>{t('operationLogs.maintenance.columns.unitPrice')}</Table.Th>
+                <Table.Th w={150}>{t('operationLogs.maintenance.columns.warranty')}</Table.Th>
+                <Table.Th w={40} />
+              </Table.Tr>
+            </Table.Thead>
+            <Table.Tbody>
+              {rows.length === 0 ? (
+                <Table.Tr>
+                  <Table.Td colSpan={4}>
+                    <Text size="sm" c="dimmed" ta="center">
+                      {t('operationLogs.maintenance.form.noItemLines')}
+                    </Text>
+                  </Table.Td>
+                </Table.Tr>
+              ) : (
+                rows.map((_, i) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      <TextInput
+                        placeholder={t('operationLogs.maintenance.form.itemPlaceholder')}
+                        {...form.getInputProps(`items.${i}.name`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput
+                        min={0}
+                        thousandSeparator=","
+                        {...form.getInputProps(`items.${i}.unitPrice`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput
+                        min={0}
+                        placeholder={t('operationLogs.maintenance.form.warrantyPlaceholder')}
+                        suffix={` ${t('operationLogs.maintenance.form.monthsSuffix')}`}
+                        {...form.getInputProps(`items.${i}.warrantyMonths`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        onClick={() => form.removeListItem('items', i)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))
+              )}
+            </Table.Tbody>
+          </Table>
+        </Stack>
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           <TextInput
             label={t('operationLogs.maintenance.columns.condition')}
             placeholder={t('operationLogs.maintenance.form.conditionPlaceholder')}
@@ -550,53 +619,28 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             {...form.getInputProps('odometer')}
           />
         </SimpleGrid>
-        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-          <NumberInput
-            label={t('operationLogs.maintenance.columns.unitPrice')}
-            min={0}
-            thousandSeparator=","
-            {...form.getInputProps('unitPrice')}
-            onChange={(v) => {
-              form.setFieldValue('unitPrice', v);
-              syncTotalAmount(v, form.values.quantity);
-            }}
-          />
-          <NumberInput
-            label={t('operationLogs.maintenance.columns.quantity')}
-            min={0}
-            {...form.getInputProps('quantity')}
-            onChange={(v) => {
-              form.setFieldValue('quantity', v);
-              syncTotalAmount(form.values.unitPrice, v);
-            }}
-          />
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 5 }} spacing="md">
           <NumberInput
             label={t('operationLogs.maintenance.columns.totalAmount')}
-            min={0}
+            description={t('operationLogs.maintenance.form.totalAmountHint')}
             thousandSeparator=","
-            {...form.getInputProps('totalAmount')}
-            onChange={(v) => {
-              form.setFieldValue('totalAmount', v);
-              syncGrandTotal(v, form.values.laborCost);
-            }}
+            variant="filled"
+            readOnly
+            value={totalAmount}
           />
-        </SimpleGrid>
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="md">
           <NumberInput
             label={t('operationLogs.maintenance.columns.laborCost')}
             min={0}
             thousandSeparator=","
             {...form.getInputProps('laborCost')}
-            onChange={(v) => {
-              form.setFieldValue('laborCost', v);
-              syncGrandTotal(form.values.totalAmount, v);
-            }}
           />
           <NumberInput
             label={t('operationLogs.maintenance.columns.total')}
-            min={0}
+            description={t('operationLogs.maintenance.form.grandTotalHint')}
             thousandSeparator=","
-            {...form.getInputProps('grandTotal')}
+            variant="filled"
+            readOnly
+            value={grandTotal}
           />
           <NumberInput
             label={t('operationLogs.maintenance.columns.accountsReceived')}
@@ -622,6 +666,72 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
           {...form.getInputProps('note')}
         />
       </>
+    );
+  },
+  
+  
+  
+  renderExpanded: (log, t) => {
+    const e = log.extra ?? {};
+    const items = readMaintenanceItems(e);
+    const date = datePart(log.logDate);
+    return (
+      <Stack gap="sm">
+        <Table withTableBorder>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>{t('operationLogs.maintenance.form.itemName')}</Table.Th>
+              <Table.Th w={160} ta="right">
+                {t('operationLogs.maintenance.columns.unitPrice')}
+              </Table.Th>
+              <Table.Th w={260}>{t('operationLogs.maintenance.columns.warranty')}</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {items.length === 0 ? (
+              <Table.Tr>
+                <Table.Td colSpan={3}>
+                  <Text size="sm" c="dimmed" ta="center">
+                    {t('operationLogs.maintenance.form.noItemLines')}
+                  </Text>
+                </Table.Td>
+              </Table.Tr>
+            ) : (
+              items.map((it, i) => {
+                const until = warrantyExpiry(date, it.warrantyMonths);
+                return (
+                  <Table.Tr key={i}>
+                    <Table.Td>{textCell(it.name)}</Table.Td>
+                    <Table.Td ta="right">{formatNumber(it.unitPrice)}</Table.Td>
+                    <Table.Td>
+                      {until
+                        ? `${monthsLabel(t, it.warrantyMonths as number)} (${t(
+                            'operationLogs.maintenance.warrantyUntil',
+                            { date: formatDate(until) },
+                          )})`
+                        : textCell(undefined)}
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              })
+            )}
+          </Table.Tbody>
+        </Table>
+        <SimpleGrid cols={{ base: 2, sm: 3, md: 5 }} spacing="md">
+          {detailStat(
+            t('operationLogs.maintenance.columns.totalAmount'),
+            formatNumber(e.totalAmount),
+          )}
+          {detailStat(t('operationLogs.maintenance.columns.laborCost'), formatNumber(e.laborCost))}
+          {detailStat(
+            t('operationLogs.maintenance.columns.accountsReceived'),
+            formatNumber(e.accountsReceived),
+          )}
+          {detailStat(t('operationLogs.maintenance.columns.condition'), e.condition || '—')}
+          {detailStat(t('operationLogs.maintenance.columns.odometer'), formatNumber(e.odometer))}
+        </SimpleGrid>
+        {detailStat(t('__new__.01-common.labels.note'), e.note || '—')}
+      </Stack>
     );
   },
 };
@@ -657,8 +767,18 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
       header: 'operationLogs.trip.columns.driver',
       render: (log) => textCell(log.extra?.driverName),
     },
+    {
+      
+      
+      header: 'operationLogs.trip.columns.transportOrder',
+      nowrap: true,
+      render: (log) => textCell(log.extra?.transportOrderNumber),
+    },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
+  
+  
+  rowLocked: (log) => Boolean(log.extra?.transportOrderId),
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
   }),

@@ -206,7 +206,6 @@ export function SalesOrderCardList({
                     <ActionIcon
                       variant="subtle"
                       color="gray"
-                      aria-label={t('salesOrders.detail.viewItems')}
                       onClick={(e) => {
                         e.stopPropagation();
                         onShowItems(order);

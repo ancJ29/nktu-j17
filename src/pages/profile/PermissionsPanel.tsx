@@ -262,7 +262,6 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
                             size="sm"
                             variant="subtle"
                             color="green"
-                            aria-label={t('profile.perm.enableAll')}
                             onClick={() => handleSetAllForModule(moduleKey, true)}
                           >
                             <IconCheck size={14} />
@@ -278,7 +277,6 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
                             size="sm"
                             variant="subtle"
                             color="red"
-                            aria-label={t('profile.perm.disableAll')}
                             onClick={() => handleSetAllForModule(moduleKey, false)}
                           >
                             <IconX size={14} />

@@ -67,7 +67,6 @@ export default function DeliveryReportView({ title, period, onPeriodChange }: Pr
             onChange={(v) => v && onPeriodChange(v)}
             allowDeselect={false}
             w={isMobile ? '100%' : 280}
-            aria-label="Chọn tuần"
           />
         </Group>
         <Group justify="space-between" wrap="wrap" gap="xs">

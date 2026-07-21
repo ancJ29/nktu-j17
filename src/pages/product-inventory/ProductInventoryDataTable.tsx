@@ -132,11 +132,7 @@ function InboundCell({
                 </Text>
               )}
               {entry.unmappedCount > 0 && (
-                <IconAlertTriangle
-                  size={14}
-                  color="var(--mantine-color-orange-6)"
-                  aria-label="unmapped-inbound"
-                />
+                <IconAlertTriangle size={14} color="var(--mantine-color-orange-6)" />
               )}
             </Group>
             {breakdown.length > 0 && (
@@ -461,11 +457,7 @@ export function ProductInventoryDataTable({
                       })}
                       withArrow
                     >
-                      <IconAlertTriangle
-                        size={14}
-                        color="var(--mantine-color-orange-6)"
-                        aria-label="overcommitted"
-                      />
+                      <IconAlertTriangle size={14} color="var(--mantine-color-orange-6)" />
                     </Tooltip>
                   )}
                   <Text

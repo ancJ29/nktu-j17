@@ -101,13 +101,7 @@ export function MaterialLinesEditor({ value, onChange }: Props) {
               value={m.unit ?? ''}
               onChange={(e) => patchLine(i, { unit: e.currentTarget.value })}
             />
-            <ActionIcon
-              variant="subtle"
-              color="red"
-              size="lg"
-              aria-label={t('cropDiaryTemplates.form.removeMaterial')}
-              onClick={() => removeLine(i)}
-            >
+            <ActionIcon variant="subtle" color="red" size="lg" onClick={() => removeLine(i)}>
               <IconTrash size={16} />
             </ActionIcon>
           </Group>

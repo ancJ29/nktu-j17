@@ -1,7 +1,9 @@
 import react from '@vitejs/plugin-react';
+import { execFileSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
-import { defineConfig, loadEnv } from 'vite';
+import { defineConfig, loadEnv, type Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
@@ -13,11 +15,54 @@ function requireEnv(env: Record<string, string>, key: string): string {
   return value;
 }
 
-// https://vite.dev/config/
+function buildIdentity(): { version: string; hash: string; timestamp: number } {
+  const pkg = JSON.parse(readFileSync('./package.json', 'utf8')) as { version?: string };
+
+  const fromEnv =
+    process.env.VERCEL_GIT_COMMIT_SHA ??
+    process.env.CF_PAGES_COMMIT_SHA ??
+    process.env.GITHUB_SHA ??
+    process.env.VITE_APP_GIT_COMMIT;
+
+  let hash = fromEnv?.slice(0, 8) ?? '';
+  if (!hash) {
+    try {
+      hash = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim().slice(0, 8);
+    } catch {
+      hash = 'nogit';
+    }
+  }
+
+  return { version: `v${pkg.version ?? '0.0.0'}`, hash, timestamp: Date.now() };
+}
+
+function buildInfoPlugin(identity: ReturnType<typeof buildIdentity>): Plugin {
+  return {
+    name: 'build-info',
+    apply: 'build',
+    generateBundle() {
+      this.emitFile({
+        type: 'asset',
+        fileName: 'build-info.json',
+        source: JSON.stringify({
+          buildHash: identity.hash,
+          buildTimestamp: String(identity.timestamp),
+        }),
+      });
+    },
+  };
+}
+
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
+  const identity = buildIdentity();
   return {
+    define: {
+      __BUILD_VERSION__: JSON.stringify(identity.version),
+      __BUILD_HASH__: JSON.stringify(identity.hash),
+      __BUILD_TIMESTAMP__: JSON.stringify(identity.timestamp),
+    },
     server: {
       port: env.VITE_APP_PORT ? parseInt(env.VITE_APP_PORT) : 5189,
       hmr: true,
@@ -52,6 +97,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       react(),
+      buildInfoPlugin(identity),
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
@@ -144,7 +190,6 @@ export default defineConfig(({ mode }) => {
               },
             },
             {
-              // cspell:word gstatic precaching
               urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
               handler: 'CacheFirst',
               options: {

@@ -400,7 +400,6 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
                       color="gray"
                       size="sm"
                       onClick={() => openEdit(entry)}
-                      aria-label={t('__new__.01-common.actions.edit')}
                     >
                       <IconPencil size={15} />
                     </ActionIcon>
@@ -411,7 +410,6 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
                       color="red"
                       size="sm"
                       onClick={() => setDeleteTarget(entry)}
-                      aria-label={t('__new__.01-common.actions.remove')}
                     >
                       <IconTrash size={15} />
                     </ActionIcon>

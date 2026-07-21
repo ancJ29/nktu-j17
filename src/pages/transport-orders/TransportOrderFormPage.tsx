@@ -184,7 +184,9 @@ function toFeeRows(order: Pick<TransportOrder, 'fees' | 'disbursements'>): FeeRo
 }
 
 function tripDate(trip: TripRow): string | null {
-  const fromLoading = trip.loadingAt ? isoToVnDateString(dateTimeStringToIso(trip.loadingAt)) : null;
+  const fromLoading = trip.loadingAt
+    ? isoToVnDateString(dateTimeStringToIso(trip.loadingAt))
+    : null;
   return fromLoading ?? trip.date ?? todayInVnDateString();
 }
 

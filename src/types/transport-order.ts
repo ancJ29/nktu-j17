@@ -89,12 +89,27 @@ export type TransportOrderCancellation = {
   fromStatus: string;
 };
 
+export type TransportOrderTripLogRef = {
+  logId: string;
+  targetId: string;
+  period: string;
+  
+  tripIndex: number;
+};
+
+export type TransportOrderTripLogSync = {
+  hash: string;
+  refs: TransportOrderTripLogRef[];
+};
+
 export type TransportOrderExtra = {
   
   isDeleted?: boolean;
   cancellation?: TransportOrderCancellation;
   createdBy?: string;
   activityLog?: TransportOrderActivityEntry[];
+  
+  tripLogSync?: TransportOrderTripLogSync;
   [key: string]: unknown;
 };
 

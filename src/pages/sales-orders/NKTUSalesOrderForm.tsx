@@ -2887,7 +2887,6 @@ function DesktopItemTable({
                           +
                         </Text>
                       }
-                      aria-label={t('salesOrders.form.extraQuantityLabel')}
                       placeholder={t('salesOrders.form.extraQuantityPlaceholder')}
                       value={item.extraQuantity ?? ''}
                       onChange={(v) => {

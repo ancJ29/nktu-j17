@@ -852,7 +852,6 @@ export function GoodsReceiptDetailPage() {
   const stickyBar =
     isMobile && (showConfirmCta || showCancelCta) ? (
       <Box
-        aria-label={t('goodsReceipts.detail.stickyActionsLabel')}
         style={{
           position: 'fixed',
           left: 0,

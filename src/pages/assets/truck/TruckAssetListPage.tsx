@@ -88,7 +88,6 @@ function FleetRefuelExport() {
         value={month}
         onChange={(v) => setMonth(v ?? 'all')}
         allowDeselect={false}
-        aria-label={t('operationLogs.monthLabel')}
       />
       <Select
         size="xs"
@@ -97,7 +96,6 @@ function FleetRefuelExport() {
         value={year}
         onChange={(v) => setYear(v ?? String(CURRENT_YEAR))}
         allowDeselect={false}
-        aria-label={t('operationLogs.yearLabel')}
       />
       <Button
         size="compact-sm"

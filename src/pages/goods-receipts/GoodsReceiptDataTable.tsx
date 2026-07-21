@@ -148,7 +148,6 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
                   <ActionIcon
                     variant="subtle"
                     color="gray"
-                    aria-label={t('goodsReceipts.detail.viewItems')}
                     onClick={(e) => {
                       e.stopPropagation();
                       onShowItems(item);

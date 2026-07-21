@@ -116,7 +116,6 @@ export function NotesSection({ notes, canEdit, onAdd, onRemove }: NotesSectionPr
                           size="sm"
                           loading={removingId === note.id}
                           onClick={() => handleRemove(note.id)}
-                          aria-label={t('common.detail.notes.removeAria')}
                         >
                           <IconTrash size={14} />
                         </ActionIcon>

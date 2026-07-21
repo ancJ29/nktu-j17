@@ -2329,6 +2329,12 @@
     "warehouse": "Warehouse"
   },
   "operationLogs": {
+    "actions": {
+      "collapse": "Hide details",
+      "delete": "Delete",
+      "edit": "Edit",
+      "expand": "Show details"
+    },
     "addItem": "Add Refuel",
     "allMonths": "All months",
     "deleteConfirm": {
@@ -2368,24 +2374,35 @@
         "laborCost": "Labor cost",
         "odometer": "Odometer",
         "outstanding": "Outstanding",
-        "quantity": "Quantity",
         "supplier": "Supplier",
         "total": "Total",
         "totalAmount": "Total amount",
         "type": "Type",
-        "unitPrice": "Unit price"
+        "unitPrice": "Unit price",
+        "warranty": "Warranty"
       },
       "editItem": "Edit maintenance",
       "empty": "No maintenance logs for {{year}} yet.",
       "form": {
+        "addItemLine": "Add item",
         "conditionPlaceholder": "e.g. New / Used",
+        "grandTotalHint": "Items + labor (auto)",
+        "itemName": "Item name",
         "itemPlaceholder": "e.g. Oil change, brake pads",
+        "monthsSuffix": "mo",
+        "noItemLines": "No items yet — add one.",
         "notePlaceholder": "Optional note",
         "outstandingHint": "Total − Paid (auto)",
+        "removeItemLine": "Remove item",
         "supplierPlaceholder": "Garage / vendor",
-        "typePlaceholder": "Select maintenance type"
+        "totalAmountHint": "Sum of items (auto)",
+        "typePlaceholder": "Select maintenance type",
+        "warrantyPlaceholder": "None"
       },
-      "sectionTitle": "Maintenance"
+      "months_one": "{{count}} month",
+      "months_other": "{{count}} months",
+      "sectionTitle": "Maintenance",
+      "warrantyUntil": "until {{date}}"
     },
     "monthLabel": "Month",
     "notifications": {
@@ -2431,7 +2448,8 @@
         "date": "Date",
         "destination": "Route / Destination",
         "driver": "Driver",
-        "odometer": "Odometer"
+        "odometer": "Odometer",
+        "transportOrder": "Transport order"
       },
       "editItem": "Edit trip",
       "empty": "No trips for {{year}} yet.",
@@ -2445,7 +2463,6 @@
     "validation": {
       "dateRequired": "Date is required",
       "litresInvalid": "Litres cannot be negative",
-      "quantityInvalid": "Quantity cannot be negative",
       "unitPriceInvalid": "Unit price cannot be negative"
     },
     "yearLabel": "Year"
@@ -3666,6 +3683,7 @@
       "loadError": "Failed to load transport orders",
       "mobileFormBlocked": "Transport-order editing is available on desktop only.",
       "saveError": "Failed to save changes",
+      "tripLogSyncError": "The truck trip log could not be updated. It will retry the next time this order is opened.",
       "updateError": "Failed to update transport order",
       "updated": "Transport order updated"
     },

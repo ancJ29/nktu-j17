@@ -78,7 +78,6 @@ export default function SalesReportView({ title, kind, period, onPeriodChange }:
             onChange={(v) => v && onPeriodChange(v)}
             allowDeselect={false}
             w={isMobile ? '100%' : 280}
-            aria-label="Chọn kỳ báo cáo"
           />
         </Group>
         <Group justify="space-between" wrap="wrap" gap="xs">

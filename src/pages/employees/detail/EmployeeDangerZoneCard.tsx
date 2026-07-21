@@ -85,11 +85,6 @@ export function EmployeeDangerZoneCard({
                 variant="default"
                 size="lg"
                 color={employee.isActive ? 'orange' : 'green'}
-                aria-label={
-                  employee.isActive
-                    ? t('__new__.07-entities.employees.dangerZone.disableButton')
-                    : t('__new__.07-entities.employees.dangerZone.enableButton')
-                }
                 onClick={onToggleStatus}
               >
                 {employee.isActive ? <IconLock size={16} /> : <IconLockOpen size={16} />}
@@ -111,12 +106,7 @@ export function EmployeeDangerZoneCard({
               </Text>
             </Stack>
             <Tooltip label={t('__new__.01-common.actions.remove')} withArrow>
-              <ActionIcon
-                variant="default"
-                size="lg"
-                aria-label={t('__new__.01-common.actions.remove')}
-                onClick={onDelete}
-              >
+              <ActionIcon variant="default" size="lg" onClick={onDelete}>
                 <IconTrash size={16} />
               </ActionIcon>
             </Tooltip>

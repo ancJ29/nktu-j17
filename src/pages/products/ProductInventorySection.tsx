@@ -174,11 +174,7 @@ export function ProductInventorySection({
                         {inboundEntry.totalBase.toLocaleString()} {baseUnitLabel}
                       </Text>
                       {inboundEntry.unmappedCount > 0 && (
-                        <IconAlertTriangle
-                          size={12}
-                          color="var(--mantine-color-orange-6)"
-                          aria-label="unmapped-inbound"
-                        />
+                        <IconAlertTriangle size={12} color="var(--mantine-color-orange-6)" />
                       )}
                     </Group>
                   </Tooltip>

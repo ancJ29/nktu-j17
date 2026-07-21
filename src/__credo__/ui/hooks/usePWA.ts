@@ -281,13 +281,35 @@ async function fetchRemoteBuild(retries = 3): Promise<string | null> {
       });
       if (!response.ok) throw new Error(`Failed to fetch build-info: ${response.status}`);
 
+      
+      
+      
+      
+      
+      
+      const contentType = response.headers.get('content-type') ?? '';
+      if (!contentType.includes('json')) {
+        throw new Error(
+          `build-info.json is not being served (content-type: ${contentType || 'none'}). ` +
+            'The deploy is missing dist/build-info.json, so update detection is disabled.',
+        );
+      }
+
       const data: { buildHash: string; buildTimestamp: string } = await response.json();
       const build = `${data.buildHash}_${data.buildTimestamp}`;
       cachedRemote = { build, fetchedAt: Date.now() };
       return build;
     } catch (error) {
       console.error(`Failed to fetch build-info (attempt ${i + 1}/${retries}):`, error);
-      if (i === retries - 1) return null;
+      if (i === retries - 1) {
+        
+        
+        console.error(
+          '[pwa] Update detection is DISABLED — /build-info.json is unreadable. ' +
+            'Users will keep running the build they already have.',
+        );
+        return null;
+      }
       await new Promise((resolve) => setTimeout(resolve, 1000 * Math.pow(2, i)));
     }
   }

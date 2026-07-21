@@ -2329,6 +2329,12 @@
     "warehouse": "Kho"
   },
   "operationLogs": {
+    "actions": {
+      "collapse": "Ẩn chi tiết",
+      "delete": "Xóa",
+      "edit": "Sửa",
+      "expand": "Xem chi tiết"
+    },
     "addItem": "Thêm đổ dầu",
     "allMonths": "Tất cả các tháng",
     "deleteConfirm": {
@@ -2368,24 +2374,35 @@
         "laborCost": "Tiền công",
         "odometer": "Số km",
         "outstanding": "Công nợ",
-        "quantity": "Số lượng",
         "supplier": "Nhà cung cấp",
         "total": "Tổng cộng",
         "totalAmount": "Thành tiền",
         "type": "Loại",
-        "unitPrice": "Đơn giá"
+        "unitPrice": "Đơn giá",
+        "warranty": "Bảo hành"
       },
       "editItem": "Sửa bảo trì",
       "empty": "Chưa có lịch sử bảo trì năm {{year}}.",
       "form": {
+        "addItemLine": "Thêm hạng mục",
         "conditionPlaceholder": "vd. Mới / Đã qua sử dụng",
+        "grandTotalHint": "Hạng mục + tiền công (tự động)",
+        "itemName": "Tên hạng mục",
         "itemPlaceholder": "vd. Thay nhớt, má phanh",
+        "monthsSuffix": "tháng",
+        "noItemLines": "Chưa có hạng mục nào — bấm thêm.",
         "notePlaceholder": "Ghi chú (tùy chọn)",
         "outstandingHint": "Tổng cộng − Đã thanh toán (tự động)",
+        "removeItemLine": "Xóa hạng mục",
         "supplierPlaceholder": "Gara / nhà cung cấp",
-        "typePlaceholder": "Chọn loại bảo trì"
+        "totalAmountHint": "Tổng các hạng mục (tự động)",
+        "typePlaceholder": "Chọn loại bảo trì",
+        "warrantyPlaceholder": "Không"
       },
-      "sectionTitle": "Bảo trì"
+      "months_one": "{{count}} tháng",
+      "months_other": "{{count}} tháng",
+      "sectionTitle": "Bảo trì",
+      "warrantyUntil": "đến {{date}}"
     },
     "monthLabel": "Tháng",
     "notifications": {
@@ -2431,7 +2448,8 @@
         "date": "Ngày",
         "destination": "Tuyến / Điểm đến",
         "driver": "Lái xe",
-        "odometer": "Số km"
+        "odometer": "Số km",
+        "transportOrder": "Đơn vận chuyển"
       },
       "editItem": "Sửa chuyến",
       "empty": "Chưa có chuyến đi năm {{year}}.",
@@ -2445,7 +2463,6 @@
     "validation": {
       "dateRequired": "Bắt buộc nhập ngày",
       "litresInvalid": "Số lít không được âm",
-      "quantityInvalid": "Số lượng không được âm",
       "unitPriceInvalid": "Đơn giá không được âm"
     },
     "yearLabel": "Năm"
@@ -3666,6 +3683,7 @@
       "loadError": "Không tải được đơn vận chuyển",
       "mobileFormBlocked": "Chỉnh sửa đơn vận chuyển chỉ khả dụng trên máy tính.",
       "saveError": "Lưu thay đổi thất bại",
+      "tripLogSyncError": "Chưa cập nhật được nhật ký chuyến của xe. Hệ thống sẽ thử lại khi mở đơn này lần sau.",
       "updateError": "Cập nhật đơn vận chuyển thất bại",
       "updated": "Đã cập nhật đơn vận chuyển"
     },

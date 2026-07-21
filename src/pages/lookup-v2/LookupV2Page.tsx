@@ -415,7 +415,6 @@ export function LookupV2Page() {
                         onDragEnd={handleDragEnd}
                         onClick={(e: MouseEvent) => e.stopPropagation()}
                         style={{ cursor: 'grab', color: 'var(--mantine-color-dimmed)' }}
-                        aria-label={t('lookups.reorderHint')}
                       >
                         <IconGripVertical size={16} />
                       </Table.Td>

@@ -434,13 +434,7 @@ function DashboardSection({
           </Group>
         </UnstyledButton>
         <Tooltip label={viewAllLabel} withArrow position="left">
-          <ActionIcon
-            variant="subtle"
-            color="gray"
-            radius="xl"
-            onClick={onViewAll}
-            aria-label={viewAllLabel}
-          >
+          <ActionIcon variant="subtle" color="gray" radius="xl" onClick={onViewAll}>
             <IconChevronRight size={20} />
           </ActionIcon>
         </Tooltip>

@@ -110,7 +110,6 @@ export function TransportRouteCell({ order }: { order: TransportOrder }) {
           e.stopPropagation();
           setExpanded((v) => !v);
         }}
-        aria-label={t(expanded ? 'transportOrders.route.collapse' : 'transportOrders.route.expand')}
       >
         {expanded ? <IconChevronDown size={14} /> : <IconChevronRight size={14} />}
       </ActionIcon>

@@ -121,7 +121,6 @@ export function GoodsReceiptCardList({ receipts, isLoading, onShowItems }: Props
                       <ActionIcon
                         variant="subtle"
                         color="gray"
-                        aria-label={t('goodsReceipts.detail.viewItems')}
                         onClick={(e) => {
                           e.stopPropagation();
                           onShowItems(r);

@@ -96,6 +96,7 @@ import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activity
 import { useContainerSizeLabel } from './containerSize';
 import { truckNameWithPlate } from './truckDisplay';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
+import { reconcileTripLogs } from './tripLogSync';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -154,6 +155,27 @@ export function TransportOrderDetailPage() {
     if (!employeesInit) loadEmployees();
   }, [trucksInit, loadTrucks, employeesInit, loadEmployees]);
 
+  
+  const syncTripLogs = useCallback(
+    async (source: TransportOrder) => {
+      if (!canEdit) return source;
+      try {
+        const synced = await reconcileTripLogs(source);
+        if (synced !== source) setOrder(synced);
+        return synced;
+      } catch {
+        notifications.show({
+          color: 'yellow',
+          message: t('transportOrders.notifications.tripLogSyncError'),
+          autoClose: 8000,
+        });
+        return source;
+      }
+    },
+    
+    [t],
+  );
+
   const load = useCallback(async () => {
     if (!id) return;
     try {
@@ -167,6 +189,7 @@ export function TransportOrderDetailPage() {
         return;
       }
       setOrder(o);
+      void syncTripLogs(o);
     } catch {
       if (!getCached(id)) {
         notifications.show({ color: 'red', message: t('transportOrders.notifications.loadError') });
@@ -198,6 +221,9 @@ export function TransportOrderDetailPage() {
         });
         setOrder(updated);
         notifications.show({ color: 'green', message: successMsg });
+        
+        
+        void syncTripLogs(updated);
       } catch (err) {
         if (err instanceof EntityConflictError) {
           if (err.latest) setOrder(err.latest as TransportOrder);
@@ -216,7 +242,7 @@ export function TransportOrderDetailPage() {
         setActionLoading(false);
       }
     },
-    [order, t],
+    [order, t, syncTripLogs],
   );
 
   
@@ -230,6 +256,8 @@ export function TransportOrderDetailPage() {
           patch,
         });
         setOrder(updated);
+        
+        void syncTripLogs(updated);
         const fields = diffTransportOrder(order, updated);
         if (!isEmptyDiff(fields)) {
           logActivity('transportOrder.update', order.id, {
@@ -256,7 +284,7 @@ export function TransportOrderDetailPage() {
         throw err;
       }
     },
-    [order, t],
+    [order, t, syncTripLogs],
   );
 
   const handleTransition = useCallback(
@@ -369,7 +397,11 @@ export function TransportOrderDetailPage() {
         version: order.version,
         patch: { extra: { ...order.extra, isDeleted: true } },
       })
-      .then(() => {
+      .then(async (updated) => {
+        
+        
+        
+        await syncTripLogs(updated);
         logActivity('transportOrder.delete', order.id, {
           orderNumber: order.orderNumber,
           fromStatus: order.status,
@@ -381,7 +413,7 @@ export function TransportOrderDetailPage() {
         notifications.show({ color: 'red', message: t('transportOrders.notifications.saveError') });
       })
       .finally(() => setActionLoading(false));
-  }, [order, navigate, t]);
+  }, [order, navigate, t, syncTripLogs]);
 
   if (loading && !order) {
     return (

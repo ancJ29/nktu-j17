@@ -112,7 +112,6 @@ export function SalesOrderDataTable({
                 width: '44px',
                 header: (
                   <Checkbox
-                    aria-label={t('deliveryRequests.bulkCreate.selectAll')}
                     checked={allSelected}
                     indeterminate={someSelected}
                     onChange={() => onToggleAll?.()}
@@ -130,7 +129,6 @@ export function SalesOrderDataTable({
                       events={{ hover: true, focus: false, touch: true }}
                     >
                       <Checkbox
-                        aria-label={item.orderNumber}
                         checked={(selectedIds?.has(item.id) ?? false) && !disabled}
                         disabled={disabled}
                         onChange={() => onToggleRow?.(item.id)}
@@ -472,7 +470,6 @@ export function SalesOrderDataTable({
                           <ActionIcon
                             variant="subtle"
                             color="gray"
-                            aria-label={t('salesOrders.detail.viewItems')}
                             onClick={(e) => {
                               e.stopPropagation();
                               onShowItems(item);

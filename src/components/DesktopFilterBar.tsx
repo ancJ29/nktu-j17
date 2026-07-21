@@ -105,7 +105,6 @@ export function DesktopFilterBar({
         style={{ flex: 1 }}
         rightSection={
           <ActionIcon
-            aria-label={t('__new__.01-common.actions.clearSearch')}
             variant="subtle"
             color="gray"
             size="sm"

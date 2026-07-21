@@ -411,7 +411,6 @@ export function VendorForm({ variant }: VendorFormProps) {
                       variant="subtle"
                       color="red"
                       onClick={() => form.removeListItem('pickupAddresses', index)}
-                      aria-label={t('__new__.01-common.actions.remove')}
                     >
                       <IconTrash size={14} />
                     </ActionIcon>
@@ -501,7 +500,6 @@ export function VendorForm({ variant }: VendorFormProps) {
                         variant="subtle"
                         color="red"
                         onClick={() => form.removeListItem('contacts', index)}
-                        aria-label={t('__new__.01-common.actions.remove')}
                       >
                         <IconTrash size={14} />
                       </ActionIcon>

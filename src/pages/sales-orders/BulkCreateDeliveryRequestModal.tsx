@@ -215,7 +215,6 @@ function BulkForm({ onClose, salesOrders, getCustomerByCode, resolveStatus, t }:
                       checked={checked}
                       onChange={() => toggleOne(so.id)}
                       onClick={(e) => e.stopPropagation()}
-                      aria-label={so.orderNumber}
                     />
                     <Box style={{ flex: 1, minWidth: 0 }}>
                       <Text size="sm" fw={600} truncate>

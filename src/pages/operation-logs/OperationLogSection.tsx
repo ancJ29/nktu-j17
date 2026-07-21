@@ -12,8 +12,15 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconDownload, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  IconChevronDown,
+  IconChevronRight,
+  IconDownload,
+  IconPencil,
+  IconPlus,
+  IconTrash,
+} from '@tabler/icons-react';
+import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cMngtConnector, CallApiError } from '@credo/connectors/connector';
 import { ConfirmModal } from '@/components/ConfirmModal';
@@ -40,6 +47,12 @@ function serverMessage(err: unknown): string | undefined {
     if (typeof m === 'string') return m;
   }
   return undefined;
+}
+
+function cloneFormValues(values: LogFormValues): LogFormValues {
+  return Object.fromEntries(
+    Object.entries(values).map(([k, v]) => [k, Array.isArray(v) ? v.map((r) => ({ ...r })) : v]),
+  );
 }
 
 type Props = {
@@ -72,6 +85,17 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const [deleteTarget, setDeleteTarget] = useState<OperationLog | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  
+  
+  const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
+  const toggleExpanded = useCallback((id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }, []);
 
   const form = useForm<LogFormValues>({
     initialValues: config.emptyForm,
@@ -141,7 +165,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const openAdd = useCallback(() => {
     setEditing(null);
-    form.setValues({ ...config.emptyForm, logDate: todayString() });
+    form.setValues({ ...cloneFormValues(config.emptyForm), logDate: todayString() });
     form.resetDirty();
     formHandlers.open();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- form identity is stable across renders
@@ -242,6 +266,9 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
   if (!canView) return null;
 
   const showActions = canEdit || canDelete;
+  const expandable = Boolean(config.renderExpanded);
+  
+  const detailColSpan = config.columns.length + (expandable ? 1 : 0) + (showActions ? 1 : 0);
 
   return (
     <SectionCard
@@ -256,7 +283,6 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             value={month}
             onChange={(v) => setMonth(v ?? 'all')}
             allowDeselect={false}
-            aria-label={tr('operationLogs.monthLabel')}
           />
           <Select
             size="xs"
@@ -265,7 +291,6 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             value={String(year)}
             onChange={switchYear}
             allowDeselect={false}
-            aria-label={tr('operationLogs.yearLabel')}
           />
           {config.export && (
             <Button
@@ -316,6 +341,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
           <Table verticalSpacing="xs" highlightOnHover>
             <Table.Thead>
               <Table.Tr>
+                {expandable && <Table.Th w={36} />}
                 {config.columns.map((col) => (
                   <Table.Th key={col.header} ta={col.align}>
                     {tr(col.header)}
@@ -327,6 +353,9 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             <Table.Tbody>
               {visibleLogs.map((log) => {
                 const tone = config.rowTone?.(log, visibleLogs);
+                const isOpen = expanded.has(log.id);
+                
+                const locked = config.rowLocked?.(log) ?? false;
                 const row = (
                   <Table.Tr
                     key={log.id}
@@ -336,6 +365,18 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                         : undefined
                     }
                   >
+                    {expandable && (
+                      <Table.Td>
+                        <ActionIcon
+                          variant="subtle"
+                          color="gray"
+                          size="sm"
+                          onClick={() => toggleExpanded(log.id)}
+                        >
+                          {isOpen ? <IconChevronDown size={15} /> : <IconChevronRight size={15} />}
+                        </ActionIcon>
+                      </Table.Td>
+                    )}
                     {config.columns.map((col) => (
                       <Table.Td
                         key={col.header}
@@ -349,24 +390,22 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                     {showActions && (
                       <Table.Td>
                         <Group gap={2} wrap="nowrap" justify="flex-end">
-                          {canEdit && (
+                          {canEdit && !locked && (
                             <ActionIcon
                               variant="subtle"
                               color="gray"
                               size="sm"
                               onClick={() => openEdit(log)}
-                              aria-label={tr('operationLogs.actions.edit')}
                             >
                               <IconPencil size={15} />
                             </ActionIcon>
                           )}
-                          {canDelete && (
+                          {canDelete && !locked && (
                             <ActionIcon
                               variant="subtle"
                               color="red"
                               size="sm"
                               onClick={() => setDeleteTarget(log)}
-                              aria-label={tr('operationLogs.actions.delete')}
                             >
                               <IconTrash size={15} />
                             </ActionIcon>
@@ -376,12 +415,24 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                     )}
                   </Table.Tr>
                 );
-                return tone?.danger && tone.tooltipKey ? (
-                  <Tooltip key={log.id} label={tr(tone.tooltipKey)} withArrow multiline w={220}>
-                    {row}
-                  </Tooltip>
-                ) : (
-                  row
+                const toned =
+                  tone?.danger && tone.tooltipKey ? (
+                    <Tooltip key={log.id} label={tr(tone.tooltipKey)} withArrow multiline w={220}>
+                      {row}
+                    </Tooltip>
+                  ) : (
+                    row
+                  );
+                if (!expandable || !isOpen) return toned;
+                return (
+                  <Fragment key={log.id}>
+                    {toned}
+                    <Table.Tr bg="var(--mantine-color-default-hover)">
+                      <Table.Td colSpan={detailColSpan} p="md">
+                        {config.renderExpanded?.(log, tr)}
+                      </Table.Td>
+                    </Table.Tr>
+                  </Fragment>
                 );
               })}
             </Table.Tbody>

@@ -92,7 +92,6 @@ export function BarcodeDisplay({ value, label }: Props) {
             size="sm"
             color={clipboard.copied ? 'teal' : 'gray'}
             onClick={() => clipboard.copy(trimmed)}
-            aria-label="Copy barcode"
           >
             {clipboard.copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
           </ActionIcon>
@@ -120,7 +119,7 @@ export function BarcodeDisplay({ value, label }: Props) {
             overflow: 'hidden',
           }}
         >
-          <svg ref={svgRef} aria-label={`Barcode ${trimmed}`} />
+          <svg ref={svgRef} />
         </Box>
       )}
     </Card>

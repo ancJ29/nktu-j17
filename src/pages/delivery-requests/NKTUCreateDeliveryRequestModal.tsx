@@ -660,12 +660,7 @@ function OrderRow({ order, checked, customerName, onToggle }: OrderRowProps) {
         cursor: 'pointer',
       }}
     >
-      <Checkbox
-        checked={checked}
-        onChange={onToggle}
-        onClick={(e) => e.stopPropagation()}
-        aria-label={order.orderNumber}
-      />
+      <Checkbox checked={checked} onChange={onToggle} onClick={(e) => e.stopPropagation()} />
       <Box style={{ flex: 1, minWidth: 0 }}>
         <Text size="sm" fw={600} truncate>
           {order.orderNumber}

@@ -390,9 +390,7 @@ export type ResolvedTagOption = {
 
 export function resolveStatusOptions(
   options:
-    | SalesOrderStatusOption[]
-    | DeliveryRequestStatusOption[]
-    | TransportOrderStatusOptionConfig[],
+    SalesOrderStatusOption[] | DeliveryRequestStatusOption[] | TransportOrderStatusOptionConfig[],
 ): ResolvedStatusOption[] {
   const lang = i18n.resolvedLanguage ?? i18n.language ?? appConfig.defaultLanguage;
   const defaultLang = appConfig.defaultLanguage;
