@@ -18,17 +18,14 @@ import { LoadingFallback, PCAppLayout as PCAppLayoutUI } from '@credo/base-ui/co
 import type { CredoNavigationItem } from '@credo/base-ui/types';
 import type { NavigationItem } from '@/types';
 import { stripRootOnlyNavItems } from '@/config/navigation';
-import { ConfirmModal } from '@/components/ConfirmModal';
 import { Container, Indicator } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
 import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
-import { isAdmin, isInternal } from '@/config/env';
 import { reloadPage } from '@credo/base-ui/utils';
-import { forceClearCache } from '@/utils/forceClearCache';
+import { showRefreshConfig } from '@/config/menu-access';
+import { useClearCacheConfirm } from '@/hooks/useClearCacheConfirm';
 import { EmployeeAvatar } from '@/components/EmployeeAvatar';
-import { resolveClientCode } from '@/config/client-code';
 
 const hasAvatar = hasAvatarForEmployees();
 
@@ -37,10 +34,6 @@ const logoSrc =
   headerVariant === 'light'
     ? appConfig.app.logoUrl || '/logo.svg'
     : appConfig.app.logoDarkBgUrl || appConfig.app.logoUrl || '/logo-white.svg';
-
-const availableClientCodes = new Set<string>(['nktu']);
-const clientCode = resolveClientCode();
-const showRefreshConfig = isInternal || isAdmin || availableClientCodes.has(clientCode);
 
 export function PCAppLayout() {
   const { t, i18n } = useTranslation();
@@ -136,11 +129,7 @@ export function PCAppLayout() {
 
   
   
-  
-  const [clearCacheOpened, { open: openClearCache, close: closeClearCache }] = useDisclosure(false);
-  const handleClearCache = useCallback(() => {
-    forceClearCache().catch(console.error);
-  }, []);
+  const clearCache = useClearCacheConfirm();
 
   return (
     <PCAppLayoutUI
@@ -166,7 +155,7 @@ export function PCAppLayout() {
       }}
       showInstallApp={showInstallApp}
       onInstallApp={handleInstallApp}
-      onClearCache={openClearCache}
+      onClearCache={clearCache.open}
       labels={{
         languageTooltip: t('common.labels.language'),
         menuProfile: t('menu.profile'),
@@ -199,14 +188,7 @@ export function PCAppLayout() {
           </EmployeeReadyGate>
         </Container>
       </Suspense>
-      <ConfirmModal
-        opened={clearCacheOpened}
-        onClose={closeClearCache}
-        onConfirm={handleClearCache}
-        title={t('menu.clearCache')}
-        message={t('menu.clearCacheConfirm')}
-        confirmLabel={t('menu.clearCache')}
-      />
+      {clearCache.modal}
     </PCAppLayoutUI>
   );
 }

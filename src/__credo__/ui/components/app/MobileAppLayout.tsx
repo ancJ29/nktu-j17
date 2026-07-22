@@ -5,6 +5,7 @@ import {
   Box,
   Group,
   Image,
+  Menu,
   Text,
   UnstyledButton,
   useMantineTheme,
@@ -35,7 +36,10 @@ const BOTTOM_NAV_HEIGHT = 64;
 type MobileAppLayoutLabels = {
   languageTooltip: string;
   
-  refreshTooltip?: string;
+  accountTooltip?: string;
+  menuReloadPage?: string;
+  menuRefreshConfig?: string;
+  menuClearCache?: string;
 };
 
 type MobileAppLayoutProps = {
@@ -59,6 +63,10 @@ type MobileAppLayoutProps = {
   onRefresh?: () => void | Promise<void>;
   children: ReactNode;
   showLanguageSwitcher?: boolean;
+  
+  showRefreshConfig?: boolean;
+  onRefreshConfig?: () => void;
+  onClearCache?: () => void;
 };
 
 export type { MobileAppLayoutLabels, MobileAppLayoutProps };
@@ -80,6 +88,9 @@ export function MobileAppLayout({
   onRefresh,
   children,
   showLanguageSwitcher = true,
+  showRefreshConfig = false,
+  onRefreshConfig,
+  onClearCache,
 }: MobileAppLayoutProps) {
   const theme = useMantineTheme();
   const location = useLocation();
@@ -123,21 +134,26 @@ export function MobileAppLayout({
           zIndex: 100,
         }}
       >
-        <Group h="100%" px="md" justify="space-between">
-          {/* Logo */}
-          <Group>
+        <Group h="100%" px="md" justify="space-between" wrap="nowrap">
+          {/* Logo. Shrinkable with a clamped name: a long client brand must
+              truncate, never push the controls out of the viewport. */}
+          <Group wrap="nowrap" style={{ minWidth: 0 }}>
             <Box component={Link} to="/" style={{ display: 'flex', alignItems: 'center' }}>
               <Image src={logoSrc} alt={appName} height={36} />
             </Box>
             {appName && (
-              <Text size="lg" fw={600} c="white">
+              <Text size="lg" fw={600} c="white" lineClamp={1}>
                 {appName}
               </Text>
             )}
           </Group>
 
-          {/* Right Side: Language Switcher + Theme Toggle + Notifications */}
-          <Group gap="xs">
+          {/* Right side. Deliberately at most two controls: the app name is
+              client-branded and can be long ("NGŨ KIM TÂN UYÊN"), and a 56px
+              header that also carries a logo runs out of room — a third button
+              pushed the account icon off-screen entirely. Everything else lives
+              in the account menu. */}
+          <Group gap="xs" wrap="nowrap">
             {showLanguageSwitcher && (
               <LanguageSwitcher
                 languages={languageSwitcher.languages}
@@ -148,18 +164,47 @@ export function MobileAppLayout({
                 lightIcon
               />
             )}
-            {onRefresh && (
-              <UnstyledButton
-                className={classes.headerButton}
-                onClick={() => onRefresh()}
-                aria-label={labels.refreshTooltip}
-              >
-                <Icon name={IconName.Refresh} size={20} color="white" />
-              </UnstyledButton>
+            {(onRefresh || onClearCache || (showRefreshConfig && onRefreshConfig)) && (
+              <Menu position="bottom-end" width={220} shadow="md" offset={8}>
+                <Menu.Target>
+                  <UnstyledButton
+                    className={classes.headerButton}
+                    aria-label={labels.accountTooltip}
+                  >
+                    <Icon name={IconName.User} size={20} color="white" />
+                  </UnstyledButton>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  {onRefresh && (
+                    <Menu.Item
+                      leftSection={<Icon name={IconName.Refresh} size={16} />}
+                      fz="sm"
+                      onClick={() => onRefresh()}
+                    >
+                      {labels.menuReloadPage || 'Reload Page'}
+                    </Menu.Item>
+                  )}
+                  {showRefreshConfig && onRefreshConfig && (
+                    <Menu.Item
+                      leftSection={<Icon name={IconName.CloudDownload} size={16} />}
+                      fz="sm"
+                      onClick={onRefreshConfig}
+                    >
+                      {labels.menuRefreshConfig}
+                    </Menu.Item>
+                  )}
+                  {onClearCache && (
+                    <Menu.Item
+                      leftSection={<Icon name={IconName.Trash} size={16} />}
+                      fz="sm"
+                      onClick={onClearCache}
+                    >
+                      {labels.menuClearCache || 'Force Clear All Cache'}
+                    </Menu.Item>
+                  )}
+                </Menu.Dropdown>
+              </Menu>
             )}
-            <UnstyledButton className={classes.headerButton}>
-              <Icon name={IconName.Bell} size={20} color="white" />
-            </UnstyledButton>
           </Group>
         </Group>
       </AppShell.Header>

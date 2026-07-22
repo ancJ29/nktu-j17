@@ -1,4 +1,4 @@
-import { appConfig, featureFlags, themeConfig } from '@/config';
+import { appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useCurrentEmployee, useLanguageSync } from '@/hooks';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -14,6 +14,8 @@ import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { reloadPage } from '@credo/base-ui/utils';
+import { showRefreshConfig } from '@/config/menu-access';
+import { useClearCacheConfirm } from '@/hooks/useClearCacheConfirm';
 
 export function MobileAppLayout() {
   const { t, i18n } = useTranslation();
@@ -75,6 +77,11 @@ export function MobileAppLayout() {
     reloadPage('manual refresh');
   }, []);
 
+  
+  
+  
+  const clearCache = useClearCacheConfirm();
+
   return (
     <MobileAppLayoutUI
       
@@ -92,9 +99,17 @@ export function MobileAppLayout() {
       }}
       showLanguageSwitcher={featureFlags.common.languageSwitcher}
       morePath={ROUTES.MORE}
+      showRefreshConfig={showRefreshConfig}
+      onRefreshConfig={() => {
+        forceRefreshConfig().catch(console.error);
+      }}
+      onClearCache={clearCache.open}
       labels={{
         languageTooltip: t('common.labels.language'),
-        refreshTooltip: t('__new__.01-common.cache.refresh'),
+        accountTooltip: t('menu.profile'),
+        menuReloadPage: t('menu.reloadPage'),
+        menuRefreshConfig: t('menu.refreshConfig'),
+        menuClearCache: t('menu.clearCache'),
       }}
       isAuthenticated={!!token}
       isProfileLoaded={isProfileLoaded}
@@ -109,6 +124,7 @@ export function MobileAppLayout() {
           </EmployeeReadyGate>
         </Container>
       </Suspense>
+      {clearCache.modal}
     </MobileAppLayoutUI>
   );
 }
