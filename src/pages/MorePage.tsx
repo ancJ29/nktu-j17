@@ -1,4 +1,5 @@
 import { appConfig, themeConfig } from '@/config';
+import { stripRootOnlyNavItems } from '@/config/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Icon, IconName } from '@credo/base-ui/components';
@@ -8,9 +9,7 @@ import {
   Avatar,
   Box,
   Card,
-  Divider,
   Group,
-  SimpleGrid,
   Stack,
   Text,
   UnstyledButton,
@@ -21,6 +20,15 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { isAutoLoginEmail } from '@/utils/loginEmail';
+
+const ROW_HEIGHT = 56;
+
+type NavSection = {
+  id: string;
+  
+  title?: string;
+  items: NavigationItem[];
+};
 
 function getInitials(name?: string): string {
   if (!name) return '?';
@@ -37,25 +45,35 @@ export default function MorePage() {
   const theme = useMantineTheme();
   const mainColor = themeConfig.mainColor;
   const user = useAuthStore((s) => s.user);
+  const isRoot = user?.isRoot ?? false;
 
   const getColor = (color: string) => getThemeColor(theme, color);
+  const accentColor = getColor(`${mainColor}.7`);
 
   
-  const { groups, flatItems } = useMemo(() => {
-    const allMobile = appConfig.navigation.mobile.filter((item) => !item.hidden && !item.navbar);
-    const groups: NavigationItem[] = [];
-    const flatItems: NavigationItem[] = [];
-    for (const item of allMobile) {
-      if (item.subs && item.subs.length > 0) {
-        groups.push(item);
-      } else {
-        flatItems.push(item);
-      }
-    }
-    return { groups, flatItems };
-  }, []);
+  
+  
+  const sections = useMemo<NavSection[]>(() => {
+    const visible = stripRootOnlyNavItems(appConfig.navigation.mobile, isRoot).filter(
+      (item) => !item.hidden && !item.navbar,
+    );
 
-  const accentColor = getColor(`${mainColor}.7`);
+    const result: NavSection[] = [];
+    for (const item of visible) {
+      if (item.subs && item.subs.length > 0) {
+        result.push({
+          id: item.id,
+          title: item.labelKey ? t(item.labelKey, item.label) : item.label,
+          items: item.subs,
+        });
+        continue;
+      }
+      const last = result.at(-1);
+      if (last && !last.title) last.items.push(item);
+      else result.push({ id: item.id, items: [item] });
+    }
+    return result;
+  }, [isRoot, t]);
 
   const userEmail = useMemo(() => {
     const email = user?.email;
@@ -63,7 +81,7 @@ export default function MorePage() {
   }, [user?.email]);
 
   return (
-    <Stack gap="md" pb="xl">
+    <Stack gap="lg" pb="xl">
       {/* User Card */}
       <Card
         component={Link}
@@ -100,132 +118,98 @@ export default function MorePage() {
         </Group>
       </Card>
 
-      {/* Grouped nav sections */}
-      {groups.map((group) => (
-        <Stack key={group.id} gap="xs">
-          <Group gap="xs" px={4}>
-            <Icon name={group.icon} size={16} stroke={1.8} style={{ color: accentColor }} />
-            <Text size="sm" fw={600}>
-              {group.labelKey ? t(group.labelKey, group.label) : group.label}
-            </Text>
-          </Group>
-          <SimpleGrid cols={3} spacing="sm">
-            {group.subs!.map((sub) => (
-              <GridNavItem
-                key={sub.id}
-                to={sub.path || '/'}
-                icon={sub.icon}
-                label={sub.labelKey ? t(sub.labelKey, sub.label) : sub.label}
-                color={accentColor}
-              />
-            ))}
-          </SimpleGrid>
-        </Stack>
-      ))}
-
-      {/* Ungrouped flat nav items */}
-      {flatItems.length > 0 && (
-        <SimpleGrid cols={3} spacing="sm">
-          {flatItems.map((item) => (
-            <GridNavItem
+      {sections.map((section) => (
+        <NavListSection key={section.id} title={section.title}>
+          {section.items.map((item, index) => (
+            <NavListRow
               key={item.id}
               to={item.path || '/'}
               icon={item.icon}
               label={item.labelKey ? t(item.labelKey, item.label) : item.label}
               color={accentColor}
+              lastRow={index === section.items.length - 1}
             />
           ))}
-        </SimpleGrid>
-      )}
+        </NavListSection>
+      ))}
 
-      <Divider />
-
-      {/* Profile */}
-      <SimpleGrid cols={3} spacing="sm">
-        <GridNavItem
+      <NavListSection title={t('profile.account')}>
+        <NavListRow
           to={ROUTES.PROFILE}
           icon={IconName.User}
           label={t('menu.profile')}
           color={accentColor}
         />
-      </SimpleGrid>
-
-      {/* Logout — fixed to bottom */}
-      <Box
-        px="xs"
-        pb="md"
-        style={{
-          position: 'fixed',
-          bottom: 64,
-          left: 0,
-          right: 0,
-          zIndex: 50,
-          paddingBottom: 'calc(var(--mantine-spacing-md) + env(safe-area-inset-bottom, 0px))',
-        }}
-      >
-        <UnstyledButton
-          component={Link}
+        <NavListRow
           to={ROUTES.AUTH.LOGOUT}
-          w="100%"
-          py="sm"
-          px="md"
-          style={{
-            display: 'block',
-            borderRadius: 'var(--mantine-radius-md)',
-            border: '1px solid var(--mantine-color-red-3)',
-            backgroundColor: 'var(--mantine-color-body)',
-          }}
-        >
-          <Group justify="center" gap="xs">
-            <Icon
-              name={IconName.Logout}
-              size={18}
-              stroke={1.8}
-              style={{ color: getColor('red.6') }}
-            />
-            <Text size="sm" fw={500} c="red.6">
-              {t('menu.logout')}
-            </Text>
-          </Group>
-        </UnstyledButton>
-      </Box>
+          icon={IconName.Logout}
+          label={t('menu.logout')}
+          color={getColor('red.6')}
+          textColor="red.6"
+          withChevron={false}
+          lastRow
+        />
+      </NavListSection>
     </Stack>
   );
 }
 
-function GridNavItem({
+function NavListSection({ title, children }: { title?: string; children: React.ReactNode }) {
+  return (
+    <Stack gap={0}>
+      {title && (
+        <Text size="sm" fw={600} c="dimmed" tt="uppercase" px="xs" pb={4}>
+          {title}
+        </Text>
+      )}
+      {children}
+    </Stack>
+  );
+}
+
+function NavListRow({
   to,
   icon,
   label,
   color,
+  textColor,
+  withChevron = true,
+  lastRow = false,
 }: {
   to: string;
   icon: IconName;
   label: string;
   color: string;
+  textColor?: string;
+  withChevron?: boolean;
+  lastRow?: boolean;
 }) {
   return (
-    <UnstyledButton component={Link} to={to} style={{ textDecoration: 'none', color: 'inherit' }}>
-      <Card withBorder radius="md" padding="sm" style={{ height: '100%' }}>
-        <Stack align="center" gap={6}>
-          <Box
-            w={40}
-            h={40}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 12,
-              backgroundColor: 'var(--mantine-color-default-hover)',
-            }}
-          >
-            <Icon name={icon} size={22} stroke={1.8} style={{ color }} />
-          </Box>
-          <Text size="xs" fw={500} ta="center" lineClamp={2}>
+    <UnstyledButton
+      component={Link}
+      to={to}
+      w="100%"
+      px="xs"
+      style={{ display: 'block', textDecoration: 'none', color: 'inherit' }}
+    >
+      <Group gap="md" wrap="nowrap" align="center">
+        <Icon name={icon} size={24} stroke={1.8} style={{ color, flexShrink: 0 }} />
+        {/* Hairline lives on the inner box so it insets past the icon (iOS list). */}
+        <Group
+          gap="md"
+          wrap="nowrap"
+          h={ROW_HEIGHT}
+          flex={1}
+          style={
+            lastRow ? undefined : { borderBottom: '1px solid var(--mantine-color-default-border)' }
+          }
+        >
+          <Text size="md" c={textColor} flex={1} truncate>
             {label}
           </Text>
-        </Stack>
-      </Card>
+          {withChevron && <IconChevronRight size={20} color="var(--mantine-color-dimmed)" />}
+        </Group>
+      </Group>
     </UnstyledButton>
   );
 }

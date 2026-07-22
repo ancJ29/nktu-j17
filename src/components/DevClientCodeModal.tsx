@@ -3,7 +3,8 @@ import { Button, Divider, Group, Modal, Space, Switch, Text, TextInput } from '@
 import { useDisclosure, useHotkeys } from '@mantine/hooks';
 import { useState } from 'react';
 import { ADMIN_CONFIG_KEY, appApiGroup, getAdminConfigValue, setAppApiGroup } from '@/config/env';
-import { clearAllCache, reloadPage } from '@credo/base-ui/utils';
+import { reloadPage } from '@credo/base-ui/utils';
+import { forceClearCache } from '@/utils/forceClearCache';
 import { appConfig } from '@/config';
 import { isProduction } from '@/config/env';
 
@@ -125,9 +126,8 @@ export function DevClientCodeModal() {
         fullWidth
         color="red"
         variant="light"
-        onClick={async () => {
-          await clearAllCache();
-          reloadPage('force clear cache');
+        onClick={() => {
+          forceClearCache().catch(console.error);
         }}
       >
         Force Clear All Cache

@@ -1,9 +1,16 @@
 /**
  * Danger zone — deactivate / delete.
  *
- * Desktop-only: the shared V2 convention hides destructive actions on mobile
- * until a deliberate mobile pattern ships. Renders nothing when the operator has
- * neither right, so the caller can drop it in unconditionally.
+ * Split by device on purpose: **deactivate is available on mobile, delete is
+ * not**. Locking an account is the one danger-zone action with a real field
+ * use-case — a manager who learns of a leaked account or a walk-out needs to cut
+ * access from their phone, and it is reversible. Delete is permanent, so it
+ * stays desktop-only, the same call the product team made for "delete sales
+ * order". Mobile therefore takes the sanctioned Variant F shape (one full-width
+ * button where the danger zone sits on desktop), not a shrunken red card — see
+ * `docs/guidelines/single-mode-modules/detail-page-pattern.md § F`.
+ * Renders nothing when the operator has no applicable right, so the caller can
+ * drop it in unconditionally.
  *
  * Both actions are more consequential than they look: `isActive` is the c-sso
  * login gate, and "delete" is a soft delete that flips the same flag — so either
@@ -11,7 +18,17 @@
  * SSO-outcome toasts live in `useEmployeeDangerZone`.
  */
 
-import { ActionIcon, Card, Divider, Group, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import {
+  ActionIcon,
+  Button,
+  Card,
+  Divider,
+  Group,
+  Stack,
+  Text,
+  ThemeIcon,
+  Tooltip,
+} from '@mantine/core';
 import { IconAlertTriangle, IconLock, IconLockOpen, IconTrash } from '@tabler/icons-react';
 import { FieldLabel } from '@credo/base-ui/components';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +54,25 @@ export function EmployeeDangerZoneCard({
 }: EmployeeDangerZoneCardProps) {
   const { t } = useTranslation();
 
-  if (isMobile || (!canToggleStatus && !canDelete)) return null;
+  if (isMobile) {
+    if (!canToggleStatus) return null;
+    return (
+      <Button
+        variant="light"
+        color={employee.isActive ? 'orange' : 'green'}
+        size="sm"
+        leftSection={employee.isActive ? <IconLock size={16} /> : <IconLockOpen size={16} />}
+        onClick={onToggleStatus}
+        fullWidth
+      >
+        {employee.isActive
+          ? t('__new__.07-entities.employees.dangerZone.disableButton')
+          : t('__new__.07-entities.employees.dangerZone.enableButton')}
+      </Button>
+    );
+  }
+
+  if (!canToggleStatus && !canDelete) return null;
 
   return (
     <Card

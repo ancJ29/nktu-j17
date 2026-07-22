@@ -21,12 +21,12 @@ export function InternalBanner() {
   return (
     <Affix position={{ top: 10, left: '20%' }}>
       <Center w="50vw" p={0}>
-        <Text c="black" ta="center" fw={600} p="xs" bg="yellow.4">
+        <Text c="orange.3" ta="center" fw={600} p="xs">
           Internal deployment. For development and evaluation use only.
           {/* DO NOT USE IN PRODUCTION. */}
         </Text>
         <Space w="md" />
-        <Button variant="light" onClick={() => setHide(true)}>
+        <Button variant="outline" color="orange.3" onClick={() => setHide(true)}>
           Hide me
         </Button>
       </Center>

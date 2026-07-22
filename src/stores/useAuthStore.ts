@@ -84,12 +84,41 @@ mobileUserStorage.onChange(debouncedSaveProfile);
 
 export const SESSION_EXPIRED_NOTICE_KEY = 'sessionExpiredNotice';
 
+export type SessionExpiredNotice = {
+  reason: string;
+  
+  at: number;
+};
+
+export function takeSessionExpiredNotice(): SessionExpiredNotice | null {
+  const raw = sessionStorage.getItem(SESSION_EXPIRED_NOTICE_KEY);
+  if (!raw) return null;
+  sessionStorage.removeItem(SESSION_EXPIRED_NOTICE_KEY);
+
+  
+  
+  try {
+    const parsed = JSON.parse(raw) as Partial<SessionExpiredNotice>;
+    if (typeof parsed?.reason !== 'string') return { reason: 'unknown', at: Date.now() };
+    return { reason: parsed.reason, at: typeof parsed.at === 'number' ? parsed.at : Date.now() };
+  } catch {
+    return { reason: 'unknown', at: Date.now() };
+  }
+}
+
 let lastAuthToken = useAuthStore.getState().token;
 useAuthStore.subscribe((state) => {
   const next = state.token;
   if (next === lastAuthToken) return;
   if (lastAuthToken && !next) {
-    sessionStorage.setItem(SESSION_EXPIRED_NOTICE_KEY, '1');
+    const reason = state.lastLogoutReason ?? 'unknown';
+    logger.warn('Session ended', { reason });
+    const notice: SessionExpiredNotice = { reason, at: Date.now() };
+    try {
+      sessionStorage.setItem(SESSION_EXPIRED_NOTICE_KEY, JSON.stringify(notice));
+    } catch {
+      // Quota / disabled storage — the toast is a nicety, not a requirement.
+    }
   }
   lastAuthToken = next;
 });

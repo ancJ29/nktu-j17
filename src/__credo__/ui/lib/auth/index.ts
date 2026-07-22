@@ -24,6 +24,7 @@ export type {
   LoginWithQrCodeResponse,
   LoginWithTokenParams,
   LoginWithTokenResponse,
+  LogoutReason,
   PersistStorage,
   RefreshTokenParams,
   RefreshTokenResponse,
@@ -31,4 +32,5 @@ export type {
   RegisterResponse,
   ResetPasswordParams,
   ResetPasswordResponse,
+  TokenRefreshOutcome,
 } from './types';

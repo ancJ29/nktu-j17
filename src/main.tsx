@@ -13,8 +13,9 @@ import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
 import { theme } from './theme';
 import { setCredoGroup } from '@credo/connectors/connector';
-import { installChunkErrorReload, clearAllCache, reloadPage } from '@credo/base-ui/utils';
+import { installChunkErrorReload } from '@credo/base-ui/utils';
 import { appApiGroup, appCredoStorageHash } from './config/env';
+import { forceClearCache } from './utils/forceClearCache';
 
 // Recover from stale-chunk 404s after a deploy (see @credo/base-ui chunk-error).
 // Registered before the first lazy import so it can catch App's own chunk.
@@ -27,7 +28,24 @@ if (!rootElement) {
   throw new Error('Root element not found');
 }
 
-setCredoGroup(appApiGroup);
+// Storage-hash migration: a build can declare that any cache older than its
+// hash must go. This runs BEFORE `setCredoGroup` on purpose — `setCredoGroup`
+// schedules its own reload 100ms out, which used to fire mid-wipe, before the
+// marker below was written. The marker never landed, so the next boot wiped
+// again, and again: a permanent reload loop that also re-deleted the client
+// code and group on every pass. `forceClearCache` restores those and writes the
+// marker before its own reload, so the wipe happens exactly once.
+const CREDO_STORAGE_HASH_KEY = '151f93916';
+const storageHashStale =
+  !!appCredoStorageHash && localStorage.getItem(CREDO_STORAGE_HASH_KEY) !== appCredoStorageHash;
+
+if (storageHashStale) {
+  void forceClearCache('storage hash change', () => {
+    localStorage.setItem(CREDO_STORAGE_HASH_KEY, appCredoStorageHash);
+  });
+} else {
+  setCredoGroup(appApiGroup);
+}
 
 createRoot(rootElement).render(
   <StrictMode>
@@ -39,14 +57,3 @@ createRoot(rootElement).render(
     </MantineProvider>
   </StrictMode>,
 );
-
-if (appCredoStorageHash) {
-  const CREDO_STORAGE_HASH_KEY = '151f93916';
-  const currentHash = localStorage.getItem(CREDO_STORAGE_HASH_KEY);
-  if (currentHash !== appCredoStorageHash) {
-    clearAllCache().then(() => {
-      localStorage.setItem(CREDO_STORAGE_HASH_KEY, appCredoStorageHash);
-      reloadPage('force clear cache');
-    });
-  }
-}

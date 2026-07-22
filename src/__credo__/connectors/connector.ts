@@ -7,5 +7,5 @@ export { emailConnector } from './__internal__/email';
 export { notificationManagerConnector } from './__internal__/notification-manager';
 export { r2Connector } from './__internal__/r2';
 export { slackConnector } from './__internal__/slack';
-export { setCredoGroup, credoGroup } from './__internal__/shared/config';
+export { setCredoGroup, credoGroup, CREDO_GROUP_STORAGE_KEY } from './__internal__/shared/config';
 export { CallApiError } from './__internal__/shared/errors';

@@ -115,7 +115,7 @@ export function useCurrentEmployee({ isProfileLoaded, email, token }: UseCurrent
           id: match.id,
           isDeleted: extra?.isDeleted ?? false,
         });
-        useAuthStore.getState().logout();
+        useAuthStore.getState().logout('account-locked');
         
         
         scheduleReload('current employee locked', 2000);

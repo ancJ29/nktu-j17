@@ -567,7 +567,12 @@
     },
     "session": {
       "expiredMessage": "Your session has expired. Please sign in again.",
-      "expiredTitle": "Session expired"
+      "expiredTitle": "Session expired",
+      "reason": {
+        "accountLocked": "Your account was deactivated. Contact your administrator.",
+        "refreshRejected": "Your session was ended by the server. Please sign in again.",
+        "refreshTokenExpired": "You were signed out after the session time limit. Tip: tick \"Remember me\" to stay signed in longer."
+      }
     }
   },
   "chat": {
@@ -1242,7 +1247,6 @@
       "unregisteredVendorLabel": "Unregistered vendor",
       "updateButton": "Update Request",
       "vendorLabel": "Vendor",
-      "vendorPickOrTypeDesc": "Pick from the list, or type a name for a one-off vendor.",
       "vendorPlaceholder": "Pick a vendor or type a name",
       "vendorTypePlaceholder": "Type the vendor name"
     },
@@ -2309,6 +2313,8 @@
     }
   },
   "menu": {
+    "clearCache": "Clear Cached Data",
+    "clearCacheConfirm": "This wipes all locally cached data (settings, offline data, cookies) and signs you out. Use it only when the app is stuck on outdated data.",
     "installApp": "Install App",
     "logout": "Logout",
     "profile": "Profile",

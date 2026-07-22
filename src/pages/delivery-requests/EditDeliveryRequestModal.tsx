@@ -1,23 +1,14 @@
 
 
-import {
-  Autocomplete,
-  Button,
-  Group,
-  Modal,
-  Stack,
-  Switch,
-  TextInput,
-  Textarea,
-} from '@mantine/core';
+import { Button, Group, Modal, Stack, Switch, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconCalendar } from '@tabler/icons-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { DateField } from '@/components/DateField';
-import { CustomerSelector, EmployeeSelector } from '@/components/selectors';
+import { CustomerSelector, EmployeeSelector, VendorSelector } from '@/components/selectors';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -98,7 +89,6 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
-  const vendors = useVendorStore((s) => s.items);
   const vendorsInit = useVendorStore((s) => s.initialized);
   const loadVendors = useVendorStore((s) => s.loadAll);
   const customers = useCustomerStore((s) => s.items);
@@ -123,23 +113,23 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
     loadCustomers,
   ]);
 
-  const vendorOptions = useMemo(
-    () =>
-      vendors
-        .filter((v) => !v.extra?.isDeleted)
-        .map((v) => v.extra?.shortName?.trim() || v.name)
-        .filter((name): name is string => !!name),
-    [vendors],
+  
+  
+  
+  
+  
+  
+  
+  const currentVendorCode = request.vendorCode ?? '';
+  const registeredVendorFilter = useCallback(
+    (v: Vendor) => !v.extra?.isDeleted && (v.isActive || v.code === currentVendorCode),
+    [currentVendorCode],
   );
-  const vendorByDisplayName = useMemo(() => {
-    const m = new Map<string, Vendor>();
-    for (const v of vendors) {
-      if (v.extra?.isDeleted) continue;
-      const display = v.extra?.shortName?.trim() || v.name;
-      if (display && !m.has(display)) m.set(display, v);
-    }
-    return m;
-  }, [vendors]);
+  
+  
+  const [oneOffVendor, setOneOffVendor] = useState(
+    () => !partyIsCustomer && !currentVendorCode && !!request.vendorName,
+  );
 
   const drExtra = (request.extra ?? {}) as DeliveryRequestExtra;
   const form = useForm<EditFormValues>({
@@ -245,28 +235,53 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
         />
 
         {!partyIsCustomer ? (
-          <Autocomplete
-            label={t('deliveryRequests.form.vendorLabel')}
-            placeholder={t('deliveryRequests.form.vendorPlaceholder')}
-            description={t('deliveryRequests.form.vendorPickOrTypeDesc')}
-            data={vendorOptions}
-            value={form.getValues().vendorName}
-            onChange={(value) => {
-              
-              
-              const matched = vendorByDisplayName.get(value);
-              const prevCode = form.getValues().vendorCode;
-              form.setFieldValue('vendorName', value);
-              form.setFieldValue('vendorCode', matched?.code ?? '');
-              
-              
-              if (matched && matched.code !== prevCode) {
-                const { deliveryAddress, googleMapUrl } = resolveVendorInboundAddress(matched);
-                form.setFieldValue('deliveryAddress', deliveryAddress);
-                form.setFieldValue('googleMapUrl', googleMapUrl);
-              }
-            }}
-          />
+          <Stack gap={6}>
+            <Switch
+              size="xs"
+              label={t('deliveryRequests.form.unregisteredVendorLabel')}
+              checked={oneOffVendor}
+              onChange={(e) => {
+                setOneOffVendor(e.currentTarget.checked);
+                
+                
+                form.setFieldValue('vendorName', '');
+                form.setFieldValue('vendorCode', '');
+              }}
+            />
+            {oneOffVendor ? (
+              <TextInput
+                label={t('deliveryRequests.form.vendorLabel')}
+                placeholder={t('deliveryRequests.form.vendorTypePlaceholder')}
+                value={form.getValues().vendorName}
+                onChange={(e) => {
+                  form.setFieldValue('vendorName', e.currentTarget.value);
+                  form.setFieldValue('vendorCode', '');
+                }}
+              />
+            ) : (
+              <VendorSelector
+                label={t('deliveryRequests.form.vendorLabel')}
+                placeholder={t('deliveryRequests.form.vendorPlaceholder')}
+                clearable
+                filter={registeredVendorFilter}
+                value={form.getValues().vendorCode || null}
+                onChange={(sel) => {
+                  const prevCode = form.getValues().vendorCode;
+                  form.setFieldValue('vendorName', sel?.name ?? '');
+                  form.setFieldValue('vendorCode', sel?.code ?? '');
+                  
+                  
+                  if (sel && sel.code !== prevCode) {
+                    const { deliveryAddress, googleMapUrl } = resolveVendorInboundAddress(
+                      sel.vendor,
+                    );
+                    form.setFieldValue('deliveryAddress', deliveryAddress);
+                    form.setFieldValue('googleMapUrl', googleMapUrl);
+                  }
+                }}
+              />
+            )}
+          </Stack>
         ) : (
           <>
             {request.salesOrderNumber ? (

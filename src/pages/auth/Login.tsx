@@ -1,6 +1,6 @@
 import { appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
-import { SESSION_EXPIRED_NOTICE_KEY, useAuthStore } from '@/stores/useAuthStore';
+import { takeSessionExpiredNotice, useAuthStore } from '@/stores/useAuthStore';
 import { resolveLoginIdentifier } from '@/utils/loginEmail';
 import { markPendingLogin } from '@/utils/pendingLoginLog';
 import { markPostLoginReloads } from '@/utils/postLoginReload';
@@ -30,15 +30,28 @@ export function LoginPage() {
   
   
   
+  
+  
+  
+  
+  
   useEffect(() => {
-    if (sessionStorage.getItem(SESSION_EXPIRED_NOTICE_KEY)) {
-      sessionStorage.removeItem(SESSION_EXPIRED_NOTICE_KEY);
-      notifications.show({
-        color: 'yellow',
-        title: t('auth.session.expiredTitle'),
-        message: t('auth.session.expiredMessage'),
-      });
-    }
+    const notice = takeSessionExpiredNotice();
+    if (!notice) return;
+
+    const isLocked = notice.reason === 'account-locked';
+    const messageByReason: Record<string, string> = {
+      'refresh-token-expired': t('auth.session.reason.refreshTokenExpired'),
+      'refresh-rejected': t('auth.session.reason.refreshRejected'),
+      'profile-rejected': t('auth.session.reason.refreshRejected'),
+      'account-locked': t('auth.session.reason.accountLocked'),
+    };
+
+    notifications.show({
+      color: isLocked ? 'red' : 'yellow',
+      title: t('auth.session.expiredTitle'),
+      message: messageByReason[notice.reason] ?? t('auth.session.expiredMessage'),
+    });
   }, [t]);
 
   const handleLanguageChange = useCallback(

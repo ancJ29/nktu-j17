@@ -1,9 +1,25 @@
 
 
+import { CallApiError } from '@credo/connectors/connector';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { asyncDeduplicator, isTokenExpired, logger } from '../../utils';
-import type { AuthData, AuthState, BaseProfile, CreateAuthStoreOptions } from './types';
+import type {
+  AuthData,
+  AuthState,
+  BaseProfile,
+  CreateAuthStoreOptions,
+  TokenRefreshOutcome,
+} from './types';
+
+const REFRESH_RETRY_ATTEMPTS = 2;
+const REFRESH_RETRY_DELAY_MS = 600;
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isAuthRejection(error: unknown): boolean {
+  return error instanceof CallApiError && (error.status === 401 || error.status === 403);
+}
 
 export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
   options: CreateAuthStoreOptions<TProfile>,
@@ -58,50 +74,77 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
           user: { name: '' } as TProfile,
           ...loadAuthFromStorage(),
           isProfileLoaded: false,
+          lastLogoutReason: null,
 
-          checkAndRefreshToken: async () => {
+          checkAndRefreshToken: async (): Promise<TokenRefreshOutcome> => {
             const { token, refreshToken, userUuid } = get();
 
-            
-            if (!token || !refreshToken || !isTokenExpired(token)) {
-              return;
-            }
+            if (!token || !refreshToken) return 'anonymous';
+            if (!isTokenExpired(token)) return 'valid';
 
+            
+            
             
             if (isTokenExpired(refreshToken, 0)) {
               logger.info('Refresh token expired, logging out');
-              get().logout();
-              return;
+              get().logout('refresh-token-expired');
+              return 'logged-out';
             }
 
-            try {
-              
-              const response = await asyncDeduplicator.call('refreshToken', async () => {
-                return api.refreshToken({ refreshToken });
-              });
+            
+            
+            const outcome = await asyncDeduplicator.call<TokenRefreshOutcome>(
+              'refreshToken',
+              async () => {
+                let lastError: unknown;
 
-              if (response.success && response.token) {
-                
-                if (!get().token) return;
+                for (let attempt = 1; attempt <= REFRESH_RETRY_ATTEMPTS; attempt++) {
+                  try {
+                    const response = await api.refreshToken({ refreshToken });
+
+                    if (response.success && response.token) {
+                      
+                      if (!get().token) return 'logged-out';
+
+                      const updatedAuth: AuthData = {
+                        userUuid,
+                        token: response.token,
+                        refreshToken: response.refreshToken || refreshToken,
+                      };
+                      set(updatedAuth);
+                      saveAuthToStorage(updatedAuth);
+                      return 'refreshed';
+                    }
+
+                    
+                    logger.error('Token refresh rejected by server:', response.error);
+                    get().logout('refresh-rejected');
+                    return 'logged-out';
+                  } catch (error) {
+                    if (isAuthRejection(error)) {
+                      logger.error('Token refresh rejected (401/403), logging out');
+                      get().logout('refresh-rejected');
+                      return 'logged-out';
+                    }
+
+                    lastError = error;
+                    if (attempt < REFRESH_RETRY_ATTEMPTS) {
+                      await delay(REFRESH_RETRY_DELAY_MS);
+                    }
+                  }
+                }
 
                 
-                const updatedAuth: AuthData = {
-                  userUuid,
-                  token: response.token,
-                  refreshToken: response.refreshToken || refreshToken,
-                };
-                set(updatedAuth);
-                saveAuthToStorage(updatedAuth);
-              } else {
                 
-                logger.error('Token refresh failed:', response.error);
-                get().logout();
-              }
-            } catch (error) {
-              
-              logger.error('Token refresh error:', error);
-              get().logout();
-            }
+                logger.warn(
+                  'Token refresh unavailable, keeping session for a later retry:',
+                  lastError,
+                );
+                return 'deferred';
+              },
+            );
+
+            return outcome;
           },
 
           loadProfile: async () => {
@@ -112,7 +155,7 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
             
 
             try {
-              await get().checkAndRefreshToken();
+              const outcome = await get().checkAndRefreshToken();
               const state = get();
               const token = state.token;
 
@@ -121,10 +164,30 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
                 throw new Error('Token is required');
               }
 
+              
+              
+              
+              
+              
+              if (outcome === 'deferred') {
+                logger.warn('Skipping profile fetch: token refresh was deferred');
+                set({ isProfileLoaded: true });
+                return;
+              }
+
               const user = await asyncDeduplicator.call(`getProfile-${token}`, async () => {
-                const profile = await api.getProfile({ token }).catch((error) => {
-                  logger.error('Failed to get profile:', error);
-                  get().logout();
+                const profile = await api.getProfile({ token }).catch((error: unknown) => {
+                  
+                  
+                  
+                  
+                  
+                  if (isAuthRejection(error)) {
+                    logger.error('Profile fetch rejected (401/403), logging out');
+                    get().logout('profile-rejected');
+                  } else {
+                    logger.warn('Failed to get profile, keeping session:', error);
+                  }
                   return undefined;
                 });
                 return profile;
@@ -133,6 +196,9 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
               if (user) {
                 set({ user, isProfileLoaded: true });
               } else {
+                
+                
+                
                 set({ isProfileLoaded: true });
               }
             } catch (error) {
@@ -167,8 +233,22 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
             return { success: true };
           },
 
-          logout: () => {
-            set({ token: null, refreshToken: null, isProfileLoaded: false });
+          logout: (reason = 'unknown') => {
+            logger.info('Logging out', { reason });
+            
+            
+            
+            
+            
+            
+            set({
+              user: { name: '' } as TProfile,
+              userUuid: null,
+              token: null,
+              refreshToken: null,
+              isProfileLoaded: false,
+              lastLogoutReason: reason,
+            });
             clearAuthFromStorage();
             persistStorage?.removeItem(persistKey);
             return { success: true };
@@ -267,6 +347,11 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
             userUuid: state.userUuid,
             token: state.token,
             refreshToken: state.refreshToken,
+            
+            
+            
+            
+            user: state.user,
           }),
         },
       ),

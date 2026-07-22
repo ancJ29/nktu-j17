@@ -32,26 +32,38 @@ const configs: Record<string, Record<string, string>> = {
   },
 };
 
-const CREDO_GROUP_KEY = '19c55230d1';
+export const CREDO_GROUP_STORAGE_KEY = '19c55230d1';
 
 export function setCredoGroup(group: string): void {
+  
+  
+  
+  
+  if (!group) return;
+
   if (group === 'ridge') {
     setCredoGroup('409e36');
     return;
   }
 
-  const current = getEnvVar(CREDO_GROUP_KEY) || '-';
+  const current = getEnvVar(CREDO_GROUP_STORAGE_KEY) || '-';
   if (current === group) return;
 
-  setEnvVar(CREDO_GROUP_KEY, group);
+  setEnvVar(CREDO_GROUP_STORAGE_KEY, group);
   console.log('credoGroup', group);
-  if (isBrowser()) {
+
+  
+  
+  
+  
+  
+  if (isBrowser() && group !== credoGroup) {
     setTimeout(() => {
       window.location.reload();
     }, 100);
   }
 }
 
-export const credoGroup = getEnvVar(CREDO_GROUP_KEY) || '__default__';
+export const credoGroup = getEnvVar(CREDO_GROUP_STORAGE_KEY) || '__default__';
 
 export const urls: Record<string, string> = configs[credoGroup] ?? {};

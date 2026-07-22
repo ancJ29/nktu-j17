@@ -160,6 +160,17 @@ export type AuthData = {
   refreshToken: string | null;
 };
 
+export type TokenRefreshOutcome = 'valid' | 'refreshed' | 'deferred' | 'logged-out' | 'anonymous';
+
+export type LogoutReason =
+  | 'user'
+  | 'refresh-token-expired'
+  | 'refresh-rejected'
+  | 'profile-rejected'
+  | 'account-locked'
+  | 'unknown'
+  | (string & {});
+
 export type AuthState<TProfile extends BaseProfile = BaseProfile> = {
   
   user: TProfile;
@@ -168,6 +179,8 @@ export type AuthState<TProfile extends BaseProfile = BaseProfile> = {
   refreshToken: string | null;
   
   isProfileLoaded: boolean;
+  
+  lastLogoutReason: LogoutReason | null;
 
   
   login: (params: {
@@ -176,13 +189,13 @@ export type AuthState<TProfile extends BaseProfile = BaseProfile> = {
     remember: boolean;
   }) => Promise<{ success: boolean }>;
 
-  logout: () => { success: boolean };
+  logout: (reason?: LogoutReason) => { success: boolean };
 
   loadProfile: () => Promise<void>;
 
   saveProfile: () => Promise<void>;
 
-  checkAndRefreshToken: () => Promise<void>;
+  checkAndRefreshToken: () => Promise<TokenRefreshOutcome>;
 
   register: (params: {
     username: string;

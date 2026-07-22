@@ -11,9 +11,18 @@
  * 2000 ms so the auth-cleared screen renders before the navigation.
  */
 import { cacheFlush } from '@/utils/appCache';
+import { markCfgReady, markEmpReady } from '@/utils/bootState';
 import { reloadPage } from '@credo/base-ui/utils';
 
 export function scheduleReload(reason: string, delayMs: number = 100): void {
   cacheFlush();
-  setTimeout(() => reloadPage(reason), delayMs);
+  setTimeout(() => {
+    if (!reloadPage(reason)) {
+      // The reload-loop breaker suppressed it. Callers of scheduleReload leave
+      // the boot gates unready on purpose ("a reload is coming") — with no
+      // reload coming, release them: a rendered app beats a pinned spinner.
+      markCfgReady();
+      markEmpReady();
+    }
+  }, delayMs);
 }

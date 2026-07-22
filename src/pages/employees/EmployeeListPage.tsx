@@ -233,7 +233,10 @@ export function EmployeeListPage() {
               to: ROUTES.EMPLOYEES.NEW,
               label: t('employees.addEmployee'),
               enabled: canCreate,
-              mobileVariant: 'icon',
+              
+              
+              
+              mobileVariant: 'hidden',
             }}
           />
 

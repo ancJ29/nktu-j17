@@ -367,12 +367,14 @@ export function EmployeeDetailPage() {
   
   
   
+  
   const detailsContent = isMobile ? (
     <Stack gap="md">
       {quickActionsCard}
       {personalCard}
       {contactsCard}
       {notesCard}
+      {dangerZoneCard}
     </Stack>
   ) : (
     <Grid gutter="md">

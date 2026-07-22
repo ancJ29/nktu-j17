@@ -567,7 +567,12 @@
     },
     "session": {
       "expiredMessage": "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.",
-      "expiredTitle": "Phiên đã hết hạn"
+      "expiredTitle": "Phiên đã hết hạn",
+      "reason": {
+        "accountLocked": "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.",
+        "refreshRejected": "Phiên đăng nhập đã bị máy chủ kết thúc. Vui lòng đăng nhập lại.",
+        "refreshTokenExpired": "Bạn đã được đăng xuất sau khi hết thời hạn phiên. Mẹo: chọn \"Ghi nhớ đăng nhập\" để duy trì đăng nhập lâu hơn."
+      }
     }
   },
   "chat": {
@@ -1242,7 +1247,6 @@
       "unregisteredVendorLabel": "NCC chưa đăng ký",
       "updateButton": "Cập nhật yêu cầu",
       "vendorLabel": "Nhà cung cấp",
-      "vendorPickOrTypeDesc": "Chọn từ danh sách, hoặc nhập tay tên NCC vãng lai.",
       "vendorPlaceholder": "Chọn NCC hoặc nhập tên",
       "vendorTypePlaceholder": "Nhập tên nhà cung cấp"
     },
@@ -2309,6 +2313,8 @@
     }
   },
   "menu": {
+    "clearCache": "Xóa dữ liệu",
+    "clearCacheConfirm": "Thao tác này sẽ xóa toàn bộ dữ liệu lưu tạm trên máy (cài đặt, dữ liệu ngoại tuyến, cookie) và đăng xuất bạn. Chỉ dùng khi ứng dụng bị kẹt ở dữ liệu cũ.",
     "installApp": "Cài đặt ứng dụng",
     "logout": "Đăng xuất",
     "profile": "Hồ sơ",

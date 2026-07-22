@@ -191,14 +191,20 @@ export async function refreshConfigFromBackend(): Promise<void> {
     });
 
     
+    
+    
+    
+    cacheSet('cfg', config);
+
+    
     if (config.version && config.version !== appConfig.version) {
       logger.info('new version of remote config found, reloading...', config.version);
       
       
-      cacheSet('cfg', config);
       cacheFlush();
-      reloading = true;
-      reloadPage('config version mismatch');
+      
+      
+      reloading = reloadPage('config version mismatch');
     }
     // Ignore config with older version
   } finally {

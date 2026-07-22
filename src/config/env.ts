@@ -22,11 +22,15 @@ export function getAdminConfigValue(): string {
 
 export const isDev = import.meta.env.DEV;
 
+export const API_GROUP_STORAGE_KEY = 'e4f039f79';
+
 export const appApiGroup =
-  localStorage.getItem('e4f039f79') || (import.meta.env.VITE_APP_API_GROUP as string) || '';
+  localStorage.getItem(API_GROUP_STORAGE_KEY) ||
+  (import.meta.env.VITE_APP_API_GROUP as string) ||
+  '';
 
 export function setAppApiGroup(apiGroup: string) {
-  localStorage.setItem('e4f039f79', apiGroup);
+  localStorage.setItem(API_GROUP_STORAGE_KEY, apiGroup);
 }
 
 export const appActivityLoggerInternalAccessKey =

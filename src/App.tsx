@@ -7,11 +7,10 @@ import { usePWA } from '@credo/base-ui/hooks';
 
 import { buildHash, buildTimestamp } from '@/config/build-version';
 import { isFirstBoot } from '@/config';
-import { resolveClientCode } from '@/config/client-code';
 import { isInternal } from '@/config/env';
-import { useClientUnconfigured } from '@/utils/bootState';
+import { useCfgReady } from '@/utils/bootState';
 import router from './router';
-import { clearChunkReloadParam, logger } from '@credo/base-ui/utils';
+import { clearChunkReloadParam, logger, resetReloadGuard } from '@credo/base-ui/utils';
 import { useTranslation } from 'react-i18next';
 import { isLocalhost } from '@credo/kits/misc';
 
@@ -84,20 +83,26 @@ export default function App() {
   // done its job by the time we render, so take it back out of the address bar.
   useEffect(() => clearChunkReloadParam(), []);
 
-  // Re-renders App when the config refresh finds the resolved client has no
-  // backend config, so the overlay dismissal below reacts to it.
-  // cspell:word Unconfigured
-  const clientUnconfigured = useClientUnconfigured();
+  // Re-renders App when the config refresh settles, so the dismissal below can
+  // release the overlay on the paths that never reload.
+  const cfgReady = useCfgReady();
 
-  // On first boot (no cached config), keep the loading overlay visible —
-  // refreshConfigFromBackend() will fetch, cache, and reload the page.
-  // On subsequent boots, config is cached so the theme is correct — dismiss immediately.
-  // Also dismiss when no usable client is resolvable, otherwise the overlay sits
-  // forever on top of the BaseLayout ClientCodePrompt underneath it:
-  //   - no client code resolved at all, or
-  //   - a code resolved but the backend has no config for it (clientUnconfigured).
-  // In both cases refreshConfigFromBackend() never triggers a reload.
-  if (!isFirstBoot || !resolveClientCode() || clientUnconfigured) {
+  // A settled config refresh is this app's definition of a healthy boot; hand
+  // the next legitimate reload a full budget instead of this boot's leftovers.
+  useEffect(() => {
+    if (cfgReady) resetReloadGuard();
+  }, [cfgReady]);
+
+  // The overlay stays up only while a boot-time reload is genuinely pending:
+  //
+  // - Not first boot (config cached, theme correct) → dismiss immediately.
+  // - First boot → hold until `cfgReady`. It flips on EVERY outcome of the
+  //   config refresh except an imminent reload: fetch settled or rejected,
+  //   no client code (BaseLayout shows ClientCodePrompt), client unconfigured
+  //   (same prompt), a reload suppressed by the loop breaker, and the 15s
+  //   watchdog as the floor. Adding conditions here restates `cfgReady`;
+  //   removing the hold re-creates the theme flash `isFirstBoot` exists for.
+  if (!isFirstBoot || cfgReady) {
     dismissLoadingOverlay();
   }
 

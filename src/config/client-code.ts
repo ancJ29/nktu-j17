@@ -6,12 +6,14 @@ import { reloadPage } from '@credo/base-ui/utils';
 import { credoClientCode } from './env';
 import { isLocalhost } from '@credo/kits/misc';
 
+export const CLIENT_CODE_STORAGE_KEY = '__CREDO_SERVICE_CODE__';
+
 function fromStorage(): string {
-  return localStorage.getItem('__CREDO_SERVICE_CODE__') ?? '';
+  return localStorage.getItem(CLIENT_CODE_STORAGE_KEY) ?? '';
 }
 
 function saveToStorage(clientCode: string): void {
-  localStorage.setItem('__CREDO_SERVICE_CODE__', clientCode);
+  localStorage.setItem(CLIENT_CODE_STORAGE_KEY, clientCode);
 }
 
 function fromDomain(): string {

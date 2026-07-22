@@ -58,6 +58,7 @@ type PCAppLayoutLabels = {
   menuReloadPage?: string;
   menuRefreshConfig?: string;
   menuInstallApp?: string;
+  menuClearCache?: string;
 };
 
 type PCAppLayoutProps = {
@@ -92,6 +93,8 @@ type PCAppLayoutProps = {
   onRefreshConfig?: () => void;
   showInstallApp?: boolean;
   onInstallApp?: () => void;
+  
+  onClearCache?: () => void;
   
   navbarOpenedProp?: boolean;
   
@@ -131,6 +134,7 @@ export function PCAppLayout({
   onRefreshConfig,
   showInstallApp = false,
   onInstallApp,
+  onClearCache,
   navbarOpenedProp,
   onNavbarToggle,
   navbarVariant = 'dark',
@@ -375,12 +379,24 @@ export function PCAppLayout({
                 )}
                 {showRefreshConfig && onRefreshConfig && (
                   <Menu.Item
-                    leftSection={<Icon name={IconName.Refresh} size={16} />}
+                    leftSection={<Icon name={IconName.CloudDownload} size={16} />}
                     fz="sm"
                     onClick={onRefreshConfig}
                   >
                     {labels.menuRefreshConfig}
                   </Menu.Item>
+                )}
+                {onClearCache && (
+                  <>
+                    <Menu.Divider />
+                    <Menu.Item
+                      leftSection={<Icon name={IconName.Trash} size={16} />}
+                      fz="sm"
+                      onClick={onClearCache}
+                    >
+                      {labels.menuClearCache || 'Force Clear All Cache'}
+                    </Menu.Item>
+                  </>
                 )}
                 <Menu.Divider />
                 <Menu.Item

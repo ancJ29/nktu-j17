@@ -10,7 +10,7 @@ export function LogoutPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    logout();
+    logout('user');
     sessionStorage.clear();
     
     
