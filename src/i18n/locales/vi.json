@@ -3425,6 +3425,7 @@
       "extraQuantityPlaceholder": "Dư",
       "fromLocationLabel": "Lấy từ kho",
       "fromLocationPlaceholder": "Chọn kho",
+      "generalNoteLabel": "Ghi chú chung",
       "googleMapUrlLabel": "Link Google Maps",
       "googleMapUrlPlaceholder": "Dán link Google Maps (không bắt buộc)",
       "importItemsButton": "Nhập từ Excel",
@@ -3529,6 +3530,24 @@
       "statusChangeSuccess": "Đã cập nhật trạng thái",
       "updateError": "Không thể cập nhật đơn hàng",
       "updateSuccess": "Cập nhật đơn hàng thành công"
+    },
+    "reconcile": {
+      "bannerTitle": "Dữ liệu giao hàng chưa đồng bộ",
+      "behind": "Đã giao xong ({{count}} phiếu đã đóng) nhưng đơn hàng chưa được chuyển sang trạng thái hoàn tất.",
+      "behindBlocked": "Đã giao xong ({{count}} phiếu đã đóng) nhưng trạng thái hiện tại của đơn không thể chuyển sang trạng thái hoàn tất.",
+      "blockedHint": "Không thể tự động sửa — trạng thái hiện tại không thể chuyển sang trạng thái hoàn tất (kiểm tra cấu hình chuyển trạng thái, hoặc chuyển đơn thủ công).",
+      "confirmMessage": "Thao tác này chạy lại các bước còn thiếu (căn chỉnh giữ hàng, hoàn tất đơn, trừ tồn kho, giải phóng giữ hàng thừa). An toàn khi chạy lại — các bước đã xong sẽ được bỏ qua.",
+      "confirmMessageShip": "Đơn này chưa ghi nhận trừ tồn kho. Thao tác sửa sẽ giữ và trừ tồn theo số lượng đặt. Chỉ xác nhận nếu chắc chắn hàng chưa từng bị trừ theo cách khác — sửa một đơn đã trừ rồi sẽ bị trừ trùng.",
+      "confirmTitle": "Sửa dữ liệu giao hàng?",
+      "drift": "Dữ liệu giữ hàng của đơn không khớp với tồn kho ({{count}} dòng).",
+      "driftLine": "đơn ghi {{snapshot}} / kho giữ {{row}}",
+      "failedTitle": "Sửa thất bại",
+      "nothingToRepair": "Không có gì cần sửa — đơn đã đồng bộ.",
+      "notDeductedMissing": "Đơn đã hoàn tất nhưng chưa ghi nhận trừ tồn kho cho các dòng hàng.",
+      "notDeductedReserved": "Đơn đã hoàn tất nhưng hàng đang giữ chưa được trừ khỏi tồn kho.",
+      "orphans": "Tồn kho vẫn đang giữ hàng cho đơn này dù đơn không còn giữ ({{count}} dòng).",
+      "repairButton": "Sửa ngay",
+      "repairSuccess": "Đã sửa: {{actions}}"
     },
     "stats": {
       "total": "Tổng cộng",

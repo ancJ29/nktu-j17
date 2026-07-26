@@ -240,6 +240,8 @@ function isEmptyRowAt(items: ItemFormValues[], path: string): boolean {
   return row != null && isEmptyRow(row);
 }
 
+const COMPACT_FORM_COLS = { base: 1, sm: 2, md: 4 } as const;
+
 export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -383,6 +385,22 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     for (const c of customers) m.set(c.id, c);
     return m;
   }, [customers]);
+
+  
+  
+  
+  const customerNameCodeData = useMemo(
+    () =>
+      variant.customerPicker === 'nameCodeSelect'
+        ? customers
+            .filter((c) => c.isActive && !c.extra?.isDeleted)
+            .map((c) => {
+              const name = c.extra?.shortName?.trim() || c.name;
+              return { value: c.id, label: c.code ? `${name} — ${c.code}` : name };
+            })
+        : [],
+    [customers, variant.customerPicker],
+  );
 
   
   
@@ -2037,20 +2055,24 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               />
             )}
 
-            {/* Order Number + Customer PO Number */}
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <TextInput
-                label={t('salesOrders.form.orderNumberLabel')}
-                placeholder={t('salesOrders.form.orderNumberAutoPlaceholder')}
-                disabled
-                {...form.getInputProps('orderNumber')}
-              />
-              <TextInput
-                label={t('salesOrders.form.customerPONumberLabel')}
-                placeholder={t('salesOrders.form.customerPONumberPlaceholder')}
-                {...form.getInputProps('customerPONumber')}
-              />
-            </SimpleGrid>
+            {/* Order Number + Customer PO Number. The compact layout hides the
+                auto-generated (disabled) SO-number field entirely — it's still
+                set on save — and moves the PO number into the header grid below. */}
+            {variant.headerLayout === 'twoColumn' && (
+              <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                <TextInput
+                  label={t('salesOrders.form.orderNumberLabel')}
+                  placeholder={t('salesOrders.form.orderNumberAutoPlaceholder')}
+                  disabled
+                  {...form.getInputProps('orderNumber')}
+                />
+                <TextInput
+                  label={t('salesOrders.form.customerPONumberLabel')}
+                  placeholder={t('salesOrders.form.customerPONumberPlaceholder')}
+                  {...form.getInputProps('customerPONumber')}
+                />
+              </SimpleGrid>
+            )}
 
             {/* Customer + Delivery Address */}
             {hasCustomerRegistry && (
@@ -2092,68 +2114,113 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 variant.showAddressPicker &&
                 !form.getValues().isIndividualCustomer &&
                 addressOptionGroups.length > 0;
-              return (
+              const customerField =
+                hasCustomerRegistry && !form.getValues().isIndividualCustomer ? (
+                  variant.customerPicker === 'nameCodeSelect' ? (
+                    <Select
+                      label={t('common.labels.customer')}
+                      placeholder={t('salesOrders.form.customerPlaceholder')}
+                      withAsterisk
+                      searchable
+                      data={customerNameCodeData}
+                      value={form.getValues().customerId || null}
+                      onChange={(id) => {
+                        const c = id ? customerMap.get(id) : undefined;
+                        handleCustomerChange(
+                          c
+                            ? { id: c.id, name: c.extra?.shortName?.trim() || c.name, customer: c }
+                            : null,
+                        );
+                      }}
+                      error={form.errors.customerId}
+                    />
+                  ) : (
+                    <CustomerSelector
+                      label={t('common.labels.customer')}
+                      placeholder={t('salesOrders.form.customerPlaceholder')}
+                      withAsterisk
+                      value={form.getValues().customerId || null}
+                      onChange={handleCustomerChange}
+                      error={form.errors.customerId}
+                    />
+                  )
+                ) : (
+                  <TextInput
+                    label={t('salesOrders.form.customerNameLabel')}
+                    placeholder={t('salesOrders.form.customerNamePlaceholder')}
+                    withAsterisk
+                    {...form.getInputProps('customerName')}
+                  />
+                );
+              const addressPickerField = showAddressPicker && (
+                <Select
+                  label={t('salesOrders.form.savedAddressLabel')}
+                  placeholder={t('salesOrders.form.savedAddressPlaceholder')}
+                  data={addressOptionGroups}
+                  searchable
+                  clearable
+                  value={shippingAddressId || null}
+                  onChange={handlePickAddress}
+                />
+              );
+              const deliveryAddressField = (
+                <TextInput
+                  label={t('common.labels.deliveryAddress')}
+                  placeholder={t('salesOrders.form.deliveryAddressPlaceholder')}
+                  disabled={!form.getValues().customerId && !form.getValues().isIndividualCustomer}
+                  {...form.getInputProps('deliveryAddress')}
+                />
+              );
+              const googleMapField = (
+                <TextInput
+                  label={t('salesOrders.form.googleMapUrlLabel')}
+                  placeholder={t('salesOrders.form.googleMapUrlPlaceholder')}
+                  {...form.getInputProps('googleMapUrl')}
+                />
+              );
+              return variant.headerLayout === 'compactFourColumn' ? (
+                
+                
+                
+                <SimpleGrid cols={COMPACT_FORM_COLS}>
+                  <TextInput
+                    label={t('salesOrders.form.customerPONumberLabel')}
+                    placeholder={t('salesOrders.form.customerPONumberPlaceholder')}
+                    {...form.getInputProps('customerPONumber')}
+                  />
+                  {customerField}
+                  {addressPickerField}
+                  {deliveryAddressField}
+                  {googleMapField}
+                </SimpleGrid>
+              ) : (
                 <>
                   <SimpleGrid cols={{ base: 1, sm: showAddressPicker ? 2 : 1 }}>
-                    {hasCustomerRegistry && !form.getValues().isIndividualCustomer ? (
-                      <CustomerSelector
-                        label={t('common.labels.customer')}
-                        placeholder={t('salesOrders.form.customerPlaceholder')}
-                        withAsterisk
-                        value={form.getValues().customerId || null}
-                        onChange={handleCustomerChange}
-                        error={form.errors.customerId}
-                      />
-                    ) : (
-                      <TextInput
-                        label={t('salesOrders.form.customerNameLabel')}
-                        placeholder={t('salesOrders.form.customerNamePlaceholder')}
-                        withAsterisk
-                        {...form.getInputProps('customerName')}
-                      />
-                    )}
-                    {showAddressPicker && (
-                      <Select
-                        label={t('salesOrders.form.savedAddressLabel')}
-                        placeholder={t('salesOrders.form.savedAddressPlaceholder')}
-                        data={addressOptionGroups}
-                        searchable
-                        clearable
-                        value={shippingAddressId || null}
-                        onChange={handlePickAddress}
-                      />
-                    )}
+                    {customerField}
+                    {addressPickerField}
                   </SimpleGrid>
                   <SimpleGrid cols={{ base: 1, sm: 2 }}>
-                    <TextInput
-                      label={t('common.labels.deliveryAddress')}
-                      placeholder={t('salesOrders.form.deliveryAddressPlaceholder')}
-                      disabled={
-                        !form.getValues().customerId && !form.getValues().isIndividualCustomer
-                      }
-                      {...form.getInputProps('deliveryAddress')}
-                    />
-                    <TextInput
-                      label={t('salesOrders.form.googleMapUrlLabel')}
-                      placeholder={t('salesOrders.form.googleMapUrlPlaceholder')}
-                      {...form.getInputProps('googleMapUrl')}
-                    />
+                    {deliveryAddressField}
+                    {googleMapField}
                   </SimpleGrid>
                 </>
               );
             })()}
 
-            {/* Assigned Staff + Delivery Method */}
-            <SimpleGrid cols={{ base: 1, sm: deliveryMethodOptions.length > 0 ? 2 : 1 }}>
-              <EmployeeSelector
-                label={t('salesOrders.form.assignedStaffLabel')}
-                placeholder={t('salesOrders.form.assignedStaffPlaceholder')}
-                clearable
-                filter={picEmployeeFilter}
-                value={form.getValues().assignedStaff || null}
-                onChange={(v) => form.setFieldValue('assignedStaff', v?.id ?? '')}
-              />
-              {deliveryMethodOptions.length > 0 && (
+            {/* Assigned Staff + Delivery Method + dates — one packed 4-col row
+                in the compact layout, two 2-col grids otherwise. */}
+            {(() => {
+              const staffField = (
+                <EmployeeSelector
+                  label={t('salesOrders.form.assignedStaffLabel')}
+                  placeholder={t('salesOrders.form.assignedStaffPlaceholder')}
+                  clearable
+                  filter={picEmployeeFilter}
+                  value={form.getValues().assignedStaff || null}
+                  onChange={(v) => form.setFieldValue('assignedStaff', v?.id ?? '')}
+                />
+              );
+              const deliveryMethodField = deliveryMethodOptions.length > 0 && (
                 <Select
                   label={t('salesOrders.form.deliveryMethodLabel')}
                   placeholder={t('salesOrders.form.deliveryMethodPlaceholder')}
@@ -2170,25 +2237,44 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   }}
                   clearable
                 />
-              )}
-            </SimpleGrid>
-
-            {/* Order Date + Delivery Date */}
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              <DateField
-                label={t('salesOrders.form.orderDateLabel')}
-                placeholder={t('salesOrders.form.orderDatePlaceholder')}
-                value={form.getValues().orderDate}
-                {...form.getInputProps('orderDate')}
-              />
-              <DateField
-                futureOnly
-                label={t('salesOrders.form.deliveryDateLabel')}
-                placeholder={t('salesOrders.form.deliveryDatePlaceholder')}
-                value={form.getValues().deliveryDate}
-                {...form.getInputProps('deliveryDate')}
-              />
-            </SimpleGrid>
+              );
+              const orderDateField = (
+                <DateField
+                  label={t('salesOrders.form.orderDateLabel')}
+                  placeholder={t('salesOrders.form.orderDatePlaceholder')}
+                  value={form.getValues().orderDate}
+                  {...form.getInputProps('orderDate')}
+                />
+              );
+              const deliveryDateField = (
+                <DateField
+                  futureOnly
+                  label={t('salesOrders.form.deliveryDateLabel')}
+                  placeholder={t('salesOrders.form.deliveryDatePlaceholder')}
+                  value={form.getValues().deliveryDate}
+                  {...form.getInputProps('deliveryDate')}
+                />
+              );
+              return variant.headerLayout === 'compactFourColumn' ? (
+                <SimpleGrid cols={COMPACT_FORM_COLS}>
+                  {staffField}
+                  {deliveryMethodField}
+                  {orderDateField}
+                  {deliveryDateField}
+                </SimpleGrid>
+              ) : (
+                <>
+                  <SimpleGrid cols={{ base: 1, sm: deliveryMethodOptions.length > 0 ? 2 : 1 }}>
+                    {staffField}
+                    {deliveryMethodField}
+                  </SimpleGrid>
+                  <SimpleGrid cols={{ base: 1, sm: 2 }}>
+                    {orderDateField}
+                    {deliveryDateField}
+                  </SimpleGrid>
+                </>
+              );
+            })()}
 
             {/* Tags */}
             {tagOptions.length > 0 && (
@@ -2235,15 +2321,23 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 )}
             </SimpleGrid>
 
-            {/* Notes — NKTU splits this into department-scoped warehouse +
-                driver notes (visibility-gated); every other client keeps the
+            {/* Notes — with `splitNotes`, the general order note stays
+                authorable ALONGSIDE the two department-scoped notes
+                (2026-07-02); the visibility gates hide the other department's
+                note, never the general one. Every other client keeps the
                 single order note. */}
             {splitNotesCfg ? (
-              <>
+              <SimpleGrid cols={{ base: 1, md: 3 }}>
+                <Textarea
+                  label={t('salesOrders.form.generalNoteLabel')}
+                  autosize
+                  minRows={2}
+                  maxRows={4}
+                  {...form.getInputProps('notes')}
+                />
                 {!isNoteDriverDept && (
                   <Textarea
                     label={t('salesOrders.form.warehouseNoteLabel')}
-                    placeholder={t('salesOrders.form.warehouseNotePlaceholder')}
                     autosize
                     minRows={2}
                     maxRows={4}
@@ -2253,14 +2347,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 {!isNoteWarehouseDept && (
                   <Textarea
                     label={t('salesOrders.form.driverNoteLabel')}
-                    placeholder={t('salesOrders.form.driverNotePlaceholder')}
                     autosize
                     minRows={2}
                     maxRows={4}
                     {...form.getInputProps('driverNote')}
                   />
                 )}
-              </>
+              </SimpleGrid>
             ) : (
               <Textarea
                 label={t('__new__.01-common.labels.note')}

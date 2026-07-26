@@ -29,10 +29,10 @@ import {
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
-import { isNKTU } from '@/config/client';
+import { RESOLVED_DELIVERY_REQUEST_VARIANT } from './deliveryRequestVariant';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 
-const shouldShowListItems = isNKTU ? false : true;
+const { showListItems, seedScheduledDateFromSalesOrder } = RESOLVED_DELIVERY_REQUEST_VARIANT;
 
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
 
@@ -140,7 +140,7 @@ export function CreateDeliveryRequestModal({
     const soExtra = (salesOrder.extra ?? {}) as SalesOrderExtra;
     const allDRs = useDeliveryRequestStore.getState().items;
     const scheduledDate = resolveInitialScheduledDateFromSalesOrder(
-      isNKTU ? null : soExtra.deliveryDate,
+      seedScheduledDateFromSalesOrder ? soExtra.deliveryDate : null,
     );
     form.setValues({
       requestNumber: '',
@@ -294,7 +294,7 @@ export function CreateDeliveryRequestModal({
           />
 
           {/* Line items — optional. Header-only DR is allowed. */}
-          {shouldShowListItems && (
+          {showListItems && (
             <Stack gap="xs">
               <Group justify="space-between" align="center">
                 <Text fw={600} size="sm">

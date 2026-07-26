@@ -6,7 +6,7 @@ import { ROUTES } from '@/constants/routes';
 import { useProductStore } from '@/stores/useProductStore';
 import { hasImagesForProducts } from '@/utils/permission';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
-import { isNKTU } from '@/config/client';
+import { PRODUCT_LINK_HIDES_SKU } from '@/config/productDisplayDefaults';
 
 type ProductLinkProps = {
   
@@ -18,7 +18,7 @@ type ProductLinkProps = {
   photoOnHover?: boolean;
 };
 
-const noSku = isNKTU ? true : false;
+const noSku = PRODUCT_LINK_HIDES_SKU;
 const productImagesEnabled = hasImagesForProducts();
 
 export function ProductLink({ code, name, size = 'sm', photoOnHover = false }: ProductLinkProps) {

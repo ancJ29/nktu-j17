@@ -2,6 +2,7 @@ import { resolveClientCode } from '@/config/client-code';
 import {
   DEFAULT_APP_INFO,
   DEFAULT_AUTH,
+  DEFAULT_COMPANY_INFO,
   DEFAULT_CUSTOMER_FEATURES,
   DEFAULT_DELIVERY_REQUEST_FEATURES,
   DEFAULT_DISPLAY_SETTINGS,
@@ -23,7 +24,7 @@ import {
   DEFAULT_VENDOR_FEATURES,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
-import type { GoodsReceiptFeatures } from '@/config/schema';
+import type { CompanyInfoConfig, GoodsReceiptFeatures } from '@/config/schema';
 import { LOOKUP_CATEGORIES } from '@/pages/lookups/categoryRegistry';
 import { LOOKUP_V2_CATEGORIES } from '@/pages/lookup-v2/categoryRegistry';
 import {
@@ -94,6 +95,7 @@ import {
   IconArrowsMinimize,
   IconBox,
   IconBrush,
+  IconBuilding,
   IconCalendar,
   IconCategory2,
   IconCoin,
@@ -124,6 +126,7 @@ import {
   AuthFeaturesSection,
   CodeFormatFields,
   CollapsibleSection,
+  CompanyInfoSection,
   FeatureToggleRow,
   ConfigOptionEditor,
   DeliveryRequestConfigInvariantAlert,
@@ -307,6 +310,7 @@ export function ConfigEditor({
   );
   const [displaySettings, setDisplaySettings] =
     useState<CMngtDisplaySettings>(DEFAULT_DISPLAY_SETTINGS);
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfoConfig>(DEFAULT_COMPANY_INFO);
 
   
   const departmentMultiSelectData = useMemo(
@@ -368,6 +372,7 @@ export function ConfigEditor({
       },
       layout,
       displaySettings,
+      companyInfo,
       permissions: Object.keys(permissions).length > 0 ? permissions : undefined,
       translations,
     }),
@@ -406,6 +411,7 @@ export function ConfigEditor({
       farmFeatures,
       layout,
       displaySettings,
+      companyInfo,
       permissions,
       translations,
     ],
@@ -486,6 +492,7 @@ export function ConfigEditor({
     setPermissions(cfg.permissions ?? {});
     setTranslations(cfg.translations ?? {});
     setDisplaySettings({ ...DEFAULT_DISPLAY_SETTINGS, ...cfg.displaySettings });
+    setCompanyInfo({ ...DEFAULT_COMPANY_INFO, ...cfg.companyInfo });
     setHasConfig(true);
   }, []);
 
@@ -722,6 +729,7 @@ export function ConfigEditor({
     setUserSettings(DEFAULT_USER_SETTINGS);
     setTranslations(DEFAULT_TRANSLATIONS);
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
+    setCompanyInfo(DEFAULT_COMPANY_INFO);
   }, []);
 
   
@@ -808,6 +816,7 @@ export function ConfigEditor({
   const resetUserSettings = useCallback(() => setUserSettings(DEFAULT_USER_SETTINGS), []);
   const resetTranslations = useCallback(() => setTranslations(DEFAULT_TRANSLATIONS), []);
   const resetDisplaySettings = useCallback(() => setDisplaySettings(DEFAULT_DISPLAY_SETTINGS), []);
+  const resetCompanyInfo = useCallback(() => setCompanyInfo(DEFAULT_COMPANY_INFO), []);
 
   
   
@@ -822,6 +831,7 @@ export function ConfigEditor({
       eqDefault(enablePdfSharing, DEFAULT_ENABLE_PDF_SHARING) &&
       eqDefault(enableStats, DEFAULT_ENABLE_STATS),
     displaySettings: eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS),
+    companyInfo: eqDefault(companyInfo, DEFAULT_COMPANY_INFO),
     layout: eqDefault(layout, DEFAULT_LAYOUT),
     theme: eqDefault(themeConfig, DEFAULT_THEME),
     languages: eqDefault(languages, DEFAULT_LANGUAGES) && defaultLanguage === DEFAULT_LANGUAGE,
@@ -970,6 +980,19 @@ export function ConfigEditor({
             onReset={resetDisplaySettings}
           >
             <DisplaySettingsSection settings={displaySettings} onChange={setDisplaySettings} />
+          </CollapsibleSection>
+
+          <CollapsibleSection
+            icon={IconBuilding}
+            title="Company Info"
+            description="Seller identity printed on generated documents (delivery note, quotation)"
+            sectionKey="companyInfo"
+            isDefault={sectionIsDefault.companyInfo}
+            opened={openSections.has('companyInfo')}
+            onToggle={toggleSection}
+            onReset={resetCompanyInfo}
+          >
+            <CompanyInfoSection value={companyInfo} onChange={setCompanyInfo} />
           </CollapsibleSection>
           <CollapsibleSection
             icon={IconLayoutSidebar}

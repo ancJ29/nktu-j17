@@ -119,7 +119,15 @@ export type InventoryLinkageVia =
    * delete-driven inventory move from a cancel-driven one in the audit trail.
    * See `useSalesOrderDetail.handleDelete`.
    */
-  | { kind: 'delete-rollback' };
+  | { kind: 'delete-rollback' }
+  /**
+   * The detail-page delivery-reconciliation repair (`handleReconcileRepair`)
+   * moved this order's inventory — realigning a drifted reservation, shipping
+   * a completed-but-never-deducted order, or releasing orphaned holds. See
+   * `deliveryReconciliation.ts` + "Delivery reconciliation" in
+   * `docs/memo/modules/sales-orders.md`.
+   */
+  | { kind: 'reconcile-repair' };
 
 export type InventoryLinkageTransition = {
   action: 'reserve' | 'ship' | 'release';

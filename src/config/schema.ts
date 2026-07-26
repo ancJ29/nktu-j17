@@ -305,6 +305,8 @@ const SalesOrderFeaturesSchema = z
     
     shortagePolicy: z.enum(['block', 'allow']).default('allow'),
     
+    completionEvidence: z.enum(['quantities', 'closedDeliveries']).default('quantities'),
+    
     allowExtraDeliveryQuantity: z.boolean().default(false),
   })
   .default({
@@ -321,6 +323,7 @@ const SalesOrderFeaturesSchema = z
     allowAdditionalDR: true,
     allowSkipInitialStage: false,
     shortagePolicy: 'allow',
+    completionEvidence: 'quantities',
     allowExtraDeliveryQuantity: false,
   });
 
@@ -545,8 +548,20 @@ const LayoutSchema = z
 
 const TranslationsSchema = z.record(z.string(), z.record(z.string(), z.unknown())).optional();
 
+const CompanyInfoSchema = z
+  .object({
+    name: z.string().default(''),
+    address: z.string().default(''),
+    taxCode: z.string().default(''),
+    tel: z.string().default(''),
+    email: z.string().default(''),
+  })
+  .default({ name: '', address: '', taxCode: '', tel: '', email: '' });
+export type CompanyInfoConfig = z.infer<typeof CompanyInfoSchema>;
+
 export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
   
+  companyInfo: CompanyInfoSchema,
   features: FeaturesSchema,
   layout: LayoutSchema,
   displaySettings: DisplaySettingsSchema,

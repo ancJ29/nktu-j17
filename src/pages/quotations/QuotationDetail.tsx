@@ -48,7 +48,7 @@ import { DetailField } from '@/components/DetailField';
 import { NotFoundState } from '@/components/NotFoundState';
 import { ProductLink } from '@/components/ProductLink';
 import { SectionCard } from '@/components/SectionCard';
-import { COMPANY_INFO } from '@/config/companyInfo';
+import { getCompanyInfo } from '@/config/companyInfo';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
@@ -346,7 +346,7 @@ export function QuotationDetail() {
     const d = new Date(q.createdAt);
     const dateText = `Ngày ${String(d.getDate()).padStart(2, '0')} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
     return {
-      seller: COMPANY_INFO,
+      seller: getCompanyInfo(),
       code: q.extra.code,
       dateText,
       note: q.extra.note,

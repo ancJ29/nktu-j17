@@ -21,7 +21,7 @@ import type {
   CMngtDisplaySettings,
 } from '@credo/kits/types';
 
-import type { GoodsReceiptFeatures } from './schema';
+import type { CompanyInfoConfig, GoodsReceiptFeatures } from './schema';
 
 const CLIENT_NAME = 'Credo Management';
 
@@ -335,6 +335,14 @@ export const DEFAULT_LAYOUT: CMngtLayoutConfig = {
 export const DEFAULT_DISPLAY_SETTINGS: CMngtDisplaySettings = {
   dateFormat: 'DD/MM/YYYY',
   dateTimeFormat: 'HH:mm DD/MM/YYYY',
+};
+
+export const DEFAULT_COMPANY_INFO: CompanyInfoConfig = {
+  name: '',
+  address: '',
+  taxCode: '',
+  tel: '',
+  email: '',
 };
 
 export const DEFAULT_TRANSLATIONS: Record<string, Record<string, unknown>> = {};

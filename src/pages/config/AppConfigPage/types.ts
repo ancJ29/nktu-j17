@@ -29,6 +29,7 @@ export type SectionKey =
   | 'permissions'
   | 'deptPermissions'
   | 'displaySettings'
+  | 'companyInfo'
   | 'theme'
   | 'layout'
   | 'languages'
@@ -63,6 +64,7 @@ export const ALL_SECTIONS: SectionKey[] = [
   'permissions',
   'deptPermissions',
   'displaySettings',
+  'companyInfo',
   'theme',
   'layout',
   'languages',

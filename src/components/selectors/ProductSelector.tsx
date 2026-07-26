@@ -2,7 +2,7 @@ import { Select, type SelectProps } from '@mantine/core';
 import { useMemo } from 'react';
 import { useProductStore } from '@/stores/useProductStore';
 import type { Product } from '@/types';
-import { isNKTU } from '@/config/client';
+import { PRODUCT_SELECTOR_PRIMARY_NAMES_ONLY } from '@/config/productDisplayDefaults';
 
 export type ProductSelectorChange = {
   
@@ -41,7 +41,7 @@ type Option = {
   product: Product;
 };
 
-const noAlternativeNames = isNKTU ? true : false;
+const noAlternativeNames = PRODUCT_SELECTOR_PRIMARY_NAMES_ONLY;
 
 export function ProductSelector({
   code,

@@ -131,6 +131,13 @@ export function getShortagePolicy(): 'block' | 'allow' {
   return featureFlags?.salesOrders?.shortagePolicy ?? 'allow';
 }
 
+export function getSalesOrderCompletionEvidence(): 'quantities' | 'closedDeliveries' {
+  return (
+    (featureFlags?.salesOrders as { completionEvidence?: 'quantities' | 'closedDeliveries' })
+      ?.completionEvidence ?? 'quantities'
+  );
+}
+
 export function isExtraDeliveryQuantityAllowed(): boolean {
   return featureFlags?.salesOrders?.allowExtraDeliveryQuantity ?? false;
 }
@@ -390,7 +397,9 @@ export type ResolvedTagOption = {
 
 export function resolveStatusOptions(
   options:
-    SalesOrderStatusOption[] | DeliveryRequestStatusOption[] | TransportOrderStatusOptionConfig[],
+    | SalesOrderStatusOption[]
+    | DeliveryRequestStatusOption[]
+    | TransportOrderStatusOptionConfig[],
 ): ResolvedStatusOption[] {
   const lang = i18n.resolvedLanguage ?? i18n.language ?? appConfig.defaultLanguage;
   const defaultLang = appConfig.defaultLanguage;

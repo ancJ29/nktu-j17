@@ -77,7 +77,7 @@ import {
 } from '@/utils/salesOrderPricing';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useLookupLabels, lookupLabelOf } from '@/hooks';
-import { COMPANY_INFO } from '@/config/companyInfo';
+import { getCompanyInfo } from '@/config/companyInfo';
 import type { SalesOrderDetailVariant } from './salesOrderDetailVariant';
 import {
   printSalesOrderDeliveryNote,
@@ -196,6 +196,11 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     openManualRelease,
     closeManualRelease,
     handleManualRelease,
+    reconcileIssues,
+    reconcileOpened,
+    openReconcile,
+    closeReconcile,
+    handleReconcileRepair,
     showDelete,
     deleteOpened,
     openDelete,
@@ -313,7 +318,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     const dateText = `Ngày ${String(d.getDate()).padStart(2, '0')} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
 
     return {
-      seller: COMPANY_INFO,
+      seller: getCompanyInfo(),
       payment: resolveSalesOrderPaymentState(extra, totals.grandTotal),
       orderNumber: order.orderNumber,
       dateText,
@@ -882,6 +887,114 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         </Stack>
       </Alert>
     ) : null;
+
+  
+  
+  
+  
+  
+  const reconcileBanner =
+    canEdit && reconcileIssues.length > 0 ? (
+      <Alert
+        icon={<IconAlertTriangle size={16} />}
+        color="orange"
+        variant="light"
+        title={t('salesOrders.reconcile.bannerTitle')}
+      >
+        <Stack gap="sm">
+          {reconcileIssues.map((issue) => {
+            switch (issue.kind) {
+              case 'so-behind-deliveries':
+                return (
+                  <Text size="sm" key={issue.kind}>
+                    {issue.blockedByMatrix
+                      ? t('salesOrders.reconcile.behindBlocked', { count: issue.closedDrCount })
+                      : t('salesOrders.reconcile.behind', { count: issue.closedDrCount })}
+                  </Text>
+                );
+              case 'completed-not-deducted':
+                return (
+                  <Text size="sm" key={issue.kind}>
+                    {issue.reason === 'still-reserved'
+                      ? t('salesOrders.reconcile.notDeductedReserved')
+                      : t('salesOrders.reconcile.notDeductedMissing')}
+                  </Text>
+                );
+              case 'reservation-drift':
+                return (
+                  <Box key={issue.kind}>
+                    <Text size="sm">
+                      {t('salesOrders.reconcile.drift', { count: issue.lines.length })}
+                    </Text>
+                    <Stack gap={2} mt={4}>
+                      {issue.lines.slice(0, 5).map((l, idx) => (
+                        <Text size="xs" ff="monospace" c="dimmed" key={idx}>
+                          {l.itemCode} @ {l.locationCode} · {l.unit}:{' '}
+                          {t('salesOrders.reconcile.driftLine', {
+                            snapshot: l.snapshotQty.toLocaleString(),
+                            row: l.rowHoldQty.toLocaleString(),
+                          })}
+                        </Text>
+                      ))}
+                    </Stack>
+                  </Box>
+                );
+              case 'orphaned-holds':
+                return (
+                  <Box key={issue.kind}>
+                    <Text size="sm">
+                      {t('salesOrders.reconcile.orphans', { count: issue.lines.length })}
+                    </Text>
+                    <Stack gap={2} mt={4}>
+                      {issue.lines.slice(0, 5).map((l, idx) => (
+                        <Text size="xs" ff="monospace" c="dimmed" key={idx}>
+                          {l.itemCode} @ {l.locationCode} · {l.unit}:{' '}
+                          {l.rowHoldQty.toLocaleString()}
+                        </Text>
+                      ))}
+                    </Stack>
+                  </Box>
+                );
+            }
+          })}
+          {!reconcileIssues.some((i) => i.kind === 'so-behind-deliveries' && i.blockedByMatrix) ? (
+            <Group justify="flex-end">
+              <Button
+                color="orange"
+                size="xs"
+                leftSection={<IconAlertTriangle size={14} />}
+                onClick={openReconcile}
+              >
+                {t('salesOrders.reconcile.repairButton')}
+              </Button>
+            </Group>
+          ) : (
+            <Text size="xs" c="dimmed">
+              {t('salesOrders.reconcile.blockedHint')}
+            </Text>
+          )}
+        </Stack>
+      </Alert>
+    ) : null;
+
+  const reconcileModal = (
+    <ConfirmModal
+      opened={reconcileOpened}
+      onClose={closeReconcile}
+      onConfirm={handleReconcileRepair}
+      title={t('salesOrders.reconcile.confirmTitle')}
+      message={
+        reconcileIssues.some(
+          (i) => i.kind === 'completed-not-deducted' && i.reason === 'no-deduction-recorded',
+        )
+          ? t('salesOrders.reconcile.confirmMessageShip')
+          : t('salesOrders.reconcile.confirmMessage')
+      }
+      confirmLabel={t('salesOrders.reconcile.repairButton')}
+      confirmColor="orange"
+      loading={actionLoading}
+    />
+  );
 
   
   
@@ -1608,15 +1721,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     return (
       <Stack gap={0}>
         <Tabs value={mobileTab} onChange={(v) => setMobileTab(v ?? mobileTabs[0].value)}>
-          <MobileScrollPillTabs
-            tabs={mobileTabs}
-            value={mobileTab}
-            onChange={setMobileTab}
-          />
+          <MobileScrollPillTabs tabs={mobileTabs} value={mobileTab} onChange={setMobileTab} />
 
           <Tabs.Panel value="overview">
             <Stack gap="sm" p="sm">
               {stuckReservationBanner}
+              {reconcileBanner}
               {/* Info / Items / Activity / Attachments accordions */}
               <Accordion defaultValue="info" variant="separated">
                 <Accordion.Item value="info">
@@ -1726,6 +1836,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         {statusChangeModal}
         {cancelOrderModal}
         {manualReleaseModal}
+        {reconcileModal}
         {deleteOrderModal}
         {printOptionsModal}
       </Stack>
@@ -1795,6 +1906,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Group>
 
       {stuckReservationBanner}
+      {reconcileBanner}
 
       {/* Header — order number + status (configured cancelled status when cancelled) + urgent + linkage + created timestamp */}
       <Group justify="space-between" wrap="nowrap" align="center">
@@ -1913,6 +2025,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       {statusChangeModal}
       {cancelOrderModal}
       {manualReleaseModal}
+      {reconcileModal}
       {deleteOrderModal}
       {printOptionsModal}
       <CreateDeliveryRequestModal

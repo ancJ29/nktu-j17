@@ -6,6 +6,8 @@ export type DeliveryStatus = 'sent' | 'failed';
 export type DeliveryResult = {
   notificationId: string;
   channel: DeliveryChannel;
+  
+  target?: string;
   status: DeliveryStatus;
   error?: string;
 };
@@ -34,7 +36,7 @@ export type CreateNotificationInput = {
   body?: string;
   payload?: Record<string, unknown>;
   
-  channels?: string[];
+  channels?: DeliveryChannel[];
   
   slackChannel?: string;
   

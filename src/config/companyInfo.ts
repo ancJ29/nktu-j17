@@ -1,3 +1,4 @@
+import { appConfig } from './index';
 import { isNKTU } from './client';
 
 export type CompanyInfo = {
@@ -8,7 +9,7 @@ export type CompanyInfo = {
   email: string;
 };
 
-export const COMPANY_INFO: CompanyInfo = isNKTU
+const FALLBACK_COMPANY_INFO: CompanyInfo = isNKTU
   ? {
       
       name: 'CÔNG TY TNHH NGŨ KIM TÂN UYÊN',
@@ -25,3 +26,14 @@ export const COMPANY_INFO: CompanyInfo = isNKTU
       tel: '',
       email: '',
     };
+
+export function getCompanyInfo(): CompanyInfo {
+  const cfg = appConfig.companyInfo;
+  return {
+    name: cfg?.name?.trim() || FALLBACK_COMPANY_INFO.name,
+    address: cfg?.address?.trim() || FALLBACK_COMPANY_INFO.address,
+    taxCode: cfg?.taxCode?.trim() || FALLBACK_COMPANY_INFO.taxCode,
+    tel: cfg?.tel?.trim() || FALLBACK_COMPANY_INFO.tel,
+    email: cfg?.email?.trim() || FALLBACK_COMPANY_INFO.email,
+  };
+}

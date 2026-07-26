@@ -881,6 +881,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           vacuousCompletionIds={vacuousCompletionIds}
           financeMode={financeMode}
           onToggleBillingExempt={canEditOrders ? handleToggleBillingExempt : undefined}
+          statusBadgeVariant={variant.statusBadge}
           {...(variant.showItemsPreview && !financeMode && { onShowItems: setItemsOrder })}
         />
       ) : (
@@ -897,6 +898,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           sortField={filters.sortField}
           onSortChange={filters.setSortField}
           financeMode={financeMode}
+          dateColumns={variant.dateColumns}
+          showPaymentColumns={variant.showPaymentColumns}
+          statusBadgeVariant={variant.statusBadge}
           {...(variant.showItemsPreview && !financeMode && { onShowItems: setItemsOrder })}
           {...(variant.bulkDrMode === 'selection' && {
             selectable: canBulkCreateDeliveries && selectionMode,

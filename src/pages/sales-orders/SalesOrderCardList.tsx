@@ -19,7 +19,8 @@ import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import type { SalesOrder, Employee } from '@/types';
 import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission';
 import { useMemo } from 'react';
-import { SalesOrderStatusBadge } from '@/components/sales-orders/SalesOrderStatusBadge';
+import { SalesOrderStatusBadgeBase } from '@/components/sales-orders/SalesOrderStatusBadgeBase';
+import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
@@ -30,8 +31,6 @@ import {
   isSalesOrderBillingExempt,
   isSalesOrderMissingMoneyInfo,
 } from '@/utils/salesOrderPricing';
-import { isNKTU } from '@/config/client';
-import { NKTUSalesOrderStatusBadge } from '@/components/sales-orders/NKTUSalesOrderStatusBadge';
 
 type SalesOrderCardListProps = {
   readonly orders: SalesOrder[];
@@ -50,6 +49,8 @@ type SalesOrderCardListProps = {
   readonly showCheatMarker?: boolean;
   
   readonly vacuousCompletionIds?: ReadonlySet<string>;
+  
+  readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
 };
 
 function SalesOrderCardSkeleton() {
@@ -96,6 +97,7 @@ export function SalesOrderCardList({
   onToggleBillingExempt,
   showCheatMarker = false,
   vacuousCompletionIds,
+  statusBadgeVariant,
 }: SalesOrderCardListProps) {
   const { t } = useTranslation();
   const vatRate = getPricingVatRate();
@@ -279,21 +281,14 @@ export function SalesOrderCardList({
                     );
                   })()}
                 <Divider variant="dashed" my="xs" />
-                {isNKTU ? (
-                  <NKTUSalesOrderStatusBadge
-                    extra={extra}
-                    resolveStatus={resolveStatus}
-                    resolveDeliveryMethod={resolveDeliveryMethod}
-                  />
-                ) : (
-                  <SalesOrderStatusBadge
-                    extra={extra}
-                    resolveStatus={resolveStatus}
-                    resolveDeliveryMethod={resolveDeliveryMethod}
-                    tagOptions={tagOptions}
-                    size="sm"
-                  />
-                )}
+                <SalesOrderStatusBadgeBase
+                  extra={extra}
+                  resolveStatus={resolveStatus}
+                  resolveDeliveryMethod={resolveDeliveryMethod}
+                  tagOptions={tagOptions}
+                  size="sm"
+                  variant={statusBadgeVariant}
+                />
               </Stack>
             </Stack>
           </Card>

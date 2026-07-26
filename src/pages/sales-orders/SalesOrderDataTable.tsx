@@ -9,7 +9,7 @@ import { DataTable } from '@credo/base-ui/components';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission';
 import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
-import { SalesOrderStatusBadge } from '@/components/sales-orders/SalesOrderStatusBadge';
+import { SalesOrderStatusBadgeBase } from '@/components/sales-orders/SalesOrderStatusBadgeBase';
 import { SortHeader } from '@/components/SortHeader';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
@@ -21,8 +21,8 @@ import {
   resolveSalesOrderPaymentState,
 } from '@/utils/salesOrderPricing';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
-import { NKTUSalesOrderStatusBadge } from '@/components/sales-orders/NKTUSalesOrderStatusBadge';
-import { isNKTU } from '@/config/client';
+import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
+import type { SalesOrderListVariant } from './salesOrderListVariant';
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 const vatRate = getPricingVatRate();
@@ -68,6 +68,12 @@ type SalesOrderDataTableProps = {
   
   readonly vacuousCompletionIds?: ReadonlySet<string>;
   readonly viewportRef?: Ref<HTMLDivElement>;
+  
+  readonly dateColumns: SalesOrderListVariant['dateColumns'];
+  
+  readonly showPaymentColumns: boolean;
+  
+  readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
 };
 
 export function SalesOrderDataTable({
@@ -91,6 +97,9 @@ export function SalesOrderDataTable({
   showCheatMarker = false,
   vacuousCompletionIds,
   viewportRef,
+  dateColumns,
+  showPaymentColumns,
+  statusBadgeVariant,
 }: SalesOrderDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -295,7 +304,7 @@ export function SalesOrderDataTable({
                   return <Text size="sm">{staffId ? (employeeMap.get(staffId) ?? '-') : '-'}</Text>;
                 },
               },
-              ...(isNKTU
+              ...(dateColumns === 'combinedReady'
                 ? [
                     {
                       key: 'dates',
@@ -377,7 +386,7 @@ export function SalesOrderDataTable({
                     },
                     {
                       key: 'isPaid',
-                      hidden: isNKTU,
+                      hidden: !showPaymentColumns,
                       header: t('salesOrders.billing.paidLabel'),
                       width: '150px',
                       render: (item: SalesOrder) => {
@@ -411,7 +420,7 @@ export function SalesOrderDataTable({
                     },
                     {
                       key: 'invoiceIssued',
-                      hidden: isNKTU,
+                      hidden: !showPaymentColumns,
                       header: t('salesOrders.billing.invoiceLabel'),
                       width: '150px',
                       render: (item: SalesOrder) => {
@@ -440,21 +449,15 @@ export function SalesOrderDataTable({
                 key: 'labels',
                 header: t('salesOrders.columns.labels'),
                 width: '200px',
-                render: (item: SalesOrder) =>
-                  isNKTU ? (
-                    <NKTUSalesOrderStatusBadge
-                      extra={item.extra ?? {}}
-                      resolveStatus={resolveStatus}
-                      resolveDeliveryMethod={resolveDeliveryMethod}
-                    />
-                  ) : (
-                    <SalesOrderStatusBadge
-                      extra={item.extra ?? {}}
-                      resolveStatus={resolveStatus}
-                      resolveDeliveryMethod={resolveDeliveryMethod}
-                      tagOptions={tagOptions}
-                    />
-                  ),
+                render: (item: SalesOrder) => (
+                  <SalesOrderStatusBadgeBase
+                    extra={item.extra ?? {}}
+                    resolveStatus={resolveStatus}
+                    resolveDeliveryMethod={resolveDeliveryMethod}
+                    tagOptions={tagOptions}
+                    variant={statusBadgeVariant}
+                  />
+                ),
               },
               
               
@@ -504,6 +507,9 @@ export function SalesOrderDataTable({
       financeMode,
       showCheatMarker,
       vacuousCompletionIds,
+      dateColumns,
+      showPaymentColumns,
+      statusBadgeVariant,
     ],
   );
 

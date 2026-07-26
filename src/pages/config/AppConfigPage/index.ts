@@ -52,6 +52,7 @@ export { TransportOrderStatusOptionEditor } from './editors/TransportOrderStatus
 
 export { AppInfoSection } from './sections/AppInfoSection';
 export { AuthFeaturesSection } from './sections/AuthFeaturesSection';
+export { CompanyInfoSection } from './sections/CompanyInfoSection';
 export { CodeFormatFields } from './sections/CodeFormatFields';
 export { FeatureToggleRow } from './sections/FeatureToggleRow';
 export { DeptPermissionsSection } from './sections/DeptPermissionsSection';

@@ -14,6 +14,7 @@ import { EMPTY_DATE_RANGE, defaultLastNDaysRange } from '@/utils/listFilterDateR
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
 import { getSalesOrderReadyDate, getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
 import type { SalesOrder } from '@/types';
+import { isNKTU } from '@/config/client';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
@@ -178,6 +179,15 @@ export function useSalesOrderListFilters(
         const aVal = a.extra?.deliveryDate ?? '';
         const bVal = b.extra?.deliveryDate ?? '';
         return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
+      }
+
+      if (isNKTU) {
+        
+        const aInternal = a.extra?.isInternalDelivery === false ? 1 : 0;
+        const bInternal = b.extra?.isInternalDelivery === false ? 1 : 0;
+        if (aInternal !== bInternal) {
+          return aInternal - bInternal;
+        }
       }
       
       

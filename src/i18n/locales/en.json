@@ -3425,6 +3425,7 @@
       "extraQuantityPlaceholder": "Extra",
       "fromLocationLabel": "From location",
       "fromLocationPlaceholder": "Pick warehouse",
+      "generalNoteLabel": "General note",
       "googleMapUrlLabel": "Google Maps URL",
       "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
       "importItemsButton": "Import from Excel",
@@ -3529,6 +3530,24 @@
       "statusChangeSuccess": "Order status updated",
       "updateError": "Failed to update order",
       "updateSuccess": "Order updated successfully"
+    },
+    "reconcile": {
+      "bannerTitle": "Delivery data out of sync",
+      "behind": "Deliveries are complete ({{count}} closed) but the order has not been marked as completed.",
+      "behindBlocked": "Deliveries are complete ({{count}} closed) but the order's current status cannot reach the completion status.",
+      "blockedHint": "No automatic repair available — the current status cannot reach the completion status (check status transitions in App Config, or move the order forward manually).",
+      "confirmMessage": "This replays the missing steps of the delivery chain (align the reservation, complete the order, deduct stock, release stray holds). Safe to re-run — steps already done are skipped.",
+      "confirmMessageShip": "This order recorded no inventory deduction. Repair will reserve and deduct its ordered quantities now. Confirm only if you are sure the stock was never deducted another way — repairing an already-deducted order would double-count.",
+      "confirmTitle": "Repair delivery data?",
+      "drift": "The order's reservation snapshot does not match the inventory holds ({{count}} line(s)).",
+      "driftLine": "order says {{snapshot}} / inventory holds {{row}}",
+      "failedTitle": "Repair failed",
+      "nothingToRepair": "Nothing to repair — the order is already in sync.",
+      "notDeductedMissing": "The order is completed but no inventory deduction was recorded for its lines.",
+      "notDeductedReserved": "The order is completed but its reserved stock was never deducted from inventory.",
+      "orphans": "Inventory rows still hold stock for this order although it no longer reserves ({{count}} line(s)).",
+      "repairButton": "Repair now",
+      "repairSuccess": "Repair applied: {{actions}}"
     },
     "stats": {
       "total": "Total",

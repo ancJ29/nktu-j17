@@ -272,6 +272,14 @@ export type CMngtTransportOrderFeatures = {
   driverDepartments?: string[];
 };
 
+export type CMngtCompanyInfo = {
+  name: string;
+  address: string;
+  taxCode: string;
+  tel: string;
+  email: string;
+};
+
 export type CMngtDisplaySettings = {
   dateFormat: 'DD/MM/YYYY' | 'YYYY/MM/DD' | 'YYYY-MM-DD' | 'DD-MM-YYYY';
   dateTimeFormat:
@@ -320,6 +328,8 @@ export type CMngtAppConfig = AppConfig & {
   };
   layout: CMngtLayoutConfig;
   displaySettings: CMngtDisplaySettings;
+  
+  companyInfo?: CMngtCompanyInfo;
   translations: Record<string, Record<string, unknown>>;
   permissions?: PartialPermissions;
 };

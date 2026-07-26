@@ -18,6 +18,7 @@ import { resolveClientCode } from '@/config/client-code';
 import type {
   DeliveryRequest,
   InventoryLinkage,
+  InventoryLinkageSnapshotEntry,
   Product,
   SalesOrder,
   SalesOrderActivityEntry,
@@ -27,14 +28,23 @@ import type {
   SalesOrderExtra,
   SalesOrderPhoto,
 } from '@/types';
-import { buildReleasedLinkage } from '@/utils/inventoryLinkage';
+import {
+  buildReleasedLinkage,
+  buildReservedLinkage,
+  buildShippedLinkage,
+} from '@/utils/inventoryLinkage';
 import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
 import {
+  buildLinkageSnapshotFromReserveOps,
   executeReservationPlan,
   planReleaseFromLinkage,
+  planReservation,
+  planReservationDiff,
+  planShipFromLinkage,
   planUnshipFromLinkage,
+  rollbackAppliedOps,
   type AppliedOp,
 } from '@/utils/inventoryReservation';
 import { emitInventoryActivityForApplied } from '@/utils/inventoryActivityEmit';
@@ -45,6 +55,7 @@ import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import {
   deriveIsClosedFromStage,
   getAllowedTransitions,
+  getAutoCompletionTargetValue,
   getCancellationTargetStatusValue,
   getInitialStatusValue,
   getStatusFlowOrder,
@@ -52,18 +63,27 @@ import {
   statusHasCapability,
   type TransitionFailure,
 } from './transitionEngine';
+import { deriveSoDeliveryIssues, type SoDeliveryIssue } from './deliveryReconciliation';
 import { dispatchSoFollowUp } from './followUps';
 import { advanceSoIfFullyDelivered } from './reconcileFromDeliveries';
 import { softDeleteLinkedDeliveryRequests } from '@/pages/delivery-requests/deliveryRequestDelete';
 import type { Stage } from './capabilities/types';
 import { device } from '@credo/base-ui/utils';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
-import { isAdditionalDRAllowed, isReturnShipmentEnabled, perms } from '@/utils/permission';
+import {
+  getSalesOrderCompletionEvidence,
+  isAdditionalDRAllowed,
+  isProductInventoryEnabled,
+  isReturnShipmentEnabled,
+  perms,
+} from '@/utils/permission';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 
 const isMobile = device.isMobile;
 const additionalDRAllowed = isAdditionalDRAllowed();
 const returnShipmentEnabled = isReturnShipmentEnabled();
+const productInventoryEnabled = isProductInventoryEnabled();
+const completionEvidence = getSalesOrderCompletionEvidence();
 const canViewAll = perms.salesOrder.canViewAll();
 const canViewSelf = perms.salesOrder.canViewSelf();
 const canDeletePerm = perms.salesOrder.canDelete();
@@ -191,6 +211,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   const loadProducts = useProductStore((s) => s.loadAll);
   const inventoryInit = useProductInventoryStore((s) => s.initialized);
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
+  const inventoryRows = useProductInventoryStore((s) => s.items);
   const locationsInit = useLocationStore((s) => s.initialized);
   const loadLocations = useLocationStore((s) => s.loadAll);
   const drs = useDeliveryRequestStore((s) => s.items);
@@ -1380,6 +1401,394 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   
   
   
+  const reconcileIssues: SoDeliveryIssue[] = useMemo(() => {
+    if (!order || !drsInit || !inventoryInit || !productsInit) return [];
+    const status = (order.extra as SalesOrderExtra | undefined)?.status ?? '';
+    const completionTarget = getAutoCompletionTargetValue();
+    return deriveSoDeliveryIssues({
+      so: order,
+      liveDrsForSo: linkedDRs,
+      evidence: completionEvidence,
+      currentStage: resolveStatus(status).stage as Stage | undefined,
+      completionReachable:
+        completionTarget != null && getAllowedTransitions(status).includes(completionTarget),
+      inventoryRows,
+      productsByCode: productByCode,
+      inventoryEnabled: productInventoryEnabled,
+    });
+  }, [
+    order,
+    drsInit,
+    inventoryInit,
+    productsInit,
+    linkedDRs,
+    resolveStatus,
+    inventoryRows,
+    productByCode,
+  ]);
+
+  const [reconcileOpened, { open: openReconcile, close: closeReconcile }] = useDisclosure(false);
+
+  
+  const handleReconcileRepair = useCallback(async () => {
+    if (!id || !order) return;
+    setActionLoading(true);
+    const failRed = (message: string) =>
+      notifications.show({
+        color: 'red',
+        title: t('salesOrders.reconcile.failedTitle'),
+        message,
+        autoClose: 12000,
+      });
+    try {
+      
+      await useProductInventoryStore.getState().revalidate();
+      let inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
+      let workingOrder = order;
+      const actor = currentEmployee
+        ? { id: currentEmployee.id, name: currentEmployee.name }
+        : undefined;
+      const repaired: string[] = [];
+      const derive = () => {
+        const status = (workingOrder.extra as SalesOrderExtra | undefined)?.status ?? '';
+        const completionTarget = getAutoCompletionTargetValue();
+        return deriveSoDeliveryIssues({
+          so: workingOrder,
+          liveDrsForSo: linkedDRs,
+          evidence: completionEvidence,
+          currentStage: resolveStatus(status).stage as Stage | undefined,
+          completionReachable:
+            completionTarget != null && getAllowedTransitions(status).includes(completionTarget),
+          inventoryRows: useProductInventoryStore.getState().items,
+          productsByCode: productByCode,
+          inventoryEnabled: productInventoryEnabled,
+        });
+      };
+      const reindex = () =>
+        (inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items));
+
+      let issues = derive();
+
+      
+      const extra0 = (workingOrder.extra ?? {}) as SalesOrderExtra;
+      const linkage0 = extra0.inventoryLinkage;
+      if (
+        issues.some((i) => i.kind === 'reservation-drift') &&
+        linkage0?.state === 'reserved' &&
+        (linkage0.reservedSnapshot?.length ?? 0) > 0
+      ) {
+        const diff = planReservationDiff({
+          oldSnapshot: linkage0.reservedSnapshot!,
+          newItems: workingOrder.items,
+          so: workingOrder,
+          productsByCode: productByCode,
+          inventoryByProduct,
+        });
+        if (!diff.ok) {
+          failRed(formatPlanFailures(diff.failures, t, productByCode));
+          return;
+        }
+        let applied: readonly AppliedOp[] = [];
+        if (diff.plan.ops.length > 0) {
+          const exec = await executeReservationPlan(diff.plan.ops);
+          if (!exec.ok) {
+            useProductInventoryStore.getState().forceRefresh();
+            failRed(exec.error.message);
+            return;
+          }
+          applied = exec.applied;
+        }
+        const nextLinkage = buildReservedLinkage(diff.newSnapshot, Date.now(), actor, {
+          kind: 'reconcile-repair',
+        });
+        try {
+          workingOrder = (await useSalesOrderStore.getState().updateSafely({
+            id,
+            version: workingOrder.version,
+            patch: {
+              extra: {
+                ...(workingOrder.extra as SalesOrderExtra),
+                inventoryLinkage: nextLinkage,
+              },
+            },
+          })) as SalesOrder;
+        } catch (err) {
+          if (applied.length > 0) await rollbackAppliedOps(applied);
+          useProductInventoryStore.getState().forceRefresh();
+          throw err;
+        }
+        repaired.push('realigned-reservation');
+        reindex();
+        issues = derive();
+      }
+
+      
+      const behind = issues.find((i) => i.kind === 'so-behind-deliveries');
+      if (behind && behind.kind === 'so-behind-deliveries' && !behind.blockedByMatrix) {
+        const target = getAutoCompletionTargetValue();
+        if (target) {
+          
+          
+          
+          
+          
+          const extraNow = (workingOrder.extra ?? {}) as SalesOrderExtra;
+          const linkNow = extraNow.inventoryLinkage;
+          const holdsLive =
+            linkNow?.state === 'reserved' && (linkNow.reservedSnapshot?.length ?? 0) > 0;
+          if (productInventoryEnabled && !holdsLive && linkNow?.state !== 'shipped') {
+            const plan = planReservation({
+              action: 'reserve',
+              so: workingOrder,
+              productsByCode: productByCode,
+              inventoryByProduct,
+            });
+            if (plan.ok && plan.plan.ops.length > 0) {
+              const exec = await executeReservationPlan(plan.plan.ops);
+              if (!exec.ok) {
+                useProductInventoryStore.getState().forceRefresh();
+                failRed(exec.error.message);
+                return;
+              }
+              const reservedLinkage = buildReservedLinkage(
+                buildLinkageSnapshotFromReserveOps(plan.plan.ops),
+                Date.now(),
+                actor,
+                { kind: 'reconcile-repair' },
+              );
+              try {
+                workingOrder = (await useSalesOrderStore.getState().updateSafely({
+                  id,
+                  version: workingOrder.version,
+                  patch: {
+                    extra: {
+                      ...(workingOrder.extra as SalesOrderExtra),
+                      inventoryLinkage: reservedLinkage,
+                    },
+                  },
+                })) as SalesOrder;
+              } catch (err) {
+                await rollbackAppliedOps(exec.applied);
+                useProductInventoryStore.getState().forceRefresh();
+                throw err;
+              }
+              reindex();
+            }
+          }
+          const result = await runTransition({
+            order: workingOrder,
+            toStatusValue: target,
+            actor,
+            productsByCode: productByCode,
+            inventoryByProduct,
+          });
+          if (!result.ok) {
+            failRed(
+              result.failure.kind === 'plan-failure'
+                ? formatPlanFailures(result.failure.failures, t, productByCode)
+                : result.failure.kind === 'patch-error' ||
+                    result.failure.kind === 'execution-failure'
+                  ? result.failure.error.message
+                  : result.failure.kind,
+            );
+            return;
+          }
+          workingOrder = result.updated;
+          for (const followUp of result.followUps) {
+            await dispatchSoFollowUp(followUp, result.updated, actor, t);
+          }
+          repaired.push('completed');
+          reindex();
+          issues = derive();
+        }
+      }
+
+      
+      const notDeducted = issues.find((i) => i.kind === 'completed-not-deducted');
+      if (notDeducted && notDeducted.kind === 'completed-not-deducted') {
+        let linkNow = ((workingOrder.extra ?? {}) as SalesOrderExtra).inventoryLinkage;
+        let reserveApplied: readonly AppliedOp[] = [];
+        if (notDeducted.reason === 'no-deduction-recorded') {
+          const plan = planReservation({
+            action: 'reserve',
+            so: workingOrder,
+            productsByCode: productByCode,
+            inventoryByProduct,
+          });
+          if (!plan.ok) {
+            failRed(formatPlanFailures(plan.failures, t, productByCode));
+            return;
+          }
+          if (plan.plan.ops.length > 0) {
+            const exec = await executeReservationPlan(plan.plan.ops);
+            if (!exec.ok) {
+              useProductInventoryStore.getState().forceRefresh();
+              failRed(exec.error.message);
+              return;
+            }
+            reserveApplied = exec.applied;
+            linkNow = buildReservedLinkage(
+              buildLinkageSnapshotFromReserveOps(plan.plan.ops),
+              Date.now(),
+              actor,
+              { kind: 'reconcile-repair' },
+            );
+            reindex();
+          }
+        }
+        const snapshot = linkNow?.state === 'reserved' ? (linkNow.reservedSnapshot ?? []) : [];
+        if (snapshot.length > 0) {
+          const ship = planShipFromLinkage({
+            snapshot,
+            so: workingOrder,
+            productsByCode: productByCode,
+            inventoryByProduct,
+          });
+          if (!ship.ok) {
+            if (reserveApplied.length > 0) await rollbackAppliedOps(reserveApplied);
+            useProductInventoryStore.getState().forceRefresh();
+            failRed(formatPlanFailures(ship.failures, t, productByCode));
+            return;
+          }
+          let shipApplied: readonly AppliedOp[] = [];
+          if (ship.plan.ops.length > 0) {
+            const exec = await executeReservationPlan(ship.plan.ops);
+            if (!exec.ok) {
+              if (reserveApplied.length > 0) await rollbackAppliedOps(reserveApplied);
+              useProductInventoryStore.getState().forceRefresh();
+              failRed(exec.error.message);
+              return;
+            }
+            shipApplied = exec.applied;
+          }
+          const shippedLinkage = buildShippedLinkage(Date.now(), actor, {
+            kind: 'reconcile-repair',
+          });
+          try {
+            workingOrder = (await useSalesOrderStore.getState().updateSafely({
+              id,
+              version: workingOrder.version,
+              patch: {
+                extra: {
+                  ...(workingOrder.extra as SalesOrderExtra),
+                  inventoryLinkage: shippedLinkage,
+                },
+              },
+            })) as SalesOrder;
+          } catch (err) {
+            if (shipApplied.length > 0) await rollbackAppliedOps(shipApplied);
+            if (reserveApplied.length > 0) await rollbackAppliedOps(reserveApplied);
+            useProductInventoryStore.getState().forceRefresh();
+            throw err;
+          }
+          if (shipApplied.length > 0) {
+            emitInventoryActivityForApplied(shipApplied, {
+              kind: 'SO',
+              id: workingOrder.id,
+              label: workingOrder.orderNumber,
+              suffix: '(reconcile repair)',
+            });
+          }
+          repaired.push('shipped');
+          reindex();
+          issues = derive();
+        }
+      }
+
+      
+      const orphaned = issues.find((i) => i.kind === 'orphaned-holds');
+      if (orphaned && orphaned.kind === 'orphaned-holds') {
+        const entries: InventoryLinkageSnapshotEntry[] = [];
+        for (const r of useProductInventoryStore.getState().items) {
+          const hold = r.extra?.reservedBySalesOrder?.[workingOrder.id]?.byUnit;
+          if (!hold) continue;
+          const byUnit = Object.fromEntries(Object.entries(hold).filter(([, q]) => q > 0));
+          if (Object.keys(byUnit).length > 0) {
+            entries.push({
+              rowId: r.id,
+              itemCode: r.itemCode,
+              locationCode: r.locationCode,
+              byUnit,
+            });
+          }
+        }
+        if (entries.length > 0) {
+          const rel = planReleaseFromLinkage({
+            snapshot: entries,
+            so: workingOrder,
+            productsByCode: productByCode,
+            inventoryByProduct,
+          });
+          if (!rel.ok) {
+            failRed(formatPlanFailures(rel.failures, t, productByCode));
+            return;
+          }
+          if (rel.plan.ops.length > 0) {
+            const exec = await executeReservationPlan(rel.plan.ops);
+            if (!exec.ok) {
+              useProductInventoryStore.getState().forceRefresh();
+              failRed(exec.error.message);
+              return;
+            }
+            repaired.push('released-orphaned-holds');
+          }
+        }
+      }
+
+      if (repaired.length > 0) {
+        setOrder(workingOrder);
+        forceRefresh();
+        useProductInventoryStore.getState().forceRefresh();
+        notifications.show({
+          color: 'teal',
+          message: t('salesOrders.reconcile.repairSuccess', {
+            actions: repaired.join(', '),
+          }),
+        });
+        
+        
+        logActivity('salesOrder.reconcileRepair', workingOrder.id, {
+          orderNumber: workingOrder.orderNumber,
+          actions: repaired,
+        });
+      } else {
+        notifications.show({ color: 'blue', message: t('salesOrders.reconcile.nothingToRepair') });
+      }
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        if (err.latest) setOrder(err.latest as SalesOrder);
+        notifications.show({
+          color: 'yellow',
+          title: t('common.conflict.title'),
+          message: t('common.conflict.message'),
+          autoClose: 8000,
+        });
+      } else {
+        failRed(err instanceof Error ? err.message : String(err));
+      }
+    } finally {
+      setActionLoading(false);
+      closeReconcile();
+    }
+  }, [
+    id,
+    order,
+    currentEmployee,
+    linkedDRs,
+    resolveStatus,
+    productByCode,
+    t,
+    forceRefresh,
+    closeReconcile,
+  ]);
+
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -1453,6 +1862,12 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     openManualRelease,
     closeManualRelease,
     handleManualRelease,
+
+    reconcileIssues,
+    reconcileOpened,
+    openReconcile,
+    closeReconcile,
+    handleReconcileRepair,
 
     showDelete,
     deleteOpened,

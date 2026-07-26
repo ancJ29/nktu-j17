@@ -7,6 +7,7 @@ import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
+import { getSalesOrderCompletionEvidence } from '@/utils/permission';
 import type {
   DeliveryRequest,
   DeliveryRequestExtra,
@@ -53,13 +54,26 @@ export async function ensureReconcileStoresLoaded(): Promise<void> {
   if (!drs.initialized) await drs.loadAll();
 }
 
-export function isFullyDelivered(so: SalesOrder, drsForSo: readonly DeliveryRequest[]): boolean {
-  const deliveries = drsForSo.filter((d) => d.direction !== 'inbound');
-  if (deliveries.length === 0) return false;
+export type CompletionEvidence = 'quantities' | 'closedDeliveries';
+
+export function isFullyDelivered(
+  so: SalesOrder,
+  liveDrsForSo: readonly DeliveryRequest[],
+  evidence: CompletionEvidence = 'quantities',
+): boolean {
+  const outbound = liveDrsForSo.filter((d) => d.direction !== 'inbound');
+  const closed = outbound.filter((d) => d.isClosed);
+  if (closed.length === 0) return false;
+
+  if (evidence === 'closedDeliveries') {
+    
+    
+    return outbound.every((d) => d.isClosed);
+  }
 
   
   const deliveredByKey = new Map<string, number>();
-  for (const d of deliveries) {
+  for (const d of closed) {
     const items = (d.extra as DeliveryRequestExtra)?.deliveredItems ?? [];
     for (const it of items) {
       const k = `${it.productCode}::${it.unit}`;
@@ -94,20 +108,19 @@ export async function advanceSoIfFullyDelivered(params: {
   
   
   
+  
+  
   const allDrs = useDeliveryRequestStore.getState().items as DeliveryRequest[];
   const drsForSo = allDrs
     .map((d) => (freshDr && d.id === freshDr.id ? freshDr : d))
-    .filter((d) => d.salesOrderId === so.id && d.isClosed);
-  if (
-    freshDr &&
-    freshDr.salesOrderId === so.id &&
-    freshDr.isClosed &&
-    !drsForSo.some((d) => d.id === freshDr.id)
-  ) {
+    .filter(
+      (d) => d.salesOrderId === so.id && !(d.extra as DeliveryRequestExtra | undefined)?.isDeleted,
+    );
+  if (freshDr && freshDr.salesOrderId === so.id && !drsForSo.some((d) => d.id === freshDr.id)) {
     drsForSo.push(freshDr);
   }
 
-  if (!isFullyDelivered(so, drsForSo)) return 'skipped';
+  if (!isFullyDelivered(so, drsForSo, getSalesOrderCompletionEvidence())) return 'skipped';
 
   const productsByCode = new Map<string, Product>();
   for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);

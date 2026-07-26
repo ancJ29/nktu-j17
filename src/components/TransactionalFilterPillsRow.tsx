@@ -3,7 +3,7 @@ import { Group } from '@mantine/core';
 import type { DateRangePreset, DateRangeValue } from '@/types/date-range';
 import { formatDateRangeLabel } from '@/utils/listFilterDateRange';
 import { FilterPill } from './FilterPill';
-import { isNKTU } from '@/config/client';
+import { LIST_DEFAULT_RANGE_PILL } from '@/config/listDefaults';
 
 type TransactionalFilterPillsRowProps = {
   
@@ -22,7 +22,7 @@ export function TransactionalFilterPillsRow({
 }: TransactionalFilterPillsRowProps) {
   return (
     <Group gap="xs">
-      {isNKTU ? null : (
+      {LIST_DEFAULT_RANGE_PILL && (
         <FilterPill color="gray">
           {defaultRange.label}:{' '}
           {formatDateRangeLabel(defaultRange.range, defaultRange.presetLabels)}
