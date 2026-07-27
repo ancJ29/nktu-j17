@@ -14,6 +14,7 @@ import { useProductStore } from '@/stores/useProductStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import {
   applyGoodsReceiptInventoryEffect,
+  clearGoodsReceiptMarkers,
   getGoodsReceiptPostingStatus,
   syncDraftIncomingToInventory,
   type GoodsReceiptPostingStatus,
@@ -55,6 +56,8 @@ export type UseGoodsReceiptDetailReturn = {
   showCopyCta: boolean;
   
   canEditItems: boolean;
+  
+  stockPostedOnDraft: boolean;
 
   
   confirmAction: ConfirmAction | null;
@@ -217,19 +220,91 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     
     
     const priorStatus = receipt.status;
+    const isConfirm = confirmAction === 'confirmReceived';
+    
+    
+    
+    
+    
+    const draftCarriesPostedStock =
+      priorStatus === 'draft' && receipt.extra?.inventoryPosted === true;
+
+    let inventoryEffect: { attempted: number; failed: number } | null = null;
+    let fullyPosted = false;
+    let stockMoved = false;
+
     try {
       
       
       
       
       
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      if (isConfirm && priorStatus === 'draft') {
+        stockMoved = true;
+        try {
+          const effect = await applyGoodsReceiptInventoryEffect(receipt, 'increment');
+          inventoryEffect = { attempted: effect.attempted, failed: effect.failed };
+          fullyPosted = effect.failed === 0;
+          if (effect.failed > 0) {
+            notifications.show({
+              color: 'yellow',
+              title: t('goodsReceipts.notifications.inventoryPartial'),
+              
+              
+              message:
+                effect.errors.slice(0, 5).join('\n') ||
+                t('goodsReceipts.notifications.inventoryPartialBody', {
+                  failed: effect.failed,
+                  attempted: effect.attempted,
+                }),
+              autoClose: false,
+            });
+          }
+        } catch {
+          
+          
+          
+          notifications.show({
+            color: 'yellow',
+            title: t('goodsReceipts.notifications.inventoryPartial'),
+            message: t('goodsReceipts.notifications.inventoryAborted'),
+            autoClose: false,
+          });
+        }
+      }
+
+      
+      
+      
+      
+      
+      
       let workingVersion = receipt.version;
-      if (confirmAction === 'confirmReceived' && priorStatus === 'draft') {
+      if (isConfirm && priorStatus === 'draft') {
         const actor = getCurrentActorId();
         const stamped = await useGoodsReceiptStore.getState().updateSafely({
           id,
           version: workingVersion,
-          patch: { extra: { ...receipt.extra, receivedBy: actor } },
+          patch: {
+            extra: {
+              ...receipt.extra,
+              receivedBy: actor,
+              ...(fullyPosted && { inventoryPosted: true }),
+            },
+          },
         });
         workingVersion = stamped.version;
       }
@@ -238,7 +313,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       const updated = await useGoodsReceiptStore.getState().updateSafely({
         id,
         version: workingVersion,
-        patch: { status: confirmAction === 'confirmReceived' ? 'received' : 'cancelled' },
+        patch: { status: isConfirm ? 'received' : 'cancelled' },
       });
       invalidateCache();
 
@@ -259,61 +334,55 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       
       
       
-      const inventoryDirection: 'increment' | 'decrement' | null =
-        confirmAction === 'confirmReceived'
-          ? 'increment'
-          : priorStatus === 'received'
-            ? 'decrement'
-            : null;
-      let inventoryEffect: { attempted: number; failed: number } | null = null;
-
       
-      
-      
-      
-      try {
-        if (inventoryDirection) {
-          const effect = await applyGoodsReceiptInventoryEffect(receipt, inventoryDirection);
-          inventoryEffect = { attempted: effect.attempted, failed: effect.failed };
-          if (effect.failed > 0) {
-            notifications.show({
-              color: 'yellow',
-              title: t('goodsReceipts.notifications.inventoryPartial'),
-              
-              
-              message:
-                effect.errors.slice(0, 5).join('\n') ||
-                t('goodsReceipts.notifications.inventoryPartialBody', {
+      if (!isConfirm) {
+        try {
+          if (priorStatus === 'received' || draftCarriesPostedStock) {
+            stockMoved = true;
+            const effect = await applyGoodsReceiptInventoryEffect(receipt, 'decrement');
+            inventoryEffect = { attempted: effect.attempted, failed: effect.failed };
+            if (effect.failed > 0) {
+              notifications.show({
+                color: 'yellow',
+                title: t('goodsReceipts.notifications.inventoryPartial'),
+                
+                
+                message:
+                  effect.errors.slice(0, 5).join('\n') ||
+                  t('goodsReceipts.notifications.inventoryPartialBody', {
+                    failed: effect.failed,
+                    attempted: effect.attempted,
+                  }),
+                autoClose: false,
+              });
+            }
+          }
+          if (priorStatus === 'draft') {
+            const effect = await syncDraftIncomingToInventory(receipt, null);
+            if (effect.failed > 0) {
+              notifications.show({
+                color: 'yellow',
+                title: t('goodsReceipts.notifications.inventoryPartial'),
+                message: t('goodsReceipts.notifications.inventoryPartialBody', {
                   failed: effect.failed,
                   attempted: effect.attempted,
                 }),
-              autoClose: false,
-            });
+                autoClose: 8000,
+              });
+            }
           }
-        } else if (confirmAction === 'cancel' && priorStatus === 'draft') {
-          const effect = await syncDraftIncomingToInventory(receipt, null);
-          if (effect.failed > 0) {
-            notifications.show({
-              color: 'yellow',
-              title: t('goodsReceipts.notifications.inventoryPartial'),
-              message: t('goodsReceipts.notifications.inventoryPartialBody', {
-                failed: effect.failed,
-                attempted: effect.attempted,
-              }),
-              autoClose: 8000,
-            });
-          }
+        } catch {
+          
+          
+          
+          
+          notifications.show({
+            color: 'yellow',
+            title: t('goodsReceipts.notifications.inventoryPartial'),
+            message: t('goodsReceipts.notifications.inventoryAborted'),
+            autoClose: false,
+          });
         }
-      } catch {
-        
-        
-        
-        notifications.show({
-          color: 'yellow',
-          title: t('goodsReceipts.notifications.inventoryPartial'),
-          message: t('goodsReceipts.notifications.inventoryAborted'),
-          autoClose: false,
-        });
       }
 
       
@@ -324,7 +393,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         notifications.show({
           color: 'green',
           message: t(
-            confirmAction === 'confirmReceived'
+            isConfirm
               ? 'goodsReceipts.notifications.confirmSuccess'
               : 'goodsReceipts.notifications.cancelSuccess',
           ),
@@ -336,15 +405,34 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       
       
       
-      if (inventoryDirection) {
-        const productsByCode = useProductStore.getState().mapByCode;
-        const receivedSetCodes = [
-          ...new Set(receipt.items.map((it) => it.itemCode).filter(Boolean)),
-        ].filter((code) => isProductSet(productsByCode.get(code)));
-        if (receivedSetCodes.length > 0) {
-          void rebalanceForSetStockChange(receivedSetCodes, 'goods-receipt');
+      const productsByCode = useProductStore.getState().mapByCode;
+      const receivedSetCodes = stockMoved
+        ? [...new Set(receipt.items.map((it) => it.itemCode).filter(Boolean))].filter((code) =>
+            isProductSet(productsByCode.get(code)),
+          )
+        : [];
+
+      
+      
+      
+      void (async () => {
+        
+        
+        
+        
+        
+        if (isConfirm && fullyPosted) {
+          try {
+            await clearGoodsReceiptMarkers(receipt);
+          } catch {
+            // Inert: the flag already suppresses the repair CTA and short-
+            // circuits the read-back, so leftovers are never read.
+          }
         }
-      }
+        if (receivedSetCodes.length > 0) {
+          await rebalanceForSetStockChange(receivedSetCodes, 'goods-receipt');
+        }
+      })();
 
       
       
@@ -362,7 +450,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
           inventoryFailed: inventoryEffect.failed,
         }),
       };
-      if (confirmAction === 'confirmReceived') {
+      if (isConfirm) {
         logActivity('goodsReceipt.confirmReceived', id, baseMemo);
       } else {
         
@@ -550,6 +638,15 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
 
   
   
+  
+  
+  
+  
+  
+  const stockPostedOnDraft = !!receipt && isDraft && receipt.extra?.inventoryPosted === true;
+
+  
+  
   const showConfirmCta = !!receipt && canConfirmReceived && isDraft;
   
   
@@ -560,14 +657,14 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
   
   
   
-  const showEditCta = !!receipt && canEdit && isDraft && !isMobile;
+  const showEditCta = !!receipt && canEdit && isDraft && !isMobile && !stockPostedOnDraft;
   
   
   const showCopyCta = !!receipt && canCreate && !isMobile;
   
   
   
-  const canEditItems = !!receipt && canEdit && isDraft;
+  const canEditItems = !!receipt && canEdit && isDraft && !stockPostedOnDraft;
   
   
   const showRepostCta =
@@ -586,6 +683,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     showEditCta,
     showCopyCta,
     canEditItems,
+    stockPostedOnDraft,
     confirmAction,
     confirmOpened,
     openConfirm,

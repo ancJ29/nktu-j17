@@ -1791,6 +1791,7 @@
       "repostInventoryAction": "Post missing inventory",
       "statusCancelledNote": "This receipt was cancelled",
       "stickyActionsLabel": "Receipt actions",
+      "stockPostedOnDraftWarning": "A previous confirmation already added this receipt’s goods to inventory, but the status update did not finish — so the receipt still reads Draft. Editing is locked. Confirm again to finish (it will not double-count), or cancel to remove the stock that was added.",
       "tabActivityLog": "Activity",
       "tabInfo": "Info",
       "tabItems": "Items",

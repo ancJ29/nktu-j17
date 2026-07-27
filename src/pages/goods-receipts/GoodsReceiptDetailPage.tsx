@@ -134,7 +134,12 @@ function StatusStrip({
 }
 
 type NodeState =
-  'active-gray' | 'active-green' | 'active-red' | 'done-neutral' | 'pending' | 'skipped';
+  | 'active-gray'
+  | 'active-green'
+  | 'active-red'
+  | 'done-neutral'
+  | 'pending'
+  | 'skipped';
 
 const NODE_PALETTE: Record<NodeState, { color: string; variant: 'filled' | 'light' | 'outline' }> =
   {
@@ -233,6 +238,7 @@ export function GoodsReceiptDetailPage() {
     showEditCta,
     showCopyCta,
     canEditItems,
+    stockPostedOnDraft,
     confirmAction,
     confirmOpened,
     openConfirm,
@@ -923,6 +929,18 @@ export function GoodsReceiptDetailPage() {
         {topActions}
         {headerRow}
         <StatusStrip receipt={receipt} compact={isMobile} />
+        {/* The confirm posts stock before flipping status (it has to — the
+            posting flag is only writable while draft), so a flip that failed
+            mid-flight leaves a draft whose goods are already on the inventory
+            rows. Nothing else on the page shows that: the status still reads
+            "draft". Say it plainly, and name the two ways out — re-confirm
+            (idempotent, the markers make the re-post a no-op) or cancel
+            (reverses the bump). Editing is hidden while this is up. */}
+        {stockPostedOnDraft && (
+          <Alert color="orange" variant="light" icon={<IconAlertTriangle size={16} />}>
+            <Text size="sm">{t('goodsReceipts.detail.stockPostedOnDraftWarning')}</Text>
+          </Alert>
+        )}
         {isMobile ? mobileBody : desktopBody}
       </Stack>
 

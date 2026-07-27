@@ -68,6 +68,60 @@ function isPostedOnRow(row: ProductInventoryRow, receiptId: string): boolean {
   return !!row.extra?.receivedByGoodsReceipt?.[receiptId];
 }
 
+export async function clearGoodsReceiptMarkers(
+  receipt: GoodsReceipt,
+): Promise<InventoryEffectResult> {
+  const result: InventoryEffectResult = {
+    attempted: 0,
+    succeeded: 0,
+    failed: 0,
+    alreadyPosted: 0,
+    errors: [],
+  };
+  const productItems = receipt.items.filter((i) => i.itemType === 'product');
+  if (productItems.length === 0) return result;
+
+  const snap = await cMngtConnector.getAllProductInventory<ProductInventoryExtra>();
+  const rows = snap.changed ? snap.productInventory : useProductInventoryStore.getState().items;
+
+  let touched = false;
+  for (const itemCode of aggregateByCode(productItems, 1).keys()) {
+    const row = rows.find(
+      (r) => r.itemCode === itemCode && sameLocation(r.locationCode, receipt.locationCode),
+    );
+    if (!row || !isPostedOnRow(row, receipt.id)) continue;
+    result.attempted += 1;
+    try {
+      const next = { ...row.extra?.receivedByGoodsReceipt };
+      delete next[receipt.id];
+      
+      
+      
+      
+      await useProductInventoryStore.getState().updateSafely({
+        id: row.id,
+        version: row.version,
+        patch: {
+          extra: {
+            ...row.extra,
+            receivedByGoodsReceipt: Object.keys(next).length > 0 ? next : undefined,
+          } as ProductInventoryExtra,
+        },
+      });
+      touched = true;
+      result.succeeded += 1;
+    } catch (err) {
+      result.failed += 1;
+      result.errors.push(
+        `product:${itemCode} — ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+  }
+
+  if (touched) await useProductInventoryStore.getState().forceRefresh();
+  return result;
+}
+
 async function ensureLoaded<T>(
   initialized: boolean,
   loadAll: () => Promise<T> | void,
@@ -390,8 +444,20 @@ export async function getGoodsReceiptPostingStatus(
   await ensureLoaded(productStore.initialized, productStore.loadAll);
   const products = useProductStore.getState().items;
 
-  const snap = await cMngtConnector.getAllProductInventory<ProductInventoryExtra>();
-  const rows = snap.changed ? snap.productInventory : useProductInventoryStore.getState().items;
+  
+  
+  
+  
+  
+  
+  
+  const flagged = receipt.extra?.inventoryPosted === true;
+  const rows = flagged
+    ? []
+    : await (async () => {
+        const snap = await cMngtConnector.getAllProductInventory<ProductInventoryExtra>();
+        return snap.changed ? snap.productInventory : useProductInventoryStore.getState().items;
+      })();
 
   let missingCount = 0;
   for (const itemCode of aggregateByCode(productItems, 1).keys()) {
@@ -402,6 +468,10 @@ export async function getGoodsReceiptPostingStatus(
     }
     if (isNoInventoryProduct(product)) {
       byItemCode.set(itemCode, 'skipped');
+      continue;
+    }
+    if (flagged) {
+      byItemCode.set(itemCode, 'posted');
       continue;
     }
     const row = rows.find(

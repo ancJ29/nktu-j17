@@ -13,6 +13,8 @@ export type GoodsReceiptExtra = {
   
   assignedTo?: string;
   
+  inventoryPosted?: boolean;
+  
   copyFromId?: string;
   [key: string]: unknown;
 };

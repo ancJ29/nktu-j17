@@ -1791,6 +1791,7 @@
       "repostInventoryAction": "Cập nhật tồn kho còn thiếu",
       "statusCancelledNote": "Phiếu này đã bị hủy",
       "stickyActionsLabel": "Thao tác phiếu",
+      "stockPostedOnDraftWarning": "Lần xác nhận trước đã ghi hàng của phiếu này vào tồn kho, nhưng cập nhật trạng thái chưa hoàn tất — nên phiếu vẫn ở trạng thái Nháp. Không thể sửa. Xác nhận lại để hoàn tất (không bị cộng đúp), hoặc huỷ để trừ lại số đã ghi.",
       "tabActivityLog": "Hoạt động",
       "tabInfo": "Thông tin",
       "tabItems": "Hàng nhập",

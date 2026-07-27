@@ -307,7 +307,13 @@ export function GoodsReceiptFormPage() {
       const res = await cMngtConnector.getGoodsReceiptById({ id });
       const r = res.goodsReceipt as GoodsReceipt;
       snapshotRef.current = r;
-      if (r.status !== 'draft') {
+      
+      
+      
+      
+      
+      
+      if (r.status !== 'draft' || r.extra?.inventoryPosted === true) {
         navigate(ROUTES.GOODS_RECEIPTS.DETAIL.replace(':id', id), { replace: true });
         return null;
       }
