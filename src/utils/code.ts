@@ -1,3 +1,4 @@
+import { CallApiError } from '@credo/connectors/connector';
 import { ONE_HOUR } from '@credo/kits/time';
 
 export function generateCode(prefix: string): string {
@@ -39,4 +40,32 @@ export function bumpSequentialCode(code: string, by: number): string {
   const n = Number.parseInt(tail, 10);
   if (!Number.isFinite(n)) return code;
   return `${head}${String(n + by).padStart(tail.length, '0')}`;
+}
+
+function escapeRegExp(s: string): string {
+  return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+export function buildNextSequentialCode(
+  prefix: string,
+  existingCodes: Iterable<string>,
+  padLength: number,
+): string {
+  const re = new RegExp(`^${escapeRegExp(prefix)}(\\d+)$`);
+  let max = 0;
+  for (const code of existingCodes) {
+    const m = re.exec(code);
+    if (!m) continue;
+    const n = Number.parseInt(m[1], 10);
+    if (Number.isFinite(n) && n > max) max = n;
+  }
+  return `${prefix}${String(max + 1).padStart(Math.max(0, padLength), '0')}`;
+}
+
+export function isDuplicateUniqueFieldError(err: unknown, field: string): boolean {
+  if (!(err instanceof CallApiError) || err.status !== 400) return false;
+  const payload = err.payload;
+  if (typeof payload !== 'object' || payload === null || !('fields' in payload)) return false;
+  const fields = (payload as { fields?: unknown }).fields;
+  return typeof fields === 'object' && fields !== null && field in fields;
 }

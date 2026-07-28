@@ -41,6 +41,52 @@ import {
 
 const CURRENT_YEAR = new Date().getFullYear();
 
+type GroupedRow = {
+  log: OperationLog;
+
+  grouped: boolean;
+
+  firstOfGroup: boolean;
+};
+
+function groupRows(logs: OperationLog[], group: OperationLogConfig['group']): GroupedRow[] {
+  if (!group) return logs.map((log) => ({ log, grouped: false, firstOfGroup: false }));
+
+  const buckets = new Map<string, OperationLog[]>();
+  const ordered: OperationLog[][] = [];
+  for (const log of logs) {
+    const key = group.keyOf(log);
+    if (key === undefined) {
+      ordered.push([log]);
+      continue;
+    }
+    let bucket = buckets.get(key);
+    if (!bucket) {
+      bucket = [];
+      buckets.set(key, bucket);
+      ordered.push(bucket);
+    }
+    bucket.push(log);
+  }
+
+  const rank = (bucket: OperationLog[]) =>
+    bucket.reduce((latest, l) => {
+      const d = datePart(l.logDate);
+      return d > latest ? d : latest;
+    }, '');
+
+  return [...ordered]
+    .sort((a, b) => rank(b).localeCompare(rank(a)))
+    .flatMap((bucket) => {
+      const rows = group.compare ? [...bucket].sort(group.compare) : bucket;
+      return rows.map((log, i) => ({
+        log,
+        grouped: rows.length > 1,
+        firstOfGroup: i === 0,
+      }));
+    });
+}
+
 function serverMessage(err: unknown): string | undefined {
   if (err instanceof CallApiError && typeof err.payload === 'object' && err.payload !== null) {
     const m = (err.payload as { message?: unknown }).message;
@@ -118,6 +164,8 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     const m = Number(month);
     return logs.filter((l) => Number(datePart(l.logDate).slice(5, 7)) === m);
   }, [logs, month]);
+
+  const rows = useMemo(() => groupRows(visibleLogs, config.group), [visibleLogs, config.group]);
 
   const load = useCallback(
     async (forYear: number) => {
@@ -344,7 +392,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
-              {visibleLogs.map((log) => {
+              {rows.map(({ log, grouped, firstOfGroup }, index) => {
                 const tone = config.rowTone?.(log, visibleLogs);
                 const isOpen = expanded.has(log.id);
 
@@ -352,11 +400,16 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                 const row = (
                   <Table.Tr
                     key={log.id}
-                    style={
-                      tone?.danger
+                    style={{
+                      ...(tone?.danger
                         ? { backgroundColor: 'var(--mantine-color-red-light)' }
-                        : undefined
-                    }
+                        : grouped
+                          ? { backgroundColor: 'var(--mantine-color-default-hover)' }
+                          : {}),
+                      ...(firstOfGroup && index > 0
+                        ? { borderTop: '2px solid var(--mantine-color-default-border)' }
+                        : {}),
+                    }}
                   >
                     {expandable && (
                       <Table.Td>

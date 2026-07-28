@@ -9,6 +9,7 @@ import { appConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { codeToLoginEmail, AUTO_LOGIN_DOMAIN } from '@/utils/loginEmail';
 import { cMngtConnector } from '@credo/connectors/connector';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
@@ -250,15 +251,22 @@ export function EmployeeFormPage() {
           if (!snapshot) {
             throw new Error('Employee snapshot missing');
           }
+
           const extra: EmployeeExtra = {
             ...snapshot.extra,
-            allowLogin: snapshot.extra?.allowLogin ?? true,
             personalPhoneNumber: personalPhoneNumber || undefined,
             ...buildProfileExtra(values),
           };
-          await useEmployeeStore
-            .getState()
-            .updateSafely({ id, version: snapshot.version, patch: { ...rest, extra } });
+
+          const emailLocked = !useAuthStore.getState().user?.isRoot;
+          const { email: _lockedEmail, ...restSansEmail } = rest;
+          const patchFields = emailLocked ? restSansEmail : rest;
+
+          const { meta } = await useEmployeeStore.getState().updateSafelyWithMeta({
+            id,
+            version: snapshot.version,
+            patch: { ...patchFields, extra },
+          });
           const before = {
             name: snapshot.name,
             code: snapshot.code,
@@ -269,15 +277,35 @@ export function EmployeeFormPage() {
             isActive: snapshot.isActive,
             extra: snapshot.extra,
           };
-          const after = { ...rest, extra };
+          const after = { ...rest, ...(emailLocked && { email: snapshot.email }), extra };
           const diff = deepDiff(before, after);
 
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           logActivity(onlyIsActive ? 'employee.toggleStatus' : 'employee.update', id, diff);
-          notifications.show({
-            color: 'green',
-            message: t('employees.notifications.updateSuccess'),
-          });
+
+          if (meta?.ssoWarning) {
+            notifications.show({
+              color: 'yellow',
+              title: t('employees.notifications.updateSuccess'),
+              message: t('employees.notifications.updateSsoWarning', { reason: meta.ssoWarning }),
+              autoClose: false,
+            });
+          } else {
+            notifications.show({
+              color: 'green',
+              message: t('employees.notifications.updateSuccess'),
+            });
+          }
+
+          if (meta?.loginPassword) {
+            notifications.show({
+              color: 'teal',
+              message: t('employees.notifications.mintedPassword', {
+                password: meta.loginPassword,
+              }),
+              autoClose: false,
+            });
+          }
           await reconcileTruckLink(values, id, snapshot.extra?.truckAssetId);
           navigate(ROUTES.EMPLOYEES.DETAIL.replace(':id', id));
         } else {

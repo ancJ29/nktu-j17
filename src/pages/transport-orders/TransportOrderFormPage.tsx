@@ -42,7 +42,7 @@ import { SectionCard } from '@/components/SectionCard';
 import { EmployeeSelector, CustomerSelector } from '@/components/selectors';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
-import { transportOrderBundle } from '@/stores/useTransportOrderStore';
+import { transportOrderBundle, useTransportOrderStore } from '@/stores/useTransportOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { getCurrentActorId, getCurrentEmployeeStamp, useInitFormFromFetch } from '@/hooks';
 import { logActivity } from '@/utils/activityLogger';
@@ -74,6 +74,7 @@ import {
   readFeeLines,
 } from './transportOrderPricing';
 import { useContainerSizeOptions } from './containerSize';
+import { useShipmentTypeOptions } from './shipmentType';
 import { truckNameWithPlate } from './truckDisplay';
 import {
   getInitialTransportOrderStatus,
@@ -86,6 +87,9 @@ import {
   MAX_ORDER_NUMBER_RETRIES,
 } from './transportOrderWrite';
 import { appendTimelineEntry, createMemo, diffTransportOrder, isEmptyDiff } from './activityMemo';
+import { ScheduleConflictAlert } from './ScheduleConflictAlert';
+import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleConflicts';
+import type { ScheduleSlot } from './scheduleConflicts';
 
 const isMobile = device.isMobile;
 const toFeatures = appConfig.features.transportOrders;
@@ -99,6 +103,15 @@ const driverEmployeeFilter = (e: Employee) => {
     : isDriverDepartment(e.department);
 };
 const DEFAULT_VAT_PERCENT = 8;
+
+const PLACE_INPUT_STYLES = {
+  input: {
+    border: 'none',
+    borderBottom: '1px solid var(--mantine-color-primary-6)',
+    borderRadius: 0,
+    padding: 0,
+  },
+} as const;
 
 type FeeRow = {
   label: string;
@@ -203,6 +216,28 @@ function blankTrip(): TripRow {
     driverName: '',
     laborCost: 0,
   };
+}
+
+function draftScheduleSlots(values: FormValues): ScheduleSlot[] {
+  if (values.isMultiTrip) {
+    return values.trips.flatMap((trip, i) => {
+      const window = scheduleWindow([
+        dateTimeStringToIso(trip.loadingAt),
+        dateTimeStringToIso(trip.unloadingAt),
+      ]);
+      return window
+        ? [{ tripIndex: i, truckId: trip.truckId, driverId: trip.driverId, ...window }]
+        : [];
+    });
+  }
+  const window = scheduleWindow([
+    dateTimeStringToIso(values.pickupAt),
+    dateTimeStringToIso(values.stuffingAt),
+    dateTimeStringToIso(values.dropoffAt),
+  ]);
+  return window
+    ? [{ tripIndex: WHOLE_ORDER, truckId: values.truckId, driverId: values.driverId, ...window }]
+    : [];
 }
 
 function blankValues(): FormValues {
@@ -320,11 +355,17 @@ export function TransportOrderFormPage() {
   const customersInit = useCustomerStore((s) => s.initialized);
   const getCustomerByCode = useCustomerStore((s) => s.getByCode);
 
+  const savedOrders = useTransportOrderStore((s) => s.items);
+  const ordersInit = useTransportOrderStore((s) => s.initialized);
+  const loadOrders = useTransportOrderStore((s) => s.loadAll);
+
   useEffect(() => {
     if (isMobile) return;
     if (!trucksInit) loadTrucks();
     if (!customersInit) loadCustomers();
-  }, [trucksInit, loadTrucks, customersInit, loadCustomers]);
+
+    if (!ordersInit) loadOrders();
+  }, [trucksInit, loadTrucks, customersInit, loadCustomers, ordersInit, loadOrders]);
 
   const truckSelectData = useMemo(
     () =>
@@ -346,6 +387,7 @@ export function TransportOrderFormPage() {
   );
 
   const containerSizeOptions = useContainerSizeOptions();
+  const shipmentTypeOptions = useShipmentTypeOptions();
 
   const form = useForm<FormValues>({
     initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(),
@@ -594,6 +636,14 @@ export function TransportOrderFormPage() {
     [isEdit, id, t, navigate, invalidateCache],
   );
 
+  const scheduleConflicts = useMemo(
+    () =>
+      findScheduleConflicts(draftScheduleSlots(form.values), savedOrders, {
+        ...(id ? { excludeOrderId: id } : {}),
+      }),
+    [form.values, savedOrders, id],
+  );
+
   if (fetching) return null;
   if (isMobile) return null;
 
@@ -773,10 +823,7 @@ export function TransportOrderFormPage() {
               />
               <Select
                 label={t('transportOrders.form.shipmentType')}
-                data={[
-                  { value: 'import', label: t('transportOrders.shipmentType.import') },
-                  { value: 'export', label: t('transportOrders.shipmentType.export') },
-                ]}
+                data={shipmentTypeOptions}
                 value={form.values.shipmentType}
                 onChange={(v) =>
                   form.setFieldValue('shipmentType', (v as TransportOrderShipmentType) ?? 'import')
@@ -834,28 +881,56 @@ export function TransportOrderFormPage() {
               <Table>
                 <Table.Thead>
                   <Table.Tr>
+                    {/* The two place columns are the ONLY ones without a fixed
+                        width — they take everything the others don't, because
+                        they're the only free-text fields here and the only ones an
+                        operator has to re-read to check. Every `w` below is
+                        therefore a *budget*: trimmed to what its widget actually
+                        needs (a datetime + its clear button, a picker, a money
+                        figure), so the leftover lands on the places. Don't grow one
+                        back without taking the width from somewhere other than
+                        them. */}
                     <Table.Th>{t('transportOrders.trips.departure')}</Table.Th>
                     <Table.Th>{t('transportOrders.trips.destination')}</Table.Th>
                     {/* The warehouse's plan for this leg — day + hour, at each end
                         of it. There is no NGÀY column: a full loading datetime
                         already carries the day, so the leg's date is derived from
                         it (`tripDate`) rather than typed a second time. */}
-                    <Table.Th w={185}>{t('transportOrders.trips.loadingAt')}</Table.Th>
-                    <Table.Th w={185}>{t('transportOrders.trips.unloadingAt')}</Table.Th>
-                    <Table.Th w={190}>{t('transportOrders.columns.truck')}</Table.Th>
-                    <Table.Th w={190}>{t('transportOrders.form.driver')}</Table.Th>
-                    <Table.Th w={150}>{t('transportOrders.trips.laborCost')}</Table.Th>
+                    <Table.Th w={165}>{t('transportOrders.trips.loadingAt')}</Table.Th>
+                    <Table.Th w={165}>{t('transportOrders.trips.unloadingAt')}</Table.Th>
+                    <Table.Th w={175}>{t('transportOrders.columns.truck')}</Table.Th>
+                    <Table.Th w={175}>{t('transportOrders.form.driver')}</Table.Th>
+                    <Table.Th w={120}>{t('transportOrders.trips.laborCost')}</Table.Th>
                     <Table.Th w={40} />
                   </Table.Tr>
                 </Table.Thead>
                 <Table.Tbody>
                   {form.values.trips.map((_, i) => (
                     <Table.Tr key={i}>
+                      {/* Wrapping inputs, not single-line ones: a real place is
+                          "Kho Bình Tân, Q. Bình Tân, TP.HCM", and widening the
+                          column alone only moves where it gets cut off. Growing
+                          the row is the one treatment that always shows the whole
+                          value — which is the point, since the operator's job here
+                          is telling four similar-looking addresses apart. Capped at
+                          4 rows so one pasted paragraph can't swallow the form. */}
                       <Table.Td>
-                        <TextInput {...form.getInputProps(`trips.${i}.departure`)} />
+                        <Textarea
+                          autosize
+                          minRows={1}
+                          maxRows={4}
+                          styles={PLACE_INPUT_STYLES}
+                          {...form.getInputProps(`trips.${i}.departure`)}
+                        />
                       </Table.Td>
                       <Table.Td>
-                        <TextInput {...form.getInputProps(`trips.${i}.destination`)} />
+                        <Textarea
+                          autosize
+                          minRows={1}
+                          maxRows={4}
+                          styles={PLACE_INPUT_STYLES}
+                          {...form.getInputProps(`trips.${i}.destination`)}
+                        />
                       </Table.Td>
                       <Table.Td>
                         <DateTimeField {...form.getInputProps(`trips.${i}.loadingAt`)} />
@@ -954,6 +1029,12 @@ export function TransportOrderFormPage() {
               </SimpleGrid>
             </SectionCard>
           )}
+
+          {/* Sits directly under whichever card owns the assignment — the leg list
+              on a multi-trip job, the route on a single-trip one — so the warning
+              is beside the pickers that caused it rather than at the top of a long
+              form the operator has already scrolled past. */}
+          <ScheduleConflictAlert conflicts={scheduleConflicts} />
 
           {/* Fees — TWO groups, split by `kind`, each its own card + Add button.
               The `Loại` picker is gone: a row's kind is the card it lives in.

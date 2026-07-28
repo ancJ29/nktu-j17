@@ -91,6 +91,12 @@ export type OperationLogConfig = {
 
   rowLocked?: (log: OperationLog) => boolean;
 
+  group?: {
+    keyOf: (log: OperationLog) => string | undefined;
+
+    compare?: (a: OperationLog, b: OperationLog) => number;
+  };
+
   summary?: (logs: OperationLog[], t: TFn) => ReactNode;
 
   rowTone?: (log: OperationLog, visibleLogs: OperationLog[]) => OperationLogRowTone | undefined;

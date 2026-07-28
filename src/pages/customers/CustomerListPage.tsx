@@ -102,7 +102,8 @@ export function CustomerListPage() {
             to: ROUTES.CUSTOMERS.NEW,
             label: t('customers.addItem'),
             enabled: canCreate,
-            mobileVariant: 'icon',
+
+            mobileVariant: 'hidden',
           }}
         />
 

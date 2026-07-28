@@ -50,6 +50,8 @@ type NavRegistryEntry = {
   rootOnly?: true;
 
   mobileNavbar?: true;
+
+  rootOnlyWhen?: (flags: FeatureFlags) => boolean;
 };
 
 export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
@@ -79,6 +81,8 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     labelKey: 'nav.employeeOrg',
     label: 'Organization',
     defaultIcon: IconName.Affiliate,
+
+    rootOnlyWhen: (f) => f.permissionManagement?.rootUserOnly ?? true,
   },
   delivery: {
     path: ROUTES.DELIVERY.LIST,
@@ -322,7 +326,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
   'delivery',
   'goods-receipts',
   'employees',
-  'employee-org',
+
   {
     id: 'warehouse',
     subs: [
@@ -347,7 +351,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
 
 type FeatureFlags = {
   employees?: { enabled?: boolean; selfManage?: boolean };
-  permissionManagement?: { enabled?: boolean };
+  permissionManagement?: { enabled?: boolean; rootUserOnly?: boolean };
   products?: { enabled?: boolean };
   materials?: { enabled?: boolean };
   customers?: { enabled?: boolean };
@@ -546,6 +550,11 @@ export function buildNavigation(options: BuildNavigationOptions) {
     showRestrictedItems = false,
   } = options;
 
+  function resolve(id: NavId, iconOverride?: IconName, navbarOverride?: boolean): NavigationItem {
+    const item = resolveItem(id, iconOverride, navbarOverride);
+    return NAV_REGISTRY[id]?.rootOnlyWhen?.(features) ? { ...item, rootOnly: true } : item;
+  }
+
   function isVisible(id: NavId): boolean {
     if (NAV_REGISTRY[id]?.adminOnly && !isAdmin) return false;
     return true;
@@ -576,7 +585,7 @@ export function buildNavigation(options: BuildNavigationOptions) {
         if (!isVisible(entry)) continue;
         if (checkFeatureFlags && !isFeatureEnabled(entry)) continue;
         if (!isPermitted(entry)) continue;
-        items.push(resolveItem(entry, iconOverrides.get(entry), navbarOverrides?.get(entry)));
+        items.push(resolve(entry, iconOverrides.get(entry), navbarOverrides?.get(entry)));
         continue;
       }
 
@@ -588,7 +597,7 @@ export function buildNavigation(options: BuildNavigationOptions) {
               (!checkFeatureFlags || isFeatureEnabled(subId)) &&
               isPermitted(subId),
           )
-          .map((subId) => resolveItem(subId, iconOverrides.get(subId)));
+          .map((subId) => resolve(subId, iconOverrides.get(subId)));
         if (subs.length === 0) continue;
         items.push({
           id: entry.id,
@@ -610,13 +619,9 @@ export function buildNavigation(options: BuildNavigationOptions) {
             (!checkFeatureFlags || isFeatureEnabled(subId)) &&
             isPermitted(subId),
         )
-        .map((subId) => resolveItem(subId, iconOverrides.get(subId)));
+        .map((subId) => resolve(subId, iconOverrides.get(subId)));
       if (subs.length === 0) continue;
-      const group = resolveItem(
-        entry.id,
-        iconOverrides.get(entry.id),
-        navbarOverrides?.get(entry.id),
-      );
+      const group = resolve(entry.id, iconOverrides.get(entry.id), navbarOverrides?.get(entry.id));
       items.push({ ...group, subs });
     }
 
@@ -668,8 +673,8 @@ export function buildNavigation(options: BuildNavigationOptions) {
           (subId) => NAV_REGISTRY[subId]?.adminOnly && !seenIds.has(subId),
         );
         if (adminSubs.length > 0) {
-          const group = resolveItem(entry.id);
-          const subs = adminSubs.map((subId) => resolveItem(subId));
+          const group = resolve(entry.id);
+          const subs = adminSubs.map((subId) => resolve(subId));
           items.push({ ...group, subs });
         }
       }

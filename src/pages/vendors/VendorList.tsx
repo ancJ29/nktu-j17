@@ -120,7 +120,8 @@ export function VendorList({ variant }: VendorListProps) {
             to: ROUTES.VENDORS.NEW,
             label: t('vendors.addItem'),
             enabled: canCreate,
-            mobileVariant: 'icon',
+
+            mobileVariant: 'hidden',
           }}
         />
 

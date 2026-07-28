@@ -18,7 +18,9 @@ import {
   IconAddressBook,
   IconAdjustments,
   IconArrowLeft,
+  IconHash,
   IconInfoCircle,
+  IconLock,
   IconMapPin,
   IconPlus,
   IconTrash,
@@ -27,9 +29,11 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
+import { appConfig } from '@/config';
 import { useCustomerStore, fetchCustomerById } from '@/stores/useCustomerStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { logActivity } from '@/utils/activityLogger';
+import { buildNextSequentialCode, isDuplicateUniqueFieldError } from '@/utils/code';
 import { deepDiff } from '@/utils/deepDiff';
 import { device } from '@credo/base-ui/utils';
 import { useInitFormFromFetch } from '@/hooks';
@@ -39,6 +43,14 @@ import type { Customer, CustomerContact, CustomerExtra, CustomerShippingAddress 
 
 const isMobile = device.isMobile;
 const hasShippingAddress = hasShippingAddressForCustomers();
+
+const MAX_CODE_RETRIES = 20;
+
+function buildNextCustomerCode(alsoTaken: readonly string[] = []): string {
+  const { codePrefix, codePadLength } = appConfig.features.customers;
+  const codes = useCustomerStore.getState().items.map((c) => c.code);
+  return buildNextSequentialCode(codePrefix, [...codes, ...alsoTaken], codePadLength);
+}
 
 function newRowId(): string {
   if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
@@ -120,13 +132,44 @@ export function CustomerFormPage() {
   const [loading, setLoading] = useState(false);
   const snapshotRef = useRef<Customer | null>(null);
 
+  const customersInitialized = useCustomerStore((s) => s.initialized);
+  const loadCustomers = useCustomerStore((s) => s.loadAll);
+  const totalCustomers = useCustomerStore((s) => s.items.length);
+
+  const [codeOverridden, setCodeOverridden] = useState(false);
+
   const form = useForm<CustomerFormValues>({
-    initialValues: EMPTY_VALUES,
+    initialValues: {
+      ...EMPTY_VALUES,
+      code: isEdit ? '' : buildNextCustomerCode(),
+    },
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
-      code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
+
+      code: (v) => {
+        const code = v.trim();
+        if (!code) return t('common.validation.codeRequired');
+        if (/\s/.test(code)) return t('common.validation.codeNoWhitespace');
+
+        if (!isEdit && useCustomerStore.getState().items.some((c) => c.code === code)) {
+          return t('customers.validation.codeDuplicate');
+        }
+        return null;
+      },
     },
   });
+
+  useEffect(() => {
+    if (!customersInitialized) loadCustomers();
+  }, [customersInitialized, loadCustomers]);
+
+  useEffect(() => {
+    if (isEdit || !customersInitialized || codeOverridden) return;
+    form.setFieldValue('code', buildNextCustomerCode());
+    // `form` is intentionally out of deps — Mantine mints a new form object on
+    // every value change, which would make this effect self-triggering.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, customersInitialized, totalCustomers, codeOverridden]);
 
   const fetching = useInitFormFromFetch(
     form,
@@ -237,9 +280,37 @@ export function CustomerFormPage() {
           });
           navigate(ROUTES.CUSTOMERS.DETAIL.replace(':id', id));
         } else {
-          const created = await useCustomerStore.getState().createSafely({
-            patch: { ...basePatch, extra },
-          });
+          const manualCode = codeOverridden ? values.code.trim() : null;
+          const attempted: string[] = [];
+          let created: Customer | null = null;
+          let codeTaken = false;
+
+          for (let attempt = 0; attempt <= MAX_CODE_RETRIES; attempt++) {
+            const code = manualCode ?? buildNextCustomerCode(attempted);
+            if (!manualCode) attempted.push(code);
+            try {
+              created = await useCustomerStore.getState().createSafely({
+                patch: { ...basePatch, code, extra },
+              });
+              break;
+            } catch (err) {
+              if (isDuplicateUniqueFieldError(err, 'code')) {
+                if (manualCode) {
+                  codeTaken = true;
+                  break;
+                }
+                if (attempt < MAX_CODE_RETRIES) continue;
+              }
+              throw err;
+            }
+          }
+
+          if (codeTaken) {
+            form.setFieldError('code', t('customers.validation.codeDuplicate'));
+            return;
+          }
+          if (!created) throw new Error('Customer create exhausted code retries');
+
           logActivity('customer.create', created.id);
           notifications.show({
             color: 'green',
@@ -268,10 +339,12 @@ export function CustomerFormPage() {
         setLoading(false);
       }
     },
-    [isEdit, id, t, navigate],
+    [isEdit, id, t, navigate, codeOverridden, form],
   );
 
   if (fetching) return null;
+
+  const codeInputProps = form.getInputProps('code');
 
   const topActions = (
     <Group gap="sm">
@@ -309,12 +382,34 @@ export function CustomerFormPage() {
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 3 }}>
+          {/* Pre-filled from `features.customers.{codePrefix,codePadLength}` and
+              overridable while creating — then frozen, because SO / DR /
+              quotations / transport orders all reference a customer by `code`
+              and a later edit would orphan them. */}
           <TextInput
             label={t('common.labels.code')}
-            placeholder={t('customers.form.codePlaceholder')}
-            withAsterisk
-            disabled={isEdit}
-            {...form.getInputProps('code')}
+            withAsterisk={!isEdit}
+            leftSection={<IconHash size={14} />}
+            rightSection={
+              isEdit ? <IconLock size={14} color="var(--mantine-color-dimmed)" /> : undefined
+            }
+            readOnly={isEdit}
+            styles={{
+              input: {
+                fontFamily: 'var(--mantine-font-family-monospace)',
+                ...(isEdit
+                  ? {
+                      backgroundColor: 'var(--mantine-color-default-hover)',
+                      cursor: 'not-allowed',
+                    }
+                  : {}),
+              },
+            }}
+            {...codeInputProps}
+            onChange={(event) => {
+              setCodeOverridden(true);
+              codeInputProps.onChange(event);
+            }}
           />
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>

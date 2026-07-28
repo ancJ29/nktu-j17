@@ -1004,9 +1004,6 @@
   },
   "customers": {
     "addItem": "Thêm khách hàng",
-    "columns": {
-      "tags": "Tag"
-    },
     "contacts": {
       "addContact": "Thêm người liên hệ",
       "emptyHint": "Chưa có người liên hệ bổ sung.",
@@ -1038,55 +1035,24 @@
         "details": "Thông tin"
       }
     },
-    "detailTitle": "Chi tiết khách hàng",
     "editItem": "Cập nhật khách hàng",
-    "exportNotReady": "Chức năng xuất Excel chưa khả dụng.",
-    "filterCustomerTypeAll": "Tất cả nhóm",
     "form": {
-      "accountManagerLabel": "Nhân viên phụ trách",
-      "accountManagerPlaceholder": "Người phụ trách",
       "addressPlaceholder": "Địa chỉ chính đầy đủ",
-      "becameCustomerDateLabel": "Ngày trở thành khách hàng",
-      "codePlaceholder": "Mã khách hàng",
       "contactNameLabel": "Họ tên",
       "contactPersonLabel": "Người liên hệ chính",
       "contactPersonPlaceholder": "Tên người liên hệ chính",
       "contactRoleLabel": "Vai trò / Chức danh",
       "createButton": "Tạo khách hàng",
-      "creditLimitLabel": "Hạn mức công nợ",
-      "creditLimitPlaceholder": "VD: 80000000",
-      "customerTypeLabel": "Nhóm khách hàng",
-      "customerTypePlaceholder": "VD: Đại lý, Bán lẻ",
-      "defaultDiscountLabel": "Chiết khấu mặc định (%)",
       "deliveryHoursLabel": "Giờ nhận hàng",
       "deliveryHoursPlaceholder": "VD: 7:30 - 16:30 (T2 - T6)",
-      "deliveryMethodLabel": "Phương thức giao hàng",
-      "deliveryMethodPlaceholder": "VD: Giao tận kho",
-      "emailPlaceholder": "Địa chỉ email",
       "googleMapUrlLabel": "Link Google Maps",
       "googleMapUrlPlaceholder": "Dán link Google Maps (không bắt buộc)",
       "namePlaceholder": "Tên khách hàng",
-      "notesPlaceholder": "Ghi chú thêm",
-      "paymentTermsLabel": "Điều kiện thanh toán",
-      "paymentTermsPlaceholder": "VD: NET 30 ngày",
-      "priceListLabel": "Bảng giá",
-      "priceListPlaceholder": "VD: Giá đại lý cấp 1",
-      "section": {
-        "contacts": "Người liên hệ bổ sung",
-        "salesPolicy": "Chính sách bán hàng"
-      },
-      "shippingAddressLabel": "Địa chỉ giao hàng",
       "shippingAddressesAdd": "Thêm địa chỉ giao hàng",
+      "shippingAddressLabel": "Địa chỉ giao hàng",
       "shortNamePlaceholder": "Tên rút gọn",
-      "sourceLabel": "Nguồn khách hàng",
-      "sourcePlaceholder": "VD: Giới thiệu, Website",
-      "tagsLabel": "Nhóm / Tag",
-      "tagsPlaceholder": "Thêm tag",
-      "taxCodeLabel": "Mã số thuế",
       "taxCodePlaceholder": "Mã số thuế",
-      "updateButton": "Cập nhật khách hàng",
-      "websiteLabel": "Website",
-      "websitePlaceholder": "https://..."
+      "updateButton": "Cập nhật khách hàng"
     },
     "noItems": "Không tìm thấy khách hàng",
     "notSet": "Chưa cập nhật",
@@ -1101,6 +1067,9 @@
       "toggleError": "Không thể thay đổi trạng thái khách hàng.",
       "updateError": "Không thể cập nhật khách hàng",
       "updateSuccess": "Cập nhật khách hàng thành công"
+    },
+    "validation": {
+      "codeDuplicate": "Mã này đã được dùng cho khách hàng khác"
     }
   },
   "delivery": {
@@ -1372,10 +1341,6 @@
       "activitiesError": "Không thể tải lịch sử hoạt động.",
       "activitiesLoadMore": "Tải thêm",
       "activitiesNoEntries": "Chưa có hoạt động nào được ghi nhận cho nhân viên này.",
-      "activityAction": "Hành động",
-      "activityActor": "Bởi",
-      "activityDate": "Ngày",
-      "activityDetail": "Chi tiết",
       "activityLogin": {
         "password": "Đăng nhập bằng mật khẩu",
         "qr": "Đăng nhập bằng mã QR"
@@ -1388,7 +1353,8 @@
         "generateLoginToken": "Đã tạo liên kết đăng nhập cho",
         "passwordChange": "Đã đổi mật khẩu cho",
         "update": "Đã cập nhật",
-        "updatePermissions": "Đã cập nhật quyền hạn cho"
+        "updatePermissions": "Đã cập nhật quyền hạn cho",
+        "updateProfileImage": "Đã cập nhật ảnh đại diện cho"
       },
       "contactsCardTitle": "Liên hệ",
       "personalPhone": "SĐT Cá Nhân",
@@ -1404,7 +1370,6 @@
       "profileImageUpload": "Tải lên",
       "profileImageUploadError": "Không thể tải ảnh đại diện",
       "profileImageUploadSuccess": "Đã cập nhật ảnh đại diện",
-      "profileImageUploading": "Đang tải lên...",
       "quickActions": "Thao tác nhanh",
       "recentActivities": "Hoạt động gần đây",
       "timesheet": "Bảng chấm công",
@@ -1438,13 +1403,13 @@
       "dateOfBirth": "Ngày sinh",
       "startDate": "Ngày vào làm"
     },
-    "filterButton": "Lọc",
     "filterDepartmentAll": "Tất cả các Bộ phận",
     "filterPositionAll": "Tất cả Chức vụ",
     "form": {
       "codePlaceholder": "Mã nhân viên",
       "createButton": "Tạo nhân viên",
       "emailPlaceholder": "Email nhân viên",
+      "emailRootOnly": "Chỉ tài khoản root mới có thể thay đổi email đăng nhập.",
       "nameLabel": "Họ tên",
       "namePlaceholder": "Tên nhân viên",
       "positionPlaceholder": "Chức vụ",
@@ -1471,9 +1436,11 @@
       "deleteSuccess": "Xóa nhân viên thành công",
       "fetchError": "Không thể tải danh sách nhân viên",
       "listConflictMessage": "Một quản trị viên khác vừa thay đổi danh sách nhân viên. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "mintedPassword": "Kích hoạt lại đã tạo mật khẩu đăng nhập mới: {{password}}. Mật khẩu chỉ hiển thị một lần — vui lòng lưu lại ngay.",
       "ssoWarning": "Đã tạo nhân viên, nhưng cài đặt đăng nhập thất bại: {{reason}}. Vui lòng đặt mật khẩu thủ công trước khi chia sẻ thông tin đăng nhập.",
       "truckLinkWarning": "Đã lưu nhân viên, nhưng liên kết xe thất bại. Mở lại và lưu để thử lại.",
       "updateError": "Không thể cập nhật nhân viên",
+      "updateSsoWarning": "Đã lưu bản ghi, nhưng đồng bộ đăng nhập thất bại: {{reason}}. Vui lòng kiểm tra đăng nhập của nhân viên trước khi bàn giao thông tin.",
       "updateSuccess": "Cập nhật nhân viên thành công"
     },
     "org": {
@@ -2452,10 +2419,13 @@
     "trip": {
       "addItem": "Thêm chuyến",
       "columns": {
+        "containerSize": "Loại cont",
+        "customer": "Khách hàng",
         "date": "Ngày",
         "destination": "Tuyến / Điểm đến",
         "driver": "Lái xe",
         "odometer": "Số km",
+        "schedule": "Giờ đóng / xuống hàng dự kiến",
         "transportOrder": "Đơn vận chuyển"
       },
       "editItem": "Sửa chuyến",
@@ -2465,7 +2435,11 @@
         "driverPlaceholder": "Tên lái xe",
         "notePlaceholder": "Ghi chú (tùy chọn)"
       },
-      "sectionTitle": "Chuyến đi"
+      "sectionTitle": "Chuyến đi",
+      "summary": {
+        "totalDistance": "Tổng km đã chạy",
+        "totalTrips": "Tổng số chuyến"
+      }
     },
     "validation": {
       "dateRequired": "Bắt buộc nhập ngày",
@@ -3614,6 +3588,13 @@
       "message": "Đơn vận chuyển sẽ bị xóa khỏi danh sách. Không thể hoàn tác.",
       "title": "Xóa đơn vận chuyển"
     },
+    "conflicts": {
+      "hint": "Cảnh báo này không chặn lưu đơn — kiểm tra lại rồi tự quyết định.",
+      "leg": "Chặng {{n}}",
+      "overlapsWith": "trùng khung giờ với",
+      "title": "Trùng lịch xe / tài xế",
+      "wholeOrder": "Đơn này"
+    },
     "copiedFrom": "Sao chép từ {{code}} — điều chỉnh và lưu thành đơn mới.",
     "detail": {
       "activitiesError": "Không tải được hoạt động.",
@@ -3730,6 +3711,7 @@
     },
     "search": "Tìm số đơn / số xe / tài xế / B/L / cont…",
     "shipmentType": {
+      "domestic": "Nội địa",
       "export": "Xuất",
       "import": "Nhập"
     },

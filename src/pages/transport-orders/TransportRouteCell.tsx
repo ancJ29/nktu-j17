@@ -42,7 +42,7 @@ function VehicleLines({
 export function TransportRouteCell({ order }: { order: TransportOrder }) {
   const { t } = useTranslation();
   const plateOf = useTruckPlate();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
 
   if (!order.isMultiTrip) {
     const stops = (

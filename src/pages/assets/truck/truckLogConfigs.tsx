@@ -16,7 +16,8 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { IconGasStation, IconPlus, IconRoad, IconTool, IconTrash } from '@tabler/icons-react';
 import { DatePickerField } from '@/components/DatePickerField';
-import { formatDate } from '@/utils/dateFormat';
+import { TransportOrderLink } from '@/components/TransportOrderLink';
+import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import { computeRefuelTotals, formatConsumption, refuelConsumption } from '@/utils/refuelStats';
 import type { MaintenanceItem, MaintenanceLogExtra, RefuelLogExtra, TripLogExtra } from '@/types';
@@ -37,6 +38,7 @@ import {
 } from './maintenanceItems';
 import { exportRefuelLogsToExcel } from '@/utils/excelParser';
 import { LogDriverField } from './LogDriverField';
+import { ContainerSizeCell } from './ContainerSizeCell';
 
 function textCell(value: string | undefined) {
   return value ? (
@@ -720,6 +722,24 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
   },
 };
 
+function scheduleCell(loadingAt: string | undefined, unloadingAt: string | undefined) {
+  if (!loadingAt && !unloadingAt) return textCell(undefined);
+  return (
+    <Stack gap={0}>
+      {loadingAt && (
+        <Text size="sm" style={{ whiteSpace: 'nowrap' }}>
+          {formatDateTime(loadingAt)}
+        </Text>
+      )}
+      {unloadingAt && (
+        <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+          {formatDateTime(unloadingAt)}
+        </Text>
+      )}
+    </Stack>
+  );
+}
+
 export const TRIP_LOG_CONFIG: OperationLogConfig = {
   logType: 'trip',
   icon: <IconRoad size={14} />,
@@ -738,9 +758,23 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
   },
   columns: [
     dateColumn('operationLogs.trip.columns.date'),
+
+    {
+      header: 'operationLogs.trip.columns.schedule',
+      render: (log) => scheduleCell(log.extra?.loadingAt, log.extra?.unloadingAt),
+    },
     {
       header: 'operationLogs.trip.columns.destination',
       render: (log) => textCell(log.extra?.destination),
+    },
+    {
+      header: 'operationLogs.trip.columns.customer',
+      render: (log) => textCell(log.extra?.customerName),
+    },
+    {
+      header: 'operationLogs.trip.columns.containerSize',
+      nowrap: true,
+      render: (log) => <ContainerSizeCell value={log.extra?.containerSize} />,
     },
     {
       header: 'operationLogs.trip.columns.odometer',
@@ -754,10 +788,41 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
     {
       header: 'operationLogs.trip.columns.transportOrder',
       nowrap: true,
-      render: (log) => textCell(log.extra?.transportOrderNumber),
+      render: (log) =>
+        log.extra?.transportOrderId ? (
+          <TransportOrderLink
+            id={log.extra.transportOrderId}
+            fallbackLabel={log.extra.transportOrderNumber}
+          />
+        ) : (
+          textCell(log.extra?.transportOrderNumber)
+        ),
     },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
+
+  group: {
+    keyOf: (log) => log.extra?.transportOrderId || undefined,
+    compare: (a, b) => Number(a.extra?.tripIndex ?? 0) - Number(b.extra?.tripIndex ?? 0),
+  },
+
+  summary: (logs, t) => {
+    const distance = logs.reduce((sum, log) => {
+      const km = Number(log.extra?.odometer);
+      return Number.isFinite(km) ? sum + km : sum;
+    }, 0);
+    return (
+      <Card withBorder radius="md" padding="sm" mt="xs" bg="var(--mantine-color-default-hover)">
+        <SimpleGrid cols={2} spacing="md">
+          {summaryStat(t('operationLogs.trip.summary.totalTrips'), formatNumber(logs.length))}
+          {summaryStat(
+            t('operationLogs.trip.summary.totalDistance'),
+            `${formatNumber(distance)} km`,
+          )}
+        </SimpleGrid>
+      </Card>
+    );
+  },
 
   rowLocked: (log) => Boolean(log.extra?.transportOrderId),
   validate: (t) => ({

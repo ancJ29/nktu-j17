@@ -4,18 +4,38 @@ import { notifications } from '@mantine/notifications';
 import { IconInfoCircle } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { cMngtConnector } from '@credo/connectors/connector';
+import { device } from '@credo/base-ui/utils';
 import { appConfig } from '@/config';
+import { ROUTES } from '@/constants/routes';
 import { ConfigOptionEditor } from '@/pages/config/AppConfigPage/editors/ConfigOptionEditor';
 import { DeptPermissionsSection } from '@/pages/config/AppConfigPage/sections/DeptPermissionsSection';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { isPermissionManagementEnabled, perms } from '@/utils/permission';
+import {
+  isPermissionManagementEnabled,
+  isPermissionManagementRootUserOnly,
+  perms,
+} from '@/utils/permission';
 import { scheduleReload } from '@/utils/scheduleReload';
 import { GuardedDepartmentEditor } from './GuardedDepartmentEditor';
 import { collectDepartmentConfigRefs, countEmployeesByDepartment } from './orgReferences';
 
+const isMobile = device.isMobile;
+
 export function EmployeeOrgSettingsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
+
+  const rootLocked = isPermissionManagementRootUserOnly() && !isRootUser;
+
+  useEffect(() => {
+    if (isMobile || rootLocked) {
+      navigate(ROUTES.EMPLOYEES.LIST, { replace: true });
+    }
+  }, [navigate, rootLocked]);
 
   const employees = appConfig.features.employees;
   const languages = appConfig.languages;

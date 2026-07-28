@@ -77,6 +77,13 @@ export type TripLogExtra = {
 
   driverId?: string;
 
+  loadingAt?: string;
+  unloadingAt?: string;
+
+  customerName?: string;
+
+  containerSize?: string;
+
   note?: string;
   [key: string]: unknown;
 };

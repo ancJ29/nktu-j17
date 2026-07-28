@@ -3,7 +3,7 @@ import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStor
 
 export type TransportOrderContainerSize = string;
 
-export type TransportOrderShipmentType = 'import' | 'export';
+export type TransportOrderShipmentType = 'import' | 'export' | 'domestic';
 
 export type TransportOrderRoute = {
   pickup: string;

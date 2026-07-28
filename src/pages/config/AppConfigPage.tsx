@@ -1692,7 +1692,7 @@ export function ConfigEditor({
               )}
             </Stack>
           </CollapsibleSection>
-          {/* Customers — dedicated section with customer type options */}
+          {/* Customers — enable + shipping-address + code-format knobs */}
           <CollapsibleSection
             icon={IconShoppingCart}
             title="Customer"

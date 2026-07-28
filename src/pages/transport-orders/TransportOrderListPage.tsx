@@ -38,6 +38,8 @@ import { TransportOrderDataTable } from './TransportOrderDataTable';
 import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
 import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
+import { useShipmentTypeOptions } from './shipmentType';
+import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -173,10 +175,7 @@ export function TransportOrderListPage() {
   }, [items, employees]);
   const driverLabel = (id: string) => driverData.find((e) => e.value === id)?.label ?? id;
 
-  const shipmentData = [
-    { value: 'import', label: t('transportOrders.shipmentType.import') },
-    { value: 'export', label: t('transportOrders.shipmentType.export') },
-  ];
+  const shipmentData = useShipmentTypeOptions();
 
   const containerSizeData = useContainerSizeOptions();
   const containerSizeLabel = useContainerSizeLabel();
@@ -286,7 +285,7 @@ export function TransportOrderListPage() {
       placeholder: t('__new__.01-common.filters.all'),
       value: filters.shipmentFilter === 'all' ? null : filters.shipmentFilter,
       options: shipmentData,
-      onChange: (v) => filters.setShipmentFilter((v as 'import' | 'export' | null) ?? 'all'),
+      onChange: (v) => filters.setShipmentFilter((v as TransportOrderShipmentType | null) ?? 'all'),
     },
     {
       type: 'select',
@@ -309,20 +308,13 @@ export function TransportOrderListPage() {
 
   const mobileQuickChips: QuickFilterChip[] = useMemo(
     () => [
-      {
-        key: 'import',
-        label: t('transportOrders.shipmentType.import'),
-        active: filters.shipmentFilter === 'import',
+      ...shipmentData.map((s) => ({
+        key: s.value,
+        label: s.label,
+        active: filters.shipmentFilter === s.value,
         onClick: () =>
-          filters.setShipmentFilter(filters.shipmentFilter === 'import' ? 'all' : 'import'),
-      },
-      {
-        key: 'export',
-        label: t('transportOrders.shipmentType.export'),
-        active: filters.shipmentFilter === 'export',
-        onClick: () =>
-          filters.setShipmentFilter(filters.shipmentFilter === 'export' ? 'all' : 'export'),
-      },
+          filters.setShipmentFilter(filters.shipmentFilter === s.value ? 'all' : s.value),
+      })),
       {
         key: 'hideCancelled',
         label: t('transportOrders.filters.hideCancelled'),
@@ -330,7 +322,7 @@ export function TransportOrderListPage() {
         onClick: () => filters.setHideCancelled(!filters.hideCancelled),
       },
     ],
-    [filters, t],
+    [filters, shipmentData, t],
   );
 
   const hasActiveFilters = filters.hasActiveFilters || !!search;

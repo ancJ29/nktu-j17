@@ -31,12 +31,22 @@ function routeLabel(from: string | undefined, to: string | undefined): string {
 export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
   if (order.extra?.isDeleted || order.extra?.cancellation) return [];
 
+  const orderFacts = {
+    ...(order.customerName?.trim() ? { customerName: order.customerName.trim() } : {}),
+    ...(order.containerSize ? { containerSize: order.containerSize } : {}),
+  };
+
   const base = (
     tripIndex: number,
   ): Pick<TripLogExtra, 'transportOrderId' | 'transportOrderNumber' | 'tripIndex'> => ({
     transportOrderId: order.id,
     transportOrderNumber: order.orderNumber,
     tripIndex,
+  });
+
+  const schedule = (loadingAt: unknown, unloadingAt: unknown) => ({
+    ...(loadingAt ? { loadingAt: String(loadingAt) } : {}),
+    ...(unloadingAt ? { unloadingAt: String(unloadingAt) } : {}),
   });
 
   if (order.isMultiTrip) {
@@ -53,6 +63,9 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
           destination: routeLabel(leg.departure, leg.destination),
           ...(leg.driverId ? { driverId: leg.driverId } : {}),
           ...(leg.driverName ? { driverName: leg.driverName } : {}),
+
+          ...schedule(leg.loadingAt, leg.unloadingAt),
+          ...orderFacts,
         },
       }));
   }
@@ -69,6 +82,9 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
         destination: routeLabel(order.route?.pickup, order.route?.dropoff),
         ...(order.driverId ? { driverId: order.driverId } : {}),
         ...(order.driverName ? { driverName: order.driverName } : {}),
+
+        ...schedule(order.route?.pickupAt, order.route?.dropoffAt),
+        ...orderFacts,
       },
     },
   ];
@@ -84,6 +100,10 @@ export function fingerprintTripLogs(plans: PlannedTripLog[]): string {
       p.extra.destination ?? '',
       p.extra.driverId ?? '',
       p.extra.driverName ?? '',
+      p.extra.loadingAt ?? '',
+      p.extra.unloadingAt ?? '',
+      p.extra.customerName ?? '',
+      p.extra.containerSize ?? '',
     ]),
   );
 }

@@ -1,4 +1,4 @@
-import { CallApiError } from '@credo/connectors/connector';
+import { isDuplicateUniqueFieldError } from '@/utils/code';
 import type {
   TransportOrderExtra,
   TransportOrderFee,
@@ -82,9 +82,5 @@ export function buildTransportOrderWrite(
 export const MAX_ORDER_NUMBER_RETRIES = 50;
 
 export function isDuplicateOrderNumberError(err: unknown): boolean {
-  if (!(err instanceof CallApiError) || err.status !== 400) return false;
-  const payload = err.payload;
-  if (typeof payload !== 'object' || payload === null || !('fields' in payload)) return false;
-  const fields = (payload as { fields?: unknown }).fields;
-  return typeof fields === 'object' && fields !== null && 'orderNumber' in fields;
+  return isDuplicateUniqueFieldError(err, 'orderNumber');
 }

@@ -19,6 +19,7 @@ import { dolgaConnector, r2Connector } from '@credo/connectors/connector';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import type { Employee, EmployeeExtra } from '@/types';
+import { logActivity } from '@/utils/activityLogger';
 import { deleteMedia } from '@/utils/mediaStorage';
 import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
 import { createCroppedImage } from '@/utils/screenshot';
@@ -66,7 +67,7 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
   }, [busy, onClose, resetView]);
 
   const persistUrl = useCallback(
-    async (nextUrl: string | undefined) => {
+    async (nextUrl: string | undefined): Promise<boolean> => {
       const nextExtra: EmployeeExtra = { ...employee.extra, profileImage: nextUrl };
       try {
         const updated = await useEmployeeStore.getState().updateSafely({
@@ -75,6 +76,8 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
           patch: { extra: nextExtra },
         });
         onUpdated(updated);
+        logActivity('employee.updateProfileImage', employee.id);
+        return true;
       } catch (err) {
         if (err instanceof EntityConflictError) {
           if (err.latest) onUpdated(err.latest as Employee);
@@ -84,9 +87,9 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
             message: t('common.conflict.message'),
             autoClose: 8000,
           });
-        } else {
-          throw err;
+          return false;
         }
+        throw err;
       }
     },
     [employee, onUpdated, t],
@@ -161,7 +164,11 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
       }
 
       const previousUrl = currentUrl;
-      await persistUrl(presign.fileUrl);
+      const persisted = await persistUrl(presign.fileUrl);
+      if (!persisted) {
+        deleteMedia(presign.fileUrl);
+        return;
+      }
       if (previousUrl !== presign.fileUrl) {
         deleteMedia(previousUrl);
       }
@@ -195,7 +202,8 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
     setBusy(true);
     try {
       const previousUrl = currentUrl;
-      await persistUrl(undefined);
+      const persisted = await persistUrl(undefined);
+      if (!persisted) return;
       deleteMedia(previousUrl);
       notifications.show({
         color: 'green',

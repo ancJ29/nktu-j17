@@ -1004,9 +1004,6 @@
   },
   "customers": {
     "addItem": "Add Customer",
-    "columns": {
-      "tags": "Tags"
-    },
     "contacts": {
       "addContact": "Add contact",
       "emptyHint": "No additional contacts yet.",
@@ -1038,55 +1035,24 @@
         "details": "Details"
       }
     },
-    "detailTitle": "Customer Details",
     "editItem": "Edit Customer",
-    "exportNotReady": "Excel export is not yet available.",
-    "filterCustomerTypeAll": "All types",
     "form": {
-      "accountManagerLabel": "Account Manager",
-      "accountManagerPlaceholder": "Staff in charge",
       "addressPlaceholder": "Full billing address",
-      "becameCustomerDateLabel": "Customer Since",
-      "codePlaceholder": "Customer code",
       "contactNameLabel": "Name",
       "contactPersonLabel": "Primary Contact",
       "contactPersonPlaceholder": "Primary contact name",
       "contactRoleLabel": "Role / Title",
       "createButton": "Create Customer",
-      "creditLimitLabel": "Credit Limit",
-      "creditLimitPlaceholder": "e.g. 80000000",
-      "customerTypeLabel": "Customer Type",
-      "customerTypePlaceholder": "e.g. Dealer, Retail",
-      "defaultDiscountLabel": "Default Discount (%)",
       "deliveryHoursLabel": "Receiving Hours",
       "deliveryHoursPlaceholder": "e.g. 7:30 - 16:30 (Mon - Fri)",
-      "deliveryMethodLabel": "Delivery Method",
-      "deliveryMethodPlaceholder": "e.g. Direct delivery",
-      "emailPlaceholder": "Email address",
       "googleMapUrlLabel": "Google Maps URL",
       "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
       "namePlaceholder": "Customer name",
-      "notesPlaceholder": "Additional notes",
-      "paymentTermsLabel": "Payment Terms",
-      "paymentTermsPlaceholder": "e.g. NET 30 days",
-      "priceListLabel": "Price List",
-      "priceListPlaceholder": "e.g. Tier 1 dealer price",
-      "section": {
-        "contacts": "Additional Contacts",
-        "salesPolicy": "Sales Policy"
-      },
-      "shippingAddressLabel": "Shipping Address",
       "shippingAddressesAdd": "Add shipping address",
+      "shippingAddressLabel": "Shipping Address",
       "shortNamePlaceholder": "Abbreviated name",
-      "sourceLabel": "Customer Source",
-      "sourcePlaceholder": "e.g. Referral, Website",
-      "tagsLabel": "Tags / Group",
-      "tagsPlaceholder": "Add tags",
-      "taxCodeLabel": "Tax Code",
       "taxCodePlaceholder": "Tax identification number",
-      "updateButton": "Update Customer",
-      "websiteLabel": "Website",
-      "websitePlaceholder": "https://..."
+      "updateButton": "Update Customer"
     },
     "noItems": "No customers found",
     "notSet": "Not set",
@@ -1101,6 +1067,9 @@
       "toggleError": "Failed to change customer status.",
       "updateError": "Failed to update customer",
       "updateSuccess": "Customer updated successfully"
+    },
+    "validation": {
+      "codeDuplicate": "Another customer already uses this code"
     }
   },
   "delivery": {
@@ -1372,10 +1341,6 @@
       "activitiesError": "Failed to load activities.",
       "activitiesLoadMore": "Load more",
       "activitiesNoEntries": "No activities recorded for this employee yet.",
-      "activityAction": "Action",
-      "activityActor": "By",
-      "activityDate": "Date",
-      "activityDetail": "Detail",
       "activityLogin": {
         "password": "Signed in with password",
         "qr": "Signed in via QR code"
@@ -1388,7 +1353,8 @@
         "generateLoginToken": "Issued login token for",
         "passwordChange": "Changed password for",
         "update": "Updated",
-        "updatePermissions": "Updated permissions for"
+        "updatePermissions": "Updated permissions for",
+        "updateProfileImage": "Updated profile photo for"
       },
       "contactsCardTitle": "Contacts",
       "personalPhone": "Personal Phone",
@@ -1404,7 +1370,6 @@
       "profileImageUpload": "Upload",
       "profileImageUploadError": "Failed to upload profile image",
       "profileImageUploadSuccess": "Profile image updated",
-      "profileImageUploading": "Uploading...",
       "quickActions": "Quick Actions",
       "recentActivities": "Recent Activities",
       "timesheet": "Timesheet",
@@ -1438,13 +1403,13 @@
       "dateOfBirth": "Date of birth",
       "startDate": "Start date"
     },
-    "filterButton": "Filter",
     "filterDepartmentAll": "All Departments",
     "filterPositionAll": "All Positions",
     "form": {
       "codePlaceholder": "Employee code",
       "createButton": "Create Employee",
       "emailPlaceholder": "Employee email",
+      "emailRootOnly": "The login email can only be changed by the root account.",
       "nameLabel": "Name",
       "namePlaceholder": "Employee name",
       "positionPlaceholder": "Job position",
@@ -1471,9 +1436,11 @@
       "deleteSuccess": "Employee deleted successfully",
       "fetchError": "Failed to load employees",
       "listConflictMessage": "Another user just changed the employee list. Code updated to {{code}}. Please review and submit again.",
+      "mintedPassword": "Reactivation created a new login password: {{password}}. It is shown only this once — record it now.",
       "ssoWarning": "Employee created, but login setup failed: {{reason}}. Set their password manually before sharing credentials.",
       "truckLinkWarning": "Employee saved, but linking the truck failed. Re-open and save to retry.",
       "updateError": "Failed to update employee",
+      "updateSsoWarning": "The record was saved, but the login sync failed: {{reason}}. Verify their sign-in before handing off credentials.",
       "updateSuccess": "Employee updated successfully"
     },
     "org": {
@@ -2452,10 +2419,13 @@
     "trip": {
       "addItem": "Add trip",
       "columns": {
+        "containerSize": "Container type",
+        "customer": "Customer",
         "date": "Date",
         "destination": "Route / Destination",
         "driver": "Driver",
-        "odometer": "Odometer",
+        "odometer": "Distance (km)",
+        "schedule": "Planned load / unload",
         "transportOrder": "Transport order"
       },
       "editItem": "Edit trip",
@@ -2465,7 +2435,11 @@
         "driverPlaceholder": "Driver name",
         "notePlaceholder": "Optional note"
       },
-      "sectionTitle": "Trips"
+      "sectionTitle": "Trips",
+      "summary": {
+        "totalDistance": "Total distance",
+        "totalTrips": "Total trips"
+      }
     },
     "validation": {
       "dateRequired": "Date is required",
@@ -3614,6 +3588,13 @@
       "message": "This transport order will be removed from the list. This cannot be undone.",
       "title": "Delete transport order"
     },
+    "conflicts": {
+      "hint": "This warning does not block saving — review it and decide.",
+      "leg": "Leg {{n}}",
+      "overlapsWith": "overlaps",
+      "title": "Truck / driver schedule conflict",
+      "wholeOrder": "This order"
+    },
     "copiedFrom": "Copied from {{code}} — adjust and save as a new order.",
     "detail": {
       "activitiesError": "Failed to load activities.",
@@ -3730,6 +3711,7 @@
     },
     "search": "Search order / truck / driver / bill / container…",
     "shipmentType": {
+      "domestic": "Domestic",
       "export": "Export",
       "import": "Import"
     },

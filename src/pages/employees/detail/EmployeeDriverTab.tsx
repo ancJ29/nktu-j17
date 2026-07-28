@@ -1,11 +1,10 @@
-import { Button, SimpleGrid, Stack, Text } from '@mantine/core';
+import { SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconId, IconLicense, IconTruck } from '@tabler/icons-react';
-import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
 import { DetailField } from '@/components/DetailField';
 import { SectionCard } from '@/components/SectionCard';
-import { ROUTES } from '@/constants/routes';
+import { TruckLink } from '@/components/TruckLink';
 import { OperationLogSection } from '@/pages/operation-logs/OperationLogSection';
 import type { Employee } from '@/types';
 import { featureFlags } from '@/utils/features';
@@ -70,15 +69,11 @@ export function EmployeeDriverTab({ employee, isVisible }: EmployeeDriverTabProp
       {trucksEnabled && (
         <SectionCard icon={<IconTruck size={14} />} title={t('employees.driver.linkedTruck')}>
           {employee.extra?.truckAssetId ? (
-            <Button
-              component={Link}
-              to={ROUTES.ASSETS.TRUCKS.DETAIL.replace(':id', employee.extra.truckAssetId)}
-              variant="light"
-              size="compact-sm"
-              leftSection={<IconTruck size={14} />}
-            >
-              {employee.extra?.truckAssetCode || t('employees.driver.viewTruck')}
-            </Button>
+            <TruckLink
+              id={employee.extra.truckAssetId}
+              fallbackLabel={employee.extra?.truckAssetCode || t('employees.driver.viewTruck')}
+              showPlate
+            />
           ) : (
             <Text size="sm" c="dimmed">
               {t('employees.driver.noTruck')}

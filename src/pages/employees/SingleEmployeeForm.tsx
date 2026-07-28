@@ -33,6 +33,7 @@ import {
   isDriverDepartment,
 } from '@/utils/permission';
 import { featureFlags } from '@/utils/features';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { useEmployeeFieldOptions } from './useEmployeeFieldOptions';
 import { isInternal } from '@/config/env';
@@ -88,6 +89,7 @@ export function SingleEmployeeForm({
 }: SingleEmployeeFormProps) {
   const { t } = useTranslation();
   const { departmentOptions, positionOptions } = useEmployeeFieldOptions();
+  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
 
   const isDriver = isDriverDepartment(form.values.department);
 
@@ -179,6 +181,8 @@ export function SingleEmployeeForm({
           <TextInput
             label={t('common.labels.email')}
             placeholder={t('employees.form.emailPlaceholder')}
+            disabled={isEditMode && !isRootUser}
+            description={isEditMode && !isRootUser ? t('employees.form.emailRootOnly') : undefined}
             {...form.getInputProps('email')}
           />
         )}

@@ -139,7 +139,11 @@ type SimpleVerbKey = 'create' | 'update' | 'delete' | 'enable' | 'disable';
 type VendorVerbKey = 'create' | 'update' | 'delete' | 'toggleStatus' | 'addNote' | 'removeNote';
 type CustomerVerbKey = 'create' | 'update' | 'delete' | 'toggleStatus' | 'addNote' | 'removeNote';
 type EmployeeVerbKey =
-  SimpleVerbKey | 'updatePermissions' | 'passwordChange' | 'generateLoginToken';
+  | SimpleVerbKey
+  | 'updatePermissions'
+  | 'passwordChange'
+  | 'generateLoginToken'
+  | 'updateProfileImage';
 type ProductVerbKey =
   | SimpleVerbKey
   | 'updateDescription'
@@ -243,6 +247,14 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     color: 'blue',
     i18nKey: 'employees.detail.activityVerbs.generateLoginToken',
     targetType: 'employee',
+  },
+  'employee.updateProfileImage': {
+    icon: <IconPhoto size={16} />,
+    color: 'blue',
+    i18nKey: 'employees.detail.activityVerbs.updateProfileImage',
+    targetType: 'employee',
+    // No diff: image URLs are noisy and the verb itself is the audit signal
+    // (matches `product.updateImages`).
   },
   // product
   'product.create': {

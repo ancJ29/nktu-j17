@@ -8,6 +8,7 @@ import {
 } from '@credo/base-ui/components';
 import { useTranslation } from 'react-i18next';
 
+import { device } from '@credo/base-ui/utils';
 import { DetailField } from '@/components/DetailField';
 import { SectionCard } from '@/components/SectionCard';
 import type { Employee } from '@/types';
@@ -29,6 +30,8 @@ const hasStartDate = hasStartDateForEmployees();
 const hasAddress = hasAddressForEmployees();
 const hasDateOfBirth = hasDateOfBirthForEmployees();
 const canEdit = perms.employee.canEdit();
+
+const isMobile = device.isMobile;
 
 export type InlineEditLabels = {
   edit: string;
@@ -69,6 +72,7 @@ export function EmployeePersonalCard({
             <InlineTextField
               value={employee.email ?? ''}
               onSave={onEmailSave}
+              canEdit={!isMobile}
               labels={inlineEditLabels}
               type="email"
             />
@@ -82,6 +86,7 @@ export function EmployeePersonalCard({
           <InlineTextField
             value={employee.email ?? ''}
             onSave={onEmailSave}
+            canEdit={!isMobile}
             labels={inlineEditLabels}
           />
         </DetailField>
@@ -168,7 +173,7 @@ export function EmployeeNotesCard({
       <InlineTextareaField
         value={employee.extra?.note ?? ''}
         onSave={onNoteSave}
-        canEdit={canEdit}
+        canEdit={canEdit && !isMobile}
         labels={inlineEditLabels}
         minRows={3}
       />

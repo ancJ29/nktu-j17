@@ -40,7 +40,7 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
     if (!id || !employee) return;
     setDeleting(true);
     try {
-      const { meta } = await useEmployeeStore.getState().updateSafelyWithMeta({
+      const { item: updated, meta } = await useEmployeeStore.getState().updateSafelyWithMeta({
         id,
         version: employee.version,
         patch: {
@@ -51,6 +51,7 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
       logActivity('employee.delete', id);
 
       if (meta?.ssoWarning) {
+        setUpdatedEmployee(updated);
         notifications.show({
           color: 'yellow',
           title: t('__new__.07-entities.employees.dangerZone.disableSsoWarningTitle'),

@@ -11,7 +11,7 @@ import {
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
-import type { TransportOrder } from '@/types';
+import type { TransportOrder, TransportOrderShipmentType } from '@/types';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
@@ -28,7 +28,7 @@ function usesDriver(order: TransportOrder, driverId: string): boolean {
   return (order.trips ?? []).some((trip) => trip.driverId === driverId);
 }
 
-export type TransportOrderShipmentFilter = 'all' | 'import' | 'export';
+export type TransportOrderShipmentFilter = 'all' | TransportOrderShipmentType;
 
 type TransportOrderUrlState = {
   q?: string;
@@ -36,7 +36,7 @@ type TransportOrderUrlState = {
   c?: string;
   tk?: string;
   dv?: string;
-  sh?: 'import' | 'export';
+  sh?: TransportOrderShipmentType;
   cz?: '20' | '40';
   hc?: boolean;
   sr?: string;

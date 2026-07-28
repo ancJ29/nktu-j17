@@ -150,17 +150,33 @@ export function EmployeeDetailPage() {
     ): Promise<boolean> => {
       if (!employee || !id) return false;
       try {
-        const updated = await useEmployeeStore.getState().updateSafely({
+        const { item: updated, meta } = await useEmployeeStore.getState().updateSafelyWithMeta({
           id,
           version: employee.version,
           patch,
         });
         setEmployee(updated);
         if (opts.verb) logActivity(opts.verb, id, opts.memo);
-        notifications.show({
-          color: 'green',
-          message: t('employees.notifications.updateSuccess'),
-        });
+        if (meta?.ssoWarning) {
+          notifications.show({
+            color: 'yellow',
+            title: t('employees.notifications.updateSuccess'),
+            message: t('employees.notifications.updateSsoWarning', { reason: meta.ssoWarning }),
+            autoClose: false,
+          });
+        } else {
+          notifications.show({
+            color: 'green',
+            message: t('employees.notifications.updateSuccess'),
+          });
+        }
+        if (meta?.loginPassword) {
+          notifications.show({
+            color: 'teal',
+            message: t('employees.notifications.mintedPassword', { password: meta.loginPassword }),
+            autoClose: false,
+          });
+        }
         return true;
       } catch (err) {
         if (err instanceof EntityConflictError) {
@@ -272,7 +288,8 @@ export function EmployeeDetailPage() {
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button
-        onClick={() => window.history.back()}
+        component={Link}
+        to={ROUTES.EMPLOYEES.LIST}
         variant="subtle"
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
