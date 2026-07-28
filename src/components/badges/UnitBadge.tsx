@@ -3,11 +3,11 @@ import { lookupLabelOf, useLookupLabels } from '@/hooks';
 
 type UnitBadgeProps = {
   readonly unit: string;
-  
+
   readonly base?: boolean;
-  
+
   readonly color?: string;
-  
+
   readonly lookup?: string;
 };
 

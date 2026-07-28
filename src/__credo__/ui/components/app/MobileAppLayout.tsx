@@ -35,7 +35,7 @@ const BOTTOM_NAV_HEIGHT = 64;
 
 type MobileAppLayoutLabels = {
   languageTooltip: string;
-  
+
   accountTooltip?: string;
   menuReloadPage?: string;
   menuRefreshConfig?: string;
@@ -59,11 +59,11 @@ type MobileAppLayoutProps = {
   loginPath: string;
   morePath: string;
   onMount?: () => void;
-  
+
   onRefresh?: () => void | Promise<void>;
   children: ReactNode;
   showLanguageSwitcher?: boolean;
-  
+
   showRefreshConfig?: boolean;
   onRefreshConfig?: () => void;
   onClearCache?: () => void;
@@ -97,7 +97,7 @@ export function MobileAppLayout({
 
   useEffect(() => {
     onMount?.();
-  }, []); 
+  }, []);
 
   const getColor = useCallback(
     (color: MantineColor) => {

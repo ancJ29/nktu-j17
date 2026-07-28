@@ -10,7 +10,7 @@ import type { Greenhouse } from '@/types';
 type GreenhouseCardListProps = {
   readonly greenhouses: Greenhouse[];
   readonly isLoading?: boolean;
-  
+
   readonly cropCodesByGreenhouse?: Map<string, string[]>;
 };
 

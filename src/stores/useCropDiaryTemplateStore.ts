@@ -9,7 +9,7 @@ export const CROP_DIARY_TEMPLATE_RECORD_TARGET = {
 
 export const useCropDiaryTemplateStore = createSingleRecordsStore<CropDiaryTemplate>({
   ...CROP_DIARY_TEMPLATE_RECORD_TARGET,
-  
+
   cacheKey: 'cdt2.c4e8a2',
   cacheTTL: 10 * ONE_MINUTE,
 });

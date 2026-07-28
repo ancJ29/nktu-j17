@@ -47,7 +47,6 @@ export function MaterialInventoryListPage() {
     forceRefresh,
   } = useMaterialInventoryStore();
 
-  
   const materials = useMaterialStore((s) => s.items);
   const materialsInitialized = useMaterialStore((s) => s.initialized);
   const loadMaterials = useMaterialStore((s) => s.loadAll);
@@ -106,8 +105,6 @@ export function MaterialInventoryListPage() {
       onPageChange,
     });
 
-  
-  
   const { trackedCount, negativeCount, lowStockCount, lowStockCodes } = useMemo(() => {
     let tracked = 0;
     let negative = 0;

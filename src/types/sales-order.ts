@@ -5,15 +5,14 @@ import type { CMngtSalesOrderItem as BaseSalesOrderItem } from '@credo/connector
 export type SalesOrderSetRole = 'set' | 'set-component';
 
 export type SalesOrderItem = BaseSalesOrderItem & {
-  
   groupId?: string;
-  
+
   role?: SalesOrderSetRole;
-  
+
   sourceSetCode?: string;
-  
+
   memo?: string;
-  
+
   extraQuantity?: number;
 };
 
@@ -70,7 +69,7 @@ export type InventoryLinkageSnapshotEntry = {
   rowId: string;
   itemCode: string;
   locationCode: string;
-  
+
   byUnit: Record<string, number>;
 };
 
@@ -138,79 +137,77 @@ export type InventoryLinkageTransition = {
 
 export type InventoryLinkage = {
   state: InventoryLinkageState;
-  
+
   reservedSnapshot?: InventoryLinkageSnapshotEntry[];
   lastTransition?: InventoryLinkageTransition;
 };
 
 export type SalesOrderExtra = {
   status?: string;
-  
+
   readyAt?: number;
   cancellation?: SalesOrderCancellation;
   inventoryLinkage?: InventoryLinkage;
-  
+
   cheatAutoComplete?: { at: number; drNumbers: string[] };
-  
+
   isDeleted?: boolean;
-  
+
   customerName?: string;
-  
+
   customerCode?: string;
-  
+
   isIndividualCustomer?: boolean;
-  
+
   isInternalDelivery?: boolean;
-  
+
   orderDate?: NullableDateTimeInput;
-  
+
   customerPONumber?: string;
   deliveryAddress?: string;
-  
+
   googleMapUrl?: string;
   deliveryDate?: NullableDateTimeInput;
   deliveryMethod?: string;
-  
+
   deliveryPackageSize?: string;
   assignedStaff?: string;
   createdBy?: string;
   isUrgent?: boolean;
   tags?: string[];
-  
-  
+
   needVAT?: boolean;
-  
+
   needShippingFee?: boolean;
-  
+
   vatRate?: number;
-  
+
   vatTag?: string;
-  
+
   shippingFee?: number;
-  
+
   isPaid?: boolean;
-  
+
   paidAmount?: number;
-  
+
   invoiceIssued?: boolean;
-  
+
   billingNotRequired?: boolean;
   activityLog?: SalesOrderActivityEntry[];
   chatHistory?: SalesOrderChatEntry[];
   photos?: SalesOrderPhoto[];
   attachments?: SalesOrderAttachment[];
-  
+
   deliveryRequestIds?: string[];
-  
+
   quotationId?: string;
   quotationCode?: string;
-  
+
   clientSpecific?: {
     NKTU?: {
-      
       warehouseNote?: string;
       driverNote?: string;
-      
+
       quotationId?: string;
       quotationCode?: string;
     };

@@ -1,5 +1,3 @@
-
-
 import { cacheGet, cacheSet, cacheClear } from '@/utils/appCache';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import {
@@ -105,10 +103,6 @@ export function bootstrapPermissionCache(params: {
   });
   cacheSet('prm', bootstrapPerms);
 
-  
-  
-  
-  
   if (cachedEmo?.o && cachedEmo.v && params.cfgVersion) {
     cacheSet('prv', { cfg: params.cfgVersion, emp: cachedEmo.v });
   }

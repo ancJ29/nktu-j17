@@ -1,5 +1,3 @@
-
-
 import { generateId, newVersion } from '@credo/kits/string';
 import { cMngtConnector, cStorageConnector } from '@credo/connectors/connector';
 import { recomputeOnHand } from '@/utils/inventoryMath';
@@ -11,9 +9,9 @@ import type { FakeDataSecrets } from './fakeDataSecrets';
 export type SeedProductInventoryOptions = {
   clientCode: string;
   count: number;
-  
+
   maxQty: number;
-  
+
   multiUnitSplit: boolean;
   secrets: FakeDataSecrets;
   onLog?: (line: string) => void;
@@ -33,7 +31,7 @@ const ROW_NOTES = [
   '',
   '',
   '',
-  
+
   'Tồn ban đầu',
   'Kiểm kê tháng',
   'Đếm lại sau nhập',
@@ -95,7 +93,6 @@ function buildOnHandByUnit(
 
   if (!multiUnitSplit) return { onHandByUnit, split: false };
 
-  
   const conversions = product.extra?.unitConversions ?? [];
   const reachable = conversions
     .map((c) => c.unit)

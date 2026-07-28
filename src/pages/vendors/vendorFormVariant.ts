@@ -1,9 +1,6 @@
-
-
 import { VIETNAM_CHINA_ORIGIN_LABELS, type VendorOriginLabels } from './vendorOriginLabels';
 
 export type VendorFormVariant = {
-  
   originField: { kind: 'select'; labels: VendorOriginLabels } | { kind: 'switch' };
 };
 

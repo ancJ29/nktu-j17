@@ -17,14 +17,14 @@ type Routes = { LIST: string; NEW: string; DETAIL: string; EDIT: string };
 export type WarehouseDocKind = {
   entity: WarehouseDocEntity;
   routes: Routes;
-  
+
   i18nPrefix: 'warehouseReceipt' | 'warehouseDeliveryNote';
   perms: ModulePerms;
-  
+
   code: () => { codePrefix: string; codePadLength: number };
-  
+
   direction: 'in' | 'out';
-  
+
   postInventoryEnabled: () => boolean;
   icon: Icon;
 };
@@ -84,7 +84,7 @@ export function buildDocCode(
   docsOnDay: number,
 ): string {
   const { codePrefix, codePadLength } = kind.code();
-  const ymd = recordDate.replaceAll('-', '').slice(2); 
+  const ymd = recordDate.replaceAll('-', '').slice(2);
   const seq = (docsOnDay + 1).toString().padStart(Math.max(0, codePadLength), '0');
   return `${codePrefix}${ymd}-${seq}`;
 }

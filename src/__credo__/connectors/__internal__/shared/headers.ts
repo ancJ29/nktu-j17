@@ -47,10 +47,6 @@ export function buildHeaders({
   nonceMethod = '',
   noncePath = '',
 }: BuildHeadersOptions = {}): Record<string, string> {
-  
-  
-  
-  
   const headers: Record<string, string> = {
     'x-connector-version': CONNECTOR_VERSION,
   };
@@ -94,9 +90,6 @@ export function buildHeaders({
     headers['x-access-key'] = accessKey ?? storages?.accessKey ?? '';
   }
 
-  
-  
-  
   if (adminKey || storages?.adminKey) {
     headers['x-admin-key'] = adminKey ?? storages?.adminKey ?? '';
   }

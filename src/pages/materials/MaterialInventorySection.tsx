@@ -16,7 +16,7 @@ import { MaterialInventoryUpdateModal } from '@/pages/material-inventory/Materia
 
 type Props = {
   readonly material: Material;
-  
+
   readonly canManage: boolean;
 };
 

@@ -47,8 +47,6 @@ function FleetRefuelExport() {
   const handleExport = useCallback(async () => {
     setExporting(true);
     try {
-      
-      
       const entries: RefuelExportEntry[] = [];
       for (const truck of trucks) {
         const res = await cMngtConnector.getOperationLogsByTarget<OperationLogExtra>({

@@ -1,5 +1,3 @@
-
-
 import type { CMngtAppConfig } from '@credo/kits/types';
 import type {
   AuthFeatures,
@@ -37,7 +35,6 @@ export const DEFAULT_AUTH: AuthFeatures = {
 export const DEFAULT_THEME: ThemeConfig = { mainColor: 'steel' };
 
 export const DEFAULT_LANGUAGES: Language[] = [
-  
   { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
   { code: 'en', label: 'English', flag: '🇺🇸' },
 ];
@@ -70,7 +67,6 @@ export const DEFAULT_EMPLOYEE_FEATURES: CMngtEmployeeFeatures = {
   codePrefix: 'EMP-',
   codePadLength: 4,
   departmentOptions: [
-    
     { value: 'sales', label: { en: 'Sales', vi: 'Kinh Doanh' } },
     { value: 'accounting', label: { en: 'Accounting', vi: 'Kế Toán' } },
     { value: 'delivery', label: { en: 'Delivery', vi: 'Giao hàng' } },
@@ -102,7 +98,7 @@ export const DEFAULT_SALES_ORDER_FEATURES: CMngtSalesOrderFeatures = {
   enabled: false,
   codePrefix: 'SO-',
   codePadLength: 4,
-  
+
   deliveryMethodOptions: [
     { value: 'internal', label: { en: 'Internal delivery', vi: 'Giao hàng nội bộ' } },
     { value: 'pickup', label: { en: 'Pickup at warehouse', vi: 'Tự lấy tại kho' } },
@@ -220,7 +216,7 @@ export const DEFAULT_DELIVERY_REQUEST_FEATURES: CMngtDeliveryRequestFeatures = {
   codePrefix: 'DR-',
   codePadLength: 4,
   returnShipment: { enabled: false, autoRestockOnComplete: false },
-  
+
   statusOptions: [
     {
       value: 'draft',
@@ -271,7 +267,7 @@ export const DEFAULT_TRANSPORT_ORDER_FEATURES: CMngtTransportOrderFeatures = {
   enabled: false,
   codePrefix: 'VC-',
   codePadLength: 3,
-  
+
   statusOptions: [
     {
       value: 'new',

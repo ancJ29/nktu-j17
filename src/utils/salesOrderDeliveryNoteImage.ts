@@ -1,5 +1,3 @@
-
-
 import { downloadBlob, PX_PER_MM } from './pdfExport';
 import {
   buildDeliveryNoteParts,
@@ -28,10 +26,6 @@ export async function renderDeliveryNoteImageBlob(
   const { css, docHtml, contentWidthMm } = buildDeliveryNoteParts(data, options);
   const widthPx = Math.ceil(contentWidthMm * PX_PER_MM) + PAD_PX * 2;
 
-  
-  
-  
-  
   const wrapperStyle = `width:${widthPx}px;background:#ffffff;padding:${PAD_PX}px;`;
   const measure = document.createElement('div');
   measure.setAttribute('style', `position:fixed;left:-100000px;top:0;${wrapperStyle}`);
@@ -40,9 +34,6 @@ export async function renderDeliveryNoteImageBlob(
   const heightPx = Math.ceil(measure.getBoundingClientRect().height);
   document.body.removeChild(measure);
 
-  
-  
-  
   const xhtml = `<div xmlns="http://www.w3.org/1999/xhtml" style="${wrapperStyle}"><style>${css}</style>${docHtml}</div>`;
   const svg =
     `<svg xmlns="http://www.w3.org/2000/svg" width="${widthPx}" height="${heightPx}">` +
@@ -54,8 +45,7 @@ export async function renderDeliveryNoteImageBlob(
   canvas.height = heightPx * SCALE;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('Canvas 2D context unavailable');
-  
-  
+
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height);

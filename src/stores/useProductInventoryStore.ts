@@ -17,10 +17,9 @@ export const useProductInventoryStore = createEntityStore<
   ProductInventoryPatch,
   ProductInventoryCreate
 >({
-  
   cacheKey: 'pinv',
   cacheTTL: ONE_MINUTE,
-  staleTime: ONE_MINUTE, 
+  staleTime: ONE_MINUTE,
   fetchAll: (hash) =>
     cMngtConnector
       .getAllProductInventory<ProductInventoryExtra>({ hash })

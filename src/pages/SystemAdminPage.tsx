@@ -1,5 +1,3 @@
-
-
 import {
   ActionIcon,
   Alert,
@@ -182,14 +180,8 @@ function detectFileKind(data: unknown): ImportedFileKind {
 }
 
 export function SystemAdminPage() {
-  
-  
   const [authed, setAuthed] = useState<boolean>(hasAllSecrets);
 
-  
-  
-  
-  
   useEffect(() => {
     if (authed) {
       cMngtConnector.setAccessKey(readSecret('cMngtAdminAccessKey'));
@@ -234,23 +226,16 @@ function isTabValue(v: string | null): v is TabValue {
 }
 
 function AdminTabs() {
-  
-  
-  
-  
   const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState<TabValue>(() => {
     const fromUrl = searchParams.get('tab');
     return isTabValue(fromUrl) ? fromUrl : 'provision';
   });
-  
+
   const [selectedClient, setSelectedClient] = useState<string | null>(
     () => searchParams.get('client-code') || null,
   );
 
-  
-  
-  
   useEffect(() => {
     setSearchParams(
       (prev) => {
@@ -264,7 +249,7 @@ function AdminTabs() {
       { replace: true },
     );
   }, [tab, selectedClient, setSearchParams]);
-  
+
   const [refreshSignal, setRefreshSignal] = useState(0);
   const bumpRefresh = useCallback(() => setRefreshSignal((n) => n + 1), []);
 
@@ -411,8 +396,6 @@ function AuthGate({ onAuthed }: { onAuthed: (secrets: Secrets) => void }) {
       ssoAdminAccessKey: secrets.ssoAdminAccessKey.trim(),
     };
 
-    
-    
     cMngtConnector.setAccessKey(trimmed.cMngtAdminAccessKey);
     try {
       const res = await cMngtConnector.listClients();
@@ -497,12 +480,11 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
   const [running, setRunning] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [result, setResult] = useState<ProvisionClientResponse | null>(null);
-  
+
   const [configWarning, setConfigWarning] = useState<string | null>(null);
 
-  
   const [importedAppConfig, setImportedAppConfig] = useState<Record<string, unknown> | null>(null);
-  
+
   const [importedDepartments, setImportedDepartments] = useState<DepartmentOption[] | null>(null);
   const [importedFiles, setImportedFiles] = useState<
     { name: string; kind: ImportedFileKind; error?: string }[]
@@ -605,7 +587,7 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
         domains,
         rootEmail: rootEmail.trim(),
         rootPassword: rootPassword.trim() || undefined,
-        
+
         ssoAdminAccessKey: readSecret('ssoAdminAccessKey'),
       });
 
@@ -625,11 +607,6 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
       });
       onProvisioned();
 
-      
-      
-      
-      
-      
       try {
         const baseConfig = (importedAppConfig ?? minimalAppConfig) as Record<string, unknown>;
         const baseApp = (baseConfig.app ?? {}) as Record<string, unknown>;
@@ -653,9 +630,7 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
         };
         const cfgRes = await cMngtConnector.setAppConfig({
           clientServiceCode: trimmedCode,
-          
-          
-          
+
           config: configPayload as unknown as Parameters<
             typeof cMngtConnector.setAppConfig
           >[0]['config'],
@@ -1073,9 +1048,7 @@ function ClientsPanel({
     }
   }, []);
 
-  
   useEffect(() => {
-    
     void load();
   }, [load, refreshSignal]);
 
@@ -1086,8 +1059,6 @@ function ClientsPanel({
     const ssoServiceCode = ssoServiceCodeFor(clientServiceCode);
     const issues: string[] = [];
 
-    
-    
     try {
       const res = await cMngtConnector.removeClient({ clientServiceCode, version });
       if (!res.success) {
@@ -1097,15 +1068,11 @@ function ClientsPanel({
       issues.push(`c-mngt removeClient: ${err instanceof Error ? err.message : String(err)}`);
     }
 
-    
-    
-    
-    
     try {
       const res = await cSsoConnector.disableService({ serviceCode: ssoServiceCode });
       if (!res.success) {
         const reason = (res as { error?: string }).error ?? 'failed';
-        
+
         console.info(`[deleteClient] disableService(${ssoServiceCode}): ${reason}`);
       }
     } catch (err) {
@@ -1115,8 +1082,6 @@ function ClientsPanel({
       );
     }
 
-    
-    
     try {
       const res = await cSsoConnector.deleteService({ serviceCode: ssoServiceCode });
       if (!res.success) {
@@ -1306,7 +1271,6 @@ function ConfigPanel({
   const [clients, setClients] = useState<ClientConfig[] | null>(null);
   const [listError, setListError] = useState<string | null>(null);
 
-  
   useEffect(() => {
     let cancelled = false;
     cMngtConnector
@@ -1376,9 +1340,6 @@ function ConfigPanel({
       </SectionCard>
 
       {selectedClient && cMngtAdminAccessKey && (
-        
-        
-        
         <ConfigEditor
           key={selectedClient}
           accessKey={cMngtAdminAccessKey}
@@ -1404,10 +1365,8 @@ function SeedDataPanel({
   const [secretsOpen, { open: openSecrets, close: closeSecrets }] = useDisclosure(false);
   const [secretsReady, setSecretsReady] = useState<boolean>(hasAllFakeDataSecrets);
 
-  
   const [clientConfig, setClientConfig] = useState<CMngtAppConfig | null>(null);
 
-  
   useEffect(() => {
     let cancelled = false;
     cMngtConnector
@@ -1430,12 +1389,8 @@ function SeedDataPanel({
     };
   }, [refreshSignal]);
 
-  
-  
-  
   useEffect(() => {
     if (!selectedClient) {
-      
       setClientConfig(null);
       return;
     }
@@ -1528,8 +1483,7 @@ function SeedDataPanel({
 
       {(() => {
         const features = clientConfig?.features;
-        
-        
+
         const sections = [
           {
             label: 'Employees',
@@ -1631,8 +1585,6 @@ function ValidatePanel({ refreshSignal }: { refreshSignal: number }) {
   const [results, setResults] = useState<Map<string, ValidationResult>>(new Map());
   const [running, setRunning] = useState(false);
 
-  
-  
   useEffect(() => {
     let cancelled = false;
     cMngtConnector
@@ -1658,13 +1610,11 @@ function ValidatePanel({ refreshSignal }: { refreshSignal: number }) {
   const handleRun = useCallback(async () => {
     if (!clients) return;
     setRunning(true);
-    
+
     setResults(
       new Map(clients.map((c) => [c.clientServiceCode, { status: 'pending' } as ValidationResult])),
     );
 
-    
-    
     await Promise.all(
       clients.map(async (client) => {
         let next: ValidationResult;
@@ -1850,7 +1800,7 @@ function ValidationIssuesCell({ result }: { result: ValidationResult | undefined
       </Text>
     );
   }
-  
+
   const shown = result.issues.slice(0, 20);
   const hidden = result.issues.length - shown.length;
   return (
@@ -2159,8 +2109,7 @@ function ProductsSection({
     try {
       const res = await seedFakeProducts({
         clientCode,
-        
-        
+
         industry: 'food',
         count: items.length,
         secrets: getFakeDataSecrets(),
@@ -2176,8 +2125,7 @@ function ProductsSection({
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       setSeedError(msg);
-      
-      
+
       notifications.show({
         color: 'red',
         title: 'Seed failed',
@@ -2389,7 +2337,7 @@ function VendorsSection({
     try {
       const res = await seedFakeVendors({
         clientCode,
-        industry: 'food', 
+        industry: 'food',
         count: items.length,
         secrets: getFakeDataSecrets(),
         items,
@@ -2587,7 +2535,7 @@ function CustomersSection({
     try {
       const res = await seedFakeCustomers({
         clientCode,
-        industry: 'food', 
+        industry: 'food',
         count: items.length,
         secrets: getFakeDataSecrets(),
         items,
@@ -2787,7 +2735,7 @@ function LookupsSection({
     try {
       const res = await seedFakeLookups({
         clientCode,
-        industry: 'food', 
+        industry: 'food',
         secrets: getFakeDataSecrets(),
         items,
         onLog: (line) => setLogLines((prev) => [...prev, line]),
@@ -2810,7 +2758,6 @@ function LookupsSection({
     }
   }, [canSeed, clientCode, closeConfirm, items]);
 
-  
   const byCategory = useMemo(() => {
     const out: Record<string, number> = {};
     for (const it of items ?? []) out[it.category] = (out[it.category] ?? 0) + 1;

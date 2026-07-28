@@ -1,5 +1,3 @@
-
-
 import { newVersion } from '@credo/kits/string';
 import { cMngtConnector, cStorageConnector } from '@credo/connectors/connector';
 import { appConfig } from '@/config';
@@ -17,7 +15,7 @@ import type { FakeDataSecrets } from './fakeDataSecrets';
 export type SeedSalesOrdersOptions = {
   clientCode: string;
   count: number;
-  
+
   daysBack?: number;
   secrets: FakeDataSecrets;
   onLog?: (line: string) => void;
@@ -107,7 +105,6 @@ async function fetchMasterData(): Promise<{
   locations: FetchedLocation[];
 }> {
   const [cRes, pRes, eRes, lRes] = await Promise.all([
-    
     cMngtConnector.getAllSingleRecords(CUSTOMER_RECORD_TARGET).catch(() => null),
     cMngtConnector.getAllProducts().catch(() => null),
     cMngtConnector.getAllEmployees().catch(() => null),
@@ -236,9 +233,6 @@ function generateOrders(args: {
     const updatedAtMs = createdAtMs + randomInt(0, 24) * 60 * 60 * 1000;
     const deliveryDateMs = createdAtMs + randomInt(2, 10) * dayMs;
 
-    
-    
-    
     const activityLog: SalesOrderActivityEntry[] = [
       {
         timestamp: createdAtMs,
@@ -259,11 +253,6 @@ function generateOrders(args: {
       });
     }
 
-    
-    
-    
-    
-    
     const cancellationFromStatus = statusValue;
     const finalStatus =
       isCancelled && cancellationTargetStatus ? cancellationTargetStatus : statusValue;
@@ -314,10 +303,6 @@ function generateOrders(args: {
       }),
     };
 
-    
-    
-    
-    
     records.push({
       id,
       orderNumber: generateCode(codePrefix),
@@ -400,7 +385,6 @@ export async function seedFakeSalesOrders(
     codePrefix,
   });
 
-  
   const byPartition = new Map<string, SalesOrderRecord[]>();
   for (const r of records) {
     const period = partitionFromId(r.id);
@@ -433,8 +417,6 @@ export async function seedFakeSalesOrders(
   }
   await Promise.all(writes);
 
-  
-  
   const stageOf = new Map<string, Stage>();
   for (const opt of appConfig.features.salesOrders.statusOptions) {
     stageOf.set(opt.value, opt.stage as Stage);

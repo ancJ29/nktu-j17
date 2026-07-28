@@ -42,27 +42,27 @@ export type ProductFormValues = {
   name: string;
   code: string;
   description: string;
-  
+
   units: string[];
-  
+
   price: number;
   isActive: boolean;
   alternativeNames: string[];
-  
+
   sku: string;
   barcode: string;
   basePrice: number;
-  
+
   suggestedPrice: number;
   category: string;
   tags: string[];
   attributes: Array<{ key: string; value: string }>;
   minInventoryValue: number | '';
   minInventoryUnit: string;
-  
+
   noInventory: boolean;
   unitConversions: UnitConversion[];
-  
+
   setItems: ProductSetItem[];
 };
 
@@ -74,7 +74,7 @@ type SingleProductFormProps = {
   readonly form: UseFormReturnType<ProductFormValues>;
   readonly isLoading: boolean;
   readonly isEditMode: boolean;
-  
+
   readonly onSkuChange: (value: string) => void;
   readonly onSubmit: (values: ProductFormValues) => void;
   readonly onCancel: () => void;
@@ -182,17 +182,9 @@ function SetCompositionEditor({
   const { t } = useTranslation();
   const products = useProductStore((s) => s.items);
   const items = form.values.setItems;
-  
-  
-  
-  
+
   const unitLabels = useLookupLabels('unit');
 
-  
-  
-  
-  
-  
   const componentFilter = useMemo(
     () => (p: (typeof products)[number]) =>
       !p.extra?.isDeleted && p.code !== selfCode && !isProductSet(p),
@@ -267,8 +259,7 @@ function SetCompositionEditor({
                   updateRow(idx, { productCode: '', unit: '' });
                   return;
                 }
-                
-                
+
                 updateRow(idx, {
                   productCode: sel.code,
                   unit: row.unit && sel.units.includes(row.unit) ? row.unit : (sel.units[0] ?? ''),
@@ -336,7 +327,7 @@ function BarcodePreview({ value }: { value: string }) {
         displayValue: false,
         margin: 0,
       });
-      
+
       setValid(true);
     } catch {
       setValid(false);
@@ -467,9 +458,6 @@ export function SingleProductForm({
 }: SingleProductFormProps) {
   const { t } = useTranslation();
 
-  
-  
-  
   const categoryOptions = useLookupOptions('product-category');
   const unitOptions = useLookupOptions('unit');
   const tagOptions = useLookupOptions('product-tag');
@@ -481,11 +469,9 @@ export function SingleProductForm({
     () => unitOptions.map((o) => ({ value: o.value, label: o.label })),
     [unitOptions],
   );
-  
+
   const tagData = useMemo(() => tagOptions.map((o) => o.label), [tagOptions]);
 
-  
-  
   const selectedUnitData = useMemo(
     () =>
       form.values.units.map((v) => ({
@@ -494,11 +480,6 @@ export function SingleProductForm({
       })),
     [form.values.units, unitOptions],
   );
-
-  
-  
-  
-  
 
   const primaryCard = (
     <SectionCard icon={<IconPackage size={14} />} title={t('products.form.primaryDetails')}>
@@ -515,12 +496,7 @@ export function SingleProductForm({
             placeholder={t('products.form.skuPlaceholder')}
             description={isEditMode ? undefined : t('products.form.skuCreateDescription')}
             styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
-            
-            
-            
-            
-            
-            
+
             disabled={isEditMode}
             {...form.getInputProps('sku')}
             {...(!isEditMode && {
@@ -685,10 +661,6 @@ export function SingleProductForm({
     </SectionCard>
   ) : null;
 
-  
-  
-  
-  
   return (
     <form onSubmit={form.onSubmit(onSubmit)}>
       <Stack gap="md">

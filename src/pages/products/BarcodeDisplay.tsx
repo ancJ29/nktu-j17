@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 type Props = {
   readonly value: string;
-  
+
   readonly label?: string;
 };
 
@@ -47,8 +47,6 @@ export function BarcodeDisplay({ value, label }: Props) {
   const trimmed = value.trim();
   const format = trimmed ? pickFormat(trimmed) : 'CODE128';
 
-  
-  
   const error = useMemo<string | null>(() => {
     if (!trimmed || typeof document === 'undefined') return null;
     try {
@@ -60,7 +58,6 @@ export function BarcodeDisplay({ value, label }: Props) {
     }
   }, [trimmed, format]);
 
-  
   useEffect(() => {
     if (!svgRef.current || !trimmed || error) return;
     JsBarcode(svgRef.current, trimmed, { ...RENDER_OPTIONS, format });
@@ -115,7 +112,7 @@ export function BarcodeDisplay({ value, label }: Props) {
             borderRadius: 4,
             display: 'flex',
             justifyContent: 'center',
-            
+
             overflow: 'hidden',
           }}
         >

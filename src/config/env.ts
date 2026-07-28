@@ -4,7 +4,7 @@ export const ADMIN_CONFIG_KEY = '__X_ADMIN_CONFIG__';
 
 export const isAdmin = compareEnvVar(
   ADMIN_CONFIG_KEY,
-  
+
   import.meta.env.VITE_APP_ADMIN_CONFIG ?? '7adc1b16b71a',
 );
 

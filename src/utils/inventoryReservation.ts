@@ -1,5 +1,3 @@
-
-
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import type { ProductInventoryExtra, ProductInventoryRow } from '@/types/product-inventory';
 import type { Product } from '@/types/product';
@@ -132,15 +130,15 @@ export function expandSetReservationItems(
   const out: SalesOrderItem[] = [];
   for (const group of groupLinesBySet(items)) {
     if (group.groupId === null) {
-      out.push(...group.lines); 
+      out.push(...group.lines);
       continue;
     }
     const parent = group.lines.find((l) => l.role === 'set');
     if (!parent) {
-      out.push(...group.lines); 
+      out.push(...group.lines);
       continue;
     }
-    
+
     for (const l of group.lines) {
       if (l.role !== 'set' && l.role !== 'set-component') out.push(l);
     }
@@ -148,7 +146,7 @@ export function expandSetReservationItems(
     const setProduct = productsByCode.get(parent.productCode);
     const parentQty = parent.quantity;
     if (!setProduct || !isProductSet(setProduct) || parentQty <= 0) {
-      out.push(stripSetFields(parent)); 
+      out.push(stripSetFields(parent));
       continue;
     }
 
@@ -189,11 +187,6 @@ export function planReservation(inputs: PlanInputs): PlanResult {
   };
   const buckets = new Map<string, Bucket>();
 
-  
-  
-  
-  
-  
   const reservationLines =
     action === 'reserve'
       ? expandSetReservationItems(so.items, productsByCode, inventoryByProduct)
@@ -201,18 +194,14 @@ export function planReservation(inputs: PlanInputs): PlanResult {
 
   for (const line of reservationLines) {
     if (!line.productCode || line.quantity <= 0) continue;
-    
-    
-    
-    
+
     if (line.role === 'set-component') continue;
     const product = productsByCode.get(line.productCode);
     if (!product) {
       failures.push({ kind: 'unknown-product', productCode: line.productCode });
       continue;
     }
-    
-    
+
     if (isNoInventoryProduct(product)) {
       skipped.push({
         productCode: line.productCode,
@@ -248,9 +237,7 @@ export function planReservation(inputs: PlanInputs): PlanResult {
       failures.push({ kind: 'unknown-unit', productCode: line.productCode, unit: line.unit });
       continue;
     }
-    
-    
-    
+
     const physicalQty = getLinePhysicalQuantity(line);
     const existing = buckets.get(row.id);
     if (existing) {
@@ -333,7 +320,6 @@ export function planReservation(inputs: PlanInputs): PlanResult {
         },
       };
     } else {
-      
       const result = applyShip(
         b.product,
         { onHandByUnit: currentOnHandByUnit, reservedByUnit: currentReservedByUnit },
@@ -580,9 +566,6 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
       deltas,
     );
     if (!result.ok) {
-      
-      
-      
       if (result.reason === 'reservation-mismatch') {
         failures.push({
           kind: 'reservation-mismatch',
@@ -592,9 +575,6 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
           reserved: recomputeOnHand(product, currentReservedByUnit),
         });
       } else {
-        
-        
-        
         failures.push({ kind: 'unknown-unit', productCode: product.code, unit: result.unit });
       }
       continue;
@@ -678,7 +658,6 @@ export function planUnshipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanRe
     for (const [u, q] of Object.entries(entry.byUnit)) if (q > 0) deltas[u] = q;
     if (Object.keys(deltas).length === 0) continue;
 
-    
     const result = applyDelta(product, currentOnHandByUnit, deltas);
     if (!result.ok) {
       failures.push({ kind: 'unknown-unit', productCode: product.code, unit: result.unit });
@@ -803,15 +782,13 @@ export function buildDesiredReservationSnapshot(inputs: {
   readonly items: readonly SalesOrderItem[];
   readonly productsByCode: Map<string, Product>;
   readonly inventoryByProduct: Map<string, ProductInventoryRow[]>;
-  
+
   readonly ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[];
 }): BuildDesiredSnapshotResult {
   const { items, productsByCode, inventoryByProduct, ownReservedSnapshot } = inputs;
   const failures: PlanFailure[] = [];
   const skipped: { productCode: string; reason: string }[] = [];
 
-  
-  
   const desiredLines = expandSetReservationItems(
     items,
     productsByCode,
@@ -819,9 +796,6 @@ export function buildDesiredReservationSnapshot(inputs: {
     ownReservedSnapshot,
   );
 
-  
-  
-  
   const byRow = new Map<
     string,
     { rowId: string; itemCode: string; locationCode: string; byUnit: Record<string, number> }
@@ -829,16 +803,14 @@ export function buildDesiredReservationSnapshot(inputs: {
 
   for (const line of desiredLines) {
     if (!line.productCode || line.quantity <= 0) continue;
-    
-    
+
     if (line.role === 'set-component') continue;
     const product = productsByCode.get(line.productCode);
     if (!product) {
       failures.push({ kind: 'unknown-product', productCode: line.productCode });
       continue;
     }
-    
-    
+
     if (isNoInventoryProduct(product)) {
       skipped.push({
         productCode: line.productCode,
@@ -874,8 +846,7 @@ export function buildDesiredReservationSnapshot(inputs: {
       failures.push({ kind: 'unknown-unit', productCode: line.productCode, unit: line.unit });
       continue;
     }
-    
-    
+
     const physicalQty = getLinePhysicalQuantity(line);
     const existing = byRow.get(row.id);
     if (existing) {
@@ -894,8 +865,6 @@ export function buildDesiredReservationSnapshot(inputs: {
 
   const snapshot: InventoryLinkageSnapshotEntry[] = [];
   for (const entry of byRow.values()) {
-    
-    
     const cleanByUnit: Record<string, number> = {};
     for (const [u, q] of Object.entries(entry.byUnit)) if (q > 0) cleanByUnit[u] = q;
     if (Object.keys(cleanByUnit).length === 0) continue;
@@ -929,14 +898,11 @@ export function planReservationDiff(inputs: PlanReservationDiffInputs): PlanRese
     items: newItems,
     productsByCode,
     inventoryByProduct,
-    
-    
+
     ownReservedSnapshot: oldSnapshot,
   });
   if (!desired.ok) return { ok: false, failures: [...desired.failures] };
 
-  
-  
   const oldByRow = new Map<string, InventoryLinkageSnapshotEntry>();
   for (const e of oldSnapshot) oldByRow.set(e.rowId, e);
   const newByRow = new Map<string, InventoryLinkageSnapshotEntry>();
@@ -949,8 +915,7 @@ export function planReservationDiff(inputs: PlanReservationDiffInputs): PlanRese
   for (const rowId of allRowIds) {
     const oldEntry = oldByRow.get(rowId);
     const newEntry = newByRow.get(rowId);
-    
-    
+
     const reference = newEntry ?? oldEntry!;
     const rows = inventoryByProduct.get(reference.itemCode) ?? [];
     const row =
@@ -978,16 +943,11 @@ export function planReservationDiff(inputs: PlanReservationDiffInputs): PlanRese
     const currentOnHandByUnit = readRowBreakdown(row, baseUnit);
     const currentReservedByUnit = readRowReserved(row);
 
-    
     const unitSet = new Set<string>([
       ...Object.keys(oldEntry?.byUnit ?? {}),
       ...Object.keys(newEntry?.byUnit ?? {}),
     ]);
 
-    
-    
-    
-    
     const targetReservedByUnit: OnHandByUnit = { ...currentReservedByUnit };
     const signedDeltas: Record<string, number> = {};
     let underflowed = false;
@@ -1018,11 +978,8 @@ export function planReservationDiff(inputs: PlanReservationDiffInputs): PlanRese
       }
     }
     if (underflowed) continue;
-    if (Object.keys(signedDeltas).length === 0) continue; 
+    if (Object.keys(signedDeltas).length === 0) continue;
 
-    
-    
-    
     const slotByUnit: Record<string, number> = {};
     if (newEntry)
       for (const [u, q] of Object.entries(newEntry.byUnit)) if (q > 0) slotByUnit[u] = q;
@@ -1053,10 +1010,7 @@ export function planReservationDiff(inputs: PlanReservationDiffInputs): PlanRese
         ...(nextReservedBySO !== undefined && { reservedBySalesOrder: nextReservedBySO }),
       },
     };
-    
-    
-    
-    
+
     if (nextReservedBySO === undefined && forwardPatch.extra.reservedBySalesOrder) {
       const cleaned = { ...forwardPatch.extra.reservedBySalesOrder };
       delete cleaned[so.id];
@@ -1073,8 +1027,7 @@ export function planReservationDiff(inputs: PlanReservationDiffInputs): PlanRese
       itemCode: row.itemCode,
       locationCode: row.locationCode,
       action: 'reserve-adjust',
-      
-      
+
       deltas: signedDeltas as OnHandByUnit,
       description,
       snapshotVersion: row.version,

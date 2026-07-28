@@ -1,5 +1,3 @@
-
-
 const ONES = ['không', 'một', 'hai', 'ba', 'bốn', 'năm', 'sáu', 'bảy', 'tám', 'chín'] as const;
 
 function readTriple(num: number, readHundreds: boolean): string {
@@ -17,7 +15,6 @@ function readTriple(num: number, readHundreds: boolean): string {
   } else if (tens === 1) {
     parts.push('mười');
   } else if (units > 0 && (hundreds > 0 || readHundreds)) {
-    
     parts.push('lẻ');
   }
 
@@ -36,7 +33,7 @@ function readTriple(num: number, readHundreds: boolean): string {
 
 function scaleWord(i: number): string {
   const base = ['', 'nghìn', 'triệu'][i % 3];
-  const billions = Math.floor(i / 3); 
+  const billions = Math.floor(i / 3);
   const ty = Array.from({ length: billions }, () => 'tỷ').join(' ');
   return [base, ty].filter(Boolean).join(' ');
 }
@@ -45,7 +42,6 @@ export function readVietnameseNumber(value: number): string {
   const n = Math.floor(Math.abs(value));
   if (n === 0) return 'không';
 
-  
   const triples: number[] = [];
   let x = n;
   while (x > 0) {
@@ -56,7 +52,7 @@ export function readVietnameseNumber(value: number): string {
   const parts: string[] = [];
   for (let i = triples.length - 1; i >= 0; i--) {
     const triple = triples[i];
-    if (triple === 0) continue; 
+    if (triple === 0) continue;
     const isMostSignificant = i === triples.length - 1;
     const words = readTriple(triple, !isMostSignificant);
     const scale = scaleWord(i);

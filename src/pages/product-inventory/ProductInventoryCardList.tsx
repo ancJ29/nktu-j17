@@ -85,7 +85,6 @@ export function ProductInventoryCardList({
         const baseUnit = getItemBaseUnit(s.product);
         const sku = s.product.extra?.sku;
 
-        
         let locationNode: React.ReactNode = null;
         if (locationsEnabled) {
           if (s.rows.length === 0) {

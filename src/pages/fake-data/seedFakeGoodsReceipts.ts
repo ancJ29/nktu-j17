@@ -1,5 +1,3 @@
-
-
 import { newVersion } from '@credo/kits/string';
 import { cMngtConnector, cStorageConnector } from '@credo/connectors/connector';
 import { loadIndustry, type IndustryName } from '../../../scripts/faker/industry';
@@ -13,7 +11,7 @@ export type SeedGoodsReceiptsOptions = {
   clientCode: string;
   industry: IndustryName;
   count: number;
-  
+
   daysBack?: number;
   secrets: FakeDataSecrets;
   onLog?: (line: string) => void;
@@ -103,7 +101,6 @@ async function fetchVendorsAndLocations(): Promise<{
   locations: FetchedLocation[];
 }> {
   const [vRes, lRes] = await Promise.all([
-    
     cMngtConnector.getAllSingleRecords(VENDOR_RECORD_TARGET).catch(() => null),
     cMngtConnector.getAllLocations().catch(() => null),
   ]);
@@ -265,7 +262,6 @@ export async function seedFakeGoodsReceipts(
   log(`Generating ${count} goods receipt(s) across the last ${daysBack} day(s)...`);
   const records = generateReceipts(count, daysBack, pool, vendors, locations);
 
-  
   const byPartition = new Map<string, GoodsReceiptRecord[]>();
   for (const r of records) {
     const period = partitionFromId(r.id);

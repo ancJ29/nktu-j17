@@ -49,7 +49,6 @@ export function MaterialLinesEditor({ value, onChange }: Props) {
   const removeLine = (i: number) => onChange(value.filter((_, idx) => idx !== i));
 
   const onPickMaterial = (i: number, code: string | null) => {
-    
     const cur = value[i];
     patchLine(i, {
       materialCode: code ?? '',

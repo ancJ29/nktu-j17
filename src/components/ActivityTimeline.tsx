@@ -24,17 +24,17 @@ type ActivityTimelineProps<E extends ActivityTimelineEntry = ActivityTimelineEnt
   currentStatusValue: string;
   activityByStatus: Map<string, E>;
   resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
-  
+
   deliveryDate?: NullableDateTimeInput;
-  
+
   expectedDeliveryAtStatus?: string | null;
-  
+
   labels?: {
     currentStatus?: string;
     pending?: string;
     expectedDelivery?: string;
   };
-  
+
   showNotes?: boolean;
 };
 

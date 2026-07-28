@@ -1,5 +1,3 @@
-
-
 export type ActivityEntity = {
   id: string;
   clientId: string;
@@ -16,7 +14,7 @@ export type ActivityInput = {
   action: string;
   targetId?: string;
   memo?: Record<string, unknown>;
-  
+
   timestamp?: string;
 };
 

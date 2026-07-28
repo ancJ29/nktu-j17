@@ -33,7 +33,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    
+
     supportedLngs,
     fallbackLng,
     load: 'languageOnly',

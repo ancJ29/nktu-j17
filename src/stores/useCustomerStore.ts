@@ -7,9 +7,8 @@ export const CUSTOMER_RECORD_TARGET = { entity: 'customers', uniqueField: 'code'
 
 export const useCustomerStore = createSingleRecordsStore<Customer>({
   ...CUSTOMER_RECORD_TARGET,
-  
-  
-  cacheKey: 'cst2.5f3e91', 
+
+  cacheKey: 'cst2.5f3e91',
   cacheTTL: 10 * ONE_MINUTE,
 });
 

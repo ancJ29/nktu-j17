@@ -7,13 +7,12 @@ import { IconName } from '../types';
 const TRIGGER_THRESHOLD = 70;
 
 type PullToRefreshProps = {
-  
   onRefresh: () => void | Promise<void>;
-  
+
   enabled?: boolean;
-  
+
   color?: string;
-  
+
   offsetTop?: number;
   children: ReactNode;
 };
@@ -50,7 +49,7 @@ export function PullToRefresh({
           justifyContent: 'center',
           pointerEvents: 'none',
           zIndex: 90,
-          
+
           transform: `translateY(${active ? pullDistance : 0}px)`,
           opacity: active ? Math.max(0.35, progress) : 0,
           transition: isRefreshing

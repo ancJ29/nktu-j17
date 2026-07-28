@@ -8,11 +8,10 @@ type Option = {
 };
 
 type MobileFilterSelectProps = {
-  
   title: string;
-  
+
   value: string;
-  
+
   options: Option[];
   onChange: (value: string) => void;
   multi?: false;
@@ -63,12 +62,11 @@ export function MobileFilterSelect(props: MobileFilterSelectProps | MobileFilter
     return optionValue === (props.value as string);
   };
 
-  
   const rows = Math.ceil(options.length / 2);
   const BUTTON_H = 36;
   const GAP = 12;
   const HEADER = 52;
-  const PADDING = 16 + 24; 
+  const PADDING = 16 + 24;
   const drawerHeight = HEADER + PADDING + rows * BUTTON_H + (rows - 1) * GAP;
 
   return (

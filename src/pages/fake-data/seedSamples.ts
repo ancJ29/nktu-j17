@@ -1,5 +1,3 @@
-
-
 import type { CMngtAppConfig } from '@credo/kits/types';
 import type { ManualCustomerInput } from './seedFakeCustomers';
 import type { ManualEmployeeInput } from './seedFakeEmployees';

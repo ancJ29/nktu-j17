@@ -1,5 +1,3 @@
-
-
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
@@ -86,15 +84,11 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     };
   }
 
-  
-
   const fromCapIds = new Set((fromStatus.capabilities ?? []).map((b) => b.id));
   const toBindings = toStatus.capabilities ?? [];
 
-  
   const enteringBindings = toBindings.filter((b) => !fromCapIds.has(b.id));
 
-  
   const supersededIds = new Set<CapabilityId>();
   for (const b of enteringBindings) {
     const def = getCapability(b.id);
@@ -102,18 +96,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
   }
   const enteringAfterSupersedes = enteringBindings.filter((b) => !supersededIds.has(b.id));
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const preTransitionExtra = (order.extra ?? {}) as SalesOrderExtra;
   const preLinkage = preTransitionExtra.inventoryLinkage;
   const handlerIdToAlreadyDoneState: Record<string, 'reserved' | 'shipped'> = {
@@ -131,8 +113,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     return !isRedundant;
   });
 
-  
-  
   for (const b of firingBindings) {
     const def = getCapability(b.id);
     for (const reqId of def?.requires ?? []) {
@@ -149,8 +129,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       }
     }
   }
-
-  
 
   const sortedFiring = [...firingBindings].sort((a, b) => {
     const pa = getCapability(a.id)?.priority ?? 100;
@@ -182,22 +160,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     }
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   let autoShipped = false;
   if (
     !firingHandlerIds.has('ship') &&
@@ -221,24 +183,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     }
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   let autoReleased = false;
   if (
     !firingHandlerIds.has('reserve') &&
@@ -257,9 +201,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     if (!releaseResult.ok) {
       allFailures.push(...releaseResult.failures);
     } else {
-      
-      
-      
       autoReleased = true;
       if (releaseResult.plan.ops.length > 0) {
         allOps.push(...releaseResult.plan.ops);
@@ -272,13 +213,10 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     return { ok: false, failure: { kind: 'plan-failure', failures: allFailures } };
   }
 
-  
-
   let appliedOps: readonly AppliedOp[] = [];
   if (allOps.length > 0) {
     const exec = await executeReservationPlan(allOps);
     if (!exec.ok) {
-      
       useProductInventoryStore.getState().forceRefresh();
       return {
         ok: false,
@@ -292,27 +230,11 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     appliedOps = exec.applied;
   }
 
-  
-
-  
-  
-  
   const log: SalesOrderActivityEntry[] = preTransitionExtra.activityLog ?? [];
   const transitionAt = Date.now();
 
-  
-  
-  
-  
-  
   const enteringReadyFromDraft = fromStatus.stage === 'DRAFT' && toStatus.stage !== 'DRAFT';
-  
-  
-  
-  
-  
-  
-  
+
   const newEntry: SalesOrderActivityEntry = {
     timestamp: transitionAt,
     action: 'status_change',
@@ -322,17 +244,8 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     ...(note ? { note } : {}),
   };
 
-  
-  
-  
-  
-  
-  
   let nextLinkage: InventoryLinkage | undefined;
   if (autoReleased) {
-    
-    
-    
     nextLinkage = buildReleasedLinkage(transitionAt, actor, {
       kind: 'revert-to-draft',
       statusValue: toStatusValue,
@@ -381,11 +294,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     });
     if (allOps.length > 0) useProductInventoryStore.getState().forceRefresh();
 
-    
-    
-    
-    
-    
     if (appliedOps.length > 0) {
       emitInventoryActivityForApplied(appliedOps, {
         kind: 'SO',
@@ -394,10 +302,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       });
     }
 
-    
-    
-    
-    
     const followUps: SoFollowUp[] = [];
     const toCapIdSet = new Set((toStatus.capabilities ?? []).map((b) => b.id));
     if (toCapIdSet.has('releasesDR')) {
@@ -406,9 +310,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
 
     return { ok: true, updated: updated as SalesOrder, followUps };
   } catch (err) {
-    
-    
-    
     let orphanedRowIds: readonly string[] | undefined;
     if (appliedOps.length > 0) {
       const rb = await rollbackAppliedOps(appliedOps);
@@ -443,7 +344,7 @@ function orderHasCapabilityInHistory(
 ): boolean {
   const log = (order.extra as SalesOrderExtra | undefined)?.activityLog ?? [];
   const visitedStatuses = new Set<string>();
-  
+
   const currentStatusValue = (order.extra as SalesOrderExtra | undefined)?.status;
   if (currentStatusValue) visitedStatuses.add(currentStatusValue);
   for (const entry of log) {

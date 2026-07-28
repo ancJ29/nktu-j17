@@ -8,9 +8,9 @@ import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 
 type Props = {
   readonly rows: MaterialInventoryRow[];
-  
+
   readonly names: ReadonlyMap<string, string>;
-  
+
   readonly lowStockCodes?: ReadonlySet<string>;
   readonly isLoading?: boolean;
   readonly onRowClick: (row: MaterialInventoryRow) => void;
@@ -71,7 +71,6 @@ export function MaterialInventoryDataTable({
     [t, names, unitLabels, lowStockCodes],
   );
 
-  
   const getRowBg = useMemo(
     () => (row: MaterialInventoryRow) =>
       row.onHand < 0 ? 'red.1' : lowStockCodes?.has(row.itemCode) ? 'orange.1' : undefined,

@@ -17,9 +17,9 @@ export type ListStatCell = {
 
 type ListStatsCardsProps = {
   readonly cells: readonly ListStatCell[];
-  
+
   readonly visible?: boolean;
-  
+
   readonly cols?: { base: number; sm: number };
 };
 
@@ -28,9 +28,6 @@ export function ListStatsCards({
   visible = true,
   cols = { base: 2, sm: 4 },
 }: ListStatsCardsProps) {
-  
-  
-  
   if (!statsEnabled || isMobile || !visible || cells.length === 0) return null;
 
   return (

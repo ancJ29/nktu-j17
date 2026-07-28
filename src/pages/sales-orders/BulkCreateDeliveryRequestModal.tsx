@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
@@ -34,7 +32,7 @@ type StatusMeta = { label: string; color: string };
 type BulkCreateDeliveryRequestModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   salesOrders: SalesOrder[];
   getCustomerByCode: (code: string) => Customer | undefined;
   resolveStatus: (value: string) => StatusMeta;

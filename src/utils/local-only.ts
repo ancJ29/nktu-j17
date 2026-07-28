@@ -3,15 +3,12 @@ if (window.location.hostname.includes('localhost')) {
   sessionStorage.__gen_client_sso_admin_key__ = import.meta.env.VITE_APP_CREDO_SSO_ADMIN_ACCESS_KEY;
 
   localStorage.__NO_TUNNEL__ = 'true';
-  
-  
-  
+
   if (import.meta.env.VITE_APP_ADMIN_CONFIG_RAW) {
     localStorage.__X_ADMIN_CONFIG__ = import.meta.env.VITE_APP_ADMIN_CONFIG_RAW;
   }
   const isDebug = localStorage.__X_ADMIN_CONFIG__ === 'CCeTvzKkd5rxNqvTK2Vy';
   if (isDebug) {
-    
     localStorage.__X_ADMIN_CONFIG__ = 'CCeTvzKkd5rxNqvTK2Vy';
     sessionStorage.__c_mngt_admin_key__ = 'oRrRYXXce83xGI8DSTLKhgGJv';
     sessionStorage.__fake_data_trusted_service_key__ = 'bd527b9op3a64u9kjntqd889apu2w392';

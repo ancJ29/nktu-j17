@@ -52,16 +52,16 @@ type OrderItemsTableProps = {
   items: SalesOrderItem[];
   showShortageAlert?: boolean;
   totalAmount?: number | null;
-  
+
   ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[];
-  
+
   currentOrderNumber?: string;
-  
+
   inventoryLinkageState?: InventoryLinkageState;
-  
+
   canEditItemMemo?: boolean;
   onItemMemoSave?: (itemIndex: number, memo: string) => Promise<void>;
-  
+
   productPhotoOnHover?: boolean;
 };
 
@@ -76,21 +76,11 @@ export function OrderItemsTable({
   productPhotoOnHover = false,
   currentOrderNumber,
 }: OrderItemsTableProps) {
-  
-  
-  
   const stockSettled = inventoryLinkageState === 'shipped' || inventoryLinkageState === 'released';
   const { t } = useTranslation();
-  
-  
-  
-  
+
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
 
-  
-  
-  
-  
   const memoEditable = canEditItemMemo && !!onItemMemoSave;
   const inlineEditLabels: InlineEditLabels = {
     edit: t('__new__.01-common.actions.edit'),
@@ -111,9 +101,6 @@ export function OrderItemsTable({
     />
   );
 
-  
-  
-  
   const products = useProductStore((s) => s.items);
   const locations = useLocationStore((s) => s.items);
   const inventoryRows = useProductInventoryStore((s) => s.items);
@@ -121,9 +108,6 @@ export function OrderItemsTable({
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
   const unitLabels = useLookupLabels('unit');
 
-  
-  
-  
   const inboundByProduct = useOpenInboundByProduct();
 
   useEffect(() => {
@@ -155,21 +139,17 @@ export function OrderItemsTable({
     if (stockSettled) return null;
     const product = productByCode.get(productCode);
     if (!product) return null;
-    
+
     if (isNoInventoryProduct(product)) return null;
     const target = locationCode || DEFAULT_LOCATION_CODE;
-    
-    
-    
-    
-    const incoming = isNKTU ? 0 : inboundByProduct.get(productCode)?.totalBase ?? 0;
+
+    const incoming = isNKTU ? 0 : (inboundByProduct.get(productCode)?.totalBase ?? 0);
     return getSequentialAvailability(product, target, inventoryByProduct, {
       orderNumber: currentOrderNumber,
       incoming,
     });
   }
 
-  
   function getUnitAvailable(
     productCode: string,
     locationCode: string | undefined,
@@ -189,11 +169,6 @@ export function OrderItemsTable({
     );
   }
 
-  
-  
-  
-  
-  
   const displayItems = useMemo(
     () =>
       canViewSetComponentInventory ? items : items.filter((it) => it.role !== 'set-component'),
@@ -206,10 +181,7 @@ export function OrderItemsTable({
         {displayItems.map((item, idx) => {
           const isSetParent = item.role === 'set';
           const isSetChild = item.role === 'set-component';
-          
-          
-          
-          
+
           const available = isSetChild
             ? getUnitAvailable(item.productCode, item.fromLocationCode, item.unit)
             : getAvailable(item.productCode, item.fromLocationCode);
@@ -415,9 +387,7 @@ export function OrderItemsTable({
           {displayItems.map((item, idx) => {
             const isSetParent = item.role === 'set';
             const isSetChild = item.role === 'set-component';
-            
-            
-            
+
             const available = isSetChild
               ? getUnitAvailable(item.productCode, item.fromLocationCode, item.unit)
               : getAvailable(item.productCode, item.fromLocationCode);

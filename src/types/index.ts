@@ -28,4 +28,3 @@ export type {
   CMngtGoodsReceiptItemType as GoodsReceiptItemType,
   CMngtLookupItem as Lookup,
 } from '@credo/connectors/types';
-

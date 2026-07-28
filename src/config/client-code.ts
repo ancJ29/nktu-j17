@@ -1,5 +1,3 @@
-
-
 import { logger } from '@credo/base-ui/utils';
 import { cacheReset } from '@/utils/appCache';
 import { reloadPage } from '@credo/base-ui/utils';
@@ -18,11 +16,6 @@ function saveToStorage(clientCode: string): void {
 
 function fromDomain(): string {
   const host = window.location.hostname.toLowerCase();
-
-  
-  
-  
-  
 
   if (host.includes('localhost') || host.includes('127.0.0.1')) {
     return ''; // Fall through to .env
@@ -58,7 +51,6 @@ export function resolveClientCode(): string {
     return '';
   }
 
-  
   if (clientCode) {
     saveToStorage(clientCode);
   }
@@ -78,10 +70,5 @@ export function setClientCode(clientCode: string): void {
 }
 
 export async function refreshClientCode(): Promise<string | null> {
-  
-  
-  
-  
-  
   return null;
 }

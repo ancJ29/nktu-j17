@@ -110,9 +110,7 @@ export const cStorageConnector = {
     return cStorageConnector;
   },
   setInternalAccessKey: (internalAccessKey: string) => {
-    
     if (isBrowser()) {
-      
       console.warn(
         '[cStorageConnector] setInternalAccessKey is disabled in browser context. c-storage is not intended for direct FE access.',
       );
@@ -125,7 +123,7 @@ export const cStorageConnector = {
     storages.trustedServiceKey = trustedServiceKey;
     return cStorageConnector;
   },
-  
+
   configureForAdmin: (keys: {
     superAdminAccessKey: string;
     internalAccessKey: string;
@@ -137,10 +135,6 @@ export const cStorageConnector = {
     storages.callerService = 'credo-admin';
     return cStorageConnector;
   },
-
-  
-  
-  
 
   getPublicRecords: <T>({ serviceCode, cursor, limit, noData }: GetPublicRecordsRequest) =>
     recordApi<GetPublicRecordsResponse<T>>(RECORD_ROUTES.GET_PUBLIC_RECORDS, {
@@ -243,10 +237,6 @@ export const cStorageConnector = {
       accessKey,
       accessKeyRequired: true,
     }),
-
-  
-  
-  
 
   getAllServices: ({ fullData }: GetAllServicesRequest = {}) =>
     serviceApi<GetAllServicesResponse>(SERVICE_ROUTES.GET_ALL_SERVICES, {

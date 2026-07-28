@@ -1,5 +1,3 @@
-
-
 import { activityLoggerConnector, cMngtConnector } from '@credo/connectors/connector';
 import { resolveClientCode } from '@/config/client-code';
 import { businessDateString } from '@/utils/code';
@@ -150,7 +148,7 @@ async function backfillInventory(
 ): Promise<{ outcome: InventoryOutcome; reason?: string }> {
   const extra = (so.extra ?? {}) as SalesOrderExtra;
   if (extra.cancellation != null) return { outcome: 'skipped-cancelled' };
-  
+
   if (extra.inventoryLinkage?.state === 'shipped') return { outcome: 'skipped-already-shipped' };
 
   const productIds = new Set<string>();
@@ -161,7 +159,6 @@ async function backfillInventory(
     productIds.add(p.id);
   }
 
-  
   if (productIds.size > 0) {
     const activity = await soHasInventoryActivity(so.id, [...productIds]);
     if (activity === 'exists') return { outcome: 'skipped-already-deducted' };
@@ -173,8 +170,6 @@ async function backfillInventory(
   let current = so;
   let inv = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
-  
-  
   let snapshot =
     extra.inventoryLinkage?.state === 'reserved'
       ? (extra.inventoryLinkage.reservedSnapshot ?? [])
@@ -189,7 +184,6 @@ async function backfillInventory(
     });
     if (!reservePlan.ok) return { outcome: 'failed', reason: 'reserve-plan' };
     if (reservePlan.plan.ops.length === 0) {
-      
       try {
         await patchLinkage(
           current,
@@ -223,8 +217,6 @@ async function backfillInventory(
     inv = indexInventoryByProduct(useProductInventoryStore.getState().items);
   }
 
-  
-  
   const shipPlan = planShipFromLinkage({
     snapshot,
     so: current,
@@ -254,8 +246,7 @@ async function backfillInventory(
   }
 
   useProductInventoryStore.getState().forceRefresh();
-  
-  
+
   if (appliedShip.length > 0) {
     emitInventoryActivityForApplied(appliedShip, {
       kind: 'SO',
@@ -277,7 +268,6 @@ export async function migrateNktuCheatData(): Promise<CheatMigrationSummary> {
     details: [],
   };
 
-  
   const invStore = useProductInventoryStore.getState();
   if (!invStore.initialized) await invStore.loadAll();
   const prodStore = useProductStore.getState();
@@ -287,7 +277,7 @@ export async function migrateNktuCheatData(): Promise<CheatMigrationSummary> {
 
   const now = Date.now();
   const fromPeriod = businessDateString(now - SCAN_BACK_DAYS * ONE_DAY);
-  const toPeriod = businessDateString(now + ONE_DAY); 
+  const toPeriod = businessDateString(now + ONE_DAY);
   const res = await cMngtConnector.querySalesOrders<SalesOrderExtra>({ fromPeriod, toPeriod });
   const orders = res.salesOrders as SalesOrder[];
   summary.scanned = orders.length;
@@ -304,7 +294,7 @@ export async function migrateNktuCheatData(): Promise<CheatMigrationSummary> {
     };
 
     let current = order;
-    
+
     try {
       const notesRes = await fixNotesAndMarker(current);
       current = notesRes.so;
@@ -315,7 +305,6 @@ export async function migrateNktuCheatData(): Promise<CheatMigrationSummary> {
       detail.reason = `notes: ${err instanceof Error ? err.message : String(err)}`;
     }
 
-    
     try {
       const inv = await backfillInventory(current, productsByCode);
       detail.inventory = inv.outcome;

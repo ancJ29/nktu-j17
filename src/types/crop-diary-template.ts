@@ -16,13 +16,12 @@ export type TemplateDay = {
 };
 
 export type CropDiaryTemplateExtra = {
-  
   description?: string;
-  
+
   totalDates?: number;
-  
+
   days?: TemplateDay[];
-  
+
   isDeleted?: boolean;
   [key: string]: unknown;
 };

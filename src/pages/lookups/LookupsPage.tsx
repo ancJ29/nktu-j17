@@ -1,5 +1,3 @@
-
-
 import {
   Button,
   Card,
@@ -41,9 +39,7 @@ type FormValues = {
 export function LookupsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  
-  
+
   const { hash } = useLocation();
   const category = hash.startsWith('#') ? hash.slice(1) : hash;
   const registered = (category ? getLookupCategory(category) : undefined) ?? enabledCategories[0];
@@ -120,7 +116,6 @@ export function LookupsPage() {
 
       setSubmitting(true);
 
-      
       values.value = values.value.trim().toUpperCase();
 
       try {
@@ -173,9 +168,6 @@ export function LookupsPage() {
             autoClose: 8000,
           });
         } else if (!editing && isListVersionConflict(err)) {
-          
-          
-          
           invalidate();
           void loadAll();
           notifications.show({

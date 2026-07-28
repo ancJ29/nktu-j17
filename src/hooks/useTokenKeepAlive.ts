@@ -1,5 +1,3 @@
-
-
 import { useEffect } from 'react';
 import { logger } from '@credo/base-ui/utils';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -15,20 +13,15 @@ export function useTokenKeepAlive(intervalMs = TOKEN_KEEP_ALIVE_INTERVAL_MS): vo
     let disposed = false;
 
     const topUp = (trigger: string) => {
-      
-      
       void useAuthStore
         .getState()
         .checkAndRefreshToken()
         .then((outcome) => {
           if (disposed) return;
-          
+
           if (outcome !== 'valid') logger.debug('Token keep-alive', { trigger, outcome });
         })
         .catch((error: unknown) => {
-          
-          
-          
           logger.warn('Token keep-alive failed', { trigger, error });
         });
     };

@@ -14,7 +14,7 @@ type Props = {
   readonly orders: TransportOrder[];
   readonly isLoading?: boolean;
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly sortField?: string;
   readonly onSortChange?: (field: string) => void;
 };
@@ -58,9 +58,7 @@ export function TransportOrderDataTable({
         key: 'billContainer',
         header: t('transportOrders.columns.billContainer'),
         width: '160px',
-        
-        
-        
+
         render: (item: TransportOrder) => (
           <Stack gap={2}>
             <Text fz="sm" lineClamp={1}>
@@ -87,8 +85,7 @@ export function TransportOrderDataTable({
       {
         key: 'route',
         header: t('transportOrders.columns.route'),
-        
-        
+
         render: (item: TransportOrder) => <TransportRouteCell order={item} />,
       },
       {
@@ -114,7 +111,7 @@ export function TransportOrderDataTable({
         },
       },
     ],
-    
+
     [t, i18n.language, sortField, onSortChange],
   );
 

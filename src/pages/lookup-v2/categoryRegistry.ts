@@ -1,5 +1,3 @@
-
-
 import { appConfig } from '@/config';
 
 export type LookupV2CategoryId =
@@ -14,9 +12,9 @@ export type LookupV2CategoryId =
 
 export type LookupV2Category = {
   id: LookupV2CategoryId;
-  
+
   labelKey: string;
-  
+
   defaultSortOrder: number;
 };
 
@@ -30,19 +28,15 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
     defaultSortOrder: 1,
   },
   { id: 'product-category', labelKey: 'lookups.categories.productCategory', defaultSortOrder: 1 },
-  
-  
+
   { id: 'truck-type', labelKey: 'lookups.categories.truckType', defaultSortOrder: 1 },
-  
-  
+
   {
     id: 'truck-maintenance-type',
     labelKey: 'lookups.categories.maintenanceType',
     defaultSortOrder: 1,
   },
-  
-  
-  
+
   { id: 'container-size', labelKey: 'lookups.categories.containerSize', defaultSortOrder: 1 },
 ];
 
@@ -52,15 +46,10 @@ const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = ['container-size']
 
 export function getEnabledLookupV2Categories(): LookupV2Category[] {
   const cfg = appConfig.features?.lookupV2;
-  
-  
-  
+
   const trucksOn = appConfig.features?.trucks?.enabled ?? false;
   const transportOrdersOn = appConfig.features?.transportOrders?.enabled ?? false;
   const available = LOOKUP_V2_CATEGORIES.filter((c) => {
-    
-    
-    
     if (!trucksOn && FLEET_ONLY_CATEGORIES.includes(c.id)) return false;
     if (!transportOrdersOn && TRANSPORT_ORDER_ONLY_CATEGORIES.includes(c.id)) return false;
     return true;

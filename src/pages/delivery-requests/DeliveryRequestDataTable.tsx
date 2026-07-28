@@ -30,9 +30,6 @@ export function DeliveryRequestDataTable({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  
-  
-  
   const customers = useCustomerStore((s) => s.items);
   const getVendorByCode = useVendorStore((s) => s.getByCode);
   const resolveCustomerShortName = useMemo(
@@ -59,7 +56,7 @@ export function DeliveryRequestDataTable({
       {
         key: 'party',
         header: t('deliveryRequests.columns.party'),
-        
+
         render: (item: DeliveryRequest) => {
           if (!deliveryRequestPartyIsCustomer(item)) {
             const vendor = item.vendorCode ? getVendorByCode(item.vendorCode) : undefined;
@@ -72,7 +69,6 @@ export function DeliveryRequestDataTable({
         },
       },
       {
-        
         key: 'scheduledDate',
         header: t('deliveryRequests.columns.scheduledDate'),
         render: (item: DeliveryRequest) => (
@@ -80,9 +76,6 @@ export function DeliveryRequestDataTable({
         ),
       },
       {
-        
-        
-        
         key: 'completedDate',
         header: t('deliveryRequests.columns.completedDate'),
         render: (item: DeliveryRequest) => {
@@ -94,17 +87,6 @@ export function DeliveryRequestDataTable({
           );
         },
       },
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
 
       {
         key: 'driver',
@@ -144,8 +126,6 @@ export function DeliveryRequestDataTable({
     navigate(ROUTES.DELIVERY.DETAIL.replace(':id', item.id));
   };
 
-  
-  
   const getRowBg = useCallback(
     (item: DeliveryRequest & Record<string, unknown>) =>
       resolveDeliveryRequestRowBg(

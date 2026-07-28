@@ -47,7 +47,7 @@ type Props = {
   readonly opened: boolean;
   readonly onClose: () => void;
   readonly row: MaterialInventoryRow | null;
-  
+
   readonly material: Material | null;
   readonly materialName: string;
   readonly canDelete: boolean;
@@ -96,13 +96,12 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
 
   useEffect(() => {
     if (!opened) return;
-    
+
     setMode('delta');
     form.setValues({ value: '', reason: '', note: '' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
-  
   useEffect(() => {
     if (!opened) return;
     form.setValues((c) => ({ ...c, value: '' }));
@@ -128,8 +127,7 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
   const handleSubmit = async (values: SimpleValues) => {
     if (!row || typeof values.value !== 'number') return;
     const nextOnHand = mode === 'delta' ? currentOnHand + values.value : values.value;
-    
-    
+
     if (nextOnHand < 0) {
       notifications.show({
         color: 'red',
@@ -446,7 +444,7 @@ function PackagingUpdate({
 
   useEffect(() => {
     if (!opened) return;
-    
+
     setMode('delta');
     form.setValues({
       value: '',
@@ -463,8 +461,6 @@ function PackagingUpdate({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, baseUnit]);
 
-  
-  
   useEffect(() => {
     if (!opened) return;
     form.setValues((c) => ({ ...c, value: '', fromQty: '', toQty: '', writeOffBaseQty: '' }));
@@ -594,8 +590,7 @@ function PackagingUpdate({
           patch: { onHand: nextOnHand, extra: updatedExtra },
         });
         const verb = mode === 'delta' ? 'adjust' : mode === 'snapshot' ? 'stockTake' : 'repack';
-        
-        
+
         logActivity(`materialInventory.${verb}`, material.id, {
           prevOnHand: row.onHand,
           nextOnHand,
@@ -631,7 +626,7 @@ function PackagingUpdate({
         setSubmitting(false);
       }
     },
-    
+
     [row, item, breakdown, mode, repackOp, repackValidation, t, onClose],
   );
 

@@ -25,11 +25,11 @@ type DataTableProps<T> = {
   readonly onRowClick?: (item: T) => void;
   readonly onActionCellClick?: (event: React.MouseEvent) => void;
   readonly getRowBg?: (item: T) => string | undefined;
-  
+
   readonly maxHeight?: number | string;
-  
+
   readonly stickyHeader?: boolean;
-  
+
   readonly viewportRef?: React.Ref<HTMLDivElement>;
 };
 
@@ -55,10 +55,6 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   const bounded = maxHeight != null;
   const sticky = stickyHeader ?? bounded;
 
-  
-  
-  
-  
   const ScrollWrap = (bounded ? ScrollArea.Autosize : ScrollArea) as React.ElementType;
   const scrollProps = bounded
     ? { mah: maxHeight, type: 'auto' as const, viewportRef }
@@ -76,8 +72,7 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
         <Table striped highlightOnHover verticalSpacing="sm" stickyHeader={sticky}>
           <Table.Thead
             px="xs"
-            
-            
+
             style={sticky ? { backgroundColor: 'var(--mantine-color-body)' } : undefined}
           >
             <Table.Tr>

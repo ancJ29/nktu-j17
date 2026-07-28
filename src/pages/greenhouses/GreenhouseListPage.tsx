@@ -67,9 +67,6 @@ export function GreenhouseListPage() {
       onPageChange,
     });
 
-  
-  
-  
   const allCrops = useCropStore((s) => s.items);
   const cropsInitialized = useCropStore((s) => s.initialized);
   const loadCrops = useCropStore((s) => s.loadAll);

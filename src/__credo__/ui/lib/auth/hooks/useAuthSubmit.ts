@@ -1,38 +1,26 @@
-
-
 import { useCallback, useState } from 'react';
 
 type UseAuthSubmitOptions<TValues, TResult> = {
-  
   onSubmit: (values: TValues) => Promise<TResult>;
 
-  
   onSuccess?: (result: TResult) => void;
 
-  
   onError?: (error: Error) => void;
 
-  
   getErrorMessage?: (error: unknown) => string;
 };
 
 type UseAuthSubmitResult<TValues> = {
-  
   isLoading: boolean;
 
-  
   error: string | null;
 
-  
   isSubmitted: boolean;
 
-  
   clearError: () => void;
 
-  
   resetSubmitted: () => void;
 
-  
   handleSubmit: (values: TValues) => Promise<void>;
 };
 

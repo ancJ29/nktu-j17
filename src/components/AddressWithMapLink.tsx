@@ -6,15 +6,14 @@ import { device } from '@credo/base-ui/utils';
 const isMobile = device.isMobile;
 
 type AddressWithMapLinkProps = {
-  
   readonly address?: string | null;
-  
+
   readonly googleMapUrl?: string | null;
-  
+
   readonly fallback?: string;
-  
+
   readonly size?: MantineSize;
-  
+
   readonly fw?: number;
 };
 
@@ -44,8 +43,6 @@ export function AddressWithMapLink({
         {address || fallback}
       </Text>
       {mapLink ? (
-        
-        
         isMobile ? (
           mapLink
         ) : (

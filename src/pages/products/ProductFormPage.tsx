@@ -60,22 +60,14 @@ export function ProductFormPage() {
   const forceRefresh = useProductStore((s) => s.forceRefresh);
   const totalProducts = useProductStore((s) => s.items.length);
 
-  
-  
-  
-  
   const categoryOptions = useLookupOptions('product-category');
   const tagOptions = useLookupOptions('product-tag');
   const unitOptions = useLookupOptions('unit');
 
-  
-  
-  
   const snapshotRef = useRef<Product | null>(null);
 
   const [activeTab, setActiveTab] = useState<string | null>('single');
 
-  
   const bulkNavTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(bulkNavTimer.current), []);
 
@@ -92,7 +84,6 @@ export function ProductFormPage() {
     | undefined
   >();
 
-  
   useEffect(() => {
     let canView = true;
     if (isMobile) {
@@ -109,32 +100,21 @@ export function ProductFormPage() {
 
   const [loading, setLoading] = useState(false);
 
-  
-  
-  
-  
   const skuIsCustomRef = useRef(false);
 
   const form = useForm<ProductFormValues>({
     initialValues: {
       name: '',
-      
+
       code: isEdit ? '' : buildNextProductCode(totalProducts + 1),
       description: '',
       units: [],
       price: 0,
       isActive: true,
       alternativeNames: [],
-      
-      
-      
-      
-      
+
       sku: isEdit ? '' : buildNextProductCode(totalProducts + 1),
-      
-      
-      
-      
+
       barcode: isEdit || !barcodeEnabled ? '' : generateInternalBarcode(),
       basePrice: 0,
       suggestedPrice: 0,
@@ -150,16 +130,7 @@ export function ProductFormPage() {
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+
       sku: (v, values) => {
         const sku = v.trim();
         const items = useProductStore.getState().items;
@@ -180,9 +151,7 @@ export function ProductFormPage() {
         if (result === 'disconnected') return t('products.validation.unitsNotConnected');
         return null;
       },
-      
-      
-      
+
       minInventoryValue: (v, values) =>
         !hasValue(v) && hasUnit(values.minInventoryUnit)
           ? t('products.validation.pairValueRequired')
@@ -191,11 +160,7 @@ export function ProductFormPage() {
         hasValue(values.minInventoryValue) && !hasUnit(v)
           ? t('products.validation.pairUnitRequired')
           : null,
-      
-      
-      
-      
-      
+
       setItems: (rows, values) => {
         if (!rows || rows.length === 0) return null;
         const allProducts = useProductStore.getState().items;
@@ -215,25 +180,15 @@ export function ProductFormPage() {
     },
   });
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isEdit || skuIsCustomRef.current) return;
     const nextCode = buildNextProductCode(totalProducts + 1);
     form.setFieldValue('code', nextCode);
-    
+
     form.setFieldValue('sku', nextCode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, totalProducts]);
 
-  
-  
-  
   const handleSkuChange = useCallback(
     (value: string) => {
       if (value.trim() === '') {
@@ -297,7 +252,6 @@ export function ProductFormPage() {
         const user = useAuthStore.getState().user;
         const updatedBy = user?.email ?? 'unknown';
 
-        
         const core = {
           name: values.name,
           code: values.code,
@@ -307,15 +261,8 @@ export function ProductFormPage() {
           isActive: values.isActive,
         };
 
-        
-        
-        
-        
-        
-        
         const images = snapshotRef.current?.extra?.images ?? [];
 
-        
         let minimumInventory: ProductMinimumInventory | undefined;
         if (
           !values.noInventory &&
@@ -348,9 +295,7 @@ export function ProductFormPage() {
             alternativeNames: values.alternativeNames,
           }),
           ...(images.length > 0 && { images }),
-          
-          
-          
+
           ...((isEdit ? values.sku.trim() : values.code.trim()) && {
             sku: isEdit ? values.sku.trim() : values.code.trim(),
           }),
@@ -359,10 +304,7 @@ export function ProductFormPage() {
           ...(values.suggestedPrice > 0 && { suggestedPrice: values.suggestedPrice }),
           ...(values.category.trim() && { category: values.category.trim() }),
           ...(values.tags.length > 0 && { tags: values.tags }),
-          
-          
-          
-          
+
           ...(() => {
             const cleaned = values.attributes
               .map((a) => ({ key: a.key.trim(), value: a.value.trim() }))
@@ -376,9 +318,7 @@ export function ProductFormPage() {
               (c) => c.unit.trim() && c.baseUnit.trim() && c.quantity > 0,
             ),
           }),
-          
-          
-          
+
           ...(() => {
             const cleaned: ProductSetItem[] = values.setItems
               .map((r) => ({
@@ -408,12 +348,10 @@ export function ProductFormPage() {
             .getState()
             .updateSafely({ id, version: snapshot.version, patch: after });
           const diff = deepDiff(before, after);
-          
-          
+
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           logActivity(onlyIsActive ? 'product.toggleStatus' : 'product.update', id, diff);
-          
-          
+
           snapshotRef.current = updated;
           notifications.show({
             color: 'green',
@@ -428,17 +366,13 @@ export function ProductFormPage() {
             ...(expectedListHash && { expectedListHash }),
           });
           logActivity('product.create', res.product.id);
-          
-          
+
           forceRefresh();
           notifications.show({
             color: 'green',
             message: t('products.notifications.createSuccess'),
           });
-          
-          
-          
-          
+
           navigate(ROUTES.PRODUCTS.DETAIL.replace(':id', res.product.id), {
             state: { promptInventory: true },
           });
@@ -457,14 +391,8 @@ export function ProductFormPage() {
             autoClose: 8000,
           });
         } else if (!isEdit && isListVersionConflict(err)) {
-          
-          
-          
-          
           await useProductStore.getState().forceRefresh();
-          
-          
-          
+
           let newCode = form.values.code;
           if (!skuIsCustomRef.current) {
             newCode = buildNextProductCode(useProductStore.getState().items.length + 1);
@@ -494,13 +422,9 @@ export function ProductFormPage() {
 
   const navigateToList = useCallback(() => navigate(ROUTES.PRODUCTS.LIST), [navigate]);
 
-  
   const handleDownloadSample = useCallback(async () => {
     setIsDownloading(true);
     try {
-      
-      
-      
       const categories = categoryOptions.map((o) => o.label);
       const tags = tagOptions.map((o) => o.label);
       const units = unitOptions.map((o) => o.label);
@@ -555,14 +479,6 @@ export function ProductFormPage() {
         return;
       }
 
-      
-      
-      
-      
-      
-      
-      
-      
       const catLabelToValue = new Map<string, string>();
       for (const o of categoryOptions) catLabelToValue.set(o.label.trim().toLowerCase(), o.value);
       const tagLabelToCanonical = new Map<string, string>();
@@ -580,9 +496,7 @@ export function ProductFormPage() {
           const tag = raw.trim();
           if (tag && !tagLabelToCanonical.has(tag.toLowerCase())) unknownTags.add(tag);
         }
-        
-        
-        
+
         for (const raw of [p.unit, p.minInventoryUnit]) {
           const unit = raw?.trim();
           if (unit && !unitLabelToValue.has(unit.toLowerCase())) unknownUnits.add(unit);
@@ -621,22 +535,13 @@ export function ProductFormPage() {
         return;
       }
 
-      
-      
-      
-      
-      
-      
-      
-      
       const user = useAuthStore.getState().user;
       const updatedBy = user?.email ?? 'unknown';
       const now = Date.now();
       let nextCodeNum = totalProducts + 1;
       const items = products.map((p) => {
         const code = p.sku?.trim() || buildNextProductCode(nextCodeNum++);
-        
-        
+
         const resolveUnit = (raw: string | undefined) => {
           const label = raw?.trim();
           return label ? (unitLabelToValue.get(label.toLowerCase()) ?? '') : '';
@@ -647,8 +552,7 @@ export function ProductFormPage() {
           typeof p.minInventoryValue === 'number' && p.minInventoryValue > 0
             ? p.minInventoryValue
             : undefined;
-        
-        
+
         const category = p.category?.trim()
           ? catLabelToValue.get(p.category.trim().toLowerCase())
           : undefined;
@@ -656,33 +560,20 @@ export function ProductFormPage() {
           .map((raw) => tagLabelToCanonical.get(raw.trim().toLowerCase()))
           .filter((v): v is string => Boolean(v));
         const extra: ProductExtra = {
-          
-          
-          
-          
           sku: code,
           ...(barcodeEnabled && {
             barcode: p.barcode?.trim() || generateInternalBarcode(),
           }),
           ...(category && { category }),
           ...(tags.length > 0 && { tags }),
-          
-          
-          
-          
-          
+
           ...(unit && { units: [unit] }),
           ...(priceManageable &&
             typeof p.basePrice === 'number' &&
             p.basePrice > 0 && {
               basePrice: p.basePrice,
             }),
-          
-          
-          
-          
-          
-          
+
           ...(minValue !== undefined &&
             minUnit && {
               minimumInventory: {
@@ -711,8 +602,7 @@ export function ProductFormPage() {
       const failed = res.summary?.errors ?? Math.max(0, total - created - skippedCount);
       const rowName = (index: number) =>
         products[index]?.name ?? t('common.bulkImport.rowLabel', { n: index + 1 });
-      
-      
+
       const skippedNames = (res.skipped ?? []).map((s) => {
         const reason =
           s.reason === 'duplicate-sku'
@@ -729,8 +619,6 @@ export function ProductFormPage() {
         errors: errorNames.length > 0 ? errorNames : undefined,
       });
 
-      
-      
       if (failed === 0 && skippedCount === 0) {
         notifications.show({
           color: 'green',
@@ -748,10 +636,6 @@ export function ProductFormPage() {
       }
     } catch (err) {
       if (err instanceof ExcelParseError) {
-        
-        
-        
-        
         const labels: Record<string, string> = {
           name: t('common.labels.name'),
         };
@@ -776,7 +660,7 @@ export function ProductFormPage() {
   const validateFileType = useCallback((f: File) => {
     const validTypes = [
       'text/csv',
-      
+
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ];
@@ -798,8 +682,6 @@ export function ProductFormPage() {
     />
   );
 
-  
-  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button

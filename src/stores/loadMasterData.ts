@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import { cacheGet, cacheSet } from '@/utils/appCache';
 import { resolveClientCode } from '@/config/client-code';
@@ -26,8 +24,7 @@ export function loadAllMasterData(): Promise<void> {
 
 function readCachedHashes(clientCode: string): CMngtMasterDataHashes {
   const entry = cacheGet('mdh');
-  
-  
+
   if (!entry || entry.c !== clientCode) return {};
   return entry.h;
 }
@@ -77,11 +74,6 @@ function applyListHashes(hashes: CMngtMasterDataHashes): void {
 }
 
 async function doLoad(): Promise<void> {
-  
-  
-  
-  
-  
   const vendorsReady = useVendorStore.getState().loadAll();
   const customersReady = useCustomerStore.getState().loadAll();
 
@@ -92,9 +84,6 @@ async function doLoad(): Promise<void> {
   const toSend = buildHashesToSend(cachedHashes);
 
   try {
-    
-    
-    
     const res = await cMngtConnector.getAllMasterData({
       ...(toSend.employees && { employeesHash: toSend.employees }),
       ...(toSend.products && { productsHash: toSend.products }),
@@ -110,15 +99,8 @@ async function doLoad(): Promise<void> {
       if (u.lookups) useLookupStore.getState().setItems(u.lookups as never[]);
     }
 
-    
-    
-    
-    
-    
     applyListHashes(res.hashes);
 
-    
-    
     saveHashes(clientCode, res.hashes);
 
     logger.debug('Master data: synced', {
@@ -130,40 +112,11 @@ async function doLoad(): Promise<void> {
     // Hydrated-from-cache state remains in place; individual list pages can
     // retry via their own `loadAll` / `forceRefresh`.
   } finally {
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     ensureStoresInitialized();
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   void ensureDefaultLocation();
 
-  
-  
-  
   await Promise.all([vendorsReady, customersReady]);
 }
 

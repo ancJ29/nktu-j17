@@ -36,7 +36,6 @@ export function usePWAInstall(options?: UsePWAInstallOptions) {
   const [shouldShowPopup, setShouldShowPopup] = useState(false);
 
   const checkShouldShowPopup = useCallback((): boolean => {
-    
     if (customStorage) {
       if (customStorage.isDismissed()) return false;
     } else {
@@ -44,7 +43,6 @@ export function usePWAInstall(options?: UsePWAInstallOptions) {
       if (dismissed === 'true') return false;
     }
 
-    
     let reminder: ReminderData | null = null;
     if (customStorage) {
       reminder = customStorage.getReminder();
@@ -57,7 +55,7 @@ export function usePWAInstall(options?: UsePWAInstallOptions) {
       }
     }
 
-    if (!reminder) return true; 
+    if (!reminder) return true;
 
     if (reminder.period === 'never') return false;
 
@@ -65,38 +63,32 @@ export function usePWAInstall(options?: UsePWAInstallOptions) {
 
     switch (reminder.period) {
       case 'tomorrow':
-        return timePassed > 24 * 60 * 60 * 1000; 
+        return timePassed > 24 * 60 * 60 * 1000;
       case 'next-week':
-        return timePassed > 7 * 24 * 60 * 60 * 1000; 
+        return timePassed > 7 * 24 * 60 * 60 * 1000;
       case 'next-month':
-        return timePassed > 30 * 24 * 60 * 60 * 1000; 
+        return timePassed > 30 * 24 * 60 * 60 * 1000;
       default:
         return true;
     }
   }, [customStorage]);
 
-  
   useEffect(() => {
-    
     const iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
     setIsIOS(iOS);
 
-    
     const standalone = window.matchMedia('(display-mode: standalone)').matches;
     setIsStandalone(standalone);
 
-    
     const shouldShow = checkShouldShowPopup();
     setShouldShowPopup(shouldShow && !standalone);
 
-    
     const handleBeforeInstallPrompt = (e: Event) => {
       e.preventDefault();
       const promptEvent = e as BeforeInstallPromptEvent;
       setDeferredPrompt(promptEvent);
       setIsInstallable(true);
 
-      
       const shouldShow = checkShouldShowPopup();
       setShouldShowPopup(shouldShow);
     };
@@ -107,7 +99,6 @@ export function usePWAInstall(options?: UsePWAInstallOptions) {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
   }, []);
-  
 
   const setReminder = (period: ReminderPeriod) => {
     if (period === 'never') {
@@ -135,7 +126,6 @@ export function usePWAInstall(options?: UsePWAInstallOptions) {
       const { outcome } = await deferredPrompt.userChoice;
 
       if (outcome === 'accepted') {
-        
         if (customStorage) {
           customStorage.setDismissed(true);
         } else {

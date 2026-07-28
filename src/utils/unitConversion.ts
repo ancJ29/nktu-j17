@@ -56,7 +56,7 @@ function buildRateGraph(conversions: UnitConversion[]): Map<string, Map<string, 
     if (!c.unit || !c.baseUnit || !c.quantity || c.quantity <= 0) continue;
     ensure(c.unit);
     ensure(c.baseUnit);
-    g.get(c.unit)!.set(c.baseUnit, c.quantity); 
+    g.get(c.unit)!.set(c.baseUnit, c.quantity);
     g.get(c.baseUnit)!.set(c.unit, 1 / c.quantity); // inverse
   }
   return g;
@@ -120,8 +120,6 @@ export function getConversionDisplay(
 
   const graph = buildRateGraph(conversions);
 
-  
-  
   let best: { unit: string; value: number } | null = null;
 
   for (const u of allUnits) {
@@ -130,7 +128,7 @@ export function getConversionDisplay(
     if (rate === null) continue;
     const converted = onHand * rate;
     if (converted === 0) continue;
-    
+
     if (!best || Math.abs(converted) < Math.abs(best.value)) {
       best = { unit: u, value: converted };
     }
@@ -138,7 +136,6 @@ export function getConversionDisplay(
 
   if (!best) return null;
 
-  
   const formatted = Number.isInteger(best.value)
     ? best.value.toLocaleString()
     : best.value.toLocaleString(undefined, { maximumFractionDigits: 2 });

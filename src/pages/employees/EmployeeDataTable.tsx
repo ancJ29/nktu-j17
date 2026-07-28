@@ -109,9 +109,7 @@ export function EmployeeDataTable({
             const work = emp.phone?.trim() || '';
             const personal = emp.extra?.personalPhoneNumber?.trim() || '';
             if (!work && !personal) return <Text size="sm">-</Text>;
-            
-            
-            
+
             const showLabels = !!work && !!personal;
             return (
               <Stack gap={2}>

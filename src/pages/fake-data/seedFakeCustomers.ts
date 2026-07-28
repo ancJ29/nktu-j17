@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import { generateId, newVersion } from '@credo/kits/string';
 import { generateName } from '../../../scripts/faker/name';
@@ -56,7 +54,7 @@ export type SeedCustomersOptions = {
   industry: IndustryName;
   count: number;
   secrets: FakeDataSecrets;
-  
+
   items?: ManualCustomerInput[];
   onLog?: (line: string) => void;
 };
@@ -227,7 +225,6 @@ const NOTES_POOL = [
 ];
 
 function buildEmailFrom(name: string, domain: string): string {
-  
   const ascii = name
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '')
@@ -257,7 +254,7 @@ function generateContacts(
   primaryPhone: string,
   primaryEmail: string,
 ): Array<Record<string, unknown>> {
-  const extraCount = randomInt(0, 2); 
+  const extraCount = randomInt(0, 2);
   const primary = {
     id: generateId(),
     name: primaryFullName,
@@ -309,7 +306,7 @@ function generateCustomers(
     const { firstName, fullName } = generateName();
     const suffix = pick(COMPANY_SUFFIXES);
     const businessType = pick(types);
-    
+
     const companyName = `Công ty ${suffix} ${businessType} ${firstName}`;
     const shortName = firstName.trim();
     const code = `${config.codePrefix}${pad(index + 1, config.codePadLength)}`;

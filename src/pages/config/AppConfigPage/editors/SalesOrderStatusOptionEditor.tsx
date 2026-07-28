@@ -62,8 +62,6 @@ export function SalesOrderStatusOptionEditor({
       if (field === 'color') return { ...opt, color: val as string };
       if (field === 'icon') return { ...opt, icon: (val as string) || undefined };
       if (field === 'stage') {
-        
-        
         const newStage = val as CMngtSalesOrderStage;
         const allowed = new Set(listCapabilitiesForStage(newStage).map((c) => c.id));
         const filteredCaps = (opt.capabilities ?? []).filter((b) => allowed.has(b.id));

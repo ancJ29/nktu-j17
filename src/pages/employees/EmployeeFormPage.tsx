@@ -50,16 +50,6 @@ function buildProfileExtra(values: EmployeeFormValues): Partial<EmployeeExtra> {
     ? useTruckAssetStore.getState().items.find((a) => a.id === values.truckAssetId)
     : undefined;
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const truckAssetCode: Partial<EmployeeExtra> = truck
     ? { truckAssetCode: truck.extra?.plateNumber || truck.code }
     : values.truckAssetId
@@ -129,11 +119,9 @@ export function EmployeeFormPage() {
   const isEdit = !!id;
   const forceRefresh = useEmployeeStore((s) => s.forceRefresh);
   const totalEmployees = useEmployeeStore((s) => s.items.length);
-  
-  
+
   const reconcileTruckLink = useDriverTruckReconcile();
 
-  
   useEffect(() => {
     if (isMobile || (isEdit && !canEdit) || (!isEdit && !perms.employee.canCreate())) {
       navigate(ROUTES.EMPLOYEES.LIST, { replace: true });
@@ -143,10 +131,8 @@ export function EmployeeFormPage() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>('single');
 
-  
   const bulkNavTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  
   useEffect(() => () => clearTimeout(bulkNavTimer.current), []);
 
   const [isBulkLoading, setIsBulkLoading] = useState(false);
@@ -190,21 +176,12 @@ export function EmployeeFormPage() {
     },
   });
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isEdit) return;
     form.setFieldValue('code', buildNextEmployeeCode(totalEmployees + 1));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, totalEmployees]);
 
-  
-  
   const snapshotRef = useRef<Employee | null>(null);
 
   const resetFormFromEmployee = useCallback(
@@ -258,9 +235,7 @@ export function EmployeeFormPage() {
       setLoading(true);
       try {
         const { personalPhoneNumber } = values;
-        
-        
-        
+
         const rest = {
           name: values.name,
           code: values.code,
@@ -271,12 +246,8 @@ export function EmployeeFormPage() {
           isActive: values.isActive,
         };
         if (isEdit && id) {
-          
-          
-          
           const snapshot = snapshotRef.current;
           if (!snapshot) {
-            
             throw new Error('Employee snapshot missing');
           }
           const extra: EmployeeExtra = {
@@ -300,9 +271,7 @@ export function EmployeeFormPage() {
           };
           const after = { ...rest, extra };
           const diff = deepDiff(before, after);
-          
-          
-          
+
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           logActivity(onlyIsActive ? 'employee.toggleStatus' : 'employee.update', id, diff);
           notifications.show({
@@ -312,11 +281,6 @@ export function EmployeeFormPage() {
           await reconcileTruckLink(values, id, snapshot.extra?.truckAssetId);
           navigate(ROUTES.EMPLOYEES.DETAIL.replace(':id', id));
         } else {
-          
-          
-          
-          
-          
           const email = rest.email?.trim() || generateLoginEmail(rest.code);
           const extra: EmployeeExtra = {
             allowLogin: true,
@@ -332,11 +296,9 @@ export function EmployeeFormPage() {
             ...(expectedListHash && { expectedListHash }),
           });
           logActivity('employee.create', res.employee.id);
-          
-          
+
           forceRefresh();
-          
-          
+
           if (res.ssoWarning) {
             notifications.show({
               color: 'yellow',
@@ -363,10 +325,6 @@ export function EmployeeFormPage() {
             autoClose: 8000,
           });
         } else if (!isEdit && isListVersionConflict(err)) {
-          
-          
-          
-          
           await useEmployeeStore.getState().forceRefresh();
           const newCode = buildNextEmployeeCode(useEmployeeStore.getState().items.length + 1);
           form.setFieldValue('code', newCode);
@@ -393,7 +351,6 @@ export function EmployeeFormPage() {
 
   const navigateToList = useCallback(() => navigate(ROUTES.EMPLOYEES.LIST), [navigate]);
 
-  
   const handleDownloadSample = useCallback(async () => {
     setIsDownloading(true);
     try {
@@ -448,7 +405,6 @@ export function EmployeeFormPage() {
         return;
       }
 
-      
       let nextCodeNum = totalEmployees + 1;
       const items = employees.map((emp) => {
         const code = emp.code?.trim() || buildNextEmployeeCode(nextCodeNum++);
@@ -489,11 +445,6 @@ export function EmployeeFormPage() {
         errors: errorNames.length > 0 ? errorNames : undefined,
       });
 
-      
-      
-      
-      
-      
       const ssoFailed = res.ssoFailed ?? 0;
 
       if (failed === 0 && ssoFailed === 0) {
@@ -503,8 +454,6 @@ export function EmployeeFormPage() {
         });
         bulkNavTimer.current = setTimeout(() => navigate(ROUTES.EMPLOYEES.LIST), 2000);
       } else if (failed === 0) {
-        
-        
         notifications.show({
           color: 'yellow',
           title: t('employees.bulkImport.ssoWarningTitle'),
@@ -522,7 +471,6 @@ export function EmployeeFormPage() {
       }
     } catch (err) {
       if (err instanceof ExcelParseError) {
-        
         const labels: Record<string, string> = {
           name: t('employees.columns.name'),
           code: t('common.labels.code'),
@@ -548,7 +496,7 @@ export function EmployeeFormPage() {
   const validateFileType = useCallback((f: File) => {
     const validTypes = [
       'text/csv',
-      
+
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ];
@@ -559,8 +507,6 @@ export function EmployeeFormPage() {
 
   const pageTitle = isEdit ? t('employees.editEmployee') : t('employees.addEmployee');
 
-  
-  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button

@@ -3,7 +3,7 @@ import { lookupLabelOf, useLookupLabels } from '@/hooks';
 
 type TagBadgeProps = {
   readonly tag: string;
-  
+
   readonly lookup?: string;
   readonly color?: string;
 };

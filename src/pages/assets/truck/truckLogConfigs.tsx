@@ -180,8 +180,6 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     };
   },
   renderFields: (form, t, ctx) => {
-    
-    
     const syncTotal = (litres: LogFormValue, unitPrice: LogFormValue) => {
       const lit = Number(litres);
       const price = Number(unitPrice);
@@ -189,8 +187,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
         form.setFieldValue('totalAmount', Math.round(lit * price));
       }
     };
-    
-    
+
     const syncDistance = (before: LogFormValue, after: LogFormValue) => {
       const b = Number(before);
       const a = Number(after);
@@ -308,8 +305,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       </Card>
     );
   },
-  
-  
+
   rowTone: (log, visibleLogs) => {
     const c = refuelConsumption(log);
     if (c == null) return undefined;
@@ -373,7 +369,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
   addTitleKey: 'operationLogs.maintenance.addItem',
   editTitleKey: 'operationLogs.maintenance.editItem',
   emptyKey: 'operationLogs.maintenance.empty',
-  
+
   modalSize: 'xl',
   emptyForm: {
     logDate: todayString(),
@@ -385,17 +381,15 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     laborCost: '',
     accountsReceived: '',
     note: '',
-    
-    
+
     items: [blankMaintenanceItem()],
   },
-  
-  
+
   columns: [
     dateColumn('operationLogs.maintenance.columns.date'),
     {
       header: 'operationLogs.maintenance.columns.type',
-      
+
       render: (log) => textCell(log.extra?.maintenanceTypeLabel ?? log.extra?.maintenanceType),
     },
     {
@@ -410,7 +404,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       header: 'operationLogs.maintenance.columns.total',
       align: 'right',
       emphasize: true,
-      
+
       render: (log) => formatNumber(log.extra?.grandTotal ?? log.extra?.cost),
     },
     {
@@ -424,8 +418,6 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
   }),
   buildExtra: (values): Partial<MaintenanceLogExtra> => {
-    
-    
     const items: MaintenanceItem[] = (Array.isArray(values.items) ? values.items : [])
       .map((r) => r as LogFormLine)
       .filter((r) => String(r.name).trim() !== '' || r.unitPrice !== '')
@@ -435,15 +427,13 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
         ...(r.warrantyMonths !== '' &&
           Number(r.warrantyMonths) > 0 && { warrantyMonths: Number(r.warrantyMonths) }),
       }));
-    
-    
-    
+
     const totalAmount = maintenanceItemsTotal(items);
     const laborCost = values.laborCost === '' ? 0 : Number(values.laborCost);
     return {
       ...(String(values.maintenanceType).trim() && {
         maintenanceType: String(values.maintenanceType).trim(),
-        
+
         ...(String(values.maintenanceTypeLabel).trim() && {
           maintenanceTypeLabel: String(values.maintenanceTypeLabel).trim(),
         }),
@@ -476,22 +466,18 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       laborCost: e.laborCost ?? '',
       accountsReceived: e.accountsReceived ?? '',
       note: e.note ?? '',
-      
-      
+
       items: items.length > 0 ? items : [blankMaintenanceItem()],
     };
   },
   renderFields: (form, t, ctx) => {
-    
-    
     const rows = itemRows(form);
     const totalAmount = draftItemsTotal(rows);
     const laborCost = form.values.laborCost === '' ? 0 : Number(form.values.laborCost);
     const grandTotal = totalAmount + laborCost;
     const outstanding =
       grandTotal - (form.values.accountsReceived === '' ? 0 : Number(form.values.accountsReceived));
-    
-    
+
     const typeOptions = ctx?.maintenanceTypeOptions ?? [];
     const currentType = String(form.values.maintenanceType);
     const typeData =
@@ -668,9 +654,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       </>
     );
   },
-  
-  
-  
+
   renderExpanded: (log, t) => {
     const e = log.extra ?? {};
     const items = readMaintenanceItems(e);
@@ -768,16 +752,13 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
       render: (log) => textCell(log.extra?.driverName),
     },
     {
-      
-      
       header: 'operationLogs.trip.columns.transportOrder',
       nowrap: true,
       render: (log) => textCell(log.extra?.transportOrderNumber),
     },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
-  
-  
+
   rowLocked: (log) => Boolean(log.extra?.transportOrderId),
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),

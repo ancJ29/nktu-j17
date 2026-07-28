@@ -1,5 +1,3 @@
-
-
 import { SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconClock, IconNote, IconPhone, IconUser } from '@tabler/icons-react';
 import {

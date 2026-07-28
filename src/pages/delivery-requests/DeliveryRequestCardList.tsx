@@ -58,8 +58,6 @@ export function DeliveryRequestCardList({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  
-  
   const customers = useCustomerStore((s) => s.items);
   const getVendorByCode = useVendorStore((s) => s.getByCode);
   const resolveCustomerShortName = useMemo(
@@ -89,7 +87,7 @@ export function DeliveryRequestCardList({
     <Stack gap="sm">
       {requests.map((req) => {
         const status = resolveStatus((req.extra as { status?: string })?.status);
-        
+
         const partyIsCustomer = deliveryRequestPartyIsCustomer(req);
         const drExtra = (req.extra ?? {}) as DeliveryRequestExtra;
         const isUrgent = drExtra.isUrgent === true;

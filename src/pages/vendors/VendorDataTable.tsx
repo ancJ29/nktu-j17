@@ -12,7 +12,7 @@ import type { VendorOriginLabels } from './vendorOriginLabels';
 type VendorDataTableProps = {
   readonly vendors: Vendor[];
   readonly isLoading?: boolean;
-  
+
   readonly origin?: VendorOriginLabels;
   readonly viewportRef?: Ref<HTMLDivElement>;
 };

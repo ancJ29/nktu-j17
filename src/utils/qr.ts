@@ -5,29 +5,25 @@ import { DEFAULT_THEME } from '@mantine/core';
 import { getThemeColor } from '@credo/base-ui/utils';
 
 export async function generateQRCodeWithLogo(link: string) {
-  
   const mergedTheme = {
     ...DEFAULT_THEME,
     colors: { ...DEFAULT_THEME.colors, ...theme.colors },
   } as MantineTheme;
   const brandColor = getThemeColor(mergedTheme, 'primary.8');
 
-  
   const qrDataUrl = await QRCode.toDataURL(link, {
     margin: 2,
-    errorCorrectionLevel: 'H', 
+    errorCorrectionLevel: 'H',
     color: {
       dark: brandColor,
       light: '#ffffff',
     },
   });
 
-  
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) return qrDataUrl;
 
-  
   const qrImage = document.createElement('img');
   qrImage.src = qrDataUrl;
   await new Promise<void>((resolve) => {
@@ -36,23 +32,18 @@ export async function generateQRCodeWithLogo(link: string) {
     });
   });
 
-  
   canvas.width = qrImage.width;
   canvas.height = qrImage.height;
 
-  
   ctx.drawImage(qrImage, 0, 0);
 
-  
   const logoSize = Math.floor(canvas.width * 0.2);
   const logoX = (canvas.width - logoSize) / 2;
   const logoY = (canvas.height - logoSize) / 2;
 
-  
   ctx.fillStyle = 'white';
   ctx.fillRect(logoX - 5, logoY - 5, logoSize + 10, logoSize + 10);
 
-  
   const logoSvg = [
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"`,
     ` fill="none" stroke="${brandColor}" stroke-width="1.5"`,

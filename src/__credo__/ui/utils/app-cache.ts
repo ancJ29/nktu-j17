@@ -1,5 +1,3 @@
-
-
 import { encode as msgpackEncode, decode as msgpackDecode } from '@msgpack/msgpack';
 import { hashString } from '@credo/kits/crypt';
 import { logger } from './logger';
@@ -42,26 +40,24 @@ function fromBase64(b64: string): Uint8Array {
 }
 
 export type AppCacheConfig = {
-  
   storageKey: string;
-  
+
   timestampKey: string;
-  
+
   flushDelay?: number;
 };
 
 export type AppCache<T extends Record<string, unknown>> = {
-  
   init: () => void;
-  
+
   get: <K extends keyof T>(key: K) => T[K];
-  
+
   set: <K extends keyof T>(key: K, value: T[K]) => void;
-  
+
   clear: <K extends keyof T>(key: K) => void;
-  
+
   reset: () => void;
-  
+
   flush: () => void;
 };
 
@@ -73,8 +69,6 @@ export function createAppCache<T extends Record<string, unknown>>(
   let memoryCache: Partial<T> = {};
   let initialized = false;
   let flushTimer: ReturnType<typeof setTimeout> | null = null;
-
-  
 
   function encodeBlob(data: Partial<T>): string {
     const now = Date.now();
@@ -102,7 +96,6 @@ export function createAppCache<T extends Record<string, unknown>>(
       logger.debug('[APP-CACHE] renew cache', memoryCache['auth'] ?? {});
       localStorage.setItem(SK, encoded);
     } catch (error) {
-      
       logger.error('[APP-CACHE] flush cache failed', error);
     }
   }
@@ -119,8 +112,6 @@ export function createAppCache<T extends Record<string, unknown>>(
   function ensureInit(): void {
     if (!initialized) init();
   }
-
-  
 
   function init(): void {
     if (initialized) return;

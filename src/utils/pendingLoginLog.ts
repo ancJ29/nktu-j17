@@ -1,7 +1,5 @@
-
-
 const KEY = 'cmngt.pendingLoginLog';
-const MAX_AGE_MS = 60_000; 
+const MAX_AGE_MS = 60_000;
 
 export type LoginMethod = 'password' | 'qr';
 

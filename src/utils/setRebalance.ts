@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
@@ -21,13 +19,12 @@ import type { SalesOrder, SalesOrderExtra } from '@/types';
 export type SetRebalanceTrigger = 'compose' | 'decompose' | 'goods-receipt';
 
 export type SetRebalanceSummary = {
-  
   attempted: number;
-  
+
   rebalanced: number;
-  
+
   unchanged: number;
-  
+
   failed: number;
 };
 
@@ -48,13 +45,9 @@ export async function rebalanceForSetStockChange(
   if (setCodes.length === 0) return summary;
 
   try {
-    
     await useProductInventoryStore.getState().revalidate();
     const productsByCode = useProductStore.getState().mapByCode;
 
-    
-    
-    
     const candidateCodes = new Set<string>();
     for (const setCode of setCodes) {
       candidateCodes.add(setCode);
@@ -63,7 +56,6 @@ export async function rebalanceForSetStockChange(
       }
     }
 
-    
     const soIds = new Set<string>();
     const invByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
     for (const code of candidateCodes) {
@@ -84,9 +76,6 @@ export async function rebalanceForSetStockChange(
     const at = Date.now();
 
     for (const soId of soIds) {
-      
-      
-      
       const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
       let so: SalesOrder;
@@ -100,7 +89,7 @@ export async function rebalanceForSetStockChange(
 
       const extra = (so.extra ?? {}) as SalesOrderExtra;
       const linkage = extra.inventoryLinkage;
-      
+
       if (linkage?.state !== 'reserved' || !linkage.reservedSnapshot) continue;
       summary.attempted += 1;
 
@@ -122,7 +111,6 @@ export async function rebalanceForSetStockChange(
 
       const exec = await executeReservationPlan(diff.plan.ops);
       if (!exec.ok) {
-        
         summary.failed += 1;
         continue;
       }
@@ -138,8 +126,6 @@ export async function rebalanceForSetStockChange(
           patch: { extra: { ...extra, inventoryLinkage: nextLinkage } },
         });
       } catch {
-        
-        
         await rollbackAppliedOps(exec.applied);
         summary.failed += 1;
         continue;
@@ -166,7 +152,6 @@ export async function rebalanceForSetStockChange(
       summary.rebalanced += 1;
     }
 
-    
     if (summary.rebalanced > 0) useProductInventoryStore.getState().forceRefresh();
     return summary;
   } catch (err) {

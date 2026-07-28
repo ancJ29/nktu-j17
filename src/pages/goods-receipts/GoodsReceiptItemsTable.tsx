@@ -11,14 +11,13 @@ export type GoodsReceiptItemsProps = {
   readonly items: readonly GoodsReceiptItem[];
   readonly unitLabels: ReturnType<typeof useLookupLabels>;
   readonly products: readonly PackagingAwareEntity[];
-  
+
   readonly onItemTap?: (idx: number) => void;
 };
 
 export function GoodsReceiptItemsTableDesktop(props: GoodsReceiptItemsProps) {
   const { t } = useTranslation();
-  
-  
+
   const showSubtotal = props.items.length >= 2;
   const unitTotals = new Map<string, number>();
   if (showSubtotal) {
@@ -137,9 +136,6 @@ export function GoodsReceiptItemsListMobile(props: GoodsReceiptItemsProps) {
               <Stack gap={6} style={{ flex: 1, minWidth: 0 }}>
                 <Text size="sm" fw={600} lh={1.3}>
                   {tappable ? (
-                    
-                    
-                    
                     item.itemName
                   ) : (
                     <ProductLink code={item.itemCode} name={item.itemName} size="sm" />
@@ -165,9 +161,6 @@ export function GoodsReceiptItemsListMobile(props: GoodsReceiptItemsProps) {
                 )}
               </Stack>
               {tappable && (
-                
-                
-                
                 <ThemeIcon
                   variant="light"
                   color="gray"

@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   DndContext,
@@ -103,8 +101,6 @@ function SortableDeliveryRow({
     disabled,
   });
 
-  
-  
   const partyName = deliveryRequestPartyIsCustomer(dr)
     ? dr.customerName || dr.salesOrderNumber
     : dr.vendorName || dr.vendorCode;
@@ -119,15 +115,13 @@ function SortableDeliveryRow({
         transform: CSS.Transform.toString(transform),
         transition,
         borderRadius: 'var(--mantine-radius-md)',
-        
-        
-        
+
         border: `1px solid ${
           isDragging ? 'var(--mantine-color-blue-5)' : 'var(--mantine-color-default-border)'
         }`,
         background: isDragging ? 'var(--mantine-color-blue-light)' : 'var(--mantine-color-body)',
         boxShadow: isDragging ? 'var(--mantine-shadow-md)' : undefined,
-        
+
         position: 'relative',
         zIndex: isDragging ? 2 : undefined,
       }}
@@ -144,13 +138,11 @@ function SortableDeliveryRow({
           alignSelf: 'stretch',
           minHeight: TOUCH_TARGET,
           borderRadius: 'var(--mantine-radius-sm)',
-          
-          
+
           background: 'var(--mantine-color-default-hover)',
           color: 'var(--mantine-color-dimmed)',
           cursor: disabled ? 'not-allowed' : isDragging ? 'grabbing' : 'grab',
-          
-          
+
           touchAction: 'none',
         }}
       >
@@ -198,20 +190,16 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
   const loadDrs = useDeliveryRequestStore((s) => s.loadAll);
   const employees = useEmployeeStore((s) => s.items);
 
-  
-  
   useEffect(() => {
     if (!drsInit) loadDrs();
   }, [drsInit, loadDrs]);
 
   const [date, setDate] = useState<Date | null>(null);
   const [driverId, setDriverId] = useState<string | null>(null);
-  
+
   const [manualOrder, setManualOrder] = useState<string[] | null>(null);
   const [saving, setSaving] = useState(false);
 
-  
-  
   const handleDateChange = useCallback((v: Date | null) => {
     setDate(v);
     setManualOrder(null);
@@ -226,9 +214,6 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
     [driverId, employees],
   );
 
-  
-  
-  
   const matchingDrs = useMemo<DeliveryRequest[]>(() => {
     if (!date || !driverId) return [];
     const matches = allDrs.filter((d) => {
@@ -247,10 +232,6 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
     });
   }, [allDrs, date, driverId]);
 
-  
-  
-  
-  
   const displayedIds = useMemo<string[]>(() => {
     const naturalIds = matchingDrs.map((d) => d.id);
     if (manualOrder == null) return naturalIds;
@@ -267,14 +248,12 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
     return m;
   }, [allDrs]);
 
-  
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   );
 
-  
   const moveByIndex = useCallback(
     (from: number, to: number) => {
       if (from < 0 || to < 0 || from === to || to >= displayedIds.length) return;
@@ -304,13 +283,11 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
     setSaving(true);
     const codePrefix = appConfig.features?.employees?.codePrefix ?? '';
     const store = useDeliveryRequestStore.getState();
-    
-    
+
     const workingMap = new Map(drById);
     const failures: { id: string; reason: string }[] = [];
     let written = 0;
-    
-    
+
     for (let i = 0; i < displayedIds.length; i++) {
       const id = displayedIds[i]!;
       const dr = workingMap.get(id);
@@ -322,7 +299,6 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
       const newNumber = buildDisplayOrderNumber(date, driver, codePrefix, seq);
       const currentExtra = (dr.extra ?? {}) as DeliveryRequestExtra;
       if (currentExtra.displayOrderNumber === newNumber) {
-        
         continue;
       }
       try {
@@ -336,7 +312,6 @@ function ReorderForm({ onClose, t }: ReorderFormProps) {
         if (err instanceof EntityConflictError) {
           failures.push({ id, reason: 'conflict' });
           if (err.latest) {
-            
             workingMap.set(id, err.latest as DeliveryRequest);
           }
         } else {

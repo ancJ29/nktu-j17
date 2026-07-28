@@ -33,17 +33,16 @@ export type LogFormValues = Record<string, LogFormValue>;
 
 export type OperationLogContext = {
   assignedDriver?: { id?: string; name: string };
-  
+
   maintenanceTypeOptions?: LookupOption[];
 };
 
 export type OperationLogColumn = {
-  
   header: string;
   align?: 'right';
   nowrap?: boolean;
   emphasize?: boolean;
-  
+
   render: (log: OperationLog) => ReactNode;
 };
 
@@ -61,41 +60,41 @@ export type OperationLogExportMeta = {
 export type OperationLogConfig = {
   logType: string;
   icon: ReactNode;
-  
+
   titleKey: string;
-  
+
   addLabelKey: string;
-  
+
   addTitleKey: string;
-  
+
   editTitleKey: string;
-  
+
   emptyKey: string;
-  
+
   modalSize?: string;
   columns: OperationLogColumn[];
-  
+
   emptyForm: LogFormValues;
   validate: (t: TFn) => Record<string, (value: unknown) => ReactNode>;
-  
+
   buildExtra: (values: LogFormValues) => Partial<OperationLogExtra>;
-  
+
   toForm: (log: OperationLog) => LogFormValues;
-  
+
   renderFields: (
     form: UseFormReturnType<LogFormValues>,
     t: TFn,
     ctx?: OperationLogContext,
   ) => ReactNode;
-  
+
   renderExpanded?: (log: OperationLog, t: TFn) => ReactNode;
-  
+
   rowLocked?: (log: OperationLog) => boolean;
-  
+
   summary?: (logs: OperationLog[], t: TFn) => ReactNode;
-  
+
   rowTone?: (log: OperationLog, visibleLogs: OperationLog[]) => OperationLogRowTone | undefined;
-  
+
   export?: (logs: OperationLog[], meta: OperationLogExportMeta) => void;
   exportLabelKey?: string;
 };

@@ -12,16 +12,14 @@ import {
 } from './EntityLink';
 
 type DeliveryRequestLinkProps = {
-  
   id: string | undefined | null;
   size?: LinkSize;
   color?: string;
-  
+
   fallbackLabel?: string | null;
 };
 
 type DeliveryRequestLinksProps = {
-  
   ids: string[];
   size?: LinkSize;
   colors?: string[];

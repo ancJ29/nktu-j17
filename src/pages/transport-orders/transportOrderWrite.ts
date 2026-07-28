@@ -1,4 +1,3 @@
-
 import { CallApiError } from '@credo/connectors/connector';
 import type {
   TransportOrderExtra,
@@ -23,9 +22,9 @@ export type TransportOrderWriteFields = {
   containerSize: TransportOrderContainerSize;
   shipmentType: TransportOrderShipmentType;
   route: TransportOrderRoute;
-  
+
   fees: TransportOrderFee[];
-  
+
   advanceAmount: number;
   vatRate: number;
   transportContractNo: string;
@@ -55,9 +54,7 @@ function deriveFromTrips(trips: TransportOrderTrip[]): Partial<MirroredTripField
       pickup: first.departure,
       stuffing: '',
       dropoff: last.destination,
-      
-      
-      
+
       ...(first.loadingAt ? { pickupAt: first.loadingAt } : {}),
       ...(last.unloadingAt ? { dropoffAt: last.unloadingAt } : {}),
     },
@@ -67,25 +64,16 @@ function deriveFromTrips(trips: TransportOrderTrip[]): Partial<MirroredTripField
 export function buildTransportOrderWrite(
   fields: TransportOrderWriteFields,
 ): Record<string, unknown> {
-  
-  
-  
-  
   const fees = readFeeLines({ fees: fields.fees });
   const { subtotal } = computeTransportOrderTotals(fees, fields.vatRate);
-  
-  
-  
+
   const trips = fields.isMultiTrip ? fields.trips : [];
   return {
     ...fields,
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
     fees,
     trips,
-    
-    
-    
-    
+
     disbursements: [],
     totalAmount: subtotal,
   };

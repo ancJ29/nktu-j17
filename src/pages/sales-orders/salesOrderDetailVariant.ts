@@ -1,37 +1,32 @@
-
-
 export type SalesOrderDetailVariant = {
-  
   showDeliveryNotePrint: boolean;
-  
+
   showShippingFee: boolean;
-  
+
   showVatTag: boolean;
-  
+
   notesAlwaysEditable: boolean;
-  
+
   itemMemoEditable: boolean;
-  
+
   showShortageAlert: boolean;
-  
+
   itemProductPhotoOnHover: boolean;
-  
+
   clientSpecific?: {
-    
     NKTU?: {
-      
       deliveryMethodDrivesInternalDelivery?: boolean;
-      
+
       internalDeliveryMethodCode?: string;
-      
+
       externalDeliveryMethodCode?: string;
-      
+
       hideDeliveredActionForWarehouse?: {
         deliveredStatusValue: string;
         warehouseDepartmentCode: string;
         deliveryMethods: string[];
       };
-      
+
       splitNotes?: {
         warehouseDepartmentCode: string;
       };

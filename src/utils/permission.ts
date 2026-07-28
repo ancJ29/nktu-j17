@@ -372,18 +372,18 @@ export function createOptionLabelResolver(options: { value: string; label: strin
 export type ResolvedStatusOption = {
   value: string;
   label: string;
-  
+
   actionLabel: string;
   color: string;
-  
+
   icon?: string;
-  
+
   stage?: 'DRAFT' | 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'EXCEPTIONAL';
-  
+
   capabilities?: { id: string; config?: unknown }[];
-  
+
   allowedDepartments?: string[];
-  
+
   isInitial?: boolean;
   terminal?: boolean;
   locked?: boolean;
@@ -397,9 +397,7 @@ export type ResolvedTagOption = {
 
 export function resolveStatusOptions(
   options:
-    | SalesOrderStatusOption[]
-    | DeliveryRequestStatusOption[]
-    | TransportOrderStatusOptionConfig[],
+    SalesOrderStatusOption[] | DeliveryRequestStatusOption[] | TransportOrderStatusOptionConfig[],
 ): ResolvedStatusOption[] {
   const lang = i18n.resolvedLanguage ?? i18n.language ?? appConfig.defaultLanguage;
   const defaultLang = appConfig.defaultLanguage;
@@ -551,9 +549,7 @@ export const perms = {
       ...createModulePerms('transportOrder'),
       canTransitionStatus: () => resolve().actions?.canTransitionStatus ?? false,
       canCancel: () => resolve().actions?.canCancel ?? false,
-      
-      
-      
+
       canViewPrice: () => resolve().actions?.canViewPrice ?? false,
     };
   })(),
@@ -565,8 +561,7 @@ export const perms = {
     const resolve = () => (cached ??= getModulePermissions('truck'));
     return {
       ...createModulePerms('truck'),
-      
-      
+
       canExport: () => resolve().actions?.canExport ?? false,
     };
   })(),
@@ -604,7 +599,6 @@ export function buildEffectivePermissions(
   employeePerms: PartialPermissions | undefined | null,
   versions: { cfg?: string; emp?: string },
 ): Permissions {
-  
   const deptOption = departmentValue
     ? departmentOptions.find((d) => d.value === departmentValue)
     : undefined;
@@ -616,7 +610,6 @@ export function buildEffectivePermissions(
     employee: employeePerms,
   });
 
-  
   cacheSet('prm', effective);
   cacheSet('prv', versions);
 

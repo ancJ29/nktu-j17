@@ -8,18 +8,10 @@ import { MobileAppLayout } from './MobileAppLayout';
 import { PCAppLayout } from './PCAppLayout';
 
 export function AppLayout() {
-  
-  
-  
   useInventoryAutoRevalidate();
 
-  
-  
   useProfileLoadWatchdog();
 
-  
-  
-  
   useTokenKeepAlive();
 
   return (

@@ -1,5 +1,3 @@
-
-
 import { appConfig } from '@/config';
 import { resolveServiceCode } from '@/config/client-code';
 import { cacheGet, cacheSet } from '@/utils/appCache';
@@ -16,7 +14,6 @@ import { createCredoAuthStore } from '@credo/base-ui/lib';
 import { logger, ONE_DAY, ONE_MINUTE } from '@credo/base-ui/utils';
 
 export type Profile = BaseProfile & {
-  
   isRoot?: boolean;
 };
 
@@ -62,7 +59,7 @@ export const useAuthStore = createCredoAuthStore<Profile>({
   userStorage: compositeUserStorage,
   storage: encodedAuthStorage,
   persistStorage: encodedPersistStorage,
-  
+
   tokenDuration: 15 * ONE_MINUTE,
   rememberRefreshDuration: 180 * ONE_DAY,
   sessionRefreshDuration: ONE_DAY,
@@ -86,7 +83,7 @@ export const SESSION_EXPIRED_NOTICE_KEY = 'sessionExpiredNotice';
 
 export type SessionExpiredNotice = {
   reason: string;
-  
+
   at: number;
 };
 
@@ -95,8 +92,6 @@ export function takeSessionExpiredNotice(): SessionExpiredNotice | null {
   if (!raw) return null;
   sessionStorage.removeItem(SESSION_EXPIRED_NOTICE_KEY);
 
-  
-  
   try {
     const parsed = JSON.parse(raw) as Partial<SessionExpiredNotice>;
     if (typeof parsed?.reason !== 'string') return { reason: 'unknown', at: Date.now() };

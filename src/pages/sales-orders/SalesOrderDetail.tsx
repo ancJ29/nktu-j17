@@ -150,16 +150,12 @@ type SalesOrderDetailProps = {
 };
 
 export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
-  
-  
-  
   const showDeliveryNotePrint = variant.showDeliveryNotePrint && showPrice;
-  
-  
+
   const canSharePdf = isPdfSharingEnabled();
   const shouldDisplayShippingFee = variant.showShippingFee;
   const shouldDisplayVatTag = variant.showVatTag;
-  
+
   const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
   const {
     order,
@@ -247,21 +243,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       : undefined,
   });
 
-  
-  
   const [mobileTab, setMobileTab] = useState<string>('overview');
-  
-  
-  
+
   const [activeTab, setActiveTab] = useState<string | null>('items');
 
-  
-  
-  
   const [togglingDelivery, setTogglingDelivery] = useState(false);
 
-  
-  
   const [printOptionsOpened, setPrintOptionsOpened] = useState(false);
   const [paperSize, setPaperSize] = useState<DeliveryNotePaperSize>(
     DEFAULT_PRINT_OPTIONS.paperSize,
@@ -269,17 +256,13 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const [orientation, setOrientation] = useState<DeliveryNoteOrientation>(
     DEFAULT_PRINT_OPTIONS.orientation,
   );
-  
-  
+
   const [includePrice, setIncludePrice] = useState<boolean>(DEFAULT_PRINT_OPTIONS.includePrice);
-  
-  
+
   const [copyingImage, setCopyingImage] = useState(false);
-  
+
   const [sharingPdf, setSharingPdf] = useState(false);
 
-  
-  
   const customers = useCustomerStore((s) => s.items);
   const unitLabels = useLookupLabels('unit');
 
@@ -287,9 +270,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
 
   const { resolveStatus, tagOptions, deliveryMethodOptions } = fieldOptions;
 
-  
-  
-  
   const buildDeliveryNoteData = (): DeliveryNoteData => {
     const cust = extra.customerCode
       ? customers.find((c) => c.code === extra.customerCode)
@@ -339,8 +319,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     };
   };
 
-  
-  
   const handlePrintDeliveryNote = () => {
     const ok = printSalesOrderDeliveryNote(buildDeliveryNoteData(), {
       paperSize,
@@ -353,8 +331,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     }
   };
 
-  
-  
   const handleExportDeliveryNoteExcel = () => {
     exportSalesOrderDeliveryNoteToExcel(
       buildDeliveryNoteData(),
@@ -364,10 +340,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     setPrintOptionsOpened(false);
   };
 
-  
-  
-  
-  
   const handleCopyDeliveryNoteImage = async () => {
     setCopyingImage(true);
     try {
@@ -391,10 +363,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     }
   };
 
-  
-  
-  
-  
   const handleShareDeliveryNotePdf = async () => {
     setSharingPdf(true);
     try {
@@ -414,15 +382,9 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     }
   };
 
-  
-  
-  
-  
   const cancelTargetValue = isCancelled ? getCancellationTargetStatusValue() : undefined;
   const headerStatus =
     isCancelled && cancelTargetValue ? resolveStatus(cancelTargetValue) : currentStatus;
-
-  
 
   const renderTagsRow = (tags: ReadonlyArray<string>) => (
     <Group gap={4}>
@@ -439,26 +401,11 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
 
   const tagsRow = extra.tags && extra.tags.length > 0 ? renderTagsRow(extra.tags) : null;
 
-  
-  
-  
-  
-  
   const canEditMeta = canEdit && !order.isClosed && !isCancelled;
 
-  
-  
-  
-  
-  
   const canEditNotes = variant.notesAlwaysEditable ? canEdit : canEditMeta;
   const canEditItemMemo = variant.itemMemoEditable && canEdit;
 
-  
-  
-  
-  
-  
   const canEditPackageSize = canEditDeliveryPackageSize && !order.isClosed && !isCancelled;
   const showPackageSize =
     canEditDeliveryPackageSize ||
@@ -471,9 +418,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     cancel: t('__new__.01-common.actions.cancel'),
   };
 
-  
-  
-  
   const pickableEmployees = employees.filter(picEmployeeFilter);
   const currentStaffId = extra.assignedStaff;
   if (currentStaffId && !pickableEmployees.some((e) => e.id === currentStaffId)) {
@@ -531,9 +475,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
-  
-  
   const deliveryDateForEditor: string | null = extra.deliveryDate
     ? new Date(extra.deliveryDate).toISOString().slice(0, 10)
     : null;
@@ -568,9 +509,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
-  
-  
   const deliveryPackageSizeField = (
     <InlineEditField<string>
       canEdit={canEditPackageSize}
@@ -600,8 +538,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
-  
   const deliveryAddressMobile = (
     <AddressWithMapLink
       address={extra.deliveryAddress}
@@ -617,7 +553,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
   const notesField = (
     <InlineTextareaField
       canEdit={canEditNotes}
@@ -629,13 +564,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
-  
-  
-  
-  
-  
-  
   const splitNotesCfg = variant.clientSpecific?.NKTU?.splitNotes;
   const myNoteDept = currentEmployee?.department ?? null;
   const isDriverDept = myNoteDept != null && soDriverDepartments.includes(myNoteDept);
@@ -684,9 +612,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       ].filter((f) => f.visible)
     : [];
 
-  
-  
-  
   const notesDetailContent = splitNotesCfg ? (
     <Stack gap="md">
       <DetailField label={t('__new__.01-common.labels.note')}>{notesField}</DetailField>
@@ -700,10 +625,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     <DetailField label={t('__new__.01-common.labels.note')}>{notesField}</DetailField>
   );
 
-  
-  
-  
-  
   const linkedDRIds = Array.from(
     new Set([...(extra.deliveryRequestIds ?? []), ...linkedDRs.map((d) => d.id)]),
   );
@@ -762,7 +683,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
   const linkage = extra.inventoryLinkage;
   const linkageState = linkage?.state ?? 'none';
   const reservedRowCount = linkage?.reservedSnapshot?.length ?? 0;
@@ -825,10 +745,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Tooltip>
     ) : null;
 
-  
-  
-  
-  
   const cheatBadge =
     isRootUser && isCheatCompletedSalesOrder(order) ? (
       <Tooltip label={t('salesOrders.cheatMarker.tooltip')} withArrow multiline maw={260}>
@@ -843,9 +759,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Tooltip>
     ) : null;
 
-  
-  
-  
   const vacuousCompletionBadge =
     isRootUser && drsInit && isVacuouslyCompletedSalesOrder(order, linkedDRs.length > 0) ? (
       <Tooltip label={t('salesOrders.vacuousCompletion.tooltip')} withArrow multiline maw={280}>
@@ -860,10 +773,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Tooltip>
     ) : null;
 
-  
-  
-  
-  
   const stuckReservationBanner =
     canManualReleasePerm && canManualRelease ? (
       <Alert
@@ -888,11 +797,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Alert>
     ) : null;
 
-  
-  
-  
-  
-  
   const reconcileBanner =
     canEdit && reconcileIssues.length > 0 ? (
       <Alert
@@ -996,22 +900,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const showCreateDR = canCreateDRPerm && (canCreateDR || canCreateAdditionalDR);
   const createDRButton = showCreateDR ? (
     <Button
@@ -1028,9 +916,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Button>
   ) : null;
 
-  
-  
-  
   const showCreateReturn = canCreateDRPerm && canCreateReturnShipment;
   const createReturnButton = showCreateReturn ? (
     <Button
@@ -1044,11 +929,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Button>
   ) : null;
 
-  
-  
-  
-  
-  
   const showDeliveryToggle =
     variant.clientSpecific?.NKTU?.deliveryMethodDrivesInternalDelivery &&
     canEdit &&
@@ -1081,18 +961,8 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Button>
   ) : null;
 
-  
-  
-  
-  
-  
-  
-  
   const myDepartment = currentEmployee?.department ?? null;
-  
-  
-  
-  
+
   const hideDeliveredCfg = variant.clientSpecific?.NKTU?.hideDeliveredActionForWarehouse;
   const visibleNextStatuses = allowedNextStatuses.filter((next) => {
     if (next.value === cancelTargetStatusValue) return canCancelPerm;
@@ -1168,12 +1038,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Group>
     ) : null;
 
-  
-  
-  
-  
-  
-  
   const handleStatusChangeConfirm = async () => {
     if (!targetStatus) return;
     if (cancelTargetStatusValue && targetStatus.value === cancelTargetStatusValue) {
@@ -1315,11 +1179,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
-  
-  
-  
-  
-  
   const printOptionsModal = (
     <Modal
       opened={printOptionsOpened}
@@ -1419,9 +1278,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Modal>
   );
 
-  
-  
-  
   const metadataFooter = (
     <Group justify="flex-end" gap="md" wrap="nowrap">
       <Text size="xs" c="dimmed">
@@ -1433,9 +1289,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Group>
   );
 
-  
-  
-  
   const quotationId = extra.quotationId ?? extra.clientSpecific?.NKTU?.quotationId;
   const quotationCode = extra.quotationCode ?? extra.clientSpecific?.NKTU?.quotationCode;
   const quotationLinkRow = quotationId ? (
@@ -1454,9 +1307,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Group>
   ) : null;
 
-  
-  
-  
   const customerHeaderDesktop = (
     <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
       <Stack gap={2} style={{ minWidth: 0, flex: 1 }}>
@@ -1492,8 +1342,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const salesOrderTotals = computeSalesOrderTotals(order, vatRate);
   const needVat = extra.needVAT !== false;
 
-  
-  
   const billingFields = showPrice ? (
     <>
       <Divider variant="dashed" />
@@ -1614,7 +1462,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </>
   ) : null;
 
-  
   const mobileInfoFields = (
     <Stack gap="sm">
       {customerHeaderMobile}
@@ -1650,7 +1497,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Stack>
   );
 
-  
   const desktopInfoFields = (
     <Stack gap="md">
       {customerHeaderDesktop}
@@ -1692,12 +1538,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     </Stack>
   );
 
-  
-  
-  
-
-  
-  
   const mobileTabs: ReadonlyArray<{ value: string; label: string; icon: ReactNode }> = [
     {
       value: 'overview',
@@ -1842,10 +1682,6 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Stack>
     );
   }
-
-  
-  
-  
 
   return (
     <Stack gap="lg">

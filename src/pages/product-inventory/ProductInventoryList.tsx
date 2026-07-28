@@ -1,5 +1,3 @@
-
-
 import { Badge, Button, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconBoxMultiple, IconBuildingWarehouse, IconCalendar } from '@tabler/icons-react';
@@ -59,7 +57,7 @@ type ProductInventoryFilters = {
   location: string | null;
   category: string | null;
   stock: StockFilter;
-  
+
   secondary: SecondaryFilter;
   search: string;
   page: number;
@@ -82,12 +80,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const navigate = useNavigate();
   const scrollViewportRef = useListScrollRestoration(ROUTES.INVENTORY.PRODUCTS);
 
-  
   const showBeginOfPeriod = variant.showBeginOfPeriod && canEditInventory;
   const shouldDisplayHeaderBadges = variant.showStockKpiBadges;
   const shouldDisplaySecondaryHeaderBadges = variant.showSecondaryKpiBadges;
 
-  
   const {
     items: allRows,
     loading,
@@ -105,13 +101,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const loadProducts = useProductStore((s) => s.loadAll);
   const loadLocations = useLocationStore((s) => s.loadAll);
 
-  
-  
   const goodsReceiptsInitialized = useGoodsReceiptStore((s) => s.initialized);
   const loadGoodsReceipts = useGoodsReceiptStore((s) => s.loadAll);
   const inboundIndex = useOpenInboundByProduct();
 
-  
   const {
     state: filterState,
     updateState,
@@ -137,15 +130,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const summaries: ProductInventorySummary[] = useMemo(
     () =>
       buildProductInventorySummaries(
@@ -169,10 +153,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       filterFn: (s, f) => {
         if (!s.product.isActive) return false;
         if (f.category && s.product.extra?.category !== f.category) return false;
-        
-        
-        
-        
+
         if (f.locationCode && s.rows.length === 0 && f.stock !== 'noStock') return false;
         if (f.stock === 'noStock' && s.rows.length > 0) return false;
         if (f.stock === 'outOfStock' && (s.rows.length === 0 || s.totalOnHand !== 0)) return false;
@@ -191,7 +172,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       onPageChange,
     });
 
-  
   const {
     totalCount,
     outOfStockCount,
@@ -230,14 +210,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     };
   }, [summaries]);
 
-  
   useEffect(() => {
     if (!initialized && !error) loadAll();
   }, [initialized, error, loadAll]);
 
-  
-  
-  
   useEffect(() => {
     if (!initialized || loading) return;
     void seedCurrentPeriodForProductInventory();
@@ -265,9 +241,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
 
-  
-  
-  
   const [composeOpen, setComposeOpen] = useState(false);
   const [decomposeOpen, setDecomposeOpen] = useState(false);
   const hasActiveSetProduct = useMemo(
@@ -286,10 +259,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const handleRowClick = useCallback(
     (product: Product) => {
-      
-      
-      
-      
       navigate(`${ROUTES.PRODUCTS.DETAIL.replace(':id', product.id)}?tab=inventory`, {
         state: { backTo: ROUTES.INVENTORY.PRODUCTS },
       });
@@ -297,7 +266,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [navigate],
   );
 
-  
   const locationOptions = useMemo(
     () =>
       locations
@@ -306,20 +274,14 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [locations],
   );
 
-  
-  
-  
   const categoryLookups = useLookupOptions('product-category');
-  
-  
+
   const unitLabels = useLookupLabels('unit');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],
   );
 
-  
-  
   const stockOptions = useMemo(
     () => [
       { value: 'noStock', label: t('productInventory.filterStock.noStock') },
@@ -330,8 +292,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [t],
   );
 
-  
-  
   const secondaryOptions = useMemo(
     () => [
       { value: 'outOfStock', label: t('common.secondaryStatus.outOfStock') },
@@ -421,8 +381,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             },
           ]
         : []),
-      
-      
+
       ...(variant.showStockFilter
         ? [
             {
@@ -458,11 +417,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     ],
   );
 
-  
-  
-  
-  
-  
   const mobileQuickChips: QuickFilterChip[] = useMemo(
     () =>
       variant.quickChipMode === 'secondary'
@@ -568,8 +522,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               {shouldDisplayHeaderBadges ? (
                 <>
                   {outOfStockCount > 0 && (
-                    
-                    
                     <Badge
                       size="xs"
                       variant="light"
@@ -583,9 +535,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                     </Badge>
                   )}
                   {lowCount > 0 && (
-                    
-                    
-                    
                     <Badge
                       size="xs"
                       variant="light"
@@ -599,8 +548,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                     </Badge>
                   )}
                   {negativeCount > 0 && (
-                    
-                    
                     <Badge
                       size="xs"
                       variant="light"

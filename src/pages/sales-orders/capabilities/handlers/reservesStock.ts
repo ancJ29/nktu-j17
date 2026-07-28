@@ -18,9 +18,7 @@ export const reservesStockHandler: Handler = {
 
     if (getShortagePolicy() === 'block') {
       const failures: PlanFailure[] = [];
-      
-      
-      
+
       const effectiveLines = expandSetReservationItems(
         ctx.order.items,
         ctx.productsByCode,
@@ -33,11 +31,7 @@ export const reservesStockHandler: Handler = {
         if (!product) continue;
         const target = line.fromLocationCode || DEFAULT_LOCATION_CODE;
         const avail = getProductLocationAvailability(product, target, ctx.inventoryByProduct);
-        
-        
-        
-        
-        
+
         const ownReserved = getOwnReservedAtLocation(product, target, linkage?.reservedSnapshot);
         const effectiveAvailable = avail.available + ownReserved;
         if (line.quantity > effectiveAvailable) {

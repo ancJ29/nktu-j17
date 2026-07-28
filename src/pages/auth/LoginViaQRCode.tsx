@@ -29,9 +29,7 @@ function LoginViaQRCodeContent() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const loginWithToken = useAuthStore((state) => state.loginWithToken);
-  
-  
-  
+
   const authToken = useAuthStore((state) => state.token);
 
   const [mounted, setMounted] = useState(false);
@@ -45,11 +43,9 @@ function LoginViaQRCodeContent() {
   const verificationInProgress = useRef(false);
 
   useEffect(() => {
-    
     setMounted(true);
   }, []);
 
-  
   useEffect(() => {
     if (!mounted) return;
     if (authToken) {
@@ -57,10 +53,6 @@ function LoginViaQRCodeContent() {
     }
   }, [mounted, authToken, navigate]);
 
-  
-  
-  
-  
   useEffect(() => {
     if (!mounted) return;
     const tokenFromUrl = searchParams.get('token');
@@ -77,11 +69,6 @@ function LoginViaQRCodeContent() {
       setIsLoading(true);
       setError(undefined);
 
-      
-      
-      
-      
-      
       const unwrapped = unwrapLoginToken(rawToken);
       if (!unwrapped) {
         setError(t('auth.magicLink.invalidQrCode'));
@@ -104,12 +91,9 @@ function LoginViaQRCodeContent() {
         const result = await loginWithToken({ token: unwrapped.token });
         if (result.success) {
           markPendingLogin('qr');
-          
-          
+
           markPostLoginReloads();
-          
-          
-          
+
           cacheFlush();
           setVerificationSuccess(true);
           setTimeout(() => navigate(ROUTES.APP.MAIN), 1500);
@@ -121,9 +105,7 @@ function LoginViaQRCodeContent() {
         setVerificationSuccess(false);
       } finally {
         sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
-        
-        
-        
+
         navigate(ROUTES.AUTH.LOGIN_VIA_QR_CODE, { replace: true });
         setIsLoading(false);
         verificationInProgress.current = false;
@@ -132,14 +114,12 @@ function LoginViaQRCodeContent() {
     [loginWithToken, navigate, t],
   );
 
-  
   useEffect(() => {
     if (!mounted) return;
     if (verificationInProgress.current) return;
 
     const tokenFromUrl = searchParams.get('token');
     if (tokenFromUrl) {
-      
       void verifyToken(tokenFromUrl);
       return;
     }
@@ -157,7 +137,6 @@ function LoginViaQRCodeContent() {
       }
     }
 
-    
     setShowOptions(true);
     setIsLoading(false);
     setError(undefined);

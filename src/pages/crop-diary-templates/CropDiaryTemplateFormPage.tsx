@@ -145,7 +145,6 @@ export function CropDiaryTemplateFormPage() {
     },
   );
 
-  
   const handleTotalDatesChange = useCallback(
     (v: number | string) => {
       const n = v === '' ? 0 : Math.floor(Number(v));
@@ -220,9 +219,6 @@ export function CropDiaryTemplateFormPage() {
     exportCropDiaryTemplateRows(rows, excelLabels(), `crop_diary_template_${code}.xlsx`);
   }, [form, t, excelLabels]);
 
-  
-  
-  
   const handleDownloadSample = useCallback(() => {
     const placeholder = t('cropDiaryTemplates.excel.sampleMaterial');
     downloadCropDiaryTemplateSample(
@@ -322,10 +318,7 @@ export function CropDiaryTemplateFormPage() {
     : t('cropDiaryTemplates.form.createButton');
 
   return (
-    <form
-      
-      onSubmit={form.onSubmit(handleSubmit)}
-    >
+    <form onSubmit={form.onSubmit(handleSubmit)}>
       <Stack gap="lg">
         {/* Top action bar — Cancel + Save reachable without scrolling past a long
             day plan. */}

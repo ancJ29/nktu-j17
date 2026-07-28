@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
@@ -53,7 +51,7 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
 
 export function useSalesOrderListFilters(
   storeOrders: SalesOrder[],
-  
+
   defaultDateRangeDays?: number,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<SalesOrderUrlState>({
@@ -61,7 +59,6 @@ export function useSalesOrderListFilters(
     compactState,
   });
 
-  
   const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
@@ -76,7 +73,6 @@ export function useSalesOrderListFilters(
   const deliveryKind: SalesOrderDeliveryKind = state.dk ?? 'all';
   const page = state.pg ?? DEFAULT_PAGE;
 
-  
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values.length > 0 ? values : undefined, pg: undefined }),
     [updateState],
@@ -111,10 +107,6 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
-  
-  
-  
-  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({
@@ -140,18 +132,13 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
-  
   const allOrders = useMemo(() => {
     const filtered = storeOrders.filter((o) => {
       if (statusFilter.length > 0 && !statusFilter.includes(o.extra?.status ?? '')) return false;
       if (customerFilter && o.extra?.customerCode !== customerFilter) return false;
       if (staffFilter && o.extra?.assignedStaff !== staffFilter) return false;
       if (urgentOnly && !o.extra?.isUrgent) return false;
-      
-      
-      
-      
-      
+
       if (!isInDateRange(getSalesOrderReadyDate(o), createdDateRange)) return false;
       if (
         deliveryDateRange.preset &&
@@ -159,17 +146,14 @@ export function useSalesOrderListFilters(
         !isInDateRange(o.extra.deliveryDate, deliveryDateRange)
       )
         return false;
-      
-      
-      
-      
+
       if (deliveryKind === 'internal' && o.extra?.isInternalDelivery === false) return false;
       if (deliveryKind === 'external' && o.extra?.isInternalDelivery !== false) return false;
       return true;
     });
 
     const [field, dir] = sortField.split('_') as [string, string];
-    
+
     const mult = dir === 'asc' ? 1 : -1;
     return filtered.sort((a, b) => {
       const aU = a.extra?.isUrgent ? 1 : 0;
@@ -182,16 +166,13 @@ export function useSalesOrderListFilters(
       }
 
       if (isNKTU) {
-        
         const aInternal = a.extra?.isInternalDelivery === false ? 1 : 0;
         const bInternal = b.extra?.isInternalDelivery === false ? 1 : 0;
         if (aInternal !== bInternal) {
           return aInternal - bInternal;
         }
       }
-      
-      
-      
+
       const aVal = getSalesOrderReadyMs(a);
       const bVal = getSalesOrderReadyMs(b);
       return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
@@ -220,7 +201,6 @@ export function useSalesOrderListFilters(
   );
 
   return {
-    
     statusFilter,
     setStatusFilter,
     customerFilter,
@@ -242,11 +222,9 @@ export function useSalesOrderListFilters(
     page,
     setPage,
 
-    
     allOrders,
     hasActiveFilters,
 
-    
     clearFilters,
   };
 }

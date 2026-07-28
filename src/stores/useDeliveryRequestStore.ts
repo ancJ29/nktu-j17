@@ -49,7 +49,7 @@ const fetchDeliveryRequests = createPartitionedSyncFetcher<DeliveryRequest>({
 export const useDeliveryRequestStore = createEntityStore<DeliveryRequest, DeliveryRequestPatch>({
   cacheKey: 'dr',
   cacheTTL: ONE_MINUTE,
-  staleTime: ONE_MINUTE, 
+  staleTime: ONE_MINUTE,
   fetchAll: fetchDeliveryRequests,
   fetchOne: (id) =>
     cMngtConnector

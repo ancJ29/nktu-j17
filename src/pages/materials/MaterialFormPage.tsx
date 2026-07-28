@@ -71,20 +71,20 @@ type MaterialFormValues = {
   name: string;
   code: string;
   isActive: boolean;
-  
+
   units: string[];
-  
+
   category: string;
-  
+
   unitConversions: UnitConversion[];
-  
+
   description: string;
   specification: string;
   memo: string;
   costPrice: number | '';
-  
+
   minimumStock: number | '';
-  
+
   tags: string[];
   attributes: Array<{ key: string; value: string }>;
 };
@@ -251,8 +251,6 @@ export function MaterialFormPage() {
   const [loading, setLoading] = useState(false);
   const snapshotRef = useRef<Material | null>(null);
 
-  
-  
   const unitOptions = useLookupV2Options(unitCategory);
   const categoryOptions = useLookupV2Options(MATERIAL_CATEGORY_LOOKUP);
 
@@ -276,15 +274,13 @@ export function MaterialFormPage() {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       code: (v) => {
         if (!v.trim()) return t('common.validation.codeRequired');
-        
+
         if (/\s/.test(v)) return t('common.validation.codeNoWhitespace');
-        
+
         if (!/^[a-zA-Z0-9]+$/.test(v)) return t('common.validation.codeSpecialCharacters');
         return null;
       },
       unitConversions: (conversions, values) => {
-        
-        
         if (!multiUnit || values.units.length < 2) return null;
         const result = validateUnitConversions(values.units, conversions);
         if (result === 'conflict') return t('products.validation.unitConversionConflict');
@@ -294,7 +290,6 @@ export function MaterialFormPage() {
     },
   });
 
-  
   const selectedUnitData = useMemo(
     () =>
       form.values.units.map((v) => ({
@@ -336,14 +331,13 @@ export function MaterialFormPage() {
   const handleSubmit = useCallback(
     async (values: MaterialFormValues) => {
       setLoading(true);
-      
-      
+
       const buildExtra = (base?: MaterialExtra): MaterialExtra => {
         const extra: MaterialExtra = { ...(base ?? {}) };
         extra.units = values.units;
         if (values.category) extra.category = values.category;
         else delete extra.category;
-        
+
         const validConversions =
           multiUnit && values.units.length >= 2
             ? values.unitConversions.filter(
@@ -352,9 +346,7 @@ export function MaterialFormPage() {
             : [];
         if (validConversions.length > 0) extra.unitConversions = validConversions;
         else delete extra.unitConversions;
-        
-        
-        
+
         if (hasDescription) {
           if (values.description.trim()) extra.description = values.description.trim();
           else delete extra.description;
@@ -413,10 +405,7 @@ export function MaterialFormPage() {
             patch,
           });
           snapshotRef.current = updated as Material;
-          
-          
-          
-          
+
           const diff = deepDiff(before, patch);
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           if (onlyIsActive) {
@@ -430,8 +419,6 @@ export function MaterialFormPage() {
           });
           navigate(ROUTES.MATERIALS.DETAIL.replace(':id', id));
         } else {
-          
-          
           const created = await useMaterialStore.getState().createSafely({
             patch: {
               name: values.name.trim(),
@@ -522,7 +509,7 @@ export function MaterialFormPage() {
                       label={t('common.labels.code')}
                       leftSection={<IconHash size={14} />}
                       withAsterisk
-                      
+
                       styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
                       {...form.getInputProps('code')}
                     />

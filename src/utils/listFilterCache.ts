@@ -1,13 +1,10 @@
-
-
 import { logger } from '@credo/base-ui/utils';
 
 export type ListFilterCache<T> = {
-  
   read(): T | null;
-  
+
   write(state: T): void;
-  
+
   clear(): void;
 };
 
@@ -25,12 +22,12 @@ export function createListFilterCache<T extends object>(key: string): ListFilter
         const raw = localStorage.getItem(key);
         if (!raw) return null;
         const parsed = JSON.parse(raw) as Partial<Stamped<T>>;
-        
+
         if (!parsed || typeof parsed !== 'object' || typeof parsed.__day !== 'string') {
           localStorage.removeItem(key);
           return null;
         }
-        
+
         if (parsed.__day !== todayStamp()) {
           localStorage.removeItem(key);
           return null;
@@ -50,8 +47,6 @@ export function createListFilterCache<T extends object>(key: string): ListFilter
         const stamped: Stamped<T> = { __day: todayStamp(), __v: state };
         localStorage.setItem(key, JSON.stringify(stamped));
       } catch (err) {
-        
-        
         logger.warn(`[listFilterCache] write('${key}') failed`, err);
       }
     },

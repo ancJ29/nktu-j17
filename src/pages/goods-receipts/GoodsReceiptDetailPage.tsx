@@ -80,9 +80,6 @@ function StatusStrip({
 }) {
   const { t } = useTranslation();
 
-  
-  
-  
   const isReceived = receipt.status === 'received';
   const isCancelled = receipt.status === 'cancelled';
 
@@ -134,12 +131,7 @@ function StatusStrip({
 }
 
 type NodeState =
-  | 'active-gray'
-  | 'active-green'
-  | 'active-red'
-  | 'done-neutral'
-  | 'pending'
-  | 'skipped';
+  'active-gray' | 'active-green' | 'active-red' | 'done-neutral' | 'pending' | 'skipped';
 
 const NODE_PALETTE: Record<NodeState, { color: string; variant: 'filled' | 'light' | 'outline' }> =
   {
@@ -216,7 +208,7 @@ function Connector({ state }: { readonly state: 'done' | 'pending' | 'cancelled'
         flex: 1,
         height: state === 'done' ? 2 : 0,
         minWidth: 18,
-        marginTop: 14, 
+        marginTop: 14,
         ...styles,
       }}
     />
@@ -258,25 +250,14 @@ export function GoodsReceiptDetailPage() {
     handleSaveItemQuantity,
   } = detail;
 
-  
-  
-  
-  
   const [activeTab, setActiveTab] = useState<string | null>('receipt');
 
-  
-  
   const unitLabels = useLookupLabels('unit');
 
-  
-  
   const products = useProductStore((s) => s.items);
 
   if (loading || !receipt || !status) return null;
 
-  
-  
-  
   const unitTotals = new Map<string, number>();
   for (const it of receipt.items) {
     const key = it.unit || '';
@@ -284,9 +265,6 @@ export function GoodsReceiptDetailPage() {
   }
   const unitTotalsArr = Array.from(unitTotals.entries()).filter(([u]) => u);
 
-  
-  
-  
   const headerColor = isCancelled ? 'red' : isReceived ? 'green' : 'gray';
   const thumbSize = isMobile ? 56 : 72;
   const thumbIconSize = isMobile ? 28 : 32;
@@ -333,10 +311,6 @@ export function GoodsReceiptDetailPage() {
     </Group>
   );
 
-  
-  
-  
-  
   const isSingleUnitHero = unitTotalsArr.length === 1;
   const heroBlock = (
     <Stack
@@ -356,10 +330,6 @@ export function GoodsReceiptDetailPage() {
             </Text>
           </Group>
           {(() => {
-            
-            
-            
-            
             const single = receipt.items[0];
             if (!single) return null;
             const tail = resolveBaseUnitDisplay(single, products, unitLabels);
@@ -486,9 +456,6 @@ export function GoodsReceiptDetailPage() {
     </Group>
   );
 
-  
-  
-  
   const hasReference = !!receipt.reference?.trim();
   const assignedTo = receipt.extra?.assignedTo;
   const copyFromId = receipt.extra?.copyFromId;
@@ -539,13 +506,6 @@ export function GoodsReceiptDetailPage() {
     </SectionCard>
   );
 
-  
-  
-  
-  
-  
-  
-  
   const wasReceived = isCancelled && !!receipt.receivedAt;
   const showInventoryEffect = (isReceived || wasReceived) && receipt.items.length > 0;
   const effectColor = wasReceived ? 'red' : 'green';
@@ -587,9 +547,6 @@ export function GoodsReceiptDetailPage() {
         )}
         <Stack gap={6}>
           {receipt.items.map((item, idx) => {
-            
-            
-            
             const lineState = isReceived ? postingStatus?.byItemCode.get(item.itemCode) : undefined;
             const notPosted = lineState === 'missing' || lineState === 'orphaned';
             const lineColor = notPosted ? 'orange' : lineState === 'skipped' ? 'gray' : effectColor;
@@ -668,11 +625,6 @@ export function GoodsReceiptDetailPage() {
     </SectionCard>
   ) : null;
 
-  
-  
-  
-  
-  
   const notesCard = (
     <SectionCard
       icon={<IconNote size={14} />}
@@ -760,15 +712,6 @@ export function GoodsReceiptDetailPage() {
     </SectionCard>
   );
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const mobileBody = (
     <Tabs defaultValue="items" keepMounted={false}>
       <Tabs.List grow>
@@ -795,9 +738,6 @@ export function GoodsReceiptDetailPage() {
     </Tabs>
   );
 
-  
-  
-  
   const desktopGrid = (
     <Grid gutter="md">
       <Grid.Col span={{ base: 12, md: 7 }}>
@@ -815,12 +755,7 @@ export function GoodsReceiptDetailPage() {
       </Grid.Col>
     </Grid>
   );
-  
-  
-  
-  
-  
-  
+
   const desktopBody = activityLogTabVisible ? (
     <Tabs value={activeTab} onChange={setActiveTab}>
       <Tabs.List>
@@ -846,15 +781,6 @@ export function GoodsReceiptDetailPage() {
     desktopGrid
   );
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const stickyBar =
     isMobile && (showConfirmCta || showCancelCta) ? (
       <Box
@@ -868,9 +794,7 @@ export function GoodsReceiptDetailPage() {
           gap: 8,
           padding: '0 16px',
           zIndex: 150,
-          
-          
-          
+
           pointerEvents: 'none',
         }}
       >
@@ -914,10 +838,7 @@ export function GoodsReceiptDetailPage() {
     <>
       <Stack
         gap={isMobile ? 'md' : 'lg'}
-        
-        
-        
-        
+
         style={
           stickyBar
             ? {
@@ -1151,8 +1072,7 @@ function CopiedFromLink({ id }: { readonly id: string }) {
       })
       .catch(() => {
         if (cancelled) return;
-        
-        
+
         setMissing(true);
       });
     return () => {
@@ -1242,7 +1162,7 @@ function TimelineSlot({
   readonly color: string;
   readonly icon: React.ReactNode;
   readonly timestamp: DateTimeInput;
-  
+
   readonly actor?: string;
 }) {
   const { t } = useTranslation();

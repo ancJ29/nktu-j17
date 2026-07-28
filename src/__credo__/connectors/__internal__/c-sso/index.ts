@@ -135,10 +135,6 @@ export const cSsoConnector = {
     return cSsoConnector;
   },
 
-  
-  
-  
-
   register: ({ email, password, serviceCode }: RegisterRequest) =>
     ssoApi<RegisterResponse>(SSO_ROUTES.REGISTER, {
       body: { email, password, serviceCode },
@@ -239,10 +235,6 @@ export const cSsoConnector = {
       body: { serviceCode, token },
     }),
 
-  
-  
-  
-
   getAllServices: () => configApi<GetAllServicesResponse>(CONFIG_ROUTES.GET_ALL_SERVICES),
 
   addService: ({ serviceCode, name, description, operatorAccessKey }: AddServiceRequest) =>
@@ -291,10 +283,6 @@ export const cSsoConnector = {
       params: { serviceCode },
       noContentType: true,
     }),
-
-  
-  
-  
 
   operatorAddUser: (
     operatorAccessKey: string,
@@ -367,10 +355,6 @@ export const cSsoConnector = {
       body: { serviceCode, limit, offset },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
-
-  
-  
-  
 
   unverifyEmail: ({ serviceCode, email }: UnverifyEmailRequest) =>
     adminApi<UnverifyEmailResponse>(ADMIN_ROUTES.UNVERIFY_EMAIL, {

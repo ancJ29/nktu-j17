@@ -37,10 +37,6 @@ export async function unlinkDRFromSalesOrder(salesOrderId: string, drId: string)
 }
 
 export async function linkDRToSalesOrder(salesOrderId: string, drId: string): Promise<void> {
-  
-  
-  
-  
   let so = useSalesOrderStore.getState().getById(salesOrderId) as SalesOrder | undefined;
   if (!so) {
     const fresh = await cMngtConnector.getSalesOrderById<SalesOrderExtra>({ id: salesOrderId });

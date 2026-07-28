@@ -230,7 +230,6 @@ export function ConfigEditor({
   const clientCode = useMemo(() => clientServiceCode ?? resolveClientCode(), [clientServiceCode]);
   const isExternalTarget = clientServiceCode !== undefined;
 
-  
   const [version, setVersion] = useState(DEFAULT_CONFIG.version);
   const [appInfo, setAppInfo] = useState<AppInfo>(DEFAULT_CONFIG.app);
   const [auth, setAuth] = useState<AuthFeatures>(DEFAULT_CONFIG.auth);
@@ -312,7 +311,6 @@ export function ConfigEditor({
     useState<CMngtDisplaySettings>(DEFAULT_DISPLAY_SETTINGS);
   const [companyInfo, setCompanyInfo] = useState<CompanyInfoConfig>(DEFAULT_COMPANY_INFO);
 
-  
   const departmentMultiSelectData = useMemo(
     () =>
       (employeeFeatures.departmentOptions ?? []).map((d) => {
@@ -323,7 +321,6 @@ export function ConfigEditor({
     [employeeFeatures.departmentOptions],
   );
 
-  
   const buildConfigPayload = useCallback(
     (newVersion?: string): CMngtAppConfig => ({
       version: newVersion ?? version,
@@ -333,9 +330,7 @@ export function ConfigEditor({
       themeConfig,
       languages,
       defaultLanguage,
-      
-      
-      
+
       navigation: {
         pc: stripHiddenNavItems(navigation.pc),
         mobile: stripHiddenNavItems(navigation.mobile),
@@ -417,7 +412,6 @@ export function ConfigEditor({
     ],
   );
 
-  
   const applyConfig = useCallback((cfg: CMngtAppConfig) => {
     setVersion(cfg.version ?? DEFAULT_CONFIG.version);
     setAppInfo(cfg.app ?? DEFAULT_CONFIG.app);
@@ -496,12 +490,9 @@ export function ConfigEditor({
     setHasConfig(true);
   }, []);
 
-  
-  
   useEffect(() => {
     if (!clientCode) return;
 
-    
     setConfigLoading(true);
     cMngtConnector.setAccessKey(accessKey);
     cMngtConnector
@@ -520,12 +511,9 @@ export function ConfigEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- t excluded: language change should not re-fetch config
   }, [clientCode, accessKey]);
 
-  
   const handleSave = async () => {
     if (!clientCode) return;
 
-    
-    
     const knownDepartments = new Set(
       (employeeFeatures.departmentOptions ?? []).map((d) => d.value),
     );
@@ -539,8 +527,6 @@ export function ConfigEditor({
       return;
     }
 
-    
-    
     const drResult = validateDeliveryRequestConfig(deliveryRequestsFeatures);
     if (!drResult.ok) {
       notifications.show({
@@ -551,8 +537,6 @@ export function ConfigEditor({
       return;
     }
 
-    
-    
     const toResult = validateTransportOrderConfig(transportOrdersFeatures, knownDepartments);
     if (!toResult.ok) {
       notifications.show({
@@ -573,20 +557,11 @@ export function ConfigEditor({
         config,
       });
       if (res.success) {
-        
-        
-        
         if (!isExternalTarget) cacheSet('cfg', config);
         setVersion(newVersion);
         notifications.show({ color: 'green', message: 'Config saved successfully' });
         setHasConfig(true);
 
-        
-        
-        
-        
-        
-        
         if (!isExternalTarget) scheduleReload('app config saved');
       } else {
         notifications.show({ color: 'red', message: 'Failed to save config' });
@@ -598,7 +573,6 @@ export function ConfigEditor({
     }
   };
 
-  
   const handleCopyJson = useCallback(() => {
     const json = JSON.stringify(
       {
@@ -622,7 +596,6 @@ export function ConfigEditor({
     );
   }, [buildConfigPayload]);
 
-  
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [importJsonText, setImportJsonText] = useState('');
   const [importJsonError, setImportJsonError] = useState<string | null>(null);
@@ -658,20 +631,18 @@ export function ConfigEditor({
     });
   }, [importJsonText, applyConfig]);
 
-  
   const [openSections, setOpenSections] = useState<Set<SectionKey>>(() => {
     const hash = window.location.hash.replace('#', '') as SectionKey;
     if (hash && ALL_SECTIONS.includes(hash)) return new Set<SectionKey>([hash]);
     return new Set<SectionKey>(['appInfo']);
   });
 
-  
   useEffect(() => {
     const scrollToHash = () => {
       const hash = window.location.hash.replace('#', '') as SectionKey;
       if (hash && ALL_SECTIONS.includes(hash)) {
         setOpenSections(new Set<SectionKey>([hash]));
-        
+
         requestAnimationFrame(() => {
           const el = document.getElementById(hash);
           if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -696,7 +667,6 @@ export function ConfigEditor({
   const collapseAll = useCallback(() => setOpenSections(new Set()), []);
 
   const resetAll = useCallback(() => {
-    
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
     setEnableStats(DEFAULT_ENABLE_STATS);
@@ -732,7 +702,6 @@ export function ConfigEditor({
     setCompanyInfo(DEFAULT_COMPANY_INFO);
   }, []);
 
-  
   const resetAppInfo = useCallback(() => {
     setAppInfo(DEFAULT_APP_INFO);
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
@@ -818,11 +787,6 @@ export function ConfigEditor({
   const resetDisplaySettings = useCallback(() => setDisplaySettings(DEFAULT_DISPLAY_SETTINGS), []);
   const resetCompanyInfo = useCallback(() => setCompanyInfo(DEFAULT_COMPANY_INFO), []);
 
-  
-  
-  
-  
-  
   const eqDefault = (a: unknown, b: unknown) => Object.keys(deepDiff(a, b)).length === 0;
   const sectionIsDefault: Partial<Record<SectionKey, boolean>> = {
     appInfo:
@@ -1637,7 +1601,7 @@ export function ConfigEditor({
                         checked={checked}
                         onChange={() => {
                           const allIds = LOOKUP_CATEGORIES.map((c) => c.id);
-                          
+
                           if (lookupsFeatures.enabledCategories.length === 0) {
                             setLookupsFeatures({
                               ...lookupsFeatures,
@@ -1647,7 +1611,7 @@ export function ConfigEditor({
                             const next = checked
                               ? lookupsFeatures.enabledCategories.filter((id) => id !== cat.id)
                               : [...lookupsFeatures.enabledCategories, cat.id];
-                            
+
                             setLookupsFeatures({
                               ...lookupsFeatures,
                               enabledCategories: next.length === allIds.length ? [] : next,
@@ -1697,8 +1661,7 @@ export function ConfigEditor({
                         checked={checked}
                         onChange={() => {
                           const allIds = LOOKUP_V2_CATEGORIES.map((c) => c.id);
-                          
-                          
+
                           if (lookupV2Features.enabledCategories.length === 0) {
                             setLookupV2Features({
                               ...lookupV2Features,
@@ -1708,7 +1671,7 @@ export function ConfigEditor({
                             const next = checked
                               ? lookupV2Features.enabledCategories.filter((id) => id !== cat.id)
                               : [...lookupV2Features.enabledCategories, cat.id];
-                            
+
                             setLookupV2Features({
                               ...lookupV2Features,
                               enabledCategories: next.length === allIds.length ? [] : next,
@@ -1833,9 +1796,6 @@ export function ConfigEditor({
                   <SalesOrderStatusOptionEditor
                     options={salesOrdersFeatures.statusOptions}
                     onChange={(opts) =>
-                      
-                      
-                      
                       setSalesOrdersFeatures((prev) => ({
                         ...prev,
                         statusOptions: opts,
@@ -1950,8 +1910,6 @@ export function ConfigEditor({
                   <DeliveryRequestStatusOptionEditor
                     options={deliveryRequestsFeatures.statusOptions}
                     onChange={(opts) =>
-                      
-                      
                       setDeliveryRequestsFeatures((prev) => ({
                         ...prev,
                         statusOptions: opts,
@@ -2136,8 +2094,6 @@ export function ConfigEditor({
                   <TransportOrderStatusOptionEditor
                     options={transportOrdersFeatures.statusOptions}
                     onChange={(opts) =>
-                      
-                      
                       setTransportOrdersFeatures((prev) => ({
                         ...prev,
                         statusOptions: opts,

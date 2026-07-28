@@ -1,5 +1,3 @@
-
-
 import { ROUTES } from '@/constants/routes';
 import { IconName } from '@credo/base-ui/components';
 import type { NavigationItem } from '@/types';
@@ -46,11 +44,11 @@ type NavRegistryEntry = {
   labelKey: string;
   label: string;
   defaultIcon: IconName;
-  
+
   adminOnly?: true;
-  
+
   rootOnly?: true;
-  
+
   mobileNavbar?: true;
 };
 
@@ -62,9 +60,7 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Home,
     mobileNavbar: true,
   },
-  
-  
-  
+
   report: {
     path: ROUTES.REPORTS,
     labelKey: 'nav.report',
@@ -77,9 +73,7 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     label: 'Employees',
     defaultIcon: IconName.Users,
   },
-  
-  
-  
+
   'employee-org': {
     path: ROUTES.EMPLOYEES.ORG_SETTINGS,
     labelKey: 'nav.employeeOrg',
@@ -100,9 +94,7 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.FileText,
     mobileNavbar: true,
   },
-  
-  
-  
+
   quotations: {
     path: ROUTES.QUOTATIONS.LIST,
     labelKey: 'quotations.title',
@@ -152,7 +144,7 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     label: 'Vendors',
     defaultIcon: IconName.Truck,
   },
-  
+
   'product-catalog': {
     labelKey: 'nav.productCatalog',
     label: 'Product Catalog',
@@ -224,22 +216,14 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Database,
     adminOnly: true,
   },
-  
-  
-  
-  
+
   lookups: {
     path: ROUTES.LOOKUPS.LIST,
     labelKey: 'nav.lookups',
     label: 'Meta-data',
     defaultIcon: IconName.Category2,
   },
-  
-  
-  
-  
-  
-  
+
   'lookups-v2': {
     path: ROUTES.LOOKUPS_V2.LIST,
     labelKey: 'nav.lookupsV2',
@@ -247,16 +231,14 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Category2,
     rootOnly: true,
   },
-  
+
   'truck-assets': {
     path: ROUTES.ASSETS.TRUCKS.LIST,
     labelKey: 'assets.truck.title',
     label: 'Trucks',
     defaultIcon: IconName.Truck,
   },
-  
-  
-  
+
   farm: {
     labelKey: 'nav.farm',
     label: 'Farm',
@@ -414,11 +396,10 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
 
 const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   employees: () => getModulePermissions('employee').canView ?? false,
-  
+
   'employee-org': () => getModulePermissions('permissionManagement').canView ?? false,
   'sales-orders': () => getModulePermissions('salesOrder').canView ?? false,
-  
-  
+
   quotations: () => getModulePermissions('salesOrder').canView ?? false,
   delivery: () => getModulePermissions('deliveryRequest').canView ?? false,
   'goods-receipts': () => getModulePermissions('goodsReceipt').canView ?? false,
@@ -441,8 +422,7 @@ const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
 
 function resolveItem(id: NavId, iconOverride?: IconName, navbarOverride?: boolean): NavigationItem {
   const entry = NAV_REGISTRY[id];
-  
-  
+
   const navbar = navbarOverride ?? entry.mobileNavbar ?? false;
   return {
     id,
@@ -451,8 +431,7 @@ function resolveItem(id: NavId, iconOverride?: IconName, navbarOverride?: boolea
     label: entry.label,
     icon: iconOverride ?? entry.defaultIcon,
     ...(navbar ? { navbar: true } : {}),
-    
-    
+
     ...(entry.rootOnly ? { rootOnly: true } : {}),
   };
 }
@@ -463,8 +442,7 @@ function deriveStructureFromConfig(configItems: NavigationItem[]): {
   navbarOverrides: Map<string, boolean>;
 } {
   const iconOverrides = new Map<string, IconName>();
-  
-  
+
   const navbarOverrides = new Map<string, boolean>();
   const structure: NavStructureItem[] = [];
 
@@ -477,12 +455,10 @@ function deriveStructureFromConfig(configItems: NavigationItem[]): {
 
     navbarOverrides.set(item.id, !!item.navbar);
 
-    
     if (inRegistry && item.icon && item.icon !== NAV_REGISTRY[item.id as NavId].defaultIcon) {
       iconOverrides.set(item.id, item.icon as IconName);
     }
 
-    
     const subs: NavId[] = [];
     if (item.subs && item.subs.length > 0) {
       for (const sub of item.subs) {
@@ -497,8 +473,6 @@ function deriveStructureFromConfig(configItems: NavigationItem[]): {
     }
 
     if (isCustomGroup) {
-      
-      
       if (subs.length === 0) continue;
       structure.push({
         id: item.id,
@@ -509,7 +483,6 @@ function deriveStructureFromConfig(configItems: NavigationItem[]): {
       continue;
     }
 
-    
     const id = item.id as NavId;
     if (subs.length > 0) {
       structure.push({ id, subs });
@@ -522,15 +495,14 @@ function deriveStructureFromConfig(configItems: NavigationItem[]): {
 }
 
 type BuildNavigationOptions = {
-  
   configNav?: { pc: NavigationItem[]; mobile: NavigationItem[] } | null;
-  
+
   features: FeatureFlags;
-  
+
   isAdmin?: boolean;
-  
+
   checkPermissions?: boolean;
-  
+
   showRestrictedItems?: boolean;
 };
 
@@ -540,7 +512,7 @@ export function stripHiddenNavItems<T extends { hidden?: boolean; subs?: T[] }>(
     .map((item) => {
       if (!item.subs || item.subs.length === 0) return item;
       const subs = item.subs.filter((s) => !s.hidden);
-      
+
       return { ...item, subs };
     });
 }
@@ -555,7 +527,7 @@ export function stripRootOnlyNavItems<T extends { rootOnly?: boolean; subs?: T[]
     if (item.rootOnly) continue;
     if (item.subs && item.subs.length > 0) {
       const subs = stripRootOnlyNavItems(item.subs, isRoot);
-      
+
       if (subs.length === 0) continue;
       result.push({ ...item, subs });
     } else {
@@ -608,7 +580,6 @@ export function buildNavigation(options: BuildNavigationOptions) {
         continue;
       }
 
-      
       if ('customLabel' in entry) {
         const subs = entry.subs
           .filter(
@@ -629,7 +600,6 @@ export function buildNavigation(options: BuildNavigationOptions) {
         continue;
       }
 
-      
       if (!isVisible(entry.id)) continue;
       if (checkFeatureFlags && !isFeatureEnabled(entry.id)) continue;
       if (!isPermitted(entry.id)) continue;
@@ -653,7 +623,6 @@ export function buildNavigation(options: BuildNavigationOptions) {
     return items;
   }
 
-  
   const hasPcConfig = configNav && configNav.pc.length > 0;
   const hasMobileConfig = configNav && configNav.mobile.length > 0;
 
@@ -673,15 +642,11 @@ export function buildNavigation(options: BuildNavigationOptions) {
         navbarOverrides: undefined,
       };
 
-  
   const mergedOverrides = new Map<string, IconName>([
     ...mobileDerived.iconOverrides,
     ...pcDerived.iconOverrides,
   ]);
 
-  
-  
-  
   const pc = buildItems(pcDerived.structure, mergedOverrides, !hasPcConfig);
   const mobile = buildItems(
     mobileDerived.structure,
@@ -690,9 +655,6 @@ export function buildNavigation(options: BuildNavigationOptions) {
     mobileDerived.navbarOverrides,
   );
 
-  
-  
-  
   if (isAdmin) {
     const appendAdminItems = (
       items: NavigationItem[],
@@ -700,8 +662,6 @@ export function buildNavigation(options: BuildNavigationOptions) {
     ): NavigationItem[] => {
       const seenIds = new Set(items.map((item) => item.id));
       for (const entry of defaultStructure) {
-        
-        
         if (typeof entry === 'string' || 'customLabel' in entry) continue;
         if (seenIds.has(entry.id)) continue;
         const adminSubs = entry.subs.filter(

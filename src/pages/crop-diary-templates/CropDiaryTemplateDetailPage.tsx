@@ -52,7 +52,6 @@ export function CropDiaryTemplateDetailPage() {
   const [template, setTemplate] = useState<CropDiaryTemplate | null>(null);
   const [loading, setLoading] = useState(true);
 
-  
   const materials = useMaterialStore((s) => s.items);
   const materialsInitialized = useMaterialStore((s) => s.initialized);
   const loadMaterials = useMaterialStore((s) => s.loadAll);
@@ -70,7 +69,6 @@ export function CropDiaryTemplateDetailPage() {
     const cached = useCropDiaryTemplateStore.getState().getById(id) as
       CropDiaryTemplate | undefined;
     if (cached) {
-      
       setTemplate(cached);
       setLoading(false);
       return;

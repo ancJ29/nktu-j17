@@ -52,11 +52,9 @@ const tabStyle = { flexShrink: 0, whiteSpace: 'nowrap' } as const;
 export function TruckAssetDetailPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string | null>('overview');
-  
-  
+
   const truckTypeLabels = useLookupV2Labels('truck-type');
-  
-  
+
   const maintenanceTypeOptions = useLookupV2Options('truck-maintenance-type');
 
   return (
@@ -92,13 +90,11 @@ export function TruckAssetDetailPage() {
       {(truck, dangerZone) => {
         const e = truck.extra ?? {};
         const targetCode = truck.extra?.plateNumber || truck.code;
-        
+
         const targetId = truck.id;
-        
-        
+
         const assignedDriver = e.driverName ? { id: e.driverId, name: e.driverName } : undefined;
 
-        
         const basicCard = (
           <SectionCard icon={<IconTruck size={14} />} title={t('assets.truck.detail.basicTitle')}>
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
@@ -185,7 +181,6 @@ export function TruckAssetDetailPage() {
           </SectionCard>
         );
 
-        
         const driverCard = (
           <SectionCard icon={<IconUser size={14} />} title={t('assets.truck.detail.driverTitle')}>
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
@@ -239,7 +234,6 @@ export function TruckAssetDetailPage() {
           </SectionCard>
         );
 
-        
         const registrationCard = (
           <SectionCard
             icon={<IconFileCertificate size={14} />}

@@ -1,5 +1,3 @@
-
-
 import { cStorageConnector } from '@credo/connectors/connector';
 import { generateId, randomString } from '@credo/kits/string';
 import { loadIndustry, type IndustryName } from '../../../scripts/faker/industry';
@@ -26,7 +24,7 @@ export type SeedProductsOptions = {
   industry: IndustryName;
   count: number;
   secrets: FakeDataSecrets;
-  
+
   items?: ManualProductInput[];
   onLog?: (line: string) => void;
 };
@@ -39,9 +37,9 @@ export type ManualProductInput = {
   name?: string;
   code?: string;
   description?: string;
-  
+
   unit?: string;
-  
+
   units?: string[];
   unitConversions?: { unit: string; quantity: number; baseUnit: string }[];
   alternativeNames?: string[];
@@ -51,14 +49,13 @@ export type ManualProductInput = {
   barcode?: string;
   price?: number;
   basePrice?: number;
-  
+
   minStock?: number;
-  
+
   attributes?: Array<{ key: string; value: string }>;
-  
+
   techSpecs?: Array<{ key: string; value: string }>;
-  
-  
+
   extra?: Partial<ProductExtra>;
 };
 
@@ -142,9 +139,6 @@ function generateProducts(
     const primaryUnit = source.units[0]!;
     const basePrice = Math.round((source.price * (0.5 + Math.random() * 0.25)) / 100) * 100;
 
-    
-    
-    
     const techSpecs = generateRows(pools.techSpecs, 2, 4);
     const attributes = Math.random() < 0.6 ? generateRows(pools.attributes, 1, 2) : [];
 
@@ -197,20 +191,16 @@ function buildProductsFromManualInput(
     const name = row.name?.trim() || code;
     const inputExtra: Partial<ProductExtra> = row.extra ?? {};
 
-    
     const units =
       inputExtra.units && inputExtra.units.length > 0
         ? inputExtra.units
         : row.units && row.units.length > 0
           ? row.units
           : ['pcs'];
-    
+
     const primaryUnit = row.unit?.trim() || units[0]!;
     const minStock = typeof row.minStock === 'number' && row.minStock > 0 ? row.minStock : null;
 
-    
-    
-    
     const cleanRows = (rows?: Array<{ key: string; value: string }>) =>
       (rows ?? [])
         .map((r) => ({ key: r.key?.trim() ?? '', value: r.value?.trim() ?? '' }))
@@ -218,9 +208,6 @@ function buildProductsFromManualInput(
     const attributes = cleanRows(row.attributes);
     const techSpecs = cleanRows(row.techSpecs);
 
-    
-    
-    
     const legacyExtra: Record<string, unknown> = {};
     if (row.unitConversions && row.unitConversions.length > 0) {
       legacyExtra.unitConversions = row.unitConversions;
@@ -248,14 +235,11 @@ function buildProductsFromManualInput(
     const extra: Record<string, unknown> = {
       ...legacyExtra,
       ...inputExtra,
-      
+
       units,
       seedVersion: seedStamp,
     };
 
-    
-    
-    
     const mi = extra.minimumInventory as Partial<ProductExtra['minimumInventory']> | undefined;
     if (mi && typeof mi.value === 'number') {
       extra.minimumInventory = {
@@ -345,8 +329,7 @@ export async function seedFakeProducts(opts: SeedProductsOptions): Promise<SeedP
   if (manualItems) {
     log(`Source: JSON input (${manualItems.length} rows)`);
     items = buildProductsFromManualInput(manualItems, clientCode);
-    
-    
+
     const unitLabels = await fetchUnitLookups(clientCode, secrets.storageServiceCode, log);
     if (unitLabels) assertManualUnitsAreValues(items, unitLabels, log);
   } else {

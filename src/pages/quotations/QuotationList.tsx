@@ -96,8 +96,6 @@ export function QuotationList() {
     }
   }, [error, t]);
 
-  
-  
   const applyDateRange = useCallback(
     (next: DateRangeValue) => {
       const effective = next.from && next.to ? next : defaultLastNDaysRange(RANGE_DAYS);
@@ -108,9 +106,6 @@ export function QuotationList() {
     [forceRefresh],
   );
 
-  
-  
-  
   const rows = useMemo(() => {
     const live = items.filter((r) => !r.extra.isDeleted);
     let scoped = live;
@@ -245,7 +240,6 @@ export function QuotationList() {
     },
   ];
 
-  
   const isFirstLoad = loading && !initialized;
 
   const columns = useMemo(

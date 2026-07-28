@@ -1,5 +1,3 @@
-
-
 import {
   Alert,
   Box,
@@ -57,7 +55,7 @@ const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriv
 type NKTUCreateDeliveryRequestModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   onCreated?: () => void;
 };
 
@@ -89,33 +87,25 @@ type CreateBodyProps = {
 function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const [loading, setLoading] = useState(false);
 
-  
   const [direction, setDirection] = useState<CMngtDeliveryRequestDirection>('outbound');
   const [driverId, setDriverId] = useState<string | null>(null);
   const [date, setDate] = useState<Date | null>(null);
   const [notes, setNotes] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
-  
-  
+
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [customerCode, setCustomerCode] = useState<string | null>(null);
-  
-  
-  
+
   const [inboundSource, setInboundSource] = useState<'vendor' | 'customer-sample'>('vendor');
   const [vendorName, setVendorName] = useState('');
   const [vendorCode, setVendorCode] = useState('');
-  
-  
-  
+
   const [oneOffVendor, setOneOffVendor] = useState(false);
-  
-  
+
   const [sampleCustomer, setSampleCustomer] = useState<Customer | null>(null);
   const [sampleCustomerName, setSampleCustomerName] = useState('');
 
-  
   const salesOrders = useSalesOrderStore((s) => s.items);
   const soInit = useSalesOrderStore((s) => s.initialized);
   const loadSalesOrders = useSalesOrderStore((s) => s.loadAll);
@@ -137,7 +127,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     return findEmployeeByLoginEmail(employees, user.email);
   }, [user.email, employees]);
 
-  
   useEffect(() => {
     if (!soInit) loadSalesOrders();
     if (!drInit) loadDRs();
@@ -162,10 +151,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     [driverId, employees],
   );
 
-  
-  
-  
-  
   const ordersWithDR = useMemo(() => {
     const s = new Set<string>();
     for (const dr of deliveryRequests) {
@@ -174,9 +159,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     return s;
   }, [deliveryRequests]);
 
-  
-  
-  
   const eligibleOrdersAll = useMemo(
     () =>
       salesOrders
@@ -185,8 +167,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     [salesOrders, ordersWithDR],
   );
 
-  
-  
   const customerCodesWithOpenSO = useMemo(() => {
     const s = new Set<string>();
     for (const so of eligibleOrdersAll) {
@@ -196,23 +176,17 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     return s;
   }, [eligibleOrdersAll]);
 
-  
-  
   const customerWithOpenSOFilter = useCallback(
     (c: Customer) => c.isActive && !c.extra?.isDeleted && customerCodesWithOpenSO.has(c.code),
     [customerCodesWithOpenSO],
   );
 
-  
   const eligibleOrders = useMemo(
     () =>
       customerCode ? eligibleOrdersAll.filter((so) => so.extra?.customerCode === customerCode) : [],
     [eligibleOrdersAll, customerCode],
   );
 
-  
-  
-  
   const activeVendorFilter = useCallback((v: Vendor) => !v.extra?.isDeleted && v.isActive, []);
 
   const isInbound = direction === 'inbound';
@@ -220,7 +194,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const handleDirectionChange = (next: CMngtDeliveryRequestDirection) => {
     if (next === direction) return;
     setDirection(next);
-    
+
     if (next === 'inbound') {
       setSelectedIds(new Set());
       setCustomerId(null);
@@ -238,7 +212,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const handleInboundSourceChange = (next: 'vendor' | 'customer-sample') => {
     if (next === inboundSource) return;
     setInboundSource(next);
-    
+
     if (next === 'vendor') {
       setSampleCustomer(null);
       setSampleCustomerName('');
@@ -249,7 +223,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     }
   };
 
-  
   const toggleOne = useCallback((id: string) => {
     setSelectedIds((prev) => {
       const next = new Set(prev);
@@ -267,7 +240,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     );
   }, [eligibleOrders]);
 
-  
   const handleSaveOutbound = useCallback(async () => {
     if (!driver || !date || selectedIds.size === 0) return;
     const selected = eligibleOrders.filter((o) => selectedIds.has(o.id));
@@ -338,10 +310,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     const isSample = inboundSource === 'customer-sample';
     if ((isSample ? !sampleCustomerName.trim() : !vendorName.trim()) || !driver || !date) return;
     setLoading(true);
-    
-    
-    
-    
+
     const matchedVendor =
       !isSample && vendorCode.trim()
         ? vendors.find((v) => v.code === vendorCode.trim())
@@ -352,7 +321,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     try {
       const { linkFailed } = await createDeliveryRequestRecord({
         direction: 'inbound',
-        
+
         ...(isSample ? { inboundKind: 'customer-sample' as const } : {}),
         salesOrderId: '',
         salesOrderNumber: '',
@@ -370,12 +339,11 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
         currentEmployee: currentEmployee
           ? { id: currentEmployee.id, name: currentEmployee.name }
           : undefined,
-        
+
         initialStatus: 'pending',
         defaultStatus: getInitialStatusValue() ?? '',
       });
-      
-      
+
       if (linkFailed) {
         notifications.show({
           color: 'yellow',
@@ -474,8 +442,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
                 checked={oneOffVendor}
                 onChange={(e) => {
                   setOneOffVendor(e.currentTarget.checked);
-                  
-                  
+
                   setVendorName('');
                   setVendorCode('');
                 }}
@@ -560,8 +527,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
             onChange={(sel) => {
               setCustomerId(sel?.id ?? null);
               setCustomerCode(sel?.customer.code ?? null);
-              
-              
+
               setSelectedIds(new Set());
             }}
           />

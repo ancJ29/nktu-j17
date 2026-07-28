@@ -1,5 +1,3 @@
-
-
 import type { Lookup } from '@/types';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { createEntityStore } from './createEntityStore';

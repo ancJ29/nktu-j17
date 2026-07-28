@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx';
 import type { Customer, SalesOrder } from '@/types';
 import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission';
@@ -10,12 +8,12 @@ export type SalesOrderExportOptions = {
   language?: string;
   resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
   resolveDeliveryMethod: (value: string | undefined | null) => string;
-  
+
   employeeNames: ReadonlyMap<string, string>;
-  
+
   getCustomerByCode: (code: string) => Customer | undefined;
   tagOptions: ReadonlyArray<ResolvedTagOption>;
-  
+
   pricingEnabled?: boolean;
 };
 
@@ -129,8 +127,6 @@ export const exportSalesOrdersToExcel = (
   const sheetName = isVietnamese ? 'Đơn hàng' : 'Sales Orders';
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
-  
-  
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, '0');

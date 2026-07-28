@@ -357,10 +357,6 @@ export const cMngtConnector = {
     return cMngtConnector;
   },
 
-  
-  
-  
-
   getAllEmployees: <TExtra = Record<string, unknown>>(params?: GetAllEmployeesRequest) =>
     employeeApi<GetAllEmployeesResponse<TExtra>>(EMPLOYEE_ROUTES.GET_ALL, {
       ...(params?.hash && { queryParams: { hash: params.hash } }),
@@ -423,10 +419,6 @@ export const cMngtConnector = {
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
-  
-  
-  
-
   getAllProducts: <TExtra = Record<string, unknown>>(params?: GetAllProductsRequest) =>
     productApi<GetAllProductsResponse<TExtra>>(PRODUCT_ROUTES.GET_ALL, {
       ...(params?.hash && { queryParams: { hash: params.hash } }),
@@ -479,10 +471,6 @@ export const cMngtConnector = {
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
-  
-  
-  
-
   getAllMasterData: (params?: GetAllMasterDataRequest) => {
     const queryParams: Record<string, string> = {};
     if (params?.employeesHash) queryParams['employeesHash'] = params.employeesHash;
@@ -500,10 +488,6 @@ export const cMngtConnector = {
     masterDataApi<ResyncMasterDataResponse>(MASTER_DATA_ROUTES.RESYNC, {
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   registerClient: <TExtra = Record<string, unknown>>(request: RegisterClientRequest<TExtra>) =>
     adminClientApi<RegisterClientResponse<TExtra>>(ADMIN_CLIENT_ROUTES.REGISTER, {
@@ -542,10 +526,6 @@ export const cMngtConnector = {
       body,
     }),
 
-  
-  
-  
-
   setAppConfig: ({ clientServiceCode, ...body }: SetAppConfigRequest) =>
     adminConfigApi<SetAppConfigResponse>(ADMIN_CONFIG_ROUTES.SET, {
       params: { clientServiceCode },
@@ -557,10 +537,6 @@ export const cMngtConnector = {
       params: { clientServiceCode },
     }),
 
-  
-  
-  
-
   getClientByServiceCode: <TExtra = Record<string, unknown>>({
     clientServiceCode,
   }: GetClientByServiceCodeRequest) =>
@@ -568,27 +544,16 @@ export const cMngtConnector = {
       params: { clientServiceCode },
     }),
 
-  
-  
-  
-
   getAppConfig: ({ clientServiceCode }: GetAppConfigRequest) =>
     configApi<GetAppConfigResponse>(CONFIG_ROUTES.GET, {
       params: { clientServiceCode },
     }),
 
-  
-  
-  
   setEmployeeConfig: (body: SetEmployeeConfigRequest) =>
     configApi<SetEmployeeConfigResponse>(CONFIG_ROUTES.SET_EMPLOYEE, {
       body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   querySalesOrders: <TExtra = Record<string, unknown>>({
     fromPeriod,
@@ -626,10 +591,6 @@ export const cMngtConnector = {
       body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   queryDeliveryRequests: <TExtra = Record<string, unknown>>({
     fromPeriod,
@@ -688,10 +649,6 @@ export const cMngtConnector = {
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
-  
-  
-  
-
   queryGoodsReceipts: <TExtra = Record<string, unknown>>({
     fromPeriod,
     toPeriod,
@@ -741,10 +698,6 @@ export const cMngtConnector = {
       body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   getAllLocations: <TExtra = Record<string, unknown>>(params?: GetAllLocationsRequest) =>
     locationApi<GetAllLocationsResponse<TExtra>>(LOCATION_ROUTES.GET_ALL, {
@@ -800,10 +753,6 @@ export const cMngtConnector = {
       body: request,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   getAllProductInventory: <TExtra = Record<string, unknown>>(
     params?: GetAllProductInventoryRequest,
@@ -873,10 +822,6 @@ export const cMngtConnector = {
       },
     ),
 
-  
-  
-  
-
   getAllLookups: <TExtra = Record<string, unknown>>(params?: GetAllLookupsRequest) =>
     lookupApi<GetAllLookupsResponse<TExtra>>(LOOKUP_ROUTES.GET_ALL, {
       ...(params?.hash && { queryParams: { hash: params.hash } }),
@@ -939,10 +884,6 @@ export const cMngtConnector = {
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
-  
-  
-  
-
   getOperationLogsByTarget: <TExtra = Record<string, unknown>>({
     targetId,
     period,
@@ -976,10 +917,6 @@ export const cMngtConnector = {
       body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   queryGenericRecords: <TExtra = Record<string, unknown>>({
     recordType,
@@ -1027,10 +964,6 @@ export const cMngtConnector = {
       body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
-
-  
-  
-  
 
   getAllSingleRecords: (target: SingleRecordTarget, params?: GetAllSingleRecordsRequest) => {
     const { entity, headers } = recordTarget(target);
@@ -1087,10 +1020,6 @@ export const cMngtConnector = {
       extraHeaders: headers,
     });
   },
-
-  
-  
-  
 
   queryPartitionedRecords: (
     target: PartitionedRecordTarget,

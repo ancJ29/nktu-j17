@@ -1,7 +1,7 @@
 import { ONE_HOUR } from '@credo/kits/time';
 
 export function generateCode(prefix: string): string {
-  const now = Date.now() + 7 * ONE_HOUR; 
+  const now = Date.now() + 7 * ONE_HOUR;
   const timeBased = new Date(now).toISOString().replace(/-|:/g, '').replace('T', '-').slice(2, 15);
   const randomString = Math.random().toString().substring(3, 8);
   return `${prefix}${timeBased}-${randomString}`;
@@ -18,7 +18,7 @@ export function buildDailySequentialCode(
 ): string {
   const padLength = options.padLength ?? 3;
   const date = options.date ?? businessDateString();
-  const datePart = date.slice(2).replace(/-/g, ''); 
+  const datePart = date.slice(2).replace(/-/g, '');
   const dayPrefix = `${prefix}${datePart}-`;
 
   let maxCounter = 0;

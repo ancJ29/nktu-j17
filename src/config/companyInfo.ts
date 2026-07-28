@@ -11,7 +11,6 @@ export type CompanyInfo = {
 
 const FALLBACK_COMPANY_INFO: CompanyInfo = isNKTU
   ? {
-      
       name: 'CÔNG TY TNHH NGŨ KIM TÂN UYÊN',
       address:
         'Số 49/6 Đường Nguyễn Công Trứ, Khu phố Đông A, Phường Đông Hòa, Thành phố Hồ Chí Minh, Việt Nam.',

@@ -18,7 +18,6 @@ export const DeptPermissionsSection = memo(function DeptPermissionsSection({
 }) {
   const [selectedDept, setSelectedDept] = useState<string | null>(null);
 
-  
   const resolvedClientPerms = useMemo(
     () => deepMergePermissions(BASE_PERMISSIONS, clientPermissions),
     [clientPermissions],

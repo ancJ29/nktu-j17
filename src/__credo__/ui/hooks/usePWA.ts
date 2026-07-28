@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useRef } from 'react';
 
 import { useLocalStorage } from '@mantine/hooks';
@@ -19,23 +18,18 @@ export type UsePWALabels = {
 };
 
 export type UsePWAOptions = {
-  
   bundledBuild: string;
 
-  
   sw: {
     offlineReady: boolean;
     needRefresh: boolean;
     updateServiceWorker: (reloadPage?: boolean) => Promise<void>;
   };
 
-  
   labels?: Partial<UsePWALabels>;
 
-  
   color?: string;
 
-  
   successColor?: string;
 };
 
@@ -94,7 +88,6 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
     defaultValue: true,
   });
 
-  
   const checkForUpdates = useCallback(async () => {
     if (isDev) return;
     const LIMIT = 30e3;
@@ -105,12 +98,10 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
       const remoteBuild = await fetchRemoteBuild();
       if (!remoteBuild) return;
 
-      
       if (remoteBuild === bundledBuild) return;
 
       console.log('New build detected:', remoteBuild, '(running:', bundledBuild, ')');
 
-      
       const now = Date.now();
       const timeSinceLastNotification = now - lastNotificationTime.current;
       const isSameBuild = lastDetectedBuild.current === remoteBuild;
@@ -175,7 +166,6 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
     notifColor,
   ]);
 
-  
   useEffect(() => {
     void checkForUpdates();
 
@@ -196,7 +186,6 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
     };
   }, [checkForUpdates]);
 
-  
   useEffect(() => {
     if (needRefresh) {
       const now = Date.now();
@@ -242,7 +231,6 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
     notifColor,
   ]);
 
-  
   useEffect(() => {
     if (offlineReady) {
       notifications.show({
@@ -281,12 +269,6 @@ async function fetchRemoteBuild(retries = 3): Promise<string | null> {
       });
       if (!response.ok) throw new Error(`Failed to fetch build-info: ${response.status}`);
 
-      
-      
-      
-      
-      
-      
       const contentType = response.headers.get('content-type') ?? '';
       if (!contentType.includes('json')) {
         throw new Error(
@@ -302,8 +284,6 @@ async function fetchRemoteBuild(retries = 3): Promise<string | null> {
     } catch (error) {
       console.error(`Failed to fetch build-info (attempt ${i + 1}/${retries}):`, error);
       if (i === retries - 1) {
-        
-        
         console.error(
           '[pwa] Update detection is DISABLED — /build-info.json is unreadable. ' +
             'Users will keep running the build they already have.',

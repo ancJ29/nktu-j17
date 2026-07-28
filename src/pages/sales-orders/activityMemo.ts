@@ -1,5 +1,3 @@
-
-
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
 import type { SalesOrderExtra, SalesOrderItem, SalesOrderSetRole } from '@/types/sales-order';
 
@@ -47,9 +45,9 @@ export type SalesOrderInlineFields = {
   deliveryMethod?: { from?: string; to?: string };
   deliveryDate?: { from?: number; to?: number };
   notes?: { changed: true };
-  
+
   itemMemo?: { changed: true };
-  
+
   warehouseNote?: { changed: true };
   driverNote?: { changed: true };
 };
@@ -57,7 +55,7 @@ export type SalesOrderInlineFields = {
 export type SalesOrderReleasedRow = {
   productCode: string;
   locationCode: string;
-  
+
   byUnit: Record<string, number>;
 };
 
@@ -78,9 +76,6 @@ export function toMemoItem(item: SalesOrderItem): SalesOrderMemoItem {
 }
 
 function lineIdentity(item: SalesOrderItem): string {
-  
-  
-  
   return [item.productCode, item.fromLocationCode ?? '', item.groupId ?? '', item.role ?? ''].join(
     '|',
   );

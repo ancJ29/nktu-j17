@@ -1,5 +1,3 @@
-
-
 import { Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect } from 'react';
@@ -77,7 +75,7 @@ export function VendorList({ variant }: VendorListProps) {
         if (item.extra?.isDeleted) return false;
         if (f.status === 'active' && !item.isActive) return false;
         if (f.status === 'inactive' && item.isActive) return false;
-        
+
         const isDomestic = item.extra?.isDomestic ?? true;
         if (f.origin === 'domestic' && !isDomestic) return false;
         if (f.origin === 'overseas' && isDomestic) return false;

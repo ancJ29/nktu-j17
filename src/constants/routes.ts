@@ -1,15 +1,11 @@
-
-
 export const ROUTES = {
-  
   APP: {
     MAIN: '/',
   },
   EMPLOYEES: {
     LIST: '/employees',
     NEW: '/employees/new',
-    
-    
+
     ORG_SETTINGS: '/employees/organization',
     DETAIL: '/employees/:id',
     EDIT: '/employees/:id/edit',
@@ -17,7 +13,7 @@ export const ROUTES = {
   PROFILE: '/profile',
   MORE: '/more',
   REPORTS: '/reports',
-  
+
   AUTH: {
     LOGIN: '/login',
     LOGOUT: '/logout',
@@ -54,8 +50,7 @@ export const ROUTES = {
     PRODUCTS: '/inventory/products',
     MATERIALS: '/inventory/materials',
   },
-  
-  
+
   QUOTATIONS: {
     LIST: '/quotations',
     NEW: '/quotations/new',

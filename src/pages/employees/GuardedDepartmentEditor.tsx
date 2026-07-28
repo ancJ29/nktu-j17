@@ -15,9 +15,9 @@ export function GuardedDepartmentEditor({
   onChange: (opts: DepartmentOption[]) => void;
   languages: Language[];
   label: string;
-  
+
   lockedValues: ReadonlySet<string>;
-  
+
   getRemovalBlockers: (value: string) => string[];
 }) {
   const { t } = useTranslation();

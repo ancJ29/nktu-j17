@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx-js-style';
 import type { Customer, SalesOrder } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -7,11 +5,10 @@ import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { orderNeedsVAT, resolveOrderVatRate } from '@/utils/salesOrderPricing';
 
 export type SalesOrderAccountingExportOptions = {
-  
   getCustomerByCode: (code: string) => Customer | undefined;
-  
+
   employeeCodes: ReadonlyMap<string, string>;
-  
+
   fallbackVatRate: number;
 };
 
@@ -85,8 +82,6 @@ export const exportSalesOrdersToAccountingExcel = (
     const vatRate = orderNeedsVAT(e) ? resolveOrderVatRate(e, fallbackVatRate) : 0;
 
     for (const item of o.items ?? []) {
-      
-      
       if (item.role === 'set-component') continue;
       const lineSubtotal = (item.quantity ?? 0) * (item.unitPrice ?? 0);
       const vatAmount = lineSubtotal * vatRate;
@@ -94,8 +89,8 @@ export const exportSalesOrdersToAccountingExcel = (
         orderDate,
         deliveryDate,
         o.orderNumber,
-        '', 
-        '', 
+        '',
+        '',
         item.productName ?? '',
         customerName,
         taxCode,
@@ -111,7 +106,6 @@ export const exportSalesOrdersToAccountingExcel = (
     }
   }
 
-  
   const titleRow = new Array(colCount).fill('');
   titleRow[0] = TITLE;
   const periodRow = new Array(colCount).fill('');
@@ -124,7 +118,7 @@ export const exportSalesOrdersToAccountingExcel = (
 
   const worksheet = XLSX.utils.aoa_to_sheet([titleRow, periodRow, [...HEADERS], ...dataRows]);
   worksheet['!cols'] = COL_WIDTHS.map((width) => ({ width }));
-  
+
   worksheet['!merges'] = [
     { s: { r: R_TITLE, c: 0 }, e: { r: R_TITLE, c: lastCol } },
     { s: { r: R_PERIOD, c: 0 }, e: { r: R_PERIOD, c: lastCol } },
@@ -136,15 +130,12 @@ export const exportSalesOrdersToAccountingExcel = (
     cell.s = { ...(cell.s ?? {}), ...style };
   };
 
-  
   setStyle(R_TITLE, 0, { font: { bold: true, sz: 16 }, alignment: { horizontal: 'center' } });
   setStyle(R_PERIOD, 0, {
     font: { bold: true, italic: true, sz: 12 },
     alignment: { horizontal: 'center' },
   });
 
-  
-  
   for (let c = 0; c <= lastCol; c++) {
     setStyle(R_HEADER, c, {
       font: { bold: true },
@@ -154,7 +145,6 @@ export const exportSalesOrdersToAccountingExcel = (
     });
   }
 
-  
   for (let i = 0; i < dataRows.length; i++) {
     const r = R_FIRST_DATA + i;
     for (const [col, fmt] of NUMERIC_COLS) {

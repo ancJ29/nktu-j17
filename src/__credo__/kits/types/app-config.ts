@@ -1,18 +1,16 @@
-
-
 export type AppInfo = {
   name: string;
   description?: string;
   logoUrl?: string;
-  
+
   logoDarkBgUrl?: string;
-  
+
   faviconUrl?: string;
-  
+
   pwaIcon192Url?: string;
-  
+
   pwaIcon512Url?: string;
-  
+
   pwaIconMaskableUrl?: string;
 };
 
@@ -36,7 +34,7 @@ export type Language = {
 export type NavigationItem = {
   id: string;
   path?: string;
-  
+
   labelKey?: string;
   label: string;
   icon: string;

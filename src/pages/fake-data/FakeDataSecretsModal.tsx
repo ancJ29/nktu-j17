@@ -13,7 +13,7 @@ import {
 type Props = {
   opened: boolean;
   onClose: () => void;
-  
+
   onSaved?: () => void;
 };
 

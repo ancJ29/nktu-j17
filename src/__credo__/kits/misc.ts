@@ -1,4 +1,3 @@
-
 import { isHashEqual } from './crypt';
 
 const mode = loadEnvMode();
@@ -6,28 +5,22 @@ const mode = loadEnvMode();
 type ENV_MODE = 'domain' | 'localhost' | 'lambda' | 'ec2' | 'local-node' | 'cloudflare' | 'unknown';
 
 function loadEnvMode(): ENV_MODE {
-  
-  
   if (typeof window !== 'undefined') {
-    
     if (window.location.hostname === 'localhost') {
       return 'localhost';
     }
-    
+
     if (window.location.hostname === '127.0.0.1') {
       return 'localhost';
     }
     return 'domain';
   }
 
-  
-  
   if (typeof process !== 'undefined') {
-    
     if (Boolean(process.env.AWS_LAMBDA_FUNCTION_VERSION)) {
       return 'lambda';
     }
-    
+
     if (Boolean(process.env.HOME) && process.env.HOME === '/home/ec2-user') {
       return 'ec2';
     }
@@ -68,22 +61,18 @@ export function isLocal() {
 
 export function setEnvVar(name: string, value: string) {
   if (isBrowser()) {
-    
     localStorage.setItem(name, value);
   }
   if (isNodeRuntime()) {
-    
     process.env[name] = value;
   }
 }
 
 export function getEnvVar(name: string) {
   if (isBrowser()) {
-    
     return localStorage[name];
   }
   if (isNodeRuntime()) {
-    
     return process.env[name];
   }
   return undefined;
@@ -101,7 +90,5 @@ export function compareEnvVar(key: string, value: string, compareHash: boolean =
 export function isDebugMode() {
   const debugMode = getEnvVar('__DEBUG_MODE__');
 
-  
-  
   return isHashEqual(debugMode, 'a1d46d38bb888483af2ee0');
 }

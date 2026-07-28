@@ -25,7 +25,7 @@ const minStockEnabled = hasMaterialMinimumStock();
 type MaterialDataTableProps = {
   readonly materials: Material[];
   readonly isLoading?: boolean;
-  
+
   readonly invByCode?: ReadonlyMap<string, MaterialInventoryRow>;
 };
 
@@ -121,7 +121,7 @@ export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialD
   const { t } = useTranslation();
   const unitLabels = useLookupV2Labels(getMaterialUnitCategory());
   const categoryLabels = useLookupV2Labels(MATERIAL_CATEGORY_LOOKUP);
-  
+
   const showCategory = useMemo(() => materials.some((m) => !!m.extra?.category), [materials]);
 
   const columns = useMemo(
@@ -211,8 +211,6 @@ export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialD
     [t, invByCode, showCategory, unitLabels, categoryLabels],
   );
 
-  
-  
   const getRowBg = useMemo(
     () =>
       invByCode

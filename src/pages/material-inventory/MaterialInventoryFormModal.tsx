@@ -16,9 +16,9 @@ import type { Material } from '@/types';
 type Props = {
   readonly opened: boolean;
   readonly onClose: () => void;
-  
+
   readonly available: Material[];
-  
+
   readonly fixedMaterial?: Material;
 };
 
@@ -54,7 +54,6 @@ export function MaterialInventoryFormModal({ opened, onClose, available, fixedMa
   const multiUnit = materialHasMultipleUnits(picked);
   const units = picked?.extra?.units ?? [];
 
-  
   useEffect(() => {
     if (multiUnit) form.setFieldValue('unit', units[0] ?? '');
     // eslint-disable-next-line react-hooks/exhaustive-deps

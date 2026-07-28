@@ -8,11 +8,10 @@ import { featureFlags } from '@/utils/features';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type TruckLinkProps = {
-  
   id: string | undefined | null;
-  
+
   fallbackLabel?: string | null;
-  
+
   showPlate?: boolean;
   size?: LinkSize;
 };
@@ -29,8 +28,6 @@ export function TruckLink({ id, fallbackLabel, showPlate, size = 'sm' }: TruckLi
   const name = truck?.name ?? fallbackLabel ?? '';
   if (!name) return <EntityDash size={size} />;
 
-  
-  
   const plate = showPlate ? truck?.extra?.plateNumber?.trim() : undefined;
   const label = plate ? (
     <>

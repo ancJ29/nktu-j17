@@ -29,7 +29,7 @@ export type Translatable = z.infer<typeof TranslatableSchema>;
 
 const OptionSchema = z.object({
   value: z.string(),
-  
+
   label: TranslatableSchema,
 });
 
@@ -55,9 +55,7 @@ export type DepartmentOption = z.infer<typeof DepartmentOptionSchema>;
 const EmployeesFeaturesSchema = z
   .object({
     enabled: z.boolean().default(true),
-    
-    
-    
+
     selfManage: z.boolean().default(false),
     email: z.boolean().default(false),
     position: z.boolean().default(false),
@@ -116,7 +114,7 @@ const ActivityLogFeaturesSchema = z
 const PricingFeaturesSchema = z
   .object({
     enabled: z.boolean().default(true),
-    
+
     vatRate: z.number().min(0).default(0.08),
   })
   .default({ enabled: true, vatRate: 0.08 });
@@ -159,10 +157,7 @@ const ProductFeaturesSchema = z
     codePadLength: z.number().int().min(0).max(12).default(4),
     priceManagement: z.boolean().default(false),
     bulkImport: z.boolean().default(false),
-    
-    
-    
-    
+
     technicalSpecs: z.boolean().default(true),
     barcode: z.boolean().default(true),
     images: z.boolean().default(true),
@@ -181,14 +176,11 @@ const ProductFeaturesSchema = z
 const MaterialFeaturesSchema = z
   .object({
     enabled: z.boolean().default(false),
-    
-    
-    
+
     multiUnit: z.boolean().default(false),
-    
-    
+
     unitCategory: z.enum(['unit', 'material-unit']).default('material-unit'),
-    
+
     description: z.boolean().default(false),
     specification: z.boolean().default(false),
     memo: z.boolean().default(false),
@@ -196,8 +188,7 @@ const MaterialFeaturesSchema = z
     tags: z.boolean().default(false),
     attributes: z.boolean().default(false),
     images: z.boolean().default(false),
-    
-    
+
     minimumStock: z.boolean().default(false),
   })
   .default({
@@ -231,9 +222,7 @@ const CustomerFeaturesSchema = z
     enabled: z.boolean().default(false),
     codePrefix: z.string().default('CST-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
-    
-    
-    
+
     shippingAddress: z.boolean().default(true),
     customerTypeOptions: z.array(OptionSchema).default([]),
   })
@@ -261,7 +250,7 @@ const SalesOrderStatusOptionSchema = OptionSchema.extend({
   icon: z.string().optional(),
   stage: SalesOrderStageSchema,
   capabilities: z.array(StatusCapabilityBindingSchema).default([]),
-  
+
   allowedDepartments: z.array(z.string()).default([]),
 });
 
@@ -288,25 +277,25 @@ const SalesOrderFeaturesSchema = z
     codePrefix: z.string().default('SO-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
     statusOptions: z.array(SalesOrderStatusOptionSchema).default([]),
-    
+
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
     deliveryMethodOptions: z.array(OptionSchema).default([]),
     tagOptions: z.array(TagOptionSchema).default([]),
-    
+
     deliveryPackageSizeOptions: z.array(z.string()).default([]),
-    
+
     picDepartments: z.array(z.string()).default([]),
-    
+
     allowInternalDelivery: z.boolean().default(true),
-    
+
     allowAdditionalDR: z.boolean().default(true),
-    
+
     allowSkipInitialStage: z.boolean().default(false),
-    
+
     shortagePolicy: z.enum(['block', 'allow']).default('allow'),
-    
+
     completionEvidence: z.enum(['quantities', 'closedDeliveries']).default('quantities'),
-    
+
     allowExtraDeliveryQuantity: z.boolean().default(false),
   })
   .default({
@@ -333,11 +322,11 @@ const DeliveryRequestFeaturesSchema = z
     codePrefix: z.string().default('DR-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
     statusOptions: z.array(DeliveryRequestStatusOptionSchema).default([]),
-    
+
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
-    
+
     driverDepartments: z.array(z.string()).default([]),
-    
+
     returnShipment: z
       .object({
         enabled: z.boolean().default(false),
@@ -360,9 +349,9 @@ const GoodsReceiptFeaturesSchema = z
     enabled: z.boolean().default(false),
     codePrefix: z.string().default('PNK-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
-    
+
     picDepartments: z.array(z.string()).default([]),
-    
+
     allowNoInventoryProducts: z.boolean().default(false),
   })
   .default({
@@ -395,7 +384,7 @@ const TransportOrderStatusOptionSchema = OptionSchema.extend({
   isInitial: z.boolean().optional(),
   terminal: z.boolean().optional(),
   locked: z.boolean().optional(),
-  
+
   allowedDepartments: z.array(z.string()).default([]),
 });
 
@@ -404,11 +393,11 @@ const TransportOrderFeaturesSchema = z
     enabled: z.boolean().default(false),
     codePrefix: z.string().default('VC-'),
     codePadLength: z.number().int().min(0).max(12).default(3),
-    
+
     statusOptions: z.array(TransportOrderStatusOptionSchema).default([]),
-    
+
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
-    
+
     driverDepartments: z.array(z.string()).default([]),
   })
   .default({
@@ -450,13 +439,9 @@ const FeaturesSchema = z
     common: z.object({
       darkMode: z.boolean().default(false),
       languageSwitcher: z.boolean().default(true),
-      
-      
-      
+
       enablePdfSharing: z.boolean().default(false),
-      
-      
-      
+
       enableStats: z.boolean().default(false),
     }),
     employees: EmployeesFeaturesSchema,
@@ -478,9 +463,9 @@ const FeaturesSchema = z
     materialInventory: MaterialInventoryFeaturesSchema,
     lookups: LookupFeaturesSchema,
     lookupV2: LookupFeaturesSchema,
-    
+
     trucks: ModuleFeaturesSchema,
-    
+
     farm: ModuleFeaturesSchema,
   })
   .default({
@@ -560,15 +545,14 @@ const CompanyInfoSchema = z
 export type CompanyInfoConfig = z.infer<typeof CompanyInfoSchema>;
 
 export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
-  
   companyInfo: CompanyInfoSchema,
   features: FeaturesSchema,
   layout: LayoutSchema,
   displaySettings: DisplaySettingsSchema,
   translations: TranslationsSchema,
-  
+
   permissions: PartialPermissionsSchema,
-  
+
   navigation: CMngtNavigationConfigSchema,
 });
 
@@ -590,7 +574,6 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
   themeConfig: { mainColor: 'terracotta' },
 
   languages: [
-    
     { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
     { code: 'en', label: 'English', flag: '🇺🇸' },
   ],
@@ -600,7 +583,6 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
   navigation: defaultNavigation,
 
   userSettings: {
-    
     syncDebounceDelay: 5000,
   },
 }) satisfies Omit<AppConfig, 'env' | 'navigation' | 'translations'>;

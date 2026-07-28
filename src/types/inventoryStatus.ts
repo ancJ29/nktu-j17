@@ -1,4 +1,3 @@
-
 export type InventorySecondaryStatus = 'outOfStock' | 'mustOrder' | 'ok';
 
 export const INVENTORY_SECONDARY_STATUSES: readonly InventorySecondaryStatus[] = [

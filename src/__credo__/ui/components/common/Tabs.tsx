@@ -26,8 +26,6 @@ type TabsProps = MantineTabsProps & {
 };
 
 export function Tabs({ children, classNames, value, defaultValue, onChange, ...props }: TabsProps) {
-  
-  
   const [activeValue, setActiveValue] = useUncontrolled<string | null>({
     value,
     defaultValue,
@@ -35,15 +33,11 @@ export function Tabs({ children, classNames, value, defaultValue, onChange, ...p
     onChange,
   });
 
-  
-  
-  
-  
   const tabs = device.isMobile ? extractTabs(children) : null;
 
   if (tabs && tabs.length > 0) {
     const active = tabs.find((tab) => tab.value === activeValue);
-    
+
     const panels = Children.toArray(children).filter(
       (child) => !(isValidElement(child) && child.type === TabsList),
     );

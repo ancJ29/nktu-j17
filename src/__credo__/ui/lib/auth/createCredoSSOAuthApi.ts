@@ -1,13 +1,9 @@
-
-
 import { credoSSOApi } from '../../connectors';
 import type { AuthApi, BaseProfile } from './types';
 
 type CreateCredoSSOAuthApiOptions = {
-  
   serviceCode: string;
 
-  
   api?: typeof credoSSOApi;
 };
 
@@ -49,8 +45,6 @@ export function createCredoSSOAuthApi<TProfile extends BaseProfile = BaseProfile
       return api.getProfile<TProfile>(token);
     },
 
-    
-    
     register: async ({ username, email }) => {
       console.info('Register attempt:', { username, email });
       return { success: true };

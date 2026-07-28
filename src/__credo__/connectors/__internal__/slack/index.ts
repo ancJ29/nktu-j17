@@ -117,7 +117,6 @@ export const slackConnector = {
         }),
       },
     }).catch((error) => {
-      
       console.error(`Failed to send message to Slack: ${error}`);
     });
   },
@@ -133,7 +132,6 @@ export const slackConnector = {
     channel?: string;
     memo?: Record<string, unknown> | undefined;
   }) => {
-    
     if (uniqueId) {
       const dedupeKey = `error-${uniqueId}`;
       const next = storage.nextPushByKey[dedupeKey] || 0;
@@ -261,7 +259,6 @@ async function push({
 
   const resolvedChannel = channel ?? storage.defaultChannel;
   if (!resolvedChannel) {
-    
     return;
   }
 
@@ -294,7 +291,6 @@ async function push({
     data['text'] = 'no message';
   }
 
-  
   await fetch(SLACK_API_URL, {
     method: 'POST',
     headers: {

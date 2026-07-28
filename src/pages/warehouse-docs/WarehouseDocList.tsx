@@ -75,8 +75,6 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     }
   }, [error, t]);
 
-  
-  
   const applyDateRange = useCallback(
     (next: DateRangeValue) => {
       const effective = next.from && next.to ? next : defaultLastNDaysRange(RANGE_DAYS);
@@ -207,8 +205,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             to: kind.routes.NEW,
             label: t('warehouseDoc.addItem'),
             enabled: canCreate,
-            
-            
+
             mobileVariant: 'hidden',
           }}
         />

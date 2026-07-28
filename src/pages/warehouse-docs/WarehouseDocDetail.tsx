@@ -67,7 +67,6 @@ export function WarehouseDocDetail({ kind }: { kind: WarehouseDocKind }) {
     if (!employeesInitialized) loadEmployees();
   }, [employeesInitialized, loadEmployees]);
 
-  
   const postEnabled = kind.postInventoryEnabled();
   const materials = useMaterialStore((s) => s.items);
   const materialsInitialized = useMaterialStore((s) => s.initialized);
@@ -127,20 +126,12 @@ export function WarehouseDocDetail({ kind }: { kind: WarehouseDocKind }) {
     if (!doc) return;
     setConfirming(true);
     try {
-      
-      
       const materialByCode = new Map<string, Material>(materials.map((m) => [m.code, m]));
       const invByCode = new Map<string, MaterialInventoryRow>(
         inventory.map((r) => [r.itemCode, r]),
       );
       await postWarehouseDocInventory(doc, kind.direction, materialByCode, invByCode);
 
-      
-      
-      
-      
-      
-      
       const flip = (target: WarehouseDocRow) =>
         bundle.updateSafely({
           id: target.id,

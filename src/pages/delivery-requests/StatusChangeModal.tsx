@@ -12,20 +12,20 @@ const noop = async () => {};
 type StatusChangeModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   targetStatus: { value: string; label: string; actionLabel: string } | null;
   currentStatus: { value: string; label: string; color: string };
   note: string;
   onNoteChange: (v: string) => void;
   onConfirm: () => void;
   loading: boolean;
-  
+
   requirePhotoCapture?: boolean;
-  
+
   capturedPhotos?: PhotoEntry[];
-  
+
   onCapturePhoto?: () => void;
-  
+
   capturing?: boolean;
   t: TFunction;
 };

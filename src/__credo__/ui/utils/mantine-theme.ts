@@ -9,22 +9,19 @@ export function buildMantineTheme(
   const primary = getColorPalette(themeConfig.mainColor);
 
   return {
-    
     primaryColor: 'primary',
     colors: {
       primary,
       ...colorPalettes,
-      
+
       green: colorPalettes.success,
       red: colorPalettes.danger,
-      
-      
+
       surface: colorPalettes.neutral,
       surfaceText: colorPalettes.neutralInv,
       onPrimary: colorPalettes.gray,
     },
 
-    
     fontFamily: '-apple-system, Calibri, Segoe UI, Sans-Serif, Open Sans, Arial, Helvetica',
     fontFamilyMonospace:
       'Courier New, ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace',
@@ -32,7 +29,6 @@ export function buildMantineTheme(
       fontWeight: '600',
     },
 
-    
     defaultRadius: 'sm',
     radius: {
       xs: '2px',
@@ -42,7 +38,6 @@ export function buildMantineTheme(
       xl: '16px',
     },
 
-    
     spacing: {
       xs: '8px',
       sm: '12px',
@@ -51,7 +46,6 @@ export function buildMantineTheme(
       xl: '32px',
     },
 
-    
     shadows: {
       xs: '0 1px 2px rgba(0, 0, 0, 0.05)',
       sm: '0 1px 3px rgba(0, 0, 0, 0.1)',
@@ -60,11 +54,9 @@ export function buildMantineTheme(
       xl: '0 20px 25px rgba(0, 0, 0, 0.15)',
     },
 
-    
     cursorType: 'pointer',
     focusRing: 'auto',
 
-    
     components: {
       Button: {
         defaultProps: {
@@ -105,7 +97,7 @@ export function buildMantineTheme(
           },
         },
       },
-      
+
       ...componentOverrides,
     },
   };

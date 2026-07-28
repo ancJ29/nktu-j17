@@ -1,28 +1,24 @@
-
-
 import { byClient } from '@/config/client';
 
 export type DeliveryRequestVariant = {
-  
   quickCreateMode: 'modal' | 'route';
-  
+
   editMode: 'modal' | 'route';
-  
+
   showListItems: boolean;
-  
+
   seedScheduledDateFromSalesOrder: boolean;
-  
+
   inboundStartsPending: boolean;
-  
+
   skipViewScopeGuard: boolean;
-  
+
   showScheduledDateInBar: boolean;
-  
+
   clientSpecific?: {
     NKTU?: {
-      
       salesDeptScopedView?: boolean;
-      
+
       salesDepartmentCode?: string;
     };
   };

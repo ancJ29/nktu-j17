@@ -1,5 +1,3 @@
-
-
 export type ModulePermissions = {
   canView: boolean;
   canCreate: boolean;
@@ -23,7 +21,6 @@ export type PartialModulePermissions = {
 export type PartialPermissions = Record<string, PartialModulePermissions>;
 
 export const BASE_PERMISSIONS: Permissions = {
-  
   employee: {
     canView: false,
     canCreate: false,
@@ -77,25 +74,13 @@ export const BASE_PERMISSIONS: Permissions = {
       canCancel: false,
       canManualRelease: false,
       canExport: false,
-      
-      
-      
-      
+
       canViewPrice: false,
-      
-      
-      
-      
-      
+
       canViewSetComponentInventory: false,
-      
-      
-      
+
       canTakePhoto: false,
-      
-      
-      
-      
+
       canEditDeliveryPackageSize: false,
     },
     query: {
@@ -198,9 +183,6 @@ export const BASE_PERMISSIONS: Permissions = {
     canEdit: false,
     canDelete: false,
     actions: {
-      
-      
-      
       canExport: false,
     },
   },
@@ -284,16 +266,12 @@ export const DEFAULT_PERMISSIONS: Permissions = {
       canCancel: true,
       canManualRelease: true,
       canExport: true,
-      
-      
+
       canViewPrice: true,
       canViewSetComponentInventory: true,
-      
-      
-      
+
       canTakePhoto: true,
-      
-      
+
       canEditDeliveryPackageSize: false,
     },
     query: {
@@ -379,9 +357,7 @@ export const DEFAULT_PERMISSIONS: Permissions = {
     canEdit: true,
     canDelete: false,
   },
-  
-  
-  
+
   truck: {
     canView: false,
     canCreate: false,

@@ -4,9 +4,8 @@ import { useTransportOrderStore } from '@/stores/useTransportOrderStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type TransportOrderLinkProps = {
-  
   id: string | undefined | null;
-  
+
   fallbackLabel?: string | null;
   size?: LinkSize;
 };

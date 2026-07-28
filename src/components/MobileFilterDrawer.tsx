@@ -6,7 +6,7 @@ type MobileFilterDrawerProps = {
   onClose: () => void;
   title?: string | ReactNode;
   children: ReactNode;
-  
+
   height?: string;
 };
 

@@ -1,5 +1,3 @@
-
-
 import type { ZodType } from 'zod';
 
 export type Stage = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'EXCEPTIONAL';
@@ -14,15 +12,15 @@ export type CapabilityDefinition = {
   id: CapabilityId;
   label: Translatable;
   description: Translatable;
-  
+
   allowedStages: Stage[];
-  
+
   conflictsWith?: CapabilityId[];
-  
+
   singleton?: boolean;
-  
+
   optional?: boolean;
-  
+
   configSchema?: ZodType;
 };
 

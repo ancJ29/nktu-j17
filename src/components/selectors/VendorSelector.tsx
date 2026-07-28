@@ -5,7 +5,7 @@ import type { Vendor } from '@/types';
 
 export type VendorSelectorChange = {
   code: string;
-  
+
   name: string;
   vendor: Vendor;
 };
@@ -13,7 +13,7 @@ export type VendorSelectorChange = {
 export type VendorSelectorProps = Omit<SelectProps, 'data' | 'value' | 'onChange' | 'filter'> & {
   value: string | null;
   onChange: (selection: VendorSelectorChange | null) => void;
-  
+
   filter?: (v: Vendor) => boolean;
 };
 

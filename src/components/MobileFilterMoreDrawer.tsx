@@ -51,23 +51,16 @@ function DateRangeFilter({
   const { t } = useTranslation();
   const { value, onChange } = filter;
 
-  
-  
-  
-  
-  
-  
   const [pendingStart, setPendingStart] = useState<string | null>(null);
 
   const selectPreset = useCallback(
     (preset: DateRangePreset) => {
-      setPendingStart(null); 
+      setPendingStart(null);
       if (preset === value.preset) {
         onChange(EMPTY_DATE_RANGE);
         return;
       }
-      
-      
+
       const range = getPresetRange(preset);
       onChange({ from: range.from, to: range.to, preset });
     },
@@ -90,7 +83,6 @@ function DateRangeFilter({
     [onChange],
   );
 
-  
   const pickerValue: [string | null, string | null] =
     pendingStart != null
       ? [pendingStart, null]
@@ -158,7 +150,7 @@ type MobileFilterMoreDrawerProps = {
   filters: MoreFilterDef[];
   drawerTitle: string;
   applyLabel?: string;
-  
+
   presetLabels?: Partial<Record<DateRangePreset, string>>;
 };
 

@@ -50,9 +50,7 @@ export function useTruckFormSave() {
             },
             { ...core, extra },
           );
-          
-          
-          
+
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           logActivity(onlyIsActive ? 'truck.toggleStatus' : 'truck.update', id, diff);
           notifications.show({ color: 'green', message: t('assets.notifications.updateSuccess') });

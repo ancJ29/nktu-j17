@@ -1,5 +1,3 @@
-
-
 import { hashString } from '@credo/kits/crypt';
 
 import { credoSSOApi as credoSSOApiConnector } from '../../connectors';
@@ -52,43 +50,30 @@ const defaultStorage: AuthStorage = {
 };
 
 type CreateCredoAuthStoreOptions<TProfile extends BaseProfile = BaseProfile> = {
-  
   serviceCode: string;
 
-  
   deviceIdPrefix?: string;
 
-  
   tokenDuration?: number;
 
-  
   rememberRefreshDuration?: number;
 
-  
   sessionRefreshDuration?: number;
 
-  
   persistKey?: string;
 
-  
   isDev?: boolean;
 
-  
   devProfile?: TProfile;
 
-  
   storage?: AuthStorage;
 
-  
   storageKeys?: AuthStorageKeys;
 
-  
   api?: typeof credoSSOApiConnector;
 
-  
   userStorage?: UserStorage;
 
-  
   persistStorage?: PersistStorage;
 };
 
@@ -111,10 +96,8 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     persistStorage,
   } = options;
 
-  
   let lastSavedVersion = '';
 
-  
   const authApi: AuthApi<TProfile> = {
     login: async ({ email, password, tokenExpiration, refreshTokenExpiration, deviceId }) => {
       const response = await credoSSOApi.login({
@@ -147,19 +130,16 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     getProfile: async ({ token }) => {
       const profile = await credoSSOApi.getProfile<TProfile>(token);
 
-      
-      
       const savedSettings = profile?.settings ?? profile?.profile?.settings;
       if (savedSettings && userStorage) {
         userStorage.importSettings(savedSettings as Record<string, unknown>);
-        
+
         lastSavedVersion = settingsVersion(userStorage.exportSettings());
       }
 
       return profile;
     },
 
-    
     saveProfile: userStorage
       ? async ({ token, name, email }) => {
           const settings = userStorage.exportSettings();
@@ -177,7 +157,6 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
         }
       : undefined,
 
-    
     register: async ({ username, email }) => {
       console.info('Register attempt:', { username, email });
       return { success: true };

@@ -1,5 +1,3 @@
-
-
 import type { SalesOrder, SalesOrderExtra } from '@/types';
 
 export const CHEAT_TAG = '[CHEAT auto-complete]';

@@ -815,8 +815,7 @@ const deliveryRequestDetailRoutes: RouteObject[] = [
     element: gatedComponent(
       {
         enabled: deliveryRequestsEnabled,
-        
-        
+
         requires: byClient({ nktu: () => true }, deliveryRequestGate.view),
       },
       DeliveryRequestDetailPage,
@@ -910,12 +909,9 @@ const transportOrderDetailRoutes: RouteObject[] = [
 const router = createBrowserRouter([
   {
     element: <BaseLayout />,
-    
-    
-    
+
     errorElement: <RouteErrorState />,
     children: [
-      
       {
         element: <AppLayout />,
         children: [
@@ -934,12 +930,6 @@ const router = createBrowserRouter([
             ),
           },
           {
-            
-            
-            
-            
-            
-            
             path: ROUTES.LOOKUPS_V2.LIST,
             element: gatedComponent(
               { enabled: lookupV2Enabled, requires: lookupV2Gate.view },
@@ -988,7 +978,7 @@ const router = createBrowserRouter([
           },
         ],
       },
-      
+
       {
         element: <AppDetailLayout />,
         children: [
@@ -1011,9 +1001,7 @@ const router = createBrowserRouter([
           ...goodsReceiptDetailRoutes,
         ],
       },
-      
-      
-      
+
       { path: ROUTES.AUTH.LOGOUT, element: <LogoutPage /> },
       {
         element: <GuestLayout />,
@@ -1035,10 +1023,9 @@ const router = createBrowserRouter([
       },
     ],
   },
-  
-  
+
   { path: ROUTES.SYSTEM_ADMIN, element: <SystemAdminPage /> },
-  
+
   { path: ROUTES.ERROR, element: <ErrorPage /> },
   { path: ROUTES.FORBIDDEN, element: <ForbiddenPage /> },
   { path: ROUTES.NOT_FOUND, element: <NotFoundPage /> },

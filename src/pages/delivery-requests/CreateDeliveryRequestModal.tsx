@@ -1,5 +1,3 @@
-
-
 import { Button, Group, Modal, Stack, Switch, Text, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -39,9 +37,9 @@ const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriv
 type CreateDeliveryRequestModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   salesOrder: SalesOrder;
-  
+
   onCreated?: () => void;
 };
 
@@ -54,8 +52,6 @@ export function CreateDeliveryRequestModal({
   const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
 
-  
-  
   const products = useProductStore((s) => s.items);
   const productsInit = useProductStore((s) => s.initialized);
   const loadProducts = useProductStore((s) => s.loadAll);
@@ -126,9 +122,6 @@ export function CreateDeliveryRequestModal({
     },
   });
 
-  
-  
-  
   const seededRef = useRef(false);
   useEffect(() => {
     if (!opened) {

@@ -1,5 +1,3 @@
-
-
 export type BaseProfileData = {
   settings?: Record<string, unknown>;
 };
@@ -10,7 +8,7 @@ export type BaseProfile<TProfileData extends BaseProfileData = BaseProfileData> 
   settings?: Record<string, unknown>;
   emailVerified?: boolean;
   mfaEnabled?: boolean;
-  
+
   profile?: TProfileData & { settings?: Record<string, unknown> };
 };
 
@@ -132,25 +130,18 @@ export type AuthStorage = {
 };
 
 export type AuthStoreConfig<TProfile extends BaseProfile = BaseProfile> = {
-  
   deviceIdPrefix: string;
 
-  
   tokenDuration: number;
 
-  
   rememberRefreshDuration: number;
 
-  
   sessionRefreshDuration: number;
 
-  
   persistKey?: string;
 
-  
   isDev?: boolean;
 
-  
   devProfile?: TProfile;
 };
 
@@ -172,17 +163,15 @@ export type LogoutReason =
   | (string & {});
 
 export type AuthState<TProfile extends BaseProfile = BaseProfile> = {
-  
   user: TProfile;
   userUuid: string | null;
   token: string | null;
   refreshToken: string | null;
-  
+
   isProfileLoaded: boolean;
-  
+
   lastLogoutReason: LogoutReason | null;
 
-  
   login: (params: {
     email: string;
     password: string;
@@ -223,6 +212,6 @@ export type CreateAuthStoreOptions<TProfile extends BaseProfile = BaseProfile> =
   storage: AuthStorage;
   storageKeys: AuthStorageKeys;
   config: AuthStoreConfig<TProfile>;
-  
+
   persistStorage?: PersistStorage;
 };

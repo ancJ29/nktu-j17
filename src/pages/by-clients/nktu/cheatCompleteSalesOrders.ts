@@ -1,5 +1,3 @@
-
-
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
@@ -35,7 +33,7 @@ type CheatDetail = {
   orderNumber?: string;
   drNumbers: string[];
   outcome: CheatOutcome;
-  
+
   reason?: string;
 };
 
@@ -107,14 +105,10 @@ async function reserveForCompletionIfNeeded(inputs: {
       version: so.version,
       patch: { extra: { ...extra, inventoryLinkage: reservedLinkage } },
     })) as SalesOrder;
-    
-    
-    
+
     inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
     return { ok: true, order: patched, inventoryByProduct };
   } catch {
-    
-    
     await rollbackAppliedOps(exec.applied);
     useProductInventoryStore.getState().forceRefresh();
     return { ok: false };
@@ -142,24 +136,21 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
   };
 
   const targetStatus = getAutoCompletionTargetValue();
-  if (!targetStatus) return summary; 
+  if (!targetStatus) return summary;
 
   await ensureReconcileStoresLoaded();
 
   const now = new Date();
   const resolveDrStatus = deliveryRequestStatusOptions.resolveStatus;
 
-  
-  
-  
   const drs = useDeliveryRequestStore.getState().items as DeliveryRequest[];
   const todaysCompletedDrs = drs.filter((d) => {
     const extra = d.extra ?? {};
     if (extra.isDeleted) return false;
-    if (d.direction === 'inbound') return false; 
-    if (extra.isAdditional) return false; 
+    if (d.direction === 'inbound') return false;
+    if (extra.isAdditional) return false;
     if (!d.salesOrderId) return false;
-    if (resolveDrStatus(extra.status).stage !== 'COMPLETED') return false; 
+    if (resolveDrStatus(extra.status).stage !== 'COMPLETED') return false;
     const ts = extra.deliveryTimestamp;
     if (ts == null) return false;
     const when = new Date(ts as string | number);
@@ -169,7 +160,6 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
   summary.todayCompletedDrs = todaysCompletedDrs.length;
   if (todaysCompletedDrs.length === 0) return summary;
 
-  
   const drNumbersBySo = new Map<string, string[]>();
   for (const d of todaysCompletedDrs) {
     const soId = d.salesOrderId!;
@@ -188,9 +178,6 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
   for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
-  
-  
-  
   for (const [soId, drNumbers] of drNumbersBySo) {
     const detail: CheatDetail = { salesOrderId: soId, drNumbers, outcome: 'failed' };
     const so = soStore.getById(soId) as SalesOrder | undefined;
@@ -215,8 +202,6 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       continue;
     }
 
-    
-    
     const prep = await reserveForCompletionIfNeeded({
       so,
       targetStatus,
@@ -232,12 +217,6 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       continue;
     }
 
-    
-    
-    
-    
-    
-    
     const prepExtra = (prep.order.extra ?? {}) as SalesOrderExtra;
     const orderToComplete: SalesOrder = {
       ...prep.order,

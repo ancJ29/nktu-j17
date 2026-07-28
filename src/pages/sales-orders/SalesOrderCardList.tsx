@@ -39,17 +39,17 @@ type SalesOrderCardListProps = {
   readonly resolveDeliveryMethod: (value: string | undefined | null) => string;
   readonly employees: Employee[];
   readonly tagOptions: ResolvedTagOption[];
-  
+
   readonly onShowItems?: (order: SalesOrder) => void;
-  
+
   readonly financeMode?: boolean;
-  
+
   readonly onToggleBillingExempt?: (order: SalesOrder) => void;
-  
+
   readonly showCheatMarker?: boolean;
-  
+
   readonly vacuousCompletionIds?: ReadonlySet<string>;
-  
+
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
 };
 

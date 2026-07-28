@@ -1,13 +1,12 @@
 import { Chip, Group, ScrollArea } from '@mantine/core';
 
 export type QuickFilterChip = {
-  
   readonly key: string;
-  
+
   readonly label: string;
-  
+
   readonly active: boolean;
-  
+
   readonly onClick: () => void;
 };
 

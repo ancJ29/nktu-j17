@@ -99,11 +99,7 @@ export function EmployeeListPage() {
         if (f.position && e.position !== f.position) return false;
         return true;
       },
-      
-      
-      
-      
-      
+
       searchFields: (e) => [
         e.name,
         e.code,
@@ -119,14 +115,12 @@ export function EmployeeListPage() {
       onPageChange,
     });
 
-  
   useEffect(() => {
     if (!initialized && !error) {
       loadAll();
     }
   }, [initialized, error, loadAll]);
 
-  
   useEffect(() => {
     if (error) {
       notifications.show({
@@ -137,7 +131,6 @@ export function EmployeeListPage() {
     }
   }, [error, t]);
 
-  
   const handleForceRefresh = useCallback(() => {
     forceRefresh();
   }, [forceRefresh]);
@@ -233,9 +226,7 @@ export function EmployeeListPage() {
               to: ROUTES.EMPLOYEES.NEW,
               label: t('employees.addEmployee'),
               enabled: canCreate,
-              
-              
-              
+
               mobileVariant: 'hidden',
             }}
           />

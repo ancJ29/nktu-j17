@@ -48,8 +48,6 @@ export function TransportOrderListPage() {
   const { t, i18n } = useTranslation();
   const scrollViewportRef = useListScrollRestoration(ROUTES.TRANSPORT_ORDERS.LIST);
 
-  
-  
   const { items, loading, initialized, error, cachedAt, loadAll, forceRefresh } =
     useTransportOrderStore(
       useShallow((s) => ({
@@ -65,7 +63,6 @@ export function TransportOrderListPage() {
 
   const filters = useTransportOrderListFilters(items, RANGE_DAYS);
 
-  
   const customers = useCustomerStore((s) => s.items);
   const customersInit = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
@@ -95,7 +92,6 @@ export function TransportOrderListPage() {
     }
   }, [error, t]);
 
-  
   useTransactionalRangeRefetch({
     range: filters.createdDateRange,
     setStoreRange: setTransportOrderQueryRange,
@@ -113,8 +109,6 @@ export function TransportOrderListPage() {
     paginated,
     totalPages,
   } = useListFilter(filters.allOrders, {
-    
-    
     filters: {},
     filterFn: () => true,
     searchFields: (o) => [
@@ -127,10 +121,7 @@ export function TransportOrderListPage() {
       o.route?.stuffing ?? '',
       o.route?.dropoff ?? '',
       o.notes,
-      
-      
-      
-      
+
       ...(o.trips ?? []).flatMap((trip) => [
         trip.truckPlate,
         trip.driverName,
@@ -138,21 +129,16 @@ export function TransportOrderListPage() {
         trip.destination,
       ]),
     ],
-    
-    
+
     search: filters.search,
     onSearchChange: filters.setSearch,
     page: filters.page,
     onPageChange: filters.setPage,
   });
 
-  
-
-  
-  
   const statusData = useMemo(
     () => transportOrderStatuses().map((s) => ({ value: s.value, label: s.label })),
-    
+
     [i18n.language],
   );
   const statusLabel = (v: string) => statusData.find((s) => s.value === v)?.label ?? v;
@@ -175,11 +161,6 @@ export function TransportOrderListPage() {
   );
   const truckLabel = (id: string) => truckData.find((tr) => tr.value === id)?.label ?? id;
 
-  
-  
-  
-  
-  
   const driverData = useMemo(() => {
     const driverIds = new Set<string>();
     for (const o of items) {
@@ -196,9 +177,7 @@ export function TransportOrderListPage() {
     { value: 'import', label: t('transportOrders.shipmentType.import') },
     { value: 'export', label: t('transportOrders.shipmentType.export') },
   ];
-  
-  
-  
+
   const containerSizeData = useContainerSizeOptions();
   const containerSizeLabel = useContainerSizeLabel();
 
@@ -219,15 +198,12 @@ export function TransportOrderListPage() {
     custom: t('common.datePreset.custom'),
   };
 
-  
-
   const statsCells: ListStatCell[] = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const o of filtered) counts[o.status] = (counts[o.status] ?? 0) + 1;
     return [
       { key: 'total', label: t('transportOrders.stats.total'), value: filtered.length },
-      
-      
+
       ...transportOrderStatuses()
         .slice(0, 3)
         .map((s) => ({
@@ -239,8 +215,6 @@ export function TransportOrderListPage() {
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `i18n.language` is the intended key: the status resolver reads the active language internally, so labels must re-resolve on a language switch.
   }, [filtered, i18n.language, t]);
-
-  
 
   const desktopFilters: (SelectFilter | MultiSelectFilter)[] = [
     {
@@ -281,7 +255,6 @@ export function TransportOrderListPage() {
     },
   ];
 
-  
   const moreFilters: MoreFilterDef[] = [
     {
       type: 'dateRange',
@@ -334,8 +307,6 @@ export function TransportOrderListPage() {
     },
   ];
 
-  
-  
   const mobileQuickChips: QuickFilterChip[] = useMemo(
     () => [
       {
@@ -377,8 +348,7 @@ export function TransportOrderListPage() {
             to: ROUTES.TRANSPORT_ORDERS.NEW,
             label: t('transportOrders.new'),
             enabled: canCreate,
-            
-            
+
             mobileVariant: 'hidden',
           }}
         />

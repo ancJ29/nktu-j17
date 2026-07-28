@@ -1,5 +1,3 @@
-
-
 import type {
   DeliveryRequest,
   Product,
@@ -18,9 +16,9 @@ export type ReservationDriftLine = {
   itemCode: string;
   locationCode: string;
   unit: string;
-  
+
   snapshotQty: number;
-  
+
   rowHoldQty: number;
   kind: 'row-missing' | 'hold-missing' | 'hold-mismatch';
 };
@@ -33,7 +31,6 @@ export type OrphanedHoldLine = {
 };
 
 export type SoDeliveryIssue =
-  
   | { kind: 'so-behind-deliveries'; blockedByMatrix: boolean; closedDrCount: number }
   /**
    * The SO sits in a COMPLETED-stage status but on-hand was never deducted:
@@ -79,8 +76,6 @@ function deriveDriftLines(
 
   const lines: ReservationDriftLine[] = [];
   for (const entry of snapshot) {
-    
-    
     const row =
       rowsById.get(entry.rowId) ??
       (rowsByItem.get(entry.itemCode) ?? []).find(
@@ -142,16 +137,16 @@ function deriveOrphanedHolds(
 
 export function deriveSoDeliveryIssues(params: {
   so: SalesOrder;
-  
+
   liveDrsForSo: readonly DeliveryRequest[];
   evidence: CompletionEvidence;
-  
+
   currentStage: Stage | undefined;
-  
+
   completionReachable: boolean;
   inventoryRows: readonly ProductInventoryRow[];
   productsByCode: ReadonlyMap<string, Product>;
-  
+
   inventoryEnabled: boolean;
 }): SoDeliveryIssue[] {
   const { so, liveDrsForSo, evidence, currentStage, completionReachable } = params;

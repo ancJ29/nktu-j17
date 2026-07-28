@@ -1,5 +1,3 @@
-
-
 import { Badge, Group, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { SalesOrderExtra } from '@/types';
@@ -24,7 +22,7 @@ type SalesOrderStatusBadgeBaseProps = {
   readonly resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
   readonly resolveDeliveryMethod: (value: string | undefined | null) => string;
   readonly variant: SalesOrderStatusBadgeVariant;
-  
+
   readonly tagOptions?: ResolvedTagOption[];
   readonly size?: 'xs' | 'sm' | 'md';
 };
@@ -39,19 +37,10 @@ export function SalesOrderStatusBadgeBase({
 }: SalesOrderStatusBadgeBaseProps) {
   const { t } = useTranslation();
 
-  
-  
-  
-  
   const isExternalDelivery = variant.freightIsExternal
     ? extra.deliveryMethod === 'freight' || extra.isInternalDelivery === false
     : extra.isInternalDelivery === false;
-  
-  
-  
-  
-  
-  
+
   const isCancelled = extra.cancellation != null;
   const cancelTargetValue = isCancelled ? getCancellationTargetStatusValue() : undefined;
   const status =

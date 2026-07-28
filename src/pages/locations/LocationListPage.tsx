@@ -126,8 +126,7 @@ export function LocationListPage() {
               to: ROUTES.LOCATIONS.NEW,
               label: t('locations.addItem'),
               enabled: canCreate,
-              
-              
+
               mobileVariant: 'hidden',
             }}
           />

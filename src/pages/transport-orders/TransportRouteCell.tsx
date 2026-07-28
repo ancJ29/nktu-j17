@@ -54,10 +54,7 @@ export function TransportRouteCell({ order }: { order: TransportOrder }) {
     )
       .map(([place, at]) => ({ place: typeof place === 'string' ? place.trim() : '', at }))
       .filter((s) => s.place);
-    
-    
-    
-    
+
     const scheduled = stops.some((s) => s.at);
     return (
       <Stack gap={2}>

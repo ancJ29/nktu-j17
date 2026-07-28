@@ -1,5 +1,3 @@
-
-
 import { Button, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconId, IconLicense, IconTruck } from '@tabler/icons-react';
 import { Link } from 'react-router';
@@ -26,7 +24,7 @@ const EMPLOYEE_LOG_PERMS = {
 
 type EmployeeDriverTabProps = {
   readonly employee: Employee;
-  
+
   readonly isVisible: boolean;
 };
 

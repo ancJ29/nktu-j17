@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx-js-style';
 import { DEFAULT_PRINT_OPTIONS } from './salesOrderDeliveryNote';
 import type { DeliveryNoteData, DeliveryNotePrintOptions } from './salesOrderDeliveryNote';
@@ -34,8 +32,6 @@ export function buildDeliveryNoteWorkbook(
   const aoa: CellValue[][] = [];
   const merges: XLSX.Range[] = [];
 
-  
-  
   const banner = (text: string): number => {
     const r = aoa.length;
     const row: CellValue[] = new Array(colCount).fill('');
@@ -46,20 +42,17 @@ export function buildDeliveryNoteWorkbook(
   };
   const blank = () => aoa.push([]);
 
-  
   const rSellerName = banner(data.seller.name);
   banner(data.seller.address);
   banner(`Mã số thuế: ${data.seller.taxCode} - Tel: ${data.seller.tel}`);
   banner(`Email: ${data.seller.email}`);
   blank();
 
-  
   const rTitle = banner('PHIẾU GIAO HÀNG');
   const rDate = banner(data.dateText);
   const rNo = banner(`Số: ${data.orderNumber}`);
   blank();
 
-  
   const rCustomerName = banner(`Tên khách hàng: ${data.customer.name || ''}`);
   banner(`Địa chỉ: ${data.customer.address || ''}`);
   banner(`Mã số thuế: ${data.customer.taxCode || ''}`);
@@ -68,7 +61,6 @@ export function buildDeliveryNoteWorkbook(
   if (includePrice) banner(`Thanh toán: ${paymentLabel(data.payment.state)}`);
   blank();
 
-  
   const rHeader = aoa.length;
   aoa.push(
     includePrice
@@ -85,11 +77,9 @@ export function buildDeliveryNoteWorkbook(
   });
   const rLastItem = aoa.length - 1;
 
-  
   let rFirstTotal = -1;
   let rGrandTotal = -1;
   if (includePrice) {
-    
     const summary = (label: string, value: number): number => {
       const r = aoa.length;
       const row: CellValue[] = new Array(colCount).fill('');
@@ -107,7 +97,6 @@ export function buildDeliveryNoteWorkbook(
     banner(`Số tiền viết bằng chữ: ${data.amountInWords}`);
   }
 
-  
   blank();
   const rSign = aoa.length;
   aoa.push(
@@ -118,15 +107,11 @@ export function buildDeliveryNoteWorkbook(
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
-  
-  
+
   ws['!cols'] = includePrice
     ? [{ wch: 14 }, { wch: 40 }, { wch: 10 }, { wch: 12 }, { wch: 14 }, { wch: 16 }]
     : [{ wch: 14 }, { wch: 44 }, { wch: 12 }, { wch: 12 }];
 
-  
-  
-  
   const setStyle = (r: number, c: number, style: Record<string, unknown>) => {
     const ref = XLSX.utils.encode_cell({ r, c });
     const cell = (ws[ref] ?? (ws[ref] = { t: 's', v: '' })) as StyledCell;
@@ -140,14 +125,12 @@ export function buildDeliveryNoteWorkbook(
     for (let c = 0; c <= lastCol; c++) setStyle(r, c, { border: ALL_BORDERS });
   };
 
-  
   setStyle(rSellerName, 0, { font: { bold: true, sz: 14 } });
   setStyle(rTitle, 0, { font: { bold: true, sz: 16 }, alignment: { horizontal: 'center' } });
   setStyle(rDate, 0, { font: { italic: true }, alignment: { horizontal: 'center' } });
   setStyle(rNo, 0, { alignment: { horizontal: 'center' } });
   setStyle(rCustomerName, 0, { font: { bold: true } });
 
-  
   for (let c = 0; c <= lastCol; c++) {
     setStyle(rHeader, c, {
       font: { bold: true },
@@ -157,7 +140,6 @@ export function buildDeliveryNoteWorkbook(
     });
   }
 
-  
   for (let r = rFirstItem; r <= rLastItem; r++) {
     rowBorders(r);
     setStyle(r, 0, { alignment: { horizontal: 'center' } });
@@ -172,7 +154,6 @@ export function buildDeliveryNoteWorkbook(
     }
   }
 
-  
   if (rFirstTotal >= 0) {
     for (let r = rFirstTotal; r <= rGrandTotal; r++) {
       rowBorders(r);
@@ -184,7 +165,6 @@ export function buildDeliveryNoteWorkbook(
     setStyle(rGrandTotal, lastCol, { fill: TOTAL_FILL });
   }
 
-  
   for (let c = 0; c <= lastCol; c++) {
     const ref = XLSX.utils.encode_cell({ r: rSign, c });
     const cell = ws[ref] as XLSX.CellObject | undefined;

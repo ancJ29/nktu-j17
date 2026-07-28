@@ -6,7 +6,7 @@ export const MATERIAL_RECORD_TARGET = { entity: 'materials', uniqueField: 'code'
 
 export const useMaterialStore = createSingleRecordsStore<Material>({
   ...MATERIAL_RECORD_TARGET,
-  
-  cacheKey: 'mat2.bee51a', 
+
+  cacheKey: 'mat2.bee51a',
   cacheTTL: 10 * ONE_MINUTE,
 });

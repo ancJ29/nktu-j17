@@ -11,7 +11,7 @@ import type { Vendor } from '@/types';
 type VendorCardListProps = {
   readonly vendors: Vendor[];
   readonly isLoading?: boolean;
-  
+
   readonly origin?: VendorOriginLabels;
 };
 

@@ -1,7 +1,5 @@
-
-
 const STORAGE_KEYS = {
-  cMngtAdminAccessKey: '__c_mngt_admin_key__', 
+  cMngtAdminAccessKey: '__c_mngt_admin_key__',
   trustedServiceKey: '__fake_data_trusted_service_key__',
   storageServiceCode: '__fake_data_storage_service_code__',
   storageAccessKey: '__fake_data_storage_access_key__',

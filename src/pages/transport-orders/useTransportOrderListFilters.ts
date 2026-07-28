@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
@@ -66,7 +64,7 @@ function compactState(state: TransportOrderUrlState): TransportOrderUrlState {
 
 export function useTransportOrderListFilters(
   storeOrders: TransportOrder[],
-  
+
   defaultDateRangeDays: number,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<TransportOrderUrlState>({
@@ -74,7 +72,6 @@ export function useTransportOrderListFilters(
     compactState,
   });
 
-  
   const search = state.q ?? '';
   const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
   const customerFilter = state.c ?? null;
@@ -91,7 +88,6 @@ export function useTransportOrderListFilters(
   );
   const entryDateRange = useMemo(() => restoreDateRange(state.ed, EMPTY_DATE_RANGE), [state.ed]);
 
-  
   const setSearch = useCallback(
     (v: string) => updateState({ q: v || undefined, pg: undefined }),
     [updateState],
@@ -134,9 +130,6 @@ export function useTransportOrderListFilters(
     [updateState],
   );
 
-  
-  
-  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({ cd: serializeDateRange(ensureValidDateRange(next)), pg: undefined }),
@@ -147,7 +140,6 @@ export function useTransportOrderListFilters(
     [updateState],
   );
 
-  
   const allOrders = useMemo(() => {
     const filtered = storeOrders.filter((o) => {
       if (o.extra?.isDeleted) return false;
@@ -167,8 +159,6 @@ export function useTransportOrderListFilters(
     const [field, dir] = sortField.split('_') as [string, string];
     const mult = dir === 'asc' ? 1 : -1;
     return filtered.sort((a, b) => {
-      
-      
       const aVal = field === 'entryDate' ? (a.entryDate ?? '') : a.createdAt;
       const bVal = field === 'entryDate' ? (b.entryDate ?? '') : b.createdAt;
       return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
@@ -187,8 +177,6 @@ export function useTransportOrderListFilters(
     sortField,
   ]);
 
-  
-  
   const hasActiveFilters = !!(
     statusFilter.length > 0 ||
     customerFilter ||

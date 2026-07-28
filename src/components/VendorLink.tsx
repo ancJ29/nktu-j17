@@ -4,9 +4,8 @@ import { useVendorStore } from '@/stores/useVendorStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type VendorLinkProps = {
-  
   code: string | undefined | null;
-  
+
   name?: string | undefined | null;
   size?: LinkSize;
 };

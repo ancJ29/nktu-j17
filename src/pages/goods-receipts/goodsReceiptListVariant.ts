@@ -1,7 +1,4 @@
-
-
 export type GoodsReceiptListVariant = {
-  
   showStatsCards: boolean;
 };
 

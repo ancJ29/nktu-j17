@@ -121,9 +121,6 @@ export function TransportOrderDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
-  
-  
-  
   const getCached = transportOrderBundle.useStore.getState().getById;
   const [order, setOrder] = useState<TransportOrder | null>(() =>
     id ? (getCached(id) ?? null) : null,
@@ -132,22 +129,19 @@ export function TransportOrderDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
-  
-  
+
   const [statusTarget, setStatusTarget] = useState<ResolvedStatusOption | null>(null);
   const [statusNote, setStatusNote] = useState('');
-  
+
   const [activeTab, setActiveTab] = useState<string | null>('overview');
 
-  
   const trucks = useTruckAssetStore((s) => s.items);
   const trucksInit = useTruckAssetStore((s) => s.initialized);
   const loadTrucks = useTruckAssetStore((s) => s.loadAll);
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
-  
-  
+
   const containerSizeLabel = useContainerSizeLabel();
 
   useEffect(() => {
@@ -155,7 +149,6 @@ export function TransportOrderDetailPage() {
     if (!employeesInit) loadEmployees();
   }, [trucksInit, loadTrucks, employeesInit, loadEmployees]);
 
-  
   const syncTripLogs = useCallback(
     async (source: TransportOrder) => {
       if (!canEdit) return source;
@@ -172,15 +165,13 @@ export function TransportOrderDetailPage() {
         return source;
       }
     },
-    
+
     [t],
   );
 
   const load = useCallback(async () => {
     if (!id) return;
     try {
-      
-      
       const { item: o } = await asyncDeduplicator.call(`transportOrder:${id}`, () =>
         transportOrderBundle.fetchById(id),
       );
@@ -202,7 +193,6 @@ export function TransportOrderDetailPage() {
   }, [id, navigate, t]);
 
   useEffect(() => {
-    
     void load();
   }, [load]);
 
@@ -211,9 +201,6 @@ export function TransportOrderDetailPage() {
       if (!order) return;
       setActionLoading(true);
       try {
-        
-        
-        
         const updated = await transportOrderBundle.updateSafely({
           id: order.id,
           version: order.version,
@@ -221,8 +208,7 @@ export function TransportOrderDetailPage() {
         });
         setOrder(updated);
         notifications.show({ color: 'green', message: successMsg });
-        
-        
+
         void syncTripLogs(updated);
       } catch (err) {
         if (err instanceof EntityConflictError) {
@@ -245,7 +231,6 @@ export function TransportOrderDetailPage() {
     [order, t, syncTripLogs],
   );
 
-  
   const handleMetaPatch = useCallback(
     async (patch: Record<string, unknown>) => {
       if (!order) return;
@@ -256,7 +241,7 @@ export function TransportOrderDetailPage() {
           patch,
         });
         setOrder(updated);
-        
+
         void syncTripLogs(updated);
         const fields = diffTransportOrder(order, updated);
         if (!isEmptyDiff(fields)) {
@@ -292,8 +277,7 @@ export function TransportOrderDetailPage() {
       if (!order || isTransportOrderLocked(order.status)) return;
       const fromStatus = order.status;
       const trimmedNote = note?.trim();
-      
-      
+
       const nextExtra: TransportOrderExtra = {
         ...order.extra,
         activityLog: appendTimelineEntry(order.extra, {
@@ -326,8 +310,7 @@ export function TransportOrderDetailPage() {
       const trimmedReason = reason.trim();
       const cancellation: TransportOrderCancellation = {
         at: Date.now(),
-        
-        
+
         by: { id: getCurrentActorId(), name: getCurrentEmployeeStamp().userName ?? '' },
         fromStatus,
         ...(trimmedReason ? { reason: trimmedReason } : {}),
@@ -355,13 +338,11 @@ export function TransportOrderDetailPage() {
     [order, patchOrder, t],
   );
 
-  
   const handleCopy = useCallback(() => {
     if (!order) return;
     navigate(ROUTES.TRANSPORT_ORDERS.NEW, { state: { copyFrom: order } });
   }, [order, navigate]);
 
-  
   const activityByStatus = useMemo(() => {
     const map = new Map<string, NonNullable<TransportOrderExtra['activityLog']>[number]>();
     for (const entry of order?.extra?.activityLog ?? []) {
@@ -374,23 +355,18 @@ export function TransportOrderDetailPage() {
     return map;
   }, [order?.extra?.activityLog]);
 
-  
-  
   const resolveStatus = useCallback(
     (value: string | undefined | null) => resolveTransportOrderStatus(value),
-    
+
     [i18n.language],
   );
 
-  
-  
   const myDepartment = employees.find((e) => e.id === getCurrentEmployeeId())?.department ?? null;
 
   const handleDelete = useCallback(() => {
     if (!order || isTransportOrderLocked(order.status)) return;
     setActionLoading(true);
-    
-    
+
     void transportOrderBundle
       .updateSafely({
         id: order.id,
@@ -398,9 +374,6 @@ export function TransportOrderDetailPage() {
         patch: { extra: { ...order.extra, isDeleted: true } },
       })
       .then(async (updated) => {
-        
-        
-        
         await syncTripLogs(updated);
         logActivity('transportOrder.delete', order.id, {
           orderNumber: order.orderNumber,
@@ -429,15 +402,11 @@ export function TransportOrderDetailPage() {
   const isCancelled = !!order.extra?.cancellation;
   const locked = isTransportOrderLocked(order.status);
   const totals = orderTotals(order);
-  
+
   const feeLines = readFeeLines(order);
-  
-  
+
   const tripLaborTotal = orderTripLaborTotal(order);
-  
-  
-  
-  
+
   const nextStatuses = isCancelled ? [] : getNextStatuses(order.status, myDepartment);
   const statusFlowOrder = getTransportOrderStatusFlow();
   const currentFlowIndex = statusFlowIndex(order.status);
@@ -453,8 +422,6 @@ export function TransportOrderDetailPage() {
     </Group>
   );
 
-  
-  
   const canEditMeta = canEdit && !locked && !isCancelled;
 
   const inlineEditLabels = {
@@ -473,7 +440,6 @@ export function TransportOrderDetailPage() {
     .filter(driverEmployeeFilter)
     .map((e) => ({ value: e.id, label: e.name }));
 
-  
   const truckField = (
     <InlineSelectField
       canEdit={canEditMeta}
@@ -504,8 +470,6 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  
-  
   const entryDateField = (
     <InlineEditField<string | null>
       canEdit={canEditMeta}
@@ -541,11 +505,6 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  
-  
-  
-  
-  
   const containerNumberField = (
     <InlineEditField<string>
       canEdit={canEditMeta}
@@ -598,7 +557,6 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  
   const patchRoute = (partial: Partial<typeof order.route>) =>
     handleMetaPatch({
       route: {
@@ -621,13 +579,11 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  
   const routeTimeField = (leg: 'pickupAt' | 'stuffingAt' | 'dropoffAt') => (
     <InlineEditField<string | null>
       canEdit={canEditMeta}
       value={isoToDateTimeString(order.route?.[leg])}
-      
-      
+
       onSave={async (next) => patchRoute({ [leg]: next ? dateTimeStringToIso(next) : undefined })}
       labels={inlineEditLabels}
       renderDisplay={(v) => (
@@ -646,7 +602,6 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  
   const routeStopRow = (leg: 'pickup' | 'stuffing' | 'dropoff') =>
     infoRow(
       t(`transportOrders.route.${leg}`),
@@ -656,7 +611,6 @@ export function TransportOrderDetailPage() {
       </Stack>,
     );
 
-  
   const tripsCard = order.isMultiTrip && (
     <SectionCard icon={<IconRoute size={14} />} title={t('transportOrders.trips.title')}>
       <Table>
@@ -1088,7 +1042,7 @@ export function TransportOrderDetailPage() {
           })}
           confirmLabel={statusTarget.actionLabel}
           confirmColor={statusTarget.color}
-          
+
           warning={statusTarget.locked ? t('transportOrders.statusChange.lockWarning') : undefined}
           note={statusNote}
           onNoteChange={setStatusNote}

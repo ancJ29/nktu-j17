@@ -4,7 +4,7 @@ import { StatusChangeModal as SharedStatusChangeModal } from '@/components/Statu
 type StatusChangeModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   targetStatus: { value: string; label: string; actionLabel: string } | null;
   currentStatus: { value: string; label: string; color: string };
   note: string;

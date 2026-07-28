@@ -1,5 +1,3 @@
-
-
 import { appConfig } from '@/config';
 import type { LookupV2CategoryId } from '@/pages/lookup-v2/categoryRegistry';
 

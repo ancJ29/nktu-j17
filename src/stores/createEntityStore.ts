@@ -1,14 +1,12 @@
-
-
 import { entityCacheGet, entityCacheSet, entityCacheClear } from '@/utils/entityCache';
 import { asyncDeduplicator, logger } from '@credo/base-ui/utils';
 import { hashString } from '@credo/kits/crypt';
 import { CallApiError } from '@credo/connectors/connector';
 import { create } from 'zustand';
 
-const DEFAULT_CACHE_TTL = 10 * 60 * 1000; 
+const DEFAULT_CACHE_TTL = 10 * 60 * 1000;
 
-const DEFAULT_STALE_TIME = 60 * 60 * 1000; 
+const DEFAULT_STALE_TIME = 60 * 60 * 1000;
 
 export const MAX_LIST_CONFLICT_RETRIES = 3;
 
@@ -83,88 +81,86 @@ export type BulkUpsertResult<T> = {
 };
 
 export type EntityStore<T, TUpdate = Partial<T>, TCreate = Partial<T>, TMeta = never> = {
-  
   mapById: Map<string, T>;
-  
+
   mapByCode: Map<string, T>;
-  
+
   items: T[];
-  
+
   loading: boolean;
-  
+
   initialized: boolean;
-  
+
   error: Error | null;
-  
+
   cachedAt: number | null;
-  
+
   hash: string | null;
-  
+
   loadAll: () => Promise<void>;
-  
+
   forceRefresh: () => Promise<void>;
-  
+
   revalidate: () => Promise<void>;
-  
+
   revalidateIfStale: (maxAgeMs?: number) => Promise<void>;
-  
+
   invalidate: () => void;
-  
+
   setItems: (items: T[], cachedAt?: number) => void;
-  
+
   setListHash: (hash: string) => void;
-  
+
   upsertItem: (item: T) => void;
-  
+
   removeItem: (id: string) => void;
-  
+
   getById: (id: string) => T | undefined;
-  
+
   getByCode: (code: string) => T | undefined;
-  
+
   getRecordHash: (item: T) => string;
-  
+
   updateSafely: (args: {
     id: string;
     version: string;
     patch: Omit<TUpdate, 'version'>;
   }) => Promise<T>;
-  
+
   updateSafelyWithMeta: (args: {
     id: string;
     version: string;
     patch: Omit<TUpdate, 'version'>;
   }) => Promise<{ item: T; meta?: TMeta }>;
-  
+
   deleteSafely: (args: { id: string; version: string }) => Promise<void>;
-  
+
   createSafely: (args: { patch: Omit<TCreate, 'expectedListHash'> }) => Promise<T>;
-  
+
   bulkUpsertSafely: (args: {
     items: ReadonlyArray<Omit<TCreate, 'expectedListHash'>>;
   }) => Promise<BulkUpsertResult<T>>;
-  
+
   hydrateFromCache: () => Promise<void>;
 };
 
 type EntityStoreConfig<T, TUpdate, TCreate, TMeta> = {
-  
   cacheKey: string;
-  
+
   fetchAll: (hash?: string) => Promise<FetchAllResult<T>>;
-  
+
   fetchOne?: (id: string) => Promise<T>;
-  
+
   update?: (id: string, patch: TUpdate) => Promise<{ item: T; listHash?: string; meta?: TMeta }>;
-  
+
   delete?: (
     id: string,
     version: string,
     expectedListHash?: string,
   ) => Promise<{ listHash?: string }>;
-  
+
   create?: (patch: TCreate) => Promise<{ item: T; listHash?: string }>;
-  
+
   bulkUpsert?: (items: TCreate[]) => Promise<{
     created: T[];
     updated: T[];
@@ -172,9 +168,9 @@ type EntityStoreConfig<T, TUpdate, TCreate, TMeta> = {
     summary: { total: number; created: number; updated: number; errors: number };
     listHash?: string;
   }>;
-  
+
   cacheTTL?: number;
-  
+
   staleTime?: number;
 };
 
@@ -195,9 +191,6 @@ export function createEntityStore<
     staleTime = DEFAULT_STALE_TIME,
   } = config;
 
-  
-  
-  
   const loadAllKey = `entity:${cacheKey}:loadAll`;
   const refreshKey = `entity:${cacheKey}:refresh`;
   const revalidateKey = `entity:${cacheKey}:revalidate`;
@@ -232,16 +225,11 @@ export function createEntityStore<
   }
 
   return create<EntityStore<T, TUpdate, TCreate, TMeta>>((set, get) => {
-    
     async function revalidateInBackground(): Promise<void> {
       try {
         const currentHash = get().hash ?? undefined;
         const result = await asyncDeduplicator.call(revalidateKey, () => fetchAll(currentHash));
         if (!result) {
-          
-          
-          
-          
           const { items, hash } = get();
           set({ cachedAt: Date.now() });
           saveCache(items, hash ?? undefined);
@@ -270,12 +258,8 @@ export function createEntityStore<
       hash: null,
 
       loadAll: async () => {
-        
         if (get().loading || get().error) return;
-        
-        
-        
-        
+
         if (get().initialized) {
           void get().revalidateIfStale();
           return;
@@ -294,8 +278,7 @@ export function createEntityStore<
               initialized: true,
               error: null,
             });
-            
-            
+
             void revalidateInBackground();
             return;
           }
@@ -321,12 +304,9 @@ export function createEntityStore<
 
       revalidate: async () => {
         const state = get();
-        
-        
-        
+
         if (state.loading) return;
-        
-        
+
         if (!state.initialized) {
           await get().loadAll();
           return;
@@ -336,14 +316,14 @@ export function createEntityStore<
 
       revalidateIfStale: async (maxAgeMs = staleTime) => {
         const state = get();
-        
+
         if (state.loading) return;
-        
+
         if (!state.initialized) {
           await get().loadAll();
           return;
         }
-        
+
         const age = state.cachedAt == null ? Infinity : Date.now() - state.cachedAt;
         if (age < maxAgeMs) return;
         await revalidateInBackground();
@@ -368,7 +348,6 @@ export function createEntityStore<
             });
             saveCache(result.items, result.hash);
           } else {
-            
             const { items, hash } = get();
             set({ cachedAt: Date.now(), initialized: true });
             saveCache(items, hash ?? undefined);
@@ -401,7 +380,7 @@ export function createEntityStore<
 
       setListHash: (hash: string) => {
         set({ hash });
-        
+
         saveCache(get().items, hash);
       },
 
@@ -410,8 +389,7 @@ export function createEntityStore<
         const next = items.some((i) => i.id === item.id)
           ? items.map((i) => (i.id === item.id ? item : i))
           : [...items, item];
-        
-        
+
         set({
           ...buildMaps(next),
           items: next,
@@ -446,8 +424,6 @@ export function createEntityStore<
 
       getRecordHash: (item: T) => recordHash(item),
 
-      
-      
       updateSafely: async (args) => (await get().updateSafelyWithMeta(args)).item,
 
       updateSafelyWithMeta: async ({ id, version, patch }) => {
@@ -456,11 +432,7 @@ export function createEntityStore<
             `[entity:${cacheKey}] updateSafely called but store was created without update`,
           );
         }
-        
-        
-        
-        
-        
+
         let updated: T;
         let newListHash: string | undefined;
         let meta: TMeta | undefined;
@@ -481,9 +453,7 @@ export function createEntityStore<
               await revalidateInBackground();
               continue;
             }
-            
-            
-            
+
             if (isVersionConflict(err) || isListVersionConflict(err)) {
               set({ hash: null });
               await revalidateInBackground();
@@ -495,8 +465,7 @@ export function createEntityStore<
         const next = items.some((i) => i.id === updated.id)
           ? items.map((i) => (i.id === updated.id ? updated : i))
           : [...items, updated];
-        
-        
+
         set({
           ...buildMaps(next),
           items: next,
@@ -611,8 +580,6 @@ export function createEntityStore<
           });
           saveCache(next, result.listHash);
         } else if (result.listHash) {
-          
-          
           set({ hash: result.listHash });
         }
         return {

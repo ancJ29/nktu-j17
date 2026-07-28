@@ -21,11 +21,9 @@ export function MobileAppLayout() {
   const { t, i18n } = useTranslation();
   const { token, user, loadProfile, saveProfile, isProfileLoaded } = useAuthStore();
 
-  
   useLanguageSync({ isProfileLoaded });
   useCurrentEmployee({ isProfileLoaded, email: user?.email, token });
 
-  
   const hasInitialSaved = useRef(false);
   useEffect(() => {
     if (!isProfileLoaded || hasInitialSaved.current) return;
@@ -49,8 +47,6 @@ export function MobileAppLayout() {
     [t],
   );
 
-  
-  
   const isRoot = user?.isRoot ?? false;
   const navbarItems = useMemo<NavigationItem[]>(() => {
     return stripRootOnlyNavItems(appConfig.navigation.mobile, isRoot)
@@ -70,23 +66,15 @@ export function MobileAppLayout() {
     }
   }, [token, isProfileLoaded, loadProfile]);
 
-  
-  
   const handleRefresh = useCallback(() => {
     cacheFlush();
     reloadPage('manual refresh');
   }, []);
 
-  
-  
-  
   const clearCache = useClearCacheConfirm();
 
   return (
     <MobileAppLayoutUI
-      
-      
-      
       navigation={navbarItems as CredoNavigationItem[]}
       getNavLabel={getNavLabel}
       appName={appConfig.app.name}

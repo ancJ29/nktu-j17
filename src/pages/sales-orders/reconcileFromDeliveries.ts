@@ -1,5 +1,3 @@
-
-
 import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
@@ -66,12 +64,9 @@ export function isFullyDelivered(
   if (closed.length === 0) return false;
 
   if (evidence === 'closedDeliveries') {
-    
-    
     return outbound.every((d) => d.isClosed);
   }
 
-  
   const deliveredByKey = new Map<string, number>();
   for (const d of closed) {
     const items = (d.extra as DeliveryRequestExtra)?.deliveredItems ?? [];
@@ -105,11 +100,6 @@ export async function advanceSoIfFullyDelivered(params: {
 
   await ensureReconcileStoresLoaded();
 
-  
-  
-  
-  
-  
   const allDrs = useDeliveryRequestStore.getState().items as DeliveryRequest[];
   const drsForSo = allDrs
     .map((d) => (freshDr && d.id === freshDr.id ? freshDr : d))
@@ -126,9 +116,6 @@ export async function advanceSoIfFullyDelivered(params: {
   for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
-  
-  
-  
   let result = await runSoTransition({
     order: so,
     toStatusValue: targetStatus,
@@ -137,16 +124,13 @@ export async function advanceSoIfFullyDelivered(params: {
     inventoryByProduct,
   });
 
-  
-  
-  
   if (!result.ok && result.failure.kind === 'patch-conflict') {
     await useSalesOrderStore.getState().forceRefresh();
     const fresh = useSalesOrderStore.getState().getById(so.id) as SalesOrder | undefined;
     if (fresh) {
       const freshExtra = (fresh.extra ?? {}) as SalesOrderExtra;
       const freshStatus = freshExtra.status ?? '';
-      
+
       if (fresh.isClosed || freshStatus === targetStatus) return 'skipped';
       if (freshExtra.cancellation == null && freshStatus === fromStatus) {
         so = fresh;

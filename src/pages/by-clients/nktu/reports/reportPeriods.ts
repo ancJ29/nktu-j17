@@ -1,7 +1,5 @@
-
-
 const DAY_MS = 86_400_000;
-const VN_OFFSET_MS = 7 * 3_600_000; 
+const VN_OFFSET_MS = 7 * 3_600_000;
 
 export const WEEK_LENGTH = 6;
 
@@ -35,12 +33,12 @@ export interface ResolvedWeek {
   periodKey: string;
   year: number;
   week: number;
-  
+
   mondayStr: string;
   endStr: string;
-  
+
   label: string;
-  
+
   rangeText: string;
 }
 
@@ -52,7 +50,7 @@ export function resolveIsoWeek(periodKey: string): ResolvedWeek {
   const monday = isoWeek1Monday(year);
   monday.setUTCDate(monday.getUTCDate() + (week - 1) * 7);
   const end = new Date(monday);
-  end.setUTCDate(monday.getUTCDate() + WEEK_LENGTH - 1); 
+  end.setUTCDate(monday.getUTCDate() + WEEK_LENGTH - 1);
   return {
     periodKey,
     year,
@@ -65,7 +63,6 @@ export function resolveIsoWeek(periodKey: string): ResolvedWeek {
 }
 
 function isoWeekKeyOf(utcDate: Date): string {
-  
   const monday = new Date(utcDate);
   monday.setUTCDate(utcDate.getUTCDate() - ((utcDate.getUTCDay() + 6) % 7));
   const thursday = new Date(monday);
@@ -94,14 +91,14 @@ export function recentWeekKeys(count: number, now: number = Date.now()): string[
 export interface ResolvedPeriod {
   periodKey: string;
   kind: 'week' | 'month';
-  
+
   startStr: string;
   endStr: string;
   label: string;
   rangeText: string;
-  
+
   buckets: { key: string; label: string }[];
-  
+
   bucketOf: (dateStr: string) => number;
 }
 
@@ -126,10 +123,10 @@ export function resolveMonth(periodKey: string): ResolvedPeriod {
   const m = /^(\d{4})-(\d{2})$/.exec(periodKey);
   if (!m) throw new Error(`Invalid month period key: ${periodKey}`);
   const year = Number(m[1]);
-  const month = Number(m[2]); 
+  const month = Number(m[2]);
   if (month < 1 || month > 12) throw new Error(`Invalid month: ${periodKey}`);
   const start = new Date(Date.UTC(year, month - 1, 1));
-  const end = new Date(Date.UTC(year, month, 0)); 
+  const end = new Date(Date.UTC(year, month, 0));
   const days = end.getUTCDate();
   return {
     periodKey,
@@ -154,7 +151,7 @@ export function currentMonthKey(now: number = Date.now()): string {
 export function recentMonthKeys(count: number, now: number = Date.now()): string[] {
   const vn = new Date(now + VN_OFFSET_MS);
   let y = vn.getUTCFullYear();
-  let mo = vn.getUTCMonth(); 
+  let mo = vn.getUTCMonth();
   const keys: string[] = [];
   for (let i = 0; i < count; i += 1) {
     keys.push(`${y}-${String(mo + 1).padStart(2, '0')}`);

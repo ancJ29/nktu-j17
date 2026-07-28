@@ -1,5 +1,3 @@
-
-
 import {
   Button,
   Card,
@@ -50,17 +48,12 @@ type FormValues = { value: string; label: string; sortOrder: number };
 export function LookupV2Page() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  
+
   const { hash } = useLocation();
   const category = hash.startsWith('#') ? hash.slice(1) : hash;
   const registered =
     (category ? getLookupV2Category(category) : undefined) ?? enabledCategories[0]!;
 
-  
-  
-  
-  
   const { items, initialized, loading, loadAll } = useLookupV2Store(
     useShallow((s) => ({
       items: s.items,
@@ -82,9 +75,6 @@ export function LookupV2Page() {
     [items, registered],
   );
 
-  
-  
-  
   const itemsRef = useRef(categoryItems);
   useEffect(() => {
     itemsRef.current = categoryItems;
@@ -95,10 +85,6 @@ export function LookupV2Page() {
   );
   const [reordering, setReordering] = useState(false);
 
-  
-  
-  
-  
   const persistReorder = useCallback(
     async (sourceId: string, targetId: string, pos: 'before' | 'after') => {
       const list = itemsRef.current;
@@ -210,7 +196,7 @@ export function LookupV2Page() {
       form.setValues({ value: entry.value, label: entry.label, sortOrder: entry.sortOrder });
       openForm();
     },
-    
+
     [openForm],
   );
 
@@ -227,15 +213,14 @@ export function LookupV2Page() {
         autoClose: 8000,
       });
     },
-    
+
     [t],
   );
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
       const nextValue = values.value.trim().toUpperCase();
-      
-      
+
       const duplicate = categoryItems.find(
         (l) => l.id !== editing?.id && l.value.trim().toUpperCase() === nextValue,
       );

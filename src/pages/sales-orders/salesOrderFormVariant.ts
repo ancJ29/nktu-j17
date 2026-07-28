@@ -1,33 +1,28 @@
-
-
 export type SalesOrderFormVariant = {
-  
   excelMode: 'sku' | 'by-name';
-  
+
   defaultDeliveryMethod: string;
-  
+
   showAddressPicker: boolean;
-  
+
   showInternalDeliverySwitch: boolean;
-  
+
   showVatShippingToggles: boolean;
-  
+
   showVatTag: boolean;
-  
+
   showShippingFee: boolean;
-  
+
   showDownloadTemplateButton: boolean;
-  
+
   headerLayout: 'twoColumn' | 'compactFourColumn';
-  
+
   customerPicker: 'selector' | 'nameCodeSelect';
-  
+
   clientSpecific?: {
-    
     NKTU?: {
-      
       deliveryMethodDrivesInternalDelivery?: boolean;
-      
+
       splitNotes?: {
         warehouseDepartmentCode: string;
       };

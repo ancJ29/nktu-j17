@@ -8,41 +8,24 @@ import { Outlet, useSearchParams } from 'react-router';
 
 export function BaseLayout() {
   const [searchParams] = useSearchParams();
-  
-  
+
   const cfgReady = useCfgReady();
   const clientUnconfigured = useClientUnconfigured();
 
   const code = searchParams.get('code')?.trim() ?? '';
   const resolvedCode = resolveClientCode();
   if (code && code !== resolvedCode) {
-    
     clearAllCache();
-    
+
     setClientCode(code);
-    
+
     reloadPage('client code change');
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   if (!resolvedCode || clientUnconfigured) {
     return <ClientCodePrompt unknownCode={clientUnconfigured ? resolvedCode : undefined} />;
   }
 
-  
-  
-  
-  
-  
   if (!cfgReady) return <LoadingFallback fullScreen />;
 
   return <Outlet />;
@@ -53,8 +36,7 @@ function ClientCodePrompt({ unknownCode }: { unknownCode?: string }) {
   const trimmed = value.trim();
   const submit = () => {
     if (!trimmed) return;
-    
-    
+
     setClientCode(trimmed);
   };
   return (

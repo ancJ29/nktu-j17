@@ -56,8 +56,7 @@ export function ProductInventoryDecomposeSetModal({
   const unitLabels = useLookupLabels('unit');
 
   const [setCode, setSetCode] = useState<string | null>(null);
-  
-  
+
   const [locationCode, setLocationCode] = useState<string | null>(
     locationsEnabled ? null : DEFAULT_LOCATION_CODE,
   );
@@ -116,12 +115,7 @@ export function ProductInventoryDecomposeSetModal({
     return findRow(setProduct.code, target);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setProduct, target, rows]);
-  
-  
-  
-  
-  
-  
+
   const parentBaseUnit = setProduct ? getItemBaseUnit(setProduct) : '';
   const parentCurrentQty = useMemo(() => {
     if (!setProduct || !parentRow) return 0;
@@ -238,11 +232,7 @@ export function ProductInventoryDecomposeSetModal({
   const handleDecompose = useCallback(async () => {
     if (!setProduct || !parentRow || qtyNum <= 0) return;
     setSubmitting(true);
-    
-    
-    
-    
-    
+
     await useProductInventoryStore.getState().revalidate();
     const store = useProductInventoryStore.getState();
     const actorId = getCurrentActorId();
@@ -252,13 +242,6 @@ export function ProductInventoryDecomposeSetModal({
     });
     let written = 0;
     try {
-      
-      
-      
-      
-      
-      
-      
       const parentBreakdown = readRowBreakdown(parentRow, parentBaseUnit);
       const parentResult = applyDelta(setProduct, parentBreakdown, {
         [parentBaseUnit]: -qtyNum,
@@ -281,7 +264,7 @@ export function ProductInventoryDecomposeSetModal({
         version: parentRow.version,
         patch: { onHand: parentResult.onHand, extra: parentExtra },
       });
-      
+
       logActivity('productInventory.adjust', setProduct.id, {
         locationCode: parentRow.locationCode,
         prevOnHand: parentRow.onHand,
@@ -294,9 +277,8 @@ export function ProductInventoryDecomposeSetModal({
       });
       written += 1;
 
-      
       for (const c of componentPlans) {
-        if (!c.row || !c.product.id) continue; 
+        if (!c.row || !c.product.id) continue;
         const baseUnit = getItemBaseUnit(c.product);
         const breakdown = readRowBreakdown(c.row, baseUnit);
         const result = applyDelta(c.product, breakdown, { [c.returnUnit]: c.returnQty });
@@ -318,8 +300,7 @@ export function ProductInventoryDecomposeSetModal({
           version: c.row.version,
           patch: { onHand: result.onHand, extra: updatedExtra },
         });
-        
-        
+
         logActivity('productInventory.adjust', c.product.id, {
           locationCode: c.row.locationCode,
           prevOnHand: c.row.onHand,
@@ -341,9 +322,7 @@ export function ProductInventoryDecomposeSetModal({
         }),
       });
       handleClose();
-      
-      
-      
+
       void rebalanceForSetStockChange([setProduct.code], 'decompose');
     } catch (err) {
       if (err instanceof EntityConflictError) {

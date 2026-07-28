@@ -17,11 +17,10 @@ export type ChatEntry = {
 };
 
 type ChatPanelProps = {
-  
   messages: ChatEntry[];
-  
+
   currentUserId?: string;
-  
+
   onSend: (message: string) => Promise<void>;
 };
 
@@ -34,7 +33,6 @@ export function ChatPanel({ messages, currentUserId, onSend }: ChatPanelProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [containerHeight, setContainerHeight] = useState<string>('calc(100dvh - 200px)');
 
-  
   const updateHeight = useCallback(() => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
@@ -44,17 +42,14 @@ export function ChatPanel({ messages, currentUserId, onSend }: ChatPanelProps) {
     }
   }, []);
 
-  
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
 
-    
     updateHeight();
     const t1 = setTimeout(updateHeight, 100);
     const t2 = setTimeout(updateHeight, 300);
 
-    
     const ro = new ResizeObserver(updateHeight);
     ro.observe(el);
 
@@ -68,14 +63,12 @@ export function ChatPanel({ messages, currentUserId, onSend }: ChatPanelProps) {
     };
   }, [updateHeight]);
 
-  
   useEffect(() => {
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
   }, [messages.length]);
 
-  
   useEffect(() => {
     inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, []);

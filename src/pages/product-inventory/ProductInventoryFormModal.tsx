@@ -21,9 +21,9 @@ const locationsEnabled = isLocationsEnabled();
 type Props = {
   readonly opened: boolean;
   readonly onClose: () => void;
-  
+
   readonly existingRows: readonly ProductInventoryRow[];
-  
+
   readonly product?: Product;
 };
 
@@ -58,7 +58,7 @@ export function ProductInventoryFormModal({
     validate: {
       productId: (v) =>
         productPickerHidden || v ? null : t('productInventory.validation.productRequired'),
-      
+
       onHand: (v) => (v === '' ? t('productInventory.validation.onHandRequired') : null),
     },
   });
@@ -66,12 +66,11 @@ export function ProductInventoryFormModal({
   useEffect(() => {
     if (!opened) return;
     form.reset();
-    
+
     if (fixedProduct) form.setFieldValue('productId', fixedProduct.id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, fixedProduct?.id]);
 
-  
   const selectedProduct =
     fixedProduct ?? (products.find((p) => p.id === form.values.productId) as Product | undefined);
   const selectedLocation = locations.find((l) => l.id === form.values.locationId) as
@@ -94,7 +93,6 @@ export function ProductInventoryFormModal({
     [units, unitLabels],
   );
 
-  
   useEffect(() => {
     if (baseUnit) form.setFieldValue('unit', baseUnit);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,7 +101,6 @@ export function ProductInventoryFormModal({
   const selectedUnit = form.values.unit || baseUnit;
   const inputOnHand = typeof form.values.onHand === 'number' ? form.values.onHand : 0;
 
-  
   const onHandInBase = useMemo(() => {
     if (!selectedUnit || selectedUnit === baseUnit) return inputOnHand;
     return convertUnit(inputOnHand, selectedUnit, baseUnit, conversions);
@@ -134,7 +131,6 @@ export function ProductInventoryFormModal({
 
       const locationCode = selectedLocation?.code ?? DEFAULT_LOCATION_CODE;
 
-      
       const dupe = existingRows.some(
         (r) =>
           r.itemCode === selectedProduct.code &&
@@ -149,7 +145,6 @@ export function ProductInventoryFormModal({
         return;
       }
 
-      
       const converted =
         values.unit === baseUnit || !values.unit
           ? values.onHand
@@ -165,10 +160,6 @@ export function ProductInventoryFormModal({
 
       setSubmitting(true);
       try {
-        
-        
-        
-        
         const entryUnit = values.unit || baseUnit;
         const onHandByUnit = values.onHand > 0 ? { [entryUnit]: values.onHand } : {};
         const extra: ProductInventoryExtra = {
@@ -177,18 +168,9 @@ export function ProductInventoryFormModal({
           unit: baseUnit,
           onHandByUnit,
         };
-        
-        
-        
-        
-        
-        
+
         await useProductInventoryStore.getState().revalidate();
 
-        
-        
-        
-        
         await useProductInventoryStore.getState().createSafely({
           patch: {
             itemCode: selectedProduct.code,
@@ -197,10 +179,7 @@ export function ProductInventoryFormModal({
             extra,
           },
         });
-        
-        
-        
-        
+
         const seedNote = values.note.trim();
         logActivity('productInventory.create', selectedProduct.id, {
           locationCode,
@@ -214,9 +193,6 @@ export function ProductInventoryFormModal({
         onClose();
       } catch (err) {
         if (err instanceof EntityConflictError) {
-          
-          
-          
           notifications.show({
             color: 'yellow',
             title: t('common.conflict.title'),

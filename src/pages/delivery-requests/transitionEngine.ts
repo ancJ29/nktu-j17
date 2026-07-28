@@ -1,5 +1,3 @@
-
-
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import {
@@ -36,7 +34,7 @@ export type TransitionInputs = {
   toStatusValue: string;
   actor: { id: string; name: string } | undefined;
   note?: string;
-  
+
   deliveredItems?: DeliveryRequestDeliveredItem[];
 };
 
@@ -64,11 +62,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     };
   }
 
-  
-  
-  
-  
-  
   if (toStatus.stage === 'COMPLETED') {
     const photos = (request.extra as DeliveryRequestExtra | undefined)?.photos ?? [];
     const hasPhoto = photos.some((p) => !p.isDeleted);
@@ -76,8 +69,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       return { ok: false, failure: { kind: 'photos-required' } };
     }
   }
-
-  
 
   const currentExtra = (request.extra ?? {}) as DeliveryRequestExtra;
   const log: DeliveryRequestActivityEntry[] = currentExtra.activityLog ?? [];
@@ -110,15 +101,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       },
     });
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     const followUps: DrFollowUp[] = [];
     if (request.direction !== 'inbound') {
       const toCapIdSet = new Set((toStatus.capabilities ?? []).map((b) => b.id));

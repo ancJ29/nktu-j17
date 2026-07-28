@@ -13,10 +13,10 @@ type StatusChangeModalProps = {
   readonly loading: boolean;
   readonly title: string;
   readonly message: string;
-  
+
   readonly confirmLabel: string;
   readonly confirmColor?: string;
-  
+
   readonly warning?: string;
   readonly note: string;
   readonly onNoteChange: (v: string) => void;

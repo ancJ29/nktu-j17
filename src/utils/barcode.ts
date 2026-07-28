@@ -12,6 +12,5 @@ export function generateInternalBarcode(options?: { clientCode?: string }): stri
 }
 
 export function isInternalBarcode(value: string): boolean {
-  
   return /^[A-Z0-9]+-\d{6}-[A-Z0-9]+$/.test(value.trim());
 }

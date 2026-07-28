@@ -12,11 +12,10 @@ export async function postWarehouseDocInventory(
 ): Promise<void> {
   const sign = direction === 'in' ? 1 : -1;
 
-  
   const deltaByMaterial = new Map<string, Map<string, number>>();
   for (const l of doc.extra.lines ?? []) {
     const material = materialByCode.get(l.itemCode);
-    if (!material) continue; 
+    if (!material) continue;
     const unit = l.unit || material.extra?.units?.[0] || '';
     const qty = Number(l.quantity) || 0;
     if (!unit || qty === 0) continue;
@@ -35,7 +34,6 @@ export async function postWarehouseDocInventory(
     const row = invByCode.get(itemCode);
     const prevOnHand = row?.onHand ?? 0;
 
-    
     const next = row ? readRowBreakdown(row, baseUnit) : {};
     for (const [unit, delta] of unitDeltas) {
       const q = (next[unit] ?? 0) + delta;
@@ -56,8 +54,6 @@ export async function postWarehouseDocInventory(
       });
     }
 
-    
-    
     logActivity('materialInventory.adjust', material.id, {
       prevOnHand,
       nextOnHand,

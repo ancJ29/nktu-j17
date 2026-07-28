@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
@@ -49,7 +47,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     compactState,
   });
 
-  
   const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
   const vendorFilter = state.v ?? null;
   const staffFilter = state.f ?? null;
@@ -62,9 +59,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
   const receivedDateRange = useMemo(() => restoreDateRange(state.rd, EMPTY_DATE_RANGE), [state.rd]);
   const page = state.pg ?? DEFAULT_PAGE;
 
-  
-  
-  
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values.length > 0 ? values : undefined, pg: undefined }),
     [updateState],
@@ -90,8 +84,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     [updateState],
   );
 
-  
-  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({
@@ -111,7 +103,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     [updateState],
   );
 
-  
   const allReceipts = useMemo(() => {
     const filtered = storeReceipts.filter((r) => {
       if (statusFilter.length > 0 && !statusFilter.includes(r.status)) return false;
@@ -135,8 +126,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     receivedDateRange,
   ]);
 
-  
-  
   const hasActiveFilters = !!(
     statusFilter.length > 0 ||
     vendorFilter ||
@@ -147,7 +136,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
   );
 
   return {
-    
     statusFilter,
     setStatusFilter,
     vendorFilter,
@@ -165,11 +153,9 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     page,
     setPage,
 
-    
     allReceipts,
     hasActiveFilters,
 
-    
     clearFilters,
   };
 }

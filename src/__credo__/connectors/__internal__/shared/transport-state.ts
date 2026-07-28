@@ -1,5 +1,3 @@
-
-
 const encodingModes = new Map<string, 'json' | 'msgpack'>();
 
 const vrxTokens = new Map<string, string>();

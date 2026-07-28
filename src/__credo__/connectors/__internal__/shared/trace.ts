@@ -13,12 +13,12 @@ export const isTraceEnabled = (): boolean => isEnabled();
 
 export function trace(...args: unknown[]): void {
   if (!isEnabled()) return;
-  
+
   console.log(...args);
 }
 
 export function traceError(...args: unknown[]): void {
   if (!isEnabled()) return;
-  
+
   console.error(...args);
 }

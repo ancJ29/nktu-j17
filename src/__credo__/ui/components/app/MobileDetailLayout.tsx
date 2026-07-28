@@ -28,10 +28,10 @@ type MobileDetailLayoutProps = {
   isProfileLoaded: boolean;
   loginPath: string;
   homePath: string;
-  
+
   navActions?: DetailNavAction[];
   onMount?: () => void;
-  
+
   onRefresh?: () => void | Promise<void>;
   children: ReactNode;
 };
@@ -54,7 +54,7 @@ export function MobileDetailLayout({
 
   useEffect(() => {
     onMount?.();
-  }, []); 
+  }, []);
 
   const getColor = useCallback((color: MantineColor) => getThemeColor(theme, color), [theme]);
 

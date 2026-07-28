@@ -21,13 +21,11 @@ export async function checkForNewBuild(current: BuildInfo): Promise<void> {
       `[build-check] New build detected: ${remote.buildHash}/${remote.buildTimestamp} (current: ${current.buildHash}/${current.buildTimestamp}). Reloading...`,
     );
 
-    
     if ('caches' in window) {
       const names = await caches.keys();
       await Promise.all(names.map((name) => caches.delete(name)));
     }
 
-    
     if ('serviceWorker' in navigator) {
       const registrations = await navigator.serviceWorker.getRegistrations();
       await Promise.all(registrations.map((r) => r.unregister()));

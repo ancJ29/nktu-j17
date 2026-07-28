@@ -1,5 +1,3 @@
-
-
 import type { Employee, EmployeeExtra } from '@/types';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { createEntityStore } from './createEntityStore';
@@ -8,9 +6,8 @@ import { ONE_MINUTE } from '@credo/kits/time';
 type EmployeePatch = Omit<Parameters<typeof cMngtConnector.updateEmployee<EmployeeExtra>>[0], 'id'>;
 
 export type EmployeeUpdateMeta = {
-  
   ssoWarning?: string;
-  
+
   loginPassword?: string;
 };
 

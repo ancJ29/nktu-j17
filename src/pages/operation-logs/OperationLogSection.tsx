@@ -59,24 +59,22 @@ type Props = {
   readonly targetId: string;
   readonly targetCode: string;
   readonly config: OperationLogConfig;
-  
+
   readonly perms: OperationLogPerms;
-  
+
   readonly context?: OperationLogContext;
 };
 
 export function OperationLogSection({ targetId, targetCode, config, perms, context }: Props) {
   const { canView, canCreate, canEdit, canDelete } = perms;
   const { t, i18n } = useTranslation();
-  
-  
+
   const tr = useCallback<TFn>((key, options) => t(key as never, options), [t]);
 
   const [logs, setLogs] = useState<OperationLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(CURRENT_YEAR);
-  
-  
+
   const [month, setMonth] = useState<string>('all');
 
   const [formOpened, formHandlers] = useDisclosure(false);
@@ -86,8 +84,6 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
   const [deleteTarget, setDeleteTarget] = useState<OperationLog | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  
-  
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
   const toggleExpanded = useCallback((id: string) => {
     setExpanded((prev) => {
@@ -117,9 +113,6 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     return [{ value: 'all', label: tr('operationLogs.allMonths') }, ...months];
   }, [i18n.language, tr]);
 
-  
-  
-  
   const visibleLogs = useMemo(() => {
     if (month === 'all') return logs;
     const m = Number(month);
@@ -149,7 +142,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   useEffect(() => {
     if (!canView) return;
-    
+
     load(CURRENT_YEAR);
   }, [load, canView]);
 
@@ -178,7 +171,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
       form.resetDirty();
       formHandlers.open();
     },
-    
+
     [config, formHandlers],
   );
 
@@ -267,7 +260,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const showActions = canEdit || canDelete;
   const expandable = Boolean(config.renderExpanded);
-  
+
   const detailColSpan = config.columns.length + (expandable ? 1 : 0) + (showActions ? 1 : 0);
 
   return (
@@ -354,7 +347,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               {visibleLogs.map((log) => {
                 const tone = config.rowTone?.(log, visibleLogs);
                 const isOpen = expanded.has(log.id);
-                
+
                 const locked = config.rowLocked?.(log) ?? false;
                 const row = (
                   <Table.Tr

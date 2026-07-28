@@ -63,7 +63,7 @@ export const salesOrderConfigErrors: ConfigInvariantError[] = (() => {
   const result = validateSalesOrderConfig(so, knownDepartments);
   if (result.ok) return [];
   for (const err of result.errors) logger.error('SO config invariant', formatInvariantError(err));
-  
+
   validatedConfig.features.salesOrders.enabled = false;
   return result.errors;
 })();
@@ -135,12 +135,8 @@ export const appConfig: Omit<CMngtAppConfig, 'navigation'> & { navigation: Navig
 logger.debug('appConfig:', appConfig);
 
 export async function refreshConfigFromBackend(): Promise<void> {
-  
-  
-  
   let reloading = false;
   try {
-    
     const limit = isLocalhost() ? ONE_MINUTE : 30 * ONE_MINUTE;
 
     const ts = cacheGet('crt') ?? 0;
@@ -148,10 +144,6 @@ export async function refreshConfigFromBackend(): Promise<void> {
       logger.debug('config already refreshed within limit, skipping');
       return;
     }
-
-    
-    
-    
 
     const clientServiceCode = resolveClientCode();
     if (!clientServiceCode) {
@@ -161,12 +153,6 @@ export async function refreshConfigFromBackend(): Promise<void> {
 
     const res = await cMngtConnector.getAppConfig({ clientServiceCode });
 
-    
-    
-    
-    
-    
-    
     if (res.config === null) {
       logger.debug('client not found for clientServiceCode — surfacing client-code prompt');
       markClientUnconfigured();
@@ -174,7 +160,6 @@ export async function refreshConfigFromBackend(): Promise<void> {
     }
 
     const parsedResult = CMngtAppConfigSchema.safeParse(res.config);
-    
 
     if (!parsedResult.success) {
       logger.error('config validation failed', parsedResult.error.issues);
@@ -182,7 +167,6 @@ export async function refreshConfigFromBackend(): Promise<void> {
     }
     const config = parsedResult.data;
 
-    
     cacheSet('crt', Date.now());
 
     logger.info('config version check', {
@@ -190,20 +174,13 @@ export async function refreshConfigFromBackend(): Promise<void> {
       currentVersion: appConfig.version,
     });
 
-    
-    
-    
-    
     cacheSet('cfg', config);
 
-    
     if (config.version && config.version !== appConfig.version) {
       logger.info('new version of remote config found, reloading...', config.version);
-      
-      
+
       cacheFlush();
-      
-      
+
       reloading = reloadPage('config version mismatch');
     }
     // Ignore config with older version
@@ -213,7 +190,7 @@ export async function refreshConfigFromBackend(): Promise<void> {
 }
 
 export async function forceRefreshConfig(): Promise<void> {
-  cacheSet('crt', 0); 
+  cacheSet('crt', 0);
   await refreshConfigFromBackend();
 }
 

@@ -11,9 +11,8 @@ export const CodeFormatFields = memo(function CodeFormatFields({
   onPrefixChange,
   onPadLengthChange,
 }: {
-  
   title: string;
-  
+
   noun: string;
   codePrefix: string;
   codePadLength: number;

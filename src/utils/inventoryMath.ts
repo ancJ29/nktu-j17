@@ -1,5 +1,3 @@
-
-
 import type { UnitConversion } from '@/types/product';
 import { convertUnit, getItemBaseUnit, getItemUnits } from './unitConversion';
 
@@ -69,8 +67,7 @@ export function availableByUnit(
     if (onHand === 0 && reserved === 0) continue;
     out[u] = onHand - reserved;
   }
-  
-  
+
   for (const u of Object.keys(reservedByUnit)) {
     if (!allowed.has(u)) out[u] = (out[u] ?? 0) - (reservedByUnit[u] ?? 0);
   }
@@ -91,7 +88,6 @@ export type ApplyResult =
   | { ok: false; reason: 'negative'; unit: string; wouldBe: number };
 
 export type ApplyDeltaOptions = {
-  
   allowNegative?: boolean;
 };
 
@@ -111,9 +107,7 @@ export function applyDelta(
     if (nextQty < 0 && !opts.allowNegative) {
       return { ok: false, reason: 'negative', unit, wouldBe: nextQty };
     }
-    
-    
-    
+
     if (nextQty === 0) delete next[unit];
     else next[unit] = nextQty;
   }
@@ -224,7 +218,7 @@ export function applyShip(
     if (reservedAfter < -REPACK_BALANCE_TOLERANCE) {
       return { ok: false, reason: 'reservation-mismatch', unit, wouldBe: reservedAfter };
     }
-    
+
     if (onHandAfter === 0) delete onHandNext[unit];
     else onHandNext[unit] = onHandAfter;
     if (Math.abs(reservedAfter) <= REPACK_BALANCE_TOLERANCE) delete reservedNext[unit];
@@ -253,7 +247,7 @@ export function applyRepack(
 export type RepackOp = {
   from: { unit: string; qty: number };
   to: { unit: string; qty: number };
-  
+
   writeOff?: { baseQty: number; reason: string };
 };
 

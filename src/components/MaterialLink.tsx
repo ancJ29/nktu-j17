@@ -8,12 +8,11 @@ import { hasMaterialImages } from '@/utils/materialConfig';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type MaterialLinkProps = {
-  
   code: string | undefined | null;
-  
+
   name?: string | undefined | null;
   size?: LinkSize;
-  
+
   photoOnHover?: boolean;
 };
 
@@ -47,10 +46,6 @@ export function MaterialLink({ code, name, size = 'sm', photoOnHover = false }: 
     chip
   );
 
-  
-  
-  
-  
   if (!photoOnHover || !materialImagesEnabled || !material) return content;
 
   const photoUrl = material.extra?.images?.[0]?.url?.trim();

@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import { generateId, newVersion } from '@credo/kits/string';
 import { generateName } from '../../../scripts/faker/name';
@@ -55,7 +53,7 @@ export type SeedVendorsOptions = {
   industry: IndustryName;
   count: number;
   secrets: FakeDataSecrets;
-  
+
   items?: ManualVendorInput[];
   onLog?: (line: string) => void;
 };
@@ -217,7 +215,7 @@ function generateContacts(
     name: primaryFullName,
     role: primaryRole,
     phone: primaryPhone,
-    
+
     ...(Math.random() < 0.3 ? { zalo: randomMobile() } : { zalo: primaryPhone }),
     email: primaryEmail,
     isPrimary: true,
@@ -238,7 +236,6 @@ function generateContacts(
 }
 
 function generateBankAccounts(holderName: string): Array<Record<string, unknown>> {
-  
   const r = Math.random();
   const count = r < 0.1 ? 0 : r < 0.7 ? 1 : 2;
   return Array.from({ length: count }, () => ({
@@ -264,7 +261,7 @@ function generateVendors(
     const { firstName, fullName } = generateName();
     const suffix = pick(COMPANY_SUFFIXES);
     const niche = pick(niches);
-    
+
     const companyName = `Công ty ${suffix} ${niche} ${firstName}`;
     const shortName = `${niche} ${firstName}`;
     const code = `${config.codePrefix}${pad(index + 1, config.codePadLength)}`;
@@ -293,10 +290,10 @@ function generateVendors(
       payableCreditLimit: randomInt(2, 20) * 10_000_000,
       paymentTerms: pick(PAYMENT_TERMS),
       accountManager: generateName().fullName,
-      zalo: phone, 
+      zalo: phone,
       contacts: contactsList,
       addressGoogleMapUrl: FAKE_GOOGLE_MAP_URL,
-      
+
       invoiceName: companyName.toUpperCase(),
       invoiceEmail: `ketoan-${code.toLowerCase()}@${domain}`,
       invoiceRecipient: fullName,

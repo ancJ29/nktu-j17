@@ -40,10 +40,6 @@ export function PCAppLayout() {
   const { token, user, loadProfile, saveProfile, isProfileLoaded } = useAuthStore();
   const employees = useEmployeeStore((s) => s.items);
 
-  
-  
-  
-
   const { name, profileImage } = useMemo(() => {
     const employee = findEmployeeByLoginEmail(employees, user?.email);
     return {
@@ -52,22 +48,15 @@ export function PCAppLayout() {
     };
   }, [employees, user]);
 
-  
-  
   useLanguageSync({ isProfileLoaded });
   const { isRoot } = useCurrentEmployee({ isProfileLoaded, email: user?.email, token });
   const { navbarOpened, toggleNavbar } = useNavbarSync({ isProfileLoaded });
 
-  
-  
   const pcNavigation = useMemo(
     () => stripRootOnlyNavItems(appConfig.navigation.pc, isRoot),
     [isRoot],
   );
 
-  
-  
-  
   const avatarNode = useMemo(() => {
     const inner = <EmployeeAvatar name={name} imageUrl={profileImage} />;
     if (!isRoot) return inner;
@@ -78,8 +67,6 @@ export function PCAppLayout() {
     );
   }, [isRoot, name, profileImage]);
 
-  
-  
   const hasInitialSaved = useRef(false);
   useEffect(() => {
     if (!isProfileLoaded || hasInitialSaved.current) return;
@@ -109,15 +96,11 @@ export function PCAppLayout() {
     }
   }, [token, isProfileLoaded, loadProfile]);
 
-  
-  
-  
   const handleRefresh = useCallback(() => {
     cacheFlush();
     reloadPage('manual refresh');
   }, []);
 
-  
   const showInstallApp = useMemo(
     () => !window.matchMedia('(display-mode: standalone)').matches,
     [],
@@ -127,15 +110,10 @@ export function PCAppLayout() {
     window.dispatchEvent(new Event('toggle-pwa-guide'));
   }, []);
 
-  
-  
   const clearCache = useClearCacheConfirm();
 
   return (
     <PCAppLayoutUI
-      
-      
-      
       navigation={pcNavigation as CredoNavigationItem[]}
       getNavLabel={getNavLabel}
       appName={appConfig.app.name}

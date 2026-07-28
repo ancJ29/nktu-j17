@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router';
@@ -61,7 +59,6 @@ import type {
 } from '@/types';
 
 type UseDeliveryRequestDetailOptions = {
-  
   skipViewScopeGuard?: boolean;
 };
 
@@ -105,14 +102,9 @@ async function advanceLinkedSoIfFullyDelivered(
   currentEmployee: { id: string; name: string } | undefined,
   t: TFunction,
 ): Promise<void> {
-  
-  
   if (closedDr.direction === 'inbound') return;
   if (!closedDr.salesOrderId) return;
-  
-  
-  
-  
+
   const soStore = useSalesOrderStore.getState();
   if (!soStore.initialized) await soStore.loadAll();
   const so = useSalesOrderStore.getState().getById(closedDr.salesOrderId) as SalesOrder | undefined;
@@ -128,8 +120,6 @@ async function advanceLinkedSoOnDispatch(
   if (transitionedDr.direction === 'inbound') return;
   if (!transitionedDr.salesOrderId) return;
 
-  
-  
   await ensureReconcileStoresLoaded();
   const so = useSalesOrderStore.getState().getById(transitionedDr.salesOrderId) as
     SalesOrder | undefined;
@@ -147,9 +137,6 @@ async function advanceLinkedSoOnDispatch(
   for (const p of products) productsByCode.set(p.code, p);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
-  
-  
-  
   const result = await runSoTransition({
     order: so,
     toStatusValue: targetStatus,
@@ -204,7 +191,7 @@ export type UseDeliveryRequestDetailReturn = {
   setDeliveredQty: (next: Map<string, number>) => void;
   setLineDeliveredQty: (key: string, value: number) => void;
   pending: PendingTransition | null;
-  
+
   pendingIsCompletion: boolean;
   note: string;
   setNote: (v: string) => void;
@@ -212,25 +199,25 @@ export type UseDeliveryRequestDetailReturn = {
   cancelStatusChange: () => void;
   confirmStatusChange: () => Promise<void>;
   handleMetaPatch: (patch: DeliveryRequestMetaPatch) => Promise<void>;
-  
+
   applyUpdatedRequest: (updated: DeliveryRequest) => void;
-  
+
   showDelete: boolean;
   deleteOpened: boolean;
   openDelete: () => void;
   closeDelete: () => void;
   handleDelete: () => Promise<void>;
-  
+
   imageDirectory: string;
   handlePhotosChange: (photos: DeliveryRequestPhoto[]) => Promise<void>;
   cameraOpened: boolean;
   openCamera: () => void;
-  
+
   openCompletionCamera: () => void;
   closeCamera: () => void;
   cameraUploading: boolean;
   handleMobileCameraCapture: (result: CaptureResult) => Promise<void>;
-  
+
   completionPhotos: DeliveryRequestPhoto[];
 };
 
@@ -257,14 +244,8 @@ export function useDeliveryRequestDetail(
   const [cameraUploading, setCameraUploading] = useState(false);
   const [deleteOpened, { open: openDelete, close: closeDelete }] = useDisclosure(false);
 
-  
-  
-  
   const [completionPhotos, setCompletionPhotos] = useState<DeliveryRequestPhoto[]>([]);
-  
-  
-  
-  
+
   const captureModeRef = useRef<'fab' | 'completion'>('fab');
 
   const openCamera = useCallback(() => {
@@ -276,17 +257,10 @@ export function useDeliveryRequestDetail(
     openCameraRaw();
   }, [openCameraRaw]);
 
-  
-  
   useEffect(() => {
     if (!soInit) loadSOs();
   }, [soInit, loadSOs]);
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!productsInit) loadProducts();
   }, [productsInit, loadProducts]);
@@ -299,7 +273,6 @@ export function useDeliveryRequestDetail(
     return findEmployeeByLoginEmail(employees, user.email);
   }, [user.email, employees]);
 
-  
   const [deliveredQty, setDeliveredQty] = useState<Map<string, number>>(new Map());
   useEffect(() => {
     if (!request) return;
@@ -311,7 +284,7 @@ export function useDeliveryRequestDetail(
       const found = persisted.find((p) => p.productCode === it.productCode && p.unit === it.unit);
       m.set(key, found?.quantity ?? it.quantity);
     }
-    
+
     setDeliveredQty(m);
   }, [request]);
 
@@ -323,17 +296,15 @@ export function useDeliveryRequestDetail(
     });
   }, []);
 
-  
   useEffect(() => {
     if (!id) return;
     const cached = useDeliveryRequestStore.getState().getById(id) as DeliveryRequest | undefined;
     if (cached) {
-      
       if (cached.extra?.isDeleted) {
         navigate(ROUTES.DELIVERY.LIST, { replace: true });
         return;
       }
-      
+
       setRequest(cached);
       setLoading(false);
       return;
@@ -360,13 +331,6 @@ export function useDeliveryRequestDetail(
     });
   }, [id, t, navigate]);
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (opts.skipViewScopeGuard) return;
     if (!request) return;
@@ -380,7 +344,7 @@ export function useDeliveryRequestDetail(
       return;
     }
     const me = getCurrentEmployeeId();
-    if (!me) return; 
+    if (!me) return;
     const assignedDriverId = (request.extra as { assignedDriverId?: string } | undefined)
       ?.assignedDriverId;
     if (assignedDriverId !== me) {
@@ -391,8 +355,6 @@ export function useDeliveryRequestDetail(
       navigate(ROUTES.DELIVERY.LIST);
     }
   }, [request, employees, t, navigate, opts.skipViewScopeGuard]);
-
-  
 
   const currentStatus = useMemo(
     () => resolveStatus((request?.extra as { status?: string } | undefined)?.status),
@@ -415,15 +377,9 @@ export function useDeliveryRequestDetail(
       .filter((opt) => opt.value);
   }, [request, currentStatus.value]);
 
-  
-
   const [pending, setPending] = useState<PendingTransition | null>(null);
   const [note, setNote] = useState('');
 
-  
-  
-  
-  
   const pendingIsCompletion = useMemo(
     () => (pending ? resolveStatus(pending.toValue).stage === 'COMPLETED' : false),
     [pending],
@@ -463,10 +419,6 @@ export function useDeliveryRequestDetail(
         return;
       }
       if (failure.kind === 'photos-required') {
-        
-        
-        
-        
         const isInbound = request?.direction === 'inbound';
         notifications.show({
           color: 'red',
@@ -491,8 +443,6 @@ export function useDeliveryRequestDetail(
     if (!pending || !request) return;
     setActionLoading(true);
     try {
-      
-      
       const deliveredItems: DeliveryRequestDeliveredItem[] = request.items.map((it) => ({
         productCode: it.productCode,
         unit: it.unit,
@@ -518,9 +468,6 @@ export function useDeliveryRequestDetail(
       });
       invalidateCache();
 
-      
-      
-      
       const priorStatus = (request.extra as DeliveryRequestExtra | undefined)?.status ?? '';
       logActivity('deliveryRequest.statusChange', request.id, {
         requestNumber: result.updated.requestNumber,
@@ -533,15 +480,6 @@ export function useDeliveryRequestDetail(
       setNote('');
       setCompletionPhotos([]);
 
-      
-      
-      
-      
-      
-      
-      
-      
-      
       const updatedExtra = (result.updated.extra ?? {}) as DeliveryRequestExtra;
       const toStage = getDeliveryRequestStatusOptions().find(
         (o) => o.value === pending.toValue,
@@ -583,10 +521,6 @@ export function useDeliveryRequestDetail(
         }
       }
 
-      
-      
-      
-      
       for (const followUp of result.followUps) {
         await dispatchDrFollowUp(followUp, result.updated, currentEmployee, t);
       }
@@ -604,12 +538,6 @@ export function useDeliveryRequestDetail(
     handleTransitionFailure,
   ]);
 
-  
-  
-  
-  
-  
-  
   const handleMetaPatch = useCallback(
     async (patch: DeliveryRequestMetaPatch) => {
       const { id: drId } = request ?? {};
@@ -628,11 +556,6 @@ export function useDeliveryRequestDetail(
         });
         setRequest(updated as DeliveryRequest);
 
-        
-        
-        
-        
-        
         const fields: DeliveryRequestInlineFields = {};
         if (patch.extra) {
           const before = currentExtra as DeliveryRequestExtra;
@@ -696,10 +619,6 @@ export function useDeliveryRequestDetail(
     [request, t],
   );
 
-  
-  
-  
-  
   const showDelete = canDeletePerm && request != null;
 
   const handleDelete = useCallback(async () => {
@@ -719,10 +638,7 @@ export function useDeliveryRequestDetail(
       });
       invalidateCache();
       logActivity('deliveryRequest.delete', drId, { requestNumber: request.requestNumber });
-      
-      
-      
-      
+
       if (request.salesOrderId) {
         try {
           await unlinkDRFromSalesOrder(request.salesOrderId, drId);
@@ -752,12 +668,6 @@ export function useDeliveryRequestDetail(
     }
   }, [request, t, invalidateCache, navigate, closeDelete]);
 
-  
-  
-  
-  
-  
-  
   const imageDirectory = useMemo(() => {
     const clientCode = resolveClientCode();
     const today = new Date().toISOString().slice(0, 10);
@@ -817,9 +727,6 @@ export function useDeliveryRequestDetail(
         });
         if (!uploadRes.success) return;
 
-        
-        
-        
         const isCompletionCapture = captureModeRef.current === 'completion';
         const newPhoto: DeliveryRequestPhoto = {
           url: presignRes.fileUrl,
@@ -844,7 +751,6 @@ export function useDeliveryRequestDetail(
     [request, imageDirectory, currentEmployee, handlePhotosChange, closeCamera],
   );
 
-  
   const statusFlowOrder = useMemo(() => getStatusFlowOrder(), []);
   const currentFlowIndex = useMemo(
     () => statusFlowOrder.indexOf(currentStatus.value),

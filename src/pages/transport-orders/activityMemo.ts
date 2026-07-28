@@ -1,4 +1,3 @@
-
 import type { TransportOrder, TransportOrderExtra } from '@/types';
 import { orderTotals, orderTripLaborTotal, readFeeLines } from './transportOrderPricing';
 
@@ -22,11 +21,11 @@ export type TransportOrderFields = {
   feeCount?: TransportOrderFieldDelta;
   advanceAmount?: TransportOrderFieldDelta;
   transportContractNo?: TransportOrderFieldDelta;
-  
+
   tripCount?: TransportOrderFieldDelta;
   tripLaborTotal?: TransportOrderFieldDelta;
   notes?: { changed: true };
-  
+
   scheduleChanged?: { changed: true };
 };
 
@@ -39,13 +38,13 @@ export type TransportOrderCreateMemo = {
   containerNumber?: string;
   containerSize: string;
   shipmentType: string;
-  
+
   feeCount: number;
   totalAmount: number;
   grandTotal: number;
-  
+
   advanceAmount?: number;
-  
+
   tripCount?: number;
   tripLaborTotal?: number;
 };
@@ -126,22 +125,14 @@ export function diffTransportOrder(
   set('shipmentType', delta(before.shipmentType, after.shipmentType));
   set('route', delta(routeMemo(before), routeMemo(after)));
   set('vatRate', delta(before.vatRate, after.vatRate));
-  
-  
-  
-  
-  
-  
+
   const beforeTotals = orderTotals(before);
   const afterTotals = orderTotals(after);
   set('totalAmount', delta(beforeTotals.subtotal, afterTotals.subtotal));
   set('feeCount', delta(readFeeLines(before).length, readFeeLines(after).length));
   set('advanceAmount', delta(beforeTotals.advanceAmount, afterTotals.advanceAmount));
   set('transportContractNo', delta(before.transportContractNo, after.transportContractNo));
-  
-  
-  
-  
+
   set('tripCount', delta((before.trips ?? []).length, (after.trips ?? []).length));
   set('tripLaborTotal', delta(orderTripLaborTotal(before), orderTripLaborTotal(after)));
 

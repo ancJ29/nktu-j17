@@ -88,11 +88,6 @@ export function ProductCardList({ products, isLoading, onHandByCode }: ProductCa
           onHand !== null && typeof minValue === 'number' && onHand > 0 && onHand <= minValue;
         const isNegative = onHand !== null && onHand < 0;
 
-        
-        
-        
-        
-        
         const accent = isNegative
           ? 'var(--mantine-color-red-6)'
           : isLow
@@ -111,7 +106,7 @@ export function ProductCardList({ products, isLoading, onHandByCode }: ProductCa
               ...(accent && {
                 borderLeftWidth: 3,
                 borderLeftColor: accent,
-                
+
                 paddingLeft: 'calc(var(--mantine-spacing-md) - 2px)',
               }),
             }}

@@ -12,20 +12,18 @@ import {
 } from './EntityLink';
 
 type SalesOrderLinkProps = {
-  
   id: string | undefined | null;
-  
+
   fallbackLabel?: string | null;
   size?: LinkSize;
-  
+
   color?: string;
 };
 
 type SalesOrderLinksProps = {
-  
   ids: string[];
   size?: LinkSize;
-  
+
   colors?: (string | undefined)[];
 };
 

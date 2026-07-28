@@ -5,12 +5,11 @@ import { useGoodsReceiptStore } from '@/stores/useGoodsReceiptStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type GoodsReceiptLinkProps = {
-  
   id: string | undefined | null;
-  
+
   fallbackLabel?: string | null;
   size?: LinkSize;
-  
+
   color?: string;
 };
 

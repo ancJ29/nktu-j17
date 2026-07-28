@@ -1,5 +1,3 @@
-
-
 import { VendorList } from './VendorList';
 import { DEFAULT_VENDOR_LIST_VARIANT } from './vendorListVariant';
 

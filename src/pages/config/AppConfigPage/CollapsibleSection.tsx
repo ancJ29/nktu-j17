@@ -36,7 +36,7 @@ export const CollapsibleSection = memo(function CollapsibleSection({
   opened: boolean;
   onToggle: (key: SectionKey) => void;
   onReset?: () => void;
-  
+
   isDefault?: boolean;
   children: React.ReactNode;
 }) {

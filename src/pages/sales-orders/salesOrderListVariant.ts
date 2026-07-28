@@ -1,5 +1,3 @@
-
-
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 import {
   DEFAULT_SALES_ORDER_STATUS_BADGE_VARIANT,
@@ -7,23 +5,22 @@ import {
 } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 
 export type SalesOrderListVariant = {
-  
   showStatsCards: boolean;
-  
+
   showExtraDatePresets: boolean;
-  
+
   bulkDrMode: 'simple' | 'selection';
-  
+
   defaultDateRangeDays: number | undefined;
-  
+
   accountingExport: { allowedDepartments: readonly string[] } | undefined;
-  
+
   showItemsPreview: boolean;
-  
+
   dateColumns: 'splitSortable' | 'combinedReady';
-  
+
   showPaymentColumns: boolean;
-  
+
   statusBadge: SalesOrderStatusBadgeVariant;
 };
 
@@ -44,9 +41,9 @@ export const NKTU_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
   showExtraDatePresets: false,
   bulkDrMode: 'selection',
   defaultDateRangeDays: 90,
-  
+
   accountingExport: { allowedDepartments: ['manager', 'accounting'] },
-  
+
   showItemsPreview: true,
   dateColumns: 'combinedReady',
   showPaymentColumns: false,

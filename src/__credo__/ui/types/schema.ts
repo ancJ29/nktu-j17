@@ -1,5 +1,3 @@
-
-
 import { z } from 'zod';
 import { IconName } from '../components/types/icon';
 import { brandPalettes } from '../utils/palettes';
@@ -8,21 +6,20 @@ import type { EnvConfig } from './env';
 const BRAND_PALETTE_NAMES = Object.keys(brandPalettes) as [string, ...string[]];
 
 export const AppInfoSchema = z.object({
-  
   name: z.string().max(100),
-  
+
   description: z.string().optional(),
-  
+
   logoUrl: z.string().optional(),
-  
+
   logoDarkBgUrl: z.string().optional(),
-  
+
   faviconUrl: z.string().optional(),
-  
+
   pwaIcon192Url: z.string().optional(),
-  
+
   pwaIcon512Url: z.string().optional(),
-  
+
   pwaIconMaskableUrl: z.string().optional(),
 });
 
@@ -71,32 +68,30 @@ export type CredoThemeConfig = {
 };
 
 export const LanguageSchema = z.object({
-  
   code: z.string().min(2).max(5),
-  
+
   label: z.string().min(1),
-  
+
   flag: z.string().min(1),
 });
 
 export type Language = z.infer<typeof LanguageSchema>;
 
 export const NavigationItemSchema = z.object({
-  
   id: z.string().min(1),
-  
+
   path: z.string().optional(),
-  
+
   labelKey: z.string().min(1).optional(),
-  
+
   label: z.string().min(1),
-  
+
   icon: z.enum(IconName),
-  
+
   hidden: z.boolean().optional(),
-  
+
   navbar: z.boolean().optional(),
-  
+
   get subs() {
     return z.array(NavigationItemSchema).optional();
   },
@@ -105,7 +100,7 @@ export const NavigationItemSchema = z.object({
 export type CredoNavigationItem = {
   id: string;
   path?: string;
-  
+
   labelKey?: string;
   label: string;
   icon: IconName;
@@ -115,9 +110,8 @@ export type CredoNavigationItem = {
 };
 
 export const NavigationConfigSchema = z.object({
-  
   pc: z.array(NavigationItemSchema),
-  
+
   mobile: z.array(NavigationItemSchema),
 });
 
@@ -127,7 +121,6 @@ export type NavigationConfig = {
 };
 
 export const UserSettingsSchema = z.object({
-  
   syncDebounceDelay: z.number().min(0),
 });
 
@@ -147,12 +140,10 @@ export const CredoAppConfigSchema = z.object({
 export type CredoAppConfig = Omit<z.infer<typeof CredoAppConfigSchema>, 'themeConfig'> & {
   version?: string;
 
-  
   themeConfig: CredoThemeConfig;
 
-  
   env?: EnvConfig;
-  
+
   build?: {
     version: string;
     buildHash: string;

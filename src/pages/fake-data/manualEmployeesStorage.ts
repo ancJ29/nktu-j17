@@ -1,5 +1,3 @@
-
-
 const PREFIX = '__fake_data_employees_json__.';
 
 export function getManualEmployeesJson(clientCode: string): string {

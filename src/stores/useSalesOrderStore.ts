@@ -48,8 +48,8 @@ const fetchSalesOrders = createPartitionedSyncFetcher<SalesOrder>({
 
 export const useSalesOrderStore = createEntityStore<SalesOrder, SalesOrderPatch>({
   cacheKey: 'so',
-  cacheTTL: ONE_MINUTE, 
-  staleTime: ONE_MINUTE, 
+  cacheTTL: ONE_MINUTE,
+  staleTime: ONE_MINUTE,
   fetchAll: fetchSalesOrders,
   fetchOne: (id) =>
     cMngtConnector

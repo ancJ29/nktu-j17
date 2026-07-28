@@ -1,5 +1,3 @@
-
-
 import { useProductStore } from '@/stores/useProductStore';
 import { logActivity } from './activityLogger';
 import type { AppliedOp } from './inventoryReservation';

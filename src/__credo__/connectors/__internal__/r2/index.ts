@@ -1,5 +1,4 @@
 export const r2Connector = {
-  
   uploadImage: async ({
     fileContent,
     contentType,
@@ -12,7 +11,7 @@ export const r2Connector = {
     const uploadResponse = await fetch(uploadUrl, {
       method: 'PUT',
       headers: { 'Content-Type': contentType },
-      
+
       body: fileContent as BodyInit,
     });
 

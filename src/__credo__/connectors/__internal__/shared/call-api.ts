@@ -69,12 +69,9 @@ async function runWithRetry<T>(url: string, init: RequestInit): Promise<T> {
 }
 
 type OnceResult<T> =
-  | { kind: 'ok'; value: T }
-  | { kind: 'retry' }
-  | { kind: 'throw'; error: unknown };
+  { kind: 'ok'; value: T } | { kind: 'retry' } | { kind: 'throw'; error: unknown };
 
 async function runOnce<T>(url: string, init: RequestInit): Promise<OnceResult<T>> {
-  
   if (init.method !== 'GET' && !init.body) {
     init.body = '{}';
   }
@@ -117,8 +114,6 @@ async function runOnce<T>(url: string, init: RequestInit): Promise<OnceResult<T>
   recordServerEncoding(response, origin);
   recordVrxToken(response, origin);
 
-  
-  
   if (
     response.status === 406 &&
     response.headers.get(ENCODING_HEADER) === 'msgpack' &&
@@ -156,9 +151,6 @@ function selectMode(origin: string, headers: Record<string, string>): Mode {
   const serverMode = getEncodingMode(origin) ?? DEFAULT_MODE;
   if (serverMode === 'json') return 'plain';
 
-  
-  
-  
   const optIn = getTransportMode(origin);
   if (optIn) return optIn;
 
@@ -232,16 +224,10 @@ function buildBodyEncodedRequest(
   init: RequestInit,
   headers: Record<string, string>,
 ): Built {
-  
-  
-  
-  
   if (init.method === 'GET' || init.method === 'HEAD') {
     return buildPlainRequest(url, init, headers);
   }
 
-  
-  
   const bodyJson = init.body ? JSON.parse(init.body as string) : undefined;
   const envelope =
     bodyJson && typeof bodyJson === 'object' && !Array.isArray(bodyJson)

@@ -60,7 +60,7 @@ function datePart(value: CropDiaryEntry['entryDate']): string {
 type Props = {
   readonly cropId: string;
   readonly cropCode: string;
-  
+
   readonly onSummaryChange?: (summary: CropMaterialTotal[]) => void;
 };
 
@@ -83,17 +83,14 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
   const [entries, setEntries] = useState<CropDiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  
   const [applying, setApplying] = useState(false);
   const [templateCode, setTemplateCode] = useState<string | null>(null);
   const [applyDate, setApplyDate] = useState(todayString());
 
-  
   const [formOpened, formHandlers] = useDisclosure(false);
   const [editing, setEditing] = useState<CropDiaryEntry | null>(null);
   const [saving, setSaving] = useState(false);
 
-  
   const [deleteTarget, setDeleteTarget] = useState<CropDiaryEntry | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -101,7 +98,6 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
   const templatesInit = useCropDiaryTemplateStore((s) => s.initialized);
   const loadTemplates = useCropDiaryTemplateStore((s) => s.loadAll);
 
-  
   const materials = useMaterialStore((s) => s.items);
   const materialsInit = useMaterialStore((s) => s.initialized);
   const loadMaterials = useMaterialStore((s) => s.loadAll);
@@ -132,7 +128,7 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
 
   useEffect(() => {
     if (!canView) return;
-    
+
     load();
     if (canViewTemplates && !templatesInit) loadTemplates();
     if (!materialsInit) loadMaterials();
@@ -143,9 +139,6 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
     [templates],
   );
 
-  
-  
-  
   const materialSummary = useMemo(() => aggregateCropMaterials(entries), [entries]);
   useEffect(() => {
     if (!loading) onSummaryChange?.(materialSummary);
@@ -166,13 +159,13 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
         entryDate: datePart(entry.entryDate),
         activity: entry.activity,
         notes: entry.extra?.notes ?? '',
-        
+
         materials: (entry.extra?.materials ?? []).map((m) => ({ ...m })),
       });
       form.resetDirty();
       formHandlers.open();
     },
-    
+
     [formHandlers],
   );
 
@@ -182,8 +175,6 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
       try {
         const materials = cleanMaterialLines(values.materials);
         if (editing) {
-          
-          
           const extra: CropDiaryExtra = { ...(editing.extra ?? {}) };
           if (values.notes.trim()) extra.notes = values.notes.trim();
           else delete extra.notes;
@@ -236,9 +227,6 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
     [editing, cropId, cropCode, t, load, formHandlers],
   );
 
-  
-  
-  
   const handleApply = useCallback(async () => {
     if (!templateCode) return;
     const tpl = templates.find((x) => x.code === templateCode);

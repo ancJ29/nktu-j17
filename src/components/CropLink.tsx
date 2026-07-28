@@ -18,7 +18,6 @@ function leaf(size: LinkSize) {
 }
 
 type CropLinkProps = {
-  
   code?: string | undefined | null;
   size?: LinkSize;
   noIcon?: boolean;
@@ -40,15 +39,13 @@ export function CropLink({ code, size = 'sm', noIcon = false }: CropLinkProps) {
 }
 
 type CropLinksProps = {
-  
   codes?: string[];
   size?: LinkSize;
 };
 
 export function CropLinks({ codes, size = 'sm' }: CropLinksProps) {
   const getByCode = useCropStore((s) => s.getByCode);
-  
-  
+
   useCropStore((s) => s.items);
 
   const resolved = useMemo(

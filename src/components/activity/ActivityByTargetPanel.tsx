@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Loader, Stack, Text } from '@mantine/core';
@@ -40,7 +38,7 @@ export function ActivityByTargetPanel({ targetId, i18nNamespace }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    
+
     setLoading(true);
     setError(false);
     setActivities([]);
@@ -79,8 +77,6 @@ export function ActivityByTargetPanel({ targetId, i18nNamespace }: Props) {
         setNextCursor(res.nextCursor);
       })
       .catch(() => {
-        
-        
         setError(true);
       })
       .finally(() => setLoadingMore(false));

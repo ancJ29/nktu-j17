@@ -48,8 +48,8 @@ const fetchGoodsReceipts = createPartitionedSyncFetcher<GoodsReceipt>({
 
 export const useGoodsReceiptStore = createEntityStore<GoodsReceipt, GoodsReceiptPatch>({
   cacheKey: 'gr',
-  cacheTTL: ONE_MINUTE, 
-  staleTime: ONE_MINUTE, 
+  cacheTTL: ONE_MINUTE,
+  staleTime: ONE_MINUTE,
   fetchAll: fetchGoodsReceipts,
   fetchOne: (id) =>
     cMngtConnector

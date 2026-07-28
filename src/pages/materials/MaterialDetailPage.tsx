@@ -89,12 +89,10 @@ export function MaterialDetailPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const forceRefresh = useMaterialStore((s) => s.forceRefresh);
-  
-  
+
   const unitLabels = useLookupV2Labels(getMaterialUnitCategory());
   const categoryLabels = useLookupV2Labels(MATERIAL_CATEGORY_LOOKUP);
 
-  
   const invRows = useMaterialInventoryStore((s) => s.items);
   const invInitialized = useMaterialInventoryStore((s) => s.initialized);
   const loadInventory = useMaterialInventoryStore((s) => s.loadAll);
@@ -120,14 +118,12 @@ export function MaterialDetailPage() {
     if (!id) return;
     const cached = useMaterialStore.getState().getById(id);
     if (cached) {
-      
       setMaterial(cached);
       setLoading(false);
       return;
     }
     setLoading(true);
 
-    
     asyncDeduplicator.call(`material:${id}`, async () => {
       await cMngtConnector
         .getSingleRecordById(MATERIAL_RECORD_TARGET, { id })
@@ -261,8 +257,7 @@ export function MaterialDetailPage() {
   const tags = material.extra?.tags ?? [];
   const attributes = material.extra?.attributes ?? [];
   const unitConversions = material.extra?.unitConversions ?? [];
-  
-  
+
   const categoryInUse = categoryLabels.size > 0 || !!category;
   const emptyDash = <Text c="dimmed">—</Text>;
 
@@ -634,8 +629,6 @@ export function MaterialDetailPage() {
       </DangerZoneCard>
     ) : null;
 
-  
-  
   const body = (
     <Grid gutter="md">
       <Grid.Col span={{ base: 12, md: 7 }}>
@@ -650,7 +643,6 @@ export function MaterialDetailPage() {
     </Grid>
   );
 
-  
   const mobileContent = (
     <Stack gap="md">
       <Accordion defaultValue="info" variant="separated">

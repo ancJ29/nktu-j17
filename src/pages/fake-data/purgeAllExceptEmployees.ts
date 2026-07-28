@@ -1,5 +1,3 @@
-
-
 import { cStorageConnector } from '@credo/connectors/connector';
 import { configureSeedConnectors } from './_sharedSeed';
 import type { FakeDataSecrets } from './fakeDataSecrets';

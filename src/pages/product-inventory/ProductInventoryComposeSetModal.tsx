@@ -67,24 +67,16 @@ export function ProductInventoryComposeSetModal({
   const unitLabels = useLookupLabels('unit');
 
   const [setCode, setSetCode] = useState<string | null>(null);
-  
-  
+
   const [locationCode, setLocationCode] = useState<string | null>(
     locationsEnabled ? null : DEFAULT_LOCATION_CODE,
   );
   const [quantity, setQuantity] = useState<number | ''>(1);
   const [submitting, setSubmitting] = useState(false);
 
-  
-  
-  
   const [customer, setCustomer] = useState<CustomerSelectorChange | null>(null);
   const [salesOrderId, setSalesOrderId] = useState<string | null>(null);
 
-  
-  
-  
-  
   const custAutoResolvedForRef = useRef<string | null>(null);
   const soAutoResolvedForRef = useRef<string | null>(null);
 
@@ -96,14 +88,8 @@ export function ProductInventoryComposeSetModal({
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
 
-  
-  
-  
   const soFetchRange = useMemo(() => defaultLastNDaysRange(90), []);
 
-  
-  
-  
   useEffect(() => {
     if (!opened) return;
     if (!customersInitialized) loadCustomers();
@@ -147,10 +133,6 @@ export function ProductInventoryComposeSetModal({
     [setCode, setProducts],
   );
 
-  
-  
-  
-  
   const eligibleSalesOrders = useMemo(() => {
     if (!setProduct) return [];
     return salesOrders.filter(
@@ -163,8 +145,6 @@ export function ProductInventoryComposeSetModal({
     );
   }, [salesOrders, setProduct]);
 
-  
-  
   const eligibleCustomerCodes = useMemo(() => {
     const codes = new Set<string>();
     for (const so of eligibleSalesOrders) {
@@ -183,7 +163,6 @@ export function ProductInventoryComposeSetModal({
     [customers, customerFilter],
   );
 
-  
   const salesOrderOptions = useMemo(() => {
     if (!customer) return [];
     return eligibleSalesOrders
@@ -198,48 +177,38 @@ export function ProductInventoryComposeSetModal({
 
   const handleCustomerChange = useCallback((sel: CustomerSelectorChange | null) => {
     setCustomer(sel);
-    
+
     setSalesOrderId(null);
   }, []);
 
-  
   const handleSetChange = useCallback((code: string | null) => {
     setSetCode(code);
     setCustomer(null);
     setSalesOrderId(null);
   }, []);
 
-  
-  
-  
-  
   useEffect(() => {
     if (!customersInitialized || !salesOrdersInitialized || !setProduct) return;
     if (custAutoResolvedForRef.current === setProduct.code) return;
-    if (eligibleCustomers.length === 0) return; 
+    if (eligibleCustomers.length === 0) return;
     custAutoResolvedForRef.current = setProduct.code;
     if (eligibleCustomers.length === 1) {
       const c = eligibleCustomers[0];
-      
+
       setCustomer({ id: c.id, name: c.extra?.shortName?.trim() || c.name, customer: c });
     }
   }, [customersInitialized, salesOrdersInitialized, setProduct, eligibleCustomers]);
 
-  
   useEffect(() => {
     if (!customer) return;
     if (soAutoResolvedForRef.current === customer.id) return;
     if (salesOrderOptions.length === 0) return;
     soAutoResolvedForRef.current = customer.id;
     if (salesOrderOptions.length === 1) {
-      
       setSalesOrderId(salesOrderOptions[0].value);
     }
   }, [customer, salesOrderOptions]);
 
-  
-  
-  
   const soNeeded = useMemo(() => {
     if (!selectedSalesOrder || !setProduct) return null;
     const lines = selectedSalesOrder.items.filter((it) => it.productCode === setProduct.code);
@@ -253,9 +222,6 @@ export function ProductInventoryComposeSetModal({
     return m;
   }, [products]);
 
-  
-  
-  
   function findRow(productCode: string, target: string): ProductInventoryRow | null {
     return (
       rows.find(
@@ -319,13 +285,7 @@ export function ProductInventoryComposeSetModal({
     return findRow(setProduct.code, target);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [setProduct, target, rows]);
-  
-  
-  
-  
-  
-  
-  
+
   const parentBaseUnit = setProduct ? getItemBaseUnit(setProduct) : '';
 
   const blockingReasons = useMemo(() => {
@@ -334,9 +294,6 @@ export function ProductInventoryComposeSetModal({
     if (!locationCode) reasons.push(t('productInventory.composeSet.validation.pickLocation'));
     if (qtyNum <= 0) reasons.push(t('productInventory.composeSet.validation.positiveQty'));
     if (setProduct && qtyNum > 0) {
-      
-      
-      
       for (const c of componentPlans) {
         if (!c.product.id) {
           reasons.push(
@@ -369,8 +326,7 @@ export function ProductInventoryComposeSetModal({
     setQuantity(1);
     setCustomer(null);
     setSalesOrderId(null);
-    
-    
+
     custAutoResolvedForRef.current = null;
     soAutoResolvedForRef.current = null;
     onClose();
@@ -379,12 +335,7 @@ export function ProductInventoryComposeSetModal({
   const handleCompose = useCallback(async () => {
     if (!setProduct || qtyNum <= 0) return;
     setSubmitting(true);
-    
-    
-    
-    
-    
-    
+
     await useProductInventoryStore.getState().revalidate();
     const store = useProductInventoryStore.getState();
     const actorId = getCurrentActorId();
@@ -392,9 +343,7 @@ export function ProductInventoryComposeSetModal({
       qty: qtyNum.toLocaleString(),
       code: setProduct.code,
     });
-    
-    
-    
+
     const attributionMemo = {
       setCode: setProduct.code,
       setName: setProduct.name,
@@ -406,9 +355,8 @@ export function ProductInventoryComposeSetModal({
     };
     let written = 0;
     try {
-      
       for (const c of componentPlans) {
-        if (!c.row || !c.product.id) continue; 
+        if (!c.row || !c.product.id) continue;
         const baseUnit = getItemBaseUnit(c.product);
         const breakdown = readRowBreakdown(c.row, baseUnit);
         const result = applyDelta(c.product, breakdown, { [c.requiredUnit]: -c.requiredQty });
@@ -430,8 +378,7 @@ export function ProductInventoryComposeSetModal({
           version: c.row.version,
           patch: { onHand: result.onHand, extra: updatedExtra },
         });
-        
-        
+
         logActivity('productInventory.adjust', c.product.id, {
           locationCode: c.row.locationCode,
           prevOnHand: c.row.onHand,
@@ -443,10 +390,6 @@ export function ProductInventoryComposeSetModal({
         written += 1;
       }
 
-      
-      
-      
-      
       if (parentRow) {
         const baseUnit = getItemBaseUnit(setProduct);
         const breakdown = readRowBreakdown(parentRow, baseUnit);
@@ -469,7 +412,7 @@ export function ProductInventoryComposeSetModal({
           version: parentRow.version,
           patch: { onHand: result.onHand, extra: updatedExtra },
         });
-        
+
         logActivity('productInventory.adjust', setProduct.id, {
           locationCode: parentRow.locationCode,
           prevOnHand: parentRow.onHand,
@@ -495,8 +438,7 @@ export function ProductInventoryComposeSetModal({
             extra,
           },
         });
-        
-        
+
         logActivity('productInventory.create', setProduct.id, {
           locationCode: target,
           onHand: qtyNum,
@@ -514,9 +456,7 @@ export function ProductInventoryComposeSetModal({
         }),
       });
       handleClose();
-      
-      
-      
+
       void rebalanceForSetStockChange([setProduct.code], 'compose');
     } catch (err) {
       if (err instanceof EntityConflictError) {

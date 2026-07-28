@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Loader, Stack, Text } from '@mantine/core';
@@ -30,7 +28,7 @@ export function EmployeeActivityPanel({ employeeId }: Props) {
 
   useEffect(() => {
     let cancelled = false;
-    
+
     setLoading(true);
     setError(false);
     setActivities([]);
@@ -69,15 +67,11 @@ export function EmployeeActivityPanel({ employeeId }: Props) {
         setNextCursor(res.nextCursor);
       })
       .catch(() => {
-        
-        
         setError(true);
       })
       .finally(() => setLoadingMore(false));
   }, [employeeId, nextCursor, loadingMore]);
 
-  
-  
   const resolveTargetLabel = (targetId: string | null) => {
     if (!targetId) return null;
     const match = employees.find((e) => e.id === targetId);

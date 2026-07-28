@@ -7,9 +7,8 @@ export const VENDOR_RECORD_TARGET = { entity: 'vendors', uniqueField: 'code' } a
 
 export const useVendorStore = createSingleRecordsStore<Vendor>({
   ...VENDOR_RECORD_TARGET,
-  
-  
-  cacheKey: 'vnd2.a41c7e', 
+
+  cacheKey: 'vnd2.a41c7e',
   cacheTTL: 10 * ONE_MINUTE,
 });
 

@@ -1,5 +1,3 @@
-
-
 export type RecordEntity<T = unknown> = {
   id: string;
   serviceCode: string;

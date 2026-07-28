@@ -1,5 +1,3 @@
-
-
 import { LIST_PAGINATION_DEFAULT } from '@/config/listDefaults';
 import { useDebouncedValue } from '@mantine/hooks';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -7,20 +5,19 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 type UseListFilterConfig<T, F extends Record<string, unknown>> = {
   shouldPagination?: boolean;
 
-  
   pageSize?: number;
-  
+
   searchFields?: (item: T) => (string | undefined | null)[];
-  
+
   filters?: F;
-  
+
   filterFn?: (item: T, filters: F) => boolean;
-  
+
   searchDelay?: number;
-  
+
   search?: string;
   onSearchChange?: (value: string) => void;
-  
+
   page?: number;
   onPageChange?: (page: number) => void;
 };
@@ -49,45 +46,16 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
   const [internalPage, setInternalPage] = useState(1);
   const [pageSize, setPageSize] = useState(shouldPagination ? initialPageSize : 100000);
 
-  
-  
-  
-  
   const search = controlledSearch ?? internalSearch;
   const setSearch = onSearchChange ?? setInternalSearch;
   const [debouncedSearch] = useDebouncedValue(search, searchDelay);
   const page = controlledPage ?? internalPage;
   const setPage = onPageChange ?? setInternalPage;
 
-  
   const filterValues = JSON.stringify(filters);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const isFirstRun = useRef(true);
-  
-  
-  
-  
-  
+
   const setPageRef = useRef(setPage);
   useEffect(() => {
     setPageRef.current = setPage;
@@ -103,12 +71,10 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
   const filtered = useMemo(() => {
     let result = items;
 
-    
     if (filterFn) {
       result = result.filter((item) => filterFn(item, filters));
     }
 
-    
     if (debouncedSearch && searchFields) {
       const q = debouncedSearch.toLowerCase();
       result = result.filter((item) =>
@@ -121,16 +87,6 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
 
   const totalPages = shouldPagination ? Math.max(1, Math.ceil(filtered.length / pageSize)) : 1;
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (filtered.length > 0 && page > totalPages) {
       setPageRef.current(totalPages);

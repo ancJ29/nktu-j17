@@ -74,9 +74,7 @@ export function ProductListPage() {
   } = useCachedListFilters('cmngt:product-list-filters', FILTER_DEFAULTS);
   const filter = filterState.status;
   const categoryFilter = filterState.category;
-  
-  
-  
+
   const stockFilter = filterState.stock;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
   const setCategoryFilter = useCallback(
@@ -92,9 +90,6 @@ export function ProductListPage() {
 
   const filters = { status: filter, category: categoryFilter, stock: stockFilter };
 
-  
-  
-  
   const onHandByCode = useMemo(() => {
     const m = new Map<string, number>();
     if (!inventoryEnabled) return m;
@@ -113,14 +108,8 @@ export function ProductListPage() {
         if (f.status === 'active' && !item.isActive) return false;
         if (f.status === 'inactive' && item.isActive) return false;
         if (f.category && item.extra?.category !== f.category) return false;
-        
-        
-        
-        
+
         if (inventoryEnabled && f.stock) {
-          
-          
-          
           if (f.stock === 'notManaged') return isNoInventoryProduct(item);
           if (isNoInventoryProduct(item)) return false;
           const onHand = onHandByCode.get(item.code) ?? 0;
@@ -147,17 +136,12 @@ export function ProductListPage() {
       onPageChange,
     });
 
-  
-  
-  
   const categoryLookups = useLookupOptions('product-category');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],
   );
 
-  
-  
   const tagLookups = useLookupOptions('product-tag');
   const unitLookups = useLookupOptions('unit');
 
@@ -183,9 +167,6 @@ export function ProductListPage() {
     forceRefresh();
   }, [forceRefresh]);
 
-  
-  
-  
   const stockOptions = useMemo(
     () => [
       { value: 'inStock', label: t('products.filterStockInStock') },
@@ -271,10 +252,6 @@ export function ProductListPage() {
     ],
   );
 
-  
-  
-  
-  
   const [isExporting, setIsExporting] = useState(false);
   const handleExport = useCallback(() => {
     setIsExporting(true);

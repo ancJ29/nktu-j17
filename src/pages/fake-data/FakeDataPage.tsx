@@ -1,5 +1,3 @@
-
-
 import { resolveClientCode } from '@/config/client-code';
 import {
   Alert,
@@ -304,25 +302,20 @@ function EmployeeSection({ clientCode, disabled }: BaseSectionProps) {
   const { t } = useTranslation();
   const invalidateEmployees = useEmployeeStore((s) => s.invalidate);
 
-  
-  
-  
   const [count] = useState<number>(0);
   const [skipSso, setSkipSso] = useState(false);
   const [source, setSource] = useState<'random' | 'json'>('random');
   const [jsonText, setJsonText] = useState<string>('');
   useEffect(() => {
     const stored = getManualEmployeesJson(clientCode);
-    
+
     setJsonText(stored || DEFAULT_EMPLOYEES_JSON);
   }, [clientCode]);
 
   const parsed = useMemo(() => parseJsonArray<ManualEmployeeInput>(jsonText), [jsonText]);
   const isJson = source === 'json';
   const parsedCount = parsed.items?.length ?? 0;
-  
-  
-  
+
   const effectiveCount = isJson ? parsedCount : count;
   const jsonError =
     parsed.error === 'not-array'
@@ -520,7 +513,6 @@ function ProductSection({ clientCode, industry, disabled, max }: ProductMaterial
 
   const [count, setCount] = useState<number>(max);
   useEffect(() => {
-    
     setCount(max);
   }, [max]);
 
@@ -1476,7 +1468,7 @@ function LookupsSection({ clientCode, industry, disabled }: IndustrySectionProps
   const [jsonText, setJsonText] = useState<string>('');
   useEffect(() => {
     const stored = getManualLookupsJson(clientCode);
-    
+
     setJsonText(stored || DEFAULT_LOOKUPS_JSON);
   }, [clientCode]);
 
@@ -1644,8 +1636,6 @@ type SourceRadioProps = {
 };
 
 function SourceRadio({ value, onChange, labelKey, randomKey, jsonKey }: SourceRadioProps) {
-  
-  
   const { t } = useTranslation();
   return (
     <Radio.Group

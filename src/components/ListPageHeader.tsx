@@ -9,13 +9,13 @@ const isMobile = device.isMobile;
 
 type CreateCta = {
   label: string;
-  
+
   to?: string;
-  
+
   onClick?: () => void;
-  
+
   mobileVariant?: 'icon' | 'hidden';
-  
+
   enabled?: boolean;
 };
 
@@ -84,7 +84,6 @@ export function ListPageHeader({
 
 function renderCta(cta: CreateCta) {
   if (isMobile) {
-    
     if (cta.to) {
       return (
         <ActionIcon component={Link} to={cta.to} variant="filled" size="md">
@@ -98,7 +97,7 @@ function renderCta(cta: CreateCta) {
       </ActionIcon>
     );
   }
-  
+
   if (cta.to) {
     return (
       <Button component={Link} to={cta.to} leftSection={<IconPlus size={16} />} size="sm">

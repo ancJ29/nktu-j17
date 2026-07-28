@@ -1,5 +1,3 @@
-
-
 import type { ReactNode } from 'react';
 import { Group, Stack, Text } from '@mantine/core';
 import { IconTruck } from '@tabler/icons-react';
@@ -20,7 +18,7 @@ export type TruckColumnsContext = {
 
 export type TruckConfig = {
   routes: { LIST: string; NEW: string; DETAIL: string; EDIT: string };
-  
+
   i18nKey: string;
   Icon: typeof IconTruck;
   columns: (ctx: TruckColumnsContext) => DataTableColumn<TruckAssetRow>[];
@@ -54,7 +52,7 @@ export function nearestExpiry(
   ];
   const dated = candidates.filter((c): c is { date: string; kindKey: string } => !!c.date);
   if (dated.length === 0) return null;
-  
+
   dated.sort((a, b) => a.date.localeCompare(b.date));
   const soonest = dated[0];
   const daysLeft = daysBetween(todayIso, soonest.date);

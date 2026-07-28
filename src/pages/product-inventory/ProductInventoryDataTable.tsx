@@ -25,11 +25,11 @@ type Props = {
   readonly locations: Location[];
   readonly isLoading?: boolean;
   readonly onRowClick: (product: Product) => void;
-  
+
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
-  
+
   readonly maxHeight?: number | string;
-  
+
   readonly viewportRef?: Ref<HTMLDivElement>;
 };
 
@@ -413,8 +413,6 @@ export function ProductInventoryDataTable({
           ),
           ta: 'right' as const,
           render: (s: ProductInventorySummary) => {
-            
-            
             if (!s.hasBeginOfPeriod) return <PlaceholderCell />;
             const baseUnit = getItemBaseUnit(s.product);
             return (
@@ -560,9 +558,7 @@ export function ProductInventoryDataTable({
                 )}
               </Stack>
             );
-            
-            
-            
+
             if (reservations.length === 0) return cell;
             return (
               <HoverCard width={320} shadow="md" withArrow position="top" openDelay={120}>

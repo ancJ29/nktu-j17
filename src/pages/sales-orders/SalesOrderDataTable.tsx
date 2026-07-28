@@ -49,30 +49,30 @@ type SalesOrderDataTableProps = {
   readonly tagOptions: ResolvedTagOption[];
   readonly sortField?: string;
   readonly onSortChange?: (field: string) => void;
-  
+
   readonly selectable?: boolean;
   readonly selectedIds?: ReadonlySet<string>;
   readonly onToggleRow?: (id: string) => void;
   readonly onToggleAll?: () => void;
-  
+
   readonly allSelected?: boolean;
   readonly someSelected?: boolean;
-  
+
   readonly disabledIds?: ReadonlySet<string>;
-  
+
   readonly onShowItems?: (order: SalesOrder) => void;
-  
+
   readonly financeMode?: boolean;
-  
+
   readonly showCheatMarker?: boolean;
-  
+
   readonly vacuousCompletionIds?: ReadonlySet<string>;
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly dateColumns: SalesOrderListVariant['dateColumns'];
-  
+
   readonly showPaymentColumns: boolean;
-  
+
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
 };
 
@@ -126,8 +126,7 @@ export function SalesOrderDataTable({
                     onChange={() => onToggleAll?.()}
                   />
                 ),
-                
-                
+
                 render: (item: SalesOrder) => {
                   const disabled = disabledIds?.has(item.id) ?? false;
                   return (
@@ -234,7 +233,7 @@ export function SalesOrderDataTable({
           ? [
               {
                 key: 'financeDate',
-                
+
                 header: t('__new__.01-common.labels.orderDate'),
                 width: '120px',
                 render: (item: SalesOrder) => (
@@ -242,7 +241,6 @@ export function SalesOrderDataTable({
                 ),
               },
               {
-                
                 key: 'financeSubtotal',
                 header: t('salesOrders.finance.subtotalLabel'),
                 ta: 'right' as const,
@@ -254,7 +252,6 @@ export function SalesOrderDataTable({
                 ),
               },
               {
-                
                 key: 'financeVat',
                 header: t('salesOrders.finance.vatLabel'),
                 ta: 'right' as const,
@@ -266,7 +263,6 @@ export function SalesOrderDataTable({
                 ),
               },
               {
-                
                 key: 'financeGrandTotal',
                 header: t('salesOrders.finance.grandTotalLabel'),
                 ta: 'right' as const,
@@ -278,7 +274,6 @@ export function SalesOrderDataTable({
                 ),
               },
               {
-                
                 key: 'financeInvoice',
                 header: t('salesOrders.billing.invoiceLabel'),
                 width: '120px',
@@ -308,7 +303,7 @@ export function SalesOrderDataTable({
                 ? [
                     {
                       key: 'dates',
-                      
+
                       header: t('__new__.01-common.labels.orderDate'),
                       width: '200px',
                       render: (item: SalesOrder) => {
@@ -367,13 +362,10 @@ export function SalesOrderDataTable({
                       },
                     },
                   ]),
-              
-              
+
               ...(showPrice
                 ? [
                     {
-                      
-                      
                       key: 'totalIncl',
                       header: t('salesOrders.billing.totalInclLabel'),
                       ta: 'right' as const,
@@ -459,8 +451,7 @@ export function SalesOrderDataTable({
                   />
                 ),
               },
-              
-              
+
               ...(onShowItems
                 ? [
                     {
@@ -513,11 +504,8 @@ export function SalesOrderDataTable({
     ],
   );
 
-  
-  
   const handleRowClick = (item: SalesOrder) => {
     if (selectable) {
-      
       if (disabledIds?.has(item.id)) return;
       onToggleRow?.(item.id);
       return;
@@ -528,7 +516,6 @@ export function SalesOrderDataTable({
 
   const getRowBg = useCallback(
     (item: SalesOrder & Record<string, unknown>) =>
-      
       financeMode
         ? undefined
         : resolveSalesOrderRowBg(

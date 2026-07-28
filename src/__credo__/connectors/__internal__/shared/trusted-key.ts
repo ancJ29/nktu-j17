@@ -12,7 +12,7 @@ export function getCredoConnectorTrustedKey(): string {
   if (!isBrowserContext()) {
     return process.env['CREDO_TRUSTED_SERVICE_KEY'] ?? '';
   }
-  
+
   const stored = sessionStorage.getItem(STORAGE_KEY) ?? '';
   if (!stored) return '';
 

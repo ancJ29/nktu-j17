@@ -1,5 +1,3 @@
-
-
 import { Button, Group, Modal, Stack, Switch, TextInput, Textarea } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -36,9 +34,9 @@ type EditFormValues = Omit<
 type EditDeliveryRequestModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   request: DeliveryRequest;
-  
+
   onUpdated: (updated: DeliveryRequest) => void;
 };
 
@@ -72,18 +70,12 @@ type EditBodyProps = {
 function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   const [loading, setLoading] = useState(false);
 
-  
-  
   const direction = request.direction ?? 'outbound';
   const isInbound = direction === 'inbound';
-  
-  
-  
+
   const inboundKind = (request.extra as DeliveryRequestExtra | undefined)?.inboundKind ?? 'vendor';
   const partyIsCustomer = !isInbound || inboundKind !== 'vendor';
-  
-  
-  
+
   const isSample = isInbound && inboundKind === 'customer-sample';
 
   const employees = useEmployeeStore((s) => s.items);
@@ -95,9 +87,6 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   const customersInit = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
 
-  
-  
-  
   useEffect(() => {
     if (!employeesInit) loadEmployees();
     if (!partyIsCustomer && !vendorsInit) loadVendors();
@@ -113,20 +102,12 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
     loadCustomers,
   ]);
 
-  
-  
-  
-  
-  
-  
-  
   const currentVendorCode = request.vendorCode ?? '';
   const registeredVendorFilter = useCallback(
     (v: Vendor) => !v.extra?.isDeleted && (v.isActive || v.code === currentVendorCode),
     [currentVendorCode],
   );
-  
-  
+
   const [oneOffVendor, setOneOffVendor] = useState(
     () => !partyIsCustomer && !currentVendorCode && !!request.vendorName,
   );
@@ -149,8 +130,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
 
   const handleSubmit = async (values: EditFormValues) => {
     setLoading(true);
-    
-    
+
     const customerName = partyIsCustomer ? values.customerName.trim() : '';
     const vendorCode = partyIsCustomer ? '' : values.vendorCode.trim();
     const vendorName = partyIsCustomer ? '' : values.vendorName.trim();
@@ -168,7 +148,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
         googleMapUrl: values.googleMapUrl.trim(),
         scheduledDate: toDateTimeInputOrUndefined(values.scheduledDate),
         notes: values.notes.trim(),
-        
+
         items: request.items,
         assignedDriverId: values.assignedDriverId,
         assignedDriverName: driver?.name,
@@ -182,8 +162,6 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
       onClose();
     } catch (err) {
       if (err instanceof EntityConflictError) {
-        
-        
         if (err.latest) onUpdated(err.latest as DeliveryRequest);
         notifications.show({
           color: 'yellow',
@@ -203,10 +181,6 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
     }
   };
 
-  
-  
-  
-  
   const sampleCustomerId = isSample
     ? (customers.find(
         (c) =>
@@ -242,8 +216,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
               checked={oneOffVendor}
               onChange={(e) => {
                 setOneOffVendor(e.currentTarget.checked);
-                
-                
+
                 form.setFieldValue('vendorName', '');
                 form.setFieldValue('vendorCode', '');
               }}
@@ -269,8 +242,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
                   const prevCode = form.getValues().vendorCode;
                   form.setFieldValue('vendorName', sel?.name ?? '');
                   form.setFieldValue('vendorCode', sel?.code ?? '');
-                  
-                  
+
                   if (sel && sel.code !== prevCode) {
                     const { deliveryAddress, googleMapUrl } = resolveVendorInboundAddress(
                       sel.vendor,
@@ -297,9 +269,6 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
                 placeholder={t('common.labels.customer')}
                 value={sampleCustomerId}
                 onChange={(sel) => {
-                  
-                  
-                  
                   if (!sel) return;
                   form.setFieldValue('customerName', sel.name);
                   if (sel.id === sampleCustomerId) return;
@@ -314,8 +283,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
               <TextInput
                 label={t('deliveryRequests.form.customerNameLabel')}
                 placeholder={t('deliveryRequests.form.customerNamePlaceholder')}
-                
-                
+
                 readOnly={!!request.salesOrderId}
                 {...form.getInputProps('customerName')}
               />

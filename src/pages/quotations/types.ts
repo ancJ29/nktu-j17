@@ -5,31 +5,30 @@ export type QuotationStatus = 'draft' | 'sent' | 'cancelled' | 'converted';
 export type QuotationLine = {
   productCode: string;
   productName: string;
-  
+
   unit?: string;
   quantity: number;
   unitPrice: number;
 };
 
 export type QuotationExtra = {
-  
   code: string;
-  
+
   status: QuotationStatus;
-  
+
   customerCode?: string;
-  
+
   customerName?: string;
-  
+
   assignedStaff?: string;
   note?: string;
   lines: QuotationLine[];
   isDeleted?: boolean;
-  
+
   sentAt?: number;
-  
+
   convertedAt?: number;
-  
+
   generatedSalesOrderId?: string;
   generatedSalesOrderNumber?: string;
   [key: string]: unknown;

@@ -1,16 +1,14 @@
-
 import type { TransportOrder, TransportOrderTripLogRef, TripLogExtra } from '@/types';
 
 export const WHOLE_ORDER_TRIP_INDEX = -1;
 
 export type PlannedTripLog = {
-  
   tripIndex: number;
-  
+
   targetId: string;
-  
+
   targetCode: string;
-  
+
   logDate: string;
   extra: TripLogExtra;
 };
@@ -42,9 +40,6 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
   });
 
   if (order.isMultiTrip) {
-    
-    
-    
     return (order.trips ?? [])
       .map((leg, i) => ({ leg, i }))
       .filter(({ leg }) => Boolean(leg.truckId))
@@ -118,8 +113,7 @@ export function diffTripLogs(
       ops.push({ kind: 'update', plan, ref });
     }
   }
-  
-  
+
   for (const ref of byIndex.values()) ops.push({ kind: 'delete', ref });
   return ops;
 }

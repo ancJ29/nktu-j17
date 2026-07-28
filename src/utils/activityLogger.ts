@@ -1,5 +1,3 @@
-
-
 import { activityLoggerConnector } from '@credo/connectors/connector';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { resolveClientCode } from '@/config/client-code';
@@ -26,9 +24,7 @@ function flush() {
   if (pending.length === 0) return;
   const batch = pending;
   pending = [];
-  
-  
-  
+
   const clientId = resolveClientCode();
   const activities = batch.map((entry) => ({ ...entry, clientId }));
   activityLoggerConnector.logActivities({ activities }).catch((err) => {

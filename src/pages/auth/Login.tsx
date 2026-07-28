@@ -27,14 +27,6 @@ export function LoginPage() {
   const { t, i18n } = useTranslation();
   const login = useAuthStore((state) => state.login);
 
-  
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     const notice = takeSessionExpiredNotice();
     if (!notice) return;
@@ -61,7 +53,6 @@ export function LoginPage() {
     [i18n],
   );
 
-  
   const form = useForm<LoginFormValues>({
     initialValues: {
       identifier: isLocalhost ? `${clientCode}@internal.cr3do.dev` : '',
@@ -78,17 +69,13 @@ export function LoginPage() {
   const { isLoading, error, handleSubmit } = useAuthSubmit({
     onSubmit: (values: LoginFormValues) =>
       login({
-        
-        
         email: resolveLoginIdentifier(values.identifier),
         password: values.password,
         remember: values.remember,
       }),
     onSuccess: () => {
       markPendingLogin('password');
-      
-      
-      
+
       markPostLoginReloads();
       navigate('/');
     },

@@ -99,8 +99,7 @@ export function GreenhouseFormPage() {
   const handleSubmit = useCallback(
     async (values: GreenhouseFormValues) => {
       setLoading(true);
-      
-      
+
       const buildExtra = (base?: GreenhouseExtra): GreenhouseExtra => {
         const extra: GreenhouseExtra = { ...(base ?? {}) };
         if (values.notes.trim()) extra.notes = values.notes.trim();
@@ -132,8 +131,6 @@ export function GreenhouseFormPage() {
           });
           navigate(ROUTES.GREENHOUSES.DETAIL.replace(':id', id));
         } else {
-          
-          
           const created = await useGreenhouseStore.getState().createSafely({
             patch: { ...core, isActive: true, extra: buildExtra() },
           });

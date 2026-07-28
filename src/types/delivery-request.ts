@@ -21,7 +21,7 @@ export type DeliveryRequestPhoto = {
   latitude?: number;
   longitude?: number;
   isDeleted?: boolean;
-  
+
   takenAtDelivery?: boolean;
 };
 
@@ -46,38 +46,37 @@ export type DeliveryRequestInboundKind = 'vendor' | 'customer-return' | 'custome
 
 export type DeliveryRequestExtra = {
   status?: string;
-  
+
   inboundKind?: DeliveryRequestInboundKind;
-  
+
   returnRestock?: boolean;
-  
+
   returnRestockedAt?: string;
-  
+
   isDeleted?: boolean;
-  
+
   isUrgent?: boolean;
-  
+
   isAdditional?: boolean;
-  
+
   activityLog?: DeliveryRequestActivityEntry[];
-  
+
   assignedDriverId?: string;
   assignedDriverName?: string;
-  
+
   pickupTimestamp?: NullableDateTimeInput;
-  
+
   deliveryTimestamp?: NullableDateTimeInput;
-  
+
   photos?: DeliveryRequestPhoto[];
   attachments?: DeliveryRequestAttachment[];
-  
+
   deliveredItems?: DeliveryRequestDeliveredItem[];
 
-  
   deliveryAddress?: string;
-  
+
   googleMapUrl?: string;
-  
+
   displayOrderNumber?: string;
   [key: string]: unknown;
 };

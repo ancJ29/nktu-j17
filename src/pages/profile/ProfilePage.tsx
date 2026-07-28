@@ -75,11 +75,9 @@ export function ProfilePage() {
   const currentEmployee = employeeOverride ?? storedEmployee;
   const profileImageUrl = hasAvatar ? currentEmployee?.extra?.profileImage : undefined;
   const canEditAvatar = hasAvatar && !isMobile && !!currentEmployee;
-  
-  
+
   const displayName = currentEmployee?.name || user.name || '';
 
-  
   const handleLanguageChange = useCallback(
     async (code: string) => {
       sharedUserStorage.set(SharedStorageKey.LANGUAGE, code);

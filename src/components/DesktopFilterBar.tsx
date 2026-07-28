@@ -15,13 +15,13 @@ export type SelectFilter = {
   onChange: (value: string | null) => void;
   data: ComboboxData;
   placeholder: string;
-  
+
   visible?: boolean;
-  
+
   searchable?: boolean;
-  
+
   w?: number;
-  
+
   multi?: false;
 };
 
@@ -40,19 +40,19 @@ type DesktopFilterBarProps = {
   search: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
-  
+
   status?: FilterStatus;
   onStatusChange?: (value: FilterStatus) => void;
   statusLabels: { all: string; active: string; inactive: string };
-  
+
   hideStatus?: boolean;
-  
+
   filters?: (SelectFilter | MultiSelectFilter)[];
-  
+
   moreSection?: ReactNode;
   clearLabel?: string;
   onClear: () => void;
-  
+
   hasActiveFilters?: boolean;
 };
 
@@ -81,8 +81,6 @@ export function DesktopFilterBar({
         f.multi ? f.value.length > 0 : f.value !== null && f.value !== 'all',
       ) === true);
 
-  
-  
   const handleCopyLink = useCopyLink();
 
   const [counter, setCounter] = useState(0);
@@ -90,13 +88,6 @@ export function DesktopFilterBar({
   return (
     <Group gap="sm" wrap="nowrap">
       <SearchInput
-        
-        
-        
-        
-        
-        
-        
         key={counter}
         placeholder={searchPlaceholder}
         leftSection={<IconSearch size={16} />}

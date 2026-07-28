@@ -25,7 +25,7 @@ const ROW_HEIGHT = 56;
 
 type NavSection = {
   id: string;
-  
+
   title?: string;
   items: NavigationItem[];
 };
@@ -50,9 +50,6 @@ export default function MorePage() {
   const getColor = (color: string) => getThemeColor(theme, color);
   const accentColor = getColor(`${mainColor}.7`);
 
-  
-  
-  
   const sections = useMemo<NavSection[]>(() => {
     const visible = stripRootOnlyNavItems(appConfig.navigation.mobile, isRoot).filter(
       (item) => !item.hidden && !item.navbar,

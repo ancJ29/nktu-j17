@@ -127,7 +127,7 @@ export const theme = createTheme({
   },
   defaultRadius: 'md',
   cursorType: 'pointer',
-  
+
   fontFamily: '"Noto Sans", sans-serif',
   headings: {
     fontFamily: '"Noto Sans", sans-serif',

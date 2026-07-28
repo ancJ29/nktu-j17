@@ -1,4 +1,3 @@
-
 import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
@@ -46,12 +45,6 @@ async function releaseLinkedDrsOnSoRelease(
   let advanced = 0;
   let firstFailure: string | undefined;
   for (const dr of candidates) {
-    
-    
-    
-    
-    
-    
     const res = await runDrTransition({
       request: dr,
       toStatusValue: drTarget,

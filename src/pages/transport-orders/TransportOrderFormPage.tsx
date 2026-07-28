@@ -114,9 +114,9 @@ type TripRow = {
   departure: string;
   destination: string;
   date: string | null;
-  
+
   loadingAt: string | null;
-  
+
   unloadingAt: string | null;
   truckId: string;
   truckPlate: string;
@@ -126,7 +126,6 @@ type TripRow = {
 };
 
 type FormValues = {
-  
   isMultiTrip: boolean;
   trips: TripRow[];
   entryDate: string | null;
@@ -141,12 +140,12 @@ type FormValues = {
   pickup: string;
   stuffing: string;
   dropoff: string;
-  
+
   pickupAt: string | null;
   stuffingAt: string | null;
   dropoffAt: string | null;
   fees: FeeRow[];
-  
+
   advanceAmount: number;
   vatRatePercent: number;
   transportContractNo: string;
@@ -195,8 +194,7 @@ function blankTrip(): TripRow {
     departure: '',
     destination: '',
     date: todayInVnDateString(),
-    
-    
+
     loadingAt: null,
     unloadingAt: null,
     truckId: '',
@@ -267,7 +265,7 @@ function copiedValues(src: TransportOrder): FormValues {
     pickupAt: null,
     stuffingAt: null,
     dropoffAt: null,
-    
+
     fees: toFeeRows(src),
     advanceAmount: 0,
     vatRatePercent: Math.round((src.vatRate ?? 0) * 100),
@@ -293,7 +291,6 @@ export function TransportOrderFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
-  
   const copyFrom = isEdit ? null : extractCopyFrom(location.state);
 
   useEffect(() => {
@@ -335,8 +332,7 @@ export function TransportOrderFormPage() {
         .filter((a) => a.isActive && !a.extra?.isDeleted)
         .map((a) => ({
           value: a.id,
-          
-          
+
           label: `${truckNameWithPlate(a.name, a.extra?.plateNumber)}${a.code ? ` (${a.code})` : ''}`,
           plate: a.name,
         })),
@@ -345,22 +341,15 @@ export function TransportOrderFormPage() {
 
   const statusSelectData = useMemo(
     () => transportOrderStatuses().map((s) => ({ value: s.value, label: s.label })),
-    
+
     [i18n.language],
   );
 
-  
-  
   const containerSizeOptions = useContainerSizeOptions();
 
   const form = useForm<FormValues>({
-    
-    
     initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(),
     validate: {
-      
-      
-      
       truckId: (v, values) =>
         !values.isMultiTrip && !v ? t('transportOrders.validation.truckRequired') : null,
       driverId: (v, values) =>
@@ -390,15 +379,13 @@ export function TransportOrderFormPage() {
     form,
     id,
     async (fetchId) => {
-      
-      
       const { item: o } = await transportOrderBundle.fetchById(fetchId);
       snapshotRef.current = o;
       if (o.extra?.isDeleted) {
         navigate(ROUTES.TRANSPORT_ORDERS.LIST, { replace: true });
         return null;
       }
-      
+
       if (isTransportOrderLocked(o.status)) {
         notifications.show({ color: 'yellow', message: t('transportOrders.locked.notice') });
         navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', o.id), { replace: true });
@@ -433,8 +420,7 @@ export function TransportOrderFormPage() {
         pickupAt: isoToDateTimeString(o.route?.pickupAt),
         stuffingAt: isoToDateTimeString(o.route?.stuffingAt),
         dropoffAt: isoToDateTimeString(o.route?.dropoffAt),
-        
-        
+
         fees: toFeeRows(o),
         advanceAmount: o.advanceAmount ?? 0,
         vatRatePercent: Math.round((o.vatRate ?? 0) * 100),
@@ -455,9 +441,7 @@ export function TransportOrderFormPage() {
     async (values: FormValues) => {
       setLoading(true);
       const actor = getCurrentActorId();
-      
-      
-      
+
       const fees: TransportOrderFee[] = values.fees
         .filter((f) => f.label.trim() || f.amount || f.invoiceNo.trim() || f.memo.trim())
         .map((f) => {
@@ -465,8 +449,7 @@ export function TransportOrderFormPage() {
             label: f.label.trim(),
             amount: f.amount || 0,
             invoiceNo: f.invoiceNo.trim(),
-            
-            
+
             ...(f.memo.trim() ? { memo: f.memo.trim() } : {}),
           };
           return f.kind === 'passthrough'
@@ -476,12 +459,9 @@ export function TransportOrderFormPage() {
       const trips: TransportOrderTrip[] = values.trips.map((trip) => ({
         departure: trip.departure.trim(),
         destination: trip.destination.trim(),
-        
-        
-        
+
         date: vnDateStringToIso(tripDate(trip)),
-        
-        
+
         ...(trip.loadingAt ? { loadingAt: dateTimeStringToIso(trip.loadingAt) } : {}),
         ...(trip.unloadingAt ? { unloadingAt: dateTimeStringToIso(trip.unloadingAt) } : {}),
         truckId: trip.truckId,
@@ -494,21 +474,13 @@ export function TransportOrderFormPage() {
         pickup: values.pickup.trim(),
         stuffing: values.stuffing.trim(),
         dropoff: values.dropoff.trim(),
-        
-        
-        
-        
-        
+
         ...(values.pickupAt ? { pickupAt: dateTimeStringToIso(values.pickupAt) } : {}),
         ...(values.stuffingAt ? { stuffingAt: dateTimeStringToIso(values.stuffingAt) } : {}),
         ...(values.dropoffAt ? { dropoffAt: dateTimeStringToIso(values.dropoffAt) } : {}),
       };
       const vatRate = (values.vatRatePercent || 0) / 100;
 
-      
-      
-      
-      
       const write = (extra: TransportOrderExtra) =>
         buildTransportOrderWrite({
           isMultiTrip: values.isMultiTrip,
@@ -546,9 +518,7 @@ export function TransportOrderFormPage() {
               createdBy: snapshot.extra?.createdBy ?? actor,
             }),
           });
-          
-          
-          
+
           const fields = diffTransportOrder(snapshot, updated);
           if (!isEmptyDiff(fields)) {
             logActivity('transportOrder.update', id, {
@@ -562,8 +532,6 @@ export function TransportOrderFormPage() {
           });
           navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', id));
         } else {
-          
-          
           const today = businessDateString();
           const todays = await transportOrderBundle.queryPartition(today);
           const baseNumber = buildDailySequentialCode(
@@ -571,13 +539,6 @@ export function TransportOrderFormPage() {
             todays.map((o) => o.orderNumber),
           );
 
-          
-          
-          
-          
-          
-          
-          
           const createdExtra: TransportOrderExtra = { createdBy: actor };
           createdExtra.activityLog = appendTimelineEntry(createdExtra, {
             action: 'created',
@@ -638,13 +599,11 @@ export function TransportOrderFormPage() {
 
   const pageTitle = isEdit ? t('transportOrders.edit') : t('transportOrders.new');
 
-  
   const handleMultiTripToggle = (checked: boolean) => {
     form.setFieldValue('isMultiTrip', checked);
     if (checked && form.values.trips.length === 0) form.setFieldValue('trips', [blankTrip()]);
   };
 
-  
   const setTripTruck = (i: number, truckId: string | null) => {
     const picked = truckSelectData.find((tr) => tr.value === truckId);
     form.setFieldValue(`trips.${i}.truckId`, truckId ?? '');
@@ -672,9 +631,6 @@ export function TransportOrderFormPage() {
 
   const tripLaborTotal = computeTripLaborTotal(form.values.trips);
 
-  
-  
-  
   const currentSize = form.values.containerSize;
   const containerSizeData =
     currentSize && !containerSizeOptions.some((o) => o.value === currentSize)
@@ -686,18 +642,10 @@ export function TransportOrderFormPage() {
     { value: 'customer', label: t('transportOrders.fees.payerCustomer') },
   ];
 
-  
-  
-  
-  
-  
-  
   const feeRowsIndexed = form.values.fees.map((row, i) => ({ row, i }));
   const serviceFeeRows = feeRowsIndexed.filter(({ row }) => row.kind !== 'passthrough');
   const passthroughFeeRows = feeRowsIndexed.filter(({ row }) => row.kind === 'passthrough');
 
-  
-  
   const totals = computeTransportOrderTotals(
     form.values.fees,
     (form.values.vatRatePercent || 0) / 100,
@@ -736,18 +684,13 @@ export function TransportOrderFormPage() {
         </Alert>
       )}
 
-      <form
-        onSubmit={
-          
-          form.onSubmit(handleSubmit)
-        }
-      >
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap="lg">
           {/* Job header */}
           <SectionCard
             icon={<IconTruck size={14} />}
             title={t('transportOrders.form.jobSection')}
-            
+
             actions={
               <Switch
                 label={t('transportOrders.form.multiTrip')}
@@ -776,8 +719,7 @@ export function TransportOrderFormPage() {
                       const picked = truckSelectData.find((tr) => tr.value === v);
                       form.setFieldValue('truckId', v ?? '');
                       form.setFieldValue('truckPlate', picked?.plate ?? '');
-                      
-                      
+
                       const truck = v ? trucks.find((a) => a.id === v) : undefined;
                       if (truck?.extra?.driverId) {
                         form.setFieldValue('driverId', truck.extra.driverId);
@@ -796,8 +738,7 @@ export function TransportOrderFormPage() {
                     onChange={(sel) => {
                       form.setFieldValue('driverId', sel?.id ?? '');
                       form.setFieldValue('driverName', sel?.name ?? '');
-                      
-                      
+
                       const linkedId = sel?.employee.extra?.truckAssetId;
                       const linkedTruck = linkedId
                         ? truckSelectData.find((tr) => tr.value === linkedId)
@@ -854,9 +795,7 @@ export function TransportOrderFormPage() {
               <CustomerSelector
                 label={t('transportOrders.form.customer')}
                 withAsterisk
-                
-                
-                
+
                 value={
                   form.values.customerCode
                     ? (getCustomerByCode(form.values.customerCode)?.id ?? null)

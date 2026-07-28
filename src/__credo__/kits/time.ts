@@ -1,4 +1,3 @@
-
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 export const ONE_HOUR = 60 * ONE_MINUTE;
@@ -13,7 +12,7 @@ export function delay(ms: number) {
 export function localeTime(input?: {
   ts?: number | Date;
   locale?: Intl.LocalesArgument;
-  
+
   timezone?: string;
 }) {
   return new Date(input?.ts ?? Date.now()).toLocaleString(input?.locale ?? 'en-US', {
@@ -22,7 +21,6 @@ export function localeTime(input?: {
 }
 
 export function isWeekend(ts: number, timezone: number = 0) {
-  
   const date = dateAfterAdjustTimezone(ts, timezone);
 
   const day = date.getDay();
@@ -31,18 +29,15 @@ export function isWeekend(ts: number, timezone: number = 0) {
 
 export function endOfDay(ts: number, timezone: number = 0) {
   const date = dateAfterAdjustTimezone(ts, timezone);
-  
-  
+
   date.setUTCHours(23, 59, 59, 999);
 
-  
   return date.getTime() - timezone * ONE_HOUR;
 }
 
 export function getHours(ts: number, timezone: number = 0) {
   const date = dateAfterAdjustTimezone(ts, timezone);
-  
-  
+
   return date.getUTCHours();
 }
 
@@ -76,7 +71,6 @@ export function formatDuration(ts: number, pretty = false) {
 }
 
 export function getDayOfWeek(ts: number, timezone: string = 'UTC'): number {
-  
   const weekday = new Intl.DateTimeFormat('en-US', { weekday: 'short', timeZone: timezone }).format(
     ts,
   );

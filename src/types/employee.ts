@@ -9,7 +9,7 @@ export type EmployeeExtra = {
   allowLogin?: boolean;
   phoneNumber?: string;
   personalPhoneNumber?: string;
-  
+
   loginEmail?: string;
   loginPassword?: string;
   permissions?: CMngtPartialPermissions;
@@ -17,27 +17,22 @@ export type EmployeeExtra = {
   profileImage?: string;
   note?: string;
 
-  
-  
   startDate?: string;
-  
+
   address?: string;
-  
+
   dateOfBirth?: string;
 
-  
-  
   idCardNumber?: string;
-  idCardIssueDate?: string; 
+  idCardIssueDate?: string;
   idCardIssuePlace?: string;
-  
+
   licenseNumber?: string;
-  licenseClass?: string; 
-  licenseIssueDate?: string; 
-  licenseExpiry?: string; 
+  licenseClass?: string;
+  licenseIssueDate?: string;
+  licenseExpiry?: string;
   licenseIssuePlace?: string;
-  
-  
+
   truckAssetId?: string;
   truckAssetCode?: string;
 

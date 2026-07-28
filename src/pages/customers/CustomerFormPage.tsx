@@ -63,23 +63,19 @@ type ShippingRow = {
 };
 
 type CustomerFormValues = {
-  
   name: string;
   code: string;
   shortName: string;
   taxCode: string;
   isActive: boolean;
 
-  
   phone: string;
   contactPerson: string;
 
-  
   address: string;
   addressGoogleMapUrl: string;
   shippingAddresses: ShippingRow[];
 
-  
   contacts: ContactRow[];
 };
 
@@ -195,8 +191,6 @@ export function CustomerFormPage() {
             ...(s.deliveryHours.trim() ? { deliveryHours: s.deliveryHours.trim() } : {}),
           }));
 
-        
-        
         const extra: CustomerExtra = {
           ...prevExtra,
           shortName: values.shortName.trim() || undefined,
@@ -243,9 +237,6 @@ export function CustomerFormPage() {
           });
           navigate(ROUTES.CUSTOMERS.DETAIL.replace(':id', id));
         } else {
-          
-          
-          
           const created = await useCustomerStore.getState().createSafely({
             patch: { ...basePatch, extra },
           });
@@ -282,7 +273,6 @@ export function CustomerFormPage() {
 
   if (fetching) return null;
 
-  
   const topActions = (
     <Group gap="sm">
       <Button
@@ -296,7 +286,6 @@ export function CustomerFormPage() {
     </Group>
   );
 
-  
   const basicInfoCard = (
     <SectionCard
       icon={<IconInfoCircle size={14} />}
@@ -339,9 +328,6 @@ export function CustomerFormPage() {
     </SectionCard>
   );
 
-  
-  
-  
   const statusCard = (
     <SectionCard
       icon={<IconAdjustments size={14} />}
@@ -355,7 +341,6 @@ export function CustomerFormPage() {
     </SectionCard>
   );
 
-  
   const addressesCard = (
     <SectionCard
       icon={<IconMapPin size={14} />}
@@ -430,7 +415,6 @@ export function CustomerFormPage() {
     </SectionCard>
   );
 
-  
   const contactsCard = (
     <SectionCard
       icon={<IconAddressBook size={14} />}

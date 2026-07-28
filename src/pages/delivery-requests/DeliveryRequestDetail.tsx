@@ -134,14 +134,8 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   const customers = useCustomerStore((s) => s.items);
   const getVendorByCode = useVendorStore((s) => s.getByCode);
 
-  
-  
-  
-  
   const [activeTab, setActiveTab] = useState<string | null>('photos');
 
-  
-  
   const [editOpen, setEditOpen] = useState(false);
 
   const skuByCode = useMemo(() => {
@@ -153,11 +147,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     return m;
   }, [products]);
 
-  
-  
-  
-  
-  
   const driverSelectData = useMemo(() => {
     const pickable = employees.filter(driverEmployeeFilter);
     const currentDriverId = (request?.extra as { assignedDriverId?: string } | undefined)
@@ -171,12 +160,9 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
   if (loading || !request) return null;
 
-  
-  
   const isInbound = request.direction === 'inbound';
   const drExtra = (request.extra ?? {}) as DeliveryRequestExtra;
-  
-  
+
   const inboundKind = drExtra.inboundKind ?? 'vendor';
   const isReturn = isInbound && inboundKind === 'customer-return';
   const isSample = isInbound && inboundKind === 'customer-sample';
@@ -184,11 +170,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   const showsSalesOrderLink = !isInbound || isReturn;
   const canEditMeta = canEdit && !request.isClosed;
 
-  
-  
-  
-  
-  
   const resolvedVendor =
     !partyIsCustomer && request.vendorCode ? getVendorByCode(request.vendorCode) : undefined;
   const resolvedCustomer =
@@ -206,8 +187,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     .filter(Boolean)
     .join('\n');
 
-  
-  
   const itemsSectionTitle = isInbound
     ? t('deliveryRequests.detail.itemsTitleReceive')
     : t('deliveryRequests.detail.itemsTitle');
@@ -229,8 +208,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     save: t('__new__.01-common.actions.save'),
     cancel: t('__new__.01-common.actions.cancel'),
   };
-
-  
 
   const driverField = (
     <InlineSelectField
@@ -260,10 +237,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       canEdit={canEditMeta}
       value={scheduledDateForEditor}
       onSave={async (next) =>
-        
-        
-        
-        
         handleMetaPatch({ scheduledDate: next ? new Date(next).toISOString() : undefined })
       }
       labels={inlineEditLabels}
@@ -314,7 +287,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     />
   );
 
-  
   const showTransitions = canEdit && allowedTransitions.length > 0;
   const actionButtons =
     showTransitions || showDelete ? (
@@ -352,8 +324,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       </Group>
     ) : null;
 
-  
-  
   const partyLabel = partyIsCustomer
     ? t('common.labels.customer')
     : t('deliveryRequests.detail.vendorLabel');
@@ -371,8 +341,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
   const directionBadge = <DeliveryRequestKindBadge dr={request} size="sm" />;
 
-  
-  
   const copyContactButton = contactCopyText ? (
     <CopyButton value={contactCopyText} timeout={1500}>
       {({ copied, copy }) => (
@@ -414,12 +382,10 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     </Group>
   );
 
-  
   const salesOrderLinkContent = showsSalesOrderLink ? (
     <SalesOrderLink id={request.salesOrderId} fallbackLabel={request.salesOrderNumber} />
   ) : null;
 
-  
   const metadataFooter = (
     <Group justify="flex-end" gap="md" wrap="nowrap">
       <Text size="xs" c="dimmed">
@@ -436,7 +402,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     </Group>
   );
 
-  
   const mobileInfoFields = (
     <Stack gap="sm">
       {partyHeaderMobile}
@@ -467,7 +432,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     </Stack>
   );
 
-  
   const desktopInfoFields = (
     <Stack gap="md">
       {partyHeaderDesktop}
@@ -504,7 +468,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     </Stack>
   );
 
-  
   const itemsContent =
     request.items.length === 0 ? (
       <Text size="sm" c="dimmed" ta="center" py="md">
@@ -546,11 +509,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
                     <NumberInput
                       size="xs"
                       min={0}
-                      
-                      
-                      
-                      
-                      
+
                       {...(isInbound ? {} : { max: item.quantity })}
                       hideControls
                       value={delivered}
@@ -589,10 +548,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     />
   );
 
-  
-  
-  
-  
   const photosContent = (
     <ImageUploadPanel
       images={drExtra.photos ?? []}
@@ -620,9 +575,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       onNoteChange={setNote}
       onConfirm={confirmStatusChange}
       loading={actionLoading}
-      
-      
-      
+
       requirePhotoCapture={isMobile && pendingIsCompletion}
       capturedPhotos={completionPhotos}
       onCapturePhoto={openCompletionCamera}
@@ -643,10 +596,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       loading={actionLoading}
     />
   );
-
-  
-  
-  
 
   if (isMobile) {
     return (
@@ -740,10 +689,6 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       </Stack>
     );
   }
-
-  
-  
-  
 
   return (
     <Stack gap="lg">

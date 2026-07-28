@@ -1,5 +1,3 @@
-
-
 import { cacheGet, cacheSet } from '@/utils/appCache';
 
 export enum SharedStorageKey {

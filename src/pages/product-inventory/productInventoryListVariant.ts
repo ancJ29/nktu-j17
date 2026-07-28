@@ -1,15 +1,12 @@
-
-
 export type ProductInventoryListVariant = {
-  
   showStockKpiBadges: boolean;
-  
+
   showSecondaryKpiBadges: boolean;
-  
+
   showStockFilter: boolean;
-  
+
   quickChipMode: 'stock' | 'secondary';
-  
+
   showBeginOfPeriod: boolean;
 };
 

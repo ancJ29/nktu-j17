@@ -11,7 +11,7 @@ import { CodeLabel } from '@credo/base-ui/components';
 type GreenhouseDataTableProps = {
   readonly greenhouses: Greenhouse[];
   readonly isLoading?: boolean;
-  
+
   readonly cropCodesByGreenhouse?: Map<string, string[]>;
 };
 

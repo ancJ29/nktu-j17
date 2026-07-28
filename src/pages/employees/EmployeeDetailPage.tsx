@@ -108,10 +108,8 @@ export function EmployeeDetailPage() {
     return activityTabVisible;
   }, [isRootUser]);
 
-  
   useEffect(() => {
     if (dangerZone.updatedEmployee) {
-      
       setEmployee(dangerZone.updatedEmployee);
     }
   }, [dangerZone.updatedEmployee]);
@@ -126,7 +124,6 @@ export function EmployeeDetailPage() {
     return employee?.extra?.allowLogin ?? true;
   }, [employee]);
 
-  
   const department = employee?.department;
   const resolvedDeptPerms = useMemo(() => {
     const clientPerms = (appConfig as CMngtAppConfig).permissions;
@@ -146,11 +143,6 @@ export function EmployeeDetailPage() {
     [t],
   );
 
-  
-  
-  
-  
-  
   const patchEmployee = useCallback(
     async (
       patch: Partial<Employee>,
@@ -192,16 +184,8 @@ export function EmployeeDetailPage() {
     [employee, id, t],
   );
 
-  
-  
-  
   const handleEmailSave = useCallback(
     async (next: string) => {
-      
-      
-      
-      
-      
       const patch = { email: next.trim() };
       await patchEmployee(patch, {
         verb: 'employee.update',
@@ -255,14 +239,13 @@ export function EmployeeDetailPage() {
         navigate(ROUTES.EMPLOYEES.LIST, { replace: true });
         return;
       }
-      
+
       setEmployee(cached);
       setLoading(false);
       return;
     }
     setLoading(true);
 
-    
     asyncDeduplicator.call(`employee:${id}`, async () => {
       await cMngtConnector
         .getEmployeeById<EmployeeExtra>({ id })
@@ -286,9 +269,6 @@ export function EmployeeDetailPage() {
 
   if (loading || !employee) return null;
 
-  
-  
-  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button
@@ -313,10 +293,6 @@ export function EmployeeDetailPage() {
     </Group>
   );
 
-  
-  
-  
-  
   const profileImageUrl = hasAvatar ? employee.extra?.profileImage : undefined;
   const canEditProfileImage = hasAvatar && canEdit && !isMobile;
 
@@ -364,10 +340,6 @@ export function EmployeeDetailPage() {
     />
   );
 
-  
-  
-  
-  
   const detailsContent = isMobile ? (
     <Stack gap="md">
       {quickActionsCard}
@@ -402,16 +374,8 @@ export function EmployeeDetailPage() {
     />
   ) : null;
 
-  
   const isDriver = isDriverDepartment(employee.department);
 
-  
-  
-  
-  
-  
-  
-  
   const tabIsGone =
     (activeTab === 'driver' && !isDriver) ||
     (activeTab === 'activity' && !isActivityTabVisible) ||
@@ -497,14 +461,12 @@ export function EmployeeDetailPage() {
       >
         {(() => {
           const rawLoginEmail = employee.email || '';
-          
-          
+
           const loginEmail = rawLoginEmail.endsWith(`@${AUTO_LOGIN_DOMAIN}`)
             ? rawLoginEmail.slice(0, -`@${AUTO_LOGIN_DOMAIN}`.length)
             : rawLoginEmail;
           const currentPassword = dangerZone.passwordForm.values.newPassword;
-          
-          
+
           const canCopyCredentials =
             !!loginEmail && !!currentPassword && currentPassword === dangerZone.savedPassword;
           const credentialsText = `${t('__new__.07-entities.employees.dangerZone.loginIdentifier')}: ${loginEmail}\n${t('__new__.07-entities.employees.dangerZone.newPassword')}: ${currentPassword}`;

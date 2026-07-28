@@ -1,4 +1,3 @@
-
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
@@ -58,15 +57,6 @@ export const activityLoggerConnector = {
     return activityLoggerConnector;
   },
   setInternalAccessKey: (internalAccessKey: string) => {
-    
-    
-    
-    
-    
-    
-    
-    
-    
     storages.internalAccessKey = internalAccessKey;
     return activityLoggerConnector;
   },

@@ -159,8 +159,7 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
         });
         return;
       }
-      
-      
+
       const previousUrl = currentUrl;
       await persistUrl(presign.fileUrl);
       if (previousUrl !== presign.fileUrl) {

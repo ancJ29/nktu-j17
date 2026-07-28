@@ -6,15 +6,14 @@ import { isNoInventoryProduct } from '@/utils/productSet';
 import { convertUnit, getItemBaseUnit } from '@/utils/unitConversion';
 
 export type InboundEntry = {
-  
   totalBase: number;
-  
+
   byUnit: Record<string, number>;
-  
+
   draftCount: number;
-  
+
   draftRefs: { id: string; receiptNumber: string; byUnit: Record<string, number> }[];
-  
+
   unmappedCount: number;
 };
 
@@ -31,17 +30,15 @@ export function useOpenInboundByProduct(): ReadonlyMap<string, InboundEntry> {
     for (const p of products) productByCode.set(p.code, p);
 
     const index = new Map<string, InboundEntry>();
-    
-    
-    
+
     const refByGrPerProduct = new Map<string, Map<string, InboundEntry['draftRefs'][number]>>();
 
     for (const row of inventoryRows) {
       const expectedMap = row.extra?.expectedFromGoodsReceipt;
       if (!expectedMap) continue;
       const product = productByCode.get(row.itemCode);
-      if (!product) continue; 
-      if (isNoInventoryProduct(product)) continue; 
+      if (!product) continue;
+      if (isNoInventoryProduct(product)) continue;
       const baseUnit = getItemBaseUnit(product);
       const allowedUnits = new Set(product.extra?.units ?? [product.unit]);
       const conversions = product.extra?.unitConversions ?? [];
@@ -65,7 +62,6 @@ export function useOpenInboundByProduct(): ReadonlyMap<string, InboundEntry> {
       }
 
       for (const [grId, grEntry] of Object.entries(expectedMap)) {
-        
         let ref = refsByGr.get(grId);
         if (!ref) {
           ref = { id: grId, receiptNumber: grEntry.receiptNumber, byUnit: {} };
@@ -75,8 +71,7 @@ export function useOpenInboundByProduct(): ReadonlyMap<string, InboundEntry> {
         }
         for (const [unit, qty] of Object.entries(grEntry.byUnit)) {
           if (qty === 0) continue;
-          
-          
+
           entry.byUnit[unit] = (entry.byUnit[unit] ?? 0) + qty;
           ref.byUnit[unit] = (ref.byUnit[unit] ?? 0) + qty;
 

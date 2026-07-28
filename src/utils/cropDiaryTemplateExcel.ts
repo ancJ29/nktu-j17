@@ -5,7 +5,6 @@ import type { TemplateExcelRow } from './cropDiaryTemplateModel';
 type Field = 'day' | 'activity' | 'materialName' | 'quantity' | 'unit' | 'memo';
 
 const HEADER_MAPPING: Record<string, Field> = {
-  
   day: 'day',
   activity: 'activity',
   material: 'materialName',
@@ -15,7 +14,7 @@ const HEADER_MAPPING: Record<string, Field> = {
   memo: 'memo',
   note: 'memo',
   notes: 'memo',
-  
+
   ngày: 'day',
   'hoạt động': 'activity',
   'nguyên liệu': 'materialName',
@@ -150,15 +149,14 @@ export function exportCropDiaryTemplateRows(
 }
 
 export type TemplateSampleExamples = {
-  
   activityWithMaterial: string;
-  
+
   activityPlain: string;
-  
+
   memo: string;
-  
+
   materialNames: readonly [string, string];
-  
+
   unit: string;
 };
 
@@ -177,7 +175,7 @@ export function downloadCropDiaryTemplateSample(
       unit: examples.unit,
       memo: examples.memo,
     },
-    
+
     { day: 1, activity: '', materialName: material2, quantity: 1, unit: examples.unit, memo: '' },
     { day: 2, activity: examples.activityPlain, materialName: '', unit: '', memo: '' },
   ];

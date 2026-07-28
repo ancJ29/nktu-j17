@@ -20,7 +20,6 @@ function AvatarLead({ size, imageUrl, name }: { size: LinkSize; imageUrl?: strin
 }
 
 type EmployeeLinkProps = {
-  
   code?: string | undefined | null;
   id?: string | undefined | null;
   size?: LinkSize;
@@ -28,9 +27,8 @@ type EmployeeLinkProps = {
 };
 
 type EmployeeLinksProps = {
-  
   codes?: string[];
-  
+
   ids?: string[];
   size?: LinkSize;
 };
@@ -41,9 +39,7 @@ export function EmployeeLink({ code, id, noAvatar = false, size = 'sm' }: Employ
   );
 
   const name = employee?.name ?? '';
-  
-  
-  
+
   const detailId = employee?.id ?? (code ? undefined : (id ?? undefined));
 
   if (!name || !detailId) return <EntityDash size={size} />;
@@ -66,8 +62,7 @@ export function EmployeeLink({ code, id, noAvatar = false, size = 'sm' }: Employ
 export function EmployeeLinks({ codes, ids, size = 'sm' }: EmployeeLinksProps) {
   const getByCode = useEmployeeStore((s) => s.getByCode);
   const getById = useEmployeeStore((s) => s.getById);
-  
-  
+
   useEmployeeStore((s) => s.items);
 
   const resolved = useMemo(() => {
@@ -76,8 +71,6 @@ export function EmployeeLinks({ codes, ids, size = 'sm' }: EmployeeLinksProps) {
     return keys.map((key) => {
       const emp = useCodes ? getByCode(key) : getById(key);
       return {
-        
-        
         detailId: emp?.id ?? (useCodes ? undefined : key),
         name: emp?.name ?? key,
         profileImage: emp?.extra?.profileImage,

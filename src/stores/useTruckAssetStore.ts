@@ -9,7 +9,7 @@ export const TRUCK_ASSET_RECORD_TARGET = {
 
 export const useTruckAssetStore = createSingleRecordsStore<TruckAssetRow>({
   ...TRUCK_ASSET_RECORD_TARGET,
-  
+
   cacheKey: 'tav2.9f3c1d',
   cacheTTL: 10 * ONE_MINUTE,
 });

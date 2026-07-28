@@ -1,5 +1,3 @@
-
-
 export type CropArea = {
   x: number;
   y: number;

@@ -29,19 +29,19 @@ type MobileFilterBarProps = {
   search: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
-  
+
   status?: FilterStatus;
   onStatusChange?: (value: FilterStatus) => void;
   statusTitle?: string;
   statusLabels: { all: string; active: string; inactive: string };
-  
+
   hideStatus?: boolean;
-  
+
   filters?: (MobileFilterDef | MobileMultiFilterDef)[];
-  
+
   moreSection?: ReactNode;
   onClear: () => void;
-  
+
   hasActiveFilters?: boolean;
 };
 
@@ -66,7 +66,6 @@ export function MobileFilterBar({
       status !== 'all' ||
       filters?.some((f) => (f.multi ? f.value.length > 0 : f.value && f.value !== 'all')) === true);
 
-  
   const visibleFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [];
 
   if (!hideStatus) {

@@ -35,10 +35,6 @@ const configs: Record<string, Record<string, string>> = {
 export const CREDO_GROUP_STORAGE_KEY = '19c55230d1';
 
 export function setCredoGroup(group: string): void {
-  
-  
-  
-  
   if (!group) return;
 
   if (group === 'ridge') {
@@ -52,11 +48,6 @@ export function setCredoGroup(group: string): void {
   setEnvVar(CREDO_GROUP_STORAGE_KEY, group);
   console.log('credoGroup', group);
 
-  
-  
-  
-  
-  
   if (isBrowser() && group !== credoGroup) {
     setTimeout(() => {
       window.location.reload();

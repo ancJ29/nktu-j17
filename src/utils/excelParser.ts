@@ -19,7 +19,7 @@ export type BulkEmployee = {
   personalPhoneNumber?: string;
   position?: string;
   department?: string;
-  
+
   gender?: string;
 };
 
@@ -30,7 +30,7 @@ export type EmployeeTemplateOptions = {
   hasEmail?: boolean;
   hasPosition?: boolean;
   hasDepartment?: boolean;
-  
+
   departments?: string[];
   positions?: string[];
 };
@@ -65,7 +65,6 @@ export const parseEmployeeExcelFile = async (file: File): Promise<BulkEmployee[]
         const employees: BulkEmployee[] = [];
 
         const headerMapping: Record<string, keyof BulkEmployee> = {
-          
           name: 'name',
           code: 'code',
           email: 'email',
@@ -74,7 +73,7 @@ export const parseEmployeeExcelFile = async (file: File): Promise<BulkEmployee[]
           'personal phone': 'personalPhoneNumber',
           position: 'position',
           department: 'department',
-          
+
           tên: 'name',
           'họ tên': 'name',
           mã: 'code',
@@ -86,17 +85,13 @@ export const parseEmployeeExcelFile = async (file: File): Promise<BulkEmployee[]
           'chức vụ': 'position',
           'phòng ban': 'department',
           'bộ phận': 'department',
-          
+
           gender: 'gender',
           sex: 'gender',
           'giới tính': 'gender',
           giới: 'gender',
         };
 
-        
-        
-        
-        
         const presentFields = new Set<keyof BulkEmployee>();
         for (const h of headers) {
           const f = headerMapping[h];
@@ -222,38 +217,38 @@ const SAMPLE_ROWS_EN: SampleRow[] = [
 
 export type BulkProduct = {
   name: string;
-  
+
   code?: string;
-  
+
   unit?: string;
   sku?: string;
   barcode?: string;
   description?: string;
-  
+
   category?: string;
-  
+
   tags?: string[];
-  
+
   price?: number;
-  
+
   basePrice?: number;
-  
+
   minInventoryValue?: number;
-  
+
   minInventoryUnit?: string;
 };
 
 export type ProductTemplateOptions = {
   language?: string;
-  
+
   hasPrice?: boolean;
-  
+
   hasBarcode?: boolean;
-  
+
   categories?: string[];
-  
+
   tags?: string[];
-  
+
   units?: string[];
 };
 
@@ -289,7 +284,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
         const products: BulkProduct[] = [];
 
         const headerMapping: Record<string, keyof BulkProduct> = {
-          
           name: 'name',
           code: 'code',
           unit: 'unit',
@@ -303,18 +297,14 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'selling price': 'price',
           'base price': 'basePrice',
           cost: 'basePrice',
-          
-          
-          
-          
-          
+
           'min stock': 'minInventoryValue',
           'minimum stock': 'minInventoryValue',
           'min inventory': 'minInventoryValue',
           'minimum inventory': 'minInventoryValue',
           'min stock unit': 'minInventoryUnit',
           'minimum stock unit': 'minInventoryUnit',
-          
+
           tên: 'name',
           'tên sản phẩm': 'name',
           mã: 'code',
@@ -332,12 +322,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'đơn vị tồn kho tối thiểu': 'minInventoryUnit',
         };
 
-        
-        
-        
-        
-        
-        
         const presentFields = new Set<keyof BulkProduct>();
         for (const h of headers) {
           const f = headerMapping[h];
@@ -349,7 +333,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           return;
         }
 
-        
         const numericFields = new Set<keyof BulkProduct>([
           'price',
           'basePrice',
@@ -370,9 +353,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
             const fieldName = headerMapping[header];
             if (!fieldName) continue;
 
-            
-            
-            
             if (fieldName === 'tags') {
               const list = value
                 .split(';')
@@ -383,10 +363,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
             }
 
             if (numericFields.has(fieldName)) {
-              
-              
-              
-              
               if (fieldName === 'minInventoryValue') {
                 const m = value.match(/^([\d.,]+)\s*(.*)$/);
                 if (m) {
@@ -578,9 +554,7 @@ export const generateProductExcelTemplate = ({
   const columns: Column[] = [
     { key: 'name', header: labels.name, width: 28 },
     { key: 'unit', header: labels.unit, width: 10 },
-    
-    
-    
+
     { key: 'sku', header: labels.sku, width: 18 },
     ...(hasBarcode ? [{ key: 'barcode' as const, header: labels.barcode, width: 16 }] : []),
     { key: 'description', header: labels.description, width: 36 },
@@ -596,17 +570,6 @@ export const generateProductExcelTemplate = ({
     { key: 'minInventoryUnit', header: labels.minInventoryUnit, width: 16 },
   ];
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const sampleSource = isVietnamese ? PRODUCT_SAMPLE_ROWS_VI : PRODUCT_SAMPLE_ROWS_EN;
   const sampleTagCell = (tags?.length ?? 0) >= 3 ? tags!.slice(0, 3).join('; ') : '';
   const sampleUnit = (i: number) => (units?.length ? units[i % units.length] : undefined);
@@ -632,17 +595,17 @@ export const generateProductExcelTemplate = ({
 
 export type BulkMaterial = {
   name: string;
-  
+
   code?: string;
   unit?: string;
   sku?: string;
   barcode?: string;
   description?: string;
-  
+
   packagingSpec?: string;
-  
+
   category?: string;
-  
+
   price?: number;
   minInventoryValue?: number;
   minInventoryUnit?: string;
@@ -650,15 +613,15 @@ export type BulkMaterial = {
 
 export type MaterialTemplateOptions = {
   language?: string;
-  
+
   hasSku?: boolean;
-  
+
   hasBarcode?: boolean;
-  
+
   hasPackagingSpec?: boolean;
-  
+
   hasMinimumInventory?: boolean;
-  
+
   categories?: string[];
 };
 
@@ -694,7 +657,6 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
         const materials: BulkMaterial[] = [];
 
         const headerMapping: Record<string, keyof BulkMaterial> = {
-          
           name: 'name',
           code: 'code',
           unit: 'unit',
@@ -713,7 +675,7 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
           'minimum inventory': 'minInventoryValue',
           'min stock unit': 'minInventoryUnit',
           'minimum stock unit': 'minInventoryUnit',
-          
+
           tên: 'name',
           'tên vật tư': 'name',
           mã: 'code',
@@ -756,8 +718,6 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
             if (!fieldName) continue;
 
             if (numericFields.has(fieldName)) {
-              
-              
               if (fieldName === 'minInventoryValue') {
                 const m = value.match(/^([\d.,]+)\s*(.*)$/);
                 if (m) {
@@ -966,11 +926,11 @@ export const generateMaterialExcelTemplate = ({
 export type ProductExportOptions = {
   language?: string;
   hasPrice?: boolean;
-  
+
   categoryLabels?: Record<string, string>;
-  
+
   tagLabels?: Record<string, string>;
-  
+
   unitLabels?: Record<string, string>;
 };
 
@@ -998,11 +958,6 @@ export const exportProductsToExcel = (
     | 'status';
   type Column = { key: ColumnKey; header: string; width: number };
 
-  
-  
-  
-  
-  
   const labels: Record<ColumnKey, string> = isVietnamese
     ? {
         name: 'Tên sản phẩm',
@@ -1101,8 +1056,6 @@ export const exportProductsToExcel = (
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, isVietnamese ? 'Sản phẩm' : 'Products');
 
-  
-  
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -1150,7 +1103,6 @@ export const parseGoodsReceiptItemsExcelFile = async (
         const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
 
         const headerMapping: Record<string, keyof BulkGoodsReceiptItem> = {
-          
           sku: 'sku',
           quantity: 'quantity',
           qty: 'quantity',
@@ -1158,16 +1110,12 @@ export const parseGoodsReceiptItemsExcelFile = async (
           memo: 'memo',
           note: 'memo',
           notes: 'memo',
-          
+
           'số lượng': 'quantity',
           'đơn vị': 'unit',
           'ghi chú': 'memo',
         };
 
-        
-        
-        
-        
         const presentFields = new Set<keyof BulkGoodsReceiptItem>();
         for (const h of headers) {
           const f = headerMapping[h];
@@ -1248,15 +1196,15 @@ const GR_ITEM_SAMPLE_ROWS_EN: GRItemSampleRow[] = [
 
 export type GoodsReceiptItemsTemplateSample = {
   sku: string;
-  
+
   unit?: string;
-  
+
   name?: string;
 };
 
 export type GoodsReceiptItemsTemplateOptions = {
   language?: string;
-  
+
   sampleItems?: ReadonlyArray<GoodsReceiptItemsTemplateSample>;
 };
 
@@ -1290,8 +1238,7 @@ export const generateGoodsReceiptItemsTemplate = ({
       unit: it.unit?.trim() ?? '',
       memo: it.name?.trim() ?? '',
     }));
-  
-  
+
   const sampleSource: GRItemSampleRow[] =
     real.length >= 3 ? real : [...real, ...fallback.slice(real.length)];
   const headerRow = columns.map((c) => c.header);
@@ -1316,7 +1263,6 @@ export type BulkSalesOrderItem = {
 const REQUIRED_SO_ITEM_FIELDS: ReadonlyArray<keyof BulkSalesOrderItem> = ['sku', 'quantity'];
 
 export type ParseSalesOrderItemsOptions = {
-  
   pricingEnabled?: boolean;
 };
 
@@ -1352,12 +1298,11 @@ export const parseSalesOrderItemsExcelFile = async (
         const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
 
         const headerMapping: Record<string, keyof BulkSalesOrderItem> = {
-          
           sku: 'sku',
           quantity: 'quantity',
           qty: 'quantity',
           unit: 'unit',
-          
+
           'số lượng': 'quantity',
           'đơn vị': 'unit',
         };
@@ -1450,17 +1395,17 @@ const SO_ITEM_SAMPLE_ROWS_EN: SOItemSampleRow[] = [
 
 export type SalesOrderItemsTemplateSample = {
   sku: string;
-  
+
   unit?: string;
-  
+
   unitPrice?: number;
 };
 
 export type SalesOrderItemsTemplateOptions = {
   language?: string;
-  
+
   sampleItems?: ReadonlyArray<SalesOrderItemsTemplateSample>;
-  
+
   pricingEnabled?: boolean;
 };
 
@@ -1512,13 +1457,13 @@ export const generateSalesOrderItemsTemplate = ({
 export type BulkSalesOrderItemByName = {
   name: string;
   quantity: number;
-  
+
   unitPrice?: number;
 };
 
 export type ParsedSalesOrderByName = {
   items: BulkSalesOrderItemByName[];
-  
+
   customerPONumber?: string;
 };
 
@@ -1552,16 +1497,13 @@ const parseVietnameseNumber = (raw: string): number | undefined => {
   if (!s) return undefined;
   let normalized: string;
   if (s.includes('.') && s.includes(',')) {
-    
     normalized = s.replace(/\./g, '').replace(',', '.');
   } else if (s.includes(',')) {
-    
-    
     normalized = /,\d{1,2}$/.test(s) ? s.replace(',', '.') : s.replace(/,/g, '');
   } else {
     normalized = s;
   }
-  
+
   normalized = normalized.replace(/[^\d.-]/g, '');
   const n = Number(normalized);
   return Number.isFinite(n) ? n : undefined;
@@ -1579,13 +1521,13 @@ const extractCustomerPONumber = (sheetData: string[][]): string | undefined => {
       const lower = cell.toLowerCase();
       const prefix = SO_PO_LABEL_PREFIXES.find((p) => lower.startsWith(p));
       if (!prefix) continue;
-      
+
       const inline = cell
         .slice(prefix.length)
         .replace(/^[:\s]+/, '')
         .trim();
       if (inline) return inline;
-      
+
       for (let n = c + 1; n < row.length; n++) {
         const next = String(row[n] ?? '').trim();
         if (!next) continue;
@@ -1619,12 +1561,10 @@ export const parseSalesOrderItemsByNameExcelFile = async (
           defval: '',
         }) as string[][];
 
-        
-        
         let headerRowIdx = -1;
         let nameCol = -1;
         let qtyCol = -1;
-        
+
         let priceCol = -1;
         for (let r = 0; r < sheetData.length; r++) {
           const cells = sheetData[r].map((c) => String(c).trim().toLowerCase());
@@ -1640,8 +1580,6 @@ export const parseSalesOrderItemsByNameExcelFile = async (
         }
 
         if (headerRowIdx === -1) {
-          
-          
           reject(new ExcelParseError(['name', 'quantity']));
           return;
         }
@@ -1650,7 +1588,7 @@ export const parseSalesOrderItemsByNameExcelFile = async (
         for (let r = headerRowIdx + 1; r < sheetData.length; r++) {
           const name = String(sheetData[r][nameCol] ?? '').trim();
           const lowerName = name.toLowerCase();
-          
+
           if (SO_FOOTER_MARKERS.some((m) => lowerName.startsWith(m))) break;
           if (!name) continue;
           const quantity = parseVietnameseNumber(String(sheetData[r][qtyCol] ?? ''));
@@ -1691,7 +1629,7 @@ export type SalesOrderItemsByNameSample = { name: string };
 
 export type SalesOrderItemsByNameTemplateOptions = {
   language?: string;
-  
+
   sampleItems?: ReadonlyArray<SalesOrderItemsByNameSample>;
 };
 
@@ -1794,11 +1732,11 @@ export type RefuelExportEntry = { vehicleLabel?: string; log: OperationLog };
 
 export type RefuelExportOptions = {
   language?: string;
-  
+
   periodLabel: string;
-  
+
   fileTag: string;
-  
+
   vehicleLabel?: string;
 };
 
@@ -1863,7 +1801,6 @@ function buildRefuelSheet(
     return withVehicle ? [vehicleLabel ?? '', ...base] : base;
   });
 
-  
   const { litres, cost, distance, avgConsumption } = computeRefuelTotals(entries.map((x) => x.log));
   const totalRow: (number | string)[] = new Array(columns.length).fill('');
   const off = withVehicle ? 1 : 0;

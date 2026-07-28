@@ -1,5 +1,3 @@
-
-
 import { generateId } from '@credo/kits/string';
 import { loadIndustry, type IndustryName } from '../../../scripts/faker/industry';
 import { configureSeedConnectors, pad, writeEntityEnvelope } from './_sharedSeed';
@@ -16,7 +14,7 @@ export type SeedLookupsOptions = {
   clientCode: string;
   industry: IndustryName;
   secrets: FakeDataSecrets;
-  
+
   items?: ManualLookupInput[];
   onLog?: (line: string) => void;
 };
@@ -80,8 +78,7 @@ function generateFromIndustry(industry: IndustryName): LookupRecord[] {
   register('product-category', lookups.productCategory);
   register('material-category', lookups.materialCategory);
   register('unit', lookups.unit);
-  
-  
+
   register('material-unit', lookups.materialUnit ?? []);
   register('product-tag', lookups.productTag);
 
@@ -134,8 +131,7 @@ export async function seedFakeLookups(opts: SeedLookupsOptions): Promise<SeedLoo
   if (manualItems) {
     log(`Building ${manualItems.length} lookup row(s) from JSON input...`);
     items = buildFromManualInput(manualItems);
-    
-    
+
     items.forEach((item) => {
       item.value = item.value.toUpperCase();
     });

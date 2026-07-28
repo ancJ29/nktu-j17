@@ -28,7 +28,7 @@ type SalesKind = Extract<NktuReportKind, 'sales-monthly' | 'sales-weekly'>;
 interface Props {
   title: string;
   kind: SalesKind;
-  
+
   period?: string;
   onPeriodChange: (period: string) => void;
 }

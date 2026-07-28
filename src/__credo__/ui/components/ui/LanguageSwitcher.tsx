@@ -4,17 +4,16 @@ import { Icon, Tooltip } from '../common';
 import { IconName } from '../types';
 
 type LanguageSwitcherProps = {
-  
   languages: Language[];
-  
+
   currentLanguage: string;
-  
+
   onLanguageChange: (languageCode: string) => void;
-  
+
   tooltipLabel?: string;
-  
+
   size?: number;
-  
+
   lightIcon?: boolean;
 };
 

@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector, cSsoConnector, cStorageConnector } from '@credo/connectors/connector';
 import { generateId, generatePassword } from '@credo/kits/string';
 import { generateName } from '../../../scripts/faker/name';
@@ -21,13 +19,13 @@ export type ManualEmployeeInput = {
 
 export type SeedEmployeesOptions = {
   clientCode: string;
-  
+
   count: number;
   skipSso: boolean;
   secrets: FakeDataSecrets;
-  
+
   items?: ManualEmployeeInput[];
-  
+
   onLog?: (line: string) => void;
 };
 
@@ -367,20 +365,9 @@ async function createSsoUsers(
 }
 
 export async function seedFakeEmployees(opts: SeedEmployeesOptions): Promise<SeedEmployeesResult> {
-  
-  
-  
   const { clientCode, skipSso, secrets, items: manualItems, onLog } = opts;
   const log = (line: string) => onLog?.(line);
 
-  
-  
-  
-  
-  
-  
-  
-  
   cMngtConnector.setTrustedServiceKey(secrets.trustedServiceKey);
   cMngtConnector.setClientCode(clientCode);
   cMngtConnector.setAccessKey(secrets.cMngtAdminAccessKey);
@@ -407,8 +394,6 @@ export async function seedFakeEmployees(opts: SeedEmployeesOptions): Promise<See
     log(`Building ${manualItems.length} employee(s) from JSON input...`);
     items = buildFromManualInput(manualItems, config);
   } else {
-    
-    
     log(
       `Generating employees: ${RANDOM_MIN_PER_DEPARTMENT}-${RANDOM_MAX_PER_DEPARTMENT} per department × ${config.departments.length} dept(s)...`,
     );

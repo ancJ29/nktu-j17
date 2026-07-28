@@ -1,12 +1,10 @@
-
-
 export type DeliveryChannel = 'inbox' | 'slack';
 export type DeliveryStatus = 'sent' | 'failed';
 
 export type DeliveryResult = {
   notificationId: string;
   channel: DeliveryChannel;
-  
+
   target?: string;
   status: DeliveryStatus;
   error?: string;
@@ -35,11 +33,11 @@ export type CreateNotificationInput = {
   title: string;
   body?: string;
   payload?: Record<string, unknown>;
-  
+
   channels?: DeliveryChannel[];
-  
+
   slackChannel?: string;
-  
+
   timestamp?: string;
 };
 

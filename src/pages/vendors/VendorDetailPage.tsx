@@ -90,7 +90,7 @@ export function VendorDetailPage() {
         navigate(ROUTES.VENDORS.LIST, { replace: true });
         return;
       }
-      
+
       setVendor(cached);
       setLoading(false);
       return;
@@ -319,7 +319,6 @@ export function VendorDetailPage() {
     </Group>
   );
 
-  
   const headerRow = (
     <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
       <Group gap="md" wrap="nowrap" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
@@ -559,8 +558,6 @@ export function VendorDetailPage() {
       </DangerZoneCard>
     ) : null;
 
-  
-  
   const body = (
     <Grid gutter="md">
       <Grid.Col span={{ base: 12, md: 7 }}>
@@ -579,7 +576,6 @@ export function VendorDetailPage() {
     </Grid>
   );
 
-  
   const mobileContent = (
     <Accordion defaultValue="info" variant="separated">
       <Accordion.Item value="info">

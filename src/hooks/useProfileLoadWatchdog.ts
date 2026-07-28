@@ -1,5 +1,3 @@
-
-
 import { useEffect, useRef } from 'react';
 import { logger } from '@credo/base-ui/utils';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -15,7 +13,6 @@ export function useProfileLoadWatchdog(timeoutMs = PROFILE_LOAD_WATCHDOG_MS): vo
   useEffect(() => {
     if (!token || isProfileLoaded || releasedRef.current) return;
 
-    
     const retryId = retriedRef.current
       ? undefined
       : setTimeout(() => {
@@ -25,16 +22,10 @@ export function useProfileLoadWatchdog(timeoutMs = PROFILE_LOAD_WATCHDOG_MS): vo
             .getState()
             .loadProfile()
             .catch((error: unknown) => {
-              
-              
-              
               logger.warn('Profile load watchdog: retry failed', error);
             });
         }, timeoutMs);
 
-    
-    
-    
     const releaseId = setTimeout(() => {
       if (useAuthStore.getState().isProfileLoaded) return;
       releasedRef.current = true;

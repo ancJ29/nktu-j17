@@ -1,5 +1,3 @@
-
-
 import { appConfig } from '@/config';
 
 export type LookupCategoryId =
@@ -7,9 +5,9 @@ export type LookupCategoryId =
 
 export type LookupCategory = {
   id: LookupCategoryId;
-  
+
   labelKey: string;
-  
+
   defaultSortOrder: number;
 };
 
