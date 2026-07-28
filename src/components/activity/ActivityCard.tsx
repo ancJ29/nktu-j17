@@ -27,6 +27,7 @@ import {
   IconCircleCheck,
   IconClipboardCheck,
   IconEdit,
+  IconEyeOff,
   IconFileText,
   IconKey,
   IconLock,
@@ -140,7 +141,12 @@ type CustomerVerbKey = 'create' | 'update' | 'delete' | 'toggleStatus' | 'addNot
 type EmployeeVerbKey =
   SimpleVerbKey | 'updatePermissions' | 'passwordChange' | 'generateLoginToken';
 type ProductVerbKey =
-  SimpleVerbKey | 'updateDescription' | 'updateTechSpecs' | 'updateClassification' | 'updateImages';
+  | SimpleVerbKey
+  | 'updateDescription'
+  | 'updateTechSpecs'
+  | 'updateClassification'
+  | 'updateImages'
+  | 'toggleInventoryVisibility';
 type ProductInventoryVerbKey =
   'create' | 'adjust' | 'stockTake' | 'repack' | 'import' | 'beginOfPeriod';
 type MaterialInventoryVerbKey = 'create' | 'adjust' | 'stockTake' | 'repack';
@@ -285,6 +291,16 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     i18nKey: 'products.detail.activityVerbs.updateImages',
     targetType: 'product',
     // No diff: image arrays are noisy and the verb itself is the audit signal.
+  },
+  'product.toggleInventoryVisibility': {
+    icon: <IconEyeOff size={16} />,
+    color: 'blue',
+    i18nKey: 'products.detail.activityVerbs.toggleInventoryVisibility',
+    targetType: 'product',
+    // Diff carries `extra.hiddenFromInventoryList` on/off — a one-line change
+    // the panel renders as-is, and the direction is the whole point of the
+    // entry ("who hid this product from the warehouse table, and when").
+    showDiff: true,
   },
   // productInventory — all four verbs target the product so the product's
   // Activity tab surfaces inventory writes alongside direct edits. The memo

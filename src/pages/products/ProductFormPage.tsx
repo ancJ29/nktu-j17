@@ -19,6 +19,7 @@ import { generateInternalBarcode } from '@/utils/barcode';
 import {
   hasBarcodeForProducts,
   hasBulkImportForProducts,
+  hasHideFromInventoryListForProducts,
   isPriceManagementEnabled,
   perms,
 } from '@/utils/permission';
@@ -41,6 +42,7 @@ const priceEnabled = isPriceManagementEnabled();
 
 const priceManageable = priceEnabled && perms.product.canManagePrice();
 const barcodeEnabled = hasBarcodeForProducts();
+const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 const canCreate = perms.product.canCreate();
 const canEdit = perms.product.canEdit();
 
@@ -124,6 +126,7 @@ export function ProductFormPage() {
       minInventoryValue: '',
       minInventoryUnit: '',
       noInventory: false,
+      hiddenFromInventoryList: false,
       unitConversions: [],
       setItems: [],
     },
@@ -225,6 +228,8 @@ export function ProductFormPage() {
       minInventoryValue: min?.value ?? '',
       minInventoryUnit: min?.unit ?? '',
       noInventory: p.extra?.noInventory ?? false,
+
+      hiddenFromInventoryList: p.extra?.hiddenFromInventoryList ?? false,
       unitConversions: p.extra?.unitConversions ?? [],
       setItems: p.extra?.setItems ?? [],
     };
@@ -313,6 +318,7 @@ export function ProductFormPage() {
           })(),
           ...(minimumInventory && { minimumInventory }),
           ...(values.noInventory && { noInventory: true }),
+          ...(values.hiddenFromInventoryList && { hiddenFromInventoryList: true }),
           ...(values.unitConversions.length > 0 && {
             unitConversions: values.unitConversions.filter(
               (c) => c.unit.trim() && c.baseUnit.trim() && c.quantity > 0,
@@ -426,14 +432,22 @@ export function ProductFormPage() {
     setIsDownloading(true);
     try {
       const categories = categoryOptions.map((o) => o.label);
-      const tags = tagOptions.map((o) => o.label);
       const units = unitOptions.map((o) => o.label);
+      const categoryLabels = Object.fromEntries(categoryOptions.map((o) => [o.value, o.label]));
+      const unitLabels = Object.fromEntries(unitOptions.map((o) => [o.value, o.label]));
+
+      if (!useProductStore.getState().initialized) {
+        await useProductStore.getState().loadAll();
+      }
       generateProductExcelTemplate({
         language: i18n.language,
         hasPrice: priceManageable,
         hasBarcode: barcodeEnabled,
+        hasHideFromInventoryList: hideFromInventoryListEnabled,
+        products: useProductStore.getState().items,
+        categoryLabels,
+        unitLabels,
         categories,
-        tags,
         units,
       });
       notifications.show({
@@ -448,7 +462,7 @@ export function ProductFormPage() {
     } finally {
       setIsDownloading(false);
     }
-  }, [t, i18n.language, categoryOptions, tagOptions, unitOptions]);
+  }, [t, i18n.language, categoryOptions, unitOptions]);
 
   const handleFileSelect = useCallback((selectedFile: File) => {
     fileRef.current = selectedFile;
@@ -566,6 +580,10 @@ export function ProductFormPage() {
           }),
           ...(category && { category }),
           ...(tags.length > 0 && { tags }),
+
+          ...(p.noInventory && { noInventory: true }),
+          ...(hideFromInventoryListEnabled &&
+            p.hiddenFromInventoryList && { hiddenFromInventoryList: true }),
 
           ...(unit && { units: [unit] }),
           ...(priceManageable &&

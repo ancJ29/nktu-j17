@@ -8,6 +8,12 @@ export function isNoInventoryProduct(p: Pick<Product, 'extra'> | undefined | nul
   return p?.extra?.noInventory === true;
 }
 
+export function isHiddenFromInventoryListProduct(
+  p: Pick<Product, 'extra'> | undefined | null,
+): boolean {
+  return p?.extra?.hiddenFromInventoryList === true;
+}
+
 export function getSetItems(p: Pick<Product, 'extra'> | undefined | null): ProductSetItem[] {
   return p?.extra?.setItems ?? [];
 }

@@ -185,17 +185,39 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     const draftCarriesPostedStock =
       priorStatus === 'draft' && receipt.extra?.inventoryPosted === true;
 
-    let inventoryEffect: { attempted: number; failed: number } | null = null;
+    let inventoryEffect: { attempted: number; failed: number; complete: boolean } | null = null;
     let fullyPosted = false;
     let stockMoved = false;
 
     try {
       if (isConfirm && priorStatus === 'draft') {
+        const fresh = (await cMngtConnector.getGoodsReceiptById({ id })).goodsReceipt as
+          GoodsReceipt | undefined;
+        if (!fresh || fresh.version !== receipt.version) {
+          if (fresh) setReceipt(fresh);
+          invalidateCache();
+          notifications.show({
+            color: 'yellow',
+            title: t('common.conflict.title'),
+            message: t('common.conflict.message'),
+            autoClose: 8000,
+          });
+          confirmHandlers.close();
+          return;
+        }
+      }
+
+      if (isConfirm && priorStatus === 'draft') {
         stockMoved = true;
         try {
           const effect = await applyGoodsReceiptInventoryEffect(receipt, 'increment');
-          inventoryEffect = { attempted: effect.attempted, failed: effect.failed };
-          fullyPosted = effect.failed === 0;
+          inventoryEffect = {
+            attempted: effect.attempted,
+            failed: effect.failed,
+            complete: effect.complete,
+          };
+
+          fullyPosted = effect.complete;
           if (effect.failed > 0) {
             notifications.show({
               color: 'yellow',
@@ -249,8 +271,12 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
           if (priorStatus === 'received' || draftCarriesPostedStock) {
             stockMoved = true;
             const effect = await applyGoodsReceiptInventoryEffect(receipt, 'decrement');
-            inventoryEffect = { attempted: effect.attempted, failed: effect.failed };
-            if (effect.failed > 0) {
+            inventoryEffect = {
+              attempted: effect.attempted,
+              failed: effect.failed,
+              complete: effect.complete,
+            };
+            if (!effect.complete) {
               notifications.show({
                 color: 'yellow',
                 title: t('goodsReceipts.notifications.inventoryPartial'),
@@ -290,7 +316,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       }
 
       setReceipt(updated);
-      if (!inventoryEffect || inventoryEffect.failed === 0) {
+
+      if (!inventoryEffect || inventoryEffect.complete) {
         notifications.show({
           color: 'green',
           message: t(
@@ -330,6 +357,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         ...(inventoryEffect && {
           inventoryAttempted: inventoryEffect.attempted,
           inventoryFailed: inventoryEffect.failed,
+
+          inventoryComplete: inventoryEffect.complete,
         }),
       };
       if (isConfirm) {

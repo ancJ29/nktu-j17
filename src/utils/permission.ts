@@ -327,6 +327,10 @@ export function hasImagesForProducts() {
   return featureFlags?.products?.images ?? true;
 }
 
+export function hasHideFromInventoryListForProducts() {
+  return featureFlags?.products?.hideFromInventoryList ?? false;
+}
+
 export function hasShippingAddressForCustomers() {
   return featureFlags?.customers?.shippingAddress ?? true;
 }

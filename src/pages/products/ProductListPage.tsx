@@ -19,7 +19,12 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
-import { isPriceManagementEnabled, isProductInventoryEnabled, perms } from '@/utils/permission';
+import {
+  hasHideFromInventoryListForProducts,
+  isPriceManagementEnabled,
+  isProductInventoryEnabled,
+  perms,
+} from '@/utils/permission';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { logActivity } from '@/utils/activityLogger';
 import { exportProductsToExcel } from '@/utils/excelParser';
@@ -31,6 +36,7 @@ const canCreate = perms.product.canCreate();
 
 const priceVisible = isPriceManagementEnabled() && perms.product.canViewPrice();
 const inventoryEnabled = isProductInventoryEnabled();
+const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 
@@ -265,6 +271,7 @@ export function ProductListPage() {
         categoryLabels,
         tagLabels,
         unitLabels,
+        hasHideFromInventoryList: hideFromInventoryListEnabled,
       });
       logActivity('product.export', undefined, { count: allProducts.length });
     } catch {

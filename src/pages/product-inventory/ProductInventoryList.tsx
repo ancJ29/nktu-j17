@@ -35,12 +35,18 @@ import { ProductInventoryComposeSetModal } from './ProductInventoryComposeSetMod
 import { ProductInventoryDataTable } from './ProductInventoryDataTable';
 import { ProductInventoryDecomposeSetModal } from './ProductInventoryDecomposeSetModal';
 import { InventoryImportExportActions } from '@/components/inventory/InventoryImportExportActions';
-import { isLocationsEnabled } from '@/utils/permission';
-import { isProductSet, isNoInventoryProduct } from '@/utils/productSet';
+import { hasHideFromInventoryListForProducts, isLocationsEnabled } from '@/utils/permission';
+import {
+  isProductSet,
+  isNoInventoryProduct,
+  isHiddenFromInventoryListProduct,
+} from '@/utils/productSet';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
 import type { ProductInventoryListVariant } from './productInventoryListVariant';
 
 const locationsEnabled = isLocationsEnabled();
+
+const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 const isMobile = device.isMobile;
 
 const canBulkImport = perms.productInventory.canBulkImport();
@@ -133,7 +139,11 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const summaries: ProductInventorySummary[] = useMemo(
     () =>
       buildProductInventorySummaries(
-        products.filter((p) => !isNoInventoryProduct(p)),
+        products.filter(
+          (p) =>
+            !isNoInventoryProduct(p) &&
+            !(hideFromInventoryListEnabled && isHiddenFromInventoryListProduct(p)),
+        ),
         allRows,
         { locationFilter, inboundByCode: inboundIndex },
       ),

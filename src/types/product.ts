@@ -49,6 +49,8 @@ export type ProductExtra = {
 
   noInventory?: boolean;
 
+  hiddenFromInventoryList?: boolean;
+
   unitConversions?: UnitConversion[];
 
   techSpecs?: Array<{ key: string; value: string }>;

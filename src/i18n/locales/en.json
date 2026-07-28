@@ -2775,6 +2775,7 @@
           "repack": "Repacked stock for",
           "stockTake": "Recorded stock-take for"
         },
+        "toggleInventoryVisibility": "Changed inventory-list visibility of",
         "update": "Updated",
         "updateClassification": "Updated classification for",
         "updateDescription": "Updated description for",
@@ -2841,6 +2842,8 @@
       "classificationSection": "Classification",
       "createButton": "Create Product",
       "descriptionPlaceholder": "Product description",
+      "hiddenFromInventoryListDescription": "Keeps this product off the inventory list. Stock is still tracked as usual.",
+      "hiddenFromInventoryListLabel": "Hide from inventory list",
       "isActiveLabel": "Active",
       "minimumInventoryDesc": "Alert operators when stock falls at or below this level.",
       "minimumInventoryUnitPlaceholder": "Unit (e.g. pcs, box)",

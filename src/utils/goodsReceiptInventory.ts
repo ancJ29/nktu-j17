@@ -14,7 +14,13 @@ import { applyDelta, readRowBreakdown } from './inventoryMath';
 import { logActivity } from './activityLogger';
 import { getItemBaseUnit } from './unitConversion';
 import { isNoInventoryProduct } from './productSet';
-import { aggregateByCode, pruneZeros, positiveOnly } from './goodsReceiptInventoryHelpers';
+import {
+  aggregateByCode,
+  distinctItemCodeCount,
+  isPostingComplete,
+  positiveOnly,
+  pruneZeros,
+} from './goodsReceiptInventoryHelpers';
 import { getCurrentEmployeeId } from '@/hooks';
 
 export type InventoryEffectDirection = 'increment' | 'decrement';
@@ -54,8 +60,24 @@ export type InventoryEffectResult = {
   failed: number;
 
   alreadyPosted: number;
+
+  skipped: number;
+
+  complete: boolean;
   errors: string[];
 };
+
+function emptyEffectResult(): InventoryEffectResult {
+  return {
+    attempted: 0,
+    succeeded: 0,
+    failed: 0,
+    alreadyPosted: 0,
+    skipped: 0,
+    complete: true,
+    errors: [],
+  };
+}
 
 function sameLocation(a: string | undefined | null, b: string | undefined | null): boolean {
   if (a === b) return true;
@@ -69,13 +91,7 @@ function isPostedOnRow(row: ProductInventoryRow, receiptId: string): boolean {
 export async function clearGoodsReceiptMarkers(
   receipt: GoodsReceipt,
 ): Promise<InventoryEffectResult> {
-  const result: InventoryEffectResult = {
-    attempted: 0,
-    succeeded: 0,
-    failed: 0,
-    alreadyPosted: 0,
-    errors: [],
-  };
+  const result = emptyEffectResult();
   const productItems = receipt.items.filter((i) => i.itemType === 'product');
   if (productItems.length === 0) return result;
 
@@ -167,7 +183,11 @@ async function applyForKind(
 
   for (const [itemCode, rawDeltas] of totals) {
     const deltas = pruneZeros(rawDeltas);
-    if (Object.keys(deltas).length === 0) continue;
+
+    if (Object.keys(deltas).length === 0) {
+      result.skipped += 1;
+      continue;
+    }
     result.attempted += 1;
 
     const entity = findEntity(itemCode);
@@ -179,6 +199,34 @@ async function applyForKind(
 
     if (kind === 'product' && isNoInventoryProduct(entity as Product)) {
       result.attempted -= 1;
+      result.skipped += 1;
+
+      if (sign > 0) {
+        const staleRow = rows.find(
+          (r) => r.itemCode === itemCode && sameLocation(r.locationCode, locationCode),
+        );
+        const nextExpected = dropExpectedForReceipt(
+          staleRow?.extra?.expectedFromGoodsReceipt,
+          receipt.id,
+        );
+        if (staleRow && nextExpected !== staleRow.extra?.expectedFromGoodsReceipt) {
+          try {
+            await useProductInventoryStore.getState().updateSafely({
+              id: staleRow.id,
+              version: staleRow.version,
+              patch: {
+                extra: {
+                  ...staleRow.extra,
+                  expectedFromGoodsReceipt: nextExpected,
+                } as ProductInventoryExtra,
+              },
+            });
+          } catch {
+            // Best-effort, exactly like the posting writes around it. A stale
+            // incoming badge is cosmetic; it must not fail the confirm.
+          }
+        }
+      }
       continue;
     }
     const baseUnit = getItemBaseUnit(entity);
@@ -320,18 +368,15 @@ export async function applyGoodsReceiptInventoryEffect(
   receipt: GoodsReceipt,
   direction: InventoryEffectDirection,
 ): Promise<InventoryEffectResult> {
-  const result: InventoryEffectResult = {
-    attempted: 0,
-    succeeded: 0,
-    failed: 0,
-    alreadyPosted: 0,
-    errors: [],
-  };
+  const result = emptyEffectResult();
   const sign: 1 | -1 = direction === 'increment' ? 1 : -1;
 
   const productItems = receipt.items.filter((i) => i.itemType === 'product');
+  const requestedCodes = distinctItemCodeCount(productItems);
 
   await applyForKind('product', productItems, sign, receipt, result);
+
+  result.complete = isPostingComplete(result, requestedCodes);
   return result;
 }
 
@@ -401,10 +446,14 @@ type RowContribution = {
   byUnit: Record<string, number>;
 };
 
-function buildContributionsByRow(receipt: GoodsReceipt): Map<string, RowContribution> {
+function buildContributionsByRow(
+  receipt: GoodsReceipt,
+  movesStock: (line: GoodsReceiptItem) => boolean,
+): Map<string, RowContribution> {
   const out = new Map<string, RowContribution>();
   for (const line of receipt.items) {
     if (!line.itemCode || line.quantity === 0) continue;
+    if (!movesStock(line)) continue;
     const key = `${line.itemType}|${line.itemCode}|${receipt.locationCode}`;
     const cur = out.get(key);
     if (cur) {
@@ -432,21 +481,28 @@ export async function syncDraftIncomingToInventory(
   prev: GoodsReceipt | null,
   curr: GoodsReceipt | null,
 ): Promise<InventoryEffectResult> {
-  const result: InventoryEffectResult = {
-    attempted: 0,
-    succeeded: 0,
-    failed: 0,
-    alreadyPosted: 0,
-    errors: [],
-  };
+  const result = emptyEffectResult();
   if (!prev && !curr) return result;
 
   const ref = (curr ?? prev) as GoodsReceipt;
   const receiptId = ref.id;
   const receiptNumber = ref.receiptNumber;
 
-  const prevMap = prev ? buildContributionsByRow(prev) : new Map<string, RowContribution>();
-  const currMap = curr ? buildContributionsByRow(curr) : new Map<string, RowContribution>();
+  const productStore = useProductStore.getState();
+  await ensureLoaded(productStore.initialized, productStore.loadAll);
+  const products = useProductStore.getState().items;
+  const movesStock = (line: GoodsReceiptItem): boolean => {
+    if (line.itemType !== 'product') return true;
+    const product = products.find((p) => p.code === line.itemCode);
+    return !product || !isNoInventoryProduct(product);
+  };
+
+  const prevMap = prev
+    ? buildContributionsByRow(prev, movesStock)
+    : new Map<string, RowContribution>();
+  const currMap = curr
+    ? buildContributionsByRow(curr, movesStock)
+    : new Map<string, RowContribution>();
   const allKeys = new Set<string>([...prevMap.keys(), ...currMap.keys()]);
   if (allKeys.size === 0) return result;
 

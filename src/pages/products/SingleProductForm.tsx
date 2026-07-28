@@ -36,7 +36,11 @@ import { useProductStore } from '@/stores/useProductStore';
 import type { ProductSetItem, UnitConversion } from '@/types';
 import { isProductSet } from '@/utils/productSet';
 import { appConfig } from '@/config';
-import { hasBarcodeForProducts, perms } from '@/utils/permission';
+import {
+  hasBarcodeForProducts,
+  hasHideFromInventoryListForProducts,
+  perms,
+} from '@/utils/permission';
 
 export type ProductFormValues = {
   name: string;
@@ -61,12 +65,15 @@ export type ProductFormValues = {
   minInventoryUnit: string;
 
   noInventory: boolean;
+
+  hiddenFromInventoryList: boolean;
   unitConversions: UnitConversion[];
 
   setItems: ProductSetItem[];
 };
 
 const barcodeEnabled = hasBarcodeForProducts();
+const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 const canManagePrice = perms.product.canManagePrice();
 
@@ -622,6 +629,16 @@ export function SingleProductForm({
           description={t('products.form.noInventoryDescription')}
           {...form.getInputProps('noInventory', { type: 'checkbox' })}
         />
+        {/* Meaningless alongside `noInventory` — that flag already drops the
+            product from the inventory list. The stored value still round-trips
+            through submit, so flipping `noInventory` back off restores it. */}
+        {hideFromInventoryListEnabled && !noInventory && (
+          <Switch
+            label={t('products.form.hiddenFromInventoryListLabel')}
+            description={t('products.form.hiddenFromInventoryListDescription')}
+            {...form.getInputProps('hiddenFromInventoryList', { type: 'checkbox' })}
+          />
+        )}
         {!noInventory && (
           <>
             <Text size="xs" c="dimmed">

@@ -1,4 +1,4 @@
-import { Badge, Button, Card, Group, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import { Badge, Button, Card, Group, Stack, Switch, Text, ThemeIcon, Tooltip } from '@mantine/core';
 import {
   IconAlertTriangle,
   IconBuildingWarehouse,
@@ -6,7 +6,7 @@ import {
   IconPlus,
   IconTruckLoading,
 } from '@tabler/icons-react';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InventoryRowCard } from '@/components/inventory/InventoryRowCard';
 import { useGoodsReceiptStore } from '@/stores/useGoodsReceiptStore';
@@ -32,6 +32,8 @@ type Props = {
   readonly createOpened?: boolean;
   readonly onOpenCreate?: () => void;
   readonly onCloseCreate?: () => void;
+
+  readonly onToggleHiddenFromInventoryList?: (next: boolean) => Promise<void>;
 };
 
 export function ProductInventorySection({
@@ -39,6 +41,7 @@ export function ProductInventorySection({
   createOpened: controlledOpened,
   onOpenCreate,
   onCloseCreate,
+  onToggleHiddenFromInventoryList,
 }: Props) {
   const { t } = useTranslation();
 
@@ -79,6 +82,25 @@ export function ProductInventorySection({
   const canShowAddMoreRowButton = canCreateInventory && !noInventory && locationsEnabled;
 
   const minInv = product.extra?.minimumInventory?.value;
+
+  const showHiddenToggle = !!onToggleHiddenFromInventoryList && !noInventory;
+  const hiddenFromInventoryList = product.extra?.hiddenFromInventoryList === true;
+  const [togglingHidden, setTogglingHidden] = useState(false);
+  const handleHiddenToggle = useCallback(
+    async (next: boolean) => {
+      if (!onToggleHiddenFromInventoryList) return;
+      setTogglingHidden(true);
+      try {
+        await onToggleHiddenFromInventoryList(next);
+      } catch {
+        // The parent already surfaced the failure (and re-seeded on conflict);
+        // swallow so the switch just snaps back to the product's actual value.
+      } finally {
+        setTogglingHidden(false);
+      }
+    },
+    [onToggleHiddenFromInventoryList],
+  );
 
   const rowOnClickHandlers = useMemo(() => {
     if (!canEditInventory) return new Map<string, () => void>();
@@ -190,6 +212,27 @@ export function ProductInventorySection({
               <Text size="xs" c="dimmed">
                 {t('products.detail.inventoryTab.noInventoryNote')}
               </Text>
+            </Group>
+          )}
+
+          {showHiddenToggle && (
+            <Group justify="space-between" wrap="nowrap" gap="md" align="flex-start">
+              <Stack gap={0} style={{ minWidth: 0 }}>
+                <Text size="xs" fw={600}>
+                  {t('products.form.hiddenFromInventoryListLabel')}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {t('products.form.hiddenFromInventoryListDescription')}
+                </Text>
+              </Stack>
+              <Switch
+                size="sm"
+                checked={hiddenFromInventoryList}
+                disabled={togglingHidden}
+                onChange={(e) => handleHiddenToggle(e.currentTarget.checked)}
+                aria-label={t('products.form.hiddenFromInventoryListLabel')}
+                style={{ flexShrink: 0 }}
+              />
             </Group>
           )}
 

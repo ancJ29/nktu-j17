@@ -24,7 +24,7 @@ import {
   DEFAULT_VENDOR_FEATURES,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
-import type { CompanyInfoConfig, GoodsReceiptFeatures } from '@/config/schema';
+import type { CompanyInfoConfig, GoodsReceiptFeatures, ProductFeatures } from '@/config/schema';
 import { LOOKUP_CATEGORIES } from '@/pages/lookups/categoryRegistry';
 import { LOOKUP_V2_CATEGORIES } from '@/pages/lookup-v2/categoryRegistry';
 import {
@@ -59,7 +59,6 @@ import type {
   CMngtModuleFeatures,
   CMngtPermissionManagementFeatures,
   CMngtPricingFeatures,
-  CMngtProductFeatures,
   CMngtMaterialFeatures,
   CMngtMaterialInventoryFeatures,
   CMngtSalesOrderFeatures,
@@ -257,7 +256,7 @@ export function ConfigEditor({
   const [pricingFeatures, setPricingFeatures] = useState<CMngtPricingFeatures>(
     DEFAULT_CONFIG.features.pricing,
   );
-  const [productsFeatures, setProductsFeatures] = useState<CMngtProductFeatures>(
+  const [productsFeatures, setProductsFeatures] = useState<ProductFeatures>(
     SCHEMA_DEFAULT_PRODUCT_FEATURES,
   );
   const [locationsFeatures, setLocationsFeatures] = useState<CMngtLocationFeatures>(
@@ -1209,6 +1208,14 @@ export function ConfigEditor({
                 checked={productsFeatures.images}
                 onChange={(checked) =>
                   setProductsFeatures({ ...productsFeatures, images: checked })
+                }
+              />
+              <FeatureToggleRow
+                label="Hide From Inventory List"
+                description="When enabled, the product form offers a per-product 'Hide from inventory list' switch, and flagged products are left out of the product-inventory list and its counters. Their stock is untouched — receipts, sales orders and the product's own inventory section keep working. Turning this off shows every product again without clearing the flags."
+                checked={productsFeatures.hideFromInventoryList}
+                onChange={(checked) =>
+                  setProductsFeatures({ ...productsFeatures, hideFromInventoryList: checked })
                 }
               />
               <CodeFormatFields

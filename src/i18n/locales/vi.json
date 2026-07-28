@@ -2775,6 +2775,7 @@
           "repack": "Đã đóng gói lại tồn kho cho",
           "stockTake": "Đã kiểm kê tồn kho cho"
         },
+        "toggleInventoryVisibility": "Đã thay đổi hiển thị trong danh sách tồn kho của",
         "update": "Đã cập nhật",
         "updateClassification": "Đã cập nhật phân loại cho",
         "updateDescription": "Đã cập nhật mô tả cho",
@@ -2841,6 +2842,8 @@
       "classificationSection": "Phân loại",
       "createButton": "Tạo sản phẩm",
       "descriptionPlaceholder": "Mô tả sản phẩm",
+      "hiddenFromInventoryListDescription": "Không hiển thị sản phẩm này trong danh sách tồn kho. Tồn kho vẫn được theo dõi bình thường.",
+      "hiddenFromInventoryListLabel": "Ẩn khỏi danh sách tồn kho",
       "isActiveLabel": "Đang bán",
       "minimumInventoryDesc": "Cảnh báo khi tồn kho chạm hoặc xuống dưới mức này.",
       "minimumInventoryUnitPlaceholder": "Đơn vị (vd: cái, hộp)",

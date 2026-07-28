@@ -161,6 +161,8 @@ const ProductFeaturesSchema = z
     technicalSpecs: z.boolean().default(true),
     barcode: z.boolean().default(true),
     images: z.boolean().default(true),
+
+    hideFromInventoryList: z.boolean().default(false),
   })
   .default({
     enabled: false,
@@ -171,7 +173,10 @@ const ProductFeaturesSchema = z
     technicalSpecs: true,
     barcode: true,
     images: true,
+    hideFromInventoryList: false,
   });
+
+export type ProductFeatures = z.infer<typeof ProductFeaturesSchema>;
 
 const MaterialFeaturesSchema = z
   .object({

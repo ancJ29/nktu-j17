@@ -236,7 +236,15 @@ export type BulkProduct = {
   minInventoryValue?: number;
 
   minInventoryUnit?: string;
+
+  noInventory?: boolean;
+
+  hiddenFromInventoryList?: boolean;
 };
+
+const TRUTHY_CELLS = new Set(['yes', 'y', 'true', '1', 'x', 'có', 'co']);
+
+const isTruthyCell = (raw: string) => TRUTHY_CELLS.has(raw.trim().toLowerCase());
 
 export type ProductTemplateOptions = {
   language?: string;
@@ -245,9 +253,15 @@ export type ProductTemplateOptions = {
 
   hasBarcode?: boolean;
 
-  categories?: string[];
+  hasHideFromInventoryList?: boolean;
 
-  tags?: string[];
+  products?: ReadonlyArray<Product>;
+
+  categoryLabels?: Record<string, string>;
+
+  unitLabels?: Record<string, string>;
+
+  categories?: string[];
 
   units?: string[];
 };
@@ -305,6 +319,12 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'min stock unit': 'minInventoryUnit',
           'minimum stock unit': 'minInventoryUnit',
 
+          'not inventory-managed': 'noInventory',
+          'not inventory managed': 'noInventory',
+          'no inventory': 'noInventory',
+          'hidden from inventory list': 'hiddenFromInventoryList',
+          'hide from inventory list': 'hiddenFromInventoryList',
+
           tên: 'name',
           'tên sản phẩm': 'name',
           mã: 'code',
@@ -314,6 +334,8 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'mô tả': 'description',
           'danh mục': 'category',
           thẻ: 'tags',
+          'không quản lý tồn kho': 'noInventory',
+          'ẩn khỏi danh sách tồn kho': 'hiddenFromInventoryList',
           giá: 'price',
           'giá bán': 'price',
           'giá vốn': 'basePrice',
@@ -359,6 +381,11 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
                 .map((s) => s.trim())
                 .filter(Boolean);
               if (list.length > 0) product.tags = list;
+              continue;
+            }
+
+            if (fieldName === 'noInventory' || fieldName === 'hiddenFromInventoryList') {
+              if (isTruthyCell(value)) product[fieldName] = true;
               continue;
             }
 
@@ -419,11 +446,12 @@ type ProductSampleRow = {
   barcode: string;
   description: string;
   category: string;
-  tags: string;
   price: string;
   basePrice: string;
   minInventoryValue: string;
   minInventoryUnit: string;
+  noInventory: string;
+  hiddenFromInventoryList: string;
 };
 
 const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
@@ -434,11 +462,12 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
     barcode: '8936000000101',
     description: 'Cà phê pha phin truyền thống',
     category: 'Đồ uống',
-    tags: '',
     price: '25000',
     basePrice: '15000',
     minInventoryValue: '20',
     minInventoryUnit: 'ly',
+    noInventory: '',
+    hiddenFromInventoryList: '',
   },
   {
     name: 'Bánh mì thịt nguội',
@@ -447,11 +476,12 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
     barcode: '8936000000102',
     description: 'Bánh mì giòn với thịt nguội và rau',
     category: 'Thức ăn',
-    tags: '',
     price: '35000',
     basePrice: '20000',
     minInventoryValue: '10',
     minInventoryUnit: 'cái',
+    noInventory: '',
+    hiddenFromInventoryList: '',
   },
   {
     name: 'Nước suối Lavie 500ml',
@@ -460,11 +490,12 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
     barcode: '8936000000103',
     description: 'Nước khoáng thiên nhiên',
     category: 'Đồ uống',
-    tags: '',
     price: '10000',
     basePrice: '6000',
     minInventoryValue: '50',
     minInventoryUnit: 'chai',
+    noInventory: '',
+    hiddenFromInventoryList: '',
   },
 ];
 
@@ -476,11 +507,12 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
     barcode: '0123456789012',
     description: 'Traditional Vietnamese filter coffee',
     category: 'Beverages',
-    tags: '',
     price: '25000',
     basePrice: '15000',
     minInventoryValue: '20',
     minInventoryUnit: 'cup',
+    noInventory: '',
+    hiddenFromInventoryList: '',
   },
   {
     name: 'Ham Sandwich',
@@ -489,11 +521,12 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
     barcode: '0123456789013',
     description: 'Crusty bread with ham and vegetables',
     category: 'Food',
-    tags: '',
     price: '35000',
     basePrice: '20000',
     minInventoryValue: '10',
     minInventoryUnit: 'piece',
+    noInventory: '',
+    hiddenFromInventoryList: '',
   },
   {
     name: 'Bottled Water 500ml',
@@ -502,11 +535,12 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
     barcode: '0123456789014',
     description: 'Natural mineral water',
     category: 'Beverages',
-    tags: '',
     price: '10000',
     basePrice: '6000',
     minInventoryValue: '50',
     minInventoryUnit: 'bottle',
+    noInventory: '',
+    hiddenFromInventoryList: '',
   },
 ];
 
@@ -514,8 +548,11 @@ export const generateProductExcelTemplate = ({
   language,
   hasPrice = true,
   hasBarcode = true,
+  hasHideFromInventoryList = false,
+  products,
+  categoryLabels,
+  unitLabels,
   categories,
-  tags,
   units,
 }: ProductTemplateOptions = {}) => {
   const isVietnamese = language === 'vi';
@@ -531,11 +568,12 @@ export const generateProductExcelTemplate = ({
         barcode: 'Mã vạch',
         description: 'Mô tả',
         category: 'Danh mục',
-        tags: 'Thẻ',
         price: 'Giá bán',
         basePrice: 'Giá vốn',
         minInventoryValue: 'Tồn kho tối thiểu',
         minInventoryUnit: 'Đơn vị tồn kho tối thiểu',
+        noInventory: 'Không quản lý tồn kho',
+        hiddenFromInventoryList: 'Ẩn khỏi danh sách tồn kho',
       }
     : {
         name: 'Name',
@@ -544,11 +582,12 @@ export const generateProductExcelTemplate = ({
         barcode: 'Barcode',
         description: 'Description',
         category: 'Category',
-        tags: 'Tags',
         price: 'Price',
         basePrice: 'Base Price',
         minInventoryValue: 'Min stock',
         minInventoryUnit: 'Min stock unit',
+        noInventory: 'Not inventory-managed',
+        hiddenFromInventoryList: 'Hidden from inventory list',
       };
 
   const columns: Column[] = [
@@ -559,7 +598,7 @@ export const generateProductExcelTemplate = ({
     ...(hasBarcode ? [{ key: 'barcode' as const, header: labels.barcode, width: 16 }] : []),
     { key: 'description', header: labels.description, width: 36 },
     { key: 'category', header: labels.category, width: 18 },
-    { key: 'tags', header: labels.tags, width: 24 },
+
     ...(hasPrice
       ? [
           { key: 'price' as const, header: labels.price, width: 12 },
@@ -568,21 +607,60 @@ export const generateProductExcelTemplate = ({
       : []),
     { key: 'minInventoryValue', header: labels.minInventoryValue, width: 14 },
     { key: 'minInventoryUnit', header: labels.minInventoryUnit, width: 16 },
+    { key: 'noInventory', header: labels.noInventory, width: 20 },
+    ...(hasHideFromInventoryList
+      ? [
+          {
+            key: 'hiddenFromInventoryList' as const,
+            header: labels.hiddenFromInventoryList,
+            width: 24,
+          },
+        ]
+      : []),
   ];
 
+  const yes = isVietnamese ? 'Có' : 'Yes';
+  const no = isVietnamese ? 'Không' : 'No';
+  const flagCell = (on: boolean | undefined) => (on ? yes : no);
+  const resolveLabel = (val: string | undefined, map?: Record<string, string>) =>
+    val ? (map?.[val] ?? val) : '';
+
+  const realRows: ProductSampleRow[] = (products ?? [])
+    .filter((p) => !p.extra?.isDeleted)
+    .map((p) => {
+      const e = p.extra ?? {};
+      const min = e.minimumInventory;
+      return {
+        name: p.name,
+        unit: resolveLabel(p.unit, unitLabels),
+        sku: e.sku ?? '',
+        barcode: e.barcode ?? '',
+        description: p.description ?? '',
+        category: resolveLabel(e.category, categoryLabels),
+        price: typeof p.price === 'number' && p.price > 0 ? String(p.price) : '',
+        basePrice: typeof e.basePrice === 'number' && e.basePrice > 0 ? String(e.basePrice) : '',
+        minInventoryValue: typeof min?.value === 'number' && min.value > 0 ? String(min.value) : '',
+        minInventoryUnit: resolveLabel(min?.unit, unitLabels),
+        noInventory: flagCell(e.noInventory),
+        hiddenFromInventoryList: flagCell(e.hiddenFromInventoryList),
+      };
+    });
+
   const sampleSource = isVietnamese ? PRODUCT_SAMPLE_ROWS_VI : PRODUCT_SAMPLE_ROWS_EN;
-  const sampleTagCell = (tags?.length ?? 0) >= 3 ? tags!.slice(0, 3).join('; ') : '';
   const sampleUnit = (i: number) => (units?.length ? units[i % units.length] : undefined);
-  const sampleRows = sampleSource.map((row, i) => ({
+  const fallbackRows = sampleSource.map((row, i) => ({
     ...row,
     unit: sampleUnit(i) ?? row.unit,
     minInventoryUnit: sampleUnit(i) ?? row.minInventoryUnit,
     category: categories?.[i] ?? row.category,
-    tags: sampleTagCell,
+    noInventory: no,
+    hiddenFromInventoryList: no,
   }));
 
+  const bodyRows = realRows.length > 0 ? realRows : fallbackRows;
+
   const headerRow = columns.map((c) => c.header);
-  const dataRows = sampleRows.map((row) => columns.map((c) => row[c.key]));
+  const dataRows = bodyRows.map((row) => columns.map((c) => row[c.key]));
 
   const worksheet = XLSX.utils.aoa_to_sheet([headerRow, ...dataRows]);
   worksheet['!cols'] = columns.map((c) => ({ width: c.width }));
@@ -932,11 +1010,20 @@ export type ProductExportOptions = {
   tagLabels?: Record<string, string>;
 
   unitLabels?: Record<string, string>;
+
+  hasHideFromInventoryList?: boolean;
 };
 
 export const exportProductsToExcel = (
   products: ReadonlyArray<Product>,
-  { language, hasPrice = true, categoryLabels, tagLabels, unitLabels }: ProductExportOptions = {},
+  {
+    language,
+    hasPrice = true,
+    categoryLabels,
+    tagLabels,
+    unitLabels,
+    hasHideFromInventoryList = false,
+  }: ProductExportOptions = {},
 ) => {
   const isVietnamese = language === 'vi';
 
@@ -955,6 +1042,8 @@ export const exportProductsToExcel = (
     | 'minInventoryUnit'
     | 'price'
     | 'basePrice'
+    | 'noInventory'
+    | 'hiddenFromInventoryList'
     | 'status';
   type Column = { key: ColumnKey; header: string; width: number };
 
@@ -974,6 +1063,8 @@ export const exportProductsToExcel = (
         minInventoryUnit: 'Đơn vị tồn kho tối thiểu',
         price: 'Giá bán',
         basePrice: 'Giá vốn',
+        noInventory: 'Không quản lý tồn kho',
+        hiddenFromInventoryList: 'Ẩn khỏi danh sách tồn kho',
         status: 'Trạng thái',
       }
     : {
@@ -991,6 +1082,8 @@ export const exportProductsToExcel = (
         minInventoryUnit: 'Min stock unit',
         price: 'Price',
         basePrice: 'Base price',
+        noInventory: 'Not inventory-managed',
+        hiddenFromInventoryList: 'Hidden from inventory list',
         status: 'Status',
       };
 
@@ -1013,11 +1106,23 @@ export const exportProductsToExcel = (
           { key: 'basePrice' as const, header: labels.basePrice, width: 12 },
         ]
       : []),
+    { key: 'noInventory', header: labels.noInventory, width: 20 },
+    ...(hasHideFromInventoryList
+      ? [
+          {
+            key: 'hiddenFromInventoryList' as const,
+            header: labels.hiddenFromInventoryList,
+            width: 24,
+          },
+        ]
+      : []),
     { key: 'status', header: labels.status, width: 12 },
   ];
 
   const statusActive = isVietnamese ? 'Đang bán' : 'Active';
   const statusInactive = isVietnamese ? 'Ngừng bán' : 'Inactive';
+  const flagYes = isVietnamese ? 'Có' : 'Yes';
+  const flagNo = isVietnamese ? 'Không' : 'No';
   const resolveLabel = (val: string | undefined, map?: Record<string, string>) =>
     val ? (map?.[val] ?? val) : '';
 
@@ -1045,6 +1150,9 @@ export const exportProductsToExcel = (
         minInventoryUnit: resolveLabel(min?.unit, unitLabels),
         price: typeof p.price === 'number' && p.price > 0 ? p.price : '',
         basePrice: typeof e.basePrice === 'number' && e.basePrice > 0 ? e.basePrice : '',
+
+        noInventory: e.noInventory ? flagYes : flagNo,
+        hiddenFromInventoryList: e.hiddenFromInventoryList ? flagYes : flagNo,
         status: p.isActive ? statusActive : statusInactive,
       };
       return columns.map((c) => cells[c.key]);

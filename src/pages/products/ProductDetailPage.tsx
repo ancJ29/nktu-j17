@@ -68,6 +68,7 @@ import { lookupLabelOf, useLookupLabels, useLookupOptions } from '@/hooks';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import {
   hasBarcodeForProducts,
+  hasHideFromInventoryListForProducts,
   hasImagesForProducts,
   hasTechnicalSpecsForProducts,
   isActivityLoggingEnabled,
@@ -101,6 +102,7 @@ const activityTabVisible = !isMobile && isActivityLoggingEnabled();
 const technicalSpecsEnabled = hasTechnicalSpecsForProducts();
 const barcodeEnabled = hasBarcodeForProducts();
 const imagesEnabled = hasImagesForProducts();
+const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 type ClassificationDraft = {
   category: string;
@@ -411,6 +413,16 @@ export function ProductDetailPage() {
       await patchProduct({ extra: { ...product.extra, ...partial } }, auditVerb);
     },
     [product, patchProduct],
+  );
+
+  const handleToggleHiddenFromInventoryList = useCallback(
+    async (next: boolean) => {
+      await patchExtra(
+        { hiddenFromInventoryList: next || undefined },
+        'product.toggleInventoryVisibility',
+      );
+    },
+    [patchExtra],
   );
 
   const employees = useEmployeeStore((s) => s.items);
@@ -1175,6 +1187,10 @@ export function ProductDetailPage() {
       createOpened={enterInventoryOpened}
       onOpenCreate={openEnterInventory}
       onCloseCreate={closeEnterInventory}
+
+      onToggleHiddenFromInventoryList={
+        hideFromInventoryListEnabled && canEdit ? handleToggleHiddenFromInventoryList : undefined
+      }
     />
   ) : null;
 

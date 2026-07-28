@@ -8,7 +8,6 @@ import type {
 } from '@credo/kits/types';
 import type {
   CMngtEmployeeFeatures,
-  CMngtProductFeatures,
   CMngtLocationFeatures,
   CMngtCustomerFeatures,
   CMngtVendorFeatures,
@@ -19,7 +18,7 @@ import type {
   CMngtDisplaySettings,
 } from '@credo/kits/types';
 
-import type { CompanyInfoConfig, GoodsReceiptFeatures } from './schema';
+import type { CompanyInfoConfig, GoodsReceiptFeatures, ProductFeatures } from './schema';
 
 const CLIENT_NAME = 'Credo Management';
 
@@ -77,7 +76,7 @@ export const DEFAULT_EMPLOYEE_FEATURES: CMngtEmployeeFeatures = {
   positionOptions: [],
 };
 
-export const DEFAULT_PRODUCT_FEATURES: CMngtProductFeatures = {
+export const DEFAULT_PRODUCT_FEATURES: ProductFeatures = {
   enabled: true,
   codePrefix: 'PRD-',
   codePadLength: 4,
@@ -86,6 +85,8 @@ export const DEFAULT_PRODUCT_FEATURES: CMngtProductFeatures = {
   technicalSpecs: true,
   barcode: true,
   images: true,
+
+  hideFromInventoryList: false,
 };
 
 export const DEFAULT_LOCATION_FEATURES: CMngtLocationFeatures = {

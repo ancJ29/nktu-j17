@@ -1,4 +1,4 @@
-import { defaultAppConfig, type GoodsReceiptFeatures } from '@/config/schema';
+import { defaultAppConfig, type GoodsReceiptFeatures, type ProductFeatures } from '@/config/schema';
 import type {
   AuthFeatures,
   CMngtActivityLogFeatures,
@@ -13,7 +13,6 @@ import type {
   CMngtModuleFeatures,
   CMngtPermissionManagementFeatures,
   CMngtPricingFeatures,
-  CMngtProductFeatures,
   CMngtSalesOrderFeatures,
   CMngtVendorFeatures,
   CMngtWarehouseDocFeatures,
@@ -45,8 +44,7 @@ export const SCHEMA_DEFAULT_LOOKUP_FEATURES: CMngtLookupFeatures = {
   enabled: false,
   enabledCategories: [],
 };
-export const SCHEMA_DEFAULT_PRODUCT_FEATURES: CMngtProductFeatures =
-  defaultAppConfig.features.products;
+export const SCHEMA_DEFAULT_PRODUCT_FEATURES: ProductFeatures = defaultAppConfig.features.products;
 export const SCHEMA_DEFAULT_LOCATION_FEATURES: CMngtLocationFeatures =
   defaultAppConfig.features.locations;
 export const SCHEMA_DEFAULT_CUSTOMER_FEATURES: CMngtCustomerFeatures =
