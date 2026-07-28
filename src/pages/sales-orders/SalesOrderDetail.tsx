@@ -798,7 +798,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     ) : null;
 
   const reconcileBanner =
-    canEdit && reconcileIssues.length > 0 ? (
+    isRootUser && canEdit && reconcileIssues.length > 0 ? (
       <Alert
         icon={<IconAlertTriangle size={16} />}
         color="orange"
