@@ -308,6 +308,6 @@ function configureTrace(
   }
 
   const hashed = (hashString(pathname) ?? '').slice(0, 4);
-  const enabled = compareEnvVar('__TRACE_HASH__', hashed, false);
+  const enabled = compareEnvVar('__TRACE_HASH__', hashed);
   return { enabled, url: `${fetchUrl}?p=${pathname}&h=${hashed}` };
 }
