@@ -51,6 +51,7 @@ import { CodeLabel, FieldLabel, Tabs } from '@credo/base-ui/components';
 import { asyncDeduplicator, device } from '@credo/base-ui/utils';
 import { ActiveBadge, CategoryBadge, TagBadge, UnitBadge } from '@/components/badges';
 import { ConfirmModal } from '@/components/ConfirmModal';
+import { CopyValueButton } from '@/components/CopyValueButton';
 import { DescriptionText } from '@/components/DescriptionText';
 import { EmployeeLink } from '@/components/EmployeeLink';
 import { ImageUploadPanel, type PhotoEntry } from '@/components/ImageUploadPanel';
@@ -642,6 +643,16 @@ export function ProductDetailPage() {
     <TimestampLine updatedAt={product.updatedAt} createdAt={product.createdAt} />
   );
 
+  const sku = extra.sku?.trim();
+  const skuLine = !sku ? null : isMobile ? (
+    <Group gap={4} wrap="nowrap">
+      <CodeLabel code={sku} />
+      <CopyValueButton value={sku} copiedMessage={t('products.notifications.skuCopied')} />
+    </Group>
+  ) : (
+    <CodeLabel code={sku} />
+  );
+
   const headerRow = isMobile ? (
     <Stack gap="sm">
       <Group gap="md" wrap="nowrap" align="flex-start">
@@ -650,7 +661,7 @@ export function ProductDetailPage() {
           <Title order={5} lh={1.2}>
             {product.name}
           </Title>
-          {extra.sku && <CodeLabel code={extra.sku} />}
+          {skuLine}
           {altNamesLine}
         </Stack>
         {stockSummary}
@@ -666,7 +677,7 @@ export function ProductDetailPage() {
           <Title order={3} lh={1.2}>
             {product.name}
           </Title>
-          {extra.sku && <CodeLabel code={extra.sku} />}
+          {skuLine}
           {altNamesLine}
           <Group gap={6} wrap="wrap" mt={2}>
             <ActiveBadge

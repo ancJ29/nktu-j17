@@ -17,6 +17,7 @@ import { device, logger } from '@credo/base-ui/utils';
 import { exportSalesOrdersToExcel } from '@/utils/salesOrderExcel';
 import { exportSalesOrdersToAccountingExcel } from '@/utils/salesOrderAccountingExcel';
 import { useListFilter } from '@/hooks/useListFilter';
+import { useSelectionMode } from '@/hooks/useRowSelection';
 import { useTransactionalRangeRefetch } from '@/hooks/useTransactionalRangeRefetch';
 import {
   DesktopFilterBar,
@@ -33,6 +34,7 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
+import { multiOptionFilter } from '@/components/mobileFilterDefs';
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { TransactionalFilterPillsRow } from '@/components/TransactionalFilterPillsRow';
@@ -103,20 +105,14 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   const [viewMode, setViewMode] = useState<'ops' | 'finance'>('ops');
   const financeMode = showPrice && viewMode === 'finance';
 
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
-  const toggleRow = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-  const exitSelectionMode = useCallback(() => {
-    setSelectionMode(false);
-    setSelectedIds(new Set());
-  }, []);
+  const selection = useSelectionMode();
+  const {
+    selectionMode,
+    selectedKeys: selectedIds,
+    toggle: toggleRow,
+    exitSelectionMode,
+  } = selection;
+  const enterSelectionMode = selection.enterSelectionMode;
 
   const {
     items: storeOrders,
@@ -153,7 +149,11 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     return live.filter((o) => o.extra?.assignedStaff === me);
   }, [storeOrders]);
 
-  const filters = useSalesOrderListFilters(visibleStoreOrders, variant.defaultDateRangeDays);
+  const filters = useSalesOrderListFilters(
+    visibleStoreOrders,
+    variant.defaultDateRangeDays,
+    variant.internalDeliveryFirstSort,
+  );
 
   useEffect(() => {
     if (!initialized && !error) loadAll();
@@ -287,20 +287,13 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     () => paginated.filter((o) => !ordersWithDR.has(o.id)),
     [paginated, ordersWithDR],
   );
-  const allPageSelected =
-    selectableOnPage.length > 0 && selectableOnPage.every((o) => selectedIds.has(o.id));
-  const somePageSelected = selectableOnPage.some((o) => selectedIds.has(o.id)) && !allPageSelected;
-  const toggleAllOnPage = useCallback(() => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      const all = selectableOnPage.length > 0 && selectableOnPage.every((o) => next.has(o.id));
-      for (const o of selectableOnPage) {
-        if (all) next.delete(o.id);
-        else next.add(o.id);
-      }
-      return next;
-    });
-  }, [selectableOnPage]);
+  const selectableOnPageIds = useMemo(() => selectableOnPage.map((o) => o.id), [selectableOnPage]);
+  const { allSelected: allPageSelected, someSelected: somePageSelected } =
+    selection.headerState(selectableOnPageIds);
+  const toggleAllOnPage = useCallback(
+    () => selection.toggleAllIn(selectableOnPageIds),
+    [selection, selectableOnPageIds],
+  );
 
   const statusFilterData = useMemo(
     () => statusOptions.map((s) => ({ value: s.value, label: s.label })),
@@ -479,14 +472,15 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   ];
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
-    {
+    multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
+      displayValue: statusPlaceholder,
       value: filters.statusFilter,
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusFilterData],
+      options: statusFilterData,
       onChange: filters.setStatusFilter,
+      allLabel: t('__new__.01-common.filters.all'),
       visible: statusFilterData.length > 0,
-      multi: true,
-    },
+    }),
   ];
 
   const dateAndUrgentFilters: MoreFilterDef[] = [
@@ -568,8 +562,14 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           },
         ] satisfies MoreFilterDef[])
       : []),
-    ...dateAndUrgentFilters,
+
+    ...dateAndUrgentFilters.filter((f) => f.key !== 'urgent'),
   ];
+
+  const showStatusPills = !isMobile;
+  const showUrgentPill = !isMobile;
+
+  const showDeliveryKindPill = !isMobile || !deliveryKindFilterEnabled;
 
   return (
     <Stack gap={isMobile ? 'md' : 'lg'}>
@@ -604,7 +604,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
                       variant="default"
                       size="sm"
                       leftSection={<IconTruckDelivery size={16} />}
-                      onClick={() => setSelectionMode(true)}
+                      onClick={enterSelectionMode}
                     >
                       {t('deliveryRequests.bulkCreate.openButton')}
                     </Button>
@@ -647,7 +647,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             to: ROUTES.SALES_ORDERS.NEW,
             label: t('salesOrders.addItem'),
             enabled: canCreate,
-            mobileVariant: 'icon',
           }}
         />
 
@@ -675,14 +674,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.salesOrders.list.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('salesOrders.filterActive'),
-              inactive: t('salesOrders.filterClosed'),
-            }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -694,20 +686,14 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.salesOrders.list.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('salesOrders.filterActive'),
-              inactive: t('salesOrders.filterClosed'),
-            }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover
@@ -727,14 +713,17 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             presetLabels,
           }}
         >
-          {filters.statusFilter.map((sf) => (
-            <FilterPill
-              key={sf}
-              onClose={() => filters.setStatusFilter(filters.statusFilter.filter((v) => v !== sf))}
-            >
-              {resolveStatus(sf).label}
-            </FilterPill>
-          ))}
+          {showStatusPills &&
+            filters.statusFilter.map((sf) => (
+              <FilterPill
+                key={sf}
+                onClose={() =>
+                  filters.setStatusFilter(filters.statusFilter.filter((v) => v !== sf))
+                }
+              >
+                {resolveStatus(sf).label}
+              </FilterPill>
+            ))}
           {filters.customerFilter && (
             <FilterPill onClose={() => filters.setCustomerFilter(null)}>
               {customerFilterData.find((c) => c.value === filters.customerFilter)?.label ??
@@ -748,12 +737,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
                 filters.staffFilter}
             </FilterPill>
           )}
-          {filters.urgentOnly && (
+          {showUrgentPill && filters.urgentOnly && (
             <FilterPill color="red" onClose={() => filters.setUrgentOnly(false)}>
               {t('salesOrders.filterUrgentOnly')}
             </FilterPill>
           )}
-          {filters.deliveryKind !== 'all' && (
+          {showDeliveryKindPill && filters.deliveryKind !== 'all' && (
             <FilterPill onClose={() => filters.setDeliveryKind('all')}>
               {filters.deliveryKind === 'internal'
                 ? t('__new__.07-entities.salesOrders.list.filterInternalDelivery')

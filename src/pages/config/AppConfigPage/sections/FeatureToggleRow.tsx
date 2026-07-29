@@ -15,11 +15,12 @@ export const FeatureToggleRow = memo(function FeatureToggleRow({
   return (
     <Group
       justify="space-between"
+      wrap="nowrap"
       p="xs"
       style={{ borderRadius: 'var(--mantine-radius-sm)' }}
       bg={checked ? undefined : 'var(--mantine-color-default-hover)'}
     >
-      <Box>
+      <Box style={{ flex: 1, minWidth: 0 }}>
         <Text fz="sm" fw={500}>
           {label}
         </Text>
@@ -29,7 +30,11 @@ export const FeatureToggleRow = memo(function FeatureToggleRow({
           </Text>
         )}
       </Box>
-      <Switch checked={checked} onChange={(e) => onChange(e.currentTarget.checked)} />
+      <Switch
+        checked={checked}
+        onChange={(e) => onChange(e.currentTarget.checked)}
+        style={{ flexShrink: 0 }}
+      />
     </Group>
   );
 });

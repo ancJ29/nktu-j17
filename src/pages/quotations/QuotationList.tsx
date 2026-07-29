@@ -12,6 +12,7 @@ import { ListPagination } from '@/components/custom/ListPagination';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { DesktopFilterMorePopover } from '@/components/DesktopFilterMorePopover';
 import { MobileFilterBar, type MobileFilterDef } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { FilterPill } from '@/components/FilterPill';
 import { ROUTES } from '@/constants/routes';
@@ -207,27 +208,35 @@ export function QuotationList() {
     },
   ];
 
+  const allLabel = t('__new__.01-common.filters.all');
+
   const mobileFilters: MobileFilterDef[] = [
-    {
+    allOptionFilter<'' | QuotationStatus>({
       title: t('__new__.01-common.labels.status'),
-      value: statusFilter || 'all',
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusData],
-      onChange: (v) => setStatusFilter((v === 'all' ? '' : v) as '' | QuotationStatus),
-    },
-    {
+      value: statusFilter,
+      options: statusData,
+      onChange: setStatusFilter,
+      allLabel,
+      emptyValue: '',
+    }),
+    allOptionFilter({
       title: t('common.labels.customer'),
-      value: customerFilter || 'all',
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...customerData],
-      onChange: (v) => setCustomerFilter(v === 'all' ? '' : v),
+      value: customerFilter,
+      options: customerData,
+      onChange: setCustomerFilter,
+      allLabel,
+      emptyValue: '',
       visible: customerData.length > 0,
-    },
-    {
+    }),
+    allOptionFilter({
       title: t('salesOrders.columns.assignedStaff'),
-      value: staffFilter || 'all',
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...staffData],
-      onChange: (v) => setStaffFilter(v === 'all' ? '' : v),
+      value: staffFilter,
+      options: staffData,
+      onChange: setStaffFilter,
+      allLabel,
+      emptyValue: '',
       visible: canViewAll && staffData.length > 0,
-    },
+    }),
   ];
 
   const dateFilter: MoreFilterDef[] = [
@@ -308,7 +317,10 @@ export function QuotationList() {
 
   const hasActiveFilters =
     !!search || !!statusFilter || !!customerFilter || !!staffFilter || !dateIsDefault;
-  const hasPills = !!statusFilter || !!customerFilter || !!staffFilter || !dateIsDefault;
+
+  const showSelectPills = !isMobile;
+  const hasPills =
+    (showSelectPills && (!!statusFilter || !!customerFilter || !!staffFilter)) || !dateIsDefault;
 
   return (
     <Stack gap={isMobile ? 'md' : 'lg'}>
@@ -332,7 +344,6 @@ export function QuotationList() {
             label: t('quotations.actions.new'),
             to: ROUTES.QUOTATIONS.NEW,
             enabled: canCreate,
-            mobileVariant: 'hidden',
           }}
         />
 
@@ -341,10 +352,7 @@ export function QuotationList() {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('quotations.filter.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -356,16 +364,14 @@ export function QuotationList() {
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('quotations.filter.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={dateFilter} presetLabels={presetLabels} />
@@ -377,19 +383,19 @@ export function QuotationList() {
 
         {hasPills && (
           <Group gap="xs">
-            {statusFilter && (
+            {showSelectPills && statusFilter && (
               <FilterPill onClose={() => setStatusFilter('')}>
                 {t('__new__.01-common.labels.status')}:{' '}
                 {statusData.find((s) => s.value === statusFilter)?.label ?? statusFilter}
               </FilterPill>
             )}
-            {customerFilter && (
+            {showSelectPills && customerFilter && (
               <FilterPill onClose={() => setCustomerFilter('')}>
                 {t('common.labels.customer')}:{' '}
                 {customerData.find((c) => c.value === customerFilter)?.label ?? customerFilter}
               </FilterPill>
             )}
-            {staffFilter && (
+            {showSelectPills && staffFilter && (
               <FilterPill onClose={() => setStaffFilter('')}>
                 {t('salesOrders.columns.assignedStaff')}: {staffName(staffFilter)}
               </FilterPill>

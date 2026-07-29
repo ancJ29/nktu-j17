@@ -78,7 +78,13 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   const isEdit = !!id;
   const bundle = bundleFor(kind);
 
-  const copyFrom = (location.state as { copyFrom?: WarehouseDocRow } | null)?.copyFrom ?? null;
+  const navState = location.state as {
+    copyFrom?: WarehouseDocRow;
+    seedMaterialCodes?: string[];
+  } | null;
+  const copyFrom = navState?.copyFrom ?? null;
+
+  const seedMaterialCodes = navState?.seedMaterialCodes ?? null;
 
   useEffect(() => {
     if (isMobile || (isEdit && !kind.perms.canEdit()) || (!isEdit && !kind.perms.canCreate())) {
@@ -107,9 +113,13 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   const snapshotRef = useRef<WarehouseDocRow | null>(null);
   const seededRef = useRef(false);
   const copySeededRef = useRef(false);
+  const materialSeededRef = useRef(false);
 
   const materialSelectRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const focusNewLineRef = useRef(false);
+
+  const quantityInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
+  const focusFirstQuantityRef = useRef(false);
 
   const form = useForm<FormValues>({
     initialValues: {
@@ -224,6 +234,25 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   }, [isEdit, copyFrom]);
 
   useEffect(() => {
+    if (isEdit || !seedMaterialCodes?.length || materialSeededRef.current) return;
+    if (!materialsInitialized) return;
+    materialSeededRef.current = true;
+    const seeded = seedMaterialCodes
+      .map((code) => materialByCode.get(code))
+      .filter((m): m is Material => !!m && !m.extra?.isDeleted)
+      .map((m) => ({
+        itemCode: m.code,
+        itemName: m.name,
+        unit: m.extra?.units?.[0] ?? '',
+        quantity: '' as const,
+      }));
+    if (seeded.length === 0) return;
+    form.setFieldValue('lines', seeded);
+    focusFirstQuantityRef.current = true;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEdit, seedMaterialCodes, materialsInitialized, materialByCode]);
+
+  useEffect(() => {
     if (isEdit && initialized && !existing && !seededRef.current) {
       navigate(kind.routes.LIST, { replace: true });
     }
@@ -249,9 +278,13 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   };
 
   useEffect(() => {
-    if (!focusNewLineRef.current) return;
-    focusNewLineRef.current = false;
-    materialSelectRefs.current[form.values.lines.length - 1]?.focus();
+    if (focusNewLineRef.current) {
+      focusNewLineRef.current = false;
+      materialSelectRefs.current[form.values.lines.length - 1]?.focus();
+    } else if (focusFirstQuantityRef.current) {
+      focusFirstQuantityRef.current = false;
+      quantityInputRefs.current[0]?.focus();
+    }
   }, [form.values.lines.length]);
   const removeLine = (idx: number) =>
     form.setFieldValue(
@@ -390,6 +423,13 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
           {t('warehouseDoc.copiedFrom', { code: copyFrom.extra.code })}
         </Text>
       )}
+      {/* Counts the lines that actually seeded, not the codes asked for — a
+          deleted material resolves to nothing and shouldn't be claimed. */}
+      {!isEdit && !copyFrom && !!seedMaterialCodes?.length && form.values.lines.length > 0 && (
+        <Text size="sm" c="dimmed" mt={-8}>
+          {t('warehouseDoc.seededFromMaterials', { count: form.values.lines.length })}
+        </Text>
+      )}
 
       {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
       <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -517,6 +557,9 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
                         </Table.Td>
                         <Table.Td>
                           <NumberInput
+                            ref={(el) => {
+                              quantityInputRefs.current[idx] = el;
+                            }}
                             min={0}
                             thousandSeparator=","
                             placeholder="0"

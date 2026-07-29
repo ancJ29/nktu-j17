@@ -81,7 +81,7 @@ export function LocationDataTable({ locations, isLoading }: LocationDataTablePro
           <ActiveBadge
             isActive={item.isActive}
             activeLabel={t('__new__.01-common.labels.active')}
-            inactiveLabel={t('common.status.inactive')}
+            inactiveLabel={t('__new__.01-common.labels.inactive')}
             size="sm"
           />
         ),

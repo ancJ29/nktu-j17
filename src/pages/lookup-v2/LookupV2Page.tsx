@@ -416,8 +416,8 @@ export function LookupV2Page() {
                     <Table.Td>
                       <ActiveBadge
                         isActive={entry.isActive}
-                        activeLabel={t('common.status.active')}
-                        inactiveLabel={t('common.filters.inactive')}
+                        activeLabel={t('__new__.01-common.labels.active')}
+                        inactiveLabel={t('__new__.01-common.labels.inactive')}
                         size="sm"
                       />
                     </Table.Td>

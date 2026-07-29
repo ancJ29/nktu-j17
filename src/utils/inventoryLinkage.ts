@@ -4,6 +4,7 @@ import type {
   InventoryLinkageSnapshotEntry,
   InventoryLinkageTransition,
   InventoryLinkageVia,
+  PendingInventoryShip,
 } from '@/types/sales-order';
 
 export type LinkageActor = { id: string; name: string } | undefined;
@@ -32,6 +33,27 @@ export function buildReservedLinkage(
     state: 'reserved',
     reservedSnapshot: snapshot,
     lastTransition: buildTransition('reserve', at, actor, via),
+  };
+}
+
+export function buildPendingShipLinkage(
+  current: InventoryLinkage,
+  snapshot: InventoryLinkageSnapshotEntry[],
+  at: DateTimeInput,
+  actor: LinkageActor,
+  via: InventoryLinkageVia,
+): InventoryLinkage {
+  const pendingShip: PendingInventoryShip = {
+    snapshot,
+    at,
+    ...(actor && { by: { id: actor.id, name: actor.name } }),
+    via,
+  };
+  return {
+    ...current,
+    state: 'reserved',
+    reservedSnapshot: current.reservedSnapshot ?? snapshot,
+    pendingShip,
   };
 }
 

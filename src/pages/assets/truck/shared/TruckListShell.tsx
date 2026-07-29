@@ -1,9 +1,7 @@
-import { Button, Card, Group, Skeleton, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Card, Group, Skeleton, Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconPlus } from '@tabler/icons-react';
 import { type ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { ListPagination } from '@credo/base-ui/components';
@@ -79,6 +77,8 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
       onPageChange,
     });
 
+  const hasActiveFilters = !!search || filter !== FILTER_DEFAULTS.status;
+
   useEffect(() => {
     if (!initialized && !error) loadAll();
   }, [initialized, error, loadAll]);
@@ -124,7 +124,6 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
             to: TRUCK_CONFIG.routes.NEW,
             label: tk(`${i18nKey}.addItem`),
             enabled: canCreate,
-            mobileVariant: 'hidden',
           }}
         />
 
@@ -138,10 +137,12 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
+            hasActiveFilters={hasActiveFilters}
             onClear={clearFilters}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
@@ -152,24 +153,12 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
             onStatusChange={setFilter}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
+            hasActiveFilters={hasActiveFilters}
             onClear={clearFilters}
           />
-        )}
-
-        {isMobile && canCreate && (
-          <Button
-            component={Link}
-            to={TRUCK_CONFIG.routes.NEW}
-            leftSection={<IconPlus size={16} />}
-            size="sm"
-            variant="light"
-            fullWidth
-          >
-            {tk(`${i18nKey}.addItem`)}
-          </Button>
         )}
       </StickyListChrome>
 
@@ -209,8 +198,8 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
                 </Text>
                 <ActiveBadge
                   isActive={item.isActive}
-                  activeLabel={t('common.status.active')}
-                  inactiveLabel={t('common.status.inactive')}
+                  activeLabel={t('__new__.01-common.labels.active')}
+                  inactiveLabel={t('__new__.01-common.labels.inactive')}
                   size="sm"
                   style={{ flexShrink: 0 }}
                 />

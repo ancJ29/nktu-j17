@@ -1,9 +1,8 @@
-import { Button, Stack, ThemeIcon } from '@mantine/core';
+import { Stack, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconBuildingWarehouse, IconPlus } from '@tabler/icons-react';
+import { IconBuildingWarehouse } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { useGreenhouseStore } from '@/stores/useGreenhouseStore';
 import { useCropStore } from '@/stores/useCropStores';
@@ -67,6 +66,8 @@ export function GreenhouseListPage() {
       onPageChange,
     });
 
+  const hasActiveFilters = !!search || filter !== FILTER_DEFAULTS.status;
+
   const allCrops = useCropStore((s) => s.items);
   const cropsInitialized = useCropStore((s) => s.initialized);
   const loadCrops = useCropStore((s) => s.loadAll);
@@ -118,7 +119,6 @@ export function GreenhouseListPage() {
             to: ROUTES.GREENHOUSES.NEW,
             label: t('greenhouses.addItem'),
             enabled: canCreate,
-            mobileVariant: 'hidden',
           }}
         />
 
@@ -132,10 +132,12 @@ export function GreenhouseListPage() {
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
+            hasActiveFilters={hasActiveFilters}
             onClear={clearFilters}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
@@ -146,24 +148,12 @@ export function GreenhouseListPage() {
             onStatusChange={setFilter}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
+            hasActiveFilters={hasActiveFilters}
             onClear={clearFilters}
           />
-        )}
-
-        {isMobile && canCreate && (
-          <Button
-            component={Link}
-            to={ROUTES.GREENHOUSES.NEW}
-            leftSection={<IconPlus size={16} />}
-            size="sm"
-            variant="light"
-            fullWidth
-          >
-            {t('greenhouses.addItem')}
-          </Button>
         )}
       </StickyListChrome>
 

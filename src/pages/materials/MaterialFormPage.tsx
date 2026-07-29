@@ -1,34 +1,8 @@
-import {
-  ActionIcon,
-  Button,
-  Card,
-  Divider,
-  Grid,
-  Group,
-  MultiSelect,
-  NumberInput,
-  Select,
-  Stack,
-  Switch,
-  TagsInput,
-  Text,
-  Textarea,
-  TextInput,
-  ThemeIcon,
-  Title,
-} from '@mantine/core';
-import { useForm, type UseFormReturnType } from '@mantine/form';
+import { Button, Divider, Group, Stack, Title } from '@mantine/core';
+import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import {
-  IconArrowLeft,
-  IconBox,
-  IconCategory,
-  IconHash,
-  IconPlus,
-  IconRuler2,
-  IconTrash,
-} from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { IconArrowLeft, IconBox, IconFileSpreadsheet } from '@tabler/icons-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
@@ -36,11 +10,13 @@ import { cMngtConnector } from '@credo/connectors/connector';
 import { useMaterialStore, MATERIAL_RECORD_TARGET } from '@/stores/useMaterialStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { device } from '@credo/base-ui/utils';
+import { Tabs } from '@credo/base-ui/components';
 import { useInitFormFromFetch, useLookupV2Options } from '@/hooks';
 import { perms } from '@/utils/permission';
 import {
   getMaterialUnitCategory,
   hasMaterialAttributes,
+  hasMaterialBulkImport,
   hasMaterialDescription,
   hasMaterialMemo,
   hasMaterialMinimumStock,
@@ -53,7 +29,14 @@ import {
 import { validateUnitConversions } from '@/utils/unitConversion';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
-import type { Material, MaterialExtra, UnitConversion } from '@/types';
+import {
+  ExcelParseError,
+  generateMaterialExcelTemplate,
+  parseMaterialExcelFile,
+} from '@/utils/excelParser';
+import type { Material, MaterialExtra } from '@/types';
+import { SingleMaterialForm, type MaterialFormValues } from './SingleMaterialForm';
+import { MaterialBulkImportForm, type MaterialImportResult } from './MaterialBulkImportForm';
 
 const isMobile = device.isMobile;
 
@@ -66,174 +49,12 @@ const hasPricing = hasMaterialPricing();
 const hasMinimumStock = hasMaterialMinimumStock();
 const hasTags = hasMaterialTags();
 const hasAttributes = hasMaterialAttributes();
+const hasBulkImport = hasMaterialBulkImport();
 
-type MaterialFormValues = {
-  name: string;
-  code: string;
-  isActive: boolean;
-
-  units: string[];
-
-  category: string;
-
-  unitConversions: UnitConversion[];
-
-  description: string;
-  specification: string;
-  memo: string;
-  costPrice: number | '';
-
-  minimumStock: number | '';
-
-  tags: string[];
-  attributes: Array<{ key: string; value: string }>;
-};
-
-function MaterialAttributesEditor({ form }: { form: UseFormReturnType<MaterialFormValues> }) {
-  const { t } = useTranslation();
-  const attrs = form.values.attributes;
-  const updateRow = (idx: number, patch: Partial<{ key: string; value: string }>) =>
-    form.setFieldValue(
-      'attributes',
-      attrs.map((r, i) => (i === idx ? { ...r, ...patch } : r)),
-    );
-  const removeRow = (idx: number) =>
-    form.setFieldValue(
-      'attributes',
-      attrs.filter((_, i) => i !== idx),
-    );
-  const addRow = () => form.setFieldValue('attributes', [...attrs, { key: '', value: '' }]);
-
-  return (
-    <Stack gap={4}>
-      <Text size="sm" fw={500}>
-        {t('products.form.attributesLabel')}
-      </Text>
-      <Text size="xs" c="dimmed">
-        {t('products.form.attributesDesc')}
-      </Text>
-      {attrs.map((row, idx) => (
-        <Group key={idx} gap="xs" wrap="nowrap" align="flex-start">
-          <TextInput
-            placeholder={t('products.form.attributeKeyPlaceholder')}
-            value={row.key}
-            onChange={(e) => updateRow(idx, { key: e.currentTarget.value })}
-            style={{ flex: 1 }}
-          />
-          <TextInput
-            placeholder={t('products.form.attributeValuePlaceholder')}
-            value={row.value}
-            onChange={(e) => updateRow(idx, { value: e.currentTarget.value })}
-            style={{ flex: 2 }}
-          />
-          <ActionIcon variant="subtle" color="red" size="lg" onClick={() => removeRow(idx)}>
-            <IconTrash size={14} />
-          </ActionIcon>
-        </Group>
-      ))}
-      <Button
-        variant="default"
-        size="compact-sm"
-        leftSection={<IconPlus size={13} />}
-        onClick={addRow}
-        style={{ alignSelf: 'flex-start' }}
-      >
-        {t('products.form.attributeAdd')}
-      </Button>
-    </Stack>
-  );
-}
-
-function MaterialUnitConversionsEditor({
-  form,
-  selectedUnits,
-}: {
-  form: UseFormReturnType<MaterialFormValues>;
-  selectedUnits: { value: string; label: string }[];
-}) {
-  const { t } = useTranslation();
-  const rows = form.values.unitConversions;
-
-  const addRow = () =>
-    form.setFieldValue('unitConversions', [...rows, { unit: '', quantity: 1, baseUnit: '' }]);
-  const removeRow = (idx: number) =>
-    form.setFieldValue(
-      'unitConversions',
-      rows.filter((_, i) => i !== idx),
-    );
-  const updateRow = (idx: number, patch: Partial<UnitConversion>) =>
-    form.setFieldValue(
-      'unitConversions',
-      rows.map((r, i) => (i === idx ? { ...r, ...patch } : r)),
-    );
-
-  return (
-    <Stack gap="xs">
-      <Text size="sm" fw={500}>
-        {t('materials.form.unitConversionsLabel')}
-      </Text>
-      <Text size="xs" c="dimmed">
-        {t('materials.form.unitConversionsHint')}
-      </Text>
-      {rows.map((row, idx) => (
-        <Group key={idx} gap="xs" wrap="nowrap" align="flex-end">
-          <Text size="sm" fw={500} style={{ whiteSpace: 'nowrap' }}>
-            1
-          </Text>
-          <Select
-            placeholder={t('products.form.unitConversionFrom')}
-            data={selectedUnits}
-            searchable={false}
-            allowDeselect={false}
-            value={row.unit}
-            onChange={(v) => updateRow(idx, { unit: v ?? '' })}
-            style={{ flex: 1 }}
-          />
-          <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-            =
-          </Text>
-          <NumberInput
-            min={0.001}
-            step={1}
-            value={row.quantity}
-            onChange={(v) => updateRow(idx, { quantity: typeof v === 'number' ? v : 1 })}
-            style={{ width: 90 }}
-          />
-          <Select
-            placeholder={t('products.form.unitConversionTo')}
-            data={selectedUnits}
-            searchable={false}
-            allowDeselect={false}
-            value={row.baseUnit}
-            onChange={(v) => updateRow(idx, { baseUnit: v ?? '' })}
-            style={{ flex: 1 }}
-          />
-          <ActionIcon variant="subtle" color="red" size="sm" onClick={() => removeRow(idx)}>
-            <IconTrash size={14} />
-          </ActionIcon>
-        </Group>
-      ))}
-      <Group gap="sm" align="center">
-        <Button
-          variant="default"
-          size="compact-sm"
-          leftSection={<IconPlus size={13} />}
-          onClick={addRow}
-        >
-          {t('products.form.unitConversionAdd')}
-        </Button>
-        {typeof form.errors.unitConversions === 'string' && (
-          <Text size="xs" c="red">
-            {form.errors.unitConversions}
-          </Text>
-        )}
-      </Group>
-    </Stack>
-  );
-}
+const CODE_PATTERN = /^[a-zA-Z0-9]+$/;
 
 export function MaterialFormPage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
@@ -253,6 +74,16 @@ export function MaterialFormPage() {
 
   const unitOptions = useLookupV2Options(unitCategory);
   const categoryOptions = useLookupV2Options(MATERIAL_CATEGORY_LOOKUP);
+
+  const [activeTab, setActiveTab] = useState<string | null>('single');
+  const [isBulkLoading, setIsBulkLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [file, setFile] = useState<File | undefined>();
+  const fileRef = useRef<File | undefined>(undefined);
+  const [importResult, setImportResult] = useState<MaterialImportResult | undefined>();
+  const bulkNavTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  useEffect(() => () => clearTimeout(bulkNavTimer.current), []);
 
   const form = useForm<MaterialFormValues>({
     initialValues: {
@@ -277,7 +108,7 @@ export function MaterialFormPage() {
 
         if (/\s/.test(v)) return t('common.validation.codeNoWhitespace');
 
-        if (!/^[a-zA-Z0-9]+$/.test(v)) return t('common.validation.codeSpecialCharacters');
+        if (!CODE_PATTERN.test(v)) return t('common.validation.codeSpecialCharacters');
         return null;
       },
       unitConversions: (conversions, values) => {
@@ -289,15 +120,6 @@ export function MaterialFormPage() {
       },
     },
   });
-
-  const selectedUnitData = useMemo(
-    () =>
-      form.values.units.map((v) => ({
-        value: v,
-        label: unitOptions.find((o) => o.value === v)?.label ?? v,
-      })),
-    [form.values.units, unitOptions],
-  );
 
   const fetching = useInitFormFromFetch(
     form,
@@ -460,9 +282,271 @@ export function MaterialFormPage() {
 
   const navigateToList = useCallback(() => navigate(ROUTES.MATERIALS.LIST), [navigate]);
 
+  const handleDownloadSample = useCallback(async () => {
+    setIsDownloading(true);
+    try {
+      const categoryLabels = Object.fromEntries(categoryOptions.map((o) => [o.value, o.label]));
+      const unitLabels = Object.fromEntries(unitOptions.map((o) => [o.value, o.label]));
+
+      if (!useMaterialStore.getState().initialized) {
+        await useMaterialStore.getState().loadAll();
+      }
+      generateMaterialExcelTemplate({
+        language: i18n.language,
+        hasCategory: categoryOptions.length > 0,
+        hasPricing,
+        hasMinimumStock,
+        hasSpecification,
+        hasDescription,
+        hasMemo,
+        hasTags,
+        multiUnit,
+        materials: useMaterialStore.getState().items,
+        categoryLabels,
+        unitLabels,
+        categories: categoryOptions.map((o) => o.label),
+        units: unitOptions.map((o) => o.label),
+      });
+      notifications.show({
+        color: 'green',
+        message: t('common.bulkImport.downloadSuccess'),
+      });
+    } catch {
+      notifications.show({ color: 'red', message: t('materials.notifications.createError') });
+    } finally {
+      setIsDownloading(false);
+    }
+  }, [t, i18n.language, categoryOptions, unitOptions]);
+
+  const handleFileSelect = useCallback((selectedFile: File) => {
+    fileRef.current = selectedFile;
+    setFile(selectedFile);
+    setImportResult(undefined);
+  }, []);
+
+  const handleFileRemove = useCallback(() => {
+    fileRef.current = undefined;
+    setFile(undefined);
+    setImportResult(undefined);
+  }, []);
+
+  const handleBulkUpload = useCallback(async () => {
+    if (!fileRef.current) return;
+
+    setIsBulkLoading(true);
+    setImportResult(undefined);
+
+    try {
+      const rows = await parseMaterialExcelFile(fileRef.current);
+
+      if (rows.length === 0) {
+        notifications.show({ color: 'red', message: t('materials.bulkImport.noValidRows') });
+        return;
+      }
+
+      const unitLabelToValue = new Map<string, string>();
+      for (const o of unitOptions) unitLabelToValue.set(o.label.trim().toLowerCase(), o.value);
+      const catLabelToValue = new Map<string, string>();
+      for (const o of categoryOptions) catLabelToValue.set(o.label.trim().toLowerCase(), o.value);
+
+      const unknownUnits = new Set<string>();
+      const unknownCategories = new Set<string>();
+      for (const r of rows) {
+        for (const raw of r.units ?? []) {
+          const unit = raw.trim();
+          if (unit && !unitLabelToValue.has(unit.toLowerCase())) unknownUnits.add(unit);
+        }
+        const cat = r.category?.trim();
+        if (cat && !catLabelToValue.has(cat.toLowerCase())) unknownCategories.add(cat);
+      }
+
+      if (unknownUnits.size > 0 || unknownCategories.size > 0) {
+        const lines: string[] = [];
+        if (unknownUnits.size > 0) {
+          lines.push(
+            t('materials.bulkImport.unknownUnitMessage', {
+              labels: Array.from(unknownUnits).join(', '),
+            }),
+          );
+        }
+        if (unknownCategories.size > 0) {
+          lines.push(
+            t('materials.bulkImport.unknownCategoryMessage', {
+              labels: Array.from(unknownCategories).join(', '),
+            }),
+          );
+        }
+        notifications.show({
+          color: 'red',
+          title: t('materials.bulkImport.unknownLabelTitle'),
+          message: lines.join(' '),
+          autoClose: 12000,
+        });
+        return;
+      }
+
+      await useMaterialStore.getState().forceRefresh();
+      const {
+        items: liveMaterials,
+        error: refreshError,
+        initialized,
+      } = useMaterialStore.getState();
+
+      if (refreshError || !initialized) {
+        notifications.show({
+          color: 'red',
+          title: t('materials.bulkImport.refreshFailedTitle'),
+          message: t('materials.bulkImport.refreshFailedMessage'),
+          autoClose: 10000,
+        });
+        return;
+      }
+
+      const existingCodes = new Set(liveMaterials.map((m) => m.code?.trim()).filter(Boolean));
+
+      const errorLines: string[] = [];
+      const skippedLines: string[] = [];
+      const seenCodes = new Set<string>();
+      const items: Array<Pick<Material, 'name' | 'code' | 'isActive'> & { extra: MaterialExtra }> =
+        [];
+
+      const itemLabels: string[] = [];
+
+      for (const [index, row] of rows.entries()) {
+        const name = row.name.trim();
+        const label = name || t('common.bulkImport.rowLabel', { n: index + 1 });
+        const code = row.code?.trim() ?? '';
+
+        if (!code) {
+          errorLines.push(`${label}: ${t('materials.bulkImport.errorCodeRequired')}`);
+          continue;
+        }
+        if (!CODE_PATTERN.test(code)) {
+          errorLines.push(`${label}: ${t('materials.bulkImport.errorCodeInvalid')}`);
+          continue;
+        }
+        if (existingCodes.has(code) || seenCodes.has(code)) {
+          skippedLines.push(`${label}: ${t('materials.bulkImport.skippedDuplicateCode')}`);
+          continue;
+        }
+        seenCodes.add(code);
+
+        const resolvedUnits = (row.units ?? [])
+          .map((raw) => unitLabelToValue.get(raw.trim().toLowerCase()))
+          .filter((v): v is string => Boolean(v));
+
+        const units = [...new Set(multiUnit ? resolvedUnits : resolvedUnits.slice(0, 1))];
+        const category = row.category?.trim()
+          ? catLabelToValue.get(row.category.trim().toLowerCase())
+          : undefined;
+
+        const extra: MaterialExtra = {
+          units,
+          ...(category && { category }),
+          ...(hasPricing &&
+            typeof row.costPrice === 'number' &&
+            row.costPrice >= 0 && { costPrice: row.costPrice }),
+          ...(hasMinimumStock &&
+            typeof row.minimumStock === 'number' &&
+            row.minimumStock >= 0 && { minimumStock: row.minimumStock }),
+          ...(hasSpecification &&
+            row.specification?.trim() && { specification: row.specification.trim() }),
+          ...(hasDescription && row.description?.trim() && { description: row.description.trim() }),
+          ...(hasMemo && row.memo?.trim() && { memo: row.memo.trim() }),
+          ...(hasTags &&
+            (row.tags?.length ?? 0) > 0 && {
+              tags: [...new Set(row.tags!.map((tag) => tag.trim()).filter(Boolean))],
+            }),
+        };
+
+        items.push({ name, code, isActive: row.isActive ?? true, extra });
+        itemLabels.push(label);
+      }
+
+      const total = rows.length;
+
+      if (items.length === 0) {
+        setImportResult({
+          summary: { total, created: 0, skipped: skippedLines.length, failed: errorLines.length },
+          ...(skippedLines.length > 0 && { skipped: skippedLines }),
+          ...(errorLines.length > 0 && { errors: errorLines }),
+        });
+        notifications.show({ color: 'red', message: t('materials.bulkImport.noValidRows') });
+        return;
+      }
+
+      const res = await useMaterialStore.getState().bulkUpsertSafely({ items });
+
+      const created = res.created.length + res.updated.length;
+      const serverErrors = res.errors.map(
+        (e) =>
+          `${itemLabels[e.index] ?? t('common.bulkImport.rowLabel', { n: e.index + 1 })}: ${e.message}`,
+      );
+      const failed = errorLines.length + res.errors.length;
+      const allErrors = [...errorLines, ...serverErrors];
+
+      setImportResult({
+        summary: { total, created, skipped: skippedLines.length, failed },
+        ...(skippedLines.length > 0 && { skipped: skippedLines }),
+        ...(allErrors.length > 0 && { errors: allErrors }),
+      });
+
+      if (failed === 0 && skippedLines.length === 0) {
+        notifications.show({
+          color: 'green',
+          message: t('materials.notifications.createSuccess'),
+        });
+        bulkNavTimer.current = setTimeout(() => navigate(ROUTES.MATERIALS.LIST), 2000);
+      } else {
+        notifications.show({
+          color: 'yellow',
+          message: t('common.bulkImport.partialSuccess', { success: created, total }),
+        });
+      }
+    } catch (err) {
+      if (err instanceof ExcelParseError) {
+        const labels: Record<string, string> = {
+          name: t('common.labels.name'),
+          code: t('common.labels.code'),
+        };
+        const columns = err.missing.map((f) => labels[f] ?? f).join(', ');
+        notifications.show({
+          color: 'red',
+          title: t('materials.bulkImport.missingColumnTitle'),
+          message: t('materials.bulkImport.missingColumnMessage', { columns }),
+          autoClose: 10000,
+        });
+        return;
+      }
+      notifications.show({ color: 'red', message: t('materials.notifications.createError') });
+    } finally {
+      setIsBulkLoading(false);
+    }
+  }, [t, navigate, unitOptions, categoryOptions]);
+
+  const validateFileType = useCallback((f: File) => {
+    const validTypes = [
+      'text/csv',
+
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ];
+    return validTypes.includes(f.type) || /\.(csv|xlsx|xls)$/i.test(f.name);
+  }, []);
+
   if (fetching) return null;
 
   const pageTitle = isEdit ? t('materials.editItem') : t('materials.addItem');
+
+  const singleForm = (
+    <SingleMaterialForm
+      form={form}
+      isLoading={loading}
+      isEditMode={isEdit}
+      onSubmit={handleSubmit}
+      onCancel={navigateToList}
+    />
+  );
 
   return (
     <Stack gap="lg">
@@ -481,192 +565,41 @@ export function MaterialFormPage() {
 
       <Title order={isMobile ? 4 : 3}>{pageTitle}</Title>
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Stack gap="md">
-          <Grid gutter="md">
-            <Grid.Col span={{ base: 12, md: 7 }}>
-              <Stack gap="md">
-                <Card withBorder radius="md" padding="lg">
-                  <Group gap="xs" mb="xs">
-                    <ThemeIcon size={28} radius="md" variant="light" color="primary">
-                      <IconBox size={16} stroke={1.75} />
-                    </ThemeIcon>
-                    <Text fw={600} size="sm">
-                      {t('materials.title')}
-                    </Text>
-                  </Group>
-                  <Divider mb="md" />
-                  <Stack gap="md">
-                    <TextInput
-                      label={t('common.labels.name')}
-                      placeholder={t('materials.form.namePlaceholder')}
-                      withAsterisk
-                      size="md"
-                      {...form.getInputProps('name')}
-                    />
-                    <TextInput
-                      label={t('common.labels.code')}
-                      leftSection={<IconHash size={14} />}
-                      withAsterisk
+      <Divider />
 
-                      styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
-                      {...form.getInputProps('code')}
-                    />
-                    {categoryOptions.length > 0 && (
-                      <Select
-                        label={t('materials.form.categoryLabel')}
-                        placeholder={t('materials.form.categoryPlaceholder')}
-                        leftSection={<IconCategory size={14} />}
-                        data={categoryOptions}
-                        searchable
-                        clearable
-                        value={form.values.category || null}
-                        onChange={(v) => form.setFieldValue('category', v ?? '')}
-                      />
-                    )}
-                    {hasPricing && (
-                      <NumberInput
-                        label={t('materials.form.priceLabel')}
-                        placeholder={t('materials.form.pricePlaceholder')}
-                        min={0}
-                        thousandSeparator=","
-                        {...form.getInputProps('costPrice')}
-                      />
-                    )}
-                    {hasMinimumStock && (
-                      <NumberInput
-                        label={t('materials.form.minimumStockLabel')}
-                        placeholder={t('materials.form.minimumStockPlaceholder')}
-                        description={t('materials.form.minimumStockHint')}
-                        min={0}
-                        thousandSeparator=","
-                        {...form.getInputProps('minimumStock')}
-                      />
-                    )}
-                    {hasSpecification && (
-                      <TextInput
-                        label={t('materials.form.packagingSpecLabel')}
-                        placeholder={t('materials.form.packagingSpecPlaceholder')}
-                        {...form.getInputProps('specification')}
-                      />
-                    )}
-                    {hasDescription && (
-                      <Textarea
-                        label={t('common.labels.description')}
-                        placeholder={t('materials.form.descriptionPlaceholder')}
-                        autosize
-                        minRows={2}
-                        maxRows={5}
-                        {...form.getInputProps('description')}
-                      />
-                    )}
-                    {hasMemo && (
-                      <Textarea
-                        label={t('materials.form.memoLabel')}
-                        placeholder={t('materials.form.memoPlaceholder')}
-                        autosize
-                        minRows={2}
-                        maxRows={4}
-                        {...form.getInputProps('memo')}
-                      />
-                    )}
-                  </Stack>
-                </Card>
+      {isEdit || !hasBulkImport ? (
+        singleForm
+      ) : (
+        <Tabs value={activeTab} onChange={setActiveTab}>
+          <Tabs.List>
+            <Tabs.Tab value="single" leftSection={<IconBox size={16} />}>
+              {t('materials.tab.single')}
+            </Tabs.Tab>
+            <Tabs.Tab value="bulk" leftSection={<IconFileSpreadsheet size={16} />}>
+              {t('materials.tab.bulk')}
+            </Tabs.Tab>
+          </Tabs.List>
 
-                {(hasTags || hasAttributes) && (
-                  <Card withBorder radius="md" padding="lg">
-                    <Group gap="xs" mb="xs">
-                      <ThemeIcon size={28} radius="md" variant="light" color="primary">
-                        <IconCategory size={16} stroke={1.75} />
-                      </ThemeIcon>
-                      <Text fw={600} size="sm">
-                        {t('products.form.classificationSection')}
-                      </Text>
-                    </Group>
-                    <Divider mb="md" />
-                    <Stack gap="md">
-                      {hasTags && (
-                        <TagsInput
-                          label={t('products.form.tagsLabel')}
-                          placeholder={t('products.form.tagsPlaceholder')}
-                          clearable
-                          {...form.getInputProps('tags')}
-                        />
-                      )}
-                      {hasAttributes && <MaterialAttributesEditor form={form} />}
-                    </Stack>
-                  </Card>
-                )}
-              </Stack>
-            </Grid.Col>
-            <Grid.Col span={{ base: 12, md: 5 }}>
-              <Stack gap="md">
-                <Card withBorder radius="md" padding="lg">
-                  <Group gap="xs" mb="xs">
-                    <ThemeIcon size={28} radius="md" variant="light" color="primary">
-                      <IconRuler2 size={16} stroke={1.75} />
-                    </ThemeIcon>
-                    <Text fw={600} size="sm">
-                      {t('common.labels.units')}
-                    </Text>
-                  </Group>
-                  <Divider mb="md" />
-                  <Stack gap="md">
-                    {multiUnit ? (
-                      <>
-                        <MultiSelect
-                          label={t('materials.form.unitsLabel')}
-                          placeholder={t('materials.form.unitPickerPlaceholder')}
-                          description={t('materials.form.unitsPrimaryHint')}
-                          data={unitOptions}
-                          searchable
-                          clearable
-                          {...form.getInputProps('units')}
-                        />
-                        {form.values.units.length >= 2 && (
-                          <MaterialUnitConversionsEditor
-                            form={form}
-                            selectedUnits={selectedUnitData}
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <Select
-                        label={t('materials.form.unitLabel')}
-                        placeholder={t('materials.form.unitPickerPlaceholder')}
-                        data={unitOptions}
-                        searchable
-                        clearable
-                        value={form.values.units[0] ?? null}
-                        onChange={(v) => form.setFieldValue('units', v ? [v] : [])}
-                      />
-                    )}
-                  </Stack>
-                </Card>
+          <Tabs.Panel value="single" pt="md">
+            {singleForm}
+          </Tabs.Panel>
 
-                {isEdit && (
-                  <Card withBorder radius="md" padding="lg">
-                    <Switch
-                      label={t('materials.form.isActiveLabel')}
-                      {...form.getInputProps('isActive', { type: 'checkbox' })}
-                    />
-                  </Card>
-                )}
-              </Stack>
-            </Grid.Col>
-          </Grid>
-
-          <Group justify="flex-end" gap="sm">
-            <Button variant="default" size="sm" disabled={loading} onClick={navigateToList}>
-              {t('__new__.01-common.actions.cancel')}
-            </Button>
-            <Button type="submit" loading={loading} size="sm">
-              {isEdit ? t('materials.form.updateButton') : t('materials.form.createButton')}
-            </Button>
-          </Group>
-        </Stack>
-      </form>
+          <Tabs.Panel value="bulk" pt="md">
+            <MaterialBulkImportForm
+              isLoading={isBulkLoading}
+              isDownloading={isDownloading}
+              file={file}
+              importResult={importResult}
+              onDownloadSample={handleDownloadSample}
+              onFileSelect={handleFileSelect}
+              onFileRemove={handleFileRemove}
+              onImport={handleBulkUpload}
+              onCancel={navigateToList}
+              validateFileType={validateFileType}
+            />
+          </Tabs.Panel>
+        </Tabs>
+      )}
     </Stack>
   );
 }

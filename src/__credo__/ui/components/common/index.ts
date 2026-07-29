@@ -6,6 +6,7 @@ export { DataTable } from './DataTable';
 export { ErrorBoundary } from './ErrorBoundary';
 export { FieldLabel } from './FieldLabel';
 export { Icon } from './Icon';
+export { InfiniteScrollSentinel } from './InfiniteScrollSentinel';
 export {
   InlineEditField,
   InlineSelectField,

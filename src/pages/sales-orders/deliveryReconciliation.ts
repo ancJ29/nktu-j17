@@ -9,6 +9,7 @@ import type { Stage } from './capabilities/types';
 import { isDefaultLocation } from '@/types/location';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { isFullyDelivered, type CompletionEvidence } from './reconcileFromDeliveries';
+import { classifyPendingShip } from './shipRecovery';
 
 const HOLD_TOLERANCE = 1e-6;
 
@@ -166,6 +167,9 @@ export function deriveSoDeliveryIssues(params: {
   }
 
   if (!params.inventoryEnabled) return issues;
+
+  const shipVerdict = classifyPendingShip({ so, inventoryRows: params.inventoryRows });
+  if (shipVerdict.kind === 'owed' || shipVerdict.kind === 'applied') return issues;
 
   if (so.isClosed && currentStage === 'COMPLETED') {
     if (linkage?.state === 'reserved' && reservedSnapshot.length > 0) {

@@ -1,5 +1,10 @@
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
-import type { SalesOrderExtra, SalesOrderItem, SalesOrderSetRole } from '@/types/sales-order';
+import type {
+  SalesOrder,
+  SalesOrderExtra,
+  SalesOrderItem,
+  SalesOrderSetRole,
+} from '@/types/sales-order';
 
 export type SalesOrderMemoItem = {
   productCode: string;
@@ -51,6 +56,44 @@ export type SalesOrderInlineFields = {
   warehouseNote?: { changed: true };
   driverNote?: { changed: true };
 };
+
+export type SalesOrderStatusChangeTrigger = 'dr-completion' | 'dr-dispatch' | 'self-heal';
+
+export type SalesOrderStatusChangeMemo = {
+  orderNumber: string;
+  fromStatus: string;
+  toStatus: string;
+  note?: string;
+  inventoryAction?: string;
+  trigger?: SalesOrderStatusChangeTrigger;
+
+  shipPending?: boolean;
+};
+
+export function statusChangeMemo(params: {
+  updated: SalesOrder;
+  fromStatus: string;
+  toStatus: string;
+  note?: string;
+  trigger?: SalesOrderStatusChangeTrigger;
+  shipPending?: boolean;
+}): SalesOrderStatusChangeMemo {
+  const { updated, fromStatus, toStatus, note, trigger, shipPending } = params;
+  const linkage = ((updated.extra ?? {}) as SalesOrderExtra).inventoryLinkage;
+  const inventoryAction =
+    linkage?.lastTransition?.via?.kind === 'completion-auto-ship'
+      ? 'auto-ship-on-completion'
+      : linkage?.lastTransition?.action;
+  return {
+    orderNumber: updated.orderNumber,
+    fromStatus,
+    toStatus,
+    ...(note ? { note } : {}),
+    ...(inventoryAction ? { inventoryAction } : {}),
+    ...(trigger ? { trigger } : {}),
+    ...(shipPending ? { shipPending: true } : {}),
+  };
+}
 
 export type SalesOrderReleasedRow = {
   productCode: string;

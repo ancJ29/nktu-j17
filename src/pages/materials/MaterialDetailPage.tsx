@@ -372,7 +372,7 @@ export function MaterialDetailPage() {
             <ActiveBadge
               isActive={material.isActive}
               activeLabel={t('materials.status.active')}
-              inactiveLabel={t('common.status.inactive')}
+              inactiveLabel={t('__new__.01-common.labels.inactive')}
               size="sm"
             />
             {category && (

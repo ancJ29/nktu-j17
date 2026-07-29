@@ -24,6 +24,7 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { perms } from '@/utils/permission';
 import type { Product, ProductInventorySummary } from '@/types';
@@ -380,37 +381,42 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     () => [
       ...(categoryOptions.length > 0
         ? [
-            {
+            allOptionFilter({
               title: t('common.labels.category'),
-              value: categoryFilter ?? 'all',
-              options: [
-                { value: 'all', label: t('products.filterCategoryAll') },
-                ...categoryOptions,
-              ],
-              onChange: (v: string) => setCategoryFilter(v === 'all' ? null : v),
-            },
+              value: categoryFilter,
+              options: categoryOptions,
+              onChange: setCategoryFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
 
-      ...(variant.showStockFilter
+      ...(variant.showStockFilter && !(isMobile && variant.quickChipMode === 'stock')
         ? [
-            {
+            allOptionFilter<StockFilter>({
               title: t('productInventory.filterStock.title'),
-              value: stockFilter ?? 'all',
-              options: [
-                { value: 'all', label: t('productInventory.filterStock.all') },
-                ...stockOptions,
-              ],
-              onChange: (v: string) => setStockFilter(v === 'all' ? null : (v as StockFilter)),
-            },
+              value: stockFilter,
+              options: stockOptions,
+              onChange: setStockFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
-      {
-        title: t('common.columns.secondaryStatus'),
-        value: secondaryFilter ?? 'all',
-        options: [{ value: 'all', label: t('common.secondaryStatus.all') }, ...secondaryOptions],
-        onChange: (v: string) => setSecondaryFilter(v === 'all' ? null : (v as SecondaryFilter)),
-      },
+
+      ...(isMobile && variant.quickChipMode === 'secondary'
+        ? []
+        : [
+            allOptionFilter<SecondaryFilter>({
+              title: t('common.columns.secondaryStatus'),
+              value: secondaryFilter,
+              options: secondaryOptions,
+              onChange: setSecondaryFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
+          ]),
     ],
     [
       categoryFilter,
@@ -423,6 +429,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       setSecondaryFilter,
       secondaryOptions,
       variant.showStockFilter,
+      variant.quickChipMode,
       t,
     ],
   );
@@ -659,27 +666,17 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.inventory.products.list.searchPlaceholder')}
-            hideStatus={true}
-            statusTitle={t('__new__.01-common.labels.status')}
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('common.filters.active'),
-              inactive: t('productInventory.filterInactive'),
-            }}
+            hideStatus
             filters={mobileFilters}
             onClear={clearFilters}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.inventory.products.list.searchPlaceholder')}
-            hideStatus={true}
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('common.filters.active'),
-              inactive: t('productInventory.filterInactive'),
-            }}
+            hideStatus
             filters={desktopFilters}
             onClear={clearFilters}
           />

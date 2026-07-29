@@ -319,7 +319,7 @@ export function ProductInventoryDataTable({
                   <ActiveBadge
                     isActive={isActive}
                     activeLabel={t('products.status.active')}
-                    inactiveLabel={t('common.status.inactive')}
+                    inactiveLabel={t('__new__.01-common.labels.inactive')}
                     size="sm"
                   />
                 </Stack> */}

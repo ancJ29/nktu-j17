@@ -102,8 +102,8 @@ export function CustomerListPage() {
             to: ROUTES.CUSTOMERS.NEW,
             label: t('customers.addItem'),
             enabled: canCreate,
-
-            mobileVariant: 'hidden',
+            // No mobile create CTA — the form page redirects mobile users
+            // (mobile-workflow.md), so any mobile affordance is a dead tap.
           }}
         />
 
@@ -117,10 +117,11 @@ export function CustomerListPage() {
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.filters.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
             onClear={clearFilters}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
@@ -131,8 +132,8 @@ export function CustomerListPage() {
             onStatusChange={setFilter}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.filters.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
             onClear={clearFilters}
           />

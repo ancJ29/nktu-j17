@@ -4,6 +4,7 @@
       "actions": {
         "addEntry": "Thêm dòng",
         "back": "Quay lại",
+        "backToTop": "Lên đầu trang",
         "cancel": "Hủy",
         "clearFilters": "Xóa bộ lọc",
         "clearSearch": "Xóa tìm kiếm",
@@ -41,10 +42,14 @@
         "openInMaps": "Xem trên Google Maps"
       },
       "labels": {
-        "active": "Đang hoạt động",
+        "active": "Hoạt động",
         "note": "Ghi chú",
         "orderDate": "Ngày đặt hàng",
-        "status": "Trạng thái"
+        "status": "Trạng thái",
+        "inactive": "Ngừng"
+      },
+      "list": {
+        "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…"
       }
     },
     "07-entities": {
@@ -176,7 +181,7 @@
           "enableItemDesc": "Cho phép nhập lại vật tư này"
         },
         "list": {
-          "searchPlaceholder": "Tìm theo tên, mã, đơn vị, SKU..."
+          "searchPlaceholder": "Tìm theo tên, mã..."
         },
         "singular": "__keep__",
         "title": "__keep__"
@@ -665,9 +670,7 @@
       "pending": "Đang chờ"
     },
     "filters": {
-      "active": "Hoạt động",
       "apply": "Áp dụng",
-      "inactive": "Ngừng",
       "more": "Thêm",
       "selectDateRange": "Chọn khoảng thời gian",
       "statusCount": "{{count}} trạng thái"
@@ -740,9 +743,7 @@
       "outOfStock": "Hết hàng"
     },
     "status": {
-      "active": "Hoạt động",
-      "archived": "Đã lưu trữ",
-      "inactive": "Ngừng"
+      "archived": "Đã lưu trữ"
     },
     "validation": {
       "codeNoWhitespace": "Mã không được chứa khoảng trắng",
@@ -897,6 +898,9 @@
     "stepCount_one": "{{count}} bước",
     "stepCount_other": "{{count}} bước",
     "stepsTitle": "Các bước",
+    "summary": {
+      "total": "{{count}} mẫu"
+    },
     "title": "Mẫu nhật ký",
     "validation": {
       "activityRequired": "Thêm ít nhất một ngày có hoạt động",
@@ -1182,6 +1186,8 @@
     "editItem": "Điều chỉnh yêu cầu",
     "filterDriver": "Người phụ trách",
     "filterParty": "Khách hàng / NCC",
+    "filterScheduledDate": "Ngày giao",
+    "filterScheduledDateCustom": "Khoảng ngày giao tùy chỉnh",
     "form": {
       "addItem": "Thêm sản phẩm",
       "createButton": "Tạo yêu cầu giao hàng",
@@ -1426,16 +1432,20 @@
       "generateError": "Không thể tạo mã đăng nhập",
       "qrCopied": "Đã sao chép QR!",
       "regenerate": "Tạo mã mới",
+      "regenerateConfirmMessage": "Mã đăng nhập hiện tại sẽ không còn sử dụng được. Nhân viên phải dùng mã mới để đăng nhập.",
+      "regenerateConfirmTitle": "Tạo mã đăng nhập mới?",
       "title": "Tạo mã đăng nhập"
     },
     "noEmployees": "Không tìm thấy nhân viên",
     "notifications": {
+      "codeCopied": "Đã sao chép mã nhân viên",
       "createError": "Không thể tạo nhân viên",
       "createSuccess": "Tạo nhân viên thành công",
       "deleteError": "Không thể xóa nhân viên",
       "deleteSuccess": "Xóa nhân viên thành công",
       "fetchError": "Không thể tải danh sách nhân viên",
       "listConflictMessage": "Một quản trị viên khác vừa thay đổi danh sách nhân viên. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "loginIdentifierCopied": "Đã sao chép tên đăng nhập",
       "mintedPassword": "Kích hoạt lại đã tạo mật khẩu đăng nhập mới: {{password}}. Mật khẩu chỉ hiển thị một lần — vui lòng lưu lại ngay.",
       "ssoWarning": "Đã tạo nhân viên, nhưng cài đặt đăng nhập thất bại: {{reason}}. Vui lòng đặt mật khẩu thủ công trước khi chia sẻ thông tin đăng nhập.",
       "truckLinkWarning": "Đã lưu nhân viên, nhưng liên kết xe thất bại. Mở lại và lưu để thử lại.",
@@ -1939,6 +1949,9 @@
       "updateError": "Không thể cập nhật vị trí",
       "updateSuccess": "Cập nhật vị trí thành công"
     },
+    "summary": {
+      "total": "{{count}} vị trí"
+    },
     "title": "Vị trí"
   },
   "lookups": {
@@ -2142,13 +2155,20 @@
   "materials": {
     "addItem": "Thêm vật tư",
     "bulkImport": {
+      "errorCodeInvalid": "Mã chỉ được chứa chữ và số — đã bỏ qua",
+      "errorCodeRequired": "Thiếu mã vật tư — đã bỏ qua",
       "import": "Nhập vật tư",
       "missingColumnMessage": "Tệp thiếu cột bắt buộc: {{columns}}. Vui lòng dùng mẫu mới nhất — bấm \"Tải mẫu\" ở trên.",
       "missingColumnTitle": "Định dạng tệp không hợp lệ",
       "noValidRows": "Không tìm thấy vật tư hợp lệ trong tệp",
+      "refreshFailedMessage": "Không tải lại được danh sách vật tư nên không thể kiểm tra mã trùng một cách an toàn. Vui lòng kiểm tra kết nối và thử lại.",
+      "refreshFailedTitle": "Không kiểm tra được vật tư hiện có",
       "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin vật tư",
+      "skippedDuplicateCode": "Mã vật tư đã tồn tại — đã bỏ qua",
+      "skippedTitle": "Các dòng bị bỏ qua do trùng lặp",
       "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
-      "unknownLabelTitle": "Danh mục không hợp lệ",
+      "unknownLabelTitle": "Đơn vị hoặc danh mục không hợp lệ",
+      "unknownUnitMessage": "Đơn vị không hợp lệ: {{labels}}. Vui lòng dùng đúng tên đơn vị hiển thị trong mục Danh mục dữ liệu (không phải mã), hoặc thêm mới tại đó rồi nhập lại.",
       "uploadFile": "Tải lên tệp vật tư"
     },
     "columns": {
@@ -2271,7 +2291,7 @@
     },
     "tab": {
       "bulk": "Nhập hàng loạt",
-      "single": "Vật tư"
+      "single": "Một vật tư"
     },
     "title": "Vật tư",
     "validation": {
@@ -2796,6 +2816,10 @@
     "filterActive": "Đang bán",
     "filterCategoryAll": "Tất cả danh mục",
     "filterInactive": "Ngừng cung cấp",
+    "filterKindAll": "Tất cả loại",
+    "filterKindSet": "Bộ sản phẩm",
+    "filterKindSingle": "Sản phẩm đơn",
+    "filterKindTitle": "Loại",
     "filterStockAll": "Tất cả",
     "filterStockInStock": "Còn hàng",
     "filterStockLowStock": "Dưới mức tối thiểu",
@@ -2861,6 +2885,7 @@
       "exportError": "Không thể xuất danh sách sản phẩm",
       "fetchError": "Không thể tải danh sách sản phẩm",
       "listConflictMessage": "Một người khác vừa thay đổi danh sách sản phẩm. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+      "skuCopied": "Đã sao chép SKU",
       "toggleError": "Không thể cập nhật trạng thái sản phẩm",
       "updateError": "Không thể cập nhật sản phẩm",
       "updateSuccess": "Cập nhật sản phẩm thành công"
@@ -3295,6 +3320,8 @@
         "create": "Đã tạo đơn",
         "delete": "Đã xóa đơn",
         "manualRelease": "Đã giải phóng tồn giữ",
+        "reconcileRepair": "Đã sửa đồng bộ giao hàng",
+        "shipRecovery": "Đã hoàn tất trừ kho",
         "statusChange": "Đã đổi trạng thái",
         "update": "Đã sửa đơn",
         "updateInline": "Đã cập nhật thông tin"
@@ -3526,6 +3553,15 @@
       "orphans": "Tồn kho vẫn đang giữ hàng cho đơn này dù đơn không còn giữ ({{count}} dòng).",
       "repairButton": "Sửa ngay",
       "repairSuccess": "Đã sửa: {{actions}}"
+    },
+    "shipRecovery": {
+      "ambiguous": "{{orderNumber}}: lượng giữ tồn của {{items}} đã thay đổi trong lúc trừ kho nên hệ thống không tự thực hiện lại. Hãy dùng thông báo đối soát trên đơn hàng.",
+      "ambiguousTitle": "Cần kiểm tra việc trừ kho",
+      "applied": "{{orderNumber}}: đã tự động hoàn tất việc trừ kho bị gián đoạn.",
+      "appliedTitle": "Đã hoàn tất trừ kho",
+      "failed": "{{orderNumber}}: chưa hoàn tất trừ kho ({{error}}). Hệ thống sẽ thử lại khi mở đơn hàng lần sau.",
+      "failedTitle": "Chưa trừ kho xong",
+      "pendingNotice": "Việc trừ kho cho đơn này bắt đầu lúc {{at}} nhưng chưa xong. Không mất dữ liệu — tồn kho vẫn đang được giữ và hệ thống sẽ tự hoàn tất."
     },
     "stats": {
       "total": "Tổng cộng",
@@ -3910,6 +3946,18 @@
       "quantityLabel": "Số lượng",
       "unitLabel": "Đơn vị"
     },
+    "fromMaterials": {
+      "clear": "Bỏ chọn",
+      "createDeliveryNote": "Phiếu xuất",
+      "createReceipt": "Phiếu nhập",
+      "enterSelection": "Chọn vật tư",
+      "rowCreateDeliveryNote": "Tạo phiếu xuất cho vật tư này",
+      "rowCreateReceipt": "Tạo phiếu nhập cho vật tư này",
+      "selectAll": "Chọn tất cả trong trang",
+      "selectPrompt": "Chọn vật tư để đưa vào phiếu",
+      "selected_one": "Đã chọn {{count}} vật tư",
+      "selected_other": "Đã chọn {{count}} vật tư"
+    },
     "lockedNote": "Phiếu đã xác nhận và bị khóa — số lượng đã được cập nhật vào tồn kho.",
     "notifications": {
       "confirmError": "Xác nhận phiếu thất bại",
@@ -3925,6 +3973,8 @@
       "updateSuccess": "Đã cập nhật phiếu"
     },
     "searchPlaceholder": "Tìm theo mã hoặc ghi chú...",
+    "seededFromMaterials_one": "Tạo từ {{count}} vật tư trong danh sách vật tư — nhập số lượng rồi lưu.",
+    "seededFromMaterials_other": "Tạo từ {{count}} vật tư trong danh sách vật tư — nhập số lượng rồi lưu.",
     "status": {
       "confirmed": "Đã xác nhận",
       "draft": "Nháp"

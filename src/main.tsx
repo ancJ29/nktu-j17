@@ -16,6 +16,7 @@ import { setCredoGroup } from '@credo/connectors/connector';
 import { installChunkErrorReload } from '@credo/base-ui/utils';
 import { appApiGroup, appCredoStorageHash } from './config/env';
 import { forceClearCache } from './utils/forceClearCache';
+import { isLocalhost } from '@/config/env';
 
 // Recover from stale-chunk 404s after a deploy (see @credo/base-ui chunk-error).
 // Registered before the first lazy import so it can catch App's own chunk.
@@ -40,8 +41,15 @@ const storageHashStale =
   !!appCredoStorageHash && localStorage.getItem(CREDO_STORAGE_HASH_KEY) !== appCredoStorageHash;
 
 if (storageHashStale) {
+  if (isLocalhost) {
+    alert('Storage hash stale, clearing cache and reloading...');
+  }
   void forceClearCache('storage hash change', () => {
+    localStorage.clear();
+    sessionStorage.clear();
     localStorage.setItem(CREDO_STORAGE_HASH_KEY, appCredoStorageHash);
+    setCredoGroup(appApiGroup);
+    return;
   });
 } else {
   setCredoGroup(appApiGroup);

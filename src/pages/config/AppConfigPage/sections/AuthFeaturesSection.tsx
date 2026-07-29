@@ -42,8 +42,9 @@ export const AuthFeaturesSection = memo(function AuthFeaturesSection({
           p="xs"
           style={{ borderRadius: 'var(--mantine-radius-sm)' }}
           bg={auth[key] ? undefined : 'var(--mantine-color-default-hover)'}
+          wrap="nowrap"
         >
-          <Group gap="xs">
+          <Group gap="xs" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
             <ThemeIcon variant="light" size="sm" color={auth[key] ? 'teal' : 'gray'}>
               <FlagIcon size={14} />
             </ThemeIcon>
@@ -56,7 +57,11 @@ export const AuthFeaturesSection = memo(function AuthFeaturesSection({
               </Text>
             </Box>
           </Group>
-          <Switch checked={auth[key]} onChange={() => onChange({ ...auth, [key]: !auth[key] })} />
+          <Switch
+            checked={auth[key]}
+            onChange={() => onChange({ ...auth, [key]: !auth[key] })}
+            style={{ flexShrink: 0 }}
+          />
         </Group>
       ))}
     </SimpleGrid>

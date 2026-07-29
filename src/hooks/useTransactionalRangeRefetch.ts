@@ -12,15 +12,17 @@ export function useTransactionalRangeRefetch({
   setStoreRange,
   forceRefresh,
 }: TransactionalRangeRefetchOptions): void {
-  const isFirstRunRef = useRef(true);
+  const prevRangeKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
     setStoreRange(range.from, range.to);
-    if (isFirstRunRef.current) {
-      isFirstRunRef.current = false;
 
-      return;
-    }
+    const rangeKey = JSON.stringify([range.from?.getTime() ?? null, range.to?.getTime() ?? null]);
+    const previous = prevRangeKeyRef.current;
+    prevRangeKeyRef.current = rangeKey;
+
+    if (previous === null || previous === rangeKey) return;
+
     forceRefresh();
   }, [range.from, range.to, setStoreRange, forceRefresh]);
 }

@@ -1,8 +1,9 @@
-import { Badge, Group, Stack, ThemeIcon } from '@mantine/core';
+import { Badge, Button, Group, Paper, Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconBox } from '@tabler/icons-react';
+import { IconBox, IconChecklist, IconPackageExport, IconPackageImport } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import { useMaterialInventoryStore } from '@/stores/useMaterialInventoryStore';
@@ -10,18 +11,21 @@ import { ListPagination } from '@/components/custom/ListPagination';
 import { device } from '@credo/base-ui/utils';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
+import { useSelectionMode } from '@/hooks/useRowSelection';
 import { useLookupV2Options } from '@/hooks';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { MobileFilterBar, type MobileFilterDef } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { perms } from '@/utils/permission';
+import { featureFlags } from '@/utils/features';
 import {
   hasMaterialMinimumStock,
   isMaterialLowStock,
   MATERIAL_CATEGORY_LOOKUP,
 } from '@/utils/materialConfig';
-import type { MaterialInventoryRow } from '@/types';
+import type { Material, MaterialInventoryRow } from '@/types';
 
 import { MaterialCardList } from './MaterialCardList';
 import { MaterialDataTable } from './MaterialDataTable';
@@ -32,6 +36,12 @@ const canCreate = perms.material.canCreate();
 const canManageInventory = perms.material.canManageInventory();
 
 const lowStockEnabled = canManageInventory && hasMaterialMinimumStock();
+
+const canQuickCreateReceipt =
+  featureFlags.warehouseReceipts.enabled && perms.warehouseReceipt.canCreate();
+const canQuickCreateDeliveryNote =
+  featureFlags.warehouseDeliveryNotes.enabled && perms.warehouseDeliveryNote.canCreate();
+const quickCreateEnabled = !isMobile && (canQuickCreateReceipt || canQuickCreateDeliveryNote);
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 
@@ -52,6 +62,7 @@ const FILTER_DEFAULTS: MaterialFilters = {
 
 export function MaterialListPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const {
     items: allMaterials,
@@ -126,6 +137,33 @@ export function MaterialListPage() {
       page: filterState.page,
       onPageChange,
     });
+
+  const selection = useSelectionMode();
+  const { selectionMode, selectedKeys, count: selectedCount, toggle: toggleRow } = selection;
+
+  const pageCodes = useMemo(() => paginated.map((m) => m.code), [paginated]);
+  const { allSelected: allPageSelected, someSelected: somePageSelected } =
+    selection.headerState(pageCodes);
+  const toggleAllOnPage = useCallback(
+    () => selection.toggleAllIn(pageCodes),
+    [selection, pageCodes],
+  );
+
+  const startWarehouseDoc = useCallback(
+    (route: string, codes: string[]) => {
+      if (codes.length === 0) return;
+      navigate(route, { state: { seedMaterialCodes: codes } });
+    },
+    [navigate],
+  );
+  const createReceiptFor = useCallback(
+    (material: Material) => startWarehouseDoc(ROUTES.WAREHOUSE_RECEIPTS.NEW, [material.code]),
+    [startWarehouseDoc],
+  );
+  const createDeliveryNoteFor = useCallback(
+    (material: Material) => startWarehouseDoc(ROUTES.WAREHOUSE_DELIVERY_NOTES.NEW, [material.code]),
+    [startWarehouseDoc],
+  );
 
   const { totalCount, inactiveCount } = useMemo(() => {
     let inactive = 0;
@@ -231,25 +269,26 @@ export function MaterialListPage() {
     () => [
       ...(categoryOptions.length > 0
         ? [
-            {
+            allOptionFilter({
               title: t('common.labels.category'),
-              value: categoryFilter ?? 'all',
-              options: [
-                { value: 'all', label: t('materials.filterCategoryAll') },
-                ...categoryOptions,
-              ],
-              onChange: (v: string) => setCategoryFilter(v === 'all' ? null : v),
-            } as MobileFilterDef,
+              value: categoryFilter,
+              options: categoryOptions,
+              onChange: setCategoryFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
       ...(canManageInventory
         ? [
-            {
+            allOptionFilter({
               title: t('materials.filterStockTitle'),
-              value: stockFilter ?? 'all',
-              options: [{ value: 'all', label: t('materials.filterStockAll') }, ...stockOptions],
-              onChange: (v: string) => setStockFilter(v === 'all' ? null : v),
-            } as MobileFilterDef,
+              value: stockFilter,
+              options: stockOptions,
+              onChange: setStockFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
     ],
@@ -284,7 +323,7 @@ export function MaterialListPage() {
                 )}
                 {inactiveCount > 0 && (
                   <Badge size="xs" variant="light" color="gray" radius="sm" tt="lowercase">
-                    {inactiveCount} {t('common.status.inactive')}
+                    {inactiveCount} {t('__new__.01-common.labels.inactive')}
                   </Badge>
                 )}
                 {canManageInventory && trackedCount > 0 && (
@@ -308,6 +347,20 @@ export function MaterialListPage() {
           cachedAt={cachedAt}
           loading={loading}
           onRefresh={handleForceRefresh}
+          extraActions={
+            quickCreateEnabled ? (
+              <Button
+                variant={selectionMode ? 'filled' : 'default'}
+                size="sm"
+                leftSection={<IconChecklist size={16} />}
+                onClick={selection.toggleSelectionMode}
+              >
+                {selectionMode
+                  ? t('__new__.01-common.actions.cancel')
+                  : t('warehouseDoc.fromMaterials.enterSelection')}
+              </Button>
+            ) : undefined
+          }
           createCta={{
             to: ROUTES.MATERIALS.NEW,
             label: t('materials.addItem'),
@@ -326,10 +379,12 @@ export function MaterialListPage() {
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
               active: t('materials.filterActive'),
-              inactive: t('common.filters.inactive'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
             filters={mobileFilters.length > 0 ? mobileFilters : undefined}
             onClear={clearFilters}
+
+            labelChips
           />
         ) : (
           <DesktopFilterBar
@@ -341,13 +396,63 @@ export function MaterialListPage() {
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
               active: t('materials.filterActive'),
-              inactive: t('common.filters.inactive'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
             filters={desktopFilters.length > 0 ? desktopFilters : undefined}
             onClear={clearFilters}
           />
         )}
       </StickyListChrome>
+
+      {/* Present for the whole mode, not just once something is ticked — the
+          bar is what tells the operator the mode is on and how to leave it, so
+          it has to be there before the first tick. Buttons disable at zero. */}
+      {selectionMode && (
+        <Paper withBorder radius="md" p="xs" bg="var(--mantine-color-primary-light)">
+          <Group justify="space-between" wrap="nowrap">
+            <Text size="sm" fw={600}>
+              {selectedCount > 0
+                ? t('warehouseDoc.fromMaterials.selected', { count: selectedCount })
+                : t('warehouseDoc.fromMaterials.selectPrompt')}
+            </Text>
+            <Group gap="xs" wrap="nowrap">
+              {canQuickCreateReceipt && (
+                <Button
+                  size="compact-sm"
+                  disabled={selectedCount === 0}
+                  leftSection={<IconPackageImport size={16} />}
+                  onClick={() =>
+                    startWarehouseDoc(ROUTES.WAREHOUSE_RECEIPTS.NEW, [...selectedKeys])
+                  }
+                >
+                  {t('warehouseDoc.fromMaterials.createReceipt')}
+                </Button>
+              )}
+              {canQuickCreateDeliveryNote && (
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  disabled={selectedCount === 0}
+                  leftSection={<IconPackageExport size={16} />}
+                  onClick={() =>
+                    startWarehouseDoc(ROUTES.WAREHOUSE_DELIVERY_NOTES.NEW, [...selectedKeys])
+                  }
+                >
+                  {t('warehouseDoc.fromMaterials.createDeliveryNote')}
+                </Button>
+              )}
+              <Button
+                size="compact-sm"
+                variant="subtle"
+                color="gray"
+                onClick={selection.exitSelectionMode}
+              >
+                {t('__new__.01-common.actions.cancel')}
+              </Button>
+            </Group>
+          </Group>
+        </Paper>
+      )}
 
       {isMobile ? (
         <MaterialCardList
@@ -360,6 +465,14 @@ export function MaterialListPage() {
           materials={paginated}
           isLoading={loading && !initialized}
           invByCode={canManageInventory ? invByCode : undefined}
+          selectionMode={selectionMode}
+          isSelected={selection.isSelected}
+          onToggleRow={toggleRow}
+          onToggleAll={toggleAllOnPage}
+          allSelected={allPageSelected}
+          someSelected={somePageSelected}
+          {...(canQuickCreateReceipt && { onCreateReceipt: createReceiptFor })}
+          {...(canQuickCreateDeliveryNote && { onCreateDeliveryNote: createDeliveryNoteFor })}
         />
       )}
 

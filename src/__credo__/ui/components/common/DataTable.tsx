@@ -1,6 +1,8 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 
 import { Box, Center, LoadingOverlay, ScrollArea, Table, Text } from '@mantine/core';
+
+import { InfiniteScrollSentinel } from './InfiniteScrollSentinel';
 
 export type DataTableColumn<T> = {
   key: string;
@@ -31,6 +33,10 @@ type DataTableProps<T> = {
   readonly stickyHeader?: boolean;
 
   readonly viewportRef?: React.Ref<HTMLDivElement>;
+
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 export function DataTable<T extends Record<string, unknown> & { id: string }>({
@@ -49,16 +55,35 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   maxHeight,
   stickyHeader,
   viewportRef,
+  hasMore = false,
+  onLoadMore,
+  loadingMoreLabel,
 }: DataTableProps<T>) {
   const visibleColumns = useMemo(() => columns.filter((column) => !column.hidden), [columns]);
+
+  const showsActionsColumn = !noActions && Boolean(renderActions);
+  const columnCount = visibleColumns.length + (withIndex ? 1 : 0) + (showsActionsColumn ? 1 : 0);
+  const lazy = hasMore && Boolean(onLoadMore);
 
   const bounded = maxHeight != null;
   const sticky = stickyHeader ?? bounded;
 
+  const localViewportRef = useRef<HTMLDivElement | null>(null);
+  const setViewport = useCallback(
+    (node: HTMLDivElement | null) => {
+      localViewportRef.current = node;
+      if (typeof viewportRef === 'function') viewportRef(node);
+      else if (viewportRef) {
+        (viewportRef as React.RefObject<HTMLDivElement | null>).current = node;
+      }
+    },
+    [viewportRef],
+  );
+
   const ScrollWrap = (bounded ? ScrollArea.Autosize : ScrollArea) as React.ElementType;
   const scrollProps = bounded
-    ? { mah: maxHeight, type: 'auto' as const, viewportRef }
-    : { viewportRef };
+    ? { mah: maxHeight, type: 'auto' as const, viewportRef: setViewport }
+    : { viewportRef: setViewport };
 
   return (
     <Box style={{ position: 'relative' }}>
@@ -117,6 +142,20 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
                 </Table.Tr>
               );
             })}
+            {lazy && (
+              <Table.Tr>
+                <Table.Td colSpan={columnCount}>
+                  <InfiniteScrollSentinel
+                    hasMore={hasMore}
+                    onLoadMore={onLoadMore!}
+                    renderedCount={data.length}
+                    label={loadingMoreLabel}
+
+                    rootRef={bounded ? localViewportRef : undefined}
+                  />
+                </Table.Td>
+              </Table.Tr>
+            )}
           </Table.Tbody>
         </Table>
       </ScrollWrap>

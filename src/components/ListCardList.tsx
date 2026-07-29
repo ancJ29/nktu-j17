@@ -1,6 +1,7 @@
 import { Fragment, type ReactNode } from 'react';
 import { Card, Skeleton, Stack, Text } from '@mantine/core';
 import { useNavigate } from 'react-router';
+import { InfiniteScrollSentinel } from '@credo/base-ui/components';
 
 type Row = { id: string };
 
@@ -15,6 +16,10 @@ type ListCardListProps<T extends Row> = {
   readonly detailRoute?: string;
   readonly onRowClick?: (item: T) => void;
   readonly getRowBg?: (item: T) => string | undefined;
+
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 function DefaultSkeleton({ lines }: { lines: number }) {
@@ -41,6 +46,9 @@ export function ListCardList<T extends Row>({
   detailRoute,
   onRowClick,
   getRowBg,
+  hasMore = false,
+  onLoadMore,
+  loadingMoreLabel,
 }: ListCardListProps<T>) {
   const navigate = useNavigate();
 
@@ -87,6 +95,15 @@ export function ListCardList<T extends Row>({
           {renderCard(item)}
         </Card>
       ))}
+
+      {onLoadMore && (
+        <InfiniteScrollSentinel
+          hasMore={hasMore}
+          onLoadMore={onLoadMore}
+          renderedCount={data.length}
+          label={loadingMoreLabel}
+        />
+      )}
     </Stack>
   );
 }

@@ -1,10 +1,9 @@
-import { Button, Group, SegmentedControl, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Group, SegmentedControl, Stack, Text, ThemeIcon } from '@mantine/core';
 import { MonthPickerInput } from '@mantine/dates';
 import { notifications } from '@mantine/notifications';
-import { IconCalendar, IconPlant2, IconPlus } from '@tabler/icons-react';
+import { IconCalendar, IconPlant2 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { queryHarvestedCrops, useCropStore } from '@/stores/useCropStores';
 import { ListPagination } from '@credo/base-ui/components';
@@ -15,6 +14,7 @@ import { DesktopFilterBar } from '@/components/DesktopFilterBar';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { MobileFilterBar } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { perms } from '@/utils/permission';
 import type { Crop, CropStatus } from '@/types';
 
@@ -180,7 +180,6 @@ export function CropListPage() {
             to: ROUTES.CROPS.NEW,
             label: t('crops.addItem'),
             enabled: canCreate,
-            mobileVariant: 'hidden',
           }}
         />
 
@@ -223,43 +222,29 @@ export function CropListPage() {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('crops.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.status.inactive'),
-            }}
             hideStatus
             filters={
               showStatusFilter
                 ? [
-                    {
+                    allOptionFilter<CropFilterStatus>({
                       title: t('__new__.01-common.labels.status'),
                       value: filter,
-                      options: [
-                        { value: 'all', label: t('__new__.01-common.filters.all') },
-                        ...statusOptions,
-                      ],
-                      onChange: (v) => setFilter(v as CropFilterStatus),
-                    },
+                      options: statusOptions,
+                      onChange: setFilter,
+                      allLabel: t('__new__.01-common.filters.all'),
+                      emptyValue: 'all',
+                    }),
                   ]
                 : []
             }
             onClear={clearFilters}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('crops.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.status.inactive'),
-            }}
             hideStatus
             filters={
               showStatusFilter
@@ -275,19 +260,6 @@ export function CropListPage() {
             }
             onClear={clearFilters}
           />
-        )}
-
-        {isMobile && canCreate && (
-          <Button
-            component={Link}
-            to={ROUTES.CROPS.NEW}
-            leftSection={<IconPlus size={16} />}
-            size="sm"
-            variant="light"
-            fullWidth
-          >
-            {t('crops.addItem')}
-          </Button>
         )}
       </StickyListChrome>
 

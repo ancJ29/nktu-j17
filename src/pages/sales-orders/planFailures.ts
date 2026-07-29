@@ -1,6 +1,40 @@
 import type { TFunction } from 'i18next';
 import type { Product } from '@/types/product';
 import type { PlanFailure } from '@/utils/inventoryReservation';
+import type { TransitionFailure } from './transitionEngine';
+
+export function formatAutoTransitionFailure(
+  failure: TransitionFailure,
+  t: TFunction,
+  productByCode: Map<string, Product>,
+): string {
+  const orphaned =
+    'orphanedRowIds' in failure && failure.orphanedRowIds && failure.orphanedRowIds.length > 0
+      ? t('salesOrders.notifications.reservationFailedDirty', {
+          rows: failure.orphanedRowIds.join(', '),
+        })
+      : undefined;
+  const base = (() => {
+    switch (failure.kind) {
+      case 'plan-failure':
+        return formatPlanFailures(failure.failures, t, productByCode);
+      case 'patch-error':
+      case 'execution-failure':
+        return failure.error.message;
+      case 'patch-conflict':
+        return t('common.conflict.message');
+      case 'requires-missing':
+      case 'transition-not-allowed':
+      case 'unknown-from-status':
+      case 'unknown-to-status':
+        return t('salesOrders.notifications.planFailureUnsupportedTransition', {
+          from: 'from' in failure ? failure.from : '',
+          to: 'to' in failure ? failure.to : '',
+        });
+    }
+  })();
+  return orphaned ? `${base}  •  ${orphaned}` : base;
+}
 
 export function formatPlanFailures(
   failures: PlanFailure[],

@@ -34,6 +34,10 @@ export function hasMaterialMinimumStock(): boolean {
   return appConfig.features?.materials?.minimumStock ?? false;
 }
 
+export function hasMaterialBulkImport(): boolean {
+  return appConfig.features?.materials?.bulkImport ?? false;
+}
+
 export function isMaterialLowStock(
   minimumStock: number | undefined,
   onHand: number | undefined,

@@ -22,7 +22,12 @@ import {
   type SelectFilter,
 } from '@/components/DesktopFilterBar';
 import { DesktopFilterMorePopover } from '@/components/DesktopFilterMorePopover';
-import { MobileFilterBar, type MobileFilterDef } from '@/components/MobileFilterBar';
+import {
+  MobileFilterBar,
+  type MobileFilterDef,
+  type MobileMultiFilterDef,
+} from '@/components/MobileFilterBar';
+import { allOptionFilter, multiOptionFilter } from '@/components/mobileFilterDefs';
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { FilterPill } from '@/components/FilterPill';
 import { TransactionalFilterPillsRow } from '@/components/TransactionalFilterPillsRow';
@@ -244,14 +249,27 @@ export function TransportOrderListPage() {
     },
   ];
 
-  const mobileFilters: MobileFilterDef[] = [
-    {
+  const allLabel = t('__new__.01-common.filters.all');
+
+  const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
+    multiOptionFilter({
+      title: t('__new__.01-common.labels.status'),
+      displayValue: filters.statusFilter.length === 0 ? allLabel : statusPlaceholder,
+      value: filters.statusFilter,
+      options: statusData,
+      onChange: filters.setStatusFilter,
+      allLabel,
+      visible: statusData.length > 0,
+    }),
+    allOptionFilter({
       title: t('transportOrders.columns.truck'),
-      value: filters.truckFilter ?? 'all',
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...truckData],
-      onChange: (v) => filters.setTruckFilter(v === 'all' ? null : v),
+      value: filters.truckFilter,
+      options: truckData,
+      onChange: filters.setTruckFilter,
+      allLabel,
+      emptyValue: null,
       visible: truckData.length > 0,
-    },
+    }),
   ];
 
   const moreFilters: MoreFilterDef[] = [
@@ -325,8 +343,28 @@ export function TransportOrderListPage() {
     [filters, shipmentData, t],
   );
 
+  const shipmentChipsShown = shipmentData.length > 0;
+  const mobileMoreFilters: MoreFilterDef[] = [
+    {
+      type: 'select',
+      key: 'customer',
+      title: t('transportOrders.form.customer'),
+      placeholder: t('transportOrders.form.customer'),
+      value: filters.customerFilter,
+      options: customerData,
+      onChange: filters.setCustomerFilter,
+    },
+
+    ...moreFilters.filter(
+      (f) => f.key !== 'hideCancelled' && !(shipmentChipsShown && f.key === 'shipmentType'),
+    ),
+  ];
+
   const hasActiveFilters = filters.hasActiveFilters || !!search;
   const clearAll = filters.clearFilters;
+
+  const showBarPills = !isMobile;
+  const showShipmentPill = !isMobile || !shipmentChipsShown;
 
   return (
     <Stack gap={isMobile ? 'md' : 'lg'}>
@@ -340,8 +378,8 @@ export function TransportOrderListPage() {
             to: ROUTES.TRANSPORT_ORDERS.NEW,
             label: t('transportOrders.new'),
             enabled: canCreate,
-
-            mobileVariant: 'hidden',
+            // The form is desktop-only (mobile redirects), so hide the CTA rather
+            // than dead-end into a bounce.
           }}
         />
 
@@ -354,14 +392,11 @@ export function TransportOrderListPage() {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('transportOrders.search')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
-                filters={moreFilters}
+                filters={mobileMoreFilters}
                 drawerTitle={t('common.filters.more')}
                 applyLabel={t('common.filters.apply')}
                 presetLabels={presetLabels}
@@ -369,16 +404,14 @@ export function TransportOrderListPage() {
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('transportOrders.search')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={moreFilters} presetLabels={presetLabels} />
@@ -397,15 +430,16 @@ export function TransportOrderListPage() {
             presetLabels,
           }}
         >
-          {filters.statusFilter.map((s) => (
-            <FilterPill
-              key={s}
-              onClose={() => filters.setStatusFilter(filters.statusFilter.filter((v) => v !== s))}
-            >
-              {t('__new__.01-common.labels.status')}: {statusLabel(s)}
-            </FilterPill>
-          ))}
-          {filters.truckFilter && (
+          {showBarPills &&
+            filters.statusFilter.map((s) => (
+              <FilterPill
+                key={s}
+                onClose={() => filters.setStatusFilter(filters.statusFilter.filter((v) => v !== s))}
+              >
+                {t('__new__.01-common.labels.status')}: {statusLabel(s)}
+              </FilterPill>
+            ))}
+          {showBarPills && filters.truckFilter && (
             <FilterPill onClose={() => filters.setTruckFilter(null)}>
               {t('transportOrders.columns.truck')}: {truckLabel(filters.truckFilter)}
             </FilterPill>
@@ -420,7 +454,7 @@ export function TransportOrderListPage() {
               {t('transportOrders.form.driver')}: {driverLabel(filters.driverFilter)}
             </FilterPill>
           )}
-          {filters.shipmentFilter !== 'all' && (
+          {showShipmentPill && filters.shipmentFilter !== 'all' && (
             <FilterPill onClose={() => filters.setShipmentFilter('all')}>
               {t(`transportOrders.shipmentType.${filters.shipmentFilter}`)}
             </FilterPill>
@@ -430,7 +464,7 @@ export function TransportOrderListPage() {
               {containerSizeLabel(filters.containerSizeFilter)}
             </FilterPill>
           )}
-          {filters.hideCancelled && (
+          {showBarPills && filters.hideCancelled && (
             <FilterPill color="red" onClose={() => filters.setHideCancelled(false)}>
               {t('transportOrders.filters.hideCancelled')}
             </FilterPill>

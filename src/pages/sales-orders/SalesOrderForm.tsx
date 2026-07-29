@@ -723,18 +723,34 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
   const handleProductSelect = useCallback(
     (idx: number, opt: ProductSelectorChange | null) => {
+      const currentItems = form.getValues().items;
+      const target = currentItems[idx];
+      const outgoingGroupId = target?.role === 'set' && target.groupId ? target.groupId : null;
+
+      const base = outgoingGroupId
+        ? currentItems.filter((l, i) => i === idx || l.groupId !== outgoingGroupId)
+        : currentItems;
+      const detach = (l: ItemFormValues): ItemFormValues => {
+        const { groupId: _g, role: _r, sourceSetCode: _s, ...rest } = l;
+        void _g;
+        void _r;
+        void _s;
+        return rest;
+      };
+
       if (!opt) {
-        form.setFieldValue(`items.${idx}.productCode`, '');
-        form.setFieldValue(`items.${idx}.productName`, '');
+        const next = base.map((l, i) =>
+          i === idx ? { ...detach(l), productCode: '', productName: '' } : l,
+        );
+        form.setFieldValue('items', next);
         return;
       }
       const { product, code, name, units } = opt;
 
       if (isProductSet(product)) {
-        const currentItems = form.getValues().items;
-        const currentQty = currentItems[idx]?.quantity ?? 1;
+        const currentQty = base[idx]?.quantity ?? 1;
         const expansion = buildSetExpansion(product, currentQty || 1, newSetGroupId());
-        const next = [...currentItems];
+        const next = [...base];
         next.splice(idx, 1, ...expansion);
         form.setFieldValue('items', next);
         notifications.show({
@@ -747,10 +763,18 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         });
         return;
       }
-      form.setFieldValue(`items.${idx}.productCode`, code);
-      form.setFieldValue(`items.${idx}.productName`, name);
-      form.setFieldValue(`items.${idx}.unit`, units[0] ?? product.unit ?? '');
-      form.setFieldValue(`items.${idx}.unitPrice`, getProductDefaultUnitPrice(product));
+      const next = base.map((l, i) =>
+        i === idx
+          ? {
+              ...detach(l),
+              productCode: code,
+              productName: name,
+              unit: units[0] ?? product.unit ?? '',
+              unitPrice: getProductDefaultUnitPrice(product),
+            }
+          : l,
+      );
+      form.setFieldValue('items', next);
     },
 
     [buildSetExpansion, t],

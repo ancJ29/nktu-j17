@@ -1,10 +1,12 @@
 import { useMemo } from 'react';
-import { Badge, Box, Group, HoverCard, Stack, Text } from '@mantine/core';
+import { ActionIcon, Badge, Box, Group, HoverCard, Stack, Text, Tooltip } from '@mantine/core';
+import { IconPackageExport, IconPackageImport } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Material, MaterialInventoryRow } from '@/types';
 import { ColorBadge } from '@credo/base-ui/components';
 import { ListDataTable } from '@/components/ListDataTable';
+import { selectionColumn } from '@/components/selectionColumn';
 import { ActiveBadge } from '@/components/badges';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import {
@@ -27,6 +29,17 @@ type MaterialDataTableProps = {
   readonly isLoading?: boolean;
 
   readonly invByCode?: ReadonlyMap<string, MaterialInventoryRow>;
+
+  readonly selectionMode?: boolean;
+  readonly isSelected?: (code: string) => boolean;
+  readonly onToggleRow?: (code: string) => void;
+  readonly onToggleAll?: () => void;
+
+  readonly allSelected?: boolean;
+  readonly someSelected?: boolean;
+
+  readonly onCreateReceipt?: (material: Material) => void;
+  readonly onCreateDeliveryNote?: (material: Material) => void;
 };
 
 function OnHandCell({
@@ -117,8 +130,21 @@ function OnHandCell({
   );
 }
 
-export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialDataTableProps) {
+export function MaterialDataTable({
+  materials,
+  isLoading,
+  invByCode,
+  selectionMode = false,
+  isSelected,
+  onToggleRow,
+  onToggleAll,
+  allSelected = false,
+  someSelected = false,
+  onCreateReceipt,
+  onCreateDeliveryNote,
+}: MaterialDataTableProps) {
   const { t } = useTranslation();
+  const showRowActions = !selectionMode && !!(onCreateReceipt || onCreateDeliveryNote);
   const unitLabels = useLookupV2Labels(getMaterialUnitCategory());
   const categoryLabels = useLookupV2Labels(MATERIAL_CATEGORY_LOOKUP);
 
@@ -126,6 +152,20 @@ export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialD
 
   const columns = useMemo(
     () => [
+      ...(selectionMode
+        ? [
+            selectionColumn<Material>({
+              keyOf: (m) => m.code,
+              isSelected: (code) => isSelected?.(code) ?? false,
+              onToggleRow: (code) => onToggleRow?.(code),
+              onToggleAll: () => onToggleAll?.(),
+              allSelected,
+              someSelected,
+              selectAllLabel: t('warehouseDoc.fromMaterials.selectAll'),
+              rowLabel: (m) => m.name,
+            }),
+          ]
+        : []),
       {
         key: 'name',
         header: t('common.labels.name'),
@@ -201,14 +241,76 @@ export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialD
             <ActiveBadge
               isActive={item.isActive}
               activeLabel={t('materials.status.active')}
-              inactiveLabel={t('common.status.inactive')}
+              inactiveLabel={t('__new__.01-common.labels.inactive')}
               size="sm"
             />
           </Group>
         ),
       },
+
+      ...(showRowActions
+        ? [
+            {
+              key: '__warehouseActions',
+              header: '',
+              width: '84px',
+              render: (item: Material) => (
+                <Group gap={2} wrap="nowrap" justify="flex-end">
+                  {onCreateReceipt && (
+                    <Tooltip label={t('warehouseDoc.fromMaterials.rowCreateReceipt')} withArrow>
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        aria-label={t('warehouseDoc.fromMaterials.rowCreateReceipt')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCreateReceipt(item);
+                        }}
+                      >
+                        <IconPackageImport size={18} />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                  {onCreateDeliveryNote && (
+                    <Tooltip
+                      label={t('warehouseDoc.fromMaterials.rowCreateDeliveryNote')}
+                      withArrow
+                    >
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        aria-label={t('warehouseDoc.fromMaterials.rowCreateDeliveryNote')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onCreateDeliveryNote(item);
+                        }}
+                      >
+                        <IconPackageExport size={18} />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </Group>
+              ),
+            },
+          ]
+        : []),
     ],
-    [t, invByCode, showCategory, unitLabels, categoryLabels],
+    [
+      t,
+      invByCode,
+      showCategory,
+      unitLabels,
+      categoryLabels,
+      selectionMode,
+      isSelected,
+      onToggleRow,
+      onToggleAll,
+      allSelected,
+      someSelected,
+      showRowActions,
+      onCreateReceipt,
+      onCreateDeliveryNote,
+    ],
   );
 
   const getRowBg = useMemo(
@@ -225,7 +327,10 @@ export function MaterialDataTable({ materials, isLoading, invByCode }: MaterialD
       columns={columns}
       isLoading={isLoading}
       emptyMessage={t('materials.noItems')}
-      detailRoute={ROUTES.MATERIALS.DETAIL}
+
+      {...(selectionMode
+        ? { onRowClick: (item: Material) => onToggleRow?.(item.code) }
+        : { detailRoute: ROUTES.MATERIALS.DETAIL })}
       getRowBg={getRowBg}
     />
   );

@@ -101,8 +101,9 @@ export const AppInfoSection = memo(function AppInfoSection({
         p="xs"
         style={{ borderRadius: 'var(--mantine-radius-sm)' }}
         bg={languageSwitcher ? undefined : 'var(--mantine-color-default-hover)'}
+        wrap="nowrap"
       >
-        <Box>
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <Text fz="sm" fw={500}>
             Language Switcher
           </Text>
@@ -113,6 +114,7 @@ export const AppInfoSection = memo(function AppInfoSection({
         <Switch
           checked={languageSwitcher}
           onChange={(e) => onLanguageSwitcherChange(e.currentTarget.checked)}
+          style={{ flexShrink: 0 }}
         />
       </Group>
       <Group
@@ -120,8 +122,9 @@ export const AppInfoSection = memo(function AppInfoSection({
         p="xs"
         style={{ borderRadius: 'var(--mantine-radius-sm)' }}
         bg={enablePdfSharing ? undefined : 'var(--mantine-color-default-hover)'}
+        wrap="nowrap"
       >
-        <Box>
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <Text fz="sm" fw={500}>
             Share PDF
           </Text>
@@ -132,6 +135,7 @@ export const AppInfoSection = memo(function AppInfoSection({
         <Switch
           checked={enablePdfSharing}
           onChange={(e) => onEnablePdfSharingChange(e.currentTarget.checked)}
+          style={{ flexShrink: 0 }}
         />
       </Group>
       <Group
@@ -139,8 +143,9 @@ export const AppInfoSection = memo(function AppInfoSection({
         p="xs"
         style={{ borderRadius: 'var(--mantine-radius-sm)' }}
         bg={enableStats ? undefined : 'var(--mantine-color-default-hover)'}
+        wrap="nowrap"
       >
-        <Box>
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <Text fz="sm" fw={500}>
             List Stats
           </Text>
@@ -151,6 +156,7 @@ export const AppInfoSection = memo(function AppInfoSection({
         <Switch
           checked={enableStats}
           onChange={(e) => onEnableStatsChange(e.currentTarget.checked)}
+          style={{ flexShrink: 0 }}
         />
       </Group>
     </Stack>

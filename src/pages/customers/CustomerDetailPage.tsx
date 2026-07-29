@@ -361,8 +361,8 @@ export function CustomerDetailPage() {
             )}
             <ActiveBadge
               isActive={customer.isActive}
-              activeLabel={t('common.status.active')}
-              inactiveLabel={t('common.status.inactive')}
+              activeLabel={t('__new__.01-common.labels.active')}
+              inactiveLabel={t('__new__.01-common.labels.inactive')}
               size="sm"
             />
           </Group>

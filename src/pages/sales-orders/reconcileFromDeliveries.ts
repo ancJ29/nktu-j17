@@ -17,29 +17,15 @@ import {
   getAutoCompletionTargetValue,
   runTransition as runSoTransition,
   statusHasCapability as soStatusHasCapability,
-  type TransitionFailure as SoTransitionFailure,
 } from './transitionEngine';
-import { formatPlanFailures } from './planFailures';
+import { formatAutoTransitionFailure } from './planFailures';
+import { runShipRecovery } from './shipRecovery';
+import { statusChangeMemo } from './activityMemo';
+import { logActivity } from '@/utils/activityLogger';
 
 export type Actor = { id: string; name: string } | undefined;
 
 export type SoReconcileOutcome = 'advanced' | 'skipped' | 'failed';
-
-function formatFollowUpFailureMessage(
-  failure: SoTransitionFailure,
-  productsByCode: Map<string, Product>,
-  t: TFunction,
-): string {
-  switch (failure.kind) {
-    case 'plan-failure':
-      return formatPlanFailures(failure.failures, t, productsByCode);
-    case 'patch-error':
-    case 'execution-failure':
-      return failure.error.message;
-    default:
-      return failure.kind;
-  }
-}
 
 export async function ensureReconcileStoresLoaded(): Promise<void> {
   const so = useSalesOrderStore.getState();
@@ -90,15 +76,35 @@ export async function advanceSoIfFullyDelivered(params: {
   const { actor, t, freshDr } = params;
   let so = params.so;
 
-  if (so.isClosed) return 'skipped';
-  const soExtra = (so.extra ?? {}) as SalesOrderExtra;
-  if (soExtra.cancellation != null) return 'skipped';
-  const fromStatus = soExtra.status ?? '';
-  if (!soStatusHasCapability(fromStatus, 'autoAdvanceOnFullDelivery')) return 'skipped';
+  const preExtra = (so.extra ?? {}) as SalesOrderExtra;
+  const hasPendingShip = preExtra.inventoryLinkage?.pendingShip != null;
   const targetStatus = getAutoCompletionTargetValue();
-  if (!targetStatus) return 'skipped';
+  const mayAdvance =
+    !so.isClosed &&
+    preExtra.cancellation == null &&
+    targetStatus != null &&
+    soStatusHasCapability(preExtra.status ?? '', 'autoAdvanceOnFullDelivery');
+  if (!hasPendingShip && !mayAdvance) return 'skipped';
 
   await ensureReconcileStoresLoaded();
+
+  const productsByCode = new Map<string, Product>();
+  for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
+
+  if (hasPendingShip) {
+    const recovery = await runShipRecovery({ so, actor, productsByCode, t });
+    if (recovery.kind === 'applied' || recovery.kind === 'confirmed') {
+      const fresh = useSalesOrderStore.getState().getById(so.id) as SalesOrder | undefined;
+      if (fresh) so = fresh;
+    }
+  }
+
+  if (!mayAdvance || !targetStatus) return 'skipped';
+  const soExtra = (so.extra ?? {}) as SalesOrderExtra;
+
+  if (so.isClosed || soExtra.cancellation != null) return 'skipped';
+  const fromStatus = soExtra.status ?? '';
+  if (!soStatusHasCapability(fromStatus, 'autoAdvanceOnFullDelivery')) return 'skipped';
 
   const allDrs = useDeliveryRequestStore.getState().items as DeliveryRequest[];
   const drsForSo = allDrs
@@ -112,8 +118,6 @@ export async function advanceSoIfFullyDelivered(params: {
 
   if (!isFullyDelivered(so, drsForSo, getSalesOrderCompletionEvidence())) return 'skipped';
 
-  const productsByCode = new Map<string, Product>();
-  for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
   let result = await runSoTransition({
@@ -146,6 +150,17 @@ export async function advanceSoIfFullyDelivered(params: {
   }
 
   if (result.ok) {
+    logActivity(
+      'salesOrder.statusChange',
+      so.id,
+      statusChangeMemo({
+        updated: result.updated,
+        fromStatus,
+        toStatus: targetStatus,
+        trigger: freshDr ? 'dr-completion' : 'self-heal',
+        shipPending: result.pendingShip != null,
+      }),
+    );
     notifications.show({
       color: 'green',
       message: t('deliveryRequests.notifications.soAutoAdvancedSuccess', {
@@ -153,13 +168,17 @@ export async function advanceSoIfFullyDelivered(params: {
         status: targetStatus,
       }),
     });
+
+    if (result.pendingShip) {
+      await runShipRecovery({ so: result.updated, actor, productsByCode, t });
+    }
     return 'advanced';
   }
 
   notifications.show({
     color: 'yellow',
     title: t('deliveryRequests.notifications.soAutoAdvancedFailedTitle'),
-    message: formatFollowUpFailureMessage(result.failure, productsByCode, t),
+    message: formatAutoTransitionFailure(result.failure, t, productsByCode),
     autoClose: 10000,
   });
   return 'failed';

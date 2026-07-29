@@ -1,4 +1,4 @@
-import { SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Box, Group, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconClock, IconNote, IconPhone, IconUser } from '@tabler/icons-react';
 import {
   CodeLabel,
@@ -9,6 +9,7 @@ import {
 import { useTranslation } from 'react-i18next';
 
 import { device } from '@credo/base-ui/utils';
+import { CopyValueButton } from '@/components/CopyValueButton';
 import { DetailField } from '@/components/DetailField';
 import { SectionCard } from '@/components/SectionCard';
 import type { Employee } from '@/types';
@@ -58,12 +59,32 @@ export function EmployeePersonalCard({
 }: PersonalCardProps) {
   const { t } = useTranslation();
 
+  const loginIdentifier = employee.email ?? '';
+  const loginIdentifierField = (
+    <InlineTextField
+      value={loginIdentifier}
+      onSave={onEmailSave}
+      canEdit={!isMobile}
+      labels={inlineEditLabels}
+    />
+  );
+
   return (
     <SectionCard icon={<IconUser size={14} />} title={t('common.labels.basicInfo')}>
       <SimpleGrid cols={2} spacing="md">
         <DetailField label={t('employees.columns.name')}>{employee.name}</DetailField>
         <DetailField label={t('common.labels.code')}>
-          <CodeLabel code={employee.code} />
+          {isMobile && employee.code ? (
+            <Group gap={4} wrap="nowrap">
+              <CodeLabel code={employee.code} />
+              <CopyValueButton
+                value={employee.code}
+                copiedMessage={t('employees.notifications.codeCopied')}
+              />
+            </Group>
+          ) : (
+            <CodeLabel code={employee.code} />
+          )}
         </DetailField>
       </SimpleGrid>
       {hasEmail && (
@@ -83,12 +104,20 @@ export function EmployeePersonalCard({
       )}
       {isRootUser && (
         <DetailField label={t('__new__.07-entities.employees.dangerZone.loginIdentifier')}>
-          <InlineTextField
-            value={employee.email ?? ''}
-            onSave={onEmailSave}
-            canEdit={!isMobile}
-            labels={inlineEditLabels}
-          />
+          {isMobile && loginIdentifier ? (
+            <Group gap={4} wrap="nowrap" align="flex-start">
+              <Box style={{ flex: 1, minWidth: 0 }}>{loginIdentifierField}</Box>
+              {/* Copies exactly what's displayed. Note that an auto-synthesized
+                  login carries the `@auto.local` suffix here, which the
+                  set-password modal strips — see employees.md. */}
+              <CopyValueButton
+                value={loginIdentifier}
+                copiedMessage={t('employees.notifications.loginIdentifierCopied')}
+              />
+            </Group>
+          ) : (
+            loginIdentifierField
+          )}
         </DetailField>
       )}
       {(hasDepartment || hasPosition) && (

@@ -330,7 +330,11 @@ function BrandedShell({
   return (
     <Box mih="100vh" bg="var(--mantine-color-gray-0)">
       <Box bg={headerBg} c="white" h={56}>
-        <Container size="md" h="100%">
+        {/* `xl`, not the app's usual `md`: this page is dense operator tooling —
+            config toggle rows, client tables, seed-data grids — not reading
+            copy, so the wider measure earns its keep. Header and body must
+            carry the SAME size or the brand bar stops aligning with content. */}
+        <Container size="xl" h="100%">
           <Group h="100%" justify="space-between" wrap="nowrap">
             <Group gap="sm" wrap="nowrap">
               <Box
@@ -367,7 +371,7 @@ function BrandedShell({
         </Container>
       </Box>
 
-      <Container size="md" py="xl">
+      <Container size="xl" py="xl">
         {children}
       </Container>
     </Box>

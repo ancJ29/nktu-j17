@@ -1,4 +1,4 @@
-import { Button, Drawer, SimpleGrid, rem } from '@mantine/core';
+import { Button, Drawer, Group, SimpleGrid, Text, rem } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconChevronDown } from '@tabler/icons-react';
 
@@ -7,7 +7,13 @@ type Option = {
   label: string;
 };
 
-type MobileFilterSelectProps = {
+type MobileFilterSelectCommonProps = {
+  showTitleInBar?: boolean;
+
+  displayValue?: string;
+};
+
+type MobileFilterSelectProps = MobileFilterSelectCommonProps & {
   title: string;
 
   value: string;
@@ -17,7 +23,7 @@ type MobileFilterSelectProps = {
   multi?: false;
 };
 
-type MobileFilterMultiSelectProps = {
+type MobileFilterMultiSelectProps = MobileFilterSelectCommonProps & {
   title: string;
   value: string[];
   options: Option[];
@@ -26,7 +32,7 @@ type MobileFilterMultiSelectProps = {
 };
 
 export function MobileFilterSelect(props: MobileFilterSelectProps | MobileFilterMultiSelectProps) {
-  const { title, options, multi } = props;
+  const { title, options, multi, showTitleInBar, displayValue } = props;
   const [opened, { open, close }] = useDisclosure(false);
 
   const handleSelect = (optionValue: string) => {
@@ -46,13 +52,20 @@ export function MobileFilterSelect(props: MobileFilterSelectProps | MobileFilter
     }
   };
 
-  const selectedLabel = multi
+  const selectedLabel =
+    displayValue ??
+    (multi
+      ? (props.value as string[]).length > 0
+        ? (props.value as string[])
+            .map((v) => options.find((o) => o.value === v)?.label ?? v)
+            .join(', ')
+        : (options.find((o) => o.value === 'all')?.label ?? title)
+      : (options.find((o) => o.value === (props.value as string))?.label ??
+        (props.value as string)));
+
+  const isNarrowing = multi
     ? (props.value as string[]).length > 0
-      ? (props.value as string[])
-          .map((v) => options.find((o) => o.value === v)?.label ?? v)
-          .join(', ')
-      : (options.find((o) => o.value === 'all')?.label ?? title)
-    : (options.find((o) => o.value === (props.value as string))?.label ?? (props.value as string));
+    : !!props.value && props.value !== 'all';
 
   const isSelected = (optionValue: string) => {
     if (multi) {
@@ -72,13 +85,28 @@ export function MobileFilterSelect(props: MobileFilterSelectProps | MobileFilter
   return (
     <>
       <Button
-        variant="filled"
+        variant={showTitleInBar && !isNarrowing ? 'default' : 'filled'}
         size="compact-sm"
-        rightSection={<IconChevronDown size={14} />}
+        rightSection={<IconChevronDown size={14} opacity={0.6} />}
         onClick={open}
         style={{ flex: 1, minWidth: 0 }}
+
+        styles={{ label: { flex: 1, minWidth: 0, overflow: 'hidden' } }}
       >
-        {selectedLabel}
+        {showTitleInBar ? (
+          <Group gap={6} wrap="nowrap" w="100%" style={{ minWidth: 0 }}>
+            {/* The name never truncates — it's short, fixed, and the whole point
+                of the chip. All remaining width goes to the value. */}
+            <Text component="span" fz="xs" lh={1.2} opacity={0.75} style={{ flexShrink: 0 }}>
+              {title}
+            </Text>
+            <Text component="span" fz="xs" fw={600} lh={1.2} truncate="end" style={{ minWidth: 0 }}>
+              {selectedLabel}
+            </Text>
+          </Group>
+        ) : (
+          selectedLabel
+        )}
       </Button>
 
       <Drawer

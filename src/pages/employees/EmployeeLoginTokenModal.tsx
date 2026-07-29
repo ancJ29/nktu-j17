@@ -5,6 +5,7 @@ import { notifications } from '@mantine/notifications';
 import { IconCopy, IconCheck, IconInfoCircle, IconPhoto, IconQrcode } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 
+import { ConfirmModal } from '@/components/ConfirmModal';
 import { ROUTES } from '@/constants/routes';
 import { resolveClientCode } from '@/config/client-code';
 import { cMngtConnector } from '@credo/connectors/connector';
@@ -32,6 +33,7 @@ export function EmployeeLoginTokenModal({
   const [loginLink, setLoginLink] = useState('');
   const [qrCodeData, setQrCodeData] = useState('');
   const [qrCopied, setQrCopied] = useState(false);
+  const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const qrCopiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => () => clearTimeout(qrCopiedTimer.current), []);
@@ -102,8 +104,14 @@ export function EmployeeLoginTokenModal({
     setLoginLink('');
     setQrCodeData('');
     setQrCopied(false);
+    setConfirmRegenerate(false);
     clearTimeout(qrCopiedTimer.current);
     onClose();
+  };
+
+  const handleConfirmRegenerate = () => {
+    setConfirmRegenerate(false);
+    void generateToken();
   };
 
   return (
@@ -171,7 +179,7 @@ export function EmployeeLoginTokenModal({
                   fullWidth
                   variant="subtle"
                   leftSection={<IconQrcode size={16} />}
-                  onClick={generateToken}
+                  onClick={() => setConfirmRegenerate(true)}
                 >
                   {t('employees.loginToken.regenerate')}
                 </Button>
@@ -180,6 +188,15 @@ export function EmployeeLoginTokenModal({
           </>
         )}
       </Stack>
+
+      <ConfirmModal
+        opened={confirmRegenerate}
+        onClose={() => setConfirmRegenerate(false)}
+        onConfirm={handleConfirmRegenerate}
+        title={t('employees.loginToken.regenerateConfirmTitle')}
+        message={t('employees.loginToken.regenerateConfirmMessage')}
+        confirmLabel={t('employees.loginToken.regenerate')}
+      />
     </Modal>
   );
 }

@@ -7,17 +7,26 @@ import { CacheStatus } from './CacheStatus';
 
 const isMobile = device.isMobile;
 
-type CreateCta = {
+type CreateCtaBase = {
   label: string;
-
-  to?: string;
-
-  onClick?: () => void;
-
-  mobileVariant?: 'icon' | 'hidden';
 
   enabled?: boolean;
 };
+
+type CreateCtaLink = CreateCtaBase & {
+  to: string;
+  onClick?: never;
+  mobileVariant?: never;
+};
+
+type CreateCtaAction = CreateCtaBase & {
+  onClick: () => void;
+  to?: never;
+
+  mobileVariant?: 'icon' | 'hidden';
+};
+
+type CreateCta = CreateCtaLink | CreateCtaAction;
 
 type ListPageHeaderProps = {
   readonly title: string;
@@ -41,8 +50,9 @@ export function ListPageHeader({
   createCta,
 }: ListPageHeaderProps) {
   const enabled = createCta?.enabled ?? true;
-  const mobileVariant = createCta?.mobileVariant ?? 'icon';
-  const showCta = !!createCta && enabled && !(isMobile && mobileVariant === 'hidden');
+
+  const hiddenOnMobile = !!createCta?.to || (createCta?.mobileVariant ?? 'icon') === 'hidden';
+  const showCta = !!createCta && enabled && !(isMobile && hiddenOnMobile);
 
   if (isMobile) {
     return (
@@ -84,13 +94,6 @@ export function ListPageHeader({
 
 function renderCta(cta: CreateCta) {
   if (isMobile) {
-    if (cta.to) {
-      return (
-        <ActionIcon component={Link} to={cta.to} variant="filled" size="md">
-          <IconPlus size={16} />
-        </ActionIcon>
-      );
-    }
     return (
       <ActionIcon onClick={cta.onClick} variant="filled" size="md">
         <IconPlus size={16} />

@@ -27,6 +27,7 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
+import { multiOptionFilter } from '@/components/mobileFilterDefs';
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { TransactionalFilterPillsRow } from '@/components/TransactionalFilterPillsRow';
@@ -292,14 +293,15 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
   ];
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
-    {
+    multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
+      displayValue: statusPlaceholder,
       value: filters.statusFilter,
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusFilterData],
+      options: statusFilterData,
       onChange: filters.setStatusFilter,
+      allLabel: t('__new__.01-common.filters.all'),
       visible: statusFilterData.length > 0,
-      multi: true,
-    },
+    }),
   ];
 
   const dateAndExtraFilters: MoreFilterDef[] = [
@@ -397,8 +399,8 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
             to: ROUTES.GOODS_RECEIPTS.NEW,
             label: t('goodsReceipts.addItem'),
             enabled: canCreate,
-
-            mobileVariant: 'hidden',
+            // Mobile create is hidden — the warehouse workflow is view +
+            // quantity-correct + confirm. See `docs/memo/mobile-workflow.md`.
           }}
         />
 
@@ -412,14 +414,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.goodsReceipts.list.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: '',
-              inactive: '',
-            }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -431,20 +426,14 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.goodsReceipts.list.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: '',
-              inactive: '',
-            }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={dateAndExtraFilters} presetLabels={presetLabels} />

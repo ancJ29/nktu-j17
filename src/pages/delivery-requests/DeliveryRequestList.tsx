@@ -31,6 +31,7 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
+import { allOptionFilter, multiOptionFilter } from '@/components/mobileFilterDefs';
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { type DateRangePreset, type MoreFilterDef } from '@/types/date-range';
 import {
@@ -252,6 +253,8 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     );
   }, [filters.partyFilter, partyFilterData]);
 
+  const allLabel = t('__new__.01-common.filters.all');
+
   const statusPlaceholder = useMemo(() => {
     if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
@@ -334,27 +337,27 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
   ];
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
-    {
+    multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
+      displayValue: statusPlaceholder,
       value: filters.statusFilter,
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusFilterData],
+      options: statusFilterData,
       onChange: filters.setStatusFilter,
+      allLabel,
       visible: statusFilterData.length > 0,
-      multi: true,
-    },
+    }),
     ...(variant.showScheduledDateInBar
-      ? ([
-          {
-            title: t('deliveryRequests.columns.scheduledDate'),
-            value: scheduledDatePreset ?? 'all',
-            options: [
-              { value: 'all', label: t('__new__.01-common.filters.all') },
-              ...scheduledDatePresetData,
-            ],
-            onChange: (v) => setScheduledDatePreset(v === 'all' ? null : v),
+      ? [
+          allOptionFilter({
+            title: t('deliveryRequests.filterScheduledDate'),
+            value: scheduledDatePreset,
+            options: scheduledDatePresetData,
+            onChange: setScheduledDatePreset,
+            allLabel,
+            emptyValue: null,
             visible: scheduledDatePresetData.length > 0,
-          },
-        ] satisfies MobileFilterDef[])
+          }),
+        ]
       : []),
   ];
 
@@ -367,6 +370,19 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       onChange: filters.setScheduledDateRange,
     },
   ];
+
+  const mobileScheduledDateFilter: MoreFilterDef[] = variant.showScheduledDateInBar
+    ? [
+        {
+          type: 'dateRange',
+          key: 'scheduledDate',
+          title: t('deliveryRequests.filterScheduledDateCustom'),
+          value: filters.scheduledDateRange,
+          onChange: filters.setScheduledDateRange,
+          customOnly: true,
+        },
+      ]
+    : dateAndExtraFilters;
 
   const mobileMoreFilters: MoreFilterDef[] = [
     ...(canViewAll
@@ -395,19 +411,24 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           },
         ] satisfies MoreFilterDef[])
       : []),
-    ...dateAndExtraFilters,
+    ...mobileScheduledDateFilter,
   ];
 
   const [reorderOpen, setReorderOpen] = useState(false);
 
   const [createOpen, setCreateOpen] = useState(false);
 
+  const showStatusPills = !isMobile;
+
+  const dateShownOnChip =
+    isMobile && variant.showScheduledDateInBar && scheduledDatePreset !== null;
+  const showDatePill = !!filters.scheduledDateRange.preset && !dateShownOnChip;
   const hasPills = !!(
-    filters.statusFilter.length > 0 ||
+    (showStatusPills && filters.statusFilter.length > 0) ||
     filters.salesOrderFilter ||
     (canViewAll && filters.driverFilter) ||
     filters.partyFilter ||
-    filters.scheduledDateRange.preset
+    showDatePill
   );
 
   const loadingInitial = (loading && !initialized) || (salesDeptScoped && !salesOrdersInit);
@@ -435,14 +456,17 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           createCta={
             isMobile
               ? undefined
-              : {
-                  ...(variant.quickCreateMode === 'modal'
-                    ? { onClick: () => setCreateOpen(true) }
-                    : { to: ROUTES.DELIVERY.NEW }),
-                  label: t('deliveryRequests.addItem'),
-                  enabled: canCreate,
-                  mobileVariant: 'icon',
-                }
+              : variant.quickCreateMode === 'modal'
+                ? {
+                    onClick: () => setCreateOpen(true),
+                    label: t('deliveryRequests.addItem'),
+                    enabled: canCreate,
+                  }
+                : {
+                    to: ROUTES.DELIVERY.NEW,
+                    label: t('deliveryRequests.addItem'),
+                    enabled: canCreate,
+                  }
           }
         />
 
@@ -465,14 +489,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.deliveryRequests.list.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: '',
-              inactive: '',
-            }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -484,20 +501,14 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.deliveryRequests.list.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: '',
-              inactive: '',
-            }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={dateAndExtraFilters} presetLabels={presetLabels} />
@@ -509,16 +520,17 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
 
         {hasPills && (
           <Group gap="xs">
-            {filters.statusFilter.map((sf) => (
-              <FilterPill
-                key={sf}
-                onClose={() =>
-                  filters.setStatusFilter(filters.statusFilter.filter((v) => v !== sf))
-                }
-              >
-                {resolveStatus(sf).label}
-              </FilterPill>
-            ))}
+            {showStatusPills &&
+              filters.statusFilter.map((sf) => (
+                <FilterPill
+                  key={sf}
+                  onClose={() =>
+                    filters.setStatusFilter(filters.statusFilter.filter((v) => v !== sf))
+                  }
+                >
+                  {resolveStatus(sf).label}
+                </FilterPill>
+              ))}
             {canViewAll && filters.driverFilter && (
               <FilterPill onClose={() => filters.setDriverFilter(null)}>
                 {driverFilterData.find((e) => e.value === filters.driverFilter)?.label ??
@@ -529,7 +541,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             {filters.partyFilter && (
               <FilterPill onClose={() => filters.setPartyFilter(null)}>{partyLabel}</FilterPill>
             )}
-            {filters.scheduledDateRange.preset && (
+            {showDatePill && (
               <FilterPill onClose={() => filters.setScheduledDateRange(EMPTY_DATE_RANGE)}>
                 {t('deliveryRequests.columns.scheduledDate')}:{' '}
                 {formatDateRangeLabel(filters.scheduledDateRange, presetLabels)}

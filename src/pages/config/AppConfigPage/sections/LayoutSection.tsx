@@ -25,8 +25,8 @@ export const LayoutSection = memo(function LayoutSection({
         max={400}
         step={10}
       />
-      <Group justify="space-between" p="xs" align="center">
-        <Box>
+      <Group justify="space-between" p="xs" align="center" wrap="nowrap">
+        <Box style={{ flex: 1, minWidth: 0 }}>
           <Text fz="sm" fw={500}>
             Display Icon When Collapsed
           </Text>

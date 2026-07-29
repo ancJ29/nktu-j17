@@ -43,14 +43,14 @@ type DesktopFilterBarProps = {
 
   status?: FilterStatus;
   onStatusChange?: (value: FilterStatus) => void;
-  statusLabels: { all: string; active: string; inactive: string };
+
+  statusLabels?: { all: string; active: string; inactive: string };
 
   hideStatus?: boolean;
 
   filters?: (SelectFilter | MultiSelectFilter)[];
 
   moreSection?: ReactNode;
-  clearLabel?: string;
   onClear: () => void;
 
   hasActiveFilters?: boolean;
@@ -76,7 +76,7 @@ export function DesktopFilterBar({
   const hasActiveFilters =
     hasActiveFiltersProp ??
     (!!search ||
-      status !== 'all' ||
+      (!hideStatus && (status ?? 'all') !== 'all') ||
       filters?.some((f) =>
         f.multi ? f.value.length > 0 : f.value !== null && f.value !== 'all',
       ) === true);
@@ -108,7 +108,7 @@ export function DesktopFilterBar({
           </ActionIcon>
         }
       />
-      {!hideStatus && (
+      {!hideStatus && statusLabels && (
         <Select
           size="sm"
           value={status}

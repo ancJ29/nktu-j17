@@ -3,6 +3,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import {
   buildLinkageSnapshotFromReserveOps,
+  buildLinkageSnapshotFromShipOps,
   executeReservationPlan,
   planReleaseFromLinkage,
   planShipFromLinkage,
@@ -14,6 +15,7 @@ import {
 import { emitInventoryActivityForApplied } from '@/utils/inventoryActivityEmit';
 import type {
   InventoryLinkage,
+  InventoryLinkageVia,
   Product,
   ProductInventoryRow,
   SalesOrder,
@@ -21,6 +23,7 @@ import type {
   SalesOrderExtra,
 } from '@/types';
 import {
+  buildPendingShipLinkage,
   buildReleasedLinkage,
   buildReservedLinkage,
   buildShippedLinkage,
@@ -47,8 +50,18 @@ export type TransitionFailure =
 
 export type SoFollowUp = { kind: 'release-linked-drs' };
 
+export type PendingShipOutcome = {
+  reason: 'inventory-failed' | 'confirm-failed';
+  error: Error;
+};
+
 export type TransitionResult =
-  | { ok: true; updated: SalesOrder; followUps: readonly SoFollowUp[] }
+  | {
+      ok: true;
+      updated: SalesOrder;
+      followUps: readonly SoFollowUp[];
+      pendingShip?: PendingShipOutcome;
+    }
   | { ok: false; failure: TransitionFailure };
 
 export type TransitionInputs = {
@@ -213,23 +226,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     return { ok: false, failure: { kind: 'plan-failure', failures: allFailures } };
   }
 
-  let appliedOps: readonly AppliedOp[] = [];
-  if (allOps.length > 0) {
-    const exec = await executeReservationPlan(allOps);
-    if (!exec.ok) {
-      useProductInventoryStore.getState().forceRefresh();
-      return {
-        ok: false,
-        failure: {
-          kind: 'execution-failure',
-          error: exec.error,
-          orphanedRowIds: exec.orphanedRowIds,
-        },
-      };
-    }
-    appliedOps = exec.applied;
-  }
-
   const log: SalesOrderActivityEntry[] = preTransitionExtra.activityLog ?? [];
   const transitionAt = Date.now();
 
@@ -243,6 +239,95 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     ...(actor && { userId: actor.id, userName: actor.name }),
     ...(note ? { note } : {}),
   };
+
+  const isClosedAfter = deriveIsClosedFromStage(toStatus.stage as Stage);
+  const buildExtra = (linkage: InventoryLinkage | undefined): SalesOrderExtra => ({
+    ...preTransitionExtra,
+    status: toStatusValue,
+    activityLog: [...log, newEntry],
+    ...(enteringReadyFromDraft ? { readyAt: transitionAt } : {}),
+    ...(linkage ? { inventoryLinkage: linkage } : {}),
+  });
+
+  const followUps: SoFollowUp[] = [];
+  const toCapIdSet = new Set((toStatus.capabilities ?? []).map((b) => b.id));
+  if (toCapIdSet.has('releasesDR')) {
+    followUps.push({ kind: 'release-linked-drs' });
+  }
+
+  if (allOps.length > 0 && firingHandlerIds.has('ship')) {
+    const shippingBinding = sortedFiring.find((b) => getCapability(b.id)?.onEnter === 'ship');
+    const shipVia: InventoryLinkageVia = autoShipped
+      ? { kind: 'completion-auto-ship', statusValue: toStatusValue }
+      : {
+          kind: 'capability',
+          capabilityId: shippingBinding?.id ?? 'shipsStock',
+          statusValue: toStatusValue,
+        };
+
+    let intentUpdated: SalesOrder;
+    try {
+      intentUpdated = (await useSalesOrderStore.getState().updateSafely({
+        id: order.id,
+        version: order.version,
+        patch: {
+          isClosed: isClosedAfter,
+          extra: buildExtra(
+            buildPendingShipLinkage(
+              preLinkage ?? { state: 'reserved' },
+              buildLinkageSnapshotFromShipOps(allOps),
+              transitionAt,
+              actor,
+              shipVia,
+            ),
+          ),
+        },
+      })) as SalesOrder;
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        return { ok: false, failure: { kind: 'patch-conflict' } };
+      }
+      return { ok: false, failure: { kind: 'patch-error', error: toError(err) } };
+    }
+
+    const exec = await executeReservationPlan(allOps);
+    useProductInventoryStore.getState().forceRefresh();
+    if (!exec.ok) {
+      return {
+        ok: true,
+        updated: intentUpdated,
+        followUps,
+        pendingShip: { reason: 'inventory-failed', error: exec.error },
+      };
+    }
+
+    emitInventoryActivityForApplied(exec.applied, {
+      kind: 'SO',
+      id: order.id,
+      label: order.orderNumber,
+    });
+
+    try {
+      const confirmed = (await useSalesOrderStore.getState().updateSafely({
+        id: intentUpdated.id,
+        version: intentUpdated.version,
+        patch: {
+          extra: {
+            ...((intentUpdated.extra ?? {}) as SalesOrderExtra),
+            inventoryLinkage: buildShippedLinkage(transitionAt, actor, shipVia),
+          },
+        },
+      })) as SalesOrder;
+      return { ok: true, updated: confirmed, followUps };
+    } catch (err) {
+      return {
+        ok: true,
+        updated: intentUpdated,
+        followUps,
+        pendingShip: { reason: 'confirm-failed', error: toError(err) },
+      };
+    }
+  }
 
   let nextLinkage: InventoryLinkage | undefined;
   if (autoReleased) {
@@ -262,19 +347,23 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
         statusValue: toStatusValue,
       },
     );
-  } else if (allOps.length > 0 && firingHandlerIds.has('ship')) {
-    const shippingBinding = sortedFiring.find((b) => getCapability(b.id)?.onEnter === 'ship');
-    nextLinkage = buildShippedLinkage(
-      transitionAt,
-      actor,
-      autoShipped
-        ? { kind: 'completion-auto-ship', statusValue: toStatusValue }
-        : {
-            kind: 'capability',
-            capabilityId: shippingBinding?.id ?? 'shipsStock',
-            statusValue: toStatusValue,
-          },
-    );
+  }
+
+  let appliedOps: readonly AppliedOp[] = [];
+  if (allOps.length > 0) {
+    const exec = await executeReservationPlan(allOps);
+    if (!exec.ok) {
+      useProductInventoryStore.getState().forceRefresh();
+      return {
+        ok: false,
+        failure: {
+          kind: 'execution-failure',
+          error: exec.error,
+          orphanedRowIds: exec.orphanedRowIds,
+        },
+      };
+    }
+    appliedOps = exec.applied;
   }
 
   try {
@@ -282,14 +371,8 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       id: order.id,
       version: order.version,
       patch: {
-        isClosed: deriveIsClosedFromStage(toStatus.stage as Stage),
-        extra: {
-          ...preTransitionExtra,
-          status: toStatusValue,
-          activityLog: [...log, newEntry],
-          ...(enteringReadyFromDraft ? { readyAt: transitionAt } : {}),
-          ...(nextLinkage ? { inventoryLinkage: nextLinkage } : {}),
-        },
+        isClosed: isClosedAfter,
+        extra: buildExtra(nextLinkage),
       },
     });
     if (allOps.length > 0) useProductInventoryStore.getState().forceRefresh();
@@ -300,12 +383,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
         id: order.id,
         label: order.orderNumber,
       });
-    }
-
-    const followUps: SoFollowUp[] = [];
-    const toCapIdSet = new Set((toStatus.capabilities ?? []).map((b) => b.id));
-    if (toCapIdSet.has('releasesDR')) {
-      followUps.push({ kind: 'release-linked-drs' });
     }
 
     return { ok: true, updated: updated as SalesOrder, followUps };
@@ -326,11 +403,15 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       ok: false,
       failure: {
         kind: 'patch-error',
-        error: err instanceof Error ? err : new Error(String(err)),
+        error: toError(err),
         ...(orphanedRowIds && { orphanedRowIds }),
       },
     };
   }
+}
+
+function toError(err: unknown): Error {
+  return err instanceof Error ? err : new Error(String(err));
 }
 
 export function deriveIsClosedFromStage(stage: Stage): boolean {

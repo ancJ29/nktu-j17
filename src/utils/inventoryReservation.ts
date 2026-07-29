@@ -409,12 +409,39 @@ function describeOp(
   return `${verb} ${parts.join(' + ')} of ${product.code} from ${loc} for ${so.orderNumber}`;
 }
 
+export function resolveSnapshotRow(
+  rows: readonly ProductInventoryRow[],
+  entry: { rowId?: string; locationCode: string },
+): ProductInventoryRow | undefined {
+  return (
+    (entry.rowId != null ? rows.find((r) => r.id === entry.rowId) : undefined) ??
+    rows.find(
+      (r) =>
+        r.locationCode === entry.locationCode ||
+        (isDefaultLocation(r.locationCode) && isDefaultLocation(entry.locationCode)),
+    )
+  );
+}
+
 export function buildLinkageSnapshotFromReserveOps(
   ops: readonly PlannedOp[],
 ): InventoryLinkageSnapshotEntry[] {
+  return buildLinkageSnapshotFromOps(ops, 'reserve');
+}
+
+export function buildLinkageSnapshotFromShipOps(
+  ops: readonly PlannedOp[],
+): InventoryLinkageSnapshotEntry[] {
+  return buildLinkageSnapshotFromOps(ops, 'ship');
+}
+
+function buildLinkageSnapshotFromOps(
+  ops: readonly PlannedOp[],
+  action: PlannedOp['action'],
+): InventoryLinkageSnapshotEntry[] {
   const out: InventoryLinkageSnapshotEntry[] = [];
   for (const op of ops) {
-    if (op.action !== 'reserve') continue;
+    if (op.action !== action) continue;
     const byUnit: Record<string, number> = {};
     for (const [u, q] of Object.entries(op.deltas)) if (q > 0) byUnit[u] = q;
     if (Object.keys(byUnit).length === 0) continue;
@@ -447,13 +474,7 @@ export function planReleaseFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanR
       continue;
     }
     const rows = inventoryByProduct.get(entry.itemCode) ?? [];
-    const row =
-      rows.find((r) => r.id === entry.rowId) ??
-      rows.find(
-        (r) =>
-          r.locationCode === entry.locationCode ||
-          (isDefaultLocation(r.locationCode) && isDefaultLocation(entry.locationCode)),
-      );
+    const row = resolveSnapshotRow(rows, entry);
     if (!row) {
       failures.push({
         kind: 'no-row-at-location',
@@ -535,13 +556,7 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
       continue;
     }
     const rows = inventoryByProduct.get(entry.itemCode) ?? [];
-    const row =
-      rows.find((r) => r.id === entry.rowId) ??
-      rows.find(
-        (r) =>
-          r.locationCode === entry.locationCode ||
-          (isDefaultLocation(r.locationCode) && isDefaultLocation(entry.locationCode)),
-      );
+    const row = resolveSnapshotRow(rows, entry);
     if (!row) {
       failures.push({
         kind: 'no-row-at-location',
@@ -633,13 +648,7 @@ export function planUnshipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanRe
       continue;
     }
     const rows = inventoryByProduct.get(entry.itemCode) ?? [];
-    const row =
-      rows.find((r) => r.id === entry.rowId) ??
-      rows.find(
-        (r) =>
-          r.locationCode === entry.locationCode ||
-          (isDefaultLocation(r.locationCode) && isDefaultLocation(entry.locationCode)),
-      );
+    const row = resolveSnapshotRow(rows, entry);
     if (!row) {
       failures.push({
         kind: 'no-row-at-location',

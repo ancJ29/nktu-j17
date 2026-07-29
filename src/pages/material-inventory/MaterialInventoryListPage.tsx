@@ -14,6 +14,7 @@ import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterB
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { MobileFilterBar, type MobileFilterDef } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { perms } from '@/utils/permission';
 import { hasMaterialMinimumStock, isMaterialLowStock } from '@/utils/materialConfig';
 import type { MaterialInventoryRow } from '@/types';
@@ -31,8 +32,6 @@ const minStockEnabled = hasMaterialMinimumStock();
 
 type Filters = { search: string; stock: string | null; page: number };
 const FILTER_DEFAULTS: Filters = { search: '', stock: null, page: 1 };
-
-const STATUS_LABELS = { all: '', active: '', inactive: '' };
 
 export function MaterialInventoryListPage() {
   const { t } = useTranslation();
@@ -154,12 +153,14 @@ export function MaterialInventoryListPage() {
 
   const mobileFilters: MobileFilterDef[] = useMemo(
     () => [
-      {
+      allOptionFilter({
         title: t('materials.filterStockTitle'),
-        value: stockFilter ?? 'all',
-        options: [{ value: 'all', label: t('materials.filterStockAll') }, ...stockOptions],
-        onChange: (v: string) => setStockFilter(v === 'all' ? null : v),
-      },
+        value: stockFilter,
+        options: stockOptions,
+        onChange: setStockFilter,
+        allLabel: t('__new__.01-common.filters.all'),
+        emptyValue: null,
+      }),
     ],
     [stockFilter, setStockFilter, stockOptions, t],
   );
@@ -238,9 +239,10 @@ export function MaterialInventoryListPage() {
               onSearchChange={setSearch}
               searchPlaceholder={t('materialInventory.form.materialPlaceholder')}
               hideStatus
-              statusLabels={STATUS_LABELS}
               filters={mobileFilters}
               onClear={clearFilters}
+
+              labelChips
             />
           ) : (
             <DesktopFilterBar
@@ -248,7 +250,6 @@ export function MaterialInventoryListPage() {
               onSearchChange={setSearch}
               searchPlaceholder={t('materialInventory.form.materialPlaceholder')}
               hideStatus
-              statusLabels={STATUS_LABELS}
               filters={desktopFilters}
               onClear={clearFilters}
             />

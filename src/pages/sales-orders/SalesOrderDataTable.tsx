@@ -1,6 +1,6 @@
 import { useCallback, useMemo, type Ref } from 'react';
 import { useNavigate } from 'react-router';
-import { ActionIcon, Badge, Checkbox, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { IconAlertTriangle, IconListDetails, IconRobot } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -11,6 +11,7 @@ import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission
 import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
 import { SalesOrderStatusBadgeBase } from '@/components/sales-orders/SalesOrderStatusBadgeBase';
 import { SortHeader } from '@/components/SortHeader';
+import { selectionColumn } from '@/components/selectionColumn';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
@@ -116,36 +117,18 @@ export function SalesOrderDataTable({
       [
         ...(selectable
           ? [
-              {
-                key: '__select',
-                width: '44px',
-                header: (
-                  <Checkbox
-                    checked={allSelected}
-                    indeterminate={someSelected}
-                    onChange={() => onToggleAll?.()}
-                  />
-                ),
-
-                render: (item: SalesOrder) => {
-                  const disabled = disabledIds?.has(item.id) ?? false;
-                  return (
-                    <Tooltip
-                      label={t('deliveryRequests.bulkCreate.alreadyHasDR')}
-                      disabled={!disabled}
-                      withArrow
-                      events={{ hover: true, focus: false, touch: true }}
-                    >
-                      <Checkbox
-                        checked={(selectedIds?.has(item.id) ?? false) && !disabled}
-                        disabled={disabled}
-                        onChange={() => onToggleRow?.(item.id)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </Tooltip>
-                  );
-                },
-              },
+              selectionColumn<SalesOrder>({
+                keyOf: (o) => o.id,
+                isSelected: (id) => selectedIds?.has(id) ?? false,
+                onToggleRow: (id) => onToggleRow?.(id),
+                onToggleAll: () => onToggleAll?.(),
+                allSelected,
+                someSelected,
+                selectAllLabel: t('deliveryRequests.bulkCreate.openButton'),
+                rowLabel: (o) => o.orderNumber,
+                isDisabled: (o) => disabledIds?.has(o.id) ?? false,
+                disabledTooltip: t('deliveryRequests.bulkCreate.alreadyHasDR'),
+              }),
             ]
           : []),
         {

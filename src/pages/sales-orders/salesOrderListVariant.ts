@@ -22,6 +22,8 @@ export type SalesOrderListVariant = {
   showPaymentColumns: boolean;
 
   statusBadge: SalesOrderStatusBadgeVariant;
+
+  internalDeliveryFirstSort: boolean;
 };
 
 export const DEFAULT_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
@@ -34,6 +36,7 @@ export const DEFAULT_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
   dateColumns: 'splitSortable',
   showPaymentColumns: true,
   statusBadge: DEFAULT_SALES_ORDER_STATUS_BADGE_VARIANT,
+  internalDeliveryFirstSort: false,
 };
 
 export const NKTU_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
@@ -48,4 +51,5 @@ export const NKTU_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
   dateColumns: 'combinedReady',
   showPaymentColumns: false,
   statusBadge: NKTU_SALES_ORDER_STATUS_BADGE_VARIANT,
+  internalDeliveryFirstSort: true,
 };

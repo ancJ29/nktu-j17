@@ -12,7 +12,7 @@ import { useCfgReady } from '@/utils/bootState';
 import router from './router';
 import { clearChunkReloadParam, logger, resetReloadGuard } from '@credo/base-ui/utils';
 import { useTranslation } from 'react-i18next';
-import { isLocalhost } from '@credo/kits/misc';
+import { isLocalhost } from '@/config/env';
 
 const PWAInstallPrompt = lazy(() =>
   import('@credo/base-ui/components').then((m) => ({ default: m.PWAInstallPrompt })),
@@ -37,8 +37,6 @@ function dismissLoadingOverlay() {
 }
 
 const BUNDLED_BUILD = `${buildHash}_${buildTimestamp}`;
-
-const isLocal = isLocalhost();
 
 export default function App() {
   const {
@@ -111,7 +109,7 @@ export default function App() {
       <Suspense fallback={<LoadingFallback fullScreen />}>
         <RouterProvider router={router} />
       </Suspense>
-      {!isLocal && (
+      {!isLocalhost && (
         <>
           <PWAInstallPrompt
             labels={{

@@ -93,7 +93,7 @@ export function MaterialCardList({ materials, isLoading, invByCode }: MaterialCa
                 <ActiveBadge
                   isActive={item.isActive}
                   activeLabel={t('materials.status.active')}
-                  inactiveLabel={t('common.status.inactive')}
+                  inactiveLabel={t('__new__.01-common.labels.inactive')}
                   size="sm"
                   style={{ flexShrink: 0 }}
                 />

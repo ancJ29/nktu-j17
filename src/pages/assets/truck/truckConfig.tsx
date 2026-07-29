@@ -153,8 +153,8 @@ export const TRUCK_CONFIG: TruckConfig = {
         <Group justify="flex-end" wrap="nowrap" pr="sm">
           <ActiveBadge
             isActive={item.isActive}
-            activeLabel={t('common.status.active')}
-            inactiveLabel={t('common.status.inactive')}
+            activeLabel={t('__new__.01-common.labels.active')}
+            inactiveLabel={t('__new__.01-common.labels.inactive')}
             size="sm"
           />
         </Group>

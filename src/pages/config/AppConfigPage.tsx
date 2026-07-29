@@ -1451,6 +1451,14 @@ export function ConfigEditor({
                   setMaterialsFeatures({ ...materialsFeatures, minimumStock: checked })
                 }
               />
+              <FeatureToggleRow
+                label="Bulk import (Excel)"
+                description="Add a Bulk import tab to the create form: download a template built from this client's own catalogue, then upload rows. Insert-only — an existing material code is skipped, never overwritten."
+                checked={materialsFeatures.bulkImport}
+                onChange={(checked) =>
+                  setMaterialsFeatures({ ...materialsFeatures, bulkImport: checked })
+                }
+              />
             </Stack>
           </CollapsibleSection>
           {/* Material Inventory — dedicated section (enabled + view-density toggle) */}

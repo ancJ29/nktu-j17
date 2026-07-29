@@ -21,6 +21,7 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 
 import { EmployeeCardList } from './EmployeeCardList';
 import { EmployeeDataTable } from './EmployeeDataTable';
@@ -175,30 +176,26 @@ export function EmployeeListPage() {
     () => [
       ...(hasDepartment && departmentOptions.length > 0
         ? [
-            {
+            allOptionFilter({
               title: t('common.labels.department'),
-              value: departmentFilter ?? 'all',
-              options: [
-                { value: 'all', label: t('employees.filterDepartmentAll') },
-                ...departmentOptions.map((o) =>
-                  typeof o === 'string' ? { value: o, label: o } : o,
-                ),
-              ],
-              onChange: (v: string) => setDepartmentFilter(v === 'all' ? null : v),
-            },
+              value: departmentFilter,
+              options: departmentOptions,
+              onChange: setDepartmentFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
       ...(hasPosition && positionOptions.length > 0
         ? [
-            {
+            allOptionFilter({
               title: t('common.labels.position'),
-              value: positionFilter ?? 'all',
-              options: [
-                { value: 'all', label: t('employees.filterPositionAll') },
-                ...positionOptions.map((o) => (typeof o === 'string' ? { value: o, label: o } : o)),
-              ],
-              onChange: (v: string) => setPositionFilter(v === 'all' ? null : v),
-            },
+              value: positionFilter,
+              options: positionOptions,
+              onChange: setPositionFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
     ],
@@ -226,8 +223,9 @@ export function EmployeeListPage() {
               to: ROUTES.EMPLOYEES.NEW,
               label: t('employees.addEmployee'),
               enabled: canCreate,
-
-              mobileVariant: 'hidden',
+              // Hidden on mobile: the form page redirects mobile users straight
+              // back to this list, so the "+" was a dead tap that only showed a
+              // spinner. Creating an employee is desktop/tablet data entry.
             }}
           />
 
@@ -246,6 +244,8 @@ export function EmployeeListPage() {
               }}
               filters={mobileFilters.length > 0 ? mobileFilters : undefined}
               onClear={clearFilters}
+
+              labelChips
             />
           ) : (
             <DesktopFilterBar

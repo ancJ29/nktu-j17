@@ -12,6 +12,7 @@ import { DesktopFilterBar } from '@/components/DesktopFilterBar';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { MobileFilterBar } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { perms } from '@/utils/permission';
 
 import { useListScrollRestoration } from '@/hooks';
@@ -120,8 +121,8 @@ export function VendorList({ variant }: VendorListProps) {
             to: ROUTES.VENDORS.NEW,
             label: t('vendors.addItem'),
             enabled: canCreate,
-
-            mobileVariant: 'hidden',
+            // No mobile create CTA — the form page redirects mobile users
+            // (mobile-workflow.md), so any mobile affordance is a dead tap.
           }}
         />
 
@@ -135,26 +136,28 @@ export function VendorList({ variant }: VendorListProps) {
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.filters.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
             filters={
               variant.origin
                 ? [
-                    {
+                    allOptionFilter<OriginFilter>({
                       title: t('vendors.form.originLabel'),
                       value: originFilter,
                       options: [
-                        { value: 'all', label: t('__new__.01-common.filters.all') },
                         { value: 'domestic', label: t(variant.origin.domestic) },
                         { value: 'overseas', label: t(variant.origin.overseas) },
                       ],
-                      onChange: (v) => setOrigin(v as OriginFilter),
-                    },
+                      onChange: setOrigin,
+                      allLabel: t('__new__.01-common.filters.all'),
+                      emptyValue: 'all',
+                    }),
                   ]
                 : undefined
             }
             onClear={clearFilters}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
@@ -165,8 +168,8 @@ export function VendorList({ variant }: VendorListProps) {
             onStatusChange={setFilter}
             statusLabels={{
               all: t('__new__.01-common.filters.all'),
-              active: t('common.filters.active'),
-              inactive: t('common.filters.inactive'),
+              active: t('__new__.01-common.labels.active'),
+              inactive: t('__new__.01-common.labels.inactive'),
             }}
             filters={
               variant.origin

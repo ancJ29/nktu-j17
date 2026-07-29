@@ -1,6 +1,6 @@
 import * as XLSX from 'xlsx';
 import { computeRefuelTotals, refuelConsumption } from '@/utils/refuelStats';
-import type { OperationLog, Product } from '@/types';
+import type { Material, OperationLog, Product } from '@/types';
 
 export class ExcelParseError extends Error {
   readonly missing: string[];
@@ -243,8 +243,29 @@ export type BulkProduct = {
 };
 
 const TRUTHY_CELLS = new Set(['yes', 'y', 'true', '1', 'x', 'có', 'co']);
+const FALSY_CELLS = new Set(['no', 'n', 'false', '0', 'không', 'khong', 'ko']);
 
 const isTruthyCell = (raw: string) => TRUTHY_CELLS.has(raw.trim().toLowerCase());
+const isFalsyCell = (raw: string) => FALSY_CELLS.has(raw.trim().toLowerCase());
+
+const FLAG_HEADERS: Record<
+  string,
+  { field: 'noInventory' | 'hiddenFromInventoryList'; truthySets: boolean }
+> = {
+  'inventory-managed': { field: 'noInventory', truthySets: false },
+  'inventory managed': { field: 'noInventory', truthySets: false },
+  'quản lý tồn kho': { field: 'noInventory', truthySets: false },
+  'shown in inventory list': { field: 'hiddenFromInventoryList', truthySets: false },
+  'hiển thị trong danh sách tồn kho': { field: 'hiddenFromInventoryList', truthySets: false },
+
+  'not inventory-managed': { field: 'noInventory', truthySets: true },
+  'not inventory managed': { field: 'noInventory', truthySets: true },
+  'no inventory': { field: 'noInventory', truthySets: true },
+  'không quản lý tồn kho': { field: 'noInventory', truthySets: true },
+  'hidden from inventory list': { field: 'hiddenFromInventoryList', truthySets: true },
+  'hide from inventory list': { field: 'hiddenFromInventoryList', truthySets: true },
+  'ẩn khỏi danh sách tồn kho': { field: 'hiddenFromInventoryList', truthySets: true },
+};
 
 export type ProductTemplateOptions = {
   language?: string;
@@ -319,12 +340,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'min stock unit': 'minInventoryUnit',
           'minimum stock unit': 'minInventoryUnit',
 
-          'not inventory-managed': 'noInventory',
-          'not inventory managed': 'noInventory',
-          'no inventory': 'noInventory',
-          'hidden from inventory list': 'hiddenFromInventoryList',
-          'hide from inventory list': 'hiddenFromInventoryList',
-
           tên: 'name',
           'tên sản phẩm': 'name',
           mã: 'code',
@@ -334,8 +349,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'mô tả': 'description',
           'danh mục': 'category',
           thẻ: 'tags',
-          'không quản lý tồn kho': 'noInventory',
-          'ẩn khỏi danh sách tồn kho': 'hiddenFromInventoryList',
           giá: 'price',
           'giá bán': 'price',
           'giá vốn': 'basePrice',
@@ -372,6 +385,13 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
             const value = values[headerIndex];
             if (!value) continue;
 
+            const flag = FLAG_HEADERS[header];
+            if (flag) {
+              const setsFlag = flag.truthySets ? isTruthyCell(value) : isFalsyCell(value);
+              if (setsFlag) product[flag.field] = true;
+              continue;
+            }
+
             const fieldName = headerMapping[header];
             if (!fieldName) continue;
 
@@ -381,11 +401,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
                 .map((s) => s.trim())
                 .filter(Boolean);
               if (list.length > 0) product.tags = list;
-              continue;
-            }
-
-            if (fieldName === 'noInventory' || fieldName === 'hiddenFromInventoryList') {
-              if (isTruthyCell(value)) product[fieldName] = true;
               continue;
             }
 
@@ -450,8 +465,10 @@ type ProductSampleRow = {
   basePrice: string;
   minInventoryValue: string;
   minInventoryUnit: string;
-  noInventory: string;
-  hiddenFromInventoryList: string;
+
+  inventoryManaged: string;
+
+  shownInInventoryList: string;
 };
 
 const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
@@ -466,8 +483,8 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
     basePrice: '15000',
     minInventoryValue: '20',
     minInventoryUnit: 'ly',
-    noInventory: '',
-    hiddenFromInventoryList: '',
+    inventoryManaged: '',
+    shownInInventoryList: '',
   },
   {
     name: 'Bánh mì thịt nguội',
@@ -480,8 +497,8 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
     basePrice: '20000',
     minInventoryValue: '10',
     minInventoryUnit: 'cái',
-    noInventory: '',
-    hiddenFromInventoryList: '',
+    inventoryManaged: '',
+    shownInInventoryList: '',
   },
   {
     name: 'Nước suối Lavie 500ml',
@@ -494,8 +511,8 @@ const PRODUCT_SAMPLE_ROWS_VI: ProductSampleRow[] = [
     basePrice: '6000',
     minInventoryValue: '50',
     minInventoryUnit: 'chai',
-    noInventory: '',
-    hiddenFromInventoryList: '',
+    inventoryManaged: '',
+    shownInInventoryList: '',
   },
 ];
 
@@ -511,8 +528,8 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
     basePrice: '15000',
     minInventoryValue: '20',
     minInventoryUnit: 'cup',
-    noInventory: '',
-    hiddenFromInventoryList: '',
+    inventoryManaged: '',
+    shownInInventoryList: '',
   },
   {
     name: 'Ham Sandwich',
@@ -525,8 +542,8 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
     basePrice: '20000',
     minInventoryValue: '10',
     minInventoryUnit: 'piece',
-    noInventory: '',
-    hiddenFromInventoryList: '',
+    inventoryManaged: '',
+    shownInInventoryList: '',
   },
   {
     name: 'Bottled Water 500ml',
@@ -539,8 +556,8 @@ const PRODUCT_SAMPLE_ROWS_EN: ProductSampleRow[] = [
     basePrice: '6000',
     minInventoryValue: '50',
     minInventoryUnit: 'bottle',
-    noInventory: '',
-    hiddenFromInventoryList: '',
+    inventoryManaged: '',
+    shownInInventoryList: '',
   },
 ];
 
@@ -572,8 +589,8 @@ export const generateProductExcelTemplate = ({
         basePrice: 'Giá vốn',
         minInventoryValue: 'Tồn kho tối thiểu',
         minInventoryUnit: 'Đơn vị tồn kho tối thiểu',
-        noInventory: 'Không quản lý tồn kho',
-        hiddenFromInventoryList: 'Ẩn khỏi danh sách tồn kho',
+        inventoryManaged: 'Quản lý tồn kho',
+        shownInInventoryList: 'Hiển thị trong danh sách tồn kho',
       }
     : {
         name: 'Name',
@@ -586,8 +603,8 @@ export const generateProductExcelTemplate = ({
         basePrice: 'Base Price',
         minInventoryValue: 'Min stock',
         minInventoryUnit: 'Min stock unit',
-        noInventory: 'Not inventory-managed',
-        hiddenFromInventoryList: 'Hidden from inventory list',
+        inventoryManaged: 'Inventory-managed',
+        shownInInventoryList: 'Shown in inventory list',
       };
 
   const columns: Column[] = [
@@ -607,13 +624,13 @@ export const generateProductExcelTemplate = ({
       : []),
     { key: 'minInventoryValue', header: labels.minInventoryValue, width: 14 },
     { key: 'minInventoryUnit', header: labels.minInventoryUnit, width: 16 },
-    { key: 'noInventory', header: labels.noInventory, width: 20 },
+    { key: 'inventoryManaged', header: labels.inventoryManaged, width: 18 },
     ...(hasHideFromInventoryList
       ? [
           {
-            key: 'hiddenFromInventoryList' as const,
-            header: labels.hiddenFromInventoryList,
-            width: 24,
+            key: 'shownInInventoryList' as const,
+            header: labels.shownInInventoryList,
+            width: 26,
           },
         ]
       : []),
@@ -621,7 +638,8 @@ export const generateProductExcelTemplate = ({
 
   const yes = isVietnamese ? 'Có' : 'Yes';
   const no = isVietnamese ? 'Không' : 'No';
-  const flagCell = (on: boolean | undefined) => (on ? yes : no);
+
+  const flagCell = (flagOn: boolean | undefined) => (flagOn ? no : yes);
   const resolveLabel = (val: string | undefined, map?: Record<string, string>) =>
     val ? (map?.[val] ?? val) : '';
 
@@ -641,8 +659,8 @@ export const generateProductExcelTemplate = ({
         basePrice: typeof e.basePrice === 'number' && e.basePrice > 0 ? String(e.basePrice) : '',
         minInventoryValue: typeof min?.value === 'number' && min.value > 0 ? String(min.value) : '',
         minInventoryUnit: resolveLabel(min?.unit, unitLabels),
-        noInventory: flagCell(e.noInventory),
-        hiddenFromInventoryList: flagCell(e.hiddenFromInventoryList),
+        inventoryManaged: flagCell(e.noInventory),
+        shownInInventoryList: flagCell(e.hiddenFromInventoryList),
       };
     });
 
@@ -653,8 +671,8 @@ export const generateProductExcelTemplate = ({
     unit: sampleUnit(i) ?? row.unit,
     minInventoryUnit: sampleUnit(i) ?? row.minInventoryUnit,
     category: categories?.[i] ?? row.category,
-    noInventory: no,
-    hiddenFromInventoryList: no,
+    inventoryManaged: yes,
+    shownInInventoryList: yes,
   }));
 
   const bodyRows = realRows.length > 0 ? realRows : fallbackRows;
@@ -675,35 +693,46 @@ export type BulkMaterial = {
   name: string;
 
   code?: string;
-  unit?: string;
-  sku?: string;
-  barcode?: string;
-  description?: string;
 
-  packagingSpec?: string;
+  units?: string[];
 
   category?: string;
 
-  price?: number;
-  minInventoryValue?: number;
-  minInventoryUnit?: string;
+  costPrice?: number;
+
+  minimumStock?: number;
+  specification?: string;
+  description?: string;
+  memo?: string;
+  tags?: string[];
+
+  isActive?: boolean;
 };
 
 export type MaterialTemplateOptions = {
   language?: string;
 
-  hasSku?: boolean;
+  hasCategory?: boolean;
+  hasPricing?: boolean;
+  hasMinimumStock?: boolean;
+  hasSpecification?: boolean;
+  hasDescription?: boolean;
+  hasMemo?: boolean;
+  hasTags?: boolean;
 
-  hasBarcode?: boolean;
+  multiUnit?: boolean;
 
-  hasPackagingSpec?: boolean;
+  materials?: ReadonlyArray<Material>;
 
-  hasMinimumInventory?: boolean;
+  unitLabels?: Record<string, string>;
+
+  categoryLabels?: Record<string, string>;
 
   categories?: string[];
+  units?: string[];
 };
 
-const REQUIRED_MATERIAL_FIELDS: ReadonlyArray<keyof BulkMaterial> = ['name'];
+const REQUIRED_MATERIAL_FIELDS: ReadonlyArray<keyof BulkMaterial> = ['name', 'code'];
 
 export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]> => {
   return new Promise((resolve, reject) => {
@@ -736,37 +765,44 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
 
         const headerMapping: Record<string, keyof BulkMaterial> = {
           name: 'name',
+          'material name': 'name',
           code: 'code',
-          unit: 'unit',
-          sku: 'sku',
-          barcode: 'barcode',
-          description: 'description',
-          'packaging spec': 'packagingSpec',
-          'packaging specification': 'packagingSpec',
+          'material code': 'code',
+          unit: 'units',
+          units: 'units',
           category: 'category',
-          price: 'price',
-          cost: 'price',
-          'cost price': 'price',
-          'min stock': 'minInventoryValue',
-          'minimum stock': 'minInventoryValue',
-          'min inventory': 'minInventoryValue',
-          'minimum inventory': 'minInventoryValue',
-          'min stock unit': 'minInventoryUnit',
-          'minimum stock unit': 'minInventoryUnit',
+          price: 'costPrice',
+          cost: 'costPrice',
+          'cost price': 'costPrice',
+          'min stock': 'minimumStock',
+          'minimum stock': 'minimumStock',
+          specification: 'specification',
+          'packaging spec': 'specification',
+          'packaging specification': 'specification',
+          description: 'description',
+          memo: 'memo',
+          note: 'memo',
+          tags: 'tags',
+          active: 'isActive',
+          status: 'isActive',
 
           tên: 'name',
           'tên vật tư': 'name',
           mã: 'code',
           'mã vật tư': 'code',
-          'đơn vị': 'unit',
-          'mã vạch': 'barcode',
-          'mô tả': 'description',
-          'quy cách đóng gói': 'packagingSpec',
+          'đơn vị': 'units',
+          'đơn vị tính': 'units',
           'danh mục': 'category',
-          giá: 'price',
-          'giá vốn': 'price',
-          'tồn kho tối thiểu': 'minInventoryValue',
-          'đơn vị tồn kho tối thiểu': 'minInventoryUnit',
+          giá: 'costPrice',
+          'giá vốn': 'costPrice',
+          'tồn kho tối thiểu': 'minimumStock',
+          'quy cách': 'specification',
+          'quy cách đóng gói': 'specification',
+          'mô tả': 'description',
+          'ghi chú': 'memo',
+          thẻ: 'tags',
+          'trạng thái': 'isActive',
+          'đang sử dụng': 'isActive',
         };
 
         const presentFields = new Set<keyof BulkMaterial>();
@@ -780,7 +816,13 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
           return;
         }
 
-        const numericFields = new Set<keyof BulkMaterial>(['price', 'minInventoryValue']);
+        const numericFields = new Set<keyof BulkMaterial>(['costPrice', 'minimumStock']);
+
+        const splitList = (raw: string) =>
+          raw
+            .split(/[,;]/)
+            .map((s) => s.trim())
+            .filter(Boolean);
 
         for (let index = 1; index < sheetData.length; index++) {
           const values = sheetData[index].map((v) => String(v).trim());
@@ -795,19 +837,19 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
             const fieldName = headerMapping[header];
             if (!fieldName) continue;
 
+            if (fieldName === 'units' || fieldName === 'tags') {
+              const list = splitList(value);
+              if (list.length > 0) material[fieldName] = list;
+              continue;
+            }
+
+            if (fieldName === 'isActive') {
+              if (isTruthyCell(value)) material.isActive = true;
+              else if (isFalsyCell(value)) material.isActive = false;
+              continue;
+            }
+
             if (numericFields.has(fieldName)) {
-              if (fieldName === 'minInventoryValue') {
-                const m = value.match(/^([\d.,]+)\s*(.*)$/);
-                if (m) {
-                  const n = Number(m[1].replace(/,/g, ''));
-                  if (Number.isFinite(n) && n > 0) {
-                    material.minInventoryValue = n;
-                    const tail = m[2].trim();
-                    if (tail && !material.minInventoryUnit) material.minInventoryUnit = tail;
-                  }
-                }
-                continue;
-              }
               const n = Number(value.replace(/,/g, ''));
               if (Number.isFinite(n) && n >= 0) (material[fieldName] as number) = n;
               continue;
@@ -836,102 +878,117 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
 
 type MaterialSampleRow = {
   name: string;
-  unit: string;
-  sku: string;
-  barcode: string;
-  description: string;
-  packagingSpec: string;
+  code: string;
+  units: string;
   category: string;
-  price: string;
-  minInventoryValue: string;
-  minInventoryUnit: string;
+  costPrice: string;
+  minimumStock: string;
+  specification: string;
+  description: string;
+  memo: string;
+  tags: string;
+  isActive: string;
 };
 
 const MATERIAL_SAMPLE_ROWS_VI: MaterialSampleRow[] = [
   {
-    name: 'Vải cotton 2m',
-    unit: 'cuộn',
-    sku: 'SKU-VAI-01',
-    barcode: '8936000000201',
-    description: 'Vải cotton khổ 2m',
-    packagingSpec: 'Cuộn 50m',
-    category: 'Vật tư',
-    price: '120000',
-    minInventoryValue: '10',
-    minInventoryUnit: 'cuộn',
+    name: 'Phân NPK 16-16-8',
+    code: 'PNPK01',
+    units: 'Bao',
+    category: 'Phân bón',
+    costPrice: '450000',
+    minimumStock: '20',
+    specification: 'Bao 25kg',
+    description: 'Phân bón tổng hợp NPK',
+    memo: '',
+    tags: 'Phân bón',
+    isActive: '',
   },
   {
-    name: 'Thùng carton 3 lớp',
-    unit: 'cái',
-    sku: 'SKU-CARTON-02',
-    barcode: '8936000000202',
-    description: 'Thùng carton đóng gói',
-    packagingSpec: 'Kiện 100 cái',
+    name: 'Màng phủ nông nghiệp',
+    code: 'MPNN01',
+    units: 'Cuộn',
     category: 'Vật tư',
-    price: '8000',
-    minInventoryValue: '200',
-    minInventoryUnit: 'cái',
+    costPrice: '320000',
+    minimumStock: '10',
+    specification: 'Cuộn 400m',
+    description: 'Màng phủ luống trồng',
+    memo: '',
+    tags: 'Màng phủ',
+    isActive: '',
   },
   {
-    name: 'Keo dán công nghiệp',
-    unit: 'kg',
-    sku: 'SKU-KEO-03',
-    barcode: '8936000000203',
-    description: 'Keo dán đa năng',
-    packagingSpec: 'Can 20kg',
+    name: 'Khay ươm 50 lỗ',
+    code: 'KHAY50',
+    units: 'Cái',
     category: 'Vật tư',
-    price: '95000',
-    minInventoryValue: '15',
-    minInventoryUnit: 'kg',
+    costPrice: '12000',
+    minimumStock: '100',
+    specification: '50 lỗ/khay',
+    description: 'Khay ươm cây giống',
+    memo: '',
+    tags: 'Ươm giống',
+    isActive: '',
   },
 ];
 
 const MATERIAL_SAMPLE_ROWS_EN: MaterialSampleRow[] = [
   {
-    name: 'Cotton Fabric 2m',
-    unit: 'roll',
-    sku: 'SKU-FABRIC-01',
-    barcode: '0123456789021',
-    description: 'Cotton fabric, 2m width',
-    packagingSpec: '50m/roll',
-    category: 'Raw',
-    price: '120000',
-    minInventoryValue: '10',
-    minInventoryUnit: 'roll',
+    name: 'NPK 16-16-8 Fertilizer',
+    code: 'FNPK01',
+    units: 'Bag',
+    category: 'Fertilizer',
+    costPrice: '450000',
+    minimumStock: '20',
+    specification: '25kg/bag',
+    description: 'Compound NPK fertilizer',
+    memo: '',
+    tags: 'Fertilizer',
+    isActive: '',
   },
   {
-    name: '3-ply Carton Box',
-    unit: 'piece',
-    sku: 'SKU-CARTON-02',
-    barcode: '0123456789022',
-    description: 'Packaging carton box',
-    packagingSpec: '100 pcs/bale',
-    category: 'Packaging',
-    price: '8000',
-    minInventoryValue: '200',
-    minInventoryUnit: 'piece',
+    name: 'Agricultural Mulch Film',
+    code: 'MULCH01',
+    units: 'Roll',
+    category: 'Supplies',
+    costPrice: '320000',
+    minimumStock: '10',
+    specification: '400m/roll',
+    description: 'Bed mulch film',
+    memo: '',
+    tags: 'Mulch',
+    isActive: '',
   },
   {
-    name: 'Industrial Adhesive',
-    unit: 'kg',
-    sku: 'SKU-GLUE-03',
-    barcode: '0123456789023',
-    description: 'Multi-purpose adhesive',
-    packagingSpec: '20kg/can',
-    category: 'Adhesive',
-    price: '95000',
-    minInventoryValue: '15',
-    minInventoryUnit: 'kg',
+    name: 'Seedling Tray 50 cells',
+    code: 'TRAY50',
+    units: 'Piece',
+    category: 'Supplies',
+    costPrice: '12000',
+    minimumStock: '100',
+    specification: '50 cells/tray',
+    description: 'Seedling nursery tray',
+    memo: '',
+    tags: 'Nursery',
+    isActive: '',
   },
 ];
 
 export const generateMaterialExcelTemplate = ({
   language,
-  hasSku = true,
-  hasBarcode = true,
-  hasPackagingSpec = true,
-  hasMinimumInventory = true,
+  hasCategory = false,
+  hasPricing = false,
+  hasMinimumStock = false,
+  hasSpecification = false,
+  hasDescription = false,
+  hasMemo = false,
+  hasTags = false,
+  multiUnit = false,
+  materials,
+  unitLabels,
+  categoryLabels,
   categories,
+  units,
 }: MaterialTemplateOptions = {}) => {
   const isVietnamese = language === 'vi';
 
@@ -941,56 +998,92 @@ export const generateMaterialExcelTemplate = ({
   const labels: Record<ColumnKey, string> = isVietnamese
     ? {
         name: 'Tên vật tư',
-        unit: 'Đơn vị',
-        sku: 'SKU',
-        barcode: 'Mã vạch',
-        description: 'Mô tả',
-        packagingSpec: 'Quy cách đóng gói',
+        code: 'Mã vật tư',
+        units: 'Đơn vị',
         category: 'Danh mục',
-        price: 'Giá vốn',
-        minInventoryValue: 'Tồn kho tối thiểu',
-        minInventoryUnit: 'Đơn vị tồn kho tối thiểu',
+        costPrice: 'Giá vốn',
+        minimumStock: 'Tồn kho tối thiểu',
+        specification: 'Quy cách đóng gói',
+        description: 'Mô tả',
+        memo: 'Ghi chú',
+        tags: 'Thẻ',
+        isActive: 'Đang sử dụng',
       }
     : {
         name: 'Name',
-        unit: 'Unit',
-        sku: 'SKU',
-        barcode: 'Barcode',
-        description: 'Description',
-        packagingSpec: 'Packaging specification',
+        code: 'Code',
+        units: multiUnit ? 'Units' : 'Unit',
         category: 'Category',
-        price: 'Cost price',
-        minInventoryValue: 'Min stock',
-        minInventoryUnit: 'Min stock unit',
+        costPrice: 'Cost price',
+        minimumStock: 'Min stock',
+        specification: 'Packaging specification',
+        description: 'Description',
+        memo: 'Memo',
+        tags: 'Tags',
+        isActive: 'Active',
       };
 
   const columns: Column[] = [
     { key: 'name', header: labels.name, width: 28 },
-    { key: 'unit', header: labels.unit, width: 10 },
-    ...(hasSku ? [{ key: 'sku' as const, header: labels.sku, width: 18 }] : []),
-    ...(hasBarcode ? [{ key: 'barcode' as const, header: labels.barcode, width: 16 }] : []),
-    { key: 'description', header: labels.description, width: 36 },
-    ...(hasPackagingSpec
-      ? [{ key: 'packagingSpec' as const, header: labels.packagingSpec, width: 24 }]
+    { key: 'code', header: labels.code, width: 16 },
+    { key: 'units', header: labels.units, width: multiUnit ? 20 : 12 },
+    ...(hasCategory ? [{ key: 'category' as const, header: labels.category, width: 18 }] : []),
+    ...(hasPricing ? [{ key: 'costPrice' as const, header: labels.costPrice, width: 14 }] : []),
+    ...(hasMinimumStock
+      ? [{ key: 'minimumStock' as const, header: labels.minimumStock, width: 16 }]
       : []),
-    { key: 'category', header: labels.category, width: 18 },
-    { key: 'price', header: labels.price, width: 12 },
-    ...(hasMinimumInventory
-      ? [
-          { key: 'minInventoryValue' as const, header: labels.minInventoryValue, width: 14 },
-          { key: 'minInventoryUnit' as const, header: labels.minInventoryUnit, width: 16 },
-        ]
+    ...(hasSpecification
+      ? [{ key: 'specification' as const, header: labels.specification, width: 24 }]
       : []),
+    ...(hasDescription
+      ? [{ key: 'description' as const, header: labels.description, width: 36 }]
+      : []),
+    ...(hasMemo ? [{ key: 'memo' as const, header: labels.memo, width: 28 }] : []),
+    ...(hasTags ? [{ key: 'tags' as const, header: labels.tags, width: 20 }] : []),
+    { key: 'isActive', header: labels.isActive, width: 14 },
   ];
 
+  const yes = isVietnamese ? 'Có' : 'Yes';
+  const no = isVietnamese ? 'Không' : 'No';
+  const resolveLabel = (val: string | undefined, map?: Record<string, string>) =>
+    val ? (map?.[val] ?? val) : '';
+  const num = (n: number | undefined) => (typeof n === 'number' && n > 0 ? String(n) : '');
+
+  const realRows: MaterialSampleRow[] = (materials ?? [])
+    .filter((m) => !m.extra?.isDeleted)
+    .map((m) => {
+      const e = m.extra ?? {};
+      return {
+        name: m.name,
+        code: m.code,
+        units: (e.units ?? [])
+          .map((u) => resolveLabel(u, unitLabels))
+          .filter(Boolean)
+          .join(', '),
+        category: resolveLabel(e.category, categoryLabels),
+        costPrice: num(e.costPrice),
+        minimumStock: num(e.minimumStock),
+        specification: e.specification ?? '',
+        description: e.description ?? '',
+        memo: e.memo ?? '',
+        tags: (e.tags ?? []).join(', '),
+        isActive: m.isActive ? yes : no,
+      };
+    });
+
   const sampleSource = isVietnamese ? MATERIAL_SAMPLE_ROWS_VI : MATERIAL_SAMPLE_ROWS_EN;
-  const sampleRows = sampleSource.map((row, i) => ({
+  const sampleUnit = (i: number) => (units?.length ? units[i % units.length] : undefined);
+  const fallbackRows = sampleSource.map((row, i) => ({
     ...row,
+    units: sampleUnit(i) ?? row.units,
     category: categories?.[i] ?? row.category,
+    isActive: yes,
   }));
 
+  const bodyRows = realRows.length > 0 ? realRows : fallbackRows;
+
   const headerRow = columns.map((c) => c.header);
-  const dataRows = sampleRows.map((row) => columns.map((c) => row[c.key]));
+  const dataRows = bodyRows.map((row) => columns.map((c) => row[c.key]));
 
   const worksheet = XLSX.utils.aoa_to_sheet([headerRow, ...dataRows]);
   worksheet['!cols'] = columns.map((c) => ({ width: c.width }));
@@ -1042,8 +1135,8 @@ export const exportProductsToExcel = (
     | 'minInventoryUnit'
     | 'price'
     | 'basePrice'
-    | 'noInventory'
-    | 'hiddenFromInventoryList'
+    | 'inventoryManaged'
+    | 'shownInInventoryList'
     | 'status';
   type Column = { key: ColumnKey; header: string; width: number };
 
@@ -1063,8 +1156,8 @@ export const exportProductsToExcel = (
         minInventoryUnit: 'Đơn vị tồn kho tối thiểu',
         price: 'Giá bán',
         basePrice: 'Giá vốn',
-        noInventory: 'Không quản lý tồn kho',
-        hiddenFromInventoryList: 'Ẩn khỏi danh sách tồn kho',
+        inventoryManaged: 'Quản lý tồn kho',
+        shownInInventoryList: 'Hiển thị trong danh sách tồn kho',
         status: 'Trạng thái',
       }
     : {
@@ -1082,8 +1175,8 @@ export const exportProductsToExcel = (
         minInventoryUnit: 'Min stock unit',
         price: 'Price',
         basePrice: 'Base price',
-        noInventory: 'Not inventory-managed',
-        hiddenFromInventoryList: 'Hidden from inventory list',
+        inventoryManaged: 'Inventory-managed',
+        shownInInventoryList: 'Shown in inventory list',
         status: 'Status',
       };
 
@@ -1106,13 +1199,13 @@ export const exportProductsToExcel = (
           { key: 'basePrice' as const, header: labels.basePrice, width: 12 },
         ]
       : []),
-    { key: 'noInventory', header: labels.noInventory, width: 20 },
+    { key: 'inventoryManaged', header: labels.inventoryManaged, width: 18 },
     ...(hasHideFromInventoryList
       ? [
           {
-            key: 'hiddenFromInventoryList' as const,
-            header: labels.hiddenFromInventoryList,
-            width: 24,
+            key: 'shownInInventoryList' as const,
+            header: labels.shownInInventoryList,
+            width: 26,
           },
         ]
       : []),
@@ -1151,8 +1244,8 @@ export const exportProductsToExcel = (
         price: typeof p.price === 'number' && p.price > 0 ? p.price : '',
         basePrice: typeof e.basePrice === 'number' && e.basePrice > 0 ? e.basePrice : '',
 
-        noInventory: e.noInventory ? flagYes : flagNo,
-        hiddenFromInventoryList: e.hiddenFromInventoryList ? flagYes : flagNo,
+        inventoryManaged: e.noInventory ? flagNo : flagYes,
+        shownInInventoryList: e.hiddenFromInventoryList ? flagNo : flagYes,
         status: p.isActive ? statusActive : statusInactive,
       };
       return columns.map((c) => cells[c.key]);

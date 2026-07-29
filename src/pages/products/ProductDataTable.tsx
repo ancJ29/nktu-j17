@@ -5,7 +5,7 @@ import { IconPackageOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Product } from '@/types';
-import { CodeLabel, DataTable } from '@credo/base-ui/components';
+import { CodeLabel, ColorBadge, DataTable } from '@credo/base-ui/components';
 import { lookupLabelOf, useLookupLabels } from '@/hooks';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { ProductThumb } from './ProductThumb';
@@ -15,7 +15,7 @@ import {
   isProductInventoryEnabled,
   perms,
 } from '@/utils/permission';
-import { ActiveBadge, CategoryBadge } from '@/components/badges';
+import { ActiveBadge } from '@/components/badges';
 import { isProductSet, isNoInventoryProduct } from '@/utils/productSet';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
 import { formatNumber } from '@/utils/number';
@@ -30,6 +30,9 @@ type ProductDataTableProps = {
   readonly isLoading?: boolean;
   readonly onHandByCode?: Map<string, number>;
   readonly viewportRef?: React.Ref<HTMLDivElement>;
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 export function ProductDataTable({
@@ -37,10 +40,15 @@ export function ProductDataTable({
   isLoading,
   onHandByCode,
   viewportRef,
+  hasMore,
+  onLoadMore,
+  loadingMoreLabel,
 }: ProductDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const unitLabels = useLookupLabels('unit');
+
+  const categoryLabels = useLookupLabels('product-category');
 
   const columns = useMemo(
     () =>
@@ -87,7 +95,9 @@ export function ProductDataTable({
           key: 'category',
           width: '200px',
           header: t('common.labels.category'),
-          render: (item: Product) => <CategoryBadge category={item.extra.category} />,
+          render: (item: Product) => (
+            <ColorBadge label={lookupLabelOf(categoryLabels, item.extra.category)} size="sm" />
+          ),
         },
         ...(priceVisible
           ? [
@@ -191,7 +201,7 @@ export function ProductDataTable({
               <ActiveBadge
                 isActive={item.isActive}
                 activeLabel={t('products.status.active')}
-                inactiveLabel={t('common.status.inactive')}
+                inactiveLabel={t('__new__.01-common.labels.inactive')}
                 size="sm"
               />
             </Group>
@@ -203,7 +213,7 @@ export function ProductDataTable({
         render: (item: Product) => React.ReactNode;
         ta?: 'left' | 'center' | 'right';
       }[],
-    [t, onHandByCode, unitLabels],
+    [t, onHandByCode, unitLabels, categoryLabels],
   );
 
   const handleRowClick = (item: Product) => {
@@ -221,6 +231,9 @@ export function ProductDataTable({
       isLoading={isLoading}
       emptyMessage={t('products.noItems')}
       onRowClick={handleRowClick}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      loadingMoreLabel={loadingMoreLabel}
     />
   );
 }

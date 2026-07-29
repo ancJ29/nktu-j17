@@ -195,6 +195,8 @@ const MaterialFeaturesSchema = z
     images: z.boolean().default(false),
 
     minimumStock: z.boolean().default(false),
+
+    bulkImport: z.boolean().default(false),
   })
   .default({
     enabled: false,
@@ -208,6 +210,7 @@ const MaterialFeaturesSchema = z
     attributes: false,
     images: false,
     minimumStock: false,
+    bulkImport: false,
   });
 
 const LocationFeaturesSchema = z

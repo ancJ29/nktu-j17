@@ -28,6 +28,7 @@ import {
   IconArrowLeft,
   IconBan,
   IconCamera,
+  IconClockPause,
   IconCopy,
   IconEdit,
   IconFileInvoice,
@@ -686,6 +687,8 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const linkage = extra.inventoryLinkage;
   const linkageState = linkage?.state ?? 'none';
   const reservedRowCount = linkage?.reservedSnapshot?.length ?? 0;
+
+  const pendingShipAt = linkage?.pendingShip?.at ?? null;
   const linkageBadge =
     linkageState === 'reserved' ? (
       <Tooltip
@@ -878,6 +881,13 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             </Text>
           )}
         </Stack>
+      </Alert>
+    ) : null;
+
+  const pendingShipNotice =
+    pendingShipAt != null ? (
+      <Alert icon={<IconClockPause size={16} />} color="blue" variant="light">
+        {t('salesOrders.shipRecovery.pendingNotice', { at: formatDateTime(pendingShipAt) })}
       </Alert>
     ) : null;
 
@@ -1566,6 +1576,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
           <Tabs.Panel value="overview">
             <Stack gap="sm" p="sm">
               {stuckReservationBanner}
+              {pendingShipNotice}
               {reconcileBanner}
               {/* Info / Items / Activity / Attachments accordions */}
               <Accordion defaultValue="info" variant="separated">
@@ -1742,6 +1753,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Group>
 
       {stuckReservationBanner}
+      {pendingShipNotice}
       {reconcileBanner}
 
       {/* Header — order number + status (configured cancelled status when cancelled) + urgent + linkage + created timestamp */}

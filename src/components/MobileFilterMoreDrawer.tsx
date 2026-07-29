@@ -86,7 +86,9 @@ function DateRangeFilter({
   const pickerValue: [string | null, string | null] =
     pendingStart != null
       ? [pendingStart, null]
-      : [toDateString(value.from), toDateString(value.to)];
+      : filter.customOnly && value.preset !== 'custom'
+        ? [null, null]
+        : [toDateString(value.from), toDateString(value.to)];
 
   return (
     <Stack gap="xs">
@@ -101,22 +103,24 @@ function DateRangeFilter({
         value={pickerValue}
         onChange={(range) => handleRangeChange(range as [string | null, string | null])}
       />
-      <SimpleGrid cols={2} spacing="xs">
-        {Object.keys(presetLabels)
-          .filter((preset) => preset !== 'custom')
-          .map((preset) => (
-            <Button
-              key={preset}
-              size="compact-sm"
-              variant={value.preset === preset ? 'filled' : 'outline'}
-              color={value.preset === preset ? undefined : 'gray'}
-              onClick={() => selectPreset(preset as DateRangePreset)}
-              fullWidth
-            >
-              {presetLabels[preset as DateRangePreset]}
-            </Button>
-          ))}
-      </SimpleGrid>
+      {!filter.customOnly && (
+        <SimpleGrid cols={2} spacing="xs">
+          {Object.keys(presetLabels)
+            .filter((preset) => preset !== 'custom')
+            .map((preset) => (
+              <Button
+                key={preset}
+                size="compact-sm"
+                variant={value.preset === preset ? 'filled' : 'outline'}
+                color={value.preset === preset ? undefined : 'gray'}
+                onClick={() => selectPreset(preset as DateRangePreset)}
+                fullWidth
+              >
+                {presetLabels[preset as DateRangePreset]}
+              </Button>
+            ))}
+        </SimpleGrid>
+      )}
     </Stack>
   );
 }
@@ -139,7 +143,8 @@ function SelectFilter({ filter }: { filter: MoreFilterSelect }) {
 function countActive(filters: MoreFilterDef[]): number {
   let count = 0;
   for (const f of filters) {
-    if (f.type === 'dateRange' && f.value.preset !== null) count++;
+    if (f.type === 'dateRange' && (f.customOnly ? f.value.preset === 'custom' : f.value.preset))
+      count++;
     if (f.type === 'select' && f.value !== null) count++;
     if (f.type === 'switch' && f.value) count++;
   }

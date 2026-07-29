@@ -4,6 +4,7 @@
       "actions": {
         "addEntry": "Add Item",
         "back": "Go back",
+        "backToTop": "Back to top",
         "cancel": "Cancel",
         "clearFilters": "Clear all filters",
         "clearSearch": "Clear search",
@@ -44,7 +45,11 @@
         "active": "Active",
         "note": "Note (optional)",
         "orderDate": "Order Date",
-        "status": "Status"
+        "status": "Status",
+        "inactive": "Inactive"
+      },
+      "list": {
+        "loadingMore": "Loading {{chunk}} more of {{total}}…"
       }
     },
     "07-entities": {
@@ -665,9 +670,7 @@
       "pending": "Pending"
     },
     "filters": {
-      "active": "Active",
       "apply": "Apply Filters",
-      "inactive": "Inactive",
       "more": "More",
       "selectDateRange": "Select date range",
       "statusCount": "{{count}} statuses"
@@ -740,9 +743,7 @@
       "outOfStock": "Out of stock"
     },
     "status": {
-      "active": "Active",
-      "archived": "Archived",
-      "inactive": "Inactive"
+      "archived": "Archived"
     },
     "validation": {
       "codeNoWhitespace": "Code cannot contain whitespace",
@@ -897,6 +898,9 @@
     "stepCount_one": "{{count}} step",
     "stepCount_other": "{{count}} steps",
     "stepsTitle": "Steps",
+    "summary": {
+      "total": "{{count}} templates"
+    },
     "title": "Diary Templates",
     "validation": {
       "activityRequired": "Add at least one day with an activity",
@@ -1182,6 +1186,8 @@
     "editItem": "Edit Request",
     "filterDriver": "Driver",
     "filterParty": "Party",
+    "filterScheduledDate": "Delivery date",
+    "filterScheduledDateCustom": "Custom delivery date range",
     "form": {
       "addItem": "Add Item",
       "createButton": "Create Request",
@@ -1426,16 +1432,20 @@
       "generateError": "Failed to generate login token",
       "qrCopied": "QR Copied!",
       "regenerate": "Generate New Token",
+      "regenerateConfirmMessage": "The current login code will stop working. The employee must use the new one to sign in.",
+      "regenerateConfirmTitle": "Generate a new login code?",
       "title": "Generate Login Token"
     },
     "noEmployees": "No employees found",
     "notifications": {
+      "codeCopied": "Employee code copied",
       "createError": "Failed to create employee",
       "createSuccess": "Employee created successfully",
       "deleteError": "Failed to delete employee",
       "deleteSuccess": "Employee deleted successfully",
       "fetchError": "Failed to load employees",
       "listConflictMessage": "Another user just changed the employee list. Code updated to {{code}}. Please review and submit again.",
+      "loginIdentifierCopied": "Login username copied",
       "mintedPassword": "Reactivation created a new login password: {{password}}. It is shown only this once — record it now.",
       "ssoWarning": "Employee created, but login setup failed: {{reason}}. Set their password manually before sharing credentials.",
       "truckLinkWarning": "Employee saved, but linking the truck failed. Re-open and save to retry.",
@@ -1939,6 +1949,9 @@
       "updateError": "Failed to update location",
       "updateSuccess": "Location updated successfully"
     },
+    "summary": {
+      "total": "{{count}} locations"
+    },
     "title": "Locations"
   },
   "lookups": {
@@ -2142,13 +2155,20 @@
   "materials": {
     "addItem": "Add Material",
     "bulkImport": {
+      "errorCodeInvalid": "Code must contain letters and digits only — skipped",
+      "errorCodeRequired": "Missing code — skipped",
       "import": "Import Materials",
       "missingColumnMessage": "The file is missing required column(s): {{columns}}. Please use the latest template — click \"Download Sample\" above.",
       "missingColumnTitle": "File format not supported",
       "noValidRows": "No valid materials found in the file",
+      "refreshFailedMessage": "The material list could not be refreshed, so duplicate codes cannot be detected safely. Check your connection and try again.",
+      "refreshFailedTitle": "Could not check existing materials",
       "sampleDescription": "Download a pre-formatted template to fill in material data",
-      "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
-      "unknownLabelTitle": "Unrecognized category",
+      "skippedDuplicateCode": "Material code already exists — skipped",
+      "skippedTitle": "Rows skipped as duplicates",
+      "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Meta-data, or fix the file, then re-import.",
+      "unknownLabelTitle": "Unrecognized unit or category",
+      "unknownUnitMessage": "Unrecognized units: {{labels}}. Use the unit names shown under Meta-data (not their codes), or add them there, then re-import.",
       "uploadFile": "Upload Material File"
     },
     "columns": {
@@ -2796,6 +2816,10 @@
     "filterActive": "Active",
     "filterCategoryAll": "All categories",
     "filterInactive": "Inactive",
+    "filterKindAll": "All types",
+    "filterKindSet": "Product sets",
+    "filterKindSingle": "Single products",
+    "filterKindTitle": "Type",
     "filterStockAll": "All stock levels",
     "filterStockInStock": "In stock",
     "filterStockLowStock": "Below minimum",
@@ -2861,6 +2885,7 @@
       "exportError": "Failed to export product list",
       "fetchError": "Failed to load products",
       "listConflictMessage": "Another user just changed the product list. Code updated to {{code}}. Please review and submit again.",
+      "skuCopied": "SKU copied",
       "toggleError": "Failed to update product status",
       "updateError": "Failed to update product",
       "updateSuccess": "Product updated successfully"
@@ -3295,6 +3320,8 @@
         "create": "Created order",
         "delete": "Deleted order",
         "manualRelease": "Released reservation",
+        "reconcileRepair": "Repaired delivery sync on",
+        "shipRecovery": "Completed stock deduction for",
         "statusChange": "Changed status of",
         "update": "Edited order",
         "updateInline": "Updated fields on"
@@ -3526,6 +3553,15 @@
       "orphans": "Inventory rows still hold stock for this order although it no longer reserves ({{count}} line(s)).",
       "repairButton": "Repair now",
       "repairSuccess": "Repair applied: {{actions}}"
+    },
+    "shipRecovery": {
+      "ambiguous": "{{orderNumber}}: the reservation for {{items}} changed while the deduction was in flight, so it was not replayed. Use the reconciliation banner on the order.",
+      "ambiguousTitle": "Stock deduction needs review",
+      "applied": "{{orderNumber}}: an interrupted stock deduction was completed automatically.",
+      "appliedTitle": "Stock deduction completed",
+      "failed": "{{orderNumber}}: could not finish the stock deduction ({{error}}). It will be retried next time the order is opened.",
+      "failedTitle": "Stock deduction still pending",
+      "pendingNotice": "The stock deduction for this order was started at {{at}} but has not finished yet. Nothing is lost — the reserved stock is still held and the system completes the deduction automatically."
     },
     "stats": {
       "total": "Total",
@@ -3910,6 +3946,18 @@
       "quantityLabel": "Quantity",
       "unitLabel": "Unit"
     },
+    "fromMaterials": {
+      "clear": "Clear",
+      "createDeliveryNote": "Delivery note",
+      "createReceipt": "Receipt",
+      "enterSelection": "Select materials",
+      "rowCreateDeliveryNote": "New delivery note for this material",
+      "rowCreateReceipt": "New receipt for this material",
+      "selectAll": "Select all on this page",
+      "selectPrompt": "Tick the materials to put on the document",
+      "selected_one": "{{count}} material selected",
+      "selected_other": "{{count}} materials selected"
+    },
     "lockedNote": "This document is confirmed and locked — its lines have been posted to inventory.",
     "notifications": {
       "confirmError": "Failed to confirm document",
@@ -3925,6 +3973,8 @@
       "updateSuccess": "Document updated"
     },
     "searchPlaceholder": "Search by code or note...",
+    "seededFromMaterials_one": "Started from {{count}} material on the material list — enter the quantity and save.",
+    "seededFromMaterials_other": "Started from {{count}} materials on the material list — enter the quantities and save.",
     "status": {
       "confirmed": "Confirmed",
       "draft": "Draft"

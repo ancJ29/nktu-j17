@@ -16,6 +16,7 @@ import { notifications } from '@mantine/notifications';
 import { IconCalendar, IconInfoCircle } from '@tabler/icons-react';
 import type { TFunction } from 'i18next';
 import { EmployeeSelector } from '@/components/selectors';
+import { useRowSelection } from '@/hooks/useRowSelection';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import {
   getDeliveryRequestDriverDepartments,
@@ -74,7 +75,9 @@ function BulkForm({ onClose, salesOrders, getCustomerByCode, resolveStatus, t }:
 
   const [driverId, setDriverId] = useState<string | null>(null);
   const [date, setDate] = useState<Date | null>(null);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+
+  const selection = useRowSelection();
+  const { selectedKeys: selectedIds, toggle: toggleOne } = selection;
   const [saving, setSaving] = useState(false);
 
   const driver = useMemo(
@@ -82,23 +85,12 @@ function BulkForm({ onClose, salesOrders, getCustomerByCode, resolveStatus, t }:
     [driverId, employees],
   );
 
-  const toggleOne = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const allSelected = salesOrders.length > 0 && selectedIds.size === salesOrders.length;
-  const someSelected = selectedIds.size > 0 && !allSelected;
-
-  const toggleAll = useCallback(() => {
-    setSelectedIds((prev) =>
-      prev.size === salesOrders.length ? new Set() : new Set(salesOrders.map((o) => o.id)),
-    );
-  }, [salesOrders]);
+  const candidateIds = useMemo(() => salesOrders.map((o) => o.id), [salesOrders]);
+  const { allSelected, someSelected } = selection.headerState(candidateIds);
+  const toggleAll = useCallback(
+    () => selection.toggleAllIn(candidateIds),
+    [selection, candidateIds],
+  );
 
   const handleSave = useCallback(async () => {
     if (!driver || selectedIds.size === 0) return;

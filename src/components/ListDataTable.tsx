@@ -17,6 +17,10 @@ type ListDataTableProps<T extends Row> = {
   readonly maxHeight?: number | string;
 
   readonly viewportRef?: Ref<HTMLDivElement>;
+
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 export function ListDataTable<T extends Row>({
@@ -30,6 +34,9 @@ export function ListDataTable<T extends Row>({
   getRowBg,
   maxHeight = 'calc(100vh - 300px)',
   viewportRef,
+  hasMore,
+  onLoadMore,
+  loadingMoreLabel,
 }: ListDataTableProps<T>) {
   const navigate = useNavigate();
 
@@ -53,6 +60,9 @@ export function ListDataTable<T extends Row>({
       emptyMessage={emptyMessage}
       onRowClick={handleRowClick as ((item: T & Record<string, unknown>) => void) | undefined}
       getRowBg={getRowBg as ((item: T & Record<string, unknown>) => string | undefined) | undefined}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      loadingMoreLabel={loadingMoreLabel}
     />
   );
 }

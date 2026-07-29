@@ -1,9 +1,8 @@
-import { Badge, Button, Group, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Badge, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconMapPin, IconPlus } from '@tabler/icons-react';
+import { IconMapPin } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { ListPagination } from '@/components/custom/ListPagination';
@@ -109,11 +108,11 @@ export function LocationListPage() {
               initialized && totalCount > 0 ? (
                 <Group gap={6} wrap="nowrap">
                   <Text size="xs" c="dimmed">
-                    {totalCount}
+                    {t('locations.summary.total', { count: totalCount })}
                   </Text>
                   {inactiveCount > 0 && (
                     <Badge size="xs" variant="light" color="gray" radius="sm" tt="lowercase">
-                      {inactiveCount} {t('common.filters.inactive')}
+                      {inactiveCount} {t('__new__.01-common.labels.inactive')}
                     </Badge>
                   )}
                 </Group>
@@ -126,8 +125,6 @@ export function LocationListPage() {
               to: ROUTES.LOCATIONS.NEW,
               label: t('locations.addItem'),
               enabled: canCreate,
-
-              mobileVariant: 'hidden',
             }}
           />
 
@@ -142,9 +139,10 @@ export function LocationListPage() {
               statusLabels={{
                 all: t('__new__.01-common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
-                inactive: t('common.filters.inactive'),
+                inactive: t('__new__.01-common.labels.inactive'),
               }}
               onClear={clearFilters}
+              labelChips
             />
           ) : (
             <DesktopFilterBar
@@ -156,25 +154,10 @@ export function LocationListPage() {
               statusLabels={{
                 all: t('__new__.01-common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
-                inactive: t('common.filters.inactive'),
+                inactive: t('__new__.01-common.labels.inactive'),
               }}
               onClear={clearFilters}
             />
-          )}
-
-          {/* Mobile bottom CTA — primary-action variant. See ListPageHeader header
-            comment ("`mobileVariant: 'hidden'`") + the filter guideline memo. */}
-          {isMobile && canCreate && (
-            <Button
-              component={Link}
-              to={ROUTES.LOCATIONS.NEW}
-              leftSection={<IconPlus size={16} />}
-              size="sm"
-              variant="light"
-              fullWidth
-            >
-              {t('locations.addItem')}
-            </Button>
           )}
         </StickyListChrome>
 

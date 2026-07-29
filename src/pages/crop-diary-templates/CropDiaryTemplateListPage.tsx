@@ -1,9 +1,8 @@
-import { Button, Stack, Text, ThemeIcon } from '@mantine/core';
+import { Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconClipboardList, IconPlus } from '@tabler/icons-react';
+import { IconClipboardList } from '@tabler/icons-react';
 import { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { useCropDiaryTemplateStore } from '@/stores/useCropDiaryTemplateStore';
 import { ListPagination } from '@credo/base-ui/components';
@@ -79,7 +78,7 @@ export function CropDiaryTemplateListPage() {
           subtitle={
             initialized && items.length > 0 ? (
               <Text size="xs" c="dimmed">
-                {items.length}
+                {t('cropDiaryTemplates.summary.total', { count: items.length })}
               </Text>
             ) : undefined
           }
@@ -90,7 +89,6 @@ export function CropDiaryTemplateListPage() {
             to: ROUTES.CROP_DIARY_TEMPLATES.NEW,
             label: t('cropDiaryTemplates.addItem'),
             enabled: canCreate,
-            mobileVariant: 'hidden',
           }}
         />
 
@@ -99,44 +97,19 @@ export function CropDiaryTemplateListPage() {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('cropDiaryTemplates.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.status.inactive'),
-            }}
             hideStatus
             onClear={clearFilters}
+
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('cropDiaryTemplates.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
-            statusLabels={{
-              all: t('__new__.01-common.filters.all'),
-              active: t('common.status.active'),
-              inactive: t('common.status.inactive'),
-            }}
             hideStatus
             onClear={clearFilters}
           />
-        )}
-
-        {isMobile && canCreate && (
-          <Button
-            component={Link}
-            to={ROUTES.CROP_DIARY_TEMPLATES.NEW}
-            leftSection={<IconPlus size={16} />}
-            size="sm"
-            variant="light"
-            fullWidth
-          >
-            {t('cropDiaryTemplates.addItem')}
-          </Button>
         )}
       </StickyListChrome>
 

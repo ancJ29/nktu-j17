@@ -84,8 +84,8 @@ export function EmployeeDetailHeader({
     <Group gap={6} wrap="wrap" mt={isMobile ? undefined : 2}>
       <ActiveBadge
         isActive={employee.isActive}
-        activeLabel={t('common.status.active')}
-        inactiveLabel={t('common.status.inactive')}
+        activeLabel={t('__new__.01-common.labels.active')}
+        inactiveLabel={t('__new__.01-common.labels.inactive')}
         size="sm"
       />
       <ColorBadge label={departmentLabel} />

@@ -28,6 +28,7 @@ import { DateField } from '@/components/DateField';
 import { CustomerSelector, EmployeeSelector, VendorSelector } from '@/components/selectors';
 import { SegmentTabs } from '@/components/SegmentTabs';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useRowSelection } from '@/hooks/useRowSelection';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -93,7 +94,8 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const [notes, setNotes] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
 
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const selection = useRowSelection();
+  const { selectedKeys: selectedIds, toggle: toggleOne } = selection;
   const [customerId, setCustomerId] = useState<string | null>(null);
   const [customerCode, setCustomerCode] = useState<string | null>(null);
 
@@ -196,7 +198,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     setDirection(next);
 
     if (next === 'inbound') {
-      setSelectedIds(new Set());
+      selection.clear();
       setCustomerId(null);
       setCustomerCode(null);
     } else {
@@ -223,22 +225,9 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     }
   };
 
-  const toggleOne = useCallback((id: string) => {
-    setSelectedIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  }, []);
-
-  const allSelected = eligibleOrders.length > 0 && selectedIds.size === eligibleOrders.length;
-  const someSelected = selectedIds.size > 0 && !allSelected;
-  const toggleAll = useCallback(() => {
-    setSelectedIds((prev) =>
-      prev.size === eligibleOrders.length ? new Set() : new Set(eligibleOrders.map((o) => o.id)),
-    );
-  }, [eligibleOrders]);
+  const eligibleIds = useMemo(() => eligibleOrders.map((o) => o.id), [eligibleOrders]);
+  const { allSelected, someSelected } = selection.headerState(eligibleIds);
+  const toggleAll = useCallback(() => selection.toggleAllIn(eligibleIds), [selection, eligibleIds]);
 
   const handleSaveOutbound = useCallback(async () => {
     if (!driver || !date || selectedIds.size === 0) return;
@@ -528,7 +517,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
               setCustomerId(sel?.id ?? null);
               setCustomerCode(sel?.customer.code ?? null);
 
-              setSelectedIds(new Set());
+              selection.clear();
             }}
           />
           {!customerCode ? (

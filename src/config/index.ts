@@ -10,7 +10,7 @@ import {
 import { defaultAppConfig, CMngtAppConfigSchema, type CMngtAppConfig } from './schema';
 import { buildHash, buildTimestamp, version } from './build-version';
 import { baseEnvConfig } from '@credo/base-ui/utils';
-import { isLocalhost } from '@credo/kits/misc';
+import { isLocalhost } from '@/config/env';
 import { reloadPage } from '@credo/base-ui/utils';
 import { activityLoggerConnector, cMngtConnector } from '@credo/connectors/connector';
 import { appActivityLoggerInternalAccessKey, isAdmin } from './env';
@@ -137,7 +137,7 @@ logger.debug('appConfig:', appConfig);
 export async function refreshConfigFromBackend(): Promise<void> {
   let reloading = false;
   try {
-    const limit = isLocalhost() ? ONE_MINUTE : 30 * ONE_MINUTE;
+    const limit = isLocalhost ? ONE_MINUTE : 30 * ONE_MINUTE;
 
     const ts = cacheGet('crt') ?? 0;
     if (ts > 0 && Date.now() - ts < limit) {

@@ -135,10 +135,19 @@ export type InventoryLinkageTransition = {
   via: InventoryLinkageVia;
 };
 
+export type PendingInventoryShip = {
+  snapshot: InventoryLinkageSnapshotEntry[];
+  at: DateTimeInput;
+  by?: { id: string; name: string };
+  via: InventoryLinkageVia;
+};
+
 export type InventoryLinkage = {
   state: InventoryLinkageState;
 
   reservedSnapshot?: InventoryLinkageSnapshotEntry[];
+
+  pendingShip?: PendingInventoryShip;
   lastTransition?: InventoryLinkageTransition;
 };
 

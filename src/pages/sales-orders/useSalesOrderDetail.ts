@@ -51,6 +51,7 @@ import { emitInventoryActivityForApplied } from '@/utils/inventoryActivityEmit';
 import { formatPlanFailures } from './planFailures';
 import { logActivity } from '@/utils/activityLogger';
 import type { SalesOrderInlineFields, SalesOrderReleasedRow } from './activityMemo';
+import { statusChangeMemo } from './activityMemo';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import {
   deriveIsClosedFromStage,
@@ -66,6 +67,7 @@ import {
 import { deriveSoDeliveryIssues, type SoDeliveryIssue } from './deliveryReconciliation';
 import { dispatchSoFollowUp } from './followUps';
 import { advanceSoIfFullyDelivered } from './reconcileFromDeliveries';
+import { runShipRecovery } from './shipRecovery';
 import { softDeleteLinkedDeliveryRequests } from '@/pages/delivery-requests/deliveryRequestDelete';
 import type { Stage } from './capabilities/types';
 import { device } from '@credo/base-ui/utils';
@@ -312,16 +314,18 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
   const autoAdvancedRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!order || order.isClosed) return;
+    if (!order) return;
+
+    const hasPendingShip =
+      (order.extra as SalesOrderExtra | undefined)?.inventoryLinkage?.pendingShip != null;
+    if (order.isClosed && !hasPendingShip) return;
     if (!canTransitionStatusPerm) return;
     if (!drsInit || !productsInit || !inventoryInit) return;
     if (autoAdvancedRef.current === order.id) return;
     autoAdvancedRef.current = order.id;
-    void advanceSoIfFullyDelivered({ so: order, actor: currentEmployee, t }).then((outcome) => {
-      if (outcome === 'advanced') {
-        const fresh = useSalesOrderStore.getState().getById(order.id) as SalesOrder | undefined;
-        if (fresh) setOrder(fresh);
-      }
+    void advanceSoIfFullyDelivered({ so: order, actor: currentEmployee, t }).then(() => {
+      const fresh = useSalesOrderStore.getState().getById(order.id) as SalesOrder | undefined;
+      if (fresh && fresh.version !== order.version) setOrder(fresh);
     });
   }, [order, drsInit, productsInit, inventoryInit, currentEmployee, t]);
 
@@ -356,25 +360,37 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         });
         forceRefresh();
 
-        const updatedExtra = (result.updated.extra ?? {}) as SalesOrderExtra;
         const fromStatusValue = (order.extra as SalesOrderExtra | undefined)?.status ?? '';
-        const inventoryAction =
-          updatedExtra.inventoryLinkage?.lastTransition?.via?.kind === 'completion-auto-ship'
-            ? 'auto-ship-on-completion'
-            : updatedExtra.inventoryLinkage?.lastTransition?.action;
-        logActivity('salesOrder.statusChange', id, {
-          orderNumber: result.updated.orderNumber,
-          fromStatus: fromStatusValue,
-          toStatus: newStatus,
-          ...(note ? { note } : {}),
-          ...(inventoryAction ? { inventoryAction } : {}),
-        });
+        logActivity(
+          'salesOrder.statusChange',
+          id,
+          statusChangeMemo({
+            updated: result.updated,
+            fromStatus: fromStatusValue,
+            toStatus: newStatus,
+            note,
+            shipPending: result.pendingShip != null,
+          }),
+        );
 
         const actor = currentEmployee
           ? { id: currentEmployee.id, name: currentEmployee.name }
           : undefined;
         for (const followUp of result.followUps) {
           await dispatchSoFollowUp(followUp, result.updated, actor, t);
+        }
+
+        if (result.pendingShip) {
+          const recovery = await runShipRecovery({
+            so: result.updated,
+            actor,
+            productsByCode: productByCode,
+            t,
+          });
+          if (recovery.kind === 'applied' || recovery.kind === 'confirmed') {
+            const fresh = useSalesOrderStore.getState().getById(id) as SalesOrder | undefined;
+            if (fresh) setOrder(fresh);
+          }
         }
       } else {
         notifyTransitionFailure(result.failure, t, productByCode);

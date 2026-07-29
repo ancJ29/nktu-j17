@@ -24,6 +24,8 @@ export type MoreFilterDateRange = {
   title: string;
   value: DateRangeValue;
   onChange: (value: DateRangeValue) => void;
+
+  customOnly?: boolean;
 };
 
 export type MoreFilterSelect = {

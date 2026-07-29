@@ -9,6 +9,7 @@ import { LoadingFallback, MobileAppLayout as MobileAppLayoutUI } from '@credo/ba
 import type { CredoNavigationItem } from '@credo/base-ui/types';
 import type { NavigationItem } from '@/types';
 import { stripRootOnlyNavItems } from '@/config/navigation';
+import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { Container } from '@mantine/core';
 import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -112,6 +113,11 @@ export function MobileAppLayout() {
           </EmployeeReadyGate>
         </Container>
       </Suspense>
+      {/* Outside the Suspense boundary + portaled by `Affix`, so it survives a
+          lazy route swap and escapes PullToRefresh's transform. Every mobile
+          page gets it; it reveals itself only once there's something to scroll
+          back from. */}
+      <ScrollToTopButton />
       {clearCache.modal}
     </MobileAppLayoutUI>
   );

@@ -26,7 +26,7 @@ import { ProductLink } from '@/components/ProductLink';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { getProductSuggestedPrice, isBelowSuggestedPrice } from '@/utils/productPricing';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
-import { isNKTU } from '@/config/client';
+import { AVAILABILITY_INCLUDES_INCOMING } from '@/config/inventoryDisplayDefaults';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -143,7 +143,9 @@ export function OrderItemsTable({
     if (isNoInventoryProduct(product)) return null;
     const target = locationCode || DEFAULT_LOCATION_CODE;
 
-    const incoming = isNKTU ? 0 : (inboundByProduct.get(productCode)?.totalBase ?? 0);
+    const incoming = AVAILABILITY_INCLUDES_INCOMING
+      ? (inboundByProduct.get(productCode)?.totalBase ?? 0)
+      : 0;
     return getSequentialAvailability(product, target, inventoryByProduct, {
       orderNumber: currentOrderNumber,
       incoming,

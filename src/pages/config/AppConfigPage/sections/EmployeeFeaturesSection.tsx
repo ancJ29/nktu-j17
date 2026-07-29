@@ -97,8 +97,9 @@ export const EmployeeFeaturesSection = memo(function EmployeeFeaturesSection({
             p="xs"
             style={{ borderRadius: 'var(--mantine-radius-sm)' }}
             bg={features[key] ? undefined : 'var(--mantine-color-default-hover)'}
+            wrap="nowrap"
           >
-            <Box>
+            <Box style={{ flex: 1, minWidth: 0 }}>
               <Text fz="sm" fw={500}>
                 {EMP_LABELS[`emp${key[0].toUpperCase()}${key.slice(1)}`] ?? key}
               </Text>
@@ -109,6 +110,7 @@ export const EmployeeFeaturesSection = memo(function EmployeeFeaturesSection({
             <Switch
               checked={features[key] ?? false}
               onChange={() => onChange({ ...features, [key]: !features[key] })}
+              style={{ flexShrink: 0 }}
             />
           </Group>
         ))}

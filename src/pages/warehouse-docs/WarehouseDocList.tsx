@@ -9,6 +9,7 @@ import { ListPagination } from '@/components/custom/ListPagination';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { DesktopFilterMorePopover } from '@/components/DesktopFilterMorePopover';
 import { MobileFilterBar, type MobileFilterDef } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { FilterPill } from '@/components/FilterPill';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -146,24 +147,30 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     },
   ];
 
+  const allLabel = t('__new__.01-common.filters.all');
+
   const mobileFilters: MobileFilterDef[] = [
     ...(postEnabled
       ? [
-          {
+          allOptionFilter({
             title: t('__new__.01-common.labels.status'),
-            value: statusFilter || 'all',
-            options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...statusData],
-            onChange: (v: string) => setStatusFilter(v === 'all' ? '' : v),
-          } satisfies MobileFilterDef,
+            value: statusFilter,
+            options: statusData,
+            onChange: setStatusFilter,
+            allLabel,
+            emptyValue: '',
+          }),
         ]
       : []),
-    {
+    allOptionFilter({
       title: t('common.labels.assignedTo'),
-      value: picFilter || 'all',
-      options: [{ value: 'all', label: t('__new__.01-common.filters.all') }, ...picData],
-      onChange: (v: string) => setPicFilter(v === 'all' ? '' : v),
+      value: picFilter,
+      options: picData,
+      onChange: setPicFilter,
+      allLabel,
+      emptyValue: '',
       visible: picData.length > 0,
-    },
+    }),
   ];
 
   const dateFilter: MoreFilterDef[] = [
@@ -184,7 +191,9 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
   }, [setSearch, applyDateRange]);
 
   const hasActiveFilters = !!search || !!statusFilter || !!picFilter || !dateIsDefault;
-  const hasPills = !!statusFilter || !!picFilter || !dateIsDefault;
+
+  const showSelectPills = !isMobile;
+  const hasPills = (showSelectPills && (!!statusFilter || !!picFilter)) || !dateIsDefault;
 
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
 
@@ -205,8 +214,8 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             to: kind.routes.NEW,
             label: t('warehouseDoc.addItem'),
             enabled: canCreate,
-
-            mobileVariant: 'hidden',
+            // The form is desktop-only (mobile redirects to the list), so hide
+            // the create CTA on mobile rather than dead-end into a bounce.
           }}
         />
 
@@ -215,10 +224,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('warehouseDoc.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={mobileFilters}
             moreSection={
               <MobileFilterMoreDrawer
@@ -230,16 +236,14 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}
+            labelChips
           />
         ) : (
           <DesktopFilterBar
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('warehouseDoc.searchPlaceholder')}
-            status="all"
-            onStatusChange={() => {}}
             hideStatus
-            statusLabels={{ all: t('__new__.01-common.filters.all'), active: '', inactive: '' }}
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover filters={dateFilter} presetLabels={presetLabels} />
@@ -251,13 +255,13 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
 
         {hasPills && (
           <Group gap="xs">
-            {statusFilter && (
+            {showSelectPills && statusFilter && (
               <FilterPill onClose={() => setStatusFilter('')}>
                 {t('__new__.01-common.labels.status')}:{' '}
                 {statusData.find((s) => s.value === statusFilter)?.label ?? statusFilter}
               </FilterPill>
             )}
-            {picFilter && (
+            {showSelectPills && picFilter && (
               <FilterPill onClose={() => setPicFilter('')}>
                 {t('common.labels.assignedTo')}: {picLabel(picFilter)}
               </FilterPill>

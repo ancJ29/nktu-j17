@@ -2,7 +2,7 @@ import { logger } from '@credo/base-ui/utils';
 import { cacheReset } from '@/utils/appCache';
 import { reloadPage } from '@credo/base-ui/utils';
 import { credoClientCode } from './env';
-import { isLocalhost } from '@credo/kits/misc';
+import { isLocalhost } from '@/config/env';
 
 export const CLIENT_CODE_STORAGE_KEY = '__CREDO_SERVICE_CODE__';
 
@@ -36,11 +36,9 @@ function fromEnv(): string {
   return credoClientCode;
 }
 
-const localhost = isLocalhost();
-
 export function resolveClientCode(): string {
   let clientCode = '';
-  if (localhost) {
+  if (isLocalhost) {
     clientCode = fromStorage() || fromEnv();
   } else {
     clientCode = fromStorage() || fromDomain() || fromEnv();

@@ -38,6 +38,7 @@ import {
   IconPackageImport,
   IconPhoto,
   IconQrcode,
+  IconRefresh,
   IconShield,
   IconStack3,
   IconSwitchHorizontal,
@@ -156,7 +157,15 @@ type ProductInventoryVerbKey =
 type MaterialInventoryVerbKey = 'create' | 'adjust' | 'stockTake' | 'repack';
 type MaterialVerbKey = SimpleVerbKey | 'updateImages';
 type SalesOrderVerbKey =
-  'create' | 'update' | 'updateInline' | 'statusChange' | 'cancel' | 'manualRelease' | 'delete';
+  | 'create'
+  | 'update'
+  | 'updateInline'
+  | 'statusChange'
+  | 'cancel'
+  | 'manualRelease'
+  | 'reconcileRepair'
+  | 'shipRecovery'
+  | 'delete';
 type DeliveryRequestVerbKey = 'create' | 'update' | 'updateInline' | 'statusChange' | 'delete';
 type GoodsReceiptVerbKey =
   'create' | 'update' | 'updateInline' | 'confirmReceived' | 'repostInventory' | 'cancel';
@@ -568,6 +577,22 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     i18nKey: 'salesOrders.detail.activityVerbs.manualRelease',
     targetType: 'salesOrder',
     showSalesOrderMemo: true,
+  },
+  // System-driven repairs. Both were emitted long before they were rendered —
+  // `reconcileRepair` since 2026-07-23, `shipRecovery` since 2026-07-29 — which
+  // made them root-only `RawActivityCard` entries, i.e. invisible to the very
+  // operators whose stock they moved.
+  'salesOrder.reconcileRepair': {
+    icon: <IconRefresh size={16} />,
+    color: 'orange',
+    i18nKey: 'salesOrders.detail.activityVerbs.reconcileRepair',
+    targetType: 'salesOrder',
+  },
+  'salesOrder.shipRecovery': {
+    icon: <IconRefresh size={16} />,
+    color: 'teal',
+    i18nKey: 'salesOrders.detail.activityVerbs.shipRecovery',
+    targetType: 'salesOrder',
   },
   'salesOrder.delete': {
     icon: <IconTrash size={16} />,

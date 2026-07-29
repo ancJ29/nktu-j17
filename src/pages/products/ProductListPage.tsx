@@ -7,6 +7,7 @@ import { ROUTES } from '@/constants/routes';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { ListPagination } from '@/components/custom/ListPagination';
+import { LIST_LAZY_RENDER_CHUNK } from '@/config/listDefaults';
 import { device } from '@credo/base-ui/utils';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
@@ -19,13 +20,14 @@ import {
   type MobileFilterDef,
   type MobileMultiFilterDef,
 } from '@/components/MobileFilterBar';
+import { allOptionFilter } from '@/components/mobileFilterDefs';
 import {
   hasHideFromInventoryListForProducts,
   isPriceManagementEnabled,
   isProductInventoryEnabled,
   perms,
 } from '@/utils/permission';
-import { isNoInventoryProduct } from '@/utils/productSet';
+import { isNoInventoryProduct, isProductSet } from '@/utils/productSet';
 import { logActivity } from '@/utils/activityLogger';
 import { exportProductsToExcel } from '@/utils/excelParser';
 import { ProductCardList } from './ProductCardList';
@@ -40,17 +42,24 @@ const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 
+type FilterKind = 'set' | 'single' | null;
+
 type ProductFilters = {
   status: FilterStatus;
   category: string | null;
   stock: string | null;
+  kind: FilterKind;
   search: string;
   page: number;
 };
+
+type ProductFilterDimensions = Pick<ProductFilters, 'status' | 'category' | 'stock' | 'kind'>;
+
 const FILTER_DEFAULTS: ProductFilters = {
   status: 'all',
   category: null,
   stock: null,
+  kind: null,
   search: '',
   page: 1,
 };
@@ -82,6 +91,8 @@ export function ProductListPage() {
   const categoryFilter = filterState.category;
 
   const stockFilter = filterState.stock;
+
+  const kindFilter = filterState.kind;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
   const setCategoryFilter = useCallback(
     (v: string | null) => updateState({ category: v }),
@@ -91,10 +102,17 @@ export function ProductListPage() {
     (v: string | null) => updateState({ stock: v }),
     [updateState],
   );
+  const setKindFilter = useCallback(
+    (v: string | null) => updateState({ kind: (v as FilterKind) ?? null }),
+    [updateState],
+  );
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  const filters = { status: filter, category: categoryFilter, stock: stockFilter };
+  const filters = useMemo(
+    () => ({ status: filter, category: categoryFilter, stock: stockFilter, kind: kindFilter }),
+    [filter, categoryFilter, stockFilter, kindFilter],
+  );
 
   const onHandByCode = useMemo(() => {
     const m = new Map<string, number>();
@@ -106,41 +124,71 @@ export function ProductListPage() {
     return m;
   }, [inventoryItems]);
 
-  const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
-    useListFilter(allProducts, {
-      filters,
-      filterFn: (item, f) => {
-        if (item.extra?.isDeleted) return false;
-        if (f.status === 'active' && !item.isActive) return false;
-        if (f.status === 'inactive' && item.isActive) return false;
-        if (f.category && item.extra?.category !== f.category) return false;
+  const filterFn = useCallback(
+    (item: (typeof allProducts)[number], f: ProductFilterDimensions) => {
+      if (item.extra?.isDeleted) return false;
+      if (f.status === 'active' && !item.isActive) return false;
+      if (f.status === 'inactive' && item.isActive) return false;
+      if (f.category && item.extra?.category !== f.category) return false;
+      if (f.kind === 'set' && !isProductSet(item)) return false;
+      if (f.kind === 'single' && isProductSet(item)) return false;
 
-        if (inventoryEnabled && f.stock) {
-          if (f.stock === 'notManaged') return isNoInventoryProduct(item);
-          if (isNoInventoryProduct(item)) return false;
-          const onHand = onHandByCode.get(item.code) ?? 0;
-          if (f.stock === 'inStock' && onHand <= 0) return false;
-          if (f.stock === 'outOfStock' && onHand !== 0) return false;
-          if (f.stock === 'lowStock') {
-            const min = item.extra?.minimumInventory?.value;
-            if (typeof min !== 'number' || min <= 0) return false;
-            if (onHand >= min) return false;
-          }
+      if (inventoryEnabled && f.stock) {
+        if (f.stock === 'notManaged') return isNoInventoryProduct(item);
+        if (isNoInventoryProduct(item)) return false;
+        const onHand = onHandByCode.get(item.code) ?? 0;
+        if (f.stock === 'inStock' && onHand <= 0) return false;
+        if (f.stock === 'outOfStock' && onHand !== 0) return false;
+        if (f.stock === 'lowStock') {
+          const min = item.extra?.minimumInventory?.value;
+          if (typeof min !== 'number' || min <= 0) return false;
+          if (onHand >= min) return false;
         }
-        return true;
-      },
-      searchFields: (item) => [
-        item.name,
-        item.unit,
-        item.description,
-        ...(item.extra?.alternativeNames ?? []),
-        ...(item.extra?.sku ? [item.extra.sku] : []),
-      ],
-      search: filterState.search,
-      onSearchChange,
-      page: filterState.page,
-      onPageChange,
-    });
+      }
+      return true;
+    },
+    [onHandByCode],
+  );
+
+  const searchFields = useCallback(
+    (item: (typeof allProducts)[number]) => [
+      item.name,
+      item.unit,
+      item.description,
+      ...(item.extra?.alternativeNames ?? []),
+      ...(item.extra?.sku ? [item.extra.sku] : []),
+    ],
+    [],
+  );
+
+  const {
+    search,
+    setSearch,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    paginated,
+    totalPages,
+    totalItems,
+    hasMore,
+    loadMore,
+  } = useListFilter(allProducts, {
+    filters,
+    filterFn,
+    searchFields,
+    search: filterState.search,
+    onSearchChange,
+    page: filterState.page,
+    onPageChange,
+
+    lazyKey: ROUTES.PRODUCTS.LIST,
+  });
+
+  const loadingMoreLabel = t('__new__.01-common.list.loadingMore', {
+    chunk: Math.min(totalItems - paginated.length, LIST_LAZY_RENDER_CHUNK),
+    total: totalItems,
+  });
 
   const categoryLookups = useLookupOptions('product-category');
   const categoryOptions = useMemo(
@@ -183,6 +231,19 @@ export function ProductListPage() {
     [t],
   );
 
+  const kindOptions = useMemo(
+    () => [
+      { value: 'set', label: t('products.filterKindSet') },
+      { value: 'single', label: t('products.filterKindSingle') },
+    ],
+    [t],
+  );
+
+  const showKindFilter = useMemo(
+    () => kindFilter !== null || allProducts.some((p) => isProductSet(p)),
+    [allProducts, kindFilter],
+  );
+
   const desktopFilters: SelectFilter[] = useMemo(
     () => [
       ...(categoryOptions.length > 0
@@ -194,6 +255,18 @@ export function ProductListPage() {
               placeholder: t('products.filterCategoryAll'),
               searchable: true,
               w: 200,
+            },
+          ]
+        : []),
+      ...(showKindFilter
+        ? [
+            {
+              value: kindFilter,
+              onChange: setKindFilter,
+              data: kindOptions,
+              placeholder: t('products.filterKindAll'),
+              searchable: false,
+              w: 170,
             },
           ]
         : []),
@@ -214,6 +287,10 @@ export function ProductListPage() {
       categoryOptions,
       categoryFilter,
       setCategoryFilter,
+      showKindFilter,
+      kindFilter,
+      setKindFilter,
+      kindOptions,
       stockFilter,
       setStockFilter,
       stockOptions,
@@ -225,25 +302,38 @@ export function ProductListPage() {
     () => [
       ...(categoryOptions.length > 0
         ? [
-            {
+            allOptionFilter({
               title: t('common.labels.category'),
-              value: categoryFilter ?? 'all',
-              options: [
-                { value: 'all', label: t('products.filterCategoryAll') },
-                ...categoryOptions,
-              ],
-              onChange: (v: string) => setCategoryFilter(v === 'all' ? null : v),
-            },
+              value: categoryFilter,
+              options: categoryOptions,
+              onChange: setCategoryFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
+          ]
+        : []),
+      ...(showKindFilter
+        ? [
+            allOptionFilter({
+              title: t('products.filterKindTitle'),
+              value: kindFilter,
+              options: kindOptions,
+              onChange: setKindFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
       ...(inventoryEnabled
         ? [
-            {
+            allOptionFilter({
               title: t('products.filterStockTitle'),
-              value: stockFilter ?? 'all',
-              options: [{ value: 'all', label: t('products.filterStockAll') }, ...stockOptions],
-              onChange: (v: string) => setStockFilter(v === 'all' ? null : v),
-            },
+              value: stockFilter,
+              options: stockOptions,
+              onChange: setStockFilter,
+              allLabel: t('__new__.01-common.filters.all'),
+              emptyValue: null,
+            }),
           ]
         : []),
     ],
@@ -251,6 +341,10 @@ export function ProductListPage() {
       categoryOptions,
       categoryFilter,
       setCategoryFilter,
+      showKindFilter,
+      kindFilter,
+      setKindFilter,
+      kindOptions,
       stockFilter,
       setStockFilter,
       stockOptions,
@@ -309,7 +403,6 @@ export function ProductListPage() {
               to: ROUTES.PRODUCTS.NEW,
               label: t('products.addItem'),
               enabled: canCreate,
-              mobileVariant: 'icon',
             }}
           />
 
@@ -328,6 +421,8 @@ export function ProductListPage() {
               }}
               filters={mobileFilters.length > 0 ? mobileFilters : undefined}
               onClear={clearFilters}
+
+              labelChips
             />
           ) : (
             <DesktopFilterBar
@@ -352,6 +447,9 @@ export function ProductListPage() {
             products={paginated}
             isLoading={loading && !initialized}
             onHandByCode={onHandByCode}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+            loadingMoreLabel={loadingMoreLabel}
           />
         ) : (
           <ProductDataTable
@@ -359,6 +457,9 @@ export function ProductListPage() {
             isLoading={loading && !initialized}
             onHandByCode={onHandByCode}
             viewportRef={scrollViewportRef}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+            loadingMoreLabel={loadingMoreLabel}
           />
         )}
 

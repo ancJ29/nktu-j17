@@ -121,6 +121,8 @@ export type CMngtMaterialFeatures = {
   images: boolean;
 
   minimumStock: boolean;
+
+  bulkImport: boolean;
 };
 
 export type CMngtMaterialInventoryFeatures = {

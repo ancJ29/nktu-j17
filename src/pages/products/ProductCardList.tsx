@@ -3,12 +3,12 @@ import { IconPackage, IconPackageOff } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
-import { CodeLabel } from '@credo/base-ui/components';
+import { CodeLabel, ColorBadge, InfiniteScrollSentinel } from '@credo/base-ui/components';
 import { ActiveBadge } from '@/components/badges';
 import type { Product } from '@/types';
 import { hasImagesForProducts, isProductInventoryEnabled } from '@/utils/permission';
+import { lookupLabelOf, useLookupLabels } from '@/hooks';
 import { ProductThumb } from './ProductThumb';
-import { CategoryBadge } from '@/components/badges/CategoryBadge';
 import { isProductSet, isNoInventoryProduct } from '@/utils/productSet';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
 
@@ -19,6 +19,9 @@ type ProductCardListProps = {
   readonly products: Product[];
   readonly isLoading?: boolean;
   readonly onHandByCode?: Map<string, number>;
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 function ProductCardSkeleton() {
@@ -43,9 +46,18 @@ function ProductCardSkeleton() {
   );
 }
 
-export function ProductCardList({ products, isLoading, onHandByCode }: ProductCardListProps) {
+export function ProductCardList({
+  products,
+  isLoading,
+  onHandByCode,
+  hasMore = false,
+  onLoadMore,
+  loadingMoreLabel,
+}: ProductCardListProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+
+  const categoryLabels = useLookupLabels('product-category');
 
   if (isLoading) {
     return (
@@ -145,7 +157,9 @@ export function ProductCardList({ products, isLoading, onHandByCode }: ProductCa
                     cluster. Status lives top-right (always visible). */}
                 {(category || isProductSet(item) || isNoInventoryProduct(item)) && (
                   <Group gap={6} wrap="wrap" align="center">
-                    {category && <CategoryBadge category={category} />}
+                    {category && (
+                      <ColorBadge label={lookupLabelOf(categoryLabels, category)} size="sm" />
+                    )}
                     {isProductSet(item) && (
                       <Badge size="xs" color={PRODUCT_SET_COLOR} radius="sm" tt="none">
                         {t('products.detail.setBadge')}
@@ -167,7 +181,7 @@ export function ProductCardList({ products, isLoading, onHandByCode }: ProductCa
               <ActiveBadge
                 isActive={item.isActive}
                 activeLabel={t('products.status.active')}
-                inactiveLabel={t('common.status.inactive')}
+                inactiveLabel={t('__new__.01-common.labels.inactive')}
                 size="sm"
                 style={{ flexShrink: 0 }}
               />
@@ -175,6 +189,15 @@ export function ProductCardList({ products, isLoading, onHandByCode }: ProductCa
           </Card>
         );
       })}
+
+      {onLoadMore && (
+        <InfiniteScrollSentinel
+          hasMore={hasMore}
+          onLoadMore={onLoadMore}
+          renderedCount={products.length}
+          label={loadingMoreLabel}
+        />
+      )}
     </Stack>
   );
 }

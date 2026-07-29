@@ -12,7 +12,6 @@ import { EMPTY_DATE_RANGE, defaultLastNDaysRange } from '@/utils/listFilterDateR
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
 import { getSalesOrderReadyDate, getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
 import type { SalesOrder } from '@/types';
-import { isNKTU } from '@/config/client';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
@@ -53,6 +52,8 @@ export function useSalesOrderListFilters(
   storeOrders: SalesOrder[],
 
   defaultDateRangeDays?: number,
+
+  internalDeliveryFirstSort = false,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<SalesOrderUrlState>({
     cacheKey: 'cmngt:sales-order-filters',
@@ -165,11 +166,11 @@ export function useSalesOrderListFilters(
         return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
       }
 
-      if (isNKTU) {
-        const aInternal = a.extra?.isInternalDelivery === false ? 1 : 0;
-        const bInternal = b.extra?.isInternalDelivery === false ? 1 : 0;
-        if (aInternal !== bInternal) {
-          return aInternal - bInternal;
+      if (internalDeliveryFirstSort) {
+        const aExternal = a.extra?.isInternalDelivery === false ? 1 : 0;
+        const bExternal = b.extra?.isInternalDelivery === false ? 1 : 0;
+        if (aExternal !== bExternal) {
+          return aExternal - bExternal;
         }
       }
 
@@ -187,6 +188,7 @@ export function useSalesOrderListFilters(
     deliveryDateRange,
     deliveryKind,
     sortField,
+    internalDeliveryFirstSort,
   ]);
 
   const hasActiveFilters = !!(

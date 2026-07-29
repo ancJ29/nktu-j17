@@ -27,9 +27,10 @@ import {
   getAutoShippingTargetValue,
   runTransition as runSoTransition,
   statusHasCapability as soStatusHasCapability,
-  type TransitionFailure as SoTransitionFailure,
 } from '@/pages/sales-orders/transitionEngine';
-import { formatPlanFailures } from '@/pages/sales-orders/planFailures';
+import { formatAutoTransitionFailure } from '@/pages/sales-orders/planFailures';
+import { runShipRecovery } from '@/pages/sales-orders/shipRecovery';
+import { statusChangeMemo } from '@/pages/sales-orders/activityMemo';
 import {
   advanceSoIfFullyDelivered,
   ensureReconcileStoresLoaded,
@@ -78,22 +79,6 @@ async function dispatchDrFollowUp(
       return advanceLinkedSoIfFullyDelivered(updatedDr, currentEmployee, t);
     case 'advance-so-on-dispatch':
       return advanceLinkedSoOnDispatch(updatedDr, currentEmployee, t);
-  }
-}
-
-function formatFollowUpFailureMessage(
-  failure: SoTransitionFailure,
-  productsByCode: Map<string, Product>,
-  t: TFunction,
-): string {
-  switch (failure.kind) {
-    case 'plan-failure':
-      return formatPlanFailures(failure.failures, t, productsByCode);
-    case 'patch-error':
-    case 'execution-failure':
-      return failure.error.message;
-    default:
-      return failure.kind;
   }
 }
 
@@ -146,6 +131,17 @@ async function advanceLinkedSoOnDispatch(
   });
 
   if (result.ok) {
+    logActivity(
+      'salesOrder.statusChange',
+      so.id,
+      statusChangeMemo({
+        updated: result.updated,
+        fromStatus,
+        toStatus: targetStatus,
+        trigger: 'dr-dispatch',
+        shipPending: result.pendingShip != null,
+      }),
+    );
     notifications.show({
       color: 'green',
       message: t('deliveryRequests.notifications.soAutoShippedSuccess', {
@@ -153,10 +149,14 @@ async function advanceLinkedSoOnDispatch(
         status: targetStatus,
       }),
     });
+
+    if (result.pendingShip) {
+      await runShipRecovery({ so: result.updated, actor: currentEmployee, productsByCode, t });
+    }
     return;
   }
 
-  const message = formatFollowUpFailureMessage(result.failure, productsByCode, t);
+  const message = formatAutoTransitionFailure(result.failure, t, productsByCode);
   notifications.show({
     color: 'yellow',
     title: t('deliveryRequests.notifications.soAutoShippedFailedTitle'),
