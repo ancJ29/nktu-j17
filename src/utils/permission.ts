@@ -149,6 +149,15 @@ export function getSalesOrderStatusOptions(): SalesOrderStatusOption[] {
   );
 }
 
+export function getSalesOrderDefaultListStatuses(): string[] {
+  const configured =
+    (appConfig as { features?: { salesOrders?: { defaultListStatuses?: string[] } } })?.features
+      ?.salesOrders?.defaultListStatuses ?? [];
+  if (configured.length === 0) return [];
+  const known = new Set(getSalesOrderStatusOptions().map((s) => s.value));
+  return configured.filter((v) => known.has(v));
+}
+
 export function getSalesOrderStatusTransitions(): Record<string, string[]> {
   return (
     (
@@ -167,6 +176,15 @@ export function getDeliveryRequestStatusOptions(): DeliveryRequestStatusOption[]
       }
     )?.features?.deliveryRequests?.statusOptions ?? []
   );
+}
+
+export function getDeliveryRequestDefaultListStatuses(): string[] {
+  const configured =
+    (appConfig as { features?: { deliveryRequests?: { defaultListStatuses?: string[] } } })
+      ?.features?.deliveryRequests?.defaultListStatuses ?? [];
+  if (configured.length === 0) return [];
+  const known = new Set(getDeliveryRequestStatusOptions().map((s) => s.value));
+  return configured.filter((v) => known.has(v));
 }
 
 export function getDeliveryRequestStatusTransitions(): Record<string, string[]> {

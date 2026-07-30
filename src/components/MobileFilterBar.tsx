@@ -1,12 +1,9 @@
 import { Fragment, type ReactNode } from 'react';
-import { ActionIcon, Box, Button, Group, Stack, Tooltip } from '@mantine/core';
-import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router';
+import { ActionIcon, Box, Button, Group, Stack } from '@mantine/core';
 import { SearchInput } from './SearchInput';
-import { IconFilterOff, IconLink, IconSearch } from '@tabler/icons-react';
+import { LIST_SEARCH_MIN_ROWS } from '@/config/listDefaults';
+import { IconFilterOff, IconSearch } from '@tabler/icons-react';
 import { MobileFilterSelect } from './MobileFilterSelect';
-import { URL_KEY } from '@/hooks/useUrlFilterState';
-import { useCopyLink } from '@/hooks/useCopyLink';
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 
@@ -36,6 +33,8 @@ export type MobileMultiFilterDef = MobileFilterChipDisplay & {
 
 type MobileFilterBarProps = {
   noSearchInput?: boolean;
+
+  recordCount?: number;
   search: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
@@ -67,6 +66,7 @@ type MobileFilterBarProps = {
 export function MobileFilterBar({
   search,
   noSearchInput,
+  recordCount,
   onSearchChange,
   searchPlaceholder,
   status,
@@ -83,11 +83,6 @@ export function MobileFilterBar({
   labelChips,
   wrapFilters: wrapFiltersProp,
 }: MobileFilterBarProps) {
-  const { t } = useTranslation();
-  const [params] = useSearchParams();
-  const canCopyLink = params.has(URL_KEY);
-  const handleCopyLink = useCopyLink();
-
   const hasActiveFilters =
     hasActiveFiltersProp ??
     (!!search ||
@@ -117,9 +112,11 @@ export function MobileFilterBar({
     }
   }
 
+  const showSearch =
+    !noSearchInput && (recordCount === undefined || recordCount > LIST_SEARCH_MIN_ROWS);
+
   const labelled = !!labelChips || !!clearLabelProp;
-  const clearLabel =
-    clearLabelProp ?? (labelChips ? t('__new__.01-common.actions.clearFilters') : undefined);
+  const clearLabel = clearLabelProp;
   const wrapFilters = wrapFiltersProp ?? (labelled && visibleFilters.length > CHIPS_PER_ROW);
   const actionsBelow = actionsBelowProp ?? (labelled && !!moreSection);
 
@@ -154,13 +151,12 @@ export function MobileFilterBar({
     );
   });
 
-  const clearControl = clearLabel ? (
+  const clearControl = !hasActiveFilters ? null : clearLabel ? (
     <Button
       variant="subtle"
       size="compact-sm"
-      color={hasActiveFilters ? 'orange' : 'gray'}
+      color="orange"
       leftSection={<IconFilterOff size={14} />}
-      disabled={!hasActiveFilters}
       onClick={onClear}
       style={{ flexShrink: 0 }}
     >
@@ -169,9 +165,8 @@ export function MobileFilterBar({
   ) : (
     <ActionIcon
       variant="subtle"
-      color={hasActiveFilters ? 'orange' : 'gray'}
+      color="orange"
       size="lg"
-      disabled={!hasActiveFilters}
       onClick={onClear}
       style={{ flexShrink: 0 }}
     >
@@ -179,25 +174,12 @@ export function MobileFilterBar({
     </ActionIcon>
   );
 
-  const copyLinkControl = (
-    <Tooltip label={t('__new__.01-common.actions.copyLink')} withArrow>
-      <ActionIcon
-        disabled={!canCopyLink}
-        variant="subtle"
-        color="blue"
-        size="lg"
-        onClick={handleCopyLink}
-        style={{ flexShrink: 0 }}
-      >
-        <IconLink size={16} />
-      </ActionIcon>
-    </Tooltip>
-  );
+  const actions = moreSection || clearControl;
 
   return (
     <Stack gap="sm">
-      {/* Line 1: Search */}
-      {!noSearchInput && (
+      {/* Line 1: Search — omitted on a list short enough to read at a glance. */}
+      {showSearch && (
         <SearchInput
           placeholder={searchPlaceholder}
           leftSection={<IconSearch size={16} />}
@@ -205,24 +187,24 @@ export function MobileFilterBar({
           onChange={onSearchChange}
         />
       )}
-      {/* Line 2 (+3): Filter chips, then more + copy-link + clear — same row
-          unless `actionsBelow` splits them or `wrapFilters` flows them. */}
+      {/* Line 2 (+3): Filter chips, then more + clear — same row unless
+          `actionsBelow` splits them or `wrapFilters` flows them. */}
       {actionsBelow ? (
         <Stack gap="xs">
           <Group gap="xs" wrap={wrapFilters ? 'wrap' : 'nowrap'}>
             {chips}
           </Group>
-          <Group gap="xs" wrap="nowrap">
-            {moreSection}
-            {copyLinkControl}
-            {clearControl}
-          </Group>
+          {actions && (
+            <Group gap="xs" wrap="nowrap">
+              {moreSection}
+              {clearControl}
+            </Group>
+          )}
         </Stack>
       ) : (
         <Group gap="xs" wrap={wrapFilters ? 'wrap' : 'nowrap'}>
           {chips}
           {moreSection}
-          {copyLinkControl}
           {clearControl}
         </Group>
       )}

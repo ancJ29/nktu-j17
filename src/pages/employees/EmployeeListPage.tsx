@@ -231,6 +231,7 @@ export function EmployeeListPage() {
 
           {isMobile ? (
             <MobileFilterBar
+              recordCount={allEmployees.length}
               search={search}
               onSearchChange={setSearch}
               searchPlaceholder={t('__new__.07-entities.employees.list.searchPlaceholder')}

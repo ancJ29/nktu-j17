@@ -292,6 +292,8 @@ const SalesOrderFeaturesSchema = z
 
     deliveryPackageSizeOptions: z.array(z.string()).default([]),
 
+    defaultListStatuses: z.array(z.string()).default([]),
+
     picDepartments: z.array(z.string()).default([]),
 
     allowInternalDelivery: z.boolean().default(true),
@@ -315,6 +317,7 @@ const SalesOrderFeaturesSchema = z
     deliveryMethodOptions: [],
     tagOptions: [],
     deliveryPackageSizeOptions: [],
+    defaultListStatuses: [],
     picDepartments: [],
     allowInternalDelivery: true,
     allowAdditionalDR: true,
@@ -333,6 +336,8 @@ const DeliveryRequestFeaturesSchema = z
 
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
 
+    defaultListStatuses: z.array(z.string()).default([]),
+
     driverDepartments: z.array(z.string()).default([]),
 
     returnShipment: z
@@ -348,6 +353,7 @@ const DeliveryRequestFeaturesSchema = z
     codePadLength: 4,
     statusOptions: [],
     statusTransitions: {},
+    defaultListStatuses: [],
     driverDepartments: [],
     returnShipment: { enabled: false, autoRestockOnComplete: false },
   });

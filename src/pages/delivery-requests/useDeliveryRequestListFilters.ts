@@ -8,6 +8,7 @@ import {
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import { getDeliveryRequestDefaultListStatuses } from '@/utils/permission';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
 import { deliveryRequestPartyKey } from './deliveryRequestParty';
 import { formatYYMMDD_GMT7 } from './displayOrderNumber';
@@ -22,7 +23,7 @@ function deliveryDayKey(r: DeliveryRequest, don: string): string {
 
 const DEFAULT_PAGE = 1;
 
-const EMPTY_STATUS: readonly string[] = [];
+const DEFAULT_STATUS: readonly string[] = getDeliveryRequestDefaultListStatuses();
 
 const partyKey = deliveryRequestPartyKey;
 
@@ -38,7 +39,8 @@ type DeliveryRequestUrlState = {
 
 function compactState(state: DeliveryRequestUrlState): DeliveryRequestUrlState {
   const r: DeliveryRequestUrlState = {};
-  if (state.s?.length) r.s = state.s;
+
+  if (state.s?.length || (state.s && DEFAULT_STATUS.length > 0)) r.s = state.s;
   if (state.o) r.o = state.o;
   if (state.dv) r.dv = state.dv;
   if (state.pt) r.pt = state.pt;
@@ -58,7 +60,7 @@ export function useDeliveryRequestListFilters(
     compactState,
   });
 
-  const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
+  const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const salesOrderFilter = state.o ?? null;
   const driverFilter = state.dv ?? null;
   const partyFilter = state.pt ?? null;
@@ -70,7 +72,7 @@ export function useDeliveryRequestListFilters(
   const page = state.pg ?? DEFAULT_PAGE;
 
   const setStatusFilter = useCallback(
-    (values: string[]) => updateState({ s: values.length > 0 ? values : undefined, pg: undefined }),
+    (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
   );
 
@@ -158,8 +160,15 @@ export function useDeliveryRequestListFilters(
     driverCodeById,
   ]);
 
+  const statusFilterIsDefault = useMemo(
+    () =>
+      statusFilter.length === DEFAULT_STATUS.length &&
+      statusFilter.every((v) => DEFAULT_STATUS.includes(v)),
+    [statusFilter],
+  );
+
   const hasActiveFilters = !!(
-    statusFilter.length > 0 ||
+    !statusFilterIsDefault ||
     salesOrderFilter ||
     driverFilter ||
     partyFilter ||
@@ -170,6 +179,8 @@ export function useDeliveryRequestListFilters(
   return {
     statusFilter,
     setStatusFilter,
+
+    statusFilterIsDefault,
     salesOrderFilter,
     driverFilter,
     setDriverFilter,

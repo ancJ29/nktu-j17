@@ -109,6 +109,7 @@ export function CustomerListPage() {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={allCustomers.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.customers.list.searchPlaceholder')}

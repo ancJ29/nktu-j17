@@ -27,7 +27,7 @@ import {
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { device, logger } from '@credo/base-ui/utils';
 import { DateField } from '@/components/DateField';
@@ -219,6 +219,14 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     formHandlers.open();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- form identity is stable across renders
   }, [formHandlers]);
+
+  const location = useLocation();
+  const addCropRequested = (location.state as { addCrop?: boolean } | null)?.addCrop === true;
+  useEffect(() => {
+    if (!addCropRequested || !canCreate) return;
+    openAdd();
+    navigate(location.pathname, { replace: true, state: null });
+  }, [addCropRequested, openAdd, navigate, location.pathname]);
 
   const handleSubmit = useCallback(
     async (values: CropFormValues) => {

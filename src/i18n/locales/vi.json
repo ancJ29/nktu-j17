@@ -1847,27 +1847,36 @@
   "greenhouses": {
     "addItem": "Thêm nhà màng",
     "areaValue": "{{value}} m²",
+    "capacityValue": "{{value}} cây",
     "columns": {
       "area": "Diện tích",
-      "crops": "Vụ mùa"
+      "occupancy": "Tình trạng"
     },
     "detail": {
       "infoTitle": "Thông tin",
-      "statActiveCrops": "Đang canh tác",
-      "statArea": "Diện tích"
+      "statArea": "Diện tích",
+      "statOccupancy": "Tình trạng"
     },
     "editItem": "Sửa nhà màng",
     "emptyMessage": "Thêm nhà màng đầu tiên để bắt đầu theo dõi vụ mùa.",
     "emptyTitle": "Chưa có nhà màng",
+    "filterOccupancyPlaceholder": "Tất cả tình trạng",
+    "filterOccupancyTitle": "Sử dụng",
     "form": {
       "areaLabel": "Diện tích",
       "areaPlaceholder": "Diện tích nhà màng",
+      "bedCountLabel": "Số luống",
+      "bedCountPlaceholder": "Số luống trong nhà màng",
       "codePlaceholder": "vd. GH-A",
       "createButton": "Tạo nhà màng",
       "descriptionPlaceholder": "Mô tả (tùy chọn)",
       "namePlaceholder": "vd. Nhà màng phía Bắc",
       "notesPlaceholder": "Cấu hình khí hậu, vị trí trong nông trại, v.v.",
-      "primarySection": "Thông tin nhà màng"
+      "plantCapacityLabel": "Sức chứa",
+      "plantCapacityPlaceholder": "Số cây tối đa",
+      "primarySection": "Thông tin nhà màng",
+      "systemTypeLabel": "Hệ thống canh tác",
+      "systemTypePlaceholder": "vd. đất, thủy canh"
     },
     "noItems": "Không tìm thấy nhà màng",
     "notifications": {
@@ -1877,10 +1886,32 @@
       "updateError": "Không cập nhật được nhà màng",
       "updateSuccess": "Đã cập nhật nhà màng"
     },
+    "occupancy": {
+      "dayOfCycle": "Ngày {{day}}/{{total}}",
+      "dayOpen": "Ngày {{day}}",
+      "free": "Trống",
+      "freeFrom": "Trống từ {{date}}",
+      "growing": "Đang trồng",
+      "moreCrops": "+{{n}}",
+      "overdue": "Quá hạn",
+      "planned": "Sắp trồng",
+      "startLate": "Trễ {{days}} ngày",
+      "startsIn": "Còn {{days}} ngày",
+      "startsToday": "Bắt đầu hôm nay"
+    },
+    "rowAddCrop": "Thêm vụ mùa",
     "searchPlaceholder": "Tìm nhà màng…",
+    "timeline": {
+      "today": "Hôm nay"
+    },
     "title": "Nhà màng",
     "validation": {
-      "areaInvalid": "Diện tích không được âm"
+      "areaInvalid": "Diện tích không được âm",
+      "countInvalid": "Giá trị không được âm"
+    },
+    "view": {
+      "list": "Danh sách",
+      "timeline": "Lịch trồng"
     }
   },
   "home": {
@@ -2357,6 +2388,27 @@
     "form": {
       "createButton": "Thêm nhật ký",
       "selectDriver": "Chọn tài xế"
+    },
+    "greenhouseMaintenance": {
+      "addItem": "Thêm bảo trì",
+      "columns": {
+        "activity": "Hạng mục",
+        "cost": "Chi phí",
+        "date": "Ngày",
+        "performedBy": "Người thực hiện"
+      },
+      "editItem": "Sửa bảo trì",
+      "empty": "Chưa có bảo trì nào trong năm {{year}}.",
+      "form": {
+        "activityPlaceholder": "vd. Vệ sinh và khử trùng",
+        "costPlaceholder": "Chi phí (tùy chọn)",
+        "notePlaceholder": "Ghi chú (tùy chọn)",
+        "performedByPlaceholder": "Nhân viên hoặc nhà thầu"
+      },
+      "sectionTitle": "Nhật ký bảo trì",
+      "validation": {
+        "activityRequired": "Nhập hạng mục đã thực hiện"
+      }
     },
     "maintenance": {
       "addItem": "Thêm bảo trì",

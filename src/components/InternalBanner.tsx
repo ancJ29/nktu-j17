@@ -11,8 +11,8 @@ export function InternalBanner() {
 
   if (isMobile) {
     return (
-      <Affix position={{ top: 0, right: 0 }}>
-        <Text c="red.5" fw="bold" fz="xs" m={0} p={2} fs="italic">
+      <Affix position={{ top: 0, left: 0 }}>
+        <Text c="orange.4" fw="bold" fz="xs" m={0} p={2} fs="italic">
           Internal
         </Text>
       </Affix>

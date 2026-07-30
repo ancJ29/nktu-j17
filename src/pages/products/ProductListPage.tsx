@@ -408,6 +408,7 @@ export function ProductListPage() {
 
           {isMobile ? (
             <MobileFilterBar
+              recordCount={allProducts.length}
               search={search}
               onSearchChange={setSearch}
               searchPlaceholder={t('__new__.07-entities.products.list.searchPlaceholder')}

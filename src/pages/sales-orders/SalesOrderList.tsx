@@ -566,7 +566,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     ...dateAndUrgentFilters.filter((f) => f.key !== 'urgent'),
   ];
 
-  const showStatusPills = !isMobile;
+  const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
   const showUrgentPill = !isMobile;
 
   const showDeliveryKindPill = !isMobile || !deliveryKindFilterEnabled;
@@ -671,6 +671,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
         {/* Filter bar */}
         {isMobile ? (
           <MobileFilterBar
+            recordCount={filters.allOrders.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.salesOrders.list.searchPlaceholder')}

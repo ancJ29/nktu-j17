@@ -130,6 +130,7 @@ export function LocationListPage() {
 
           {isMobile ? (
             <MobileFilterBar
+              recordCount={allLocations.length}
               search={search}
               onSearchChange={setSearch}
               searchPlaceholder={t('__new__.07-entities.locations.list.searchPlaceholder')}

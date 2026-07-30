@@ -128,6 +128,7 @@ export function VendorList({ variant }: VendorListProps) {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={allVendors.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.vendors.list.searchPlaceholder')}

@@ -1,7 +1,12 @@
 import type { Material, MaterialInventoryRow, WarehouseDocRow } from '@/types';
 import { useMaterialInventoryStore } from '@/stores/useMaterialInventoryStore';
 import { materialToPackagingItem } from '@/utils/materialPackaging';
-import { readRowBreakdown, recomputeOnHand } from '@/utils/inventoryMath';
+import {
+  applyOutflowWithUnpack,
+  readRowBreakdown,
+  recomputeOnHand,
+  type UnpackLeg,
+} from '@/utils/inventoryMath';
 import { logActivity } from '@/utils/activityLogger';
 
 export async function postWarehouseDocInventory(
@@ -34,11 +39,20 @@ export async function postWarehouseDocInventory(
     const row = invByCode.get(itemCode);
     const prevOnHand = row?.onHand ?? 0;
 
-    const next = row ? readRowBreakdown(row, baseUnit) : {};
-    for (const [unit, delta] of unitDeltas) {
-      const q = (next[unit] ?? 0) + delta;
-      if (q === 0) delete next[unit];
-      else next[unit] = q;
+    let next = row ? readRowBreakdown(row, baseUnit) : {};
+    let unpacked: UnpackLeg[] = [];
+    if (direction === 'in') {
+      for (const [unit, delta] of unitDeltas) {
+        const q = (next[unit] ?? 0) + delta;
+        if (q === 0) delete next[unit];
+        else next[unit] = q;
+      }
+    } else {
+      const outflows: Record<string, number> = {};
+      for (const [unit, delta] of unitDeltas) outflows[unit] = -delta;
+      const result = applyOutflowWithUnpack(packagingItem, next, outflows);
+      next = result.onHandByUnit;
+      unpacked = result.unpacked;
     }
     const nextOnHand = recomputeOnHand(packagingItem, next);
 
@@ -54,10 +68,14 @@ export async function postWarehouseDocInventory(
       });
     }
 
+    const unpackNote = unpacked
+      .map((u) => `[unpack] ${u.qty} ${u.from} → ${u.produced} ${u.to}`)
+      .join(' · ');
     logActivity('materialInventory.adjust', material.id, {
       prevOnHand,
       nextOnHand,
       delta: nextOnHand - prevOnHand,
+      ...(unpackNote && { note: unpackNote }),
       source: { kind: direction === 'in' ? 'WR' : 'WDN', id: doc.id, label: code },
     });
   }

@@ -1847,27 +1847,36 @@
   "greenhouses": {
     "addItem": "Add Greenhouse",
     "areaValue": "{{value}} m²",
+    "capacityValue": "{{value}} plants",
     "columns": {
       "area": "Area",
-      "crops": "Crops"
+      "occupancy": "Occupancy"
     },
     "detail": {
       "infoTitle": "Information",
-      "statActiveCrops": "Active crops",
-      "statArea": "Area"
+      "statArea": "Area",
+      "statOccupancy": "Occupancy"
     },
     "editItem": "Edit Greenhouse",
     "emptyMessage": "Add your first greenhouse to start tracking crops.",
     "emptyTitle": "No greenhouses yet",
+    "filterOccupancyPlaceholder": "All occupancy",
+    "filterOccupancyTitle": "Occupancy",
     "form": {
       "areaLabel": "Area",
       "areaPlaceholder": "Floor area",
+      "bedCountLabel": "Beds",
+      "bedCountPlaceholder": "Number of beds",
       "codePlaceholder": "e.g. GH-A",
       "createButton": "Create Greenhouse",
       "descriptionPlaceholder": "Optional description",
       "namePlaceholder": "e.g. North Polytunnel",
       "notesPlaceholder": "Climate setup, location on the farm, etc.",
-      "primarySection": "Greenhouse details"
+      "plantCapacityLabel": "Plant capacity",
+      "plantCapacityPlaceholder": "Plants held at once",
+      "primarySection": "Greenhouse details",
+      "systemTypeLabel": "Growing system",
+      "systemTypePlaceholder": "e.g. soil, hydroponic"
     },
     "noItems": "No greenhouses found",
     "notifications": {
@@ -1877,10 +1886,32 @@
       "updateError": "Failed to update greenhouse",
       "updateSuccess": "Greenhouse updated"
     },
+    "occupancy": {
+      "dayOfCycle": "Day {{day}}/{{total}}",
+      "dayOpen": "Day {{day}}",
+      "free": "Empty",
+      "freeFrom": "Free from {{date}}",
+      "growing": "Growing",
+      "moreCrops": "+{{n}}",
+      "overdue": "Overdue",
+      "planned": "Upcoming",
+      "startLate": "{{days}}d late",
+      "startsIn": "In {{days}}d",
+      "startsToday": "Starts today"
+    },
+    "rowAddCrop": "Start a crop here",
     "searchPlaceholder": "Search greenhouses…",
+    "timeline": {
+      "today": "Today"
+    },
     "title": "Greenhouses",
     "validation": {
-      "areaInvalid": "Area cannot be negative"
+      "areaInvalid": "Area cannot be negative",
+      "countInvalid": "Value cannot be negative"
+    },
+    "view": {
+      "list": "List",
+      "timeline": "Timeline"
     }
   },
   "home": {
@@ -2357,6 +2388,27 @@
     "form": {
       "createButton": "Add Log",
       "selectDriver": "Select driver"
+    },
+    "greenhouseMaintenance": {
+      "addItem": "Add maintenance",
+      "columns": {
+        "activity": "Work done",
+        "cost": "Cost",
+        "date": "Date",
+        "performedBy": "Performed by"
+      },
+      "editItem": "Edit maintenance",
+      "empty": "No maintenance logged for {{year}} yet.",
+      "form": {
+        "activityPlaceholder": "e.g. Cleaned and sterilised",
+        "costPlaceholder": "Optional cost",
+        "notePlaceholder": "Optional note",
+        "performedByPlaceholder": "Staff or contractor"
+      },
+      "sectionTitle": "Maintenance logs",
+      "validation": {
+        "activityRequired": "Describe the work done"
+      }
     },
     "maintenance": {
       "addItem": "Add maintenance",

@@ -56,6 +56,12 @@ export function windowEndDate(
   return new Date(from + (Math.floor(totalDays) - 1) * 86_400_000).toISOString().slice(0, 10);
 }
 
+export function addDays(date: string, days: number): string | null {
+  const base = dayToUtc(date);
+  if (Number.isNaN(base)) return null;
+  return new Date(base + Math.trunc(days) * 86_400_000).toISOString().slice(0, 10);
+}
+
 export function windowDayCount(
   fromDate: string | null | undefined,
   toDate: string | null | undefined,

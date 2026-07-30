@@ -94,6 +94,7 @@ export function CropDiaryTemplateListPage() {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={items.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('cropDiaryTemplates.searchPlaceholder')}

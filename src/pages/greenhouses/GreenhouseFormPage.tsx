@@ -35,6 +35,9 @@ type GreenhouseFormValues = {
   code: string;
   description: string;
   area: number | string;
+  systemType: string;
+  bedCount: number | string;
+  plantCapacity: number | string;
   isActive: boolean;
   notes: string;
 };
@@ -64,6 +67,9 @@ export function GreenhouseFormPage() {
       code: '',
       description: '',
       area: '',
+      systemType: '',
+      bedCount: '',
+      plantCapacity: '',
       isActive: true,
       notes: '',
     },
@@ -71,6 +77,10 @@ export function GreenhouseFormPage() {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
       area: (v) => (v === '' || Number(v) >= 0 ? null : t('greenhouses.validation.areaInvalid')),
+      bedCount: (v) =>
+        v === '' || Number(v) >= 0 ? null : t('greenhouses.validation.countInvalid'),
+      plantCapacity: (v) =>
+        v === '' || Number(v) >= 0 ? null : t('greenhouses.validation.countInvalid'),
     },
   });
 
@@ -86,6 +96,9 @@ export function GreenhouseFormPage() {
         code: g.code,
         description: g.description || '',
         area: g.area || '',
+        systemType: g.extra?.systemType ?? '',
+        bedCount: g.extra?.bedCount ?? '',
+        plantCapacity: g.extra?.plantCapacity ?? '',
         isActive: g.isActive,
         notes: g.extra?.notes ?? '',
       };
@@ -104,6 +117,14 @@ export function GreenhouseFormPage() {
         const extra: GreenhouseExtra = { ...(base ?? {}) };
         if (values.notes.trim()) extra.notes = values.notes.trim();
         else delete extra.notes;
+        if (values.systemType.trim()) extra.systemType = values.systemType.trim();
+        else delete extra.systemType;
+
+        for (const key of ['bedCount', 'plantCapacity'] as const) {
+          const raw = values[key];
+          if (raw === '' || !Number.isFinite(Number(raw))) delete extra[key];
+          else extra[key] = Number(raw);
+        }
         return extra;
       };
       try {
@@ -224,6 +245,33 @@ export function GreenhouseFormPage() {
                   min={0}
                   suffix=" m²"
                   {...form.getInputProps('area')}
+                />
+              </SimpleGrid>
+              {/* Structure — descriptive reference only. Beds are deliberately
+                  NOT plantable slots: occupancy stays one crop per house, so
+                  nothing here feeds the overlap / occupancy checks. */}
+              <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+                <TextInput
+                  label={t('greenhouses.form.systemTypeLabel')}
+                  placeholder={t('greenhouses.form.systemTypePlaceholder')}
+                  {...form.getInputProps('systemType')}
+                />
+                <NumberInput
+                  label={t('greenhouses.form.bedCountLabel')}
+                  placeholder={t('greenhouses.form.bedCountPlaceholder')}
+                  min={0}
+                  allowNegative={false}
+                  allowDecimal={false}
+                  {...form.getInputProps('bedCount')}
+                />
+                <NumberInput
+                  label={t('greenhouses.form.plantCapacityLabel')}
+                  placeholder={t('greenhouses.form.plantCapacityPlaceholder')}
+                  min={0}
+                  allowNegative={false}
+                  allowDecimal={false}
+                  thousandSeparator=","
+                  {...form.getInputProps('plantCapacity')}
                 />
               </SimpleGrid>
               <Textarea

@@ -129,6 +129,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={trucks.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={tk(`${i18nKey}.searchPlaceholder`)}

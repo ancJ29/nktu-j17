@@ -1,6 +1,7 @@
 import type { CMngtOperationLog } from '@credo/connectors/types';
 
-export type OperationLogType = 'refuel' | 'maintenance' | 'trip' | 'driver-training';
+export type OperationLogType =
+  'refuel' | 'maintenance' | 'trip' | 'driver-training' | 'greenhouse-maintenance';
 
 export type RefuelLogExtra = {
   litres?: number;
@@ -99,9 +100,21 @@ export type DriverTrainingLogExtra = {
   [key: string]: unknown;
 };
 
+export type GreenhouseMaintenanceLogExtra = {
+  activity?: string;
+
+  performedBy?: string;
+
+  cost?: number;
+
+  note?: string;
+  [key: string]: unknown;
+};
+
 export type OperationLogExtra = RefuelLogExtra &
   MaintenanceLogExtra &
   TripLogExtra &
-  DriverTrainingLogExtra;
+  DriverTrainingLogExtra &
+  GreenhouseMaintenanceLogExtra;
 
 export type OperationLog = CMngtOperationLog<OperationLogExtra>;

@@ -221,6 +221,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={docs.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('warehouseDoc.searchPlaceholder')}

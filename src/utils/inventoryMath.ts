@@ -115,6 +115,94 @@ export function applyDelta(
   return { ok: true, onHandByUnit: next, onHand: recomputeOnHand(item, next) };
 }
 
+export type UnpackLeg = { from: string; to: string; qty: number; produced: number };
+
+export type OutflowResult = {
+  onHandByUnit: OnHandByUnit;
+  onHand: number;
+
+  unpacked: UnpackLeg[];
+
+  shortfallByUnit: OnHandByUnit;
+};
+
+export function applyOutflowWithUnpack(
+  item: PackagingAwareItem,
+  current: OnHandByUnit,
+  outflows: OnHandByUnit,
+): OutflowResult {
+  const baseUnit = getItemBaseUnit(item);
+  const conversions = item.extra?.unitConversions ?? [];
+  const units = getItemUnits(item);
+  const next: OnHandByUnit = { ...current };
+  const unpacked: UnpackLeg[] = [];
+  const shortfallByUnit: OnHandByUnit = {};
+
+  const sizeOf = (unit: string): number =>
+    unit === baseUnit ? 1 : (convertUnit(1, unit, baseUnit, conversions) ?? 0);
+
+  const prune = (unit: string) => {
+    const q = next[unit];
+    if (q !== undefined && Math.abs(q) <= REPACK_BALANCE_TOLERANCE) delete next[unit];
+  };
+
+  const requests = Object.entries(outflows)
+    .filter(([, qty]) => qty > 0)
+    .sort(([a], [b]) => sizeOf(b) - sizeOf(a));
+
+  for (const [unit, requested] of requests) {
+    let need = requested;
+
+    const onHandHere = next[unit] ?? 0;
+    if (onHandHere > 0) {
+      const take = Math.min(onHandHere, need);
+      next[unit] = onHandHere - take;
+      need -= take;
+      prune(unit);
+    }
+
+    if (need > REPACK_BALANCE_TOLERANCE && units.includes(unit)) {
+      const targetSize = sizeOf(unit);
+      const candidates = units
+        .filter((u) => u !== unit && sizeOf(u) > targetSize && (next[u] ?? 0) > 0)
+        .sort((a, b) => sizeOf(a) - sizeOf(b));
+
+      for (const from of candidates) {
+        if (need <= REPACK_BALANCE_TOLERANCE) break;
+        const perPackage = convertUnit(1, from, unit, conversions);
+        if (perPackage === null || perPackage <= 0) continue;
+
+        const wanted = Math.ceil(need / perPackage - REPACK_BALANCE_TOLERANCE);
+        const open = Math.min(wanted, next[from] ?? 0);
+        if (open <= 0) continue;
+
+        const produced = open * perPackage;
+        next[from] = (next[from] ?? 0) - open;
+        prune(from);
+        const pool = (next[unit] ?? 0) + produced;
+        const take = Math.min(pool, need);
+        next[unit] = pool - take;
+        need -= take;
+        prune(unit);
+        unpacked.push({ from, to: unit, qty: open, produced });
+      }
+    }
+
+    if (need > REPACK_BALANCE_TOLERANCE) {
+      next[unit] = (next[unit] ?? 0) - need;
+      shortfallByUnit[unit] = need;
+      prune(unit);
+    }
+  }
+
+  return {
+    onHandByUnit: next,
+    onHand: recomputeOnHand(item, next),
+    unpacked,
+    shortfallByUnit,
+  };
+}
+
 export type SnapshotResult =
   | { ok: true; onHandByUnit: OnHandByUnit; onHand: number }
   | { ok: false; reason: 'unknown-unit'; unit: string }

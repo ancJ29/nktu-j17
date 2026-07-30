@@ -215,6 +215,16 @@ const LOOKUP_CATEGORY_LABELS: Record<string, string> = {
   'lookups.categories.maintenanceType': 'Maintenance Type',
 };
 
+function toStatusMultiSelectData(
+  options: readonly { value: string; label: Record<string, string> }[] | undefined,
+): { value: string; label: string }[] {
+  return (options ?? []).map((s) => {
+    const labels: Record<string, string> = s.label;
+    const label = labels.en || labels.vi || Object.values(labels)[0] || s.value;
+    return { value: s.value, label: `${label} (${s.value})` };
+  });
+}
+
 export function ConfigEditor({
   accessKey,
   clientServiceCode,
@@ -318,6 +328,15 @@ export function ConfigEditor({
         return { value: d.value, label: label || d.value };
       }),
     [employeeFeatures.departmentOptions],
+  );
+
+  const salesOrderStatusMultiSelectData = useMemo(
+    () => toStatusMultiSelectData(salesOrdersFeatures.statusOptions),
+    [salesOrdersFeatures.statusOptions],
+  );
+  const deliveryRequestStatusMultiSelectData = useMemo(
+    () => toStatusMultiSelectData(deliveryRequestsFeatures.statusOptions),
+    [deliveryRequestsFeatures.statusOptions],
   );
 
   const buildConfigPayload = useCallback(
@@ -1837,6 +1856,31 @@ export function ConfigEditor({
                       setSalesOrdersFeatures({ ...salesOrdersFeatures, statusOptions: opts })
                     }
                   />
+                  {/* Schema-only field (not in the under-specified kits
+                      `CMngtSalesOrderFeatures` mirror — same as
+                      `allowExtraDeliveryQuantity`), so read/written via a local
+                      cast. It round-trips through the config JSON because
+                      load/save spread the whole object, and is consumed via
+                      `getSalesOrderDefaultListStatuses()`. */}
+                  <MultiSelect
+                    label="Default List Statuses"
+                    description="Statuses the Sales Orders list opens narrowed to, so operators land on the working set instead of every order ever raised. Leave empty to show all statuses. Operators can still widen to all, and 'Clear filters' comes back to this set."
+                    placeholder="All statuses (no default narrowing)"
+                    data={salesOrderStatusMultiSelectData}
+                    value={
+                      (salesOrdersFeatures as { defaultListStatuses?: string[] })
+                        .defaultListStatuses ?? []
+                    }
+                    onChange={(v) =>
+                      setSalesOrdersFeatures({
+                        ...salesOrdersFeatures,
+                        defaultListStatuses: v,
+                      } as CMngtSalesOrderFeatures)
+                    }
+                    searchable
+                    clearable
+                    nothingFoundMessage="No statuses configured yet — add them under Sales Order Status Options above."
+                  />
                   <ConfigOptionEditor
                     options={salesOrdersFeatures.deliveryMethodOptions ?? []}
                     onChange={(opts) =>
@@ -1946,6 +1990,30 @@ export function ConfigEditor({
                         statusTransitions: tr,
                       })
                     }
+                  />
+                  {/* Schema-only field (absent from the kits
+                      `CMngtDeliveryRequestFeatures` mirror), so read/written via
+                      a local cast; it round-trips because load/save spread the
+                      whole object. Consumed via
+                      `getDeliveryRequestDefaultListStatuses()`. */}
+                  <MultiSelect
+                    label="Default List Statuses"
+                    description="Statuses the Delivery Requests list opens narrowed to, so operators land on the working set instead of the whole 90-day window. Leave empty to show all statuses. Operators can still widen to all, and 'Clear filters' comes back to this set."
+                    placeholder="All statuses (no default narrowing)"
+                    data={deliveryRequestStatusMultiSelectData}
+                    value={
+                      (deliveryRequestsFeatures as { defaultListStatuses?: string[] })
+                        .defaultListStatuses ?? []
+                    }
+                    onChange={(v) =>
+                      setDeliveryRequestsFeatures({
+                        ...deliveryRequestsFeatures,
+                        defaultListStatuses: v,
+                      } as CMngtDeliveryRequestFeatures)
+                    }
+                    searchable
+                    clearable
+                    nothingFoundMessage="No statuses configured yet — add them under Delivery Request Status Options above."
                   />
                   <MultiSelect
                     label="Driver Departments"

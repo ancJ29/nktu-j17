@@ -10,13 +10,14 @@ import {
 } from '@/utils/listFilterDateRange';
 import { EMPTY_DATE_RANGE, defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import { getSalesOrderDefaultListStatuses } from '@/utils/permission';
 import { getSalesOrderReadyDate, getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
 import type { SalesOrder } from '@/types';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
 
-const EMPTY_STATUS: readonly string[] = [];
+const DEFAULT_STATUS: readonly string[] = getSalesOrderDefaultListStatuses();
 
 export type SalesOrderDeliveryKind = 'all' | 'internal' | 'external';
 
@@ -35,7 +36,8 @@ type SalesOrderUrlState = {
 
 function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   const r: SalesOrderUrlState = {};
-  if (state.s?.length) r.s = state.s;
+
+  if (state.s?.length || (state.s && DEFAULT_STATUS.length > 0)) r.s = state.s;
   if (state.c) r.c = state.c;
   if (state.f) r.f = state.f;
   if (state.u) r.u = true;
@@ -60,7 +62,7 @@ export function useSalesOrderListFilters(
     compactState,
   });
 
-  const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
+  const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
   const urgentOnly = state.u ?? false;
@@ -75,7 +77,7 @@ export function useSalesOrderListFilters(
   const page = state.pg ?? DEFAULT_PAGE;
 
   const setStatusFilter = useCallback(
-    (values: string[]) => updateState({ s: values.length > 0 ? values : undefined, pg: undefined }),
+    (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
   );
 
@@ -191,8 +193,15 @@ export function useSalesOrderListFilters(
     internalDeliveryFirstSort,
   ]);
 
+  const statusFilterIsDefault = useMemo(
+    () =>
+      statusFilter.length === DEFAULT_STATUS.length &&
+      statusFilter.every((v) => DEFAULT_STATUS.includes(v)),
+    [statusFilter],
+  );
+
   const hasActiveFilters = !!(
-    statusFilter.length > 0 ||
+    !statusFilterIsDefault ||
     customerFilter ||
     staffFilter ||
     urgentOnly ||
@@ -205,6 +214,8 @@ export function useSalesOrderListFilters(
   return {
     statusFilter,
     setStatusFilter,
+
+    statusFilterIsDefault,
     customerFilter,
     setCustomerFilter,
     staffFilter,

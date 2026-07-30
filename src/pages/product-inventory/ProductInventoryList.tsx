@@ -663,6 +663,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={summaries.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.inventory.products.list.searchPlaceholder')}

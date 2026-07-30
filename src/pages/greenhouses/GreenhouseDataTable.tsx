@@ -1,24 +1,35 @@
 import { useMemo } from 'react';
-import { Group, Stack, Text } from '@mantine/core';
+import { IconPlant2 } from '@tabler/icons-react';
+import { ActionIcon, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Greenhouse } from '@/types';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ActiveBadge } from '@/components/badges';
-import { CropLinks } from '@/components/CropLink';
+import { CropLink } from '@/components/CropLink';
 import { CodeLabel } from '@credo/base-ui/components';
+import { FREE_OCCUPANCY, type GreenhouseOccupancy } from '@/utils/greenhouseOccupancy';
+import { GreenhouseOccupancyBadge } from './GreenhouseOccupancyBadge';
+import { freeFromDate, occupancyDetail } from './occupancyPresentation';
+import { formatPlannedDate } from '@/utils/cropSchedule';
 
 type GreenhouseDataTableProps = {
   readonly greenhouses: Greenhouse[];
   readonly isLoading?: boolean;
 
-  readonly cropCodesByGreenhouse?: Map<string, string[]>;
+  readonly occupancyByGreenhouse?: Map<string, GreenhouseOccupancy>;
+
+  readonly activeCropCounts?: Map<string, number>;
+
+  readonly onAddCrop?: (greenhouse: Greenhouse) => void;
 };
 
 export function GreenhouseDataTable({
   greenhouses,
   isLoading,
-  cropCodesByGreenhouse,
+  occupancyByGreenhouse,
+  activeCropCounts,
+  onAddCrop,
 }: GreenhouseDataTableProps) {
   const { t } = useTranslation();
 
@@ -45,23 +56,72 @@ export function GreenhouseDataTable({
       {
         key: 'area',
         header: t('greenhouses.columns.area'),
-        render: (item: Greenhouse) =>
-          item.area > 0 ? (
-            <Text size="sm">{t('greenhouses.areaValue', { value: item.area })}</Text>
-          ) : (
-            <Text size="sm" c="dimmed">
-              —
-            </Text>
-          ),
+
+        render: (item: Greenhouse) => {
+          const capacity = item.extra?.plantCapacity;
+          if (item.area <= 0 && !capacity) {
+            return (
+              <Text size="sm" c="dimmed">
+                —
+              </Text>
+            );
+          }
+          return (
+            <Stack gap={2}>
+              {item.area > 0 && (
+                <Text size="sm">{t('greenhouses.areaValue', { value: item.area })}</Text>
+              )}
+              {!!capacity && (
+                <Text size="xs" c="dimmed">
+                  {t('greenhouses.capacityValue', { value: capacity.toLocaleString() })}
+                </Text>
+              )}
+            </Stack>
+          );
+        },
       },
-      ...(cropCodesByGreenhouse
+
+      ...(occupancyByGreenhouse
         ? [
             {
-              key: 'crops',
-              header: t('greenhouses.columns.crops'),
-              render: (item: Greenhouse) => (
-                <CropLinks codes={cropCodesByGreenhouse.get(item.code) ?? []} size="sm" />
-              ),
+              key: 'occupancy',
+              header: t('greenhouses.columns.occupancy'),
+              render: (item: Greenhouse) => {
+                const occupancy = occupancyByGreenhouse.get(item.code) ?? FREE_OCCUPANCY;
+                const detail = occupancyDetail(occupancy);
+                const freeFrom = freeFromDate(occupancy);
+                const extra = (activeCropCounts?.get(item.code) ?? 0) - 1;
+                return (
+                  <Stack gap={2}>
+                    <Group gap={6} wrap="nowrap">
+                      <GreenhouseOccupancyBadge occupancy={occupancy} />
+                      {detail && (
+                        <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                          {t(detail.key, detail.values)}
+                        </Text>
+                      )}
+                      {freeFrom && (
+                        <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                          ·{' '}
+                          {t('greenhouses.occupancy.freeFrom', {
+                            date: formatPlannedDate(freeFrom),
+                          })}
+                        </Text>
+                      )}
+                    </Group>
+                    {occupancy.crop && (
+                      <Group gap={4} wrap="nowrap">
+                        <CropLink code={occupancy.crop.code} size="sm" />
+                        {extra > 0 && (
+                          <Text size="xs" c="dimmed">
+                            {t('greenhouses.occupancy.moreCrops', { n: extra })}
+                          </Text>
+                        )}
+                      </Group>
+                    )}
+                  </Stack>
+                );
+              },
             },
           ]
         : []),
@@ -80,8 +140,35 @@ export function GreenhouseDataTable({
           </Group>
         ),
       },
+
+      ...(onAddCrop
+        ? [
+            {
+              key: '__cropActions',
+              header: '',
+              width: '56px',
+              render: (item: Greenhouse) => (
+                <Group gap={2} wrap="nowrap" justify="flex-end">
+                  <Tooltip label={t('greenhouses.rowAddCrop')} withArrow>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      aria-label={t('greenhouses.rowAddCrop')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onAddCrop(item);
+                      }}
+                    >
+                      <IconPlant2 size={16} />
+                    </ActionIcon>
+                  </Tooltip>
+                </Group>
+              ),
+            },
+          ]
+        : []),
     ],
-    [t, cropCodesByGreenhouse],
+    [t, occupancyByGreenhouse, activeCropCounts, onAddCrop],
   );
 
   return (

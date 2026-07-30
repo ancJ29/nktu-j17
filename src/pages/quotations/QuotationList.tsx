@@ -349,6 +349,7 @@ export function QuotationList() {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={rows.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('quotations.filter.searchPlaceholder')}

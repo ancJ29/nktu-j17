@@ -235,6 +235,7 @@ export function MaterialInventoryListPage() {
 
           {isMobile ? (
             <MobileFilterBar
+              recordCount={rows.length}
               search={search}
               onSearchChange={setSearch}
               searchPlaceholder={t('materialInventory.form.materialPlaceholder')}

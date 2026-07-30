@@ -1,3 +1,4 @@
+import { logger } from '@credo/base-ui/utils';
 import { useProductStore } from '@/stores/useProductStore';
 import { logActivity } from './activityLogger';
 import type { AppliedOp } from './inventoryReservation';
@@ -21,11 +22,18 @@ export function emitInventoryActivityForApplied(
     let productId = productIdByCode.get(op.itemCode);
     if (productId === undefined) {
       const found = allProducts.find((p) => p.code === op.itemCode);
-      if (!found) continue;
-      productId = found.id;
-      productIdByCode.set(op.itemCode, productId);
+      if (found) {
+        productId = found.id;
+        productIdByCode.set(op.itemCode, productId);
+      } else {
+        logger.warn('[inventoryActivityEmit] unresolved product code — logging without target', {
+          itemCode: op.itemCode,
+          productCount: allProducts.length,
+        });
+      }
     }
     logActivity('productInventory.adjust', productId, {
+      itemCode: op.itemCode,
       locationCode: op.locationCode,
       prevOnHand: op.prevOnHand,
       nextOnHand: op.nextOnHand,

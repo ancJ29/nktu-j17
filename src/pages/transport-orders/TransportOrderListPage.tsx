@@ -389,6 +389,7 @@ export function TransportOrderListPage() {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={filters.allOrders.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('transportOrders.search')}

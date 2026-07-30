@@ -219,6 +219,7 @@ export function CropListPage() {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={listSource.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('crops.searchPlaceholder')}

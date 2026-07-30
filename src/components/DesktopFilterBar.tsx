@@ -87,6 +87,9 @@ export function DesktopFilterBar({
 
   return (
     <Group gap="sm" wrap="nowrap">
+      {/* Desktop always shows search. The short-list rule is mobile-only: a row
+          of a wide screen is cheap, and the input is what anchors this bar's
+          layout (`flex: 1`) — dropping it would leave the selects adrift. */}
       <SearchInput
         key={counter}
         placeholder={searchPlaceholder}
@@ -168,15 +171,18 @@ export function DesktopFilterBar({
           <IconLink size={16} />
         </ActionIcon>
       </Tooltip>
-      <ActionIcon
-        variant="subtle"
-        color={hasActiveFilters ? 'orange' : 'gray'}
-        size="lg"
-        disabled={!hasActiveFilters}
-        onClick={onClear}
-      >
-        <IconFilterOff size={16} />
-      </ActionIcon>
+      {/* Rendered only while there is something to clear — a greyed-out control
+          restates a state the empty filters already show. Kept in sync with the
+          mobile bar, which does the same.
+
+          Orange on purpose: it is the one control here that undoes rather than
+          narrows, and the warm colour is what makes it findable in a row of
+          otherwise-neutral inputs. Mobile matches. */}
+      {hasActiveFilters && (
+        <ActionIcon variant="subtle" color="orange" size="lg" onClick={onClear}>
+          <IconFilterOff size={16} />
+        </ActionIcon>
+      )}
     </Group>
   );
 }

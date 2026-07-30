@@ -370,6 +370,7 @@ export function MaterialListPage() {
 
         {isMobile ? (
           <MobileFilterBar
+            recordCount={allMaterials.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.materials.list.searchPlaceholder')}

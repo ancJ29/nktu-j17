@@ -411,6 +411,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
         {/* Filter bar */}
         {isMobile ? (
           <MobileFilterBar
+            recordCount={filters.allReceipts.length}
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.goodsReceipts.list.searchPlaceholder')}

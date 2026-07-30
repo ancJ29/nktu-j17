@@ -418,7 +418,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
 
   const [createOpen, setCreateOpen] = useState(false);
 
-  const showStatusPills = !isMobile;
+  const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
 
   const dateShownOnChip =
     isMobile && variant.showScheduledDateInBar && scheduledDatePreset !== null;
@@ -485,6 +485,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
         {/* Filter bar */}
         {isMobile ? (
           <MobileFilterBar
+            recordCount={filters.allRequests.length}
             noSearchInput={true}
             search={search}
             onSearchChange={setSearch}

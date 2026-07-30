@@ -35,13 +35,25 @@ import { NotFoundState } from '@/components/NotFoundState';
 import { useGreenhouseStore, GREENHOUSE_RECORD_TARGET } from '@/stores/useGreenhouseStore';
 import { useCropStore } from '@/stores/useCropStores';
 import { GreenhouseCropsSection } from '@/pages/crops';
+import { OperationLogSection } from '@/pages/operation-logs/OperationLogSection';
+import { GREENHOUSE_MAINTENANCE_LOG_CONFIG } from './greenhouseLogConfigs';
 import { formatDateTime } from '@/utils/dateFormat';
+import { todayInVnDateString } from '@/utils/dateTimeField';
 import { perms } from '@/utils/permission';
-import type { Greenhouse } from '@/types';
+import { FREE_OCCUPANCY, resolveGreenhouseOccupancy } from '@/utils/greenhouseOccupancy';
+import { occupancyDetail } from './occupancyPresentation';
+import type { Crop, Greenhouse } from '@/types';
 
 const isMobile = device.isMobile;
 const canEdit = perms.greenhouse.canEdit();
 const canViewCrops = perms.crop.canView();
+
+const GREENHOUSE_LOG_PERMS = {
+  canView: perms.greenhouse.canView(),
+  canCreate: perms.greenhouse.canCreate(),
+  canEdit: perms.greenhouse.canEdit(),
+  canDelete: perms.greenhouse.canDelete(),
+};
 
 export function GreenhouseDetailPage() {
   const { t } = useTranslation();
@@ -77,12 +89,14 @@ export function GreenhouseDetailPage() {
   useEffect(() => {
     if (canViewCrops && !cropsInitialized) loadCrops();
   }, [cropsInitialized, loadCrops]);
-  const activeCount = useMemo(
+
+  const today = todayInVnDateString();
+  const occupancy = useMemo(
     () =>
       greenhouse && canViewCrops
-        ? allCrops.filter((c) => c.greenhouseCode === greenhouse.code).length
-        : 0,
-    [allCrops, greenhouse],
+        ? resolveGreenhouseOccupancy(allCrops as Crop[], greenhouse.code, today)
+        : FREE_OCCUPANCY,
+    [allCrops, greenhouse, today],
   );
 
   if (loading) return null;
@@ -99,6 +113,8 @@ export function GreenhouseDetailPage() {
 
   const extra = greenhouse.extra ?? {};
   const hasArea = greenhouse.area > 0;
+  const detail = occupancyDetail(occupancy);
+  const occupancyDetailText = detail ? t(detail.key, detail.values) : null;
 
   const statbook = (
     <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'} style={{ flexShrink: 0 }}>
@@ -112,9 +128,10 @@ export function GreenhouseDetailPage() {
       {canViewCrops && (
         <StatPill
           icon={<IconPlant2 size={isMobile ? 12 : 14} />}
-          label={t('greenhouses.detail.statActiveCrops')}
-          value={activeCount.toLocaleString()}
-          tone={activeCount > 0 ? 'neutral' : 'dim'}
+          label={t('greenhouses.detail.statOccupancy')}
+          value={t(`greenhouses.occupancy.${occupancy.isOverdue ? 'overdue' : occupancy.state}`)}
+          suffix={occupancyDetailText ?? undefined}
+          tone={occupancy.isOverdue ? 'danger' : occupancy.state === 'free' ? 'dim' : 'neutral'}
           compact={isMobile}
         />
       )}
@@ -175,6 +192,15 @@ export function GreenhouseDetailPage() {
         </DetailField>
         <DetailField label={t('greenhouses.columns.area')}>
           {hasArea ? t('greenhouses.areaValue', { value: greenhouse.area }) : '—'}
+        </DetailField>
+        <DetailField label={t('greenhouses.form.systemTypeLabel')}>
+          {extra.systemType || '—'}
+        </DetailField>
+        <DetailField label={t('greenhouses.form.bedCountLabel')}>
+          {extra.bedCount ? extra.bedCount.toLocaleString() : '—'}
+        </DetailField>
+        <DetailField label={t('greenhouses.form.plantCapacityLabel')}>
+          {extra.plantCapacity ? extra.plantCapacity.toLocaleString() : '—'}
         </DetailField>
       </SimpleGrid>
       <DetailField label={t('common.labels.description')}>
@@ -250,22 +276,19 @@ export function GreenhouseDetailPage() {
 
       {headerCard}
 
-      {isMobile && canEdit && (
-        <Button
-          component={Link}
-          to={ROUTES.GREENHOUSES.EDIT.replace(':id', greenhouse.id)}
-          variant="light"
-          size="sm"
-          leftSection={<IconEdit size={16} />}
-          fullWidth
-        >
-          {t('__new__.01-common.actions.edit')}
-        </Button>
-      )}
-
       {infoSection}
 
       {canViewCrops && <GreenhouseCropsSection greenhouse={greenhouse} />}
+
+      {/* Work done to the house itself. Rides the greenhouse's own permissions
+          rather than a new module — which finally gives `greenhouse.canDelete`
+          a use, since the register itself deactivates instead of deleting. */}
+      <OperationLogSection
+        targetId={greenhouse.id}
+        targetCode={greenhouse.code}
+        config={GREENHOUSE_MAINTENANCE_LOG_CONFIG}
+        perms={GREENHOUSE_LOG_PERMS}
+      />
     </Stack>
   );
 }
