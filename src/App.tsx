@@ -1,3 +1,4 @@
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { lazy, Suspense, useEffect } from 'react';
 import { RouterProvider } from 'react-router';
 import { useRegisterSW } from 'virtual:pwa-register/react';
@@ -140,6 +141,7 @@ export default function App() {
       <DevClientCodeModal />
       <DebugPanel />
       {isInternal && <InternalBanner />}
+      <SpeedInsights />
     </ErrorBoundary>
   );
 }
