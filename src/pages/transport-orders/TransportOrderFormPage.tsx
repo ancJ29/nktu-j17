@@ -37,7 +37,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { device, logger } from '@credo/base-ui/utils';
 import { DateField } from '@/components/DateField';
-import { DateTimeField } from '@/components/DateTimeField';
+import { DateTimeTextField } from '@/components/DateTimeTextField';
 import { SectionCard } from '@/components/SectionCard';
 import { EmployeeSelector, CustomerSelector } from '@/components/selectors';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
@@ -74,8 +74,12 @@ import {
   readFeeLines,
 } from './transportOrderPricing';
 import { useContainerSizeOptions } from './containerSize';
-import { useShipmentTypeOptions } from './shipmentType';
-import { truckNameWithPlate } from './truckDisplay';
+import {
+  DEFAULT_SHIPMENT_TYPE,
+  useShipmentTypeLabel,
+  useShipmentTypeOptions,
+} from './shipmentType';
+import { truckNameWithPlate, useDriverWithPlate } from './truckDisplay';
 import {
   getInitialTransportOrderStatus,
   isTransportOrderLocked,
@@ -252,7 +256,7 @@ function blankValues(): FormValues {
     billNumber: '',
     containerNumber: '',
     containerSize: '20',
-    shipmentType: 'import',
+    shipmentType: DEFAULT_SHIPMENT_TYPE,
     pickup: '',
     stuffing: '',
     dropoff: '',
@@ -387,7 +391,11 @@ export function TransportOrderFormPage() {
   );
 
   const containerSizeOptions = useContainerSizeOptions();
+
+  const driverWithPlate = useDriverWithPlate();
+
   const shipmentTypeOptions = useShipmentTypeOptions();
+  const shipmentTypeLabel = useShipmentTypeLabel();
 
   const form = useForm<FormValues>({
     initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(),
@@ -416,6 +424,18 @@ export function TransportOrderFormPage() {
       },
     },
   });
+
+  const isCopyCreate = !!copyFrom;
+  const seededShipmentTypeRef = useRef(false);
+  useEffect(() => {
+    if (isEdit || isCopyCreate || seededShipmentTypeRef.current) return;
+    if (shipmentTypeOptions.length === 0) return;
+    seededShipmentTypeRef.current = true;
+    const current = form.getValues().shipmentType;
+    if (shipmentTypeOptions.some((o) => o.value === current)) return;
+    form.setFieldValue('shipmentType', shipmentTypeOptions[0]!.value);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine re-creates `form` every render; the ref makes this a one-shot on the options arriving.
+  }, [isEdit, isCopyCreate, shipmentTypeOptions]);
 
   const fetching = useInitFormFromFetch(
     form,
@@ -687,6 +707,15 @@ export function TransportOrderFormPage() {
       ? [...containerSizeOptions, { value: currentSize, label: `${currentSize}ft` }]
       : containerSizeOptions;
 
+  const currentShipmentType = form.values.shipmentType;
+  const shipmentTypeData =
+    currentShipmentType && !shipmentTypeOptions.some((o) => o.value === currentShipmentType)
+      ? [
+          ...shipmentTypeOptions,
+          { value: currentShipmentType, label: shipmentTypeLabel(currentShipmentType) },
+        ]
+      : shipmentTypeOptions;
+
   const payerSelectData = [
     { value: 'company', label: t('transportOrders.fees.payerCompany') },
     { value: 'customer', label: t('transportOrders.fees.payerCustomer') },
@@ -800,6 +829,7 @@ export function TransportOrderFormPage() {
                     }}
                     error={form.errors.driverId}
                     filter={driverEmployeeFilter}
+                    optionLabel={driverWithPlate}
                   />
                 </>
               )}
@@ -823,11 +853,16 @@ export function TransportOrderFormPage() {
               />
               <Select
                 label={t('transportOrders.form.shipmentType')}
-                data={shipmentTypeOptions}
-                value={form.values.shipmentType}
+                data={shipmentTypeData}
+                value={form.values.shipmentType || null}
                 onChange={(v) =>
-                  form.setFieldValue('shipmentType', (v as TransportOrderShipmentType) ?? 'import')
+                  form.setFieldValue(
+                    'shipmentType',
+                    (v as TransportOrderShipmentType) ?? DEFAULT_SHIPMENT_TYPE,
+                  )
                 }
+                searchable
+                allowDeselect={false}
               />
               {/* Status is button-driven on the detail page and defaults to the
                   first status ("New") on create, so the picker only shows on edit. */}
@@ -933,10 +968,10 @@ export function TransportOrderFormPage() {
                         />
                       </Table.Td>
                       <Table.Td>
-                        <DateTimeField {...form.getInputProps(`trips.${i}.loadingAt`)} />
+                        <DateTimeTextField {...form.getInputProps(`trips.${i}.loadingAt`)} />
                       </Table.Td>
                       <Table.Td>
-                        <DateTimeField {...form.getInputProps(`trips.${i}.unloadingAt`)} />
+                        <DateTimeTextField {...form.getInputProps(`trips.${i}.unloadingAt`)} />
                       </Table.Td>
                       <Table.Td>
                         <Select
@@ -955,6 +990,7 @@ export function TransportOrderFormPage() {
                           onChange={(sel) => setTripDriver(i, sel)}
                           error={form.errors[`trips.${i}.driverId`]}
                           filter={driverEmployeeFilter}
+                          optionLabel={driverWithPlate}
                         />
                       </Table.Td>
                       <Table.Td>
@@ -1001,7 +1037,7 @@ export function TransportOrderFormPage() {
                     label={t('transportOrders.route.pickup')}
                     {...form.getInputProps('pickup')}
                   />
-                  <DateTimeField
+                  <DateTimeTextField
                     label={t('transportOrders.route.pickupAt')}
                     {...form.getInputProps('pickupAt')}
                   />
@@ -1011,7 +1047,7 @@ export function TransportOrderFormPage() {
                     label={t('transportOrders.route.stuffing')}
                     {...form.getInputProps('stuffing')}
                   />
-                  <DateTimeField
+                  <DateTimeTextField
                     label={t('transportOrders.route.stuffingAt')}
                     {...form.getInputProps('stuffingAt')}
                   />
@@ -1021,7 +1057,7 @@ export function TransportOrderFormPage() {
                     label={t('transportOrders.route.dropoff')}
                     {...form.getInputProps('dropoff')}
                   />
-                  <DateTimeField
+                  <DateTimeTextField
                     label={t('transportOrders.route.dropoffAt')}
                     {...form.getInputProps('dropoffAt')}
                   />

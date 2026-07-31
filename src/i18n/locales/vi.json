@@ -8,6 +8,7 @@
         "cancel": "Hủy",
         "clearFilters": "Xóa bộ lọc",
         "clearSearch": "Xóa tìm kiếm",
+        "clearValue": "Xóa",
         "copy": "Sao chép",
         "copyLink": "Sao chép link",
         "disable": "Tắt",
@@ -17,6 +18,7 @@
         "generate": "Tạo",
         "open": "Mở",
         "openInMaps": "Mở Maps",
+        "pickDateTime": "Chọn ngày giờ",
         "remove": "Xóa",
         "save": "Lưu thay đổi",
         "view": "Xem"
@@ -50,6 +52,9 @@
       },
       "list": {
         "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…"
+      },
+      "validation": {
+        "invalidDateTime": "Ngày giờ không hợp lệ — ví dụ {{example}}"
       }
     },
     "07-entities": {
@@ -764,6 +769,11 @@
   },
   "cropDiaries": {
     "addItem": "Thêm mục",
+    "applyConfirm": {
+      "duplicateWarning": "Nhật ký này đã có {{existing}} mục từ mẫu — áp dụng lần nữa sẽ thêm một bản sao chứ không thay thế, và không thể hoàn tác hàng loạt.",
+      "message": "Áp dụng \"{{template}}\" vào nhật ký vụ mùa này? Sẽ tạo {{count}} mục, bắt đầu từ {{date}}.",
+      "title": "Áp dụng mẫu?"
+    },
     "applyTemplateButton": "Áp dụng",
     "applyTemplatePlaceholder": "Áp dụng mẫu…",
     "columns": {
@@ -1995,6 +2005,7 @@
       "productCategory": "Danh mục sản phẩm",
       "productTag": "Tag sản phẩm",
       "productUnit": "Đơn vị sản phẩm",
+      "shipmentType": "Loại hình",
       "truckType": "Loại xe",
       "unit": "Đơn vị tính"
     },

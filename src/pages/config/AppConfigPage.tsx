@@ -212,6 +212,7 @@ const LOOKUP_CATEGORY_LABELS: Record<string, string> = {
   'lookups.categories.productUnit': 'Product Unit',
   'lookups.categories.truckType': 'Truck Type',
   'lookups.categories.containerSize': 'Container Size',
+  'lookups.categories.shipmentType': 'Shipment Type',
   'lookups.categories.maintenanceType': 'Maintenance Type',
 };
 

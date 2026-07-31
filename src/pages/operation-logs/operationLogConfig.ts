@@ -2,11 +2,12 @@ import type { ReactNode } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import type { OperationLog, OperationLogExtra } from '@/types';
 import type { LookupOption } from '@/hooks/useLookupOptions';
+import { todayInVnDateString } from '@/utils/dateTimeField';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
 export function todayString(): string {
-  return new Date().toISOString().slice(0, 10);
+  return todayInVnDateString();
 }
 
 export function datePart(value: OperationLog['logDate']): string {

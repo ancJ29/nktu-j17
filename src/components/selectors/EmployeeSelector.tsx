@@ -14,14 +14,18 @@ export type EmployeeSelectorProps = Omit<SelectProps, 'data' | 'value' | 'onChan
   onChange: (selection: EmployeeSelectorChange | null) => void;
 
   filter?: (e: Employee) => boolean;
+
+  optionLabel?: (e: Employee) => string;
 };
 
 const defaultFilter = (e: Employee) => e.isActive && !e.extra?.isDeleted;
+const defaultOptionLabel = (e: Employee) => e.name;
 
 export function EmployeeSelector({
   value,
   onChange,
   filter = defaultFilter,
+  optionLabel = defaultOptionLabel,
   searchable = true,
   ...rest
 }: EmployeeSelectorProps) {
@@ -36,9 +40,9 @@ export function EmployeeSelector({
     }
     return filtered.map((e) => ({
       value: e.id,
-      label: e.name,
+      label: optionLabel(e),
     }));
-  }, [employees, filter, value]);
+  }, [employees, filter, optionLabel, value]);
 
   const employeeMap = useMemo(() => {
     const m = new Map<string, Employee>();

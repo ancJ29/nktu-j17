@@ -33,15 +33,17 @@ import {
 } from '@/stores/useCropDiaryStore';
 import { applyTemplateToCropDiary } from '@/utils/cropDiaryTemplateApply';
 import { aggregateCropMaterials, type CropMaterialTotal } from '@/utils/cropMaterialSummary';
-import { templatePlanDays } from '@/utils/cropDiaryTemplateModel';
+import { buildTemplateDiaryEntries, templatePlanDays } from '@/utils/cropDiaryTemplateModel';
 import { formatDate } from '@/utils/dateFormat';
+import { todayInVnDateString } from '@/utils/dateTimeField';
 import { formatNumber } from '@/utils/number';
 import { perms } from '@/utils/permission';
-import type { CropDiaryEntry, CropDiaryExtra, TemplateMaterialLine } from '@/types';
-
-function todayString(): string {
-  return new Date().toISOString().slice(0, 10);
-}
+import type {
+  CropDiaryEntry,
+  CropDiaryExtra,
+  CropDiaryTemplate,
+  TemplateMaterialLine,
+} from '@/types';
 
 function cleanMaterialLines(lines: TemplateMaterialLine[]): TemplateMaterialLine[] {
   return lines
@@ -61,6 +63,8 @@ type Props = {
   readonly cropId: string;
   readonly cropCode: string;
 
+  readonly defaultStartDate?: string;
+
   readonly onSummaryChange?: (summary: CropMaterialTotal[]) => void;
 };
 
@@ -77,7 +81,7 @@ type EntryFormValues = {
   materials: TemplateMaterialLine[];
 };
 
-export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
+export function CropDiarySection({ cropId, cropCode, defaultStartDate, onSummaryChange }: Props) {
   const { t } = useTranslation();
 
   const [entries, setEntries] = useState<CropDiaryEntry[]>([]);
@@ -85,7 +89,12 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
 
   const [applying, setApplying] = useState(false);
   const [templateCode, setTemplateCode] = useState<string | null>(null);
-  const [applyDate, setApplyDate] = useState(todayString());
+  const [applyDate, setApplyDate] = useState(defaultStartDate ?? todayInVnDateString());
+
+  const [pendingApply, setPendingApply] = useState<{
+    template: CropDiaryTemplate;
+    count: number;
+  } | null>(null);
 
   const [formOpened, formHandlers] = useDisclosure(false);
   const [editing, setEditing] = useState<CropDiaryEntry | null>(null);
@@ -108,7 +117,7 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
   }, [materials]);
 
   const form = useForm<EntryFormValues>({
-    initialValues: { entryDate: todayString(), activity: '', notes: '', materials: [] },
+    initialValues: { entryDate: todayInVnDateString(), activity: '', notes: '', materials: [] },
     validate: {
       entryDate: (v) => (v ? null : t('cropDiaries.validation.entryDateRequired')),
       activity: (v) => (v.trim() ? null : t('cropDiaries.validation.activityRequired')),
@@ -146,7 +155,7 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
 
   const openAdd = useCallback(() => {
     setEditing(null);
-    form.setValues({ entryDate: todayString(), activity: '', notes: '', materials: [] });
+    form.setValues({ entryDate: todayInVnDateString(), activity: '', notes: '', materials: [] });
     form.resetDirty();
     formHandlers.open();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- form identity is stable across renders
@@ -227,16 +236,28 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
     [editing, cropId, cropCode, t, load, formHandlers],
   );
 
-  const handleApply = useCallback(async () => {
+  const templatedCount = useMemo(
+    () => entries.filter((e) => e.extra?.templateCode).length,
+    [entries],
+  );
+
+  const requestApply = useCallback(() => {
     if (!templateCode) return;
-    const tpl = templates.find((x) => x.code === templateCode);
-    if (!tpl) return;
+    const template = templates.find((x) => x.code === templateCode);
+    if (!template) return;
+    const count = buildTemplateDiaryEntries(templatePlanDays(template), applyDate).length;
+    setPendingApply({ template, count });
+  }, [templateCode, templates, applyDate]);
+
+  const handleApply = useCallback(async () => {
+    if (!pendingApply) return;
+    const tpl = pendingApply.template;
     setApplying(true);
     try {
       const count = await applyTemplateToCropDiary({
         cropId,
         cropCode,
-        templateCode,
+        templateCode: tpl.code,
         startDate: applyDate,
         days: templatePlanDays(tpl),
       });
@@ -245,6 +266,7 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
         message: t('cropDiaries.notifications.applyTemplateSuccess', { count }),
       });
       setTemplateCode(null);
+      setPendingApply(null);
       await load();
     } catch {
       notifications.show({
@@ -255,7 +277,7 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
     } finally {
       setApplying(false);
     }
-  }, [templateCode, templates, applyDate, cropId, cropCode, t, load]);
+  }, [pendingApply, applyDate, cropId, cropCode, t, load]);
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
@@ -327,7 +349,7 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
               variant="light"
               disabled={!templateCode}
               loading={applying}
-              onClick={handleApply}
+              onClick={requestApply}
             >
               {t('cropDiaries.applyTemplateButton')}
             </Button>
@@ -453,6 +475,26 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
           </Stack>
         </form>
       </ResponsiveModal>
+
+      <ConfirmModal
+        opened={pendingApply !== null}
+        onClose={() => setPendingApply(null)}
+        onConfirm={handleApply}
+        title={t('cropDiaries.applyConfirm.title')}
+        message={
+          t('cropDiaries.applyConfirm.message', {
+            template: pendingApply?.template.name ?? '',
+            count: pendingApply?.count ?? 0,
+            date: formatDate(applyDate),
+          }) +
+          (templatedCount > 0
+            ? ` ${t('cropDiaries.applyConfirm.duplicateWarning', { existing: templatedCount })}`
+            : '')
+        }
+        confirmLabel={t('cropDiaries.applyTemplateButton')}
+        confirmColor={templatedCount > 0 ? 'red' : 'primary'}
+        loading={applying}
+      />
 
       <ConfirmModal
         opened={deleteTarget !== null}

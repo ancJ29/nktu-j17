@@ -42,6 +42,7 @@ import { useCropDiaryTemplateStore } from '@/stores/useCropDiaryTemplateStore';
 import { formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import { formatPlannedDate } from '@/utils/cropSchedule';
+import { cropDiaryPartitionId } from '@/utils/cropDiaryPartition';
 import { perms } from '@/utils/permission';
 import type { Crop } from '@/types';
 import type { CropMaterialTotal } from '@/utils/cropMaterialSummary';
@@ -152,6 +153,8 @@ export function CropDetailPage() {
   const extra = crop.extra ?? {};
   const canPlant = canEdit && crop.status === 'planned';
   const canHarvest = canEdit && crop.status === 'growing';
+
+  const diaryCropId = cropDiaryPartitionId(crop);
 
   const picEmployee = extra.picId ? employees.find((e) => e.id === extra.picId) : undefined;
   const diaryTemplate = extra.diaryTemplateCode
@@ -295,8 +298,9 @@ export function CropDetailPage() {
       </Tabs.Panel>
       <Tabs.Panel value="diary" pt="md">
         <CropDiarySection
-          cropId={crop.id}
+          cropId={diaryCropId}
           cropCode={crop.code}
+          defaultStartDate={extra.fromDate}
           onSummaryChange={setMaterialSummary}
         />
       </Tabs.Panel>

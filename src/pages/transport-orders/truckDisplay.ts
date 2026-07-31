@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
+import type { Employee } from '@/types';
 
 export function truckNameWithPlate(name: string, plate: string | undefined | null): string {
   const trimmed = plate?.trim();
@@ -16,4 +17,9 @@ export function useTruckPlate(): (truckId: string | undefined | null) => string 
     }
     return (id) => (id ? map.get(id) : undefined);
   }, [items]);
+}
+
+export function useDriverWithPlate(): (employee: Pick<Employee, 'name' | 'extra'>) => string {
+  const plateOf = useTruckPlate();
+  return (employee) => truckNameWithPlate(employee.name, plateOf(employee.extra?.truckAssetId));
 }

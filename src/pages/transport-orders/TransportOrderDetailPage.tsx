@@ -45,7 +45,7 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import { SectionCard } from '@/components/SectionCard';
 import { StatusChangeModal } from '@/components/StatusChangeModal';
 import { DateField } from '@/components/DateField';
-import { DateTimeField } from '@/components/DateTimeField';
+import { DateTimeTextField } from '@/components/DateTimeTextField';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import { EmployeeLink } from '@/components/EmployeeLink';
@@ -94,7 +94,8 @@ import {
 } from './transportOrderPricing';
 import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activityMemo';
 import { useContainerSizeLabel } from './containerSize';
-import { truckNameWithPlate } from './truckDisplay';
+import { useShipmentTypeLabel } from './shipmentType';
+import { truckNameWithPlate, useDriverWithPlate } from './truckDisplay';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 import { reconcileTripLogs } from './tripLogSync';
 
@@ -143,6 +144,9 @@ export function TransportOrderDetailPage() {
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
 
   const containerSizeLabel = useContainerSizeLabel();
+  const shipmentTypeLabel = useShipmentTypeLabel();
+
+  const driverWithPlate = useDriverWithPlate();
 
   useEffect(() => {
     if (!trucksInit) loadTrucks();
@@ -438,7 +442,7 @@ export function TransportOrderDetailPage() {
     }));
   const driverSelectData = employees
     .filter(driverEmployeeFilter)
-    .map((e) => ({ value: e.id, label: e.name }));
+    .map((e) => ({ value: e.id, label: driverWithPlate(e) }));
 
   const truckField = (
     <InlineSelectField
@@ -592,9 +596,9 @@ export function TransportOrderDetailPage() {
         </Text>
       )}
       renderEditor={({ value: v, onChange }) => (
-        <DateTimeField
+        <DateTimeTextField
           value={v}
-          onChange={(next) => onChange((next as string | null) || null)}
+          onChange={(next) => onChange(next || null)}
           placeholder={t(`transportOrders.route.${leg}`)}
           autoFocus
         />
@@ -709,7 +713,7 @@ export function TransportOrderDetailPage() {
               )}
               {infoRow(
                 t('transportOrders.form.shipmentType'),
-                order.shipmentType ? t(`transportOrders.shipmentType.${order.shipmentType}`) : '',
+                shipmentTypeLabel(order.shipmentType),
               )}
               {/* Customer stays read-only — it's the billing party, and changing it
               belongs with the fee review on the form (SO does the same). */}

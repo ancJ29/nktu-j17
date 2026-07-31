@@ -43,7 +43,7 @@ import { TransportOrderDataTable } from './TransportOrderDataTable';
 import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
 import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
-import { useShipmentTypeOptions } from './shipmentType';
+import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
 import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
@@ -181,6 +181,7 @@ export function TransportOrderListPage() {
   const driverLabel = (id: string) => driverData.find((e) => e.value === id)?.label ?? id;
 
   const shipmentData = useShipmentTypeOptions();
+  const shipmentTypeLabel = useShipmentTypeLabel();
 
   const containerSizeData = useContainerSizeOptions();
   const containerSizeLabel = useContainerSizeLabel();
@@ -457,7 +458,7 @@ export function TransportOrderListPage() {
           )}
           {showShipmentPill && filters.shipmentFilter !== 'all' && (
             <FilterPill onClose={() => filters.setShipmentFilter('all')}>
-              {t(`transportOrders.shipmentType.${filters.shipmentFilter}`)}
+              {shipmentTypeLabel(filters.shipmentFilter)}
             </FilterPill>
           )}
           {filters.containerSizeFilter && (

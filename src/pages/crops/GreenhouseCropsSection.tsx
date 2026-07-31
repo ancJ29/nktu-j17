@@ -191,6 +191,8 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
       numberOfSeeds: (v) =>
         v !== '' && Number(v) > 0 ? null : t('crops.validation.numberOfSeedsRequired'),
       fromDate: (v) => (v ? null : t('crops.validation.fromRequired')),
+
+      diaryTemplateCode: (v) => (v ? null : t('crops.validation.diaryTemplateRequired')),
       totalDates: (v, values) => {
         const n = Number(v);
         if (v === '' || !Number.isFinite(n) || n < 1) {
@@ -514,8 +516,9 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
               placeholder={t('crops.form.diaryTemplatePlaceholder')}
               data={templateOptions}
               searchable
-              clearable
+              withAsterisk
               value={form.values.diaryTemplateCode}
+              error={form.errors.diaryTemplateCode}
               onChange={(value) => {
                 form.setFieldValue('diaryTemplateCode', value);
                 if (value) {

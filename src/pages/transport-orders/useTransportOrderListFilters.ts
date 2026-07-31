@@ -36,8 +36,9 @@ type TransportOrderUrlState = {
   c?: string;
   tk?: string;
   dv?: string;
+
   sh?: TransportOrderShipmentType;
-  cz?: '20' | '40';
+  cz?: string;
   hc?: boolean;
   sr?: string;
   cd?: SerializedDateRange;
@@ -114,7 +115,7 @@ export function useTransportOrderListFilters(
     [updateState],
   );
   const setContainerSizeFilter = useCallback(
-    (v: string | null) => updateState({ cz: (v as '20' | '40') || undefined, pg: undefined }),
+    (v: string | null) => updateState({ cz: v || undefined, pg: undefined }),
     [updateState],
   );
   const setHideCancelled = useCallback(

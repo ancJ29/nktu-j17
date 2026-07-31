@@ -8,6 +8,7 @@
         "cancel": "Cancel",
         "clearFilters": "Clear all filters",
         "clearSearch": "Clear search",
+        "clearValue": "Clear",
         "copy": "Copy",
         "copyLink": "Copy link",
         "disable": "Disable",
@@ -17,6 +18,7 @@
         "generate": "Generate",
         "open": "Open",
         "openInMaps": "Open in Maps",
+        "pickDateTime": "Pick date and time",
         "remove": "Remove",
         "save": "Save Changes",
         "view": "View"
@@ -50,6 +52,9 @@
       },
       "list": {
         "loadingMore": "Loading {{chunk}} more of {{total}}…"
+      },
+      "validation": {
+        "invalidDateTime": "Unrecognised date/time — e.g. {{example}}"
       }
     },
     "07-entities": {
@@ -764,6 +769,11 @@
   },
   "cropDiaries": {
     "addItem": "Add Entry",
+    "applyConfirm": {
+      "duplicateWarning": "This diary already has {{existing}} entries from a template — applying again adds a second copy instead of replacing them, and there is no bulk undo.",
+      "message": "Apply \"{{template}}\" to this crop's diary? It creates {{count}} entries, starting {{date}}.",
+      "title": "Apply template?"
+    },
     "applyTemplateButton": "Apply",
     "applyTemplatePlaceholder": "Apply a template…",
     "columns": {
@@ -1995,6 +2005,7 @@
       "productCategory": "Product Category",
       "productTag": "Product Tag",
       "productUnit": "Product Unit",
+      "shipmentType": "Shipment Type",
       "truckType": "Truck Type",
       "unit": "Unit of Measure"
     },

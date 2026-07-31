@@ -8,7 +8,8 @@ export type LookupV2CategoryId =
   | 'product-category'
   | 'truck-type'
   | 'truck-maintenance-type'
-  | 'container-size';
+  | 'container-size'
+  | 'shipment-type';
 
 export type LookupV2Category = {
   id: LookupV2CategoryId;
@@ -38,11 +39,13 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
   },
 
   { id: 'container-size', labelKey: 'lookups.categories.containerSize', defaultSortOrder: 1 },
+
+  { id: 'shipment-type', labelKey: 'lookups.categories.shipmentType', defaultSortOrder: 1 },
 ];
 
 const FLEET_ONLY_CATEGORIES: LookupV2CategoryId[] = ['truck-type', 'truck-maintenance-type'];
 
-const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = ['container-size'];
+const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = ['container-size', 'shipment-type'];
 
 export function getEnabledLookupV2Categories(): LookupV2Category[] {
   const cfg = appConfig.features?.lookupV2;
