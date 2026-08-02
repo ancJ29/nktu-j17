@@ -1,7 +1,12 @@
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import type { ProductInventoryExtra, ProductInventoryRow } from '@/types/product-inventory';
 import type { Product } from '@/types/product';
-import type { InventoryLinkageSnapshotEntry, SalesOrder, SalesOrderItem } from '@/types';
+import type {
+  BreakdownRemainderCredit,
+  InventoryLinkageSnapshotEntry,
+  SalesOrder,
+  SalesOrderItem,
+} from '@/types';
 import { DEFAULT_LOCATION_CODE, isDefaultLocation } from '@/types/location';
 import {
   applyDelta,
@@ -15,10 +20,18 @@ import {
 } from './inventoryMath';
 import { getItemBaseUnit } from './unitConversion';
 import { getOwnReservedAtLocation, getProductLocationAvailability } from './inventoryCommitment';
-import { groupLinesBySet, isProductSet, isNoInventoryProduct } from './productSet';
+import { groupLinesBySet, isBundleSet, isNoInventoryProduct } from './productSet';
+import {
+  breakdownRowKey,
+  buildBreakdownParentIndex,
+  collectBreakdownRemainders,
+  planLineBreakdown,
+  type BreakdownParentLink,
+} from './breakdownSet';
 import { getLinePhysicalQuantity } from './salesOrderItemQuantity';
 
-export type ReservationAction = 'reserve' | 'release' | 'ship' | 'reserve-adjust' | 'unship';
+export type ReservationAction =
+  'reserve' | 'release' | 'ship' | 'reserve-adjust' | 'unship' | 'breakdown-credit';
 
 export type PlannedOp = {
   readonly rowId: string;
@@ -30,6 +43,8 @@ export type PlannedOp = {
   readonly snapshotVersion: string;
   readonly forwardPatch: ReservationPatch;
   readonly rollbackPatch: ReservationPatch;
+
+  readonly remainderCredits?: readonly BreakdownRemainderCredit[];
 };
 
 export type ReservationPatch = {
@@ -121,6 +136,35 @@ function stripSetFields(line: SalesOrderItem): SalesOrderItem {
   return rest;
 }
 
+function expandBreakdownLine(
+  line: SalesOrderItem,
+  productsByCode: Map<string, Product>,
+  inventoryByProduct: Map<string, ProductInventoryRow[]>,
+  parentIndex: Map<string, BreakdownParentLink[]>,
+  ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[],
+): SalesOrderItem[] {
+  const coverage = planLineBreakdown({
+    line,
+    productsByCode,
+    inventoryByProduct,
+    parentIndex,
+    ownReservedSnapshot,
+  });
+  if (!coverage || !coverage.parentLock) return [line];
+
+  const { extraQuantity: _extra, ...rest } = line;
+  const out: SalesOrderItem[] = [];
+  if (coverage.componentQty > 0) out.push({ ...rest, quantity: coverage.componentQty });
+  out.push({
+    ...rest,
+    productCode: coverage.parentLock.product.code,
+    productName: coverage.parentLock.product.name,
+    quantity: coverage.parentLock.quantity,
+    unit: coverage.parentLock.unit,
+  });
+  return out;
+}
+
 export function expandSetReservationItems(
   items: readonly SalesOrderItem[],
   productsByCode: Map<string, Product>,
@@ -128,9 +172,21 @@ export function expandSetReservationItems(
   ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[],
 ): SalesOrderItem[] {
   const out: SalesOrderItem[] = [];
+
+  const breakdownParents = buildBreakdownParentIndex(productsByCode.values());
   for (const group of groupLinesBySet(items)) {
     if (group.groupId === null) {
-      out.push(...group.lines);
+      for (const line of group.lines) {
+        out.push(
+          ...expandBreakdownLine(
+            line,
+            productsByCode,
+            inventoryByProduct,
+            breakdownParents,
+            ownReservedSnapshot,
+          ),
+        );
+      }
       continue;
     }
     const parent = group.lines.find((l) => l.role === 'set');
@@ -145,7 +201,8 @@ export function expandSetReservationItems(
 
     const setProduct = productsByCode.get(parent.productCode);
     const parentQty = parent.quantity;
-    if (!setProduct || !isProductSet(setProduct) || parentQty <= 0) {
+
+    if (!setProduct || !isBundleSet(setProduct) || parentQty <= 0) {
       out.push(stripSetFields(parent));
       continue;
     }
@@ -191,6 +248,11 @@ export function planReservation(inputs: PlanInputs): PlanResult {
     action === 'reserve'
       ? expandSetReservationItems(so.items, productsByCode, inventoryByProduct)
       : so.items;
+
+  const remaindersByRow =
+    action === 'reserve'
+      ? collectBreakdownRemainders({ items: so.items, productsByCode, inventoryByProduct })
+      : new Map<string, BreakdownRemainderCredit[]>();
 
   for (const line of reservationLines) {
     if (!line.productCode || line.quantity <= 0) continue;
@@ -351,6 +413,10 @@ export function planReservation(inputs: PlanInputs): PlanResult {
       };
     }
 
+    const remainderCredits = remaindersByRow.get(
+      breakdownRowKey(b.row.itemCode, b.row.locationCode),
+    );
+
     ops.push({
       rowId: b.rowId,
       itemCode: b.row.itemCode,
@@ -361,6 +427,7 @@ export function planReservation(inputs: PlanInputs): PlanResult {
       snapshotVersion: b.row.version,
       forwardPatch,
       rollbackPatch,
+      ...(remainderCredits?.length && { remainderCredits }),
     });
   }
 
@@ -404,7 +471,9 @@ function describeOp(
         ? 'Release'
         : action === 'unship'
           ? 'Un-ship'
-          : 'Ship';
+          : action === 'breakdown-credit'
+            ? 'Credit offcut'
+            : 'Ship';
   const loc = isDefaultLocation(locationCode) ? 'default' : locationCode;
   return `${verb} ${parts.join(' + ')} of ${product.code} from ${loc} for ${so.orderNumber}`;
 }
@@ -450,7 +519,25 @@ function buildLinkageSnapshotFromOps(
       itemCode: op.itemCode,
       locationCode: op.locationCode,
       byUnit,
+      ...(op.remainderCredits?.length && {
+        remainderCredits: op.remainderCredits.map((c) => ({ ...c })),
+      }),
     });
+  }
+  return out;
+}
+
+export function buildHoldSnapshotForSalesOrder(
+  rows: readonly ProductInventoryRow[],
+  salesOrderId: string,
+): InventoryLinkageSnapshotEntry[] {
+  const out: InventoryLinkageSnapshotEntry[] = [];
+  for (const row of rows) {
+    const hold = row.extra?.reservedBySalesOrder?.[salesOrderId]?.byUnit;
+    if (!hold) continue;
+    const byUnit = Object.fromEntries(Object.entries(hold).filter(([, q]) => q > 0));
+    if (Object.keys(byUnit).length === 0) continue;
+    out.push({ rowId: row.id, itemCode: row.itemCode, locationCode: row.locationCode, byUnit });
   }
   return out;
 }
@@ -549,6 +636,17 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
   const failures: PlanFailure[] = [];
   const ops: PlannedOp[] = [];
 
+  const creditsByRow = new Map<string, OnHandByUnit>();
+  for (const entry of snapshot) {
+    for (const credit of entry.remainderCredits ?? []) {
+      if (!(credit.quantity > 0)) continue;
+      const key = breakdownRowKey(credit.itemCode, entry.locationCode);
+      const bucket = creditsByRow.get(key) ?? {};
+      bucket[credit.unit] = (bucket[credit.unit] ?? 0) + credit.quantity;
+      creditsByRow.set(key, bucket);
+    }
+  }
+
   for (const entry of snapshot) {
     const product = productsByCode.get(entry.itemCode);
     if (!product) {
@@ -595,6 +693,21 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
       continue;
     }
 
+    const rowKey = breakdownRowKey(row.itemCode, row.locationCode);
+    const credit = creditsByRow.get(rowKey);
+    creditsByRow.delete(rowKey);
+    let shippedOnHandByUnit = result.onHandByUnit;
+    let shippedOnHand = result.onHand;
+    if (credit) {
+      const credited = applyDelta(product, shippedOnHandByUnit, credit, { allowNegative: true });
+      if (!credited.ok) {
+        failures.push({ kind: 'unknown-unit', productCode: product.code, unit: credited.unit });
+        continue;
+      }
+      shippedOnHandByUnit = credited.onHandByUnit;
+      shippedOnHand = credited.onHand;
+    }
+
     const description = describeOp('ship', deltas, row.locationCode, product, so);
     const rollbackPatch: ReservationPatch = {
       onHand: row.onHand,
@@ -605,10 +718,10 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
       },
     };
     const forwardPatch: ReservationPatch = {
-      onHand: result.onHand,
+      onHand: shippedOnHand,
       extra: {
         ...(row.extra ?? {}),
-        onHandByUnit: result.onHandByUnit,
+        onHandByUnit: shippedOnHandByUnit,
         reservedByUnit: result.reservedByUnit,
         reservedBySalesOrder: nextReservedBySalesOrder(
           row.extra?.reservedBySalesOrder,
@@ -629,6 +742,55 @@ export function planShipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanResu
       snapshotVersion: row.version,
       forwardPatch,
       rollbackPatch,
+      ...(entry.remainderCredits?.length && { remainderCredits: entry.remainderCredits }),
+    });
+  }
+
+  for (const [key, credit] of creditsByRow) {
+    const itemCode = key.slice(0, key.lastIndexOf('@'));
+    const locationCode = key.slice(key.lastIndexOf('@') + 1);
+    const product = productsByCode.get(itemCode);
+    const rows = inventoryByProduct.get(itemCode) ?? [];
+    const row = resolveSnapshotRow(rows, { locationCode });
+    if (!product || !row) {
+      console.warn(
+        `[breakdown-set] no inventory row for offcut ${itemCode} at ${locationCode}; ` +
+          'credit skipped — the cut pieces are unrecorded until a stock-take.',
+      );
+      continue;
+    }
+    const baseUnit = getItemBaseUnit(product);
+    const currentOnHandByUnit = readRowBreakdown(row, baseUnit);
+    const currentReservedByUnit = readRowReserved(row);
+    const credited = applyDelta(product, currentOnHandByUnit, credit, { allowNegative: true });
+    if (!credited.ok) {
+      failures.push({ kind: 'unknown-unit', productCode: product.code, unit: credited.unit });
+      continue;
+    }
+    ops.push({
+      rowId: row.id,
+      itemCode: row.itemCode,
+      locationCode: row.locationCode,
+      action: 'breakdown-credit',
+      deltas: credit,
+      description: describeOp('breakdown-credit', credit, row.locationCode, product, so),
+      snapshotVersion: row.version,
+      forwardPatch: {
+        onHand: credited.onHand,
+        extra: {
+          ...(row.extra ?? {}),
+          onHandByUnit: credited.onHandByUnit,
+          reservedByUnit: currentReservedByUnit,
+        },
+      },
+      rollbackPatch: {
+        onHand: row.onHand,
+        extra: {
+          ...(row.extra ?? {}),
+          onHandByUnit: currentOnHandByUnit,
+          reservedByUnit: currentReservedByUnit,
+        },
+      },
     });
   }
 
@@ -640,6 +802,17 @@ export function planUnshipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanRe
   const { snapshot, so, productsByCode, inventoryByProduct } = inputs;
   const failures: PlanFailure[] = [];
   const ops: PlannedOp[] = [];
+
+  const debitsByRow = new Map<string, OnHandByUnit>();
+  for (const entry of snapshot) {
+    for (const credit of entry.remainderCredits ?? []) {
+      if (!(credit.quantity > 0)) continue;
+      const key = breakdownRowKey(credit.itemCode, entry.locationCode);
+      const bucket = debitsByRow.get(key) ?? {};
+      bucket[credit.unit] = (bucket[credit.unit] ?? 0) - credit.quantity;
+      debitsByRow.set(key, bucket);
+    }
+  }
 
   for (const entry of snapshot) {
     const product = productsByCode.get(entry.itemCode);
@@ -667,7 +840,13 @@ export function planUnshipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanRe
     for (const [u, q] of Object.entries(entry.byUnit)) if (q > 0) deltas[u] = q;
     if (Object.keys(deltas).length === 0) continue;
 
-    const result = applyDelta(product, currentOnHandByUnit, deltas);
+    const rowKey = breakdownRowKey(row.itemCode, row.locationCode);
+    const debit = debitsByRow.get(rowKey);
+    debitsByRow.delete(rowKey);
+    const combined: OnHandByUnit = { ...deltas };
+    for (const [u, q] of Object.entries(debit ?? {})) combined[u] = (combined[u] ?? 0) + q;
+
+    const result = applyDelta(product, currentOnHandByUnit, combined, { allowNegative: true });
     if (!result.ok) {
       failures.push({ kind: 'unknown-unit', productCode: product.code, unit: result.unit });
       continue;
@@ -707,6 +886,54 @@ export function planUnshipFromLinkage(inputs: ReleaseFromSnapshotInputs): PlanRe
       snapshotVersion: row.version,
       forwardPatch,
       rollbackPatch,
+    });
+  }
+
+  for (const [key, debit] of debitsByRow) {
+    const itemCode = key.slice(0, key.lastIndexOf('@'));
+    const locationCode = key.slice(key.lastIndexOf('@') + 1);
+    const product = productsByCode.get(itemCode);
+    const rows = inventoryByProduct.get(itemCode) ?? [];
+    const row = resolveSnapshotRow(rows, { locationCode });
+    if (!product || !row) {
+      console.warn(
+        `[breakdown-set] no inventory row for offcut debit ${itemCode} at ${locationCode}; ` +
+          'skipped — the row was removed after the ship credited it.',
+      );
+      continue;
+    }
+    const baseUnit = getItemBaseUnit(product);
+    const currentOnHandByUnit = readRowBreakdown(row, baseUnit);
+    const currentReservedByUnit = readRowReserved(row);
+    const debited = applyDelta(product, currentOnHandByUnit, debit, { allowNegative: true });
+    if (!debited.ok) {
+      failures.push({ kind: 'unknown-unit', productCode: product.code, unit: debited.unit });
+      continue;
+    }
+    ops.push({
+      rowId: row.id,
+      itemCode: row.itemCode,
+      locationCode: row.locationCode,
+      action: 'breakdown-credit',
+      deltas: debit,
+      description: describeOp('breakdown-credit', debit, row.locationCode, product, so),
+      snapshotVersion: row.version,
+      forwardPatch: {
+        onHand: debited.onHand,
+        extra: {
+          ...(row.extra ?? {}),
+          onHandByUnit: debited.onHandByUnit,
+          reservedByUnit: currentReservedByUnit,
+        },
+      },
+      rollbackPatch: {
+        onHand: row.onHand,
+        extra: {
+          ...(row.extra ?? {}),
+          onHandByUnit: currentOnHandByUnit,
+          reservedByUnit: currentReservedByUnit,
+        },
+      },
     });
   }
 
@@ -872,16 +1099,27 @@ export function buildDesiredReservationSnapshot(inputs: {
 
   if (failures.length > 0) return { ok: false, failures };
 
+  const remaindersByRow = collectBreakdownRemainders({
+    items,
+    productsByCode,
+    inventoryByProduct,
+    ownReservedSnapshot,
+  });
+
   const snapshot: InventoryLinkageSnapshotEntry[] = [];
   for (const entry of byRow.values()) {
     const cleanByUnit: Record<string, number> = {};
     for (const [u, q] of Object.entries(entry.byUnit)) if (q > 0) cleanByUnit[u] = q;
     if (Object.keys(cleanByUnit).length === 0) continue;
+    const remainderCredits = remaindersByRow.get(
+      breakdownRowKey(entry.itemCode, entry.locationCode),
+    );
     snapshot.push({
       rowId: entry.rowId,
       itemCode: entry.itemCode,
       locationCode: entry.locationCode,
       byUnit: cleanByUnit,
+      ...(remainderCredits?.length && { remainderCredits }),
     });
   }
 

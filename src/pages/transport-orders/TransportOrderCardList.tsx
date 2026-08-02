@@ -5,6 +5,7 @@ import { ROUTES } from '@/constants/routes';
 import type { TransportOrder } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
 import { findStatus } from './transportOrderStatuses';
+import { useShipmentTypeLabel } from './shipmentType';
 import { TransportRouteCell } from './TransportRouteCell';
 
 type Props = {
@@ -15,6 +16,7 @@ type Props = {
 export function TransportOrderCardList({ orders, isLoading }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const shipmentTypeLabel = useShipmentTypeLabel();
 
   if (!isLoading && orders.length === 0) {
     return (
@@ -40,9 +42,18 @@ export function TransportOrderCardList({ orders, isLoading }: Props) {
             <Group justify="space-between" wrap="nowrap" align="flex-start">
               <Stack gap={2} style={{ minWidth: 0 }}>
                 <Text fw={600}>{item.orderNumber}</Text>
-                <Text size="xs" c="dimmed">
-                  {formatDate(item.entryDate)}
-                </Text>
+                {/* Date and LOẠI HÌNH on one line — same facts as the table,
+                    where the type sits under the order number. */}
+                <Group gap={6} wrap="nowrap">
+                  <Text size="xs" c="dimmed">
+                    {formatDate(item.entryDate)}
+                  </Text>
+                  {item.shipmentType && (
+                    <Badge size="xs" variant="light" color="gray">
+                      {shipmentTypeLabel(item.shipmentType)}
+                    </Badge>
+                  )}
+                </Group>
               </Stack>
               {item.extra?.cancellation ? (
                 <Badge color="red" variant="light">

@@ -265,6 +265,8 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
           statusValue: toStatusValue,
         };
 
+    const shipSnapshot = buildLinkageSnapshotFromShipOps(allOps);
+
     let intentUpdated: SalesOrder;
     try {
       intentUpdated = (await useSalesOrderStore.getState().updateSafely({
@@ -275,7 +277,7 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
           extra: buildExtra(
             buildPendingShipLinkage(
               preLinkage ?? { state: 'reserved' },
-              buildLinkageSnapshotFromShipOps(allOps),
+              shipSnapshot,
               transitionAt,
               actor,
               shipVia,
@@ -314,7 +316,7 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
         patch: {
           extra: {
             ...((intentUpdated.extra ?? {}) as SalesOrderExtra),
-            inventoryLinkage: buildShippedLinkage(transitionAt, actor, shipVia),
+            inventoryLinkage: buildShippedLinkage(shipSnapshot, transitionAt, actor, shipVia),
           },
         },
       })) as SalesOrder;

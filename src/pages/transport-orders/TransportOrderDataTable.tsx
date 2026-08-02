@@ -4,10 +4,11 @@ import { Badge, Box, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { TransportOrder } from '@/types';
-import { DataTable } from '@credo/base-ui/components';
+import { ColorBadge, DataTable } from '@credo/base-ui/components';
 import { formatDate } from '@/utils/dateFormat';
 import { SortHeader } from '@/components/SortHeader';
 import { findStatus } from './transportOrderStatuses';
+import { useShipmentTypeLabel } from './shipmentType';
 import { TransportRouteCell } from './TransportRouteCell';
 
 type Props = {
@@ -28,6 +29,7 @@ export function TransportOrderDataTable({
 }: Props) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const shipmentTypeLabel = useShipmentTypeLabel();
 
   const columns = useMemo(
     () => [
@@ -35,10 +37,16 @@ export function TransportOrderDataTable({
         key: 'orderNumber',
         header: t('transportOrders.columns.orderNumber'),
         width: '150px',
+
         render: (item: TransportOrder) => (
-          <Text fz="md" fw={500}>
-            {item.orderNumber}
-          </Text>
+          <Stack gap={4} align="flex-start">
+            <Text fz="md" fw={500}>
+              {item.orderNumber}
+            </Text>
+            {item.shipmentType && (
+              <ColorBadge size="xs" label={shipmentTypeLabel(item.shipmentType)} />
+            )}
+          </Stack>
         ),
       },
       {
@@ -112,7 +120,7 @@ export function TransportOrderDataTable({
       },
     ],
 
-    [t, i18n.language, sortField, onSortChange],
+    [t, i18n.language, sortField, onSortChange, shipmentTypeLabel],
   );
 
   const handleRowClick = (item: TransportOrder) => {

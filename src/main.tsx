@@ -55,13 +55,22 @@ if (storageHashStale) {
   setCredoGroup(appApiGroup);
 }
 
-createRoot(rootElement).render(
-  <StrictMode>
-    <MantineProvider theme={theme} forceColorScheme="light">
-      <Notifications position="bottom-right" autoClose={10_000} limit={5} />
-      <Suspense>
-        <App />
-      </Suspense>
-    </MantineProvider>
-  </StrictMode>,
-);
+// TODO: remove this later
+const redirectConfigs: Record<string, string> = {
+  'dung-uy.internal.cr3do.dev': 'https://dung-uy.cr3do.dev/',
+};
+
+if (redirectConfigs[window.location.host]) {
+  window.location.href = redirectConfigs[window.location.host];
+} else {
+  createRoot(rootElement).render(
+    <StrictMode>
+      <MantineProvider theme={theme} forceColorScheme="light">
+        <Notifications position="bottom-right" autoClose={10_000} limit={5} />
+        <Suspense>
+          <App />
+        </Suspense>
+      </MantineProvider>
+    </StrictMode>,
+  );
+}

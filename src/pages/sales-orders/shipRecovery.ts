@@ -224,7 +224,13 @@ async function patchShippedLinkage(
     patch: {
       extra: {
         ...extra,
-        inventoryLinkage: buildShippedLinkage(pending.at, actor ?? pending.by, pending.via),
+
+        inventoryLinkage: buildShippedLinkage(
+          pending.snapshot,
+          pending.at,
+          actor ?? pending.by,
+          pending.via,
+        ),
       },
     },
   });

@@ -301,6 +301,7 @@ export function CropDetailPage() {
           cropId={diaryCropId}
           cropCode={crop.code}
           defaultStartDate={extra.fromDate}
+          plantCount={typeof extra.numberOfSeeds === 'number' ? extra.numberOfSeeds : undefined}
           onSummaryChange={setMaterialSummary}
         />
       </Tabs.Panel>

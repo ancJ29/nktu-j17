@@ -1,7 +1,7 @@
 import { useMemo, type Ref } from 'react';
 import { Badge, Box, Group, HoverCard, Stack, Text, Tooltip } from '@mantine/core';
 import { IconAlertTriangle, IconMapPin } from '@tabler/icons-react';
-import { isProductSet } from '@/utils/productSet';
+import { ProductSetBadge } from '@/components/ProductSetBadge';
 import { useTranslation } from 'react-i18next';
 import { CodeLabel, DataTable } from '@credo/base-ui/components';
 import { formatDateTime } from '@/utils/dateFormat';
@@ -15,7 +15,6 @@ import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
 import { InventorySecondaryStatusBadge } from '@/components/inventory/InventorySecondaryStatusBadge';
 import { SalesOrderLink } from '@/components/SalesOrderLink';
 import { hasImagesForProducts } from '@/utils/permission';
-import { PRODUCT_SET_COLOR } from '@/config/misc';
 
 const imagesEnabled = hasImagesForProducts();
 const locationsEnabled = isLocationsEnabled();
@@ -291,11 +290,7 @@ export function ProductInventoryDataTable({
                     <Text fz="md" fw={600} lh={1.25}>
                       {product.name}
                     </Text>
-                    {isProductSet(product) && (
-                      <Badge size="xs" variant="light" color={PRODUCT_SET_COLOR} radius="sm">
-                        {t('products.detail.setBadge')}
-                      </Badge>
-                    )}
+                    <ProductSetBadge product={product} />
                   </Group>
                   <CodeLabel code={product.extra?.sku} />
                   {altNames.length > 0 && (

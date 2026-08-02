@@ -34,7 +34,7 @@ import { logActivity } from '@/utils/activityLogger';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { isLocationsEnabled } from '@/utils/permission';
 import { getItemBaseUnit } from '@/utils/unitConversion';
-import { isProductSet } from '@/utils/productSet';
+import { isBundleSet } from '@/utils/productSet';
 import { rebalanceForSetStockChange } from '@/utils/setRebalance';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
 const locationsEnabled = isLocationsEnabled();
@@ -107,7 +107,7 @@ export function ProductInventoryComposeSetModal({
   ]);
 
   const setProducts = useMemo(
-    () => products.filter((p) => p.isActive && isProductSet(p)),
+    () => products.filter((p) => p.isActive && isBundleSet(p)),
     [products],
   );
   const setProductOptions = useMemo(

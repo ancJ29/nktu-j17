@@ -38,6 +38,7 @@ import { ProductInventoryDecomposeSetModal } from './ProductInventoryDecomposeSe
 import { InventoryImportExportActions } from '@/components/inventory/InventoryImportExportActions';
 import { hasHideFromInventoryListForProducts, isLocationsEnabled } from '@/utils/permission';
 import {
+  isBundleSet,
   isProductSet,
   isNoInventoryProduct,
   isHiddenFromInventoryListProduct,
@@ -258,6 +259,11 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     () => products.some((p) => p.isActive && isProductSet(p)),
     [products],
   );
+  const hasActiveBundleSet = useMemo(
+    () => products.some((p) => p.isActive && isBundleSet(p)),
+    [products],
+  );
+  const showComposeButton = canCompose && hasActiveBundleSet;
   const showSetOpsButtons = canCompose && hasActiveSetProduct;
   const openCompose = useCallback(() => setComposeOpen(true), []);
   const closeCompose = useCallback(() => setComposeOpen(false), []);
@@ -600,15 +606,17 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                 )}
                 {showSetOpsButtons && (
                   <>
-                    <Button
-                      variant="light"
-                      color={PRODUCT_SET_COLOR}
-                      size="sm"
-                      leftSection={<IconBoxMultiple size={14} />}
-                      onClick={openCompose}
-                    >
-                      {t('productInventory.composeSet.openButton')}
-                    </Button>
+                    {showComposeButton && (
+                      <Button
+                        variant="light"
+                        color={PRODUCT_SET_COLOR}
+                        size="sm"
+                        leftSection={<IconBoxMultiple size={14} />}
+                        onClick={openCompose}
+                      >
+                        {t('productInventory.composeSet.openButton')}
+                      </Button>
+                    )}
                     <Button
                       variant="light"
                       color="orange"
@@ -635,13 +643,15 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
         />
         {showSetOpsButtons && (
           <>
-            <ProductInventoryComposeSetModal
-              opened={composeOpen}
-              onClose={closeCompose}
-              products={products}
-              rows={allRows}
-              locations={locations}
-            />
+            {showComposeButton && (
+              <ProductInventoryComposeSetModal
+                opened={composeOpen}
+                onClose={closeCompose}
+                products={products}
+                rows={allRows}
+                locations={locations}
+              />
+            )}
             <ProductInventoryDecomposeSetModal
               opened={decomposeOpen}
               onClose={closeDecompose}

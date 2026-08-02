@@ -15,6 +15,7 @@ import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
   IconCalendar,
+  IconDroplet,
   IconClipboardList,
   IconDownload,
   IconEdit,
@@ -37,7 +38,12 @@ import {
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import { formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
-import { daysToRows, templatePlanDays } from '@/utils/cropDiaryTemplateModel';
+import {
+  daysToRows,
+  summarizeWatering,
+  templatePlanDays,
+  templateWatering,
+} from '@/utils/cropDiaryTemplateModel';
 import { exportCropDiaryTemplateRows } from '@/utils/cropDiaryTemplateExcel';
 import { perms } from '@/utils/permission';
 import type { CropDiaryTemplate } from '@/types';
@@ -103,6 +109,8 @@ export function CropDiaryTemplateDetailPage() {
 
   const description = template.extra?.description;
   const days = templatePlanDays(template);
+  const watering = templateWatering(template);
+  const wateringRuns = summarizeWatering(days);
   const totalDays = template.extra?.totalDates ?? days.length;
 
   const statbook = (
@@ -244,6 +252,31 @@ export function CropDiaryTemplateDetailPage() {
         )}
       </SectionCard>
 
+      {watering && wateringRuns.length > 0 && (
+        <SectionCard
+          icon={<IconDroplet size={14} />}
+          title={t('cropDiaryTemplates.watering.section')}
+        >
+          <Stack gap="xs">
+            <Text size="sm" fw={600}>
+              {watering.activity}
+            </Text>
+            {/* The stage-by-stage read; each day's own figure is on its row
+                below, so this is the overview, not the source of truth. */}
+            <Group gap="xs" wrap="wrap">
+              {wateringRuns.map((run) => (
+                <Badge key={run.fromDay} variant="light" color="primary" radius="sm" tt="none">
+                  {run.fromDay === run.toDay
+                    ? t('cropDiaryTemplates.dayLabel', { day: run.fromDay })
+                    : t('cropDiaryTemplates.watering.window', { from: run.fromDay, to: run.toDay })}
+                  {` · ${formatNumber(run.perPlant)}${watering.unit ? ` ${watering.unit}` : ''}`}
+                </Badge>
+              ))}
+            </Group>
+          </Stack>
+        </SectionCard>
+      )}
+
       <SectionCard
         icon={<IconCalendar size={14} />}
         title={t('cropDiaryTemplates.daysTitle')}
@@ -266,9 +299,21 @@ export function CropDiaryTemplateDetailPage() {
                   <Badge variant="light" color="gray" radius="sm" size="sm">
                     {t('cropDiaryTemplates.dayLabel', { day: day.day })}
                   </Badge>
-                  <Text size="sm" fw={600} truncate>
+                  <Text size="sm" fw={600} truncate style={{ flex: 1 }}>
                     {day.activity || '—'}
                   </Text>
+                  {/* The day's water reads on the row itself: "how much for day
+                      12" is the question this page is scanned for, and a rate
+                      stated once at the top forces the reader to do the lookup. */}
+                  {typeof day.water === 'number' && day.water > 0 && (
+                    <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
+                      <IconDroplet size={14} color="var(--mantine-color-primary-6)" />
+                      <Text size="sm" fw={600} c="primary" style={{ whiteSpace: 'nowrap' }}>
+                        {formatNumber(day.water)}
+                        {watering?.unit ? ` ${watering.unit}` : ''}
+                      </Text>
+                    </Group>
+                  )}
                 </Group>
                 {day.memo && (
                   <Text size="xs" c="dimmed" style={{ whiteSpace: 'pre-wrap' }}>

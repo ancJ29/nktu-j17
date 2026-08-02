@@ -1,10 +1,15 @@
 import { useMemo } from 'react';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
-import type { Employee } from '@/types';
+import type { Employee, TruckAssetRow } from '@/types';
 
 export function truckNameWithPlate(name: string, plate: string | undefined | null): string {
   const trimmed = plate?.trim();
   return trimmed ? `${name} · ${trimmed}` : name;
+}
+
+export function truckOptionLabel(truck: Pick<TruckAssetRow, 'name' | 'code' | 'extra'>): string {
+  const base = truckNameWithPlate(truck.name, truck.extra?.plateNumber);
+  return truck.code ? `${base} (${truck.code})` : base;
 }
 
 export function useTruckPlate(): (truckId: string | undefined | null) => string | undefined {

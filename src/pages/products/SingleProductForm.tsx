@@ -5,6 +5,7 @@ import {
   Group,
   MultiSelect,
   NumberInput,
+  SegmentedControl,
   Select,
   SimpleGrid,
   Stack,
@@ -70,6 +71,8 @@ export type ProductFormValues = {
   unitConversions: UnitConversion[];
 
   setItems: ProductSetItem[];
+
+  setMode: 'bundle' | 'breakdown';
 };
 
 const barcodeEnabled = hasBarcodeForProducts();
@@ -246,6 +249,26 @@ function SetCompositionEditor({
       <Text size="xs" c="dimmed">
         {t('products.form.setItemsDesc')}
       </Text>
+      {/* Mode selector rides with the rows, not above the empty state: on a
+          product with no components the choice has nothing to apply to, and an
+          always-visible control would read as a property of every product. */}
+      <Stack gap={4}>
+        <SegmentedControl
+          size="xs"
+          data={[
+            { value: 'bundle', label: t('products.form.setModeBundle') },
+            { value: 'breakdown', label: t('products.form.setModeBreakdown') },
+          ]}
+          {...form.getInputProps('setMode')}
+        />
+        <Text size="xs" c="dimmed">
+          {t(
+            form.values.setMode === 'breakdown'
+              ? 'products.form.setModeBreakdownDesc'
+              : 'products.form.setModeBundleDesc',
+          )}
+        </Text>
+      </Stack>
       {items.map((row, idx) => {
         const picked = row.productCode ? productByCode.get(row.productCode) : undefined;
         const unitOptions = picked

@@ -4,6 +4,18 @@ export function isProductSet(p: Pick<Product, 'extra'> | undefined | null): bool
   return !!p?.extra?.setItems?.length;
 }
 
+export function getSetMode(p: Pick<Product, 'extra'> | undefined | null): 'bundle' | 'breakdown' {
+  return p?.extra?.setMode === 'breakdown' ? 'breakdown' : 'bundle';
+}
+
+export function isBundleSet(p: Pick<Product, 'extra'> | undefined | null): boolean {
+  return isProductSet(p) && getSetMode(p) === 'bundle';
+}
+
+export function isBreakdownSet(p: Pick<Product, 'extra'> | undefined | null): boolean {
+  return isProductSet(p) && getSetMode(p) === 'breakdown';
+}
+
 export function isNoInventoryProduct(p: Pick<Product, 'extra'> | undefined | null): boolean {
   return p?.extra?.noInventory === true;
 }

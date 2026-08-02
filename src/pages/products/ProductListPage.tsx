@@ -27,7 +27,12 @@ import {
   isProductInventoryEnabled,
   perms,
 } from '@/utils/permission';
-import { isNoInventoryProduct, isProductSet } from '@/utils/productSet';
+import {
+  isBreakdownSet,
+  isBundleSet,
+  isNoInventoryProduct,
+  isProductSet,
+} from '@/utils/productSet';
 import { logActivity } from '@/utils/activityLogger';
 import { exportProductsToExcel } from '@/utils/excelParser';
 import { ProductCardList } from './ProductCardList';
@@ -42,7 +47,7 @@ const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 
-type FilterKind = 'set' | 'single' | null;
+type FilterKind = 'set' | 'breakdown' | 'single' | null;
 
 type ProductFilters = {
   status: FilterStatus;
@@ -130,7 +135,8 @@ export function ProductListPage() {
       if (f.status === 'active' && !item.isActive) return false;
       if (f.status === 'inactive' && item.isActive) return false;
       if (f.category && item.extra?.category !== f.category) return false;
-      if (f.kind === 'set' && !isProductSet(item)) return false;
+      if (f.kind === 'set' && !isBundleSet(item)) return false;
+      if (f.kind === 'breakdown' && !isBreakdownSet(item)) return false;
       if (f.kind === 'single' && isProductSet(item)) return false;
 
       if (inventoryEnabled && f.stock) {
@@ -234,9 +240,12 @@ export function ProductListPage() {
   const kindOptions = useMemo(
     () => [
       { value: 'set', label: t('products.filterKindSet') },
+      ...(allProducts.some((p) => isBreakdownSet(p))
+        ? [{ value: 'breakdown', label: t('products.filterKindBreakdown') }]
+        : []),
       { value: 'single', label: t('products.filterKindSingle') },
     ],
-    [t],
+    [allProducts, t],
   );
 
   const showKindFilter = useMemo(

@@ -14,6 +14,7 @@ import {
 import { emitInventoryActivityForApplied } from '@/utils/inventoryActivityEmit';
 import { logActivity } from '@/utils/activityLogger';
 import { getSetItems } from '@/utils/productSet';
+import { buildBreakdownParentIndex } from '@/utils/breakdownSet';
 import type { SalesOrder, SalesOrderExtra } from '@/types';
 
 export type SetRebalanceTrigger = 'compose' | 'decompose' | 'goods-receipt';
@@ -38,21 +39,25 @@ function resolveActor(): LinkageActor {
 }
 
 export async function rebalanceForSetStockChange(
-  setCodes: readonly string[],
+  movedCodes: readonly string[],
   trigger: SetRebalanceTrigger,
 ): Promise<SetRebalanceSummary> {
   const summary: SetRebalanceSummary = { attempted: 0, rebalanced: 0, unchanged: 0, failed: 0 };
-  if (setCodes.length === 0) return summary;
+  if (movedCodes.length === 0) return summary;
 
   try {
     await useProductInventoryStore.getState().revalidate();
     const productsByCode = useProductStore.getState().mapByCode;
 
+    const parentIndex = buildBreakdownParentIndex(productsByCode.values());
     const candidateCodes = new Set<string>();
-    for (const setCode of setCodes) {
-      candidateCodes.add(setCode);
-      for (const item of getSetItems(productsByCode.get(setCode))) {
+    for (const code of movedCodes) {
+      candidateCodes.add(code);
+      for (const item of getSetItems(productsByCode.get(code))) {
         candidateCodes.add(item.productCode);
+      }
+      for (const link of parentIndex.get(code) ?? []) {
+        candidateCodes.add(link.parent.code);
       }
     }
 
@@ -67,7 +72,7 @@ export async function rebalanceForSetStockChange(
     if (soIds.size === 0) return summary;
     if (soIds.size > REBALANCE_WARN_THRESHOLD) {
       console.warn(
-        `[setRebalance] ${soIds.size} sales orders reference ${setCodes.join(', ')} — ` +
+        `[setRebalance] ${soIds.size} sales orders reference ${movedCodes.join(', ')} — ` +
           'processing all sequentially; this may take a moment.',
       );
     }
@@ -142,7 +147,7 @@ export async function rebalanceForSetStockChange(
       logActivity('salesOrder.setRebalance', so.id, {
         orderNumber: so.orderNumber,
         trigger,
-        setCodes: [...setCodes],
+        setCodes: [...movedCodes],
         adjustedRows: diff.plan.ops.map((o) => ({
           productCode: o.itemCode,
           locationCode: o.locationCode,

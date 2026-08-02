@@ -20,6 +20,7 @@ import {
 import { getCurrentActorId } from '@/hooks';
 import { logActivity } from '@/utils/activityLogger';
 import { isProductSet } from '@/utils/productSet';
+import { buildBreakdownParentIndex } from '@/utils/breakdownSet';
 import { rebalanceForSetStockChange } from '@/utils/setRebalance';
 import { perms } from '@/utils/permission';
 import type { GoodsReceipt, GoodsReceiptCopyFrom } from '@/types';
@@ -330,9 +331,10 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       confirmHandlers.close();
 
       const productsByCode = useProductStore.getState().mapByCode;
+      const breakdownParents = buildBreakdownParentIndex(productsByCode.values());
       const receivedSetCodes = stockMoved
-        ? [...new Set(receipt.items.map((it) => it.itemCode).filter(Boolean))].filter((code) =>
-            isProductSet(productsByCode.get(code)),
+        ? [...new Set(receipt.items.map((it) => it.itemCode).filter(Boolean))].filter(
+            (code) => isProductSet(productsByCode.get(code)) || breakdownParents.has(code),
           )
         : [];
 

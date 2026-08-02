@@ -1,4 +1,4 @@
-import { Badge, Card, Group, Skeleton, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import { Card, Group, Skeleton, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
 import { IconPackage, IconPackageOff } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { hasImagesForProducts, isProductInventoryEnabled } from '@/utils/permiss
 import { lookupLabelOf, useLookupLabels } from '@/hooks';
 import { ProductThumb } from './ProductThumb';
 import { isProductSet, isNoInventoryProduct } from '@/utils/productSet';
-import { PRODUCT_SET_COLOR } from '@/config/misc';
+import { ProductSetBadge } from '@/components/ProductSetBadge';
 
 const inventoryEnabled = isProductInventoryEnabled();
 const imagesEnabled = hasImagesForProducts();
@@ -160,11 +160,7 @@ export function ProductCardList({
                     {category && (
                       <ColorBadge label={lookupLabelOf(categoryLabels, category)} size="sm" />
                     )}
-                    {isProductSet(item) && (
-                      <Badge size="xs" color={PRODUCT_SET_COLOR} radius="sm" tt="none">
-                        {t('products.detail.setBadge')}
-                      </Badge>
-                    )}
+                    <ProductSetBadge product={item} variant="filled" tt="none" />
                     {isNoInventoryProduct(item) && (
                       <Tooltip label={t('products.detail.noInventoryBadge')} withArrow>
                         <ThemeIcon size="sm" variant="light" color="gray" radius="sm">

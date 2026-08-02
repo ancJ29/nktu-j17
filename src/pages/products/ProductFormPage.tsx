@@ -32,7 +32,7 @@ import {
 } from '@/utils/excelParser';
 import type { Product, ProductExtra, ProductMinimumInventory, ProductSetItem } from '@/types';
 import { validateUnitConversions } from '@/utils/unitConversion';
-import { isProductSet } from '@/utils/productSet';
+import { getSetMode, isProductSet } from '@/utils/productSet';
 import { SingleProductForm, type ProductFormValues } from './SingleProductForm';
 import { ProductBulkImportForm } from './ProductBulkImportForm';
 
@@ -129,6 +129,7 @@ export function ProductFormPage() {
       hiddenFromInventoryList: false,
       unitConversions: [],
       setItems: [],
+      setMode: 'bundle',
     },
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
@@ -232,6 +233,7 @@ export function ProductFormPage() {
       hiddenFromInventoryList: p.extra?.hiddenFromInventoryList ?? false,
       unitConversions: p.extra?.unitConversions ?? [],
       setItems: p.extra?.setItems ?? [],
+      setMode: getSetMode(p),
     };
   }, []);
 
@@ -333,7 +335,11 @@ export function ProductFormPage() {
                 unit: r.unit.trim(),
               }))
               .filter((r) => r.productCode && r.unit && r.quantity > 0);
-            return cleaned.length > 0 ? { setItems: cleaned } : {};
+            if (cleaned.length === 0) return {};
+
+            return values.setMode === 'breakdown'
+              ? { setItems: cleaned, setMode: 'breakdown' as const }
+              : { setItems: cleaned };
           })(),
         };
 

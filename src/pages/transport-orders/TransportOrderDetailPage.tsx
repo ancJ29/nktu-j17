@@ -1,5 +1,6 @@
 import {
   Alert,
+  Autocomplete,
   Badge,
   Box,
   Button,
@@ -94,8 +95,10 @@ import {
 } from './transportOrderPricing';
 import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activityMemo';
 import { useContainerSizeLabel } from './containerSize';
+import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
+import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { useShipmentTypeLabel } from './shipmentType';
-import { truckNameWithPlate, useDriverWithPlate } from './truckDisplay';
+import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 import { reconcileTripLogs } from './tripLogSync';
 
@@ -147,6 +150,8 @@ export function TransportOrderDetailPage() {
   const shipmentTypeLabel = useShipmentTypeLabel();
 
   const driverWithPlate = useDriverWithPlate();
+
+  const placeSuggestions = usePlaceSuggestions();
 
   useEffect(() => {
     if (!trucksInit) loadTrucks();
@@ -436,10 +441,7 @@ export function TransportOrderDetailPage() {
 
   const truckSelectData = trucks
     .filter((tr) => tr.isActive && !tr.extra?.isDeleted)
-    .map((tr) => ({
-      value: tr.id,
-      label: `${truckNameWithPlate(tr.name, tr.extra?.plateNumber)}${tr.code ? ` (${tr.code})` : ''}`,
-    }));
+    .map((tr) => ({ value: tr.id, label: truckOptionLabel(tr) }));
   const driverSelectData = employees
     .filter(driverEmployeeFilter)
     .map((e) => ({ value: e.id, label: driverWithPlate(e) }));
@@ -575,11 +577,32 @@ export function TransportOrderDetailPage() {
     });
 
   const routeField = (leg: 'pickup' | 'stuffing' | 'dropoff') => (
-    <InlineTextField
+    <InlineEditField<string>
       canEdit={canEditMeta}
       value={order.route?.[leg] ?? ''}
       onSave={async (next) => patchRoute({ [leg]: next.trim() })}
       labels={inlineEditLabels}
+      renderDisplay={(v) =>
+        v ? (
+          <Text size="sm" style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+            {v}
+          </Text>
+        ) : (
+          <Text size="sm" c="dimmed" fs="italic">
+            —
+          </Text>
+        )
+      }
+      renderEditor={({ value: v, onChange }) => (
+        <Autocomplete
+          data={placeSuggestions}
+          limit={PLACE_SUGGESTION_LIMIT}
+          value={v}
+          onChange={onChange}
+          placeholder={t(`transportOrders.route.${leg}`)}
+          autoFocus
+        />
+      )}
     />
   );
 

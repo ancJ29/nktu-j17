@@ -21,6 +21,7 @@ import {
   IconClipboardList,
   IconDeviceFloppy,
   IconDownload,
+  IconDroplet,
   IconFileSpreadsheet,
   IconHash,
   IconUpload,
@@ -39,12 +40,14 @@ import { device } from '@credo/base-ui/utils';
 import { useInitFormFromFetch } from '@/hooks';
 import {
   cleanDays,
+  cleanWatering,
   dayHasContent,
   daysToRows,
   deriveSteps,
   makeEmptyDay,
   resizeDays,
   rowsToDays,
+  templateWatering,
 } from '@/utils/cropDiaryTemplateModel';
 import {
   downloadCropDiaryTemplateSample,
@@ -52,8 +55,14 @@ import {
   parseCropDiaryTemplateFile,
 } from '@/utils/cropDiaryTemplateExcel';
 import { perms } from '@/utils/permission';
-import type { CropDiaryTemplate, CropDiaryTemplateExtra, TemplateDay } from '@/types';
+import type {
+  CropDiaryTemplate,
+  CropDiaryTemplateExtra,
+  CropTemplateWatering,
+  TemplateDay,
+} from '@/types';
 import { TemplateDaysEditor } from './TemplateDaysEditor';
+import { WateringPlanEditor } from './WateringPlanEditor';
 
 const isMobile = device.isMobile;
 
@@ -63,7 +72,10 @@ type FormValues = {
   description: string;
   totalDates: number | string;
   days: TemplateDay[];
+  watering: CropTemplateWatering;
 };
+
+const BLANK_WATERING: CropTemplateWatering = { activity: '', unit: '' };
 
 function daysFromTemplate(tpl: CropDiaryTemplate): TemplateDay[] {
   if (tpl.extra?.days?.length) return tpl.extra.days;
@@ -105,6 +117,7 @@ export function CropDiaryTemplateFormPage() {
       description: '',
       totalDates: 1,
       days: [makeEmptyDay(1)],
+      watering: BLANK_WATERING,
     },
     validate: {
       code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
@@ -134,6 +147,7 @@ export function CropDiaryTemplateFormPage() {
         description: tpl.extra?.description ?? '',
         totalDates: days.length,
         days,
+        watering: templateWatering(tpl) ?? BLANK_WATERING,
       };
     },
     () => {
@@ -156,6 +170,11 @@ export function CropDiaryTemplateFormPage() {
 
   const handleDaysChange = useCallback(
     (days: TemplateDay[]) => form.setFieldValue('days', days),
+    [form],
+  );
+
+  const handleWateringChange = useCallback(
+    (watering: CropTemplateWatering) => form.setFieldValue('watering', watering),
     [form],
   );
 
@@ -246,6 +265,10 @@ export function CropDiaryTemplateFormPage() {
           else delete extra.description;
           extra.totalDates = days.length;
           extra.days = days;
+
+          const watering = cleanWatering(values.watering);
+          if (watering) extra.watering = watering;
+          else delete extra.watering;
           return extra;
         };
 
@@ -402,6 +425,28 @@ export function CropDiaryTemplateFormPage() {
             </Stack>
           </Card>
 
+          {/* Above the day plan: watering is the job that runs through every day
+              of the cycle, so it reads as the backdrop the dated work sits on. */}
+          <Card withBorder radius="md" padding="lg">
+            <Group gap="xs" mb="xs">
+              <ThemeIcon size={28} radius="md" variant="light" color="primary">
+                <IconDroplet size={16} stroke={1.75} />
+              </ThemeIcon>
+              <Text fw={600} size="sm">
+                {t('cropDiaryTemplates.watering.section')}
+              </Text>
+            </Group>
+            <Text size="xs" c="dimmed" mb="md">
+              {t('cropDiaryTemplates.watering.sectionHint')}
+            </Text>
+            <WateringPlanEditor
+              value={form.getValues().watering}
+              onChange={handleWateringChange}
+              days={form.getValues().days}
+              onDaysChange={handleDaysChange}
+            />
+          </Card>
+
           <Card withBorder radius="md" padding="lg">
             <Group justify="space-between" mb="xs" wrap="wrap">
               <Text fw={600} size="sm">
@@ -441,7 +486,11 @@ export function CropDiaryTemplateFormPage() {
             <Divider mb="md" />
             {/* Bounded scroll region so a long day plan stays inside the card. */}
             <ScrollArea.Autosize mah="calc(100vh - 420px)" type="auto" offsetScrollbars>
-              <TemplateDaysEditor days={form.getValues().days} onChange={handleDaysChange} />
+              <TemplateDaysEditor
+                days={form.getValues().days}
+                onChange={handleDaysChange}
+                waterUnit={form.getValues().watering.unit?.trim() || undefined}
+              />
             </ScrollArea.Autosize>
             {typeof form.errors.days === 'string' && (
               <Text size="xs" c="red" mt="xs">

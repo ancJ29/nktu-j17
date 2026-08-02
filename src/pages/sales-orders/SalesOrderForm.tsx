@@ -124,7 +124,12 @@ import { markQuotationConverted } from '@/pages/quotations/useQuotationStore';
 import { customerMemo, diffCustomer, diffItems, toMemoItem } from './activityMemo';
 import type { SalesOrderFormVariant } from './salesOrderFormVariant';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
-import { isProductSet, isNoInventoryProduct, newSetGroupId } from '@/utils/productSet';
+import { isBundleSet, isProductSet, isNoInventoryProduct, newSetGroupId } from '@/utils/productSet';
+import {
+  buildBreakdownParentIndex,
+  planBreakdownCoverage,
+  type BreakdownCoverage,
+} from '@/utils/breakdownSet';
 import {
   getProductDefaultUnitPrice,
   getProductSuggestedPrice,
@@ -328,6 +333,25 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [productByCode, inventoryByProduct, ownReservedSnapshot, stockSettled],
   );
 
+  const breakdownParentIndex = useMemo(() => buildBreakdownParentIndex(products), [products]);
+  const breakdownCoverage = useCallback(
+    (productCode: string, locationCode: string, quantity: number, unit: string) => {
+      if (stockSettled || breakdownParentIndex.size === 0) return null;
+      const prod = productByCode.get(productCode);
+      if (!prod || isNoInventoryProduct(prod)) return null;
+      return planBreakdownCoverage({
+        component: prod,
+        quantity,
+        unit,
+        locationCode: locationCode || DEFAULT_LOCATION_CODE,
+        parentIndex: breakdownParentIndex,
+        inventoryByProduct,
+        ownReservedSnapshot,
+      });
+    },
+    [breakdownParentIndex, productByCode, inventoryByProduct, ownReservedSnapshot, stockSettled],
+  );
+
   const locationSelectData = useMemo(() => {
     if (!locationsEnabled) return [];
     const out = locations
@@ -376,11 +400,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         .filter((p) => p.isActive)
         .map((p) => ({
           value: p.code,
-          label: `${p.code} — ${p.name}${isProductSet(p) ? ' [SET]' : ''}`,
+
+          label: `${p.code} — ${p.name}${isBundleSet(p) ? ' [SET]' : ''}`,
           name: p.name,
           unit: p.unit,
           price: p.price,
-          isSet: isProductSet(p),
+          isSet: isBundleSet(p),
           product: p,
         })),
     [products],
@@ -747,7 +772,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       }
       const { product, code, name, units } = opt;
 
-      if (isProductSet(product)) {
+      if (isBundleSet(product)) {
         const currentQty = base[idx]?.quantity ?? 1;
         const expansion = buildSetExpansion(product, currentQty || 1, newSetGroupId());
         const next = [...base];
@@ -1241,7 +1266,14 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       if (!avail) return;
 
       const physicalQty = getLinePhysicalQuantity(item);
-      const short = physicalQty - avail.available;
+
+      const coverage = breakdownCoverage(
+        item.productCode,
+        item.fromLocationCode,
+        physicalQty,
+        item.unit,
+      );
+      const short = coverage ? coverage.residual : physicalQty - avail.available;
       if (short <= 0) return;
       out.push({
         idx,
@@ -1256,7 +1288,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     });
     return out;
     // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/use-memo -- intentional: recompute against live form values on every render (see comment above)
-  }, [form.getValues().items, lineAvailability]);
+  }, [form.getValues().items, lineAvailability, breakdownCoverage]);
 
   const handleAttachmentsChange = useCallback(async (updated: AttachmentEntry[]) => {
     setFormAttachments(updated as SalesOrderAttachment[]);
@@ -2146,6 +2178,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 t={t}
                 locationSelectData={locationSelectData}
                 lineAvailability={lineAvailability}
+                breakdownCoverage={breakdownCoverage}
                 unitAvailability={unitAvailability}
                 locationByCode={locationByCode}
                 unitLabels={unitLabels}
@@ -2288,6 +2321,13 @@ type ItemEditorProps = {
   locationSelectData: { value: string; label: string }[];
   lineAvailability: (productCode: string, locationCode: string) => LocationAvailability | null;
 
+  breakdownCoverage: (
+    productCode: string,
+    locationCode: string,
+    quantity: number,
+    unit: string,
+  ) => BreakdownCoverage | null;
+
   unitAvailability: (productCode: string, locationCode: string, unit: string) => number | null;
   locationByCode: Map<string, string>;
 
@@ -2304,6 +2344,7 @@ function AvailabilityHint({
   quantity,
   unit,
   lineAvailability,
+  breakdownCoverage,
   locationByCode,
   unitLabels,
   productByCode,
@@ -2314,6 +2355,7 @@ function AvailabilityHint({
   quantity: number;
   unit: string;
   lineAvailability: ItemEditorProps['lineAvailability'];
+  breakdownCoverage: ItemEditorProps['breakdownCoverage'];
   locationByCode: Map<string, string>;
   unitLabels: Map<string, string>;
   productByCode: Map<string, Product>;
@@ -2328,11 +2370,51 @@ function AvailabilityHint({
       </Text>
     );
   }
-  const short = quantity - avail.available;
   const locLabel = isDefaultLocation(avail.locationCode)
     ? t('common.labels.defaultLocation')
     : (locationByCode.get(avail.locationCode) ?? avail.locationCode);
   const unitLabel = unit ? lookupLabelOf(unitLabels, unit) : '';
+
+  const coverage = breakdownCoverage(productCode, locationCode, quantity, unit);
+  if (coverage?.parentLock) {
+    const lockLine = (
+      <Text size="xs" c="dimmed">
+        {t('salesOrders.form.availabilityBreakdownLock', {
+          count: coverage.parentLock.quantity.toLocaleString(),
+          parentName: coverage.parentLock.product.name,
+        })}
+      </Text>
+    );
+    if (coverage.residual <= 0) {
+      return (
+        <Stack gap={2}>
+          <Text size="xs" c="dimmed">
+            {t('salesOrders.form.availabilityOk', {
+              available: avail.available.toLocaleString(),
+              unit: unitLabel,
+              location: locLabel,
+            })}
+          </Text>
+          {lockLine}
+        </Stack>
+      );
+    }
+    return (
+      <Stack gap={2}>
+        <Text size="xs" c="red" fw={500}>
+          {t('salesOrders.form.availabilityShort', {
+            available: avail.available.toLocaleString(),
+            unit: unitLabel,
+            location: locLabel,
+            short: coverage.residual.toLocaleString(),
+          })}
+        </Text>
+        {lockLine}
+      </Stack>
+    );
+  }
+
+  const short = quantity - avail.available;
   if (short > 0) {
     const product = productByCode.get(productCode);
     const isSet = (product?.extra?.setItems?.length ?? 0) > 0;
@@ -2471,6 +2553,7 @@ function DesktopItemTable({
   t,
   locationSelectData,
   lineAvailability,
+  breakdownCoverage,
   unitAvailability,
   locationByCode,
   unitLabels,
@@ -2686,6 +2769,7 @@ function DesktopItemTable({
                     quantity={getLinePhysicalQuantity(item)}
                     unit={item.unit}
                     lineAvailability={lineAvailability}
+                    breakdownCoverage={breakdownCoverage}
                     locationByCode={locationByCode}
                     unitLabels={unitLabels}
                     productByCode={productByCode}

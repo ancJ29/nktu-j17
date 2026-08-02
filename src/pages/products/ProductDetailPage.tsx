@@ -86,8 +86,8 @@ import { ProductInventorySection } from './ProductInventorySection';
 import { ProductLink } from '@/components/ProductLink';
 import { ProductThumb } from './ProductThumb';
 import { TimestampLine } from '@/components/TimestampLine';
-import { isProductSet } from '@/utils/productSet';
-import { PRODUCT_SET_COLOR } from '@/config/misc';
+import { isBreakdownSet, isProductSet } from '@/utils/productSet';
+import { ProductSetBadge } from '@/components/ProductSetBadge';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 
 const isMobile = device.isMobile;
@@ -1109,13 +1109,17 @@ export function ProductDetailPage() {
     <SectionCard
       icon={<IconBoxMultiple size={14} />}
       title={t('products.detail.setCompositionTitle')}
-      actions={
-        <Badge variant="light" color={PRODUCT_SET_COLOR} size="sm" radius="sm" tt="none">
-          {t('products.detail.setBadge')}
-        </Badge>
-      }
+      actions={<ProductSetBadge product={product} />}
     >
       <Stack gap="xs">
+        {/* A breakdown set reads one way only, so the card says so outright —
+            the row list alone is ambiguous about which direction it runs, and
+            that direction is the whole difference between the two modes. */}
+        {isBreakdownSet(product) && (
+          <Text size="xs" c="dimmed">
+            {t('products.detail.setCompositionBreakdownDesc')}
+          </Text>
+        )}
         {setItems.map((row, idx) => (
           <Group key={`${row.productCode}-${idx}`} gap="xs" wrap="nowrap" align="baseline">
             <Text size="sm" fw={600} ff="monospace" style={{ minWidth: 48 }}>

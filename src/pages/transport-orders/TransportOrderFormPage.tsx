@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Alert,
+  Autocomplete,
   Button,
   Checkbox,
   Divider,
@@ -79,7 +80,7 @@ import {
   useShipmentTypeLabel,
   useShipmentTypeOptions,
 } from './shipmentType';
-import { truckNameWithPlate, useDriverWithPlate } from './truckDisplay';
+import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
 import {
   getInitialTransportOrderStatus,
   isTransportOrderLocked,
@@ -91,6 +92,8 @@ import {
   MAX_ORDER_NUMBER_RETRIES,
 } from './transportOrderWrite';
 import { appendTimelineEntry, createMemo, diffTransportOrder, isEmptyDiff } from './activityMemo';
+import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
+import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
 import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleConflicts';
 import type { ScheduleSlot } from './scheduleConflicts';
@@ -378,7 +381,7 @@ export function TransportOrderFormPage() {
         .map((a) => ({
           value: a.id,
 
-          label: `${truckNameWithPlate(a.name, a.extra?.plateNumber)}${a.code ? ` (${a.code})` : ''}`,
+          label: truckOptionLabel(a),
           plate: a.name,
         })),
     [trucks],
@@ -393,6 +396,8 @@ export function TransportOrderFormPage() {
   const containerSizeOptions = useContainerSizeOptions();
 
   const driverWithPlate = useDriverWithPlate();
+
+  const placeSuggestions = usePlaceSuggestions();
 
   const shipmentTypeOptions = useShipmentTypeOptions();
   const shipmentTypeLabel = useShipmentTypeLabel();
@@ -950,20 +955,21 @@ export function TransportOrderFormPage() {
                           is telling four similar-looking addresses apart. Capped at
                           4 rows so one pasted paragraph can't swallow the form. */}
                       <Table.Td>
-                        <Textarea
-                          autosize
-                          minRows={1}
-                          maxRows={4}
+                        <Autocomplete
+                          data={placeSuggestions}
+                          limit={PLACE_SUGGESTION_LIMIT}
                           styles={PLACE_INPUT_STYLES}
+
+                          title={form.values.trips[i]!.departure || undefined}
                           {...form.getInputProps(`trips.${i}.departure`)}
                         />
                       </Table.Td>
                       <Table.Td>
-                        <Textarea
-                          autosize
-                          minRows={1}
-                          maxRows={4}
+                        <Autocomplete
+                          data={placeSuggestions}
+                          limit={PLACE_SUGGESTION_LIMIT}
                           styles={PLACE_INPUT_STYLES}
+                          title={form.values.trips[i]!.destination || undefined}
                           {...form.getInputProps(`trips.${i}.destination`)}
                         />
                       </Table.Td>
@@ -1033,8 +1039,11 @@ export function TransportOrderFormPage() {
                   rather than as two unrelated rows of inputs. */}
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
                 <Stack gap="xs">
-                  <TextInput
+                  <Autocomplete
                     label={t('transportOrders.route.pickup')}
+                    data={placeSuggestions}
+                    limit={PLACE_SUGGESTION_LIMIT}
+                    styles={PLACE_INPUT_STYLES}
                     {...form.getInputProps('pickup')}
                   />
                   <DateTimeTextField
@@ -1043,8 +1052,11 @@ export function TransportOrderFormPage() {
                   />
                 </Stack>
                 <Stack gap="xs">
-                  <TextInput
+                  <Autocomplete
                     label={t('transportOrders.route.stuffing')}
+                    data={placeSuggestions}
+                    limit={PLACE_SUGGESTION_LIMIT}
+                    styles={PLACE_INPUT_STYLES}
                     {...form.getInputProps('stuffing')}
                   />
                   <DateTimeTextField
@@ -1053,8 +1065,11 @@ export function TransportOrderFormPage() {
                   />
                 </Stack>
                 <Stack gap="xs">
-                  <TextInput
+                  <Autocomplete
                     label={t('transportOrders.route.dropoff')}
+                    data={placeSuggestions}
+                    limit={PLACE_SUGGESTION_LIMIT}
+                    styles={PLACE_INPUT_STYLES}
                     {...form.getInputProps('dropoff')}
                   />
                   <DateTimeTextField

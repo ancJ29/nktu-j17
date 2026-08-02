@@ -1,11 +1,11 @@
 import { getEnvVar, isBrowser, setEnvVar } from '@credo/kits/misc';
 
 const configs: Record<string, Record<string, string>> = {
-  c39c49: {
-    activityLogger: 'https://d687fa1b765-c39c49.api-bridge.work',
-    credoSso: 'https://credo-sso-c39c49.api-bridge.work/$default',
-    cMngt: 'https://c-mngt-c39c49.api-bridge.work/$default',
-    cStorage: 'https://c-storage-c39c49.api-bridge.work',
+  '1786e3': {
+    activityLogger: 'https://d687fa1b765-1786e3.api-bridge.work',
+    credoSso: 'https://credo-sso-1786e3.api-bridge.work/$default',
+    cMngt: 'https://c-mngt-1786e3.api-bridge.work/$default',
+    cStorage: 'https://c-storage-1786e3.api-bridge.work',
   },
   '12b1b2': {
     activityLogger: 'https://d687fa1b765-12b1b2.api-bridge.work',
@@ -39,6 +39,11 @@ export function setCredoGroup(group: string): void {
 
   if (group === 'ridge') {
     setCredoGroup('409e36');
+    return;
+  }
+
+  if (group === 'c39c49') {
+    setCredoGroup('1786e3');
     return;
   }
 

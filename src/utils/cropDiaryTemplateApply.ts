@@ -1,22 +1,38 @@
 import { useCropDiaryTemplateStore } from '@/stores/useCropDiaryTemplateStore';
 import { createCropDiaryEntry } from '@/stores/useCropDiaryStore';
 import { todayInVnDateString } from '@/utils/dateTimeField';
-import { buildTemplateDiaryEntries, templatePlanDays } from '@/utils/cropDiaryTemplateModel';
-import type { CropDiaryExtra, TemplateDay } from '@/types';
+import { buildAllTemplateEntries, type DiaryEntryDraft } from '@/utils/cropDiaryTemplateModel';
+import { formatNumber } from '@/utils/number';
+import type { CropDiaryExtra, CropDiaryTemplate } from '@/types';
+
+function draftNote(draft: DiaryEntryDraft): string | undefined {
+  const amount =
+    draft.amount !== undefined
+      ? `${formatNumber(draft.amount)}${draft.unit ? ` ${draft.unit}` : ''}`
+      : undefined;
+  const parts = [draft.memo, amount].filter(Boolean);
+  return parts.length > 0 ? parts.join(' · ') : undefined;
+}
 
 export async function applyTemplateToCropDiary(opts: {
   cropId: string;
   cropCode: string;
-  templateCode: string;
+  template: Pick<CropDiaryTemplate, 'code' | 'steps' | 'extra'>;
   startDate: string;
-  days: TemplateDay[];
+
+  plantCount?: number;
 }): Promise<number> {
-  const drafts = buildTemplateDiaryEntries(opts.days, opts.startDate);
+  const drafts = buildAllTemplateEntries(opts.template, {
+    startDate: opts.startDate,
+    plantCount: opts.plantCount,
+  });
+
   for (const draft of drafts) {
+    const note = draftNote(draft);
     const extra: CropDiaryExtra = {
-      ...(draft.memo && { notes: draft.memo }),
+      ...(note && { notes: note }),
       ...(draft.materials.length > 0 && { materials: draft.materials }),
-      templateCode: opts.templateCode,
+      templateCode: opts.template.code,
     };
     await createCropDiaryEntry({
       cropId: opts.cropId,
@@ -34,6 +50,7 @@ export function autoApplyDiaryTemplateOnCreate(opts: {
   fromDate: string | null | undefined;
   cropId: string;
   cropCode: string;
+  plantCount?: number;
 }): Promise<number> {
   if (!opts.diaryTemplateCode) return Promise.resolve(0);
   const tpl = useCropDiaryTemplateStore
@@ -43,8 +60,8 @@ export function autoApplyDiaryTemplateOnCreate(opts: {
   return applyTemplateToCropDiary({
     cropId: opts.cropId,
     cropCode: opts.cropCode,
-    templateCode: opts.diaryTemplateCode,
+    template: tpl,
     startDate: opts.fromDate || todayInVnDateString(),
-    days: templatePlanDays(tpl),
+    plantCount: opts.plantCount,
   });
 }

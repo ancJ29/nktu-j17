@@ -3,6 +3,8 @@ import type {
   CropDiaryTemplateStep,
   TemplateDay,
   TemplateMaterialLine,
+  CropTemplateWatering,
+  WateringRange,
 } from '@/types';
 
 export function makeEmptyDay(day: number): TemplateDay {
@@ -48,11 +50,17 @@ export function cleanDays(days: TemplateDay[]): TemplateDay[] {
     activity: d.activity.trim(),
     materials: cleanMaterials(d.materials),
     ...(d.memo?.trim() && { memo: d.memo.trim() }),
+    ...(typeof d.water === 'number' && d.water > 0 && { water: d.water }),
   }));
 }
 
 export function dayHasContent(d: TemplateDay): boolean {
-  return !!(d.activity.trim() || d.memo?.trim() || d.materials.some((m) => m.materialCode));
+  return !!(
+    d.activity.trim() ||
+    d.memo?.trim() ||
+    d.materials.some((m) => m.materialCode) ||
+    (typeof d.water === 'number' && d.water > 0)
+  );
 }
 
 export function deriveSteps(days: TemplateDay[]): CropDiaryTemplateStep[] {
@@ -147,6 +155,9 @@ export type DiaryEntryDraft = {
   activity: string;
   memo?: string;
   materials: TemplateMaterialLine[];
+
+  amount?: number;
+  unit?: string;
 };
 
 export function buildTemplateDiaryEntries(
@@ -163,4 +174,87 @@ export function buildTemplateDiaryEntries(
       ...(d.memo?.trim() && { memo: d.memo.trim() }),
       materials: d.materials.filter((m) => m.materialCode),
     }));
+}
+
+export function templateWatering(
+  tpl: Pick<CropDiaryTemplate, 'extra'>,
+): CropTemplateWatering | undefined {
+  return tpl.extra?.watering;
+}
+
+export function cleanWatering(
+  watering: CropTemplateWatering | undefined,
+): CropTemplateWatering | undefined {
+  const activity = watering?.activity.trim();
+  if (!activity) return undefined;
+  return { activity, ...(watering?.unit?.trim() && { unit: watering.unit.trim() }) };
+}
+
+export function applyWateringRange(days: TemplateDay[], range: WateringRange): TemplateDay[] {
+  const from = Math.max(1, Math.floor(range.fromDay));
+  const to = Math.floor(range.toDay);
+  const perPlant = Number(range.perPlant);
+  if (!Number.isFinite(perPlant) || perPlant < 0 || to < from) return days;
+
+  return days.map((d) => {
+    if (d.day < from || d.day > to) return d;
+    if (perPlant === 0) {
+      const { water: _drop, ...rest } = d;
+      return rest;
+    }
+    return { ...d, water: perPlant };
+  });
+}
+
+export type WateringSummaryRun = { fromDay: number; toDay: number; perPlant: number };
+
+export function summarizeWatering(days: TemplateDay[]): WateringSummaryRun[] {
+  const watered = days
+    .filter((d) => typeof d.water === 'number' && d.water > 0)
+    .slice()
+    .sort((a, b) => a.day - b.day);
+
+  const runs: WateringSummaryRun[] = [];
+  for (const d of watered) {
+    const last = runs[runs.length - 1];
+    const perPlant = d.water as number;
+    if (last && last.perPlant === perPlant && last.toDay === d.day - 1) last.toDay = d.day;
+    else runs.push({ fromDay: d.day, toDay: d.day, perPlant });
+  }
+  return runs;
+}
+
+export function buildWateringDiaryEntries(
+  days: TemplateDay[],
+  watering: CropTemplateWatering | undefined,
+  startDate: string,
+  plantCount?: number,
+): DiaryEntryDraft[] {
+  const activity = watering?.activity.trim();
+  if (!activity) return [];
+
+  const scale = plantCount && plantCount > 0 ? plantCount : 1;
+
+  return days
+    .filter((d) => typeof d.water === 'number' && d.water > 0)
+    .slice()
+    .sort((a, b) => a.day - b.day)
+    .map((d) => ({
+      entryDate: addDaysToDateString(startDate, d.day - 1),
+      activity,
+      materials: [],
+      amount: (d.water as number) * scale,
+      ...(watering?.unit && { unit: watering.unit }),
+    }));
+}
+
+export function buildAllTemplateEntries(
+  tpl: Pick<CropDiaryTemplate, 'steps' | 'extra'>,
+  opts: { startDate: string; plantCount?: number },
+): DiaryEntryDraft[] {
+  const days = templatePlanDays(tpl);
+  return [
+    ...buildTemplateDiaryEntries(days, opts.startDate),
+    ...buildWateringDiaryEntries(days, templateWatering(tpl), opts.startDate, opts.plantCount),
+  ].sort((a, b) => a.entryDate.localeCompare(b.entryDate));
 }

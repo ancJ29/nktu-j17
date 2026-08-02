@@ -4,6 +4,7 @@ import { businessDateString } from '@/utils/code';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
 import {
   buildLinkageSnapshotFromReserveOps,
+  buildLinkageSnapshotFromShipOps,
   executeReservationPlan,
   planReservation,
   planShipFromLinkage,
@@ -187,7 +188,7 @@ async function backfillInventory(
       try {
         await patchLinkage(
           current,
-          buildShippedLinkage(at, undefined, { kind: 'completion-auto-ship', statusValue }),
+          buildShippedLinkage([], at, undefined, { kind: 'completion-auto-ship', statusValue }),
         );
       } catch {
         return { outcome: 'failed', reason: 'noop-patch' };
@@ -237,7 +238,10 @@ async function backfillInventory(
   try {
     await patchLinkage(
       current,
-      buildShippedLinkage(at, undefined, { kind: 'completion-auto-ship', statusValue }),
+      buildShippedLinkage(buildLinkageSnapshotFromShipOps(shipPlan.plan.ops), at, undefined, {
+        kind: 'completion-auto-ship',
+        statusValue,
+      }),
     );
   } catch {
     if (appliedShip.length > 0) await rollbackAppliedOps(appliedShip);

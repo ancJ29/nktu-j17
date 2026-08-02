@@ -65,12 +65,20 @@ export type SalesOrderCancellation = {
 
 export type InventoryLinkageState = 'none' | 'reserved' | 'shipped' | 'released';
 
+export type BreakdownRemainderCredit = {
+  itemCode: string;
+  unit: string;
+  quantity: number;
+};
+
 export type InventoryLinkageSnapshotEntry = {
   rowId: string;
   itemCode: string;
   locationCode: string;
 
   byUnit: Record<string, number>;
+
+  remainderCredits?: BreakdownRemainderCredit[];
 };
 
 export type InventoryLinkageVia =
@@ -146,6 +154,8 @@ export type InventoryLinkage = {
   state: InventoryLinkageState;
 
   reservedSnapshot?: InventoryLinkageSnapshotEntry[];
+
+  shippedSnapshot?: InventoryLinkageSnapshotEntry[];
 
   pendingShip?: PendingInventoryShip;
   lastTransition?: InventoryLinkageTransition;

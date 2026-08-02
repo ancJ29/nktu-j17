@@ -16,8 +16,8 @@ import {
   perms,
 } from '@/utils/permission';
 import { ActiveBadge } from '@/components/badges';
-import { isProductSet, isNoInventoryProduct } from '@/utils/productSet';
-import { PRODUCT_SET_COLOR } from '@/config/misc';
+import { isNoInventoryProduct } from '@/utils/productSet';
+import { ProductSetBadge } from '@/components/ProductSetBadge';
 import { formatNumber } from '@/utils/number';
 
 const inventoryEnabled = isProductInventoryEnabled();
@@ -67,11 +67,7 @@ export function ProductDataTable({
                     <Text fz="md" fw={600} lh={1.25}>
                       {item.name}
                     </Text>
-                    {isProductSet(item) && (
-                      <Badge size="xs" variant="light" color={PRODUCT_SET_COLOR} radius="sm">
-                        {t('products.detail.setBadge')}
-                      </Badge>
-                    )}
+                    <ProductSetBadge product={item} />
                     {isNoInventoryProduct(item) && (
                       <Tooltip label={t('products.detail.noInventoryBadge')} withArrow>
                         <ThemeIcon size="sm" variant="light" color="gray" radius="sm">

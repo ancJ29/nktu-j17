@@ -58,12 +58,14 @@ export function buildPendingShipLinkage(
 }
 
 export function buildShippedLinkage(
+  snapshot: InventoryLinkageSnapshotEntry[],
   at: DateTimeInput,
   actor: LinkageActor,
   via: InventoryLinkageVia,
 ): InventoryLinkage {
   return {
     state: 'shipped',
+    ...(snapshot.length > 0 && { shippedSnapshot: snapshot }),
     lastTransition: buildTransition('ship', at, actor, via),
   };
 }

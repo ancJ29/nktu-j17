@@ -44,6 +44,7 @@ import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
 import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
 import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
+import { truckOptionLabel } from './truckDisplay';
 import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
@@ -163,7 +164,7 @@ export function TransportOrderListPage() {
     () =>
       trucks
         .filter((tr) => tr.isActive && !tr.extra?.isDeleted)
-        .map((tr) => ({ value: tr.id, label: tr.name })),
+        .map((tr) => ({ value: tr.id, label: truckOptionLabel(tr) })),
     [trucks],
   );
   const truckLabel = (id: string) => truckData.find((tr) => tr.value === id)?.label ?? id;
@@ -229,6 +230,14 @@ export function TransportOrderListPage() {
       data: statusData,
       placeholder: statusPlaceholder,
       w: 200,
+    },
+    {
+      value: filters.shipmentFilter === 'all' ? null : filters.shipmentFilter,
+      onChange: (v) => filters.setShipmentFilter(v ?? 'all'),
+      data: shipmentData,
+      placeholder: t('transportOrders.form.shipmentType'),
+      visible: shipmentData.length > 0,
+      w: 150,
     },
     {
       value: filters.truckFilter,
@@ -345,6 +354,8 @@ export function TransportOrderListPage() {
   );
 
   const shipmentChipsShown = shipmentData.length > 0;
+
+  const desktopMoreFilters = moreFilters.filter((f) => f.key !== 'shipmentType');
   const mobileMoreFilters: MoreFilterDef[] = [
     {
       type: 'select',
@@ -416,7 +427,7 @@ export function TransportOrderListPage() {
             hideStatus
             filters={desktopFilters}
             moreSection={
-              <DesktopFilterMorePopover filters={moreFilters} presetLabels={presetLabels} />
+              <DesktopFilterMorePopover filters={desktopMoreFilters} presetLabels={presetLabels} />
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}

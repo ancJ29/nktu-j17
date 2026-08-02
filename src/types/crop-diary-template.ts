@@ -13,6 +13,22 @@ export type TemplateDay = {
   activity: string;
   materials: TemplateMaterialLine[];
   memo?: string;
+
+  water?: number;
+};
+
+export type WateringRange = {
+  fromDay: number;
+
+  toDay: number;
+
+  perPlant: number;
+};
+
+export type CropTemplateWatering = {
+  activity: string;
+
+  unit?: string;
 };
 
 export type CropDiaryTemplateExtra = {
@@ -21,6 +37,8 @@ export type CropDiaryTemplateExtra = {
   totalDates?: number;
 
   days?: TemplateDay[];
+
+  watering?: CropTemplateWatering;
 
   isDeleted?: boolean;
   [key: string]: unknown;

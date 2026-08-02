@@ -18,7 +18,6 @@ import { resolveClientCode } from '@/config/client-code';
 import type {
   DeliveryRequest,
   InventoryLinkage,
-  InventoryLinkageSnapshotEntry,
   Product,
   SalesOrder,
   SalesOrderActivityEntry,
@@ -37,7 +36,9 @@ import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
 import {
+  buildHoldSnapshotForSalesOrder,
   buildLinkageSnapshotFromReserveOps,
+  buildLinkageSnapshotFromShipOps,
   executeReservationPlan,
   planReleaseFromLinkage,
   planReservation,
@@ -707,62 +708,65 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     const at = Date.now();
 
     const linkage = currentExtra.inventoryLinkage;
-    const hasSnapshot = linkage?.reservedSnapshot != null && linkage.reservedSnapshot.length > 0;
-    const rollbackState =
-      (linkage?.state === 'reserved' || linkage?.state === 'shipped') && hasSnapshot
-        ? linkage.state
-        : null;
 
     let nextLinkage: InventoryLinkage | undefined = linkage;
     let appliedInventoryOps: readonly AppliedOp[] = [];
+    let rollbackKind: 'release' | 'unship' | null = null;
 
-    if (rollbackState) {
+    if (productInventoryEnabled) {
       await useProductInventoryStore.getState().revalidate();
-      const freshInventoryByProduct = indexInventoryByProduct(
-        useProductInventoryStore.getState().items,
-      );
-      const planInputs = {
-        snapshot: linkage!.reservedSnapshot!,
-        so: order,
-        productsByCode: productByCode,
-        inventoryByProduct: freshInventoryByProduct,
-      };
-      const planResult =
-        rollbackState === 'reserved'
-          ? planReleaseFromLinkage(planInputs)
-          : planUnshipFromLinkage(planInputs);
-      if (!planResult.ok) {
-        notifications.show({
-          color: 'red',
-          title: t('salesOrders.notifications.reservationPlanFailedTitle'),
-          message: formatPlanFailures(planResult.failures, t, productByCode),
-          autoClose: 12000,
-        });
-        setActionLoading(false);
-        closeDelete();
-        return;
-      }
-      if (planResult.plan.ops.length > 0) {
-        const exec = await executeReservationPlan(planResult.plan.ops);
-        if (!exec.ok) {
-          useProductInventoryStore.getState().forceRefresh();
+      const freshRows = useProductInventoryStore.getState().items;
+      const freshInventoryByProduct = indexInventoryByProduct(freshRows);
+      const heldSnapshot = buildHoldSnapshotForSalesOrder(freshRows, order.id);
+
+      const shippedSnapshot = linkage?.state === 'shipped' ? (linkage.shippedSnapshot ?? []) : [];
+      rollbackKind =
+        heldSnapshot.length > 0 ? 'release' : shippedSnapshot.length > 0 ? 'unship' : null;
+
+      if (rollbackKind) {
+        const planInputs = {
+          snapshot: rollbackKind === 'release' ? heldSnapshot : shippedSnapshot,
+          so: order,
+          productsByCode: productByCode,
+          inventoryByProduct: freshInventoryByProduct,
+        };
+        const planResult =
+          rollbackKind === 'release'
+            ? planReleaseFromLinkage(planInputs)
+            : planUnshipFromLinkage(planInputs);
+        if (!planResult.ok) {
           notifications.show({
             color: 'red',
             title: t('salesOrders.notifications.reservationPlanFailedTitle'),
-            message: exec.error.message,
+            message: formatPlanFailures(planResult.failures, t, productByCode),
             autoClose: 12000,
           });
           setActionLoading(false);
           closeDelete();
           return;
         }
-        appliedInventoryOps = exec.applied;
+        if (planResult.plan.ops.length > 0) {
+          const exec = await executeReservationPlan(planResult.plan.ops);
+          if (!exec.ok) {
+            useProductInventoryStore.getState().forceRefresh();
+            notifications.show({
+              color: 'red',
+              title: t('salesOrders.notifications.reservationPlanFailedTitle'),
+              message: exec.error.message,
+              autoClose: 12000,
+            });
+            setActionLoading(false);
+            closeDelete();
+            return;
+          }
+          appliedInventoryOps = exec.applied;
+        }
+        nextLinkage = buildReleasedLinkage(
+          at,
+          currentEmployee ? { id: currentEmployee.id, name: currentEmployee.name } : undefined,
+          { kind: 'delete-rollback' },
+        );
       }
-      nextLinkage = buildReleasedLinkage(
-        at,
-        currentEmployee ? { id: currentEmployee.id, name: currentEmployee.name } : undefined,
-        { kind: 'delete-rollback' },
-      );
     }
 
     const deleteEntry: SalesOrderActivityEntry = {
@@ -802,8 +806,8 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       logActivity('salesOrder.delete', id, {
         orderNumber: order.orderNumber,
         fromStatus: currentExtra.status ?? '',
-        ...(rollbackState === 'reserved' ? { inventoryReleased: true } : {}),
-        ...(rollbackState === 'shipped' ? { inventoryUnshipped: true } : {}),
+        ...(rollbackKind === 'release' ? { inventoryReleased: true } : {}),
+        ...(rollbackKind === 'unship' ? { inventoryUnshipped: true } : {}),
       });
 
       const cascade = await softDeleteLinkedDeliveryRequests(order.id);
@@ -1486,9 +1490,12 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             }
             shipApplied = exec.applied;
           }
-          const shippedLinkage = buildShippedLinkage(Date.now(), actor, {
-            kind: 'reconcile-repair',
-          });
+          const shippedLinkage = buildShippedLinkage(
+            buildLinkageSnapshotFromShipOps(ship.plan.ops),
+            Date.now(),
+            actor,
+            { kind: 'reconcile-repair' },
+          );
           try {
             workingOrder = (await useSalesOrderStore.getState().updateSafely({
               id,
@@ -1522,20 +1529,10 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
       const orphaned = issues.find((i) => i.kind === 'orphaned-holds');
       if (orphaned && orphaned.kind === 'orphaned-holds') {
-        const entries: InventoryLinkageSnapshotEntry[] = [];
-        for (const r of useProductInventoryStore.getState().items) {
-          const hold = r.extra?.reservedBySalesOrder?.[workingOrder.id]?.byUnit;
-          if (!hold) continue;
-          const byUnit = Object.fromEntries(Object.entries(hold).filter(([, q]) => q > 0));
-          if (Object.keys(byUnit).length > 0) {
-            entries.push({
-              rowId: r.id,
-              itemCode: r.itemCode,
-              locationCode: r.locationCode,
-              byUnit,
-            });
-          }
-        }
+        const entries = buildHoldSnapshotForSalesOrder(
+          useProductInventoryStore.getState().items,
+          workingOrder.id,
+        );
         if (entries.length > 0) {
           const rel = planReleaseFromLinkage({
             snapshot: entries,

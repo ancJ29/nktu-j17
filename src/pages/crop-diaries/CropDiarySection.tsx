@@ -33,7 +33,7 @@ import {
 } from '@/stores/useCropDiaryStore';
 import { applyTemplateToCropDiary } from '@/utils/cropDiaryTemplateApply';
 import { aggregateCropMaterials, type CropMaterialTotal } from '@/utils/cropMaterialSummary';
-import { buildTemplateDiaryEntries, templatePlanDays } from '@/utils/cropDiaryTemplateModel';
+import { buildAllTemplateEntries } from '@/utils/cropDiaryTemplateModel';
 import { formatDate } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { formatNumber } from '@/utils/number';
@@ -65,6 +65,8 @@ type Props = {
 
   readonly defaultStartDate?: string;
 
+  readonly plantCount?: number;
+
   readonly onSummaryChange?: (summary: CropMaterialTotal[]) => void;
 };
 
@@ -81,7 +83,13 @@ type EntryFormValues = {
   materials: TemplateMaterialLine[];
 };
 
-export function CropDiarySection({ cropId, cropCode, defaultStartDate, onSummaryChange }: Props) {
+export function CropDiarySection({
+  cropId,
+  cropCode,
+  defaultStartDate,
+  plantCount,
+  onSummaryChange,
+}: Props) {
   const { t } = useTranslation();
 
   const [entries, setEntries] = useState<CropDiaryEntry[]>([]);
@@ -245,9 +253,10 @@ export function CropDiarySection({ cropId, cropCode, defaultStartDate, onSummary
     if (!templateCode) return;
     const template = templates.find((x) => x.code === templateCode);
     if (!template) return;
-    const count = buildTemplateDiaryEntries(templatePlanDays(template), applyDate).length;
+
+    const count = buildAllTemplateEntries(template, { startDate: applyDate, plantCount }).length;
     setPendingApply({ template, count });
-  }, [templateCode, templates, applyDate]);
+  }, [templateCode, templates, applyDate, plantCount]);
 
   const handleApply = useCallback(async () => {
     if (!pendingApply) return;
@@ -257,9 +266,9 @@ export function CropDiarySection({ cropId, cropCode, defaultStartDate, onSummary
       const count = await applyTemplateToCropDiary({
         cropId,
         cropCode,
-        templateCode: tpl.code,
+        template: tpl,
         startDate: applyDate,
-        days: templatePlanDays(tpl),
+        plantCount,
       });
       notifications.show({
         color: 'green',
@@ -277,7 +286,7 @@ export function CropDiarySection({ cropId, cropCode, defaultStartDate, onSummary
     } finally {
       setApplying(false);
     }
-  }, [pendingApply, applyDate, cropId, cropCode, t, load]);
+  }, [pendingApply, applyDate, plantCount, cropId, cropCode, t, load]);
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;

@@ -57,6 +57,8 @@ export type ProductExtra = {
 
   setItems?: ProductSetItem[];
 
+  setMode?: 'bundle' | 'breakdown';
+
   [key: string]: unknown;
 };
 

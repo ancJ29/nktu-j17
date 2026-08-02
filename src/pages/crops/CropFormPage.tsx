@@ -266,6 +266,7 @@ export function CropFormPage() {
           try {
             await autoApplyDiaryTemplateOnCreate({
               diaryTemplateCode: values.diaryTemplateCode,
+              plantCount: Number(values.numberOfSeeds) || undefined,
               fromDate: values.fromDate,
               cropId: created.id,
               cropCode: created.code,
