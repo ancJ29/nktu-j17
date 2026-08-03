@@ -3686,6 +3686,8 @@
       "grandTotal": "Tổng cộng",
       "nonBillableTotal": "Khách tự thanh toán",
       "passthroughSubtotal": "Cộng chi hộ",
+      "roundDown": "Làm tròn xuống VAT",
+      "roundDownDescription": "Bỏ phần lẻ dưới 1 đồng thay vì làm tròn — khách hàng trả số nhỏ hơn.",
       "serviceSubtotal": "Cộng phí dịch vụ",
       "title": "Thanh toán",
       "vatAmount": "VAT ({{rate}}%)",

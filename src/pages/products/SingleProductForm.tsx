@@ -36,6 +36,7 @@ import { ProductSelector } from '@/components/selectors/ProductSelector';
 import { useProductStore } from '@/stores/useProductStore';
 import type { ProductSetItem, UnitConversion } from '@/types';
 import { isProductSet } from '@/utils/productSet';
+import type { ProductFormVariant } from './productFormVariant';
 import { appConfig } from '@/config';
 import {
   hasBarcodeForProducts,
@@ -82,6 +83,8 @@ const canManagePrice = perms.product.canManagePrice();
 
 type SingleProductFormProps = {
   readonly form: UseFormReturnType<ProductFormValues>;
+
+  readonly variant: ProductFormVariant;
   readonly isLoading: boolean;
   readonly isEditMode: boolean;
 
@@ -480,6 +483,7 @@ function AlternativeNamesField({ form }: { form: UseFormReturnType<ProductFormVa
 
 export function SingleProductForm({
   form,
+  variant,
   isLoading,
   isEditMode,
   onSkuChange,
@@ -644,14 +648,18 @@ export function SingleProductForm({
   ) : null;
 
   const noInventory = form.values.noInventory;
+
+  const showNoInventoryToggle = variant.showNoInventoryToggle || noInventory;
   const inventoryCard = (
     <SectionCard icon={<IconPlus size={14} />} title={t('common.columns.minStock')} padding="xs">
       <Stack gap="xs">
-        <Switch
-          label={t('products.form.noInventoryLabel')}
-          description={t('products.form.noInventoryDescription')}
-          {...form.getInputProps('noInventory', { type: 'checkbox' })}
-        />
+        {showNoInventoryToggle && (
+          <Switch
+            label={t('products.form.noInventoryLabel')}
+            description={t('products.form.noInventoryDescription')}
+            {...form.getInputProps('noInventory', { type: 'checkbox' })}
+          />
+        )}
         {/* Meaningless alongside `noInventory` — that flag already drops the
             product from the inventory list. The stored value still round-trips
             through submit, so flipping `noInventory` back off restores it. */}

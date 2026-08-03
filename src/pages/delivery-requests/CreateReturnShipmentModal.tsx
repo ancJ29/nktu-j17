@@ -25,7 +25,7 @@ import {
   makeEmployeeDepartmentFilter,
 } from '@/utils/permission';
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
-import type { DeliveryRequestItem, SalesOrder } from '@/types';
+import type { DeliveryRequestItem, SalesOrder, SalesOrderExtra } from '@/types';
 import {
   buildReturnableItemsFromSalesOrder,
   createDeliveryRequestRecord,
@@ -177,6 +177,8 @@ export function CreateReturnShipmentModal({
         salesOrderId: salesOrder.id,
         salesOrderNumber: salesOrder.orderNumber,
         customerName: salesOrder.customerName,
+
+        customerCode: (salesOrder.extra as SalesOrderExtra | undefined)?.customerCode ?? '',
         vendorCode: '',
         vendorName: '',
         deliveryAddress: '',

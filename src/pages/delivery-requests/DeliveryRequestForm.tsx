@@ -417,6 +417,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
             salesOrderId: values.salesOrderId,
             salesOrderNumber: values.salesOrderNumber,
             customerName,
+
             vendorCode,
             vendorName,
             deliveryAddress,

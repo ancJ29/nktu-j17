@@ -95,7 +95,7 @@ export function DeliveryRequestCardList({
         const vendor =
           !partyIsCustomer && req.vendorCode ? getVendorByCode(req.vendorCode) : undefined;
         const partyName = partyIsCustomer
-          ? resolveCustomerShortName(req.customerName)
+          ? resolveCustomerShortName(req.customerName, drExtra.customerCode)
           : vendor?.extra?.shortName?.trim() || vendor?.name || req.vendorName;
 
         return (

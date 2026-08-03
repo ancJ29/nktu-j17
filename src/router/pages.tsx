@@ -25,9 +25,15 @@ export const ProductListPage = lazy(() =>
 export const ProductDetailPage = lazy(() =>
   import('../pages/products').then((m) => ({ default: m.ProductDetailPage })),
 );
-export const ProductFormPage = lazy(() =>
+const ProductFormPageDefault = lazy(() =>
   import('../pages/products').then((m) => ({ default: m.ProductFormPage })),
 );
+const ProductFormPageNKTU = lazy(() =>
+  import('../pages/products/NKTUProductFormPage').then((m) => ({
+    default: m.NKTUProductFormPage,
+  })),
+);
+export const ProductFormPage = byClient({ nktu: ProductFormPageNKTU }, ProductFormPageDefault);
 
 const ProductInventoryListPageDefault = lazy(() =>
   import('../pages/product-inventory').then((m) => ({ default: m.ProductInventoryListPage })),

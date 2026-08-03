@@ -864,12 +864,28 @@ export function TransportOrderDetailPage() {
                     t('transportOrders.billing.passthroughSubtotal'),
                     formatMoney(totals.passthroughSubtotal),
                   )}
-                {infoRow(
-                  t('transportOrders.billing.vatAmount', {
-                    rate: Math.round((order.vatRate ?? 0) * 100),
-                  }),
-                  formatMoney(totals.vatAmount),
-                )}
+                {/* Not `infoRow` (whose label is a plain string): the rounding
+                    concession is named on the row it moves, and only when set.
+                    Without it the flag is invisible on the record — someone
+                    reconciling the invoice sees a đồng they can't account for
+                    and no reason it isn't the arithmetic figure. */}
+                <Group justify="space-between" gap="sm" wrap="nowrap">
+                  <Group gap={6} wrap="wrap">
+                    <Text c="dimmed" size="sm">
+                      {t('transportOrders.billing.vatAmount', {
+                        rate: Math.round((order.vatRate ?? 0) * 100),
+                      })}
+                    </Text>
+                    {order.roundDown && (
+                      <Badge size="xs" variant="light" color="gray">
+                        {t('transportOrders.billing.roundDown')}
+                      </Badge>
+                    )}
+                  </Group>
+                  <Text size="sm" ta="right" component="div">
+                    {formatMoney(totals.vatAmount)}
+                  </Text>
+                </Group>
                 {/* Shown for reconciliation, sitting OUTSIDE the running total —
                     it's what the customer handled themselves. */}
                 {totals.nonBillableTotal > 0 &&

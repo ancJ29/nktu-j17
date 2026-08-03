@@ -139,6 +139,8 @@ export type TransportOrder = PartitionedRecordRow & {
 
   vatRate: number;
 
+  roundDown?: boolean;
+
   transportContractNo: string;
 
   customerCode?: string;

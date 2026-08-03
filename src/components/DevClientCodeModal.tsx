@@ -77,7 +77,7 @@ export function DevClientCodeModal() {
 
       <TextInput
         label="API Group (developer only)"
-        placeholder="Enter API group (e.g. 12b1b2)"
+        placeholder="Enter API group (e.g. 49d092)"
         value={apiGroup}
         onChange={(e) => setApiGroup(e.currentTarget.value)}
         onKeyDown={(e) => {

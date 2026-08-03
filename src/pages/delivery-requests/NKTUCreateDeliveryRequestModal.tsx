@@ -4,7 +4,6 @@ import {
   Button,
   Checkbox,
   Group,
-  Modal,
   ScrollArea,
   Stack,
   Switch,
@@ -21,10 +20,12 @@ import {
   IconPackageImport,
   IconTestPipe,
 } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
+import { device } from '@credo/base-ui/utils';
 import { DateField } from '@/components/DateField';
+import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { CustomerSelector, EmployeeSelector, VendorSelector } from '@/components/selectors';
 import { SegmentTabs } from '@/components/SegmentTabs';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -51,6 +52,7 @@ import {
 import { getInitialStatusValue } from './transitionEngine';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 
+const isMobile = device.isMobile;
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
 
 type NKTUCreateDeliveryRequestModalProps = {
@@ -67,15 +69,14 @@ export function NKTUCreateDeliveryRequestModal({
 }: NKTUCreateDeliveryRequestModalProps) {
   const { t } = useTranslation();
   return (
-    <Modal
+    <ResponsiveModal
       opened={opened}
       onClose={onClose}
       title={t('deliveryRequests.addItem')}
       size="sm"
-      centered
     >
       {opened ? <CreateBody onClose={onClose} onCreated={onCreated} t={t} /> : null}
-    </Modal>
+    </ResponsiveModal>
   );
 }
 
@@ -315,6 +316,8 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
         salesOrderId: '',
         salesOrderNumber: '',
         customerName: isSample ? sampleCustomerName.trim() : '',
+
+        customerCode: isSample ? (sampleCustomer?.code ?? '') : '',
         vendorCode: isSample ? '' : vendorCode.trim(),
         vendorName: isSample ? '' : vendorName.trim(),
         deliveryAddress,
@@ -478,7 +481,9 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
         </Stack>
       )}
 
-      <Group grow align="flex-start">
+      {/* Driver + date sit side by side on desktop; on a phone two half-width
+          controls leave neither one readable, so they stack. */}
+      <DriverAndDateLayout>
         <EmployeeSelector
           label={t('deliveryRequests.form.driverLabel')}
           placeholder={t('deliveryRequests.form.driverPlaceholder')}
@@ -498,7 +503,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
           value={date}
           onChange={(v) => setDate(typeof v === 'string' ? (v ? new Date(v) : null) : v)}
         />
-      </Group>
+      </DriverAndDateLayout>
 
       {/* Outbound: pick a customer first, then its open sales orders show as a
           batch checklist (SOs without a DR yet). No orders are listed until a
@@ -541,7 +546,10 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
                   {t('deliveryRequests.bulkCreate.selectedCount', { count: selectedIds.size })}
                 </Text>
               </Group>
-              <ScrollArea.Autosize mah={320}>
+              {/* Desktop caps the checklist and scrolls it inside the modal.
+                  On mobile the drawer is already the scroll container — a
+                  second nested one traps the swipe, so the rows just flow. */}
+              <OrderChecklistScroll>
                 <Stack gap={4}>
                   {eligibleOrders.map((so) => (
                     <OrderRow
@@ -553,7 +561,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
                     />
                   ))}
                 </Stack>
-              </ScrollArea.Autosize>
+              </OrderChecklistScroll>
             </Stack>
           )}
         </Stack>
@@ -576,12 +584,18 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
         onChange={(e) => setIsUrgent(e.currentTarget.checked)}
       />
 
-      <Group justify="flex-end" gap="sm" mt="md">
-        <Button variant="default" size="sm" disabled={loading} onClick={onClose}>
+      {/* Thumb-sized actions on a phone: equal-width and full-bleed. */}
+      <Group justify="flex-end" gap="sm" mt="md" grow={isMobile}>
+        <Button
+          variant="default"
+          size={isMobile ? 'md' : 'sm'}
+          disabled={loading}
+          onClick={onClose}
+        >
           {t('__new__.01-common.actions.cancel')}
         </Button>
         <Button
-          size="sm"
+          size={isMobile ? 'md' : 'sm'}
           loading={loading}
           disabled={!canSubmit}
           onClick={isInbound ? handleSaveInbound : handleSaveOutbound}
@@ -593,6 +607,20 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
       </Group>
     </Stack>
   );
+}
+
+function DriverAndDateLayout({ children }: { children: ReactNode }) {
+  if (isMobile) return <Stack gap="sm">{children}</Stack>;
+  return (
+    <Group grow align="flex-start">
+      {children}
+    </Group>
+  );
+}
+
+function OrderChecklistScroll({ children }: { children: ReactNode }) {
+  if (isMobile) return <>{children}</>;
+  return <ScrollArea.Autosize mah={320}>{children}</ScrollArea.Autosize>;
 }
 
 type OrderRowProps = {

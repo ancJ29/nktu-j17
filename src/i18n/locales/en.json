@@ -3686,6 +3686,8 @@
       "grandTotal": "Grand total",
       "nonBillableTotal": "Settled by customer",
       "passthroughSubtotal": "Paid-on-behalf subtotal",
+      "roundDown": "Round VAT down",
+      "roundDownDescription": "Drop the sub-đồng fraction instead of rounding it — the customer pays the lower figure.",
       "serviceSubtotal": "Service subtotal",
       "title": "Billing",
       "vatAmount": "VAT ({{rate}}%)",

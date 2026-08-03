@@ -172,14 +172,20 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
   const resolvedVendor =
     !partyIsCustomer && request.vendorCode ? getVendorByCode(request.vendorCode) : undefined;
-  const resolvedCustomer =
-    partyIsCustomer && request.customerName
-      ? customers.find(
-          (c) => c.name === request.customerName || c.extra?.shortName === request.customerName,
-        )
-      : undefined;
+  const resolvedCustomer = !partyIsCustomer
+    ? undefined
+    : drExtra.customerCode
+      ? customers.find((c) => c.code === drExtra.customerCode)
+      : request.customerName
+        ? customers.find(
+            (c) => c.name === request.customerName || c.extra?.shortName === request.customerName,
+          )
+        : undefined;
+
+  const customerDisplayName =
+    resolvedCustomer?.extra?.shortName?.trim() || resolvedCustomer?.name || request.customerName;
   const contactName = partyIsCustomer
-    ? request.customerName || ''
+    ? customerDisplayName || ''
     : resolvedVendor?.extra?.shortName?.trim() || resolvedVendor?.name || request.vendorName || '';
   const contactPhone = (partyIsCustomer ? resolvedCustomer?.phone : resolvedVendor?.phone) ?? '';
   const contactCopyText = [contactName, drExtra.deliveryAddress, drExtra.googleMapUrl, contactPhone]
@@ -329,9 +335,9 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     : t('deliveryRequests.detail.vendorLabel');
   const partyContent = !partyIsCustomer ? (
     <VendorLink code={request.vendorCode} name={request.vendorName} />
-  ) : request.customerName ? (
+  ) : customerDisplayName ? (
     <Text size="md" fw={600}>
-      {request.customerName}
+      {customerDisplayName}
     </Text>
   ) : (
     <Text size="md" fw={600} c="dimmed">

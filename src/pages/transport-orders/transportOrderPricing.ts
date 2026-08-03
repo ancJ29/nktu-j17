@@ -74,10 +74,15 @@ export type TransportOrderTotals = {
   balanceDue: number;
 };
 
+function roundVat(exact: number, roundDown: boolean): number {
+  return roundDown ? Math.floor(exact) : Math.round(exact);
+}
+
 export function computeTransportOrderTotals(
   fees: TransportOrderFee[],
   vatRate: number,
   advanceAmount = 0,
+  roundDown = false,
 ): TransportOrderTotals {
   let serviceSubtotal = 0;
   let passthroughSubtotal = 0;
@@ -97,7 +102,7 @@ export function computeTransportOrderTotals(
     if (fee.vatable) vatBase += amount;
   }
   const subtotal = serviceSubtotal + passthroughSubtotal;
-  const vatAmount = Math.round(vatBase * (vatRate || 0));
+  const vatAmount = roundVat(vatBase * (vatRate || 0), roundDown);
   const grandTotal = subtotal + vatAmount;
   const advance = advanceAmount || 0;
   return {
@@ -119,6 +124,7 @@ export function orderTotals(order: TransportOrder): TransportOrderTotals {
     readFeeLines(order),
     order.vatRate ?? 0,
     order.advanceAmount ?? 0,
+    !!order.roundDown,
   );
 }
 

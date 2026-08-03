@@ -188,6 +188,8 @@ export function CreateDeliveryRequestModal({
         salesOrderId: salesOrder.id,
         salesOrderNumber: salesOrder.orderNumber,
         customerName: values.customerName.trim(),
+
+        customerCode: (salesOrder.extra as SalesOrderExtra | undefined)?.customerCode ?? '',
         vendorCode: '',
         vendorName: '',
         deliveryAddress: values.deliveryAddress.trim(),

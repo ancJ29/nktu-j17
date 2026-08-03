@@ -113,6 +113,8 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   );
 
   const drExtra = (request.extra ?? {}) as DeliveryRequestExtra;
+
+  const [customerCode, setCustomerCode] = useState(() => drExtra.customerCode ?? '');
   const form = useForm<EditFormValues>({
     initialValues: {
       direction,
@@ -142,6 +144,8 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
         id: request.id,
         snapshot: request,
         customerName,
+
+        customerCode: partyIsCustomer ? customerCode.trim() : '',
         vendorCode,
         vendorName,
         deliveryAddress: values.deliveryAddress.trim(),
@@ -182,10 +186,11 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   };
 
   const sampleCustomerId = isSample
-    ? (customers.find(
-        (c) =>
-          c.name === form.getValues().customerName ||
-          c.extra?.shortName === form.getValues().customerName,
+    ? (customers.find((c) =>
+        customerCode
+          ? c.code === customerCode
+          : c.name === form.getValues().customerName ||
+            c.extra?.shortName === form.getValues().customerName,
       )?.id ?? null)
     : null;
 
@@ -271,6 +276,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
                 onChange={(sel) => {
                   if (!sel) return;
                   form.setFieldValue('customerName', sel.name);
+                  setCustomerCode(sel.customer.code);
                   if (sel.id === sampleCustomerId) return;
                   const { deliveryAddress, googleMapUrl } = resolveCustomerPickupAddress(
                     sel.customer,

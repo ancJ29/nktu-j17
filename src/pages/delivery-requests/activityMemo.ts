@@ -39,6 +39,7 @@ export type DeliveryRequestPartyMemo = {
 
   salesOrderId?: string;
   salesOrderNumber?: string;
+  customerCode?: string;
   customerName?: string;
 
   vendorCode?: string;
@@ -125,6 +126,7 @@ export function partyMemo(request: {
   inboundKind?: DeliveryRequestInboundKind;
   salesOrderId?: string;
   salesOrderNumber?: string;
+  customerCode?: string;
   customerName?: string;
   vendorCode?: string;
   vendorName?: string;
@@ -139,6 +141,7 @@ export function partyMemo(request: {
         inboundKind,
         ...(request.salesOrderId && { salesOrderId: request.salesOrderId }),
         ...(request.salesOrderNumber && { salesOrderNumber: request.salesOrderNumber }),
+        ...(request.customerCode && { customerCode: request.customerCode }),
         ...(request.customerName && { customerName: request.customerName }),
       };
     }
@@ -147,6 +150,7 @@ export function partyMemo(request: {
       return {
         direction,
         inboundKind,
+        ...(request.customerCode && { customerCode: request.customerCode }),
         ...(request.customerName && { customerName: request.customerName }),
       };
     }
@@ -161,6 +165,7 @@ export function partyMemo(request: {
     direction,
     ...(request.salesOrderId && { salesOrderId: request.salesOrderId }),
     ...(request.salesOrderNumber && { salesOrderNumber: request.salesOrderNumber }),
+    ...(request.customerCode && { customerCode: request.customerCode }),
     ...(request.customerName && { customerName: request.customerName }),
   };
 }
@@ -171,6 +176,7 @@ export function partyMemoFromRequest(record: DeliveryRequest): DeliveryRequestPa
     inboundKind: (record.extra as DeliveryRequestExtra | undefined)?.inboundKind,
     salesOrderId: record.salesOrderId,
     salesOrderNumber: record.salesOrderNumber,
+    customerCode: (record.extra as DeliveryRequestExtra | undefined)?.customerCode,
     customerName: record.customerName,
     vendorCode: record.vendorCode,
     vendorName: record.vendorName,

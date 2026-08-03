@@ -29,6 +29,7 @@ import {
   IconArrowLeft,
   IconBoxMultiple,
   IconDownload,
+  IconPhoto,
   IconPlus,
   IconScissors,
   IconTrash,
@@ -61,6 +62,7 @@ import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import {
   getDeliveryRequestDriverDepartments,
   getSalesOrderPicDepartments,
+  hasImagesForProducts,
   isDeliveryRequestsEnabled,
   isInternalDeliveryAllowed,
   isLocationsEnabled,
@@ -97,6 +99,7 @@ import {
 } from '@/components/selectors';
 import { appConfig } from '@/config';
 import { resolveClientCode } from '@/config/client-code';
+import { ProductPhotoModal } from './ProductPhotoModal';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import {
   getCreateSkipInitialTargetValue,
@@ -444,6 +447,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
   const [lockedByReservation, setLockedByReservation] = useState(false);
 
   const [skipInitial, setSkipInitial] = useState(!!createSkipInitialTarget);
+
+  const [photoProduct, setPhotoProduct] = useState<{ code: string; name: string } | null>(null);
+
+  const productImagesEnabled = hasImagesForProducts();
 
   const [generatedUploadId] = useState(() => Math.random().toString(36).slice(2, 10));
   const uploadId = id ?? generatedUploadId;
@@ -2184,6 +2191,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 unitLabels={unitLabels}
                 productByCode={productByCode}
                 locked={lockedByReservation}
+                showPhotoButton={variant.itemProductPhotoButton && productImagesEnabled}
+                onShowPhotos={(code, name) => setPhotoProduct({ code, name })}
               />
 
               {/* Total amount */}
@@ -2291,6 +2300,18 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           </Stack>
         </form>
       </Card>
+
+      {/* Per-line product photos. Keyed by code so switching lines remounts it
+          with a fresh active-photo index — no effect to keep them in sync. */}
+      {photoProduct && (
+        <ProductPhotoModal
+          key={photoProduct.code}
+          opened
+          onClose={() => setPhotoProduct(null)}
+          productCode={photoProduct.code}
+          productName={photoProduct.name}
+        />
+      )}
     </Stack>
   );
 }
@@ -2336,6 +2357,10 @@ type ItemEditorProps = {
   productByCode: Map<string, Product>;
 
   locked: boolean;
+
+  showPhotoButton: boolean;
+
+  onShowPhotos: (productCode: string, productName: string) => void;
 };
 
 function AvailabilityHint({
@@ -2559,6 +2584,8 @@ function DesktopItemTable({
   unitLabels,
   productByCode,
   locked,
+  showPhotoButton,
+  onShowPhotos,
 }: ItemEditorProps) {
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
   const showLocationCol = locationsEnabled && locationSelectData.length > 0;
@@ -2613,83 +2640,110 @@ function DesktopItemTable({
               : undefined;
 
           const lineProduct = productByCode.get(item.productCode);
+          const hasPhoto = (lineProduct?.extra?.images?.length ?? 0) > 0;
           const suggestedPrice = getProductSuggestedPrice(lineProduct);
           const belowSuggested = !isSetChild && isBelowSuggestedPrice(lineProduct, item.unitPrice);
           return (
             <Table.Tr key={idx} bg={codeColor}>
               <Table.Td>
-                {isSetChild ? (
-                  <Stack gap={2} pl="md">
-                    <Group gap={6} wrap="nowrap">
+                <Group>
+                  {isSetChild ? (
+                    <Stack gap={2} pl="md">
+                      <Group gap={6} wrap="nowrap">
+                        <Text size="xs" c="dimmed">
+                          ↳
+                        </Text>
+                        <Text size="xs" ff="monospace" c="dimmed">
+                          {item.productCode}
+                        </Text>
+                        <Text size="xs" c="dimmed" lineClamp={1}>
+                          {item.productName}
+                        </Text>
+                      </Group>
                       <Text size="xs" c="dimmed">
-                        ↳
+                        {t('salesOrders.form.setComponentChildLabel', {
+                          setName: item.sourceSetCode,
+                        })}
                       </Text>
-                      <Text size="xs" ff="monospace" c="dimmed">
-                        {item.productCode}
-                      </Text>
-                      <Text size="xs" c="dimmed" lineClamp={1}>
-                        {item.productName}
-                      </Text>
-                    </Group>
-                    <Text size="xs" c="dimmed">
-                      {t('salesOrders.form.setComponentChildLabel', {
-                        setName: item.sourceSetCode,
-                      })}
-                    </Text>
-                  </Stack>
-                ) : productSelectData.length > 0 ? (
-                  <Stack gap={2}>
-                    <Group gap={6} wrap="nowrap" align="center">
-                      {isSetParent && (
-                        <IconBoxMultiple
-                          size={14}
-                          style={{
-                            flexShrink: 0,
-                            color: `var(--mantine-color-${PRODUCT_SET_COLOR}-6)`,
-                          }}
+                    </Stack>
+                  ) : productSelectData.length > 0 ? (
+                    <Stack gap={2}>
+                      <Group gap={6} wrap="nowrap" align="center">
+                        {isSetParent && (
+                          <IconBoxMultiple
+                            size={14}
+                            style={{
+                              flexShrink: 0,
+                              color: `var(--mantine-color-${PRODUCT_SET_COLOR}-6)`,
+                            }}
+                          />
+                        )}
+                        <ProductSelector
+                          size="xs"
+                          searchable
+                          disabled={locked}
+                          placeholder={t('common.labels.productName')}
+                          code={item.productCode || null}
+                          name={item.productName || null}
+                          filter={(p) => p.isActive && !p.extra?.isDeleted}
+                          onChange={(opt) => onProductSelect(idx, opt)}
+                          error={form.errors[`items.${idx}.productCode`]}
+                          style={{ flex: 1 }}
                         />
+                      </Group>
+                      {isSetParent && (
+                        <Badge
+                          size="xs"
+                          variant="light"
+                          color={PRODUCT_SET_COLOR}
+                          radius="sm"
+                          style={{ alignSelf: 'flex-start' }}
+                        >
+                          {t('salesOrders.form.setParentBadge')}
+                        </Badge>
                       )}
-                      <ProductSelector
+                    </Stack>
+                  ) : (
+                    <Stack gap={2}>
+                      <TextInput
                         size="xs"
-                        searchable
                         disabled={locked}
-                        placeholder={t('common.labels.productName')}
-                        code={item.productCode || null}
-                        name={item.productName || null}
-                        filter={(p) => p.isActive && !p.extra?.isDeleted}
-                        onChange={(opt) => onProductSelect(idx, opt)}
-                        error={form.errors[`items.${idx}.productCode`]}
-                        style={{ flex: 1 }}
+                        placeholder={t('common.labels.code')}
+                        {...form.getInputProps(`items.${idx}.productCode`)}
                       />
-                    </Group>
-                    {isSetParent && (
-                      <Badge
+                      <TextInput
                         size="xs"
-                        variant="light"
-                        color={PRODUCT_SET_COLOR}
-                        radius="sm"
-                        style={{ alignSelf: 'flex-start' }}
+                        placeholder={t('common.labels.name')}
+                        disabled={rowLocked}
+                        {...form.getInputProps(`items.${idx}.productName`)}
+                      />
+                    </Stack>
+                  )}
+                  {/* Verify the picked goods before the order exists. Rendered
+                      for set children too — a wrong component is as costly as a
+                      wrong parent. Dimmed when the product carries no photo, so
+                      the row itself tells the operator whether a reference shot
+                      exists; still clickable, and the modal says so plainly. */}
+                  {showPhotoButton && item.productCode && (
+                    <Tooltip
+                      label={
+                        hasPhoto
+                          ? t('salesOrders.detail.tabProductPhotos')
+                          : t('products.detail.noPhotoHint')
+                      }
+                      withArrow
+                    >
+                      <ActionIcon
+                        variant="subtle"
+                        size="sm"
+                        disabled={!hasPhoto}
+                        onClick={() => onShowPhotos(item.productCode, item.productName)}
                       >
-                        {t('salesOrders.form.setParentBadge')}
-                      </Badge>
-                    )}
-                  </Stack>
-                ) : (
-                  <Stack gap={2}>
-                    <TextInput
-                      size="xs"
-                      disabled={locked}
-                      placeholder={t('common.labels.code')}
-                      {...form.getInputProps(`items.${idx}.productCode`)}
-                    />
-                    <TextInput
-                      size="xs"
-                      placeholder={t('common.labels.name')}
-                      disabled={rowLocked}
-                      {...form.getInputProps(`items.${idx}.productName`)}
-                    />
-                  </Stack>
-                )}
+                        <IconPhoto size={14} />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </Group>
               </Table.Td>
               <Table.Td>
                 <Stack gap={2}>

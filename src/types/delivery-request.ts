@@ -53,6 +53,8 @@ export type DeliveryRequestExtra = {
 
   returnRestockedAt?: string;
 
+  customerCode?: string;
+
   isDeleted?: boolean;
 
   isUrgent?: boolean;

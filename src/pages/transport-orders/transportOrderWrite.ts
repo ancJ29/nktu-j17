@@ -27,6 +27,8 @@ export type TransportOrderWriteFields = {
 
   advanceAmount: number;
   vatRate: number;
+
+  roundDown: boolean;
   transportContractNo: string;
   customerCode?: string | undefined;
   customerName?: string | undefined;
@@ -65,6 +67,7 @@ export function buildTransportOrderWrite(
   fields: TransportOrderWriteFields,
 ): Record<string, unknown> {
   const fees = readFeeLines({ fees: fields.fees });
+
   const { subtotal } = computeTransportOrderTotals(fees, fields.vatRate);
 
   const trips = fields.isMultiTrip ? fields.trips : [];

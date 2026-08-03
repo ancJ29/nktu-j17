@@ -153,6 +153,8 @@ export type CreateDeliveryRequestParams = {
   salesOrderNumber: string;
   customerName: string;
 
+  customerCode?: string;
+
   vendorCode: string;
   vendorName: string;
 
@@ -213,6 +215,13 @@ export async function createDeliveryRequestRecord(
 
   const isAdditional = !isInbound && salesOrderHasLinkedDeliveryRequest(p.salesOrderId);
 
+  const customerCode = (
+    p.customerCode ||
+    (carriesSalesOrder
+      ? (((sourceSalesOrder?.extra ?? {}) as SalesOrderExtra).customerCode ?? '')
+      : '')
+  ).trim();
+
   const extra: DeliveryRequestExtra = {
     status: initialStatus,
     activityLog: [createdEntry],
@@ -225,6 +234,8 @@ export async function createDeliveryRequestRecord(
     }),
     ...(p.isUrgent && { isUrgent: true }),
     ...(isAdditional && { isAdditional: true }),
+
+    ...(customerCode && { customerCode }),
 
     ...(isInbound && p.inboundKind && p.inboundKind !== 'vendor' && { inboundKind: p.inboundKind }),
 
@@ -269,6 +280,7 @@ export async function createDeliveryRequestRecord(
       ...(carriesSalesOrder
         ? { salesOrderId: p.salesOrderId, salesOrderNumber: p.salesOrderNumber }
         : {}),
+      customerCode,
       customerName: p.customerName,
       vendorCode: p.vendorCode,
       vendorName: p.vendorName,
@@ -295,6 +307,8 @@ export type UpdateDeliveryRequestParams = {
   snapshot: DeliveryRequest;
 
   customerName: string;
+
+  customerCode?: string;
   vendorCode: string;
   vendorName: string;
 
@@ -327,6 +341,8 @@ export async function updateDeliveryRequestRecord(
       : { assignedDriverId: undefined, assignedDriverName: undefined }),
 
     isUrgent: p.isUrgent ? true : undefined,
+
+    ...(p.customerCode !== undefined && { customerCode: p.customerCode.trim() || undefined }),
   };
 
   const updated = (await useDeliveryRequestStore.getState().updateSafely({

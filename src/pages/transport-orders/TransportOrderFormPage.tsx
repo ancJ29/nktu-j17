@@ -168,6 +168,8 @@ type FormValues = {
 
   advanceAmount: number;
   vatRatePercent: number;
+
+  roundDown: boolean;
   transportContractNo: string;
   customerCode: string;
   customerName: string;
@@ -269,6 +271,7 @@ function blankValues(): FormValues {
     fees: initialFees(),
     advanceAmount: 0,
     vatRatePercent: DEFAULT_VAT_PERCENT,
+    roundDown: false,
     transportContractNo: '',
     customerCode: '',
     customerName: '',
@@ -311,6 +314,8 @@ function copiedValues(src: TransportOrder): FormValues {
     fees: toFeeRows(src),
     advanceAmount: 0,
     vatRatePercent: Math.round((src.vatRate ?? 0) * 100),
+
+    roundDown: !!src.roundDown,
     transportContractNo: src.transportContractNo || '',
     customerCode: src.customerCode || '',
     customerName: src.customerName || '',
@@ -491,6 +496,7 @@ export function TransportOrderFormPage() {
         fees: toFeeRows(o),
         advanceAmount: o.advanceAmount ?? 0,
         vatRatePercent: Math.round((o.vatRate ?? 0) * 100),
+        roundDown: !!o.roundDown,
         transportContractNo: o.transportContractNo || '',
         customerCode: o.customerCode || '',
         customerName: o.customerName || '',
@@ -565,6 +571,7 @@ export function TransportOrderFormPage() {
           fees,
           advanceAmount: values.advanceAmount || 0,
           vatRate,
+          roundDown: values.roundDown,
           transportContractNo: values.transportContractNo.trim(),
           customerCode: values.customerCode || undefined,
           customerName: values.customerName.trim() || undefined,
@@ -734,6 +741,7 @@ export function TransportOrderFormPage() {
     form.values.fees,
     (form.values.vatRatePercent || 0) / 100,
     form.values.advanceAmount || 0,
+    form.values.roundDown,
   );
 
   const totalsRow = (label: string, value: number, dimmed = false) => (
@@ -1266,6 +1274,16 @@ export function TransportOrderFormPage() {
                 {...form.getInputProps('advanceAmount')}
               />
             </Group>
+
+            {/* Sits under the VAT rate it modifies, not with the totals it moves:
+                it's an input the operator sets, and the effect is visible one row
+                down in the VAT line the moment it's ticked. */}
+            <Checkbox
+              mt="sm"
+              label={t('transportOrders.billing.roundDown')}
+              description={t('transportOrders.billing.roundDownDescription')}
+              {...form.getInputProps('roundDown', { type: 'checkbox' })}
+            />
 
             {/* The running total. The form never showed one before, but an operator
                 typing an advance with no visible balance is working blind — and it's

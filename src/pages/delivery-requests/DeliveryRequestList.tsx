@@ -198,6 +198,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       searchFields: (item) => [
         item.requestNumber,
         item.customerName ?? '',
+        item.extra?.customerCode ?? '',
         item.salesOrderNumber ?? '',
         item.vendorName ?? '',
         item.vendorCode ?? '',
@@ -233,7 +234,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       if (deliveryRequestPartyIsCustomer(r)) {
         const raw = r.customerName?.trim();
         if (!raw || byValue.has(raw)) continue;
-        byValue.set(raw, resolveCustomerShortName(raw) || raw);
+        byValue.set(raw, resolveCustomerShortName(raw, r.extra?.customerCode) || raw);
       } else {
         const raw = r.vendorName?.trim();
         if (!raw || byValue.has(raw)) continue;
@@ -418,6 +419,9 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
 
   const [createOpen, setCreateOpen] = useState(false);
 
+  const showQuickCreate =
+    variant.quickCreateMode === 'modal' && (!isMobile || variant.mobileQuickCreate);
+
   const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
 
   const dateShownOnChip =
@@ -454,14 +458,16 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             ) : null
           }
           createCta={
-            isMobile
-              ? undefined
-              : variant.quickCreateMode === 'modal'
+            variant.quickCreateMode === 'modal'
+              ? showQuickCreate
                 ? {
                     onClick: () => setCreateOpen(true),
                     label: t('deliveryRequests.addItem'),
                     enabled: canCreate,
                   }
+                : undefined
+              : isMobile
+                ? undefined
                 : {
                     to: ROUTES.DELIVERY.NEW,
                     label: t('deliveryRequests.addItem'),
@@ -470,7 +476,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           }
         />
 
-        {!isMobile && variant.quickCreateMode === 'modal' && (
+        {showQuickCreate && (
           <NKTUCreateDeliveryRequestModal
             opened={createOpen}
             onClose={() => setCreateOpen(false)}

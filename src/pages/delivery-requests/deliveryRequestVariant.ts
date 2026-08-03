@@ -3,6 +3,8 @@ import { byClient } from '@/config/client';
 export type DeliveryRequestVariant = {
   quickCreateMode: 'modal' | 'route';
 
+  mobileQuickCreate: boolean;
+
   editMode: 'modal' | 'route';
 
   showListItems: boolean;
@@ -26,6 +28,7 @@ export type DeliveryRequestVariant = {
 
 export const DEFAULT_DELIVERY_REQUEST_VARIANT: DeliveryRequestVariant = {
   quickCreateMode: 'route',
+  mobileQuickCreate: false,
   editMode: 'route',
   showListItems: true,
   seedScheduledDateFromSalesOrder: true,
@@ -36,6 +39,7 @@ export const DEFAULT_DELIVERY_REQUEST_VARIANT: DeliveryRequestVariant = {
 
 export const NKTU_DELIVERY_REQUEST_VARIANT: DeliveryRequestVariant = {
   quickCreateMode: 'modal',
+  mobileQuickCreate: true,
   editMode: 'modal',
   showListItems: false,
   seedScheduledDateFromSalesOrder: false,

@@ -64,7 +64,9 @@ export function DeliveryRequestDataTable({
               vendor?.extra?.shortName?.trim() || vendor?.name || item.vendorName || '-';
             return <Text fz="md">{display}</Text>;
           }
-          const display = resolveCustomerShortName(item.customerName) || '-';
+
+          const drExtra = (item.extra ?? {}) as DeliveryRequestExtra;
+          const display = resolveCustomerShortName(item.customerName, drExtra.customerCode) || '-';
           return <Text fz="md">{display}</Text>;
         },
       },

@@ -15,6 +15,8 @@ export type SalesOrderFormVariant = {
 
   showDownloadTemplateButton: boolean;
 
+  itemProductPhotoButton: boolean;
+
   headerLayout: 'twoColumn' | 'compactFourColumn';
 
   customerPicker: 'selector' | 'nameCodeSelect';
@@ -39,6 +41,7 @@ export const DEFAULT_SALES_ORDER_FORM_VARIANT: SalesOrderFormVariant = {
   showVatTag: true,
   showShippingFee: true,
   showDownloadTemplateButton: true,
+  itemProductPhotoButton: false,
   headerLayout: 'twoColumn',
   customerPicker: 'selector',
 };
@@ -52,6 +55,7 @@ export const NKTU_SALES_ORDER_FORM_VARIANT: SalesOrderFormVariant = {
   showVatTag: false,
   showShippingFee: false,
   showDownloadTemplateButton: false,
+  itemProductPhotoButton: true,
   headerLayout: 'compactFourColumn',
   customerPicker: 'nameCodeSelect',
   clientSpecific: {

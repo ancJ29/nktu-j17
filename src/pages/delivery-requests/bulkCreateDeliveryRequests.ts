@@ -83,6 +83,8 @@ export async function bulkCreateOutboundDeliveryRequests(
       };
 
       const customerName = resolveCustomerName(so) ?? '';
+
+      const customerCode = soExtra.customerCode?.trim() ?? '';
       const deliveryAddress = soExtra.deliveryAddress ?? '';
       const googleMapUrl = soExtra.googleMapUrl ?? '';
 
@@ -90,6 +92,7 @@ export async function bulkCreateOutboundDeliveryRequests(
         status: initialStatus,
         activityLog: [createdEntry],
         deliveryAddress,
+        ...(customerCode && { customerCode }),
         ...(googleMapUrl && { googleMapUrl }),
         assignedDriverId: driver.id,
         assignedDriverName: driver.name,
@@ -124,6 +127,7 @@ export async function bulkCreateOutboundDeliveryRequests(
           direction: 'outbound',
           salesOrderId: so.id,
           salesOrderNumber: so.orderNumber,
+          customerCode,
           customerName,
         }),
         lineCount: 0,
