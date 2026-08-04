@@ -205,19 +205,9 @@ export function CropDiaryTemplateDetailPage() {
         {isMobile && <Box mt="md">{statbook}</Box>}
       </Card>
 
-      {isMobile && canEdit && (
-        <Button
-          component={Link}
-          to={ROUTES.CROP_DIARY_TEMPLATES.EDIT.replace(':id', template.id)}
-          variant="light"
-          size="sm"
-          leftSection={<IconEdit size={16} />}
-          fullWidth
-        >
-          {t('__new__.01-common.actions.edit')}
-        </Button>
-      )}
-
+      {/* No mobile Edit affordance: the form page redirects mobile visitors to
+          the list, so the tap bounced and cost the operator the record they were
+          reading. Editing a template is desktop-only — detail-page pattern § F. */}
       <SectionCard
         icon={<IconInfoCircle size={14} />}
         title={t('cropDiaryTemplates.detail.infoTitle')}

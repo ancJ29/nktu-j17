@@ -24,7 +24,9 @@ memo ([`internal-only-trust-model.md`](../../../../credo-services/activity-logge
 - **No per-caller access-key registry** — the setter surface is just
   `useLocal`, `setBaseUrl`, `setInternalAccessKey`, `setTrustedServiceKey`.
 - **Default base URL** from `urls['activityLogger']` in
-  [`../shared/config.ts`](../shared/config.ts) (`https://d687fa1b765-7ae87.api-bridge.work`).
+  [`../shared/config.ts`](../shared/config.ts) — resolved per group
+  (`https://d687fa1b765-<group>.api-bridge.work`), so an unset or unknown
+  `CREDO_GROUP` leaves `urls` empty and the connector with no default at all.
 - **`getById` allows-not-found by default** — matches the
   c-storage `getRecordByKey` precedent: 404 returns `null`, opt out with
   `{ allowNotFound: false }`.

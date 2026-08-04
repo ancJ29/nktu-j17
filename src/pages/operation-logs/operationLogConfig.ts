@@ -73,6 +73,14 @@ export type OperationLogWriteEvent = {
   targetCode: string;
 };
 
+export type GroupedRow = {
+  log: OperationLog;
+
+  grouped: boolean;
+
+  firstOfGroup: boolean;
+};
+
 export type OperationLogColumn = {
   header: string;
   align?: 'right';

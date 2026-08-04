@@ -315,7 +315,7 @@
       "updateSuccess": "Đã cập nhật tài sản"
     },
     "truck": {
-      "addItem": "Thông tin xe",
+      "addItem": "Thêm xe",
       "columns": {
         "capacity": "Tải trọng",
         "compliance": "Sắp hết hạn",
@@ -2531,6 +2531,9 @@
     },
     "addItem": "Thêm đổ dầu",
     "allMonths": "Tất cả các tháng",
+    "cards": {
+      "toggleDetail": "Xem chi tiết"
+    },
     "deleteConfirm": {
       "message": "Xóa nhật ký ngày {{date}}? Không thể hoàn tác.",
       "title": "Xóa nhật ký đổ dầu?"
@@ -2685,6 +2688,9 @@
         "tankRequired": "Chọn bồn đã lấy dầu"
       }
     },
+    "sort": {
+      "default": "Mới nhất"
+    },
     "trip": {
       "addItem": "Thêm chuyến",
       "columns": {
@@ -2720,6 +2726,7 @@
   "photos": {
     "addPhotos": "Thêm ảnh",
     "capture": "Chụp",
+    "deleteError": "Không xoá được ảnh — kiểm tra kết nối và thử lại",
     "dragOrClick": "Kéo ảnh vào đây, hoặc nhấp để chọn",
     "dropHere": "Thả để tải lên",
     "empty": "Chưa có ảnh nào",
@@ -2728,13 +2735,29 @@
     "invalidType": "{{name}}: định dạng không hỗ trợ",
     "keep": "Dùng ảnh",
     "loadingLocation": "Đang tải vị trí...",
+    "pendingBadge": "Chờ tải lên",
+    "pendingCount": "{{count}} ảnh đang chờ tải lên",
     "permissionDenied": "Không có quyền truy cập camera",
+    "queueUnavailable": "Thiết bị này không lưu được ảnh khi offline, nên phải tải lên ngay. Hãy di chuyển đến chỗ có sóng và thử lại.",
+    "queuedMessage": "Hiện không có kết nối — ảnh sẽ tự động tải lên khi có mạng trở lại. Bạn cứ tiếp tục công việc.",
+    "queuedTitle": "Đã lưu ảnh trên thiết bị",
     "retake": "Chụp lại",
+    "retryFailed": "Vẫn chưa có kết nối. Ảnh vẫn được giữ trên máy và sẽ tự thử lại.",
+    "retryPending": "Tải lên ngay",
+    "saveToDevice": "Lưu về máy",
+    "saveToDeviceFailed": "Không lưu được ảnh về máy",
+    "savedToDevice": "Đã lưu ảnh về máy",
+    "saveFailed": "Đã tải lên {{count}} ảnh nhưng chưa đính kèm được. Vui lòng thử lại.",
+    "saveFailedTitle": "Chưa đính kèm được ảnh",
     "takenAtDeliveryBadge": "Chụp khi giao hàng",
     "tooLarge": "{{name}}: vượt quá giới hạn {{max}}MB",
     "tryAgain": "Thử lại",
+    "updatedElsewhere": "Phiếu vừa được cập nhật ở nơi khác — ảnh của bạn đã được ghép vào.",
     "uploadError": "Tải lên thất bại {{name}}",
+    "uploadNetworkError": "{{name}}: lỗi kết nối, tải lên thất bại. Vui lòng thử lại.",
+    "uploadOffline": "{{name}}: không có kết nối mạng — ảnh chưa được tải lên",
     "uploadSuccess": "Đã tải lên {{count}} ảnh",
+    "uploadTimeout": "{{name}}: quá thời gian chờ — mạng quá chậm. Vui lòng thử lại.",
     "uploading": "Đang tải..."
   },
   "productInventory": {

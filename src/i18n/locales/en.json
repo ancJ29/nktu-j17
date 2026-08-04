@@ -2531,6 +2531,9 @@
     },
     "addItem": "Add Refuel",
     "allMonths": "All months",
+    "cards": {
+      "toggleDetail": "Toggle details"
+    },
     "deleteConfirm": {
       "message": "Delete the log dated {{date}}? This cannot be undone.",
       "title": "Delete refuel log?"
@@ -2685,6 +2688,9 @@
         "tankRequired": "Pick which tank the fuel came from"
       }
     },
+    "sort": {
+      "default": "Newest first"
+    },
     "trip": {
       "addItem": "Add trip",
       "columns": {
@@ -2720,6 +2726,7 @@
   "photos": {
     "addPhotos": "Add photos",
     "capture": "Capture",
+    "deleteError": "Could not remove the photo — check your connection and try again",
     "dragOrClick": "Drag photos here, or click to browse",
     "dropHere": "Drop to upload",
     "empty": "No photos uploaded yet",
@@ -2728,13 +2735,29 @@
     "invalidType": "{{name}}: unsupported file type",
     "keep": "Use Photo",
     "loadingLocation": "Loading location...",
+    "pendingBadge": "Pending upload",
+    "pendingCount": "{{count}} photo(s) waiting to upload",
     "permissionDenied": "Camera access denied",
+    "queueUnavailable": "This device can't hold the photo offline, so it has to be uploaded now. Move to a spot with signal and try again.",
+    "queuedMessage": "No connection right now — it will upload by itself once you're back online. You can carry on.",
+    "queuedTitle": "Photo saved on this device",
     "retake": "Retake",
+    "retryFailed": "Still no connection. The photo is safe on this device and will keep retrying.",
+    "retryPending": "Upload now",
+    "saveToDevice": "Save to device",
+    "saveToDeviceFailed": "Could not save the photo to this device",
+    "savedToDevice": "Photo saved to your device",
+    "saveFailed": "{{count}} photo(s) were uploaded but could not be attached. Please try again.",
+    "saveFailedTitle": "Photo not attached",
     "takenAtDeliveryBadge": "Taken at delivery",
     "tooLarge": "{{name}}: exceeds {{max}}MB limit",
     "tryAgain": "Try Again",
+    "updatedElsewhere": "This record was updated elsewhere — your photo was merged in.",
     "uploadError": "Failed to upload {{name}}",
+    "uploadNetworkError": "{{name}}: connection problem, upload failed. Please try again.",
+    "uploadOffline": "{{name}}: no internet connection — the photo was not uploaded",
     "uploadSuccess": "{{count}} photo(s) uploaded",
+    "uploadTimeout": "{{name}}: upload timed out — the connection is too slow. Please try again.",
     "uploading": "Uploading..."
   },
   "productInventory": {

@@ -431,7 +431,7 @@ export function TransportOrderDetailPage() {
     </Group>
   );
 
-  const canEditMeta = canEdit && !locked && !isCancelled;
+  const canEditMeta = canEdit && !locked && !isCancelled && !isMobile;
 
   const inlineEditLabels = {
     edit: t('__new__.01-common.actions.edit'),

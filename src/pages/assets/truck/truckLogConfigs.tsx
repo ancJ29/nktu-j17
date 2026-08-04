@@ -34,6 +34,7 @@ import {
   itemQuantity,
   maintenanceItemsTotal,
   maintenanceLineTotal,
+  maintenanceOutstanding,
   readMaintenanceItems,
   warrantyExpiry,
 } from './maintenanceItems';
@@ -438,12 +439,6 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
   },
 };
 
-function maintenanceOutstanding(e: MaintenanceLogExtra | undefined): number | undefined {
-  const total = e?.grandTotal ?? e?.cost;
-  if (total == null) return undefined;
-  return total - (e?.accountsReceived ?? 0);
-}
-
 function monthsLabel(t: TFn, months: number): string {
   return t('operationLogs.maintenance.months', { count: months });
 }
@@ -546,7 +541,10 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       {
         value: 'settled',
         labelKey: 'operationLogs.maintenance.filters.settled',
-        match: (log) => (maintenanceOutstanding(log.extra) ?? 0) <= 0,
+        match: (log) => {
+          const outstanding = maintenanceOutstanding(log.extra);
+          return outstanding != null && outstanding <= 0;
+        },
       },
     ],
   },

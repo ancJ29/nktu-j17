@@ -22,6 +22,12 @@ export function maintenanceItemsTotal(items: MaintenanceItem[]): number {
   return items.reduce((sum, it) => sum + maintenanceLineTotal(it), 0);
 }
 
+export function maintenanceOutstanding(e: MaintenanceLogExtra | undefined): number | undefined {
+  const total = e?.grandTotal ?? e?.cost;
+  if (total == null) return undefined;
+  return total - (e?.accountsReceived ?? 0);
+}
+
 export function warrantyExpiry(
   logDate: string,
   warrantyMonths: number | undefined,

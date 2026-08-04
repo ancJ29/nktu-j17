@@ -2,7 +2,8 @@ import type { DateTimeInput } from '@credo/kits/types';
 import type { TransportOrder } from '@/types';
 
 export function orderPlanAt(order: TransportOrder): DateTimeInput | undefined {
-  return order.route?.pickupAt;
+  const route = order.route;
+  return route?.pickupAt ?? route?.stuffingAt ?? route?.dropoffAt;
 }
 
 export function orderPlanDate(order: TransportOrder): DateTimeInput {

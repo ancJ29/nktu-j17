@@ -19,6 +19,8 @@ import { notifications } from '@mantine/notifications';
 import {
   IconCamera,
   IconCheck,
+  IconCloudUpload,
+  IconDeviceFloppy,
   IconPhoto,
   IconPlaceholder,
   IconRotate,
@@ -29,10 +31,17 @@ import {
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { dolgaConnector } from '@credo/connectors/connector';
-import { r2Connector } from '@credo/connectors/connector';
 import { device } from '@credo/base-ui/utils';
 import { deleteMedia } from '@/utils/mediaStorage';
+import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/utils/photoUpload';
+import {
+  getPendingPhoto,
+  isPendingPhotoUrl,
+  pendingPhotoId,
+  removePendingPhoto,
+} from '@/utils/photoQueue';
+import { flushPhotoQueue } from '@/utils/photoQueueFlush';
+import { shareOrDownloadFile } from '@/utils/pdfExport';
 import { ImageZoomModal } from './ImageZoomModal';
 import type { DateTimeInput } from '@credo/kits/types';
 import { isInternal } from '@/config/env';
@@ -80,9 +89,57 @@ type ImageUploadPanelProps = {
   uploadControl?: 'auto' | 'button';
 
   uploadButtonLabel?: string;
+
+  onRetryPending?: () => void | Promise<void>;
 };
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+function usePendingPhotoPreviews(photos: PhotoEntry[]): Record<string, string> {
+  const [previews, setPreviews] = useState<Record<string, string>>({});
+
+  const pendingKey = photos
+    .map((photo) => photo.url)
+    .filter(isPendingPhotoUrl)
+    .join('|');
+
+  useEffect(() => {
+    let cancelled = false;
+    const created: string[] = [];
+
+    const load = async () => {
+      const ids = pendingKey ? pendingKey.split('|').map((url) => pendingPhotoId(url)) : [];
+      const entries = await Promise.all(
+        ids.map(async (id) => {
+          if (!id) return null;
+          const pending = await getPendingPhoto(id);
+          return pending ? ([id, URL.createObjectURL(pending.blob)] as const) : null;
+        }),
+      );
+
+      if (cancelled) {
+        entries.forEach((entry) => entry && URL.revokeObjectURL(entry[1]));
+        return;
+      }
+      const map: Record<string, string> = {};
+      entries.forEach((entry) => {
+        if (!entry) return;
+        map[entry[0]] = entry[1];
+        created.push(entry[1]);
+      });
+      setPreviews(map);
+    };
+
+    void load();
+
+    return () => {
+      cancelled = true;
+      created.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [pendingKey]);
+
+  return previews;
+}
 
 export function ImageUploadPanel({
   images,
@@ -99,9 +156,11 @@ export function ImageUploadPanel({
   buildFileName,
   uploadControl = 'auto',
   uploadButtonLabel,
+  onRetryPending,
 }: ImageUploadPanelProps) {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
+  const [retrying, setRetrying] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewOpened, { open: openPreview, close: closePreview }] = useDisclosure(false);
@@ -136,62 +195,58 @@ export function ImageUploadPanel({
       if (!validFiles.length) return;
 
       setUploading(true);
+
+      const newEntries: PhotoEntry[] = [];
       try {
-        const newEntries: PhotoEntry[] = [];
-
         for (const rawFile of validFiles) {
-          const file = await compressImageFile(rawFile, { targetKB: compressTargetKB });
-          const fileName = buildFileName
-            ? buildFileName(file.name)
-            : `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+          try {
+            const file = await compressImageFile(rawFile, { targetKB: compressTargetKB });
+            const fileName = buildFileName
+              ? buildFileName(file.name)
+              : `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
 
-          const presignRes = await dolgaConnector.mediaUploadUrl({
-            imageDirectory,
-            fileName,
-          });
+            const result = await uploadPhotoFile({ file, imageDirectory, fileName });
 
-          if (!presignRes.uploadUrl) {
-            notifications.show({
-              color: 'red',
-              message: t('photos.uploadError', { name: rawFile.name }),
-            });
-            continue;
-          }
+            if (!result.ok) {
+              notifications.show({
+                color: 'red',
+                message: t(photoUploadErrorKey(result.reason), { name: rawFile.name }),
+                autoClose: 8000,
+              });
+              continue;
+            }
 
-          const uploadRes = await r2Connector.uploadImage({
-            uploadUrl: presignRes.uploadUrl,
-            fileContent: file,
-            contentType: file.type,
-          });
-
-          if (!uploadRes.success) {
-            notifications.show({
-              color: 'red',
-              message: t('photos.uploadError', { name: rawFile.name }),
-            });
-            continue;
-          }
-
-          if (presignRes.fileUrl) {
             newEntries.push({
-              url: presignRes.fileUrl,
+              url: result.url,
               timestamp: Date.now(),
               fileName: rawFile.name,
               ...(currentUserId && { userId: currentUserId }),
               ...(currentUserName && { userName: currentUserName }),
             });
+          } catch {
+            notifications.show({
+              color: 'red',
+              message: t('photos.uploadError', { name: rawFile.name }),
+            });
           }
         }
 
         if (newEntries.length > 0) {
-          await onChange([...images, ...newEntries]);
-          notifications.show({
-            color: 'green',
-            message: t('photos.uploadSuccess', { count: newEntries.length }),
-          });
+          try {
+            await onChange([...images, ...newEntries]);
+            notifications.show({
+              color: 'green',
+              message: t('photos.uploadSuccess', { count: newEntries.length }),
+            });
+          } catch {
+            notifications.show({
+              color: 'red',
+              title: t('photos.saveFailedTitle'),
+              message: t('photos.saveFailed', { count: newEntries.length }),
+              autoClose: 10000,
+            });
+          }
         }
-      } catch {
-        notifications.show({ color: 'red', message: t('photos.uploadError', { name: '' }) });
       } finally {
         setUploading(false);
         resetRef.current?.();
@@ -211,46 +266,33 @@ export function ImageUploadPanel({
   );
 
   const handleCapturedPhoto = useCallback(
-    async (result: CaptureResult) => {
-      const res = await fetch(result.base64);
-      const blob = await res.blob();
+    async (result: CaptureResult): Promise<boolean> => {
       const fileName = `photo-${Date.now()}.jpg`;
-      const file = new File([blob], fileName, { type: 'image/jpeg' });
 
       setUploading(true);
       try {
+        const file = await captureResultToFile(result.base64, fileName);
         const storedName = buildFileName
           ? buildFileName(fileName)
           : `${Date.now()}-${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
-        const presignRes = await dolgaConnector.mediaUploadUrl({
+
+        const uploaded = await uploadPhotoFile({
+          file,
           imageDirectory,
           fileName: storedName,
         });
 
-        if (!presignRes.uploadUrl) {
+        if (!uploaded.ok) {
           notifications.show({
             color: 'red',
-            message: t('photos.uploadError', { name: fileName }),
+            message: t(photoUploadErrorKey(uploaded.reason), { name: fileName }),
+            autoClose: 8000,
           });
-          return;
-        }
-
-        const uploadRes = await r2Connector.uploadImage({
-          uploadUrl: presignRes.uploadUrl,
-          fileContent: file,
-          contentType: file.type,
-        });
-
-        if (!uploadRes.success || !presignRes.fileUrl) {
-          notifications.show({
-            color: 'red',
-            message: t('photos.uploadError', { name: fileName }),
-          });
-          return;
+          return false;
         }
 
         const newEntry: PhotoEntry = {
-          url: presignRes.fileUrl,
+          url: uploaded.url,
           timestamp: result.timestamp,
           fileName,
           ...(currentUserId && { userId: currentUserId }),
@@ -260,13 +302,27 @@ export function ImageUploadPanel({
           ...(result.longitude != null && { longitude: result.longitude }),
         };
 
-        await onChange([...images, newEntry]);
-        notifications.show({ color: 'green', message: t('photos.uploadSuccess', { count: 1 }) });
+        try {
+          await onChange([...images, newEntry]);
+          notifications.show({ color: 'green', message: t('photos.uploadSuccess', { count: 1 }) });
+        } catch {
+          notifications.show({
+            color: 'red',
+            title: t('photos.saveFailedTitle'),
+            message: t('photos.saveFailed', { count: 1 }),
+            autoClose: 10000,
+          });
+
+          return false;
+        }
+
+        closeCamera();
+        return true;
       } catch {
-        notifications.show({ color: 'red', message: t('photos.uploadError', { name: '' }) });
+        notifications.show({ color: 'red', message: t('photos.uploadError', { name: fileName }) });
+        return false;
       } finally {
         setUploading(false);
-        closeCamera();
       }
     },
     [
@@ -286,19 +342,60 @@ export function ImageUploadPanel({
       setDeleting(photo.url);
       try {
         const updated = images.map((p) => (p.url === photo.url ? { ...p, isDeleted: true } : p));
+
         await onChange(updated);
-        deleteMedia(photo.url);
+        const queueId = pendingPhotoId(photo.url);
+
+        if (queueId) void removePendingPhoto(queueId);
+        else deleteMedia(photo.url);
+      } catch {
+        notifications.show({ color: 'red', message: t('photos.deleteError') });
       } finally {
         setDeleting(null);
       }
     },
-    [images, onChange],
+    [images, onChange, t],
   );
 
   const visiblePhotos = images.filter((p) => !p.isDeleted);
+  const pendingCount = visiblePhotos.filter((p) => isPendingPhotoUrl(p.url)).length;
+  const pendingPreviews = usePendingPhotoPreviews(visiblePhotos);
 
-  const handlePreview = (photo: PhotoEntry) => {
-    setPreviewUrl(photo.url);
+  const handleRetryPending = useCallback(async () => {
+    setRetrying(true);
+    try {
+      if (onRetryPending) await onRetryPending();
+      else await flushPhotoQueue();
+    } finally {
+      setRetrying(false);
+    }
+  }, [onRetryPending]);
+
+  const handleSaveToDevice = useCallback(
+    async (photo: PhotoEntry) => {
+      const queueId = pendingPhotoId(photo.url);
+      if (!queueId) return;
+      const entry = await getPendingPhoto(queueId);
+      if (!entry) {
+        notifications.show({ color: 'red', message: t('photos.saveToDeviceFailed') });
+        return;
+      }
+
+      const safeMarker = marker.replace(/[^a-zA-Z0-9._-]/g, '_') || 'photo';
+      const result = await shareOrDownloadFile(
+        entry.blob,
+        `${safeMarker}-${entry.id}.jpg`,
+        'image/jpeg',
+      );
+      if (result !== 'cancelled') {
+        notifications.show({ color: 'green', message: t('photos.savedToDevice') });
+      }
+    },
+    [marker, t],
+  );
+
+  const handlePreview = (photo: PhotoEntry, src?: string) => {
+    setPreviewUrl(src ?? photo.url);
     openPreview();
   };
 
@@ -460,6 +557,29 @@ export function ImageUploadPanel({
         </Affix>
       )}
 
+      {/* Queued photos — the record already carries them; only the bytes are
+          still on the device. Surfaced as a line the operator can act on, so a
+          photo waiting on signal is visible rather than a silent debt. */}
+      {showGrid && pendingCount > 0 && (
+        <Group gap="xs" justify="space-between" wrap="nowrap" px={isMobile ? 4 : 0}>
+          <Group gap={6} wrap="nowrap">
+            <IconCloudUpload size={14} color="var(--mantine-color-orange-6)" />
+            <Text size="xs" c="dimmed">
+              {t('photos.pendingCount', { count: pendingCount })}
+            </Text>
+          </Group>
+          <Button
+            size="compact-xs"
+            variant="light"
+            color="orange"
+            loading={retrying}
+            onClick={handleRetryPending}
+          >
+            {t('photos.retryPending')}
+          </Button>
+        </Group>
+      )}
+
       {/* Image grid */}
       {showGrid &&
         (visiblePhotos.length === 0 ? (
@@ -471,68 +591,111 @@ export function ImageUploadPanel({
           </Stack>
         ) : (
           <SimpleGrid cols={{ base: 3, sm: 3, md: 4 }} spacing={isMobile ? 2 : 'sm'}>
-            {visiblePhotos.map((photo) => (
-              <Box
-                key={photo.url}
-                pos="relative"
-                style={{
-                  borderRadius: isMobile ? 2 : 'var(--mantine-radius-md)',
-                  overflow: 'hidden',
-                  aspectRatio: '1',
-                  cursor: 'pointer',
-                }}
-                onClick={() => handlePreview(photo)}
-              >
-                <Image
-                  src={photo.url}
-                  w="100%"
-                  h="100%"
-                  fit="cover"
-                  fallbackSrc="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>"
-                />
-                {photo.takenAtDelivery && (
-                  <Tooltip label={t('photos.takenAtDeliveryBadge')} withArrow>
-                    <Badge
-                      color="teal"
+            {visiblePhotos.map((photo) => {
+              const queueId = pendingPhotoId(photo.url);
+              const previewSrc = queueId ? pendingPreviews[queueId] : photo.url;
+              return (
+                <Box
+                  key={photo.url}
+                  pos="relative"
+                  style={{
+                    borderRadius: isMobile ? 2 : 'var(--mantine-radius-md)',
+                    overflow: 'hidden',
+                    aspectRatio: '1',
+                    cursor: 'pointer',
+                    ...(queueId && { outline: '2px solid var(--mantine-color-orange-5)' }),
+                  }}
+                  onClick={() => handlePreview(photo, previewSrc)}
+                >
+                  <Image
+                    src={previewSrc}
+                    w="100%"
+                    h="100%"
+                    fit="cover"
+                    fallbackSrc="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>"
+                  />
+                  {queueId && (
+                    <Tooltip label={t('photos.pendingBadge')} withArrow>
+                      <Badge
+                        color="orange"
+                        variant="filled"
+                        size="xs"
+                        circle={isMobile}
+                        leftSection={isMobile ? undefined : <IconCloudUpload size={11} />}
+                        pos="absolute"
+                        bottom={isMobile ? 2 : 4}
+                        left={isMobile ? 2 : 4}
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {isMobile ? <IconCloudUpload size={11} /> : t('photos.pendingBadge')}
+                      </Badge>
+                    </Tooltip>
+                  )}
+                  {/* Only queued photos get this: their bytes are on the device,
+                    and it's the operator's own copy of evidence that hasn't
+                    reached the server yet. An uploaded photo is already safe. */}
+                  {queueId && (
+                    <Tooltip label={t('photos.saveToDevice')} withArrow>
+                      <ActionIcon
+                        variant="filled"
+                        color="dark"
+                        size={isMobile ? 'xs' : 'sm'}
+                        pos="absolute"
+                        bottom={isMobile ? 2 : 4}
+                        right={isMobile ? 2 : 4}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          void handleSaveToDevice(photo);
+                        }}
+                      >
+                        <IconDeviceFloppy size={isMobile ? 10 : 12} />
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                  {photo.takenAtDelivery && (
+                    <Tooltip label={t('photos.takenAtDeliveryBadge')} withArrow>
+                      <Badge
+                        color="teal"
+                        variant="filled"
+                        size="xs"
+                        circle={isMobile}
+                        leftSection={isMobile ? undefined : <IconTruckDelivery size={11} />}
+                        pos="absolute"
+                        top={isMobile ? 2 : 4}
+                        left={isMobile ? 2 : 4}
+                        style={{ pointerEvents: 'none' }}
+                      >
+                        {isMobile ? (
+                          <IconTruckDelivery size={11} />
+                        ) : (
+                          t('photos.takenAtDeliveryBadge')
+                        )}
+                      </Badge>
+                    </Tooltip>
+                  )}
+                  {editable && (
+                    <ActionIcon
                       variant="filled"
-                      size="xs"
-                      circle={isMobile}
-                      leftSection={isMobile ? undefined : <IconTruckDelivery size={11} />}
+                      color="red"
+                      size={isMobile ? 'xs' : 'sm'}
                       pos="absolute"
                       top={isMobile ? 2 : 4}
-                      left={isMobile ? 2 : 4}
-                      style={{ pointerEvents: 'none' }}
+                      right={isMobile ? 2 : 4}
+                      loading={deleting === photo.url}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (isInternal) {
+                          return null;
+                        }
+                        handleDelete(photo);
+                      }}
                     >
-                      {isMobile ? (
-                        <IconTruckDelivery size={11} />
-                      ) : (
-                        t('photos.takenAtDeliveryBadge')
-                      )}
-                    </Badge>
-                  </Tooltip>
-                )}
-                {editable && (
-                  <ActionIcon
-                    variant="filled"
-                    color="red"
-                    size={isMobile ? 'xs' : 'sm'}
-                    pos="absolute"
-                    top={isMobile ? 2 : 4}
-                    right={isMobile ? 2 : 4}
-                    loading={deleting === photo.url}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isInternal) {
-                        return null;
-                      }
-                      handleDelete(photo);
-                    }}
-                  >
-                    <IconTrash size={isMobile ? 10 : 12} />
-                  </ActionIcon>
-                )}
-              </Box>
-            ))}
+                      <IconTrash size={isMobile ? 10 : 12} />
+                    </ActionIcon>
+                  )}
+                </Box>
+              );
+            })}
           </SimpleGrid>
         ))}
 
@@ -569,7 +732,8 @@ export type CaptureResult = {
 type CameraCaptureProps = {
   opened: boolean;
   onClose: () => void;
-  onCapture: (result: CaptureResult) => Promise<void>;
+
+  onCapture: (result: CaptureResult) => Promise<boolean>;
   uploading: boolean;
   marker: string;
   userName?: string;
@@ -595,16 +759,24 @@ function getGeoCoords(): Promise<GeolocationCoordinates | null> {
   });
 }
 
+const GEOCODE_TIMEOUT_MS = 6_000;
+
 async function reverseGeocode(lat: number, lng: number): Promise<string> {
+  const fallback = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), GEOCODE_TIMEOUT_MS);
   try {
     const res = await fetch(
       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=0`,
+      { signal: controller.signal },
     );
-    if (!res.ok) return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    if (!res.ok) return fallback;
     const data = await res.json();
-    return data.display_name ?? `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    return data.display_name ?? fallback;
   } catch {
-    return `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+    return fallback;
+  } finally {
+    clearTimeout(timer);
   }
 }
 
@@ -848,12 +1020,34 @@ export function CameraCapture({
     setViewMode('camera');
   }, []);
 
+  const saveToDevice = useCallback(async () => {
+    if (!capturedPhoto) return;
+    const safeMarker = marker.replace(/[^a-zA-Z0-9._-]/g, '_') || 'photo';
+    const fileName = `${safeMarker}-${Date.now()}.jpg`;
+    try {
+      const file = await captureResultToFile(capturedPhoto, fileName);
+      const result = await shareOrDownloadFile(file, fileName, 'image/jpeg');
+      if (result !== 'cancelled') {
+        notifications.show({ color: 'green', message: t('photos.savedToDevice') });
+      }
+    } catch {
+      notifications.show({ color: 'red', message: t('photos.saveToDeviceFailed') });
+    }
+  }, [capturedPhoto, marker, t]);
+
   const acceptPhoto = useCallback(async () => {
     if (!capturedPhoto) return;
-    await onCapture({
-      base64: capturedPhoto,
-      ...captureMetaRef.current,
-    });
+    let accepted = false;
+    try {
+      accepted = await onCapture({
+        base64: capturedPhoto,
+        ...captureMetaRef.current,
+      });
+    } catch {
+      accepted = false;
+    }
+
+    if (!accepted) return;
     setCapturedPhoto(null);
     setViewMode('camera');
   }, [capturedPhoto, onCapture]);
@@ -983,6 +1177,21 @@ export function CameraCapture({
               styles={{ root: { borderColor: 'white', color: 'white' } }}
             >
               {t('photos.retake')}
+            </Button>
+            {/* The operator's own copy. Offered on every capture, not only on
+                failure: the moment they'd want it is before they know whether
+                the upload will work, and this is the last screen that still
+                holds the bytes. Must run straight off the tap — Web Share
+                needs the transient activation. */}
+            <Button
+              size="lg"
+              variant="outline"
+              leftSection={<IconDeviceFloppy size={20} />}
+              onClick={saveToDevice}
+              disabled={uploading}
+              styles={{ root: { borderColor: 'white', color: 'white' } }}
+            >
+              {t('photos.saveToDevice')}
             </Button>
             <Button
               size="lg"

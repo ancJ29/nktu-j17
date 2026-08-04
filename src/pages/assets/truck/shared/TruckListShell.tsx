@@ -4,6 +4,8 @@ import { type ReactNode, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useShallow } from 'zustand/react/shallow';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
 import { ListPagination } from '@credo/base-ui/components';
 import { device } from '@credo/base-ui/utils';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
@@ -23,11 +25,18 @@ import type { TruckAssetRow } from '@/types';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { useLookupV2Options } from '@/hooks/useLookupV2Options';
 import { expirySortKey, matchesUrgency, type ExpiryUrgency } from '../truckExpiry';
+import { isScopeConfigured, scopeTrucksToViewer, type TruckViewScope } from '../truckViewScope';
 import { TRUCK_CONFIG } from '../truckConfig';
 import { TruckExpiryLines } from '../TruckExpiryLines';
 
 const isMobile = device.isMobile;
 const canCreate = perms.truck.canCreate();
+
+const TRUCK_SCOPE: TruckViewScope = {
+  canViewAll: perms.truck.canViewAll(),
+  canViewSelf: perms.truck.canViewSelf(),
+};
+const scopeConfigured = isScopeConfigured(TRUCK_SCOPE);
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 type TruckFilters = {
@@ -67,10 +76,18 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
       })),
     );
 
-  const trucks = useMemo(
-    () => (items as TruckAssetRow[]).filter((a) => !a.extra?.isDeleted),
-    [items],
-  );
+  const employees = useEmployeeStore((s) => s.items);
+  const employeesInit = useEmployeeStore((s) => s.initialized);
+  const loadEmployees = useEmployeeStore((s) => s.loadAll);
+  useEffect(() => {
+    if (scopeConfigured && !TRUCK_SCOPE.canViewAll && !employeesInit) loadEmployees();
+  }, [employeesInit, loadEmployees]);
+
+  const trucks = useMemo(() => {
+    const live = (items as TruckAssetRow[]).filter((a) => !a.extra?.isDeleted);
+    return scopeTrucksToViewer(live, getCurrentEmployeeId(), TRUCK_SCOPE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `employees` is the hydration trigger for `getCurrentEmployeeId()`, not a value read here.
+  }, [items, employees]);
 
   const {
     state: filterState,
@@ -312,7 +329,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
                   column has a header to justify a far-off date, a card doesn't. */}
               <TruckExpiryLines
                 extra={item.extra}
-                todayIso={todayInVnDateString()}
+                todayIso={todayIso}
                 t={tk}
                 formatDate={formatDate}
                 urgentOnly

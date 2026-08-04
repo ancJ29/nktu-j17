@@ -589,6 +589,9 @@ export const perms = {
       ...createModulePerms('truck'),
 
       canExport: () => resolve().actions?.canExport ?? false,
+
+      canViewAll: () => resolve().query?.canViewAll ?? false,
+      canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
   })(),
   oilTank: createModulePerms('oilTank'),

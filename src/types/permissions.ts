@@ -185,6 +185,10 @@ export const BASE_PERMISSIONS: Permissions = {
     actions: {
       canExport: false,
     },
+    query: {
+      canViewAll: false,
+      canViewSelf: false,
+    },
   },
 
   oilTank: {
@@ -370,6 +374,11 @@ export const DEFAULT_PERMISSIONS: Permissions = {
     canCreate: false,
     canEdit: false,
     canDelete: false,
+
+    query: {
+      canViewAll: false,
+      canViewSelf: false,
+    },
   },
   oilTank: {
     canView: false,

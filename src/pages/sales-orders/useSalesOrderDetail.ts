@@ -15,6 +15,10 @@ import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
+import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/utils/photoUpload';
+import { writePhotosWithConflictRetry } from '@/utils/photoPersist';
+import { enqueuePhoto, pendingPhotoUrl, removePendingPhoto } from '@/utils/photoQueue';
+import { flushPhotoQueue } from '@/utils/photoQueueFlush';
 import type {
   DeliveryRequest,
   InventoryLinkage,
@@ -893,26 +897,29 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   const handlePhotosChange = useCallback(
     async (photos: SalesOrderPhoto[]) => {
       if (!id || !order) return;
-      const currentExtra = order.extra ?? {};
       try {
-        const updated = await useSalesOrderStore.getState().updateSafely({
-          id,
-          version: order.version,
-          patch: { extra: { ...currentExtra, photos } },
-        });
-        setOrder(updated);
-      } catch (err) {
-        if (err instanceof EntityConflictError) {
-          if (err.latest) setOrder(err.latest as SalesOrder);
-          notifications.show({
-            color: 'yellow',
-            title: t('common.conflict.title'),
-            message: t('common.conflict.message'),
-            autoClose: 8000,
-          });
-        } else {
-          throw err;
+        const { record, rebased } = await writePhotosWithConflictRetry<SalesOrder, SalesOrderPhoto>(
+          {
+            record: order,
+            next: photos,
+            getPhotos: (rec) => (rec.extra as SalesOrderExtra | undefined)?.photos ?? [],
+            save: async (rec, nextPhotos) =>
+              (await useSalesOrderStore.getState().updateSafely({
+                id: rec.id,
+                version: rec.version,
+                patch: { extra: { ...(rec.extra ?? {}), photos: nextPhotos } },
+              })) as SalesOrder,
+          },
+        );
+        setOrder(record);
+        if (rebased) {
+          notifications.show({ color: 'blue', message: t('photos.updatedElsewhere') });
         }
+      } catch (err) {
+        if (err instanceof EntityConflictError && err.latest) {
+          setOrder(err.latest as SalesOrder);
+        }
+        throw err;
       }
     },
     [id, order, t],
@@ -1088,33 +1095,62 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   }, [order, handleMetaPatch, opts.clientSpecific]);
 
   const handleMobileCameraCapture = useCallback(
-    async (result: CaptureResult) => {
-      if (!id || !order) return;
+    async (result: CaptureResult): Promise<boolean> => {
+      if (!id || !order) return false;
       setCameraUploading(true);
+      const fileName = `photo-${Date.now()}.jpg`;
       try {
-        const { dolgaConnector } = await import('@credo/connectors/connector');
-        const { r2Connector } = await import('@credo/connectors/connector');
+        const file = await captureResultToFile(result.base64, fileName);
 
-        const res = await fetch(result.base64);
-        const blob = await res.blob();
-        const fileName = `photo-${Date.now()}.jpg`;
-        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        const storedName = `${Date.now()}-${fileName}`;
 
-        const presignRes = await dolgaConnector.mediaUploadUrl({
+        const uploaded = await uploadPhotoFile({
+          file,
           imageDirectory,
-          fileName: `${Date.now()}-${fileName}`,
+          fileName: storedName,
         });
-        if (!presignRes.uploadUrl || !presignRes.fileUrl) return;
 
-        const uploadRes = await r2Connector.uploadImage({
-          uploadUrl: presignRes.uploadUrl,
-          fileContent: file,
-          contentType: file.type,
-        });
-        if (!uploadRes.success) return;
+        let photoUrl: string;
+        let queuedId: string | null = null;
+
+        if (uploaded.ok) {
+          photoUrl = uploaded.url;
+        } else {
+          const queued = await enqueuePhoto({
+            blob: file,
+            contentType: file.type,
+            fileName: storedName,
+            displayName: fileName,
+            imageDirectory,
+            target: { kind: 'sales-order', id },
+            meta: {
+              timestamp: result.timestamp,
+              ...(currentEmployee && {
+                userId: currentEmployee.id,
+                userName: currentEmployee.name,
+              }),
+              ...(result.location && { location: result.location }),
+              ...(result.latitude != null && { latitude: result.latitude }),
+              ...(result.longitude != null && { longitude: result.longitude }),
+            },
+          });
+
+          if (!queued) {
+            notifications.show({
+              color: 'red',
+              title: t(photoUploadErrorKey(uploaded.reason), { name: fileName }),
+              message: t('photos.queueUnavailable'),
+              autoClose: 10000,
+            });
+            return false;
+          }
+
+          queuedId = queued.id;
+          photoUrl = pendingPhotoUrl(queued.id);
+        }
 
         const newPhoto: SalesOrderPhoto = {
-          url: presignRes.fileUrl,
+          url: photoUrl,
           timestamp: result.timestamp,
           fileName,
           ...(currentEmployee && { userId: currentEmployee.id, userName: currentEmployee.name }),
@@ -1124,14 +1160,62 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         };
 
         const currentPhotos: SalesOrderPhoto[] = order.extra?.photos ?? [];
-        await handlePhotosChange([...currentPhotos, newPhoto]);
+        try {
+          await handlePhotosChange([...currentPhotos, newPhoto]);
+        } catch {
+          if (queuedId) void removePendingPhoto(queuedId);
+          notifications.show({
+            color: 'red',
+            title: t('photos.saveFailedTitle'),
+            message: t('photos.saveFailed', { count: 1 }),
+            autoClose: 10000,
+          });
+          return false;
+        }
+
+        if (queuedId) {
+          notifications.show({
+            color: 'yellow',
+            title: t('photos.queuedTitle'),
+            message: t('photos.queuedMessage'),
+            autoClose: 10000,
+          });
+        }
+
+        closeCamera();
+        return true;
+      } catch {
+        notifications.show({ color: 'red', message: t('photos.uploadError', { name: fileName }) });
+        return false;
       } finally {
         setCameraUploading(false);
-        closeCamera();
       }
     },
-    [id, order, imageDirectory, currentEmployee, handlePhotosChange, closeCamera],
+    [id, order, imageDirectory, currentEmployee, handlePhotosChange, closeCamera, t],
   );
+
+  useEffect(() => {
+    if (!id) return;
+    void flushPhotoQueue({ kind: 'sales-order', id }).then((res) => {
+      const updated = res.updated.find((entry) => entry.record.id === id);
+      if (updated) setOrder(updated.record as SalesOrder);
+    });
+  }, [id]);
+
+  const retryPendingPhotos = useCallback(async () => {
+    if (!id) return;
+    const res = await flushPhotoQueue({ kind: 'sales-order', id });
+    const updated = res.updated.find((entry) => entry.record.id === id);
+    if (updated) setOrder(updated.record as SalesOrder);
+    if (res.uploaded > 0) {
+      notifications.show({
+        color: 'green',
+        message: t('photos.uploadSuccess', { count: res.uploaded }),
+      });
+    } else if (res.failed > 0) {
+      notifications.show({ color: 'yellow', message: t('photos.retryFailed'), autoClose: 8000 });
+    }
+  }, [id, t]);
 
   const extra = (order?.extra ?? {}) as SalesOrderExtra;
   const currentStatusValue = extra.status ?? '';
@@ -1696,6 +1780,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
     imageDirectory,
     handlePhotosChange,
+    retryPendingPhotos,
 
     handleAttachmentsChange,
 

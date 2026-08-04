@@ -1,28 +1,14 @@
-import {
-  Box,
-  Button,
-  Card,
-  Divider,
-  Group,
-  SimpleGrid,
-  Stack,
-  Text,
-  ThemeIcon,
-  Title,
-} from '@mantine/core';
+import { Box, Button, Card, Group, Stack, Text, ThemeIcon, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconArrowLeft, IconCopy, IconEdit, IconNote } from '@tabler/icons-react';
+import { IconArrowLeft, IconCopy, IconEdit } from '@tabler/icons-react';
 import { type ReactNode, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate, useParams } from 'react-router';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { ActiveBadge } from '@/components/badges';
 import { asyncDeduplicator, device } from '@credo/base-ui/utils';
-import { DetailField } from '@/components/DetailField';
-import { SectionCard } from '@/components/SectionCard';
 import { NotFoundState } from '@/components/NotFoundState';
 import { useTruckAssetStore, TRUCK_ASSET_RECORD_TARGET } from '@/stores/useTruckAssetStore';
-import { formatDateTime } from '@/utils/dateFormat';
 import { perms } from '@/utils/permission';
 import type { TruckAssetCopyFrom, TruckAssetRow } from '@/types';
 import { TRUCK_CONFIG } from '../truckConfig';
@@ -35,16 +21,10 @@ const canCreate = perms.truck.canCreate();
 type TruckDetailShellProps = {
   headerStats?: (truck: TruckAssetRow) => ReactNode;
 
-  showNotes?: boolean;
-
   children: (truck: TruckAssetRow, dangerZone: ReactNode) => ReactNode;
 };
 
-export function TruckDetailShell({
-  headerStats,
-  showNotes = true,
-  children,
-}: TruckDetailShellProps) {
+export function TruckDetailShell({ headerStats, children }: TruckDetailShellProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -114,8 +94,6 @@ export function TruckDetailShell({
     );
   }
 
-  const extra = truck.extra ?? {};
-
   const headerCard = (
     <Card
       withBorder
@@ -159,27 +137,6 @@ export function TruckDetailShell({
     </Card>
   );
 
-  const notesCard = (
-    <SectionCard icon={<IconNote size={14} />} title={t('__new__.01-common.labels.note')}>
-      <Text size="sm" style={{ whiteSpace: 'pre-wrap' }} c={extra.notes ? undefined : 'dimmed'}>
-        {extra.notes || '—'}
-      </Text>
-      {!isMobile && (
-        <>
-          <Divider />
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-            <DetailField label={t('common.labels.createdAt')}>
-              {formatDateTime(truck.createdAt)}
-            </DetailField>
-            <DetailField label={t('common.labels.updatedAt')}>
-              {formatDateTime(truck.updatedAt)}
-            </DetailField>
-          </SimpleGrid>
-        </>
-      )}
-    </SectionCard>
-  );
-
   return (
     <Stack gap={isMobile ? 'md' : 'lg'}>
       {!isMobile && (
@@ -220,22 +177,11 @@ export function TruckDetailShell({
 
       {headerCard}
 
-      {isMobile && canEdit && (
-        <Button
-          component={Link}
-          to={routes.EDIT.replace(':id', truck.id)}
-          variant="light"
-          size="sm"
-          leftSection={<IconEdit size={16} />}
-          fullWidth
-        >
-          {t('__new__.01-common.actions.edit')}
-        </Button>
-      )}
-
+      {/* No mobile Edit affordance, deliberately: the truck form redirects every
+          mobile visitor back to the list (`TruckAssetFormPage`), so a phone-width
+          Edit button navigated to a page that immediately bounced. Editing a
+          truck is desktop-only, like the danger zone and every other form. */}
       {children(truck, <TruckDangerZone truck={truck} onUpdated={setTruck} />)}
-
-      {showNotes && notesCard}
     </Stack>
   );
 }

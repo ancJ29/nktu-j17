@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useVendorStore } from '@/stores/useVendorStore';
+import { hasPendingPhotoUpload } from '@/utils/photoQueue';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
 import { DeliveryRequestKindBadge } from './DeliveryRequestKindBadge';
 import { deliveryRequestPartyIsCustomer } from './deliveryRequestParty';
@@ -113,6 +114,12 @@ export function DeliveryRequestCardList({
                 <Text fw={700} size="lg" style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
                   {req.requestNumber}
                 </Text>
+                {/* Same signal as the desktop table — see DeliveryRequestDataTable. */}
+                {hasPendingPhotoUpload(drExtra.photos) && (
+                  <Badge color="orange" variant="light" size="sm" radius="lg">
+                    {t('photos.pendingBadge')}
+                  </Badge>
+                )}
               </Group>
 
               <Stack gap={4}>

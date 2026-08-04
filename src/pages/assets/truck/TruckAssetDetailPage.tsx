@@ -40,7 +40,7 @@ const isMobile = device.isMobile;
 
 const canViewEmployee = perms.employee.canView();
 
-const activityTabVisible = !isMobile && isActivityLoggingEnabled();
+const activityTabVisible = isActivityLoggingEnabled();
 
 const TRUCK_LOG_PERMS = {
   canView: perms.truck.canView(),
@@ -85,7 +85,6 @@ export function TruckAssetDetailPage() {
 
   return (
     <TruckDetailShell
-      showNotes={false}
       headerStats={(truck: TruckAssetRow) => {
         const e = truck.extra ?? {};
         if (!e.plateNumber && !e.capacityTons) return null;

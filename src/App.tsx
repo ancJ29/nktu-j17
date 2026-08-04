@@ -10,6 +10,7 @@ import { buildHash, buildTimestamp } from '@/config/build-version';
 import { isFirstBoot } from '@/config';
 import { isInternal } from '@/config/env';
 import { useCfgReady } from '@/utils/bootState';
+import { startPhotoQueueAutoFlush } from '@/utils/photoQueueFlush';
 import router from './router';
 import { clearChunkReloadParam, logger, resetReloadGuard } from '@credo/base-ui/utils';
 import { useTranslation } from 'react-i18next';
@@ -81,6 +82,13 @@ export default function App() {
   // The stage-2 recovery reload lands with a cache-bust param in the URL; it has
   // done its job by the time we render, so take it back out of the address bar.
   useEffect(() => clearChunkReloadParam(), []);
+
+  // Photos captured while offline live in IndexedDB until a link comes back.
+  // Mounted app-wide, not on the SO / DR detail pages: the driver who queued
+  // one is most likely somewhere else in the app (or has just reopened it) by
+  // the time the signal returns, and the whole promise made at capture time is
+  // that it uploads without them going back to look for it.
+  useEffect(() => startPhotoQueueAutoFlush(), []);
 
   // Re-renders App when the config refresh settles, so the dismissal below can
   // release the overlay on the paths that never reload.

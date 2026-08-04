@@ -64,6 +64,7 @@ import {
   perms,
 } from '@/utils/permission';
 import type { DeliveryRequestExtra } from '@/types';
+import { hasPendingPhotoUpload } from '@/utils/photoQueue';
 import { deliveryRequestStatusOptions } from './useDeliveryRequestStatusOptions';
 import { useDeliveryRequestDetail } from './useDeliveryRequestDetail';
 import { StatusChangeModal } from './StatusChangeModal';
@@ -120,6 +121,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     handleDelete,
     imageDirectory,
     handlePhotosChange,
+    retryPendingPhotos,
     cameraOpened,
     openCamera,
     openCompletionCamera,
@@ -168,7 +170,8 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   const isSample = isInbound && inboundKind === 'customer-sample';
   const partyIsCustomer = !isInbound || isReturn || isSample;
   const showsSalesOrderLink = !isInbound || isReturn;
-  const canEditMeta = canEdit && !request.isClosed;
+
+  const canEditMeta = canEdit && !request.isClosed && !isMobile;
 
   const resolvedVendor =
     !partyIsCustomer && request.vendorCode ? getVendorByCode(request.vendorCode) : undefined;
@@ -345,7 +348,20 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     </Text>
   );
 
-  const directionBadge = <DeliveryRequestKindBadge dr={request} size="sm" />;
+  const directionBadge = (
+    <>
+      <DeliveryRequestKindBadge dr={request} size="sm" />
+      {/* Proof taken but not yet uploaded. Rendered beside the kind badge on
+          both layouts, so whoever opens the DR — driver or dispatcher — sees
+          that its evidence is still on a phone. It clears itself once the
+          queue drains. */}
+      {hasPendingPhotoUpload(drExtra.photos) && (
+        <Badge color="orange" variant="light" size="sm">
+          {t('photos.pendingBadge')}
+        </Badge>
+      )}
+    </>
+  );
 
   const copyContactButton = contactCopyText ? (
     <CopyButton value={contactCopyText} timeout={1500}>
@@ -563,6 +579,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       currentUserId={currentEmployee?.id}
       currentUserName={currentEmployee?.name}
       externalCamera={isMobile}
+      onRetryPending={retryPendingPhotos}
     />
   );
 

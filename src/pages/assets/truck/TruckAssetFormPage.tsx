@@ -484,7 +484,6 @@ export function TruckAssetFormPage() {
 
       <Title order={isMobile ? 4 : 3}>{pageTitle}</Title>
 
-      {}
       <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           {/* Two-column card layout on desktop (PC); collapses to one column on
@@ -537,11 +536,15 @@ export function TruckAssetFormPage() {
                       }}
                       {...form.getInputProps('code')}
                     />
+                    {/* Editable after creation, unlike the type above: a truck
+                        genuinely gets re-plated, and nothing keys off the plate
+                        — every consumer resolves it live from the store, and the
+                        one denormalised copy (`employee.extra.truckAssetCode`)
+                        is rewritten by `assignTruckToDriver` on each save. */}
                     <TextInput
                       label={t('assets.truck.form.plateLabel')}
                       placeholder={t('assets.truck.form.platePlaceholder')}
                       withAsterisk
-                      disabled={isEdit}
                       {...form.getInputProps('plateNumber')}
                     />
                   </SimpleGrid>

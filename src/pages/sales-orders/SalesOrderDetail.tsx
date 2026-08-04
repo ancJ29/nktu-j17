@@ -219,6 +219,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     handleSendChat,
     imageDirectory,
     handlePhotosChange,
+    retryPendingPhotos,
     handleAttachmentsChange,
     cameraOpened,
     openCamera,
@@ -402,12 +403,13 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
 
   const tagsRow = extra.tags && extra.tags.length > 0 ? renderTagsRow(extra.tags) : null;
 
-  const canEditMeta = canEdit && !order.isClosed && !isCancelled;
+  const canEditMeta = canEdit && !order.isClosed && !isCancelled && !isMobile;
 
-  const canEditNotes = variant.notesAlwaysEditable ? canEdit : canEditMeta;
-  const canEditItemMemo = variant.itemMemoEditable && canEdit;
+  const canEditNotes = (variant.notesAlwaysEditable ? canEdit : canEditMeta) && !isMobile;
+  const canEditItemMemo = variant.itemMemoEditable && canEdit && !isMobile;
 
-  const canEditPackageSize = canEditDeliveryPackageSize && !order.isClosed && !isCancelled;
+  const canEditPackageSize =
+    canEditDeliveryPackageSize && !order.isClosed && !isCancelled && !isMobile;
   const showPackageSize =
     canEditDeliveryPackageSize ||
     deliveryPackageSizeOptions.length > 0 ||
@@ -645,6 +647,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
           currentUserId={currentEmployee?.id}
           currentUserName={currentEmployee?.name}
           externalCamera={isMobile}
+          onRetryPending={retryPendingPhotos}
         />
       </Stack>
       {linkedDRIds.length > 0 && (

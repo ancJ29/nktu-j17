@@ -1,5 +1,6 @@
 import {
   ActionIcon,
+  Box,
   Button,
   Group,
   Loader,
@@ -23,6 +24,7 @@ import {
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cMngtConnector, CallApiError } from '@credo/connectors/connector';
+import { device } from '@credo/base-ui/utils';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { SectionCard } from '@/components/SectionCard';
@@ -38,6 +40,7 @@ import {
   PHOTOS_FIELD,
   todayString,
   yearOf,
+  type GroupedRow,
   type LogFormValues,
   type OperationLogConfig,
   type OperationLogContext,
@@ -46,17 +49,13 @@ import {
   type TFn,
 } from './operationLogConfig';
 import { LogPhotoCell, LogPhotoField, LogPhotoGalleryModal } from './OperationLogPhotos';
+import { OperationLogCards } from './OperationLogCards';
 import { Form } from '@/components/Form';
 
 const CURRENT_YEAR = new Date().getFullYear();
+const isMobile = device.isMobile;
 
-type GroupedRow = {
-  log: OperationLog;
-
-  grouped: boolean;
-
-  firstOfGroup: boolean;
-};
+const MOBILE_BOTTOM_CLEARANCE = 'calc(env(safe-area-inset-bottom) + var(--mantine-spacing-xs))';
 
 function groupRows(logs: OperationLog[], group: OperationLogConfig['group']): GroupedRow[] {
   if (!group) return logs.map((log) => ({ log, grouped: false, firstOfGroup: false }));
@@ -221,6 +220,18 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
   }, [filteredLogs, sortKey, config.columns]);
 
   const rows = useMemo(() => groupRows(sortedLogs, config.group), [sortedLogs, config.group]);
+
+  const sortOptions = useMemo(() => {
+    const sortable = config.columns.filter((c) => c.sortValue && c.sortField);
+    if (sortable.length === 0) return [];
+    return [
+      { value: '', label: tr('operationLogs.sort.default') },
+      ...sortable.flatMap((col) => [
+        { value: `${col.sortField}_desc`, label: `${tr(col.header)} ↓` },
+        { value: `${col.sortField}_asc`, label: `${tr(col.header)} ↑` },
+      ]),
+    ];
+  }, [config.columns, tr]);
 
   const load = useCallback(
     async (forYear: number) => {
@@ -434,79 +445,94 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
   const detailColSpan =
     config.columns.length + (expandable ? 1 : 0) + (photoCfg ? 1 : 0) + (showActions ? 1 : 0);
 
+  const controls = (
+    <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'}>
+      {/* Mobile only: the cards have no column headers, so without this the
+              sortable columns a kind declares (maintenance: Tổng cộng, Công nợ)
+              would simply stop being sortable on a phone — a capability the
+              scrollable table did still offer. Desktop keeps its `SortHeader`s. */}
+      {isMobile && sortOptions.length > 1 && (
+        <Select
+          size="xs"
+          w={180}
+          data={sortOptions}
+          value={sortKey}
+          onChange={(v) => setSortKey(v ?? '')}
+          allowDeselect={false}
+        />
+      )}
+      <Select
+        size="xs"
+        w={130}
+        data={monthOptions}
+        value={month}
+        onChange={(v) => setMonth(v ?? 'all')}
+        allowDeselect={false}
+      />
+      <Select
+        size="xs"
+        w={100}
+        data={yearOptions}
+        value={String(year)}
+        onChange={switchYear}
+        allowDeselect={false}
+      />
+      {/* Hidden until the loaded period actually holds more than one value —
+              a picker offering a single option is a control that cannot do
+              anything, and one offering none is worse. */}
+      {config.entityFilter && entityOptions.length > 1 && (
+        <Select
+          size="xs"
+          w={160}
+          data={entityOptions}
+          value={entity}
+          onChange={setEntity}
+          placeholder={tr(config.entityFilter.labelKey)}
+          clearable
+          searchable={entityOptions.length > 8}
+        />
+      )}
+      {config.export && (
+        <Button
+          onClick={() =>
+            config.export?.(sortedLogs, {
+              targetId,
+              targetCode,
+              year,
+              month,
+              monthLabel:
+                month === 'all' ? undefined : monthOptions.find((o) => o.value === month)?.label,
+              language: i18n.language,
+            })
+          }
+          size="compact-sm"
+          variant="default"
+          leftSection={<IconDownload size={14} />}
+          disabled={sortedLogs.length === 0}
+        >
+          {tr(config.exportLabelKey ?? 'operationLogs.exportExcel')}
+        </Button>
+      )}
+      {canCreate && (
+        <Button
+          onClick={openAdd}
+          size="compact-sm"
+          variant="light"
+          leftSection={<IconPlus size={14} />}
+        >
+          {tr(config.addLabelKey)}
+        </Button>
+      )}
+    </Group>
+  );
+
   return (
     <SectionCard
       icon={config.icon}
       title={tr(config.titleKey)}
-      actions={
-        <Group gap="xs" wrap="nowrap">
-          <Select
-            size="xs"
-            w={130}
-            data={monthOptions}
-            value={month}
-            onChange={(v) => setMonth(v ?? 'all')}
-            allowDeselect={false}
-          />
-          <Select
-            size="xs"
-            w={100}
-            data={yearOptions}
-            value={String(year)}
-            onChange={switchYear}
-            allowDeselect={false}
-          />
-          {/* Hidden until the loaded period actually holds more than one value —
-              a picker offering a single option is a control that cannot do
-              anything, and one offering none is worse. */}
-          {config.entityFilter && entityOptions.length > 1 && (
-            <Select
-              size="xs"
-              w={160}
-              data={entityOptions}
-              value={entity}
-              onChange={setEntity}
-              placeholder={tr(config.entityFilter.labelKey)}
-              clearable
-              searchable={entityOptions.length > 8}
-            />
-          )}
-          {config.export && (
-            <Button
-              onClick={() =>
-                config.export?.(sortedLogs, {
-                  targetId,
-                  targetCode,
-                  year,
-                  month,
-                  monthLabel:
-                    month === 'all'
-                      ? undefined
-                      : monthOptions.find((o) => o.value === month)?.label,
-                  language: i18n.language,
-                })
-              }
-              size="compact-sm"
-              variant="default"
-              leftSection={<IconDownload size={14} />}
-              disabled={sortedLogs.length === 0}
-            >
-              {tr(config.exportLabelKey ?? 'operationLogs.exportExcel')}
-            </Button>
-          )}
-          {canCreate && (
-            <Button
-              onClick={openAdd}
-              size="compact-sm"
-              variant="light"
-              leftSection={<IconPlus size={14} />}
-            >
-              {tr(config.addLabelKey)}
-            </Button>
-          )}
-        </Group>
-      }
+      actions={isMobile ? undefined : controls}
     >
+      {isMobile && controls}
       {/* Above the empty-state branch on purpose: with a bucket selected and no
           match, the chips must stay on screen or the operator has no way back
           to the rows — only a "no entries" message and no visible cause. */}
@@ -528,6 +554,20 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         <Text size="sm" c="dimmed" ta="center" py="md">
           {tr(config.emptyKey, { year })}
         </Text>
+      ) : isMobile ? (
+        <OperationLogCards
+          rows={rows}
+          visibleLogs={sortedLogs}
+          config={config}
+          t={tr}
+          canEdit={canEdit}
+          canDelete={canDelete}
+          onEdit={openEdit}
+          onDelete={setDeleteTarget}
+          expanded={expanded}
+          onToggleExpanded={toggleExpanded}
+          onOpenGallery={setGalleryLog}
+        />
       ) : (
         <Table.ScrollContainer minWidth={680}>
           <Table verticalSpacing="xs" highlightOnHover>
@@ -657,6 +697,11 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
       )}
 
       {!loading && sortedLogs.length > 0 && config.summary?.(sortedLogs, tr)}
+
+      {/* Keeps the last thing in the section — usually the summary totals — out
+          from under the fixed bottom navbar, which stands taller than the space
+          the app shell reserves for it. See `MOBILE_BOTTOM_CLEARANCE`. */}
+      {isMobile && <Box style={{ height: MOBILE_BOTTOM_CLEARANCE }} />}
 
       <ResponsiveModal
         opened={formOpened}

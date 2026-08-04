@@ -5,6 +5,9 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
+import { scopeTrucksToViewer, type TruckViewScope } from './truckViewScope';
 import { perms } from '@/utils/permission';
 import { exportFleetRefuelLogsToExcel, type RefuelExportEntry } from '@/utils/excelParser';
 import type { OperationLog, OperationLogExtra, TruckAssetRow } from '@/types';
@@ -14,13 +17,21 @@ const CURRENT_YEAR = new Date().getFullYear();
 
 const canExport = perms.truck.canExport();
 
+const TRUCK_SCOPE: TruckViewScope = {
+  canViewAll: perms.truck.canViewAll(),
+  canViewSelf: perms.truck.canViewSelf(),
+};
+
 function FleetRefuelExport() {
   const { t, i18n } = useTranslation();
   const items = useTruckAssetStore((s) => s.items);
-  const trucks = useMemo(
-    () => (items as TruckAssetRow[]).filter((a) => !a.extra?.isDeleted),
-    [items],
-  );
+
+  const employees = useEmployeeStore((s) => s.items);
+  const trucks = useMemo(() => {
+    const live = (items as TruckAssetRow[]).filter((a) => !a.extra?.isDeleted);
+    return scopeTrucksToViewer(live, getCurrentEmployeeId(), TRUCK_SCOPE);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- see `employees` above.
+  }, [items, employees]);
 
   const [month, setMonth] = useState('all');
   const [year, setYear] = useState(String(CURRENT_YEAR));

@@ -12,6 +12,7 @@ import { DataTable } from '@credo/base-ui/components';
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { tableDensity, type ResolvedStatusOption } from '@/utils/permission';
+import { hasPendingPhotoUpload } from '@/utils/photoQueue';
 import { resolveDeliveryRequestRowBg } from './urgencyRowBg';
 
 type DeliveryRequestDataTableProps = {
@@ -111,6 +112,15 @@ export function DeliveryRequestDataTable({
               {isUrgent && (
                 <Badge color="red" variant="filled" size="sm" radius="lg">
                   {t('deliveryRequests.urgent')}
+                </Badge>
+              )}
+              {/* Proof captured but still on the driver's phone. Dispatch has
+                  to see this — a completed DR whose photo never arrives is the
+                  cost of not blocking the driver, and it's only acceptable
+                  while somebody can notice it. */}
+              {hasPendingPhotoUpload((item.extra as DeliveryRequestExtra | undefined)?.photos) && (
+                <Badge color="orange" variant="light" size="sm" radius="lg">
+                  {t('photos.pendingBadge')}
                 </Badge>
               )}
               <Badge color={status.color} variant="filled" size="sm" radius="lg">

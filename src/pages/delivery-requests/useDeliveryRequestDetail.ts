@@ -5,6 +5,10 @@ import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { ROUTES } from '@/constants/routes';
 import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
+import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/utils/photoUpload';
+import { writePhotosWithConflictRetry } from '@/utils/photoPersist';
+import { enqueuePhoto, pendingPhotoUrl, removePendingPhoto } from '@/utils/photoQueue';
+import { flushPhotoQueue } from '@/utils/photoQueueFlush';
 import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { asyncDeduplicator } from '@credo/base-ui/utils';
@@ -216,9 +220,12 @@ export type UseDeliveryRequestDetailReturn = {
   openCompletionCamera: () => void;
   closeCamera: () => void;
   cameraUploading: boolean;
-  handleMobileCameraCapture: (result: CaptureResult) => Promise<void>;
+
+  handleMobileCameraCapture: (result: CaptureResult) => Promise<boolean>;
 
   completionPhotos: DeliveryRequestPhoto[];
+
+  retryPendingPhotos: () => Promise<void>;
 };
 
 export function useDeliveryRequestDetail(
@@ -676,59 +683,94 @@ export function useDeliveryRequestDetail(
   const handlePhotosChange = useCallback(
     async (photos: DeliveryRequestPhoto[]) => {
       if (!request) return;
-      const currentExtra = request.extra ?? {};
       try {
-        const updated = await useDeliveryRequestStore.getState().updateSafely({
-          id: request.id,
-          version: request.version,
-          patch: { extra: { ...currentExtra, photos } },
+        const { record, rebased } = await writePhotosWithConflictRetry<
+          DeliveryRequest,
+          DeliveryRequestPhoto
+        >({
+          record: request,
+          next: photos,
+          getPhotos: (rec) => (rec.extra as DeliveryRequestExtra | undefined)?.photos ?? [],
+          save: async (rec, nextPhotos) =>
+            (await useDeliveryRequestStore.getState().updateSafely({
+              id: rec.id,
+              version: rec.version,
+              patch: { extra: { ...(rec.extra ?? {}), photos: nextPhotos } },
+            })) as DeliveryRequest,
         });
-        setRequest(updated as DeliveryRequest);
-      } catch (err) {
-        if (err instanceof EntityConflictError) {
-          if (err.latest) setRequest(err.latest as DeliveryRequest);
-          notifications.show({
-            color: 'yellow',
-            title: t('common.conflict.title'),
-            message: t('common.conflict.message'),
-            autoClose: 8000,
-          });
-        } else {
-          throw err;
+        setRequest(record);
+        if (rebased) {
+          notifications.show({ color: 'blue', message: t('photos.updatedElsewhere') });
         }
+      } catch (err) {
+        if (err instanceof EntityConflictError && err.latest) {
+          setRequest(err.latest as DeliveryRequest);
+        }
+        throw err;
       }
     },
     [request, t],
   );
 
   const handleMobileCameraCapture = useCallback(
-    async (result: CaptureResult) => {
-      if (!request) return;
+    async (result: CaptureResult): Promise<boolean> => {
+      if (!request) return false;
       setCameraUploading(true);
+      const fileName = `photo-${Date.now()}.jpg`;
       try {
-        const { dolgaConnector, r2Connector } = await import('@credo/connectors/connector');
+        const file = await captureResultToFile(result.base64, fileName);
 
-        const res = await fetch(result.base64);
-        const blob = await res.blob();
-        const fileName = `photo-${Date.now()}.jpg`;
-        const file = new File([blob], fileName, { type: 'image/jpeg' });
-
-        const presignRes = await dolgaConnector.mediaUploadUrl({
-          imageDirectory,
-          fileName: `${Date.now()}-${fileName}`,
-        });
-        if (!presignRes.uploadUrl || !presignRes.fileUrl) return;
-
-        const uploadRes = await r2Connector.uploadImage({
-          uploadUrl: presignRes.uploadUrl,
-          fileContent: file,
-          contentType: file.type,
-        });
-        if (!uploadRes.success) return;
-
+        const storedName = `${Date.now()}-${fileName}`;
         const isCompletionCapture = captureModeRef.current === 'completion';
+
+        const uploaded = await uploadPhotoFile({
+          file,
+          imageDirectory,
+          fileName: storedName,
+        });
+
+        let photoUrl: string;
+        let queuedId: string | null = null;
+
+        if (uploaded.ok) {
+          photoUrl = uploaded.url;
+        } else {
+          const queued = await enqueuePhoto({
+            blob: file,
+            contentType: file.type,
+            fileName: storedName,
+            displayName: fileName,
+            imageDirectory,
+            target: { kind: 'delivery-request', id: request.id },
+            meta: {
+              timestamp: result.timestamp,
+              ...(currentEmployee && {
+                userId: currentEmployee.id,
+                userName: currentEmployee.name,
+              }),
+              ...(result.location && { location: result.location }),
+              ...(result.latitude != null && { latitude: result.latitude }),
+              ...(result.longitude != null && { longitude: result.longitude }),
+              ...(isCompletionCapture && { takenAtDelivery: true }),
+            },
+          });
+
+          if (!queued) {
+            notifications.show({
+              color: 'red',
+              title: t(photoUploadErrorKey(uploaded.reason), { name: fileName }),
+              message: t('photos.queueUnavailable'),
+              autoClose: 10000,
+            });
+            return false;
+          }
+
+          queuedId = queued.id;
+          photoUrl = pendingPhotoUrl(queued.id);
+        }
+
         const newPhoto: DeliveryRequestPhoto = {
-          url: presignRes.fileUrl,
+          url: photoUrl,
           timestamp: result.timestamp,
           fileName,
           ...(currentEmployee && { userId: currentEmployee.id, userName: currentEmployee.name }),
@@ -740,15 +782,64 @@ export function useDeliveryRequestDetail(
 
         const currentPhotos: DeliveryRequestPhoto[] =
           (request.extra as DeliveryRequestExtra | undefined)?.photos ?? [];
-        await handlePhotosChange([...currentPhotos, newPhoto]);
+        try {
+          await handlePhotosChange([...currentPhotos, newPhoto]);
+        } catch {
+          if (queuedId) void removePendingPhoto(queuedId);
+          notifications.show({
+            color: 'red',
+            title: t('photos.saveFailedTitle'),
+            message: t('photos.saveFailed', { count: 1 }),
+            autoClose: 10000,
+          });
+          return false;
+        }
+
+        if (queuedId) {
+          notifications.show({
+            color: 'yellow',
+            title: t('photos.queuedTitle'),
+            message: t('photos.queuedMessage'),
+            autoClose: 10000,
+          });
+        }
+
         if (isCompletionCapture) setCompletionPhotos((prev) => [...prev, newPhoto]);
+        closeCamera();
+        return true;
+      } catch {
+        notifications.show({ color: 'red', message: t('photos.uploadError', { name: fileName }) });
+        return false;
       } finally {
         setCameraUploading(false);
-        closeCamera();
       }
     },
-    [request, imageDirectory, currentEmployee, handlePhotosChange, closeCamera],
+    [request, imageDirectory, currentEmployee, handlePhotosChange, closeCamera, t],
   );
+
+  const requestId = request?.id;
+  useEffect(() => {
+    if (!requestId) return;
+    void flushPhotoQueue({ kind: 'delivery-request', id: requestId }).then((res) => {
+      const updated = res.updated.find((entry) => entry.record.id === requestId);
+      if (updated) setRequest(updated.record as DeliveryRequest);
+    });
+  }, [requestId]);
+
+  const retryPendingPhotos = useCallback(async () => {
+    if (!requestId) return;
+    const res = await flushPhotoQueue({ kind: 'delivery-request', id: requestId });
+    const updated = res.updated.find((entry) => entry.record.id === requestId);
+    if (updated) setRequest(updated.record as DeliveryRequest);
+    if (res.uploaded > 0) {
+      notifications.show({
+        color: 'green',
+        message: t('photos.uploadSuccess', { count: res.uploaded }),
+      });
+    } else if (res.failed > 0) {
+      notifications.show({ color: 'yellow', message: t('photos.retryFailed'), autoClose: 8000 });
+    }
+  }, [requestId, t]);
 
   const statusFlowOrder = useMemo(() => getStatusFlowOrder(), []);
   const currentFlowIndex = useMemo(
@@ -807,5 +898,6 @@ export function useDeliveryRequestDetail(
     cameraUploading,
     handleMobileCameraCapture,
     completionPhotos,
+    retryPendingPhotos,
   };
 }
