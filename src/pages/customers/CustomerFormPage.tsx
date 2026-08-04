@@ -40,6 +40,7 @@ import { useInitFormFromFetch } from '@/hooks';
 import { perms, hasShippingAddressForCustomers } from '@/utils/permission';
 import { SectionCard } from '@/components/SectionCard';
 import type { Customer, CustomerContact, CustomerExtra, CustomerShippingAddress } from '@/types';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 const hasShippingAddress = hasShippingAddressForCustomers();
@@ -613,8 +614,8 @@ export function CustomerFormPage() {
 
       <Divider />
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      {}
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Grid gutter="md">
             <Grid.Col span={{ base: 12, md: isEdit ? 7 : 12 }}>
@@ -645,7 +646,7 @@ export function CustomerFormPage() {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

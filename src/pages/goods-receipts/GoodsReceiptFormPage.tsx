@@ -71,6 +71,7 @@ import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { appConfig } from '@/config';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 import { NumberField } from '@/components/NumberField';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -682,13 +683,15 @@ export function GoodsReceiptFormPage() {
       )}
 
       <Card withBorder radius="md" p="xl">
-        <form
-          onSubmit={form.onSubmit(handleSubmit, () => {
+        <Form
+          form={form}
+          onSubmit={handleSubmit}
+          onError={() => {
             notifications.show({
               color: 'red',
               message: t('common.validation.formInvalid'),
             });
-          })}
+          }}
         >
           <Stack gap="md">
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
@@ -929,7 +932,7 @@ export function GoodsReceiptFormPage() {
               </Button>
             </Group>
           </Stack>
-        </form>
+        </Form>
       </Card>
     </Stack>
   );

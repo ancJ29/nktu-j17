@@ -42,6 +42,7 @@ import { getMaterialUnitCategory } from '@/utils/materialConfig';
 import { logActivity } from '@/utils/activityLogger';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import type { Material, MaterialInventoryExtra, MaterialInventoryRow } from '@/types';
+import { Form } from '@/components/Form';
 
 type Props = {
   readonly opened: boolean;
@@ -210,7 +211,7 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
       title={t('materialInventory.modal.updateTitle')}
       size="md"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Text size="sm" c="dimmed">
             {materialName}
@@ -362,7 +363,7 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
             </Group>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </ResponsiveModal>
   );
 }
@@ -671,7 +672,7 @@ function PackagingUpdate({
       title={t('materialInventory.modal.updateTitle')}
       size="lg"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Text size="sm" c="dimmed">
             {materialName}
@@ -990,7 +991,7 @@ function PackagingUpdate({
             </Group>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </ResponsiveModal>
   );
 }

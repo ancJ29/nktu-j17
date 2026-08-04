@@ -23,6 +23,7 @@ import {
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
+import { Form } from '@/components/Form';
 
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
 
@@ -205,7 +206,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
     : t('deliveryRequests.form.scheduledDateLabel');
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
+    <Form form={form} onSubmit={handleSubmit}>
       <Stack gap="md">
         <TextInput
           label={t('deliveryRequests.form.requestNumberLabel')}
@@ -351,6 +352,6 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
           </Button>
         </Group>
       </Stack>
-    </form>
+    </Form>
   );
 }

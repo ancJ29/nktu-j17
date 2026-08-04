@@ -32,6 +32,7 @@ import {
 import { toDateTimeInputOrUndefined } from './deliveryRequestFormShared';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 import { NumberField } from '@/components/NumberField';
+import { Form } from '@/components/Form';
 
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
 
@@ -229,7 +230,7 @@ export function CreateReturnShipmentModal({
       size="lg"
       centered
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput
             label={t('common.labels.salesOrder')}
@@ -350,7 +351,7 @@ export function CreateReturnShipmentModal({
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Modal>
   );
 }

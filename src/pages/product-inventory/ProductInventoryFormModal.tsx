@@ -15,6 +15,7 @@ import { convertUnit, getItemBaseUnit, getItemUnits } from '@/utils/unitConversi
 import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
 import { isLocationsEnabled } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
+import { Form } from '@/components/Form';
 
 const locationsEnabled = isLocationsEnabled();
 
@@ -218,7 +219,7 @@ export function ProductInventoryFormModal({
       onClose={onClose}
       title={t('productInventory.modal.createTitle')}
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           {!productPickerHidden && (
             <Select
@@ -314,7 +315,7 @@ export function ProductInventoryFormModal({
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </ResponsiveModal>
   );
 }

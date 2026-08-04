@@ -50,7 +50,17 @@ export type OperationLogContext = {
 
   maintenanceTypeOptions?: LookupOption[];
 
-  oilTankOptions?: { value: string; label: string; code: string }[];
+  oilTankOptions?: {
+    value: string;
+    label: string;
+    code: string;
+
+    currentLevel?: number;
+  }[];
+
+  tankCurrentLevel?: number;
+
+  truckOptions?: { value: string; label: string; code: string; driverName?: string }[];
 };
 
 export type OperationLogWriteEvent = {
@@ -70,6 +80,10 @@ export type OperationLogColumn = {
   emphasize?: boolean;
 
   render: (log: OperationLog) => ReactNode;
+
+  sortValue?: (log: OperationLog) => number;
+
+  sortField?: string;
 };
 
 export type OperationLogRowTone = { danger: boolean; tooltipKey?: string };
@@ -100,9 +114,31 @@ export type OperationLogConfig = {
   modalSize?: string;
   columns: OperationLogColumn[];
 
+  quickFilters?: {
+    options: {
+      value: string;
+      labelKey: string;
+
+      match?: (log: OperationLog) => boolean;
+    }[];
+  };
+
+  entityFilter?: {
+    labelKey: string;
+    valueOf: (log: OperationLog) => string | undefined;
+  };
+
   emptyForm: LogFormValues;
 
   validate: (t: TFn) => Record<string, (value: unknown, values: LogFormValues) => ReactNode>;
+
+  validateOnSubmit?: (args: {
+    values: LogFormValues;
+
+    previous: OperationLog | null;
+    context?: OperationLogContext;
+    t: TFn;
+  }) => Record<string, ReactNode> | null;
 
   buildExtra: (values: LogFormValues) => Partial<OperationLogExtra>;
 

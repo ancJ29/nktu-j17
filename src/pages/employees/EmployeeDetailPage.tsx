@@ -70,6 +70,7 @@ import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
 import { useDisclosure } from '@mantine/hooks';
+import { Form } from '@/components/Form';
 
 const hasQRLogin = hasLoginViaQRCode();
 const hasAllowLogin = hasAllowLoginForEmployees();
@@ -494,7 +495,7 @@ export function EmployeeDetailPage() {
             dangerZone.passwordForm.setFieldError('confirmPassword', null);
           };
           return (
-            <form onSubmit={dangerZone.passwordForm.onSubmit(dangerZone.handlePasswordChange)}>
+            <Form form={dangerZone.passwordForm} onSubmit={dangerZone.handlePasswordChange}>
               <Stack gap="md">
                 <Group gap="xs" wrap="nowrap" justify="space-between" align="end">
                   <DetailField
@@ -555,7 +556,7 @@ export function EmployeeDetailPage() {
                   </Button>
                 </Group>
               </Stack>
-            </form>
+            </Form>
           );
         })()}
       </Modal>

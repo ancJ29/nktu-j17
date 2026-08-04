@@ -27,6 +27,7 @@ import { isListVersionConflict, readListHash } from '@/utils/listVersionConflict
 import type { Lookup } from '@/types';
 import { getEnabledCategories, getLookupCategory } from './categoryRegistry';
 import { ActiveBadge } from '@/components/badges';
+import { Form } from '@/components/Form';
 
 const enabledCategories = getEnabledCategories();
 
@@ -360,7 +361,7 @@ export function LookupsPage() {
           size="50vw"
           padding={0}
         >
-          <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Form form={form} onSubmit={handleSubmit}>
             <Stack gap="md" p="md">
               <TextInput
                 label={t('lookups.form.value')}
@@ -432,7 +433,7 @@ export function LookupsPage() {
                 </Button>
               </Group>
             </Group>
-          </form>
+          </Form>
         </Modal>
 
         <ConfirmModal

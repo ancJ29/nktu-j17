@@ -363,6 +363,9 @@
         "insurance": "Insurance",
         "registration": "Registration"
       },
+      "filters": {
+        "truckType": "Truck type"
+      },
       "fleetExport": {
         "button": "Export fleet fuel logs",
         "empty": "No refuel logs for the selected period",
@@ -439,6 +442,12 @@
       "noItems": "No trucks found",
       "searchPlaceholder": "Search trucks…",
       "title": "Trucks",
+      "urgency": {
+        "all": "All",
+        "within7": "Within 7 days",
+        "within30": "Within 30 days",
+        "expired": "Expired"
+      },
       "validation": {
         "capacityInvalid": "Capacity cannot be negative",
         "dimensionInvalid": "Dimension cannot be negative",
@@ -2452,7 +2461,9 @@
         "editItem": "Edit issue",
         "empty": "No issues recorded for {{year}}",
         "form": {
-          "notePlaceholder": "Anything worth recording about this issue"
+          "driverPlaceholder": "Driver name",
+          "notePlaceholder": "Anything worth recording about this issue",
+          "truckPlaceholder": "Select a truck"
         },
         "sectionTitle": "Issues",
         "summary": {
@@ -2482,6 +2493,7 @@
         }
       },
       "validation": {
+        "exceedsStock": "Exceeds the tank stock — only {{available}} L available",
         "litresRequired": "Enter the number of litres"
       }
     },
@@ -2575,18 +2587,25 @@
         "date": "Date",
         "item": "Item",
         "laborCost": "Labor cost",
+        "lineTotal": "Line total",
         "odometer": "Odometer",
         "outstanding": "Outstanding",
         "photos": "Invoice",
+        "quantity": "Qty",
         "supplier": "Supplier",
         "total": "Total",
-        "totalAmount": "Total amount",
+        "totalAmount": "Items total",
         "type": "Type",
         "unitPrice": "Unit price",
         "warranty": "Warranty"
       },
       "editItem": "Edit maintenance",
       "empty": "No maintenance logs for {{year}} yet.",
+      "filters": {
+        "all": "All",
+        "settled": "Settled",
+        "unpaid": "Outstanding"
+      },
       "form": {
         "addItemLine": "Add item",
         "conditionPlaceholder": "e.g. New / Used",
@@ -2599,7 +2618,7 @@
         "outstandingHint": "Total − Paid (auto)",
         "removeItemLine": "Remove item",
         "supplierPlaceholder": "Garage / vendor",
-        "totalAmountHint": "Sum of items (auto)",
+        "totalAmountHint": "Unit price × Qty (auto)",
         "typePlaceholder": "Select maintenance type",
         "warrantyPlaceholder": "None"
       },
@@ -3855,10 +3874,10 @@
     },
     "columns": {
       "bill": "B/L · Booking",
-      "billContainer": "B/L · Container",
       "container": "Container",
+      "containerBill": "Container · B/L",
       "date": "Date",
-      "orderNumber": "Order No.",
+      "driver": "Driver · Truck",
       "route": "Route",
       "truck": "Truck"
     },

@@ -87,6 +87,13 @@ export function formatDate(value: NullableDateTimeInput): string {
   return applyDateFormat(p, getSettings().dateFormat);
 }
 
+export function formatTime(value: NullableDateTimeInput): string {
+  if (!value) return '';
+  const p = parts(value);
+  if (!p) return '';
+  return `${p.HH}:${p.mm}`;
+}
+
 export function formatDateTime(value: NullableDateTimeInput): string {
   if (!value) return '-';
   const p = parts(value);

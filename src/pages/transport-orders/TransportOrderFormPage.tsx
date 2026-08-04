@@ -97,6 +97,7 @@ import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
 import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleConflicts';
 import type { ScheduleSlot } from './scheduleConflicts';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 const toFeatures = appConfig.features.transportOrders;
@@ -776,7 +777,7 @@ export function TransportOrderFormPage() {
         </Alert>
       )}
 
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="lg">
           {/* Job header */}
           <SectionCard
@@ -1350,7 +1351,7 @@ export function TransportOrderFormPage() {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

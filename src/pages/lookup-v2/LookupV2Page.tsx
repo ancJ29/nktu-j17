@@ -36,6 +36,7 @@ import { useLookupV2Store } from '@/stores/useLookupV2Store';
 import { perms } from '@/utils/permission';
 import type { LookupV2Row } from '@/types';
 import { getEnabledLookupV2Categories, getLookupV2Category } from './categoryRegistry';
+import { Form } from '@/components/Form';
 
 const enabledCategories = getEnabledLookupV2Categories();
 
@@ -440,7 +441,7 @@ export function LookupV2Page() {
           size="lg"
           padding={0}
         >
-          <form onSubmit={form.onSubmit(handleSubmit)}>
+          <Form form={form} onSubmit={handleSubmit}>
             <Stack gap="md" p="md">
               <TextInput
                 label={t('lookups.form.value')}
@@ -508,7 +509,7 @@ export function LookupV2Page() {
                 </Button>
               </Group>
             </Group>
-          </form>
+          </Form>
         </Modal>
 
         <ConfirmModal

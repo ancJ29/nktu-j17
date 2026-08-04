@@ -57,6 +57,8 @@ export type MaintenanceItem = {
 
   unitPrice: number;
 
+  quantity?: number;
+
   warrantyMonths?: number;
 };
 

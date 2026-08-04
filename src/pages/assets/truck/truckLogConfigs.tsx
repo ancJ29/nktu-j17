@@ -31,16 +31,19 @@ import {
   type TFn,
 } from '@/pages/operation-logs/operationLogConfig';
 import {
+  itemQuantity,
   maintenanceItemsTotal,
+  maintenanceLineTotal,
   readMaintenanceItems,
   warrantyExpiry,
-  warrantySummary,
 } from './maintenanceItems';
-import { exportRefuelLogsToExcel } from '@/utils/excelParser';
+import { exportMaintenanceLogsToExcel, exportRefuelLogsToExcel } from '@/utils/excelParser';
 import { syncTankIssue } from '@/pages/oil-tanks/tankIssueSync';
+import { issueExceedsStock } from '@/pages/oil-tanks/oilTankBalance';
 import { LogDriverField } from './LogDriverField';
 import { ContainerSizeCell } from './ContainerSizeCell';
 import { FuelSourceCell } from './FuelSourceCell';
+import { WarrantySummaryCell } from './WarrantySummaryCell';
 
 function textCell(value: string | undefined) {
   return value ? (
@@ -158,6 +161,11 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
+
+  entityFilter: {
+    labelKey: 'operationLogs.refuel.columns.driver',
+    valueOf: (log) => log.extra?.driverName,
+  },
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
     litres: (v) =>
@@ -170,6 +178,27 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
         ? null
         : t('operationLogs.refuel.validation.tankRequired'),
   }),
+
+  validateOnSubmit: ({ values, previous, context, t }) => {
+    if (values.fuelSource !== 'tank') return null;
+    const tankId = String(values.oilTankId ?? '').trim();
+    const tank = context?.oilTankOptions?.find((o) => o.value === tankId);
+
+    if (!tank) return null;
+    const prev = previous?.extra;
+    const sameTank = prev?.fuelSource === 'tank' && prev?.oilTankId === tankId;
+    const { refused, available } = issueExceedsStock({
+      litres: values.litres,
+      currentLevel: tank.currentLevel,
+      previousLitres: sameTank ? Number(prev?.litres) || 0 : 0,
+    });
+    if (!refused) return null;
+    return {
+      litres: t('oilTanks.logs.validation.exceedsStock', {
+        available: formatNumber(available ?? 0),
+      }),
+    };
+  },
   buildExtra: (values): Partial<RefuelLogExtra> => ({
     ...(values.litres !== '' && { litres: Number(values.litres) }),
     ...(values.unitPrice !== '' && { unitPrice: Number(values.unitPrice) }),
@@ -420,15 +449,20 @@ function monthsLabel(t: TFn, months: number): string {
 }
 
 function blankMaintenanceItem(): LogFormLine {
-  return { name: '', unitPrice: '', warrantyMonths: '' };
+  return { name: '', unitPrice: '', quantity: 1, warrantyMonths: '' };
 }
 
 function itemRows(form: UseFormReturnType<LogFormValues>): LogFormLine[] {
   return (Array.isArray(form.values.items) ? form.values.items : []) as LogFormLine[];
 }
 
+function draftLineTotal(row: LogFormLine): number {
+  const qty = Number(row.quantity);
+  return (Number(row.unitPrice) || 0) * (Number.isFinite(qty) && qty > 0 ? qty : 1);
+}
+
 function draftItemsTotal(rows: LogFormLine[]): number {
-  return rows.reduce((sum, r) => sum + (Number(r.unitPrice) || 0), 0);
+  return rows.reduce((sum, r) => sum + draftLineTotal(r), 0);
 }
 
 function detailStat(label: string, value: ReactNode) {
@@ -479,7 +513,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     },
     {
       header: 'operationLogs.maintenance.columns.warranty',
-      render: (log) => textCell(warrantySummary(readMaintenanceItems(log.extra), (m) => `${m}`)),
+      render: (log) => <WarrantySummaryCell extra={log.extra as MaintenanceLogExtra | undefined} />,
     },
     {
       header: 'operationLogs.maintenance.columns.total',
@@ -487,14 +521,50 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       emphasize: true,
 
       render: (log) => formatNumber(log.extra?.grandTotal ?? log.extra?.cost),
+
+      sortField: 'total',
+      sortValue: (log) => Number(log.extra?.grandTotal ?? log.extra?.cost) || 0,
     },
     {
       header: 'operationLogs.maintenance.columns.outstanding',
       align: 'right',
       emphasize: true,
       render: (log) => formatNumber(maintenanceOutstanding(log.extra)),
+      sortField: 'outstanding',
+      sortValue: (log) => maintenanceOutstanding(log.extra) ?? 0,
     },
   ],
+
+  quickFilters: {
+    options: [
+      { value: 'all', labelKey: 'operationLogs.maintenance.filters.all' },
+      {
+        value: 'unpaid',
+        labelKey: 'operationLogs.maintenance.filters.unpaid',
+        match: (log) => (maintenanceOutstanding(log.extra) ?? 0) > 0,
+      },
+      {
+        value: 'settled',
+        labelKey: 'operationLogs.maintenance.filters.settled',
+        match: (log) => (maintenanceOutstanding(log.extra) ?? 0) <= 0,
+      },
+    ],
+  },
+  entityFilter: {
+    labelKey: 'operationLogs.maintenance.columns.supplier',
+    valueOf: (log) => log.extra?.supplier,
+  },
+  export: (logs, meta) => {
+    const periodLabel = meta.monthLabel ? `${meta.monthLabel} ${meta.year}` : String(meta.year);
+    exportMaintenanceLogsToExcel(logs, {
+      language: meta.language,
+      periodLabel,
+      fileTag:
+        meta.month === 'all' ? String(meta.year) : `${meta.year}-${meta.month.padStart(2, '0')}`,
+      vehicleLabel: meta.targetCode,
+    });
+  },
+  exportLabelKey: 'operationLogs.exportExcel',
 
   photos: {
     directoryType: 'truck-maintenance-log',
@@ -510,6 +580,8 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       .map((r) => ({
         name: String(r.name).trim(),
         unitPrice: r.unitPrice === '' ? 0 : Number(r.unitPrice),
+
+        ...(r.quantity !== '' && Number(r.quantity) > 1 && { quantity: Number(r.quantity) }),
         ...(r.warrantyMonths !== '' &&
           Number(r.warrantyMonths) > 0 && { warrantyMonths: Number(r.warrantyMonths) }),
       }));
@@ -540,6 +612,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     const items = readMaintenanceItems(e).map<LogFormLine>((it) => ({
       name: it.name,
       unitPrice: it.unitPrice,
+      quantity: itemQuantity(it),
       warrantyMonths: it.warrantyMonths ?? '',
     }));
     return {
@@ -624,22 +697,29 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             <Table.Thead>
               <Table.Tr>
                 <Table.Th>{t('operationLogs.maintenance.form.itemName')}</Table.Th>
-                <Table.Th w={160}>{t('operationLogs.maintenance.columns.unitPrice')}</Table.Th>
-                <Table.Th w={150}>{t('operationLogs.maintenance.columns.warranty')}</Table.Th>
+                <Table.Th w={150}>{t('operationLogs.maintenance.columns.unitPrice')}</Table.Th>
+                <Table.Th w={90}>{t('operationLogs.maintenance.columns.quantity')}</Table.Th>
+                {/* Derived, never typed — the same rule the invoice totals
+                    follow. An editable line total could only ever mean
+                    disagreeing with the đơn giá × số lượng above it. */}
+                <Table.Th w={140} ta="right">
+                  {t('operationLogs.maintenance.columns.lineTotal')}
+                </Table.Th>
+                <Table.Th w={140}>{t('operationLogs.maintenance.columns.warranty')}</Table.Th>
                 <Table.Th w={40} />
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
               {rows.length === 0 ? (
                 <Table.Tr>
-                  <Table.Td colSpan={4}>
+                  <Table.Td colSpan={6}>
                     <Text size="sm" c="dimmed" ta="center">
                       {t('operationLogs.maintenance.form.noItemLines')}
                     </Text>
                   </Table.Td>
                 </Table.Tr>
               ) : (
-                rows.map((_, i) => (
+                rows.map((row, i) => (
                   <Table.Tr key={i}>
                     <Table.Td>
                       <TextInput
@@ -653,6 +733,15 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
                         thousandSeparator=","
                         {...form.getInputProps(`items.${i}.unitPrice`)}
                       />
+                    </Table.Td>
+                    <Table.Td>
+                      {/* Blank is 1, not 0 — a line that exists was serviced. */}
+                      <NumberInput min={1} {...form.getInputProps(`items.${i}.quantity`)} />
+                    </Table.Td>
+                    <Table.Td ta="right">
+                      <Text size="sm" fw={500}>
+                        {formatNumber(draftLineTotal(row))}
+                      </Text>
                     </Table.Td>
                     <Table.Td>
                       <NumberInput
@@ -751,16 +840,22 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
           <Table.Thead>
             <Table.Tr>
               <Table.Th>{t('operationLogs.maintenance.form.itemName')}</Table.Th>
-              <Table.Th w={160} ta="right">
+              <Table.Th w={140} ta="right">
                 {t('operationLogs.maintenance.columns.unitPrice')}
               </Table.Th>
-              <Table.Th w={260}>{t('operationLogs.maintenance.columns.warranty')}</Table.Th>
+              <Table.Th w={80} ta="right">
+                {t('operationLogs.maintenance.columns.quantity')}
+              </Table.Th>
+              <Table.Th w={140} ta="right">
+                {t('operationLogs.maintenance.columns.lineTotal')}
+              </Table.Th>
+              <Table.Th w={240}>{t('operationLogs.maintenance.columns.warranty')}</Table.Th>
             </Table.Tr>
           </Table.Thead>
           <Table.Tbody>
             {items.length === 0 ? (
               <Table.Tr>
-                <Table.Td colSpan={3}>
+                <Table.Td colSpan={5}>
                   <Text size="sm" c="dimmed" ta="center">
                     {t('operationLogs.maintenance.form.noItemLines')}
                   </Text>
@@ -773,6 +868,11 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
                   <Table.Tr key={i}>
                     <Table.Td>{textCell(it.name)}</Table.Td>
                     <Table.Td ta="right">{formatNumber(it.unitPrice)}</Table.Td>
+                    {/* Always shown, including the 1 an absent quantity reads
+                        as — a blank column would leave the reader unsure
+                        whether one was fitted or the field was skipped. */}
+                    <Table.Td ta="right">{formatNumber(itemQuantity(it))}</Table.Td>
+                    <Table.Td ta="right">{formatNumber(maintenanceLineTotal(it))}</Table.Td>
                     <Table.Td>
                       {until
                         ? `${monthsLabel(t, it.warrantyMonths as number)} (${t(

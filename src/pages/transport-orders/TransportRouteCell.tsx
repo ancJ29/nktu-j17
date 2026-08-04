@@ -3,99 +3,59 @@ import { ActionIcon, Box, Group, Stack, Text } from '@mantine/core';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { TransportOrder } from '@/types';
-import { formatDateTime } from '@/utils/dateFormat';
-import { useTruckPlate } from './truckDisplay';
 
-function VehicleLines({
-  truckName,
-  plate,
-  driverName,
-}: {
-  truckName?: string;
-  plate?: string;
-  driverName?: string;
-}) {
-  const name = truckName?.trim();
+const ORIGIN_MIN_WIDTH = 104;
+
+function placeList(places: Array<string | undefined>): string[] {
+  return places.map((place) => place?.trim() ?? '').filter((place) => place.length > 0);
+}
+
+function RouteLine({ stops }: { stops: string[] }) {
+  const [origin, ...rest] = stops;
+  const destination = rest.pop();
+
   return (
-    <>
-      {name && (
-        <Text fz="xs" lineClamp={1}>
-          <Text span fw={500}>
-            {name}
-          </Text>
-          {plate && (
-            <Text span c="dimmed">
-              {` ${plate}`}
+    <Group gap={6} wrap="nowrap" align="baseline" title={stops.join(' › ')}>
+      <Text fz="sm" fw={500} lineClamp={1} miw={ORIGIN_MIN_WIDTH}>
+        {origin || '—'}
+      </Text>
+      {destination && (
+        <Text fz="sm" lineClamp={1} style={{ flex: 1, minWidth: 0 }}>
+          {/* Intermediate stops stay on the line — dimmed and unweighted, so the
+              two endpoints read first without the stuffing point being hidden. */}
+          {rest.map((stop) => (
+            <Text key={stop} span c="dimmed">
+              {`› ${stop} `}
             </Text>
-          )}
+          ))}
+          <Text span c="dimmed">
+            {'› '}
+          </Text>
+          <Text span fw={500}>
+            {destination}
+          </Text>
         </Text>
       )}
-      {driverName?.trim() && (
-        <Text fz="xs" c="dimmed" fs="italic" lineClamp={1}>
-          {driverName.trim()}
-        </Text>
-      )}
-    </>
+    </Group>
   );
 }
 
 export function TransportRouteCell({ order }: { order: TransportOrder }) {
   const { t } = useTranslation();
-  const plateOf = useTruckPlate();
   const [expanded, setExpanded] = useState(false);
 
   if (!order.isMultiTrip) {
-    const stops = (
-      [
-        [order.route?.pickup, order.route?.pickupAt],
-        [order.route?.stuffing, order.route?.stuffingAt],
-        [order.route?.dropoff, order.route?.dropoffAt],
-      ] as const
-    )
-      .map(([place, at]) => ({ place: typeof place === 'string' ? place.trim() : '', at }))
-      .filter((s) => s.place);
-
-    const scheduled = stops.some((s) => s.at);
     return (
-      <Stack gap={2}>
-        {scheduled ? (
-          <Stack gap={0}>
-            {stops.map((s, i) => (
-              <Group key={i} gap={6} wrap="nowrap" align="baseline">
-                <Text fz="sm" fw={500} lineClamp={1}>
-                  {i > 0 && (
-                    <Text span c="dimmed">
-                      {'→ '}
-                    </Text>
-                  )}
-                  {s.place}
-                </Text>
-                {s.at && (
-                  <Text fz="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                    {formatDateTime(s.at)}
-                  </Text>
-                )}
-              </Group>
-            ))}
-          </Stack>
-        ) : (
-          <Text fz="sm" fw={500} lineClamp={2}>
-            {stops.map((s) => s.place).join(' → ') || '—'}
-          </Text>
-        )}
-        <VehicleLines
-          truckName={order.truckPlate}
-          plate={plateOf(order.truckId)}
-          driverName={order.driverName}
-        />
-      </Stack>
+      <RouteLine
+        stops={placeList([order.route?.pickup, order.route?.stuffing, order.route?.dropoff])}
+      />
     );
   }
 
   const trips = order.trips ?? [];
   const first = trips[0]?.departure?.trim();
   const last = trips[trips.length - 1]?.destination?.trim();
-  const summary = [first, '...', last].filter(Boolean).join(' → ');
+  const summary = [first, '...', last].filter(Boolean).join(' › ');
 
   return (
     <Group gap={4} wrap="nowrap" align="flex-start">
@@ -103,6 +63,7 @@ export function TransportRouteCell({ order }: { order: TransportOrder }) {
         size="sm"
         variant="subtle"
         color="gray"
+        aria-label={t(expanded ? 'transportOrders.route.collapse' : 'transportOrders.route.expand')}
         onClick={(e) => {
           e.stopPropagation();
           setExpanded((v) => !v);
@@ -111,39 +72,20 @@ export function TransportRouteCell({ order }: { order: TransportOrder }) {
         {expanded ? <IconChevronDown size={14} /> : <IconChevronRight size={14} />}
       </ActionIcon>
       {expanded ? (
-        <Stack gap={6} style={{ minWidth: 0 }}>
+        <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
           {trips.map((trip, i) => (
-            <Box key={i}>
-              <Group gap={6} wrap="nowrap" align="baseline">
-                <Text fz="sm" fw={700} c="dimmed">
-                  {i + 1}.
-                </Text>
-                <Text fz="sm" fw={500} lineClamp={1}>
-                  {[trip.departure?.trim(), trip.destination?.trim()].filter(Boolean).join(' → ') ||
-                    '—'}
-                </Text>
-              </Group>
-              {/* The leg's estimated slots, indented with its vehicle — one line
-                  for both ends, since on a leg they read as a span. */}
-              <Box pl="md">
-                {(trip.loadingAt || trip.unloadingAt) && (
-                  <Text fz="xs" c="dimmed" lineClamp={1}>
-                    {[trip.loadingAt, trip.unloadingAt]
-                      .map((v) => (v ? formatDateTime(v) : '?'))
-                      .join(' → ')}
-                  </Text>
-                )}
-                <VehicleLines
-                  truckName={trip.truckPlate}
-                  plate={plateOf(trip.truckId)}
-                  driverName={trip.driverName}
-                />
+            <Group key={i} gap={6} wrap="nowrap" align="baseline">
+              <Text fz="sm" fw={700} c="dimmed" w={16} style={{ flexShrink: 0 }}>
+                {i + 1}.
+              </Text>
+              <Box style={{ flex: 1, minWidth: 0 }}>
+                <RouteLine stops={placeList([trip.departure, trip.destination])} />
               </Box>
-            </Box>
+            </Group>
           ))}
         </Stack>
       ) : (
-        <Text fz="sm" lineClamp={2}>
+        <Text fz="sm" lineClamp={1} style={{ flex: 1, minWidth: 0 }}>
           <Text span fw={500}>
             {summary}
           </Text>{' '}

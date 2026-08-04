@@ -1,5 +1,6 @@
 import { appConfig } from '@/config';
 import { resolveServiceCode } from '@/config/client-code';
+import { cMngtConnector } from '@credo/connectors/connector';
 import { cacheGet, cacheSet } from '@/utils/appCache';
 import {
   compositeUserStorage,
@@ -102,9 +103,13 @@ export function takeSessionExpiredNotice(): SessionExpiredNotice | null {
 }
 
 let lastAuthToken = useAuthStore.getState().token;
+
+cMngtConnector.setAuthToken(lastAuthToken ?? '');
 useAuthStore.subscribe((state) => {
   const next = state.token;
   if (next === lastAuthToken) return;
+
+  cMngtConnector.setAuthToken(next ?? '');
   if (lastAuthToken && !next) {
     const reason = state.lastLogoutReason ?? 'unknown';
     logger.warn('Session ended', { reason });

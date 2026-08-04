@@ -44,6 +44,7 @@ import type {
   CropDiaryTemplate,
   TemplateMaterialLine,
 } from '@/types';
+import { Form } from '@/components/Form';
 
 function cleanMaterialLines(lines: TemplateMaterialLine[]): TemplateMaterialLine[] {
   return lines
@@ -445,7 +446,7 @@ export function CropDiarySection({
         onClose={formHandlers.close}
         title={editing ? t('cropDiaries.editItem') : t('cropDiaries.addItem')}
       >
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Form form={form} onSubmit={handleSubmit}>
           <Stack gap="md">
             <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
               <DatePickerField
@@ -482,7 +483,7 @@ export function CropDiarySection({
               </Button>
             </Group>
           </Stack>
-        </form>
+        </Form>
       </ResponsiveModal>
 
       <ConfirmModal

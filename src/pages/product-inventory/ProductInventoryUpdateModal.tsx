@@ -40,6 +40,7 @@ import {
   validateRepack,
 } from '@/utils/inventoryMath';
 import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { Form } from '@/components/Form';
 
 export type UpdateMode = 'delta' | 'snapshot' | 'repack';
 
@@ -348,7 +349,7 @@ export function ProductInventoryUpdateModal({
       title={t('productInventory.modal.updateTitle')}
       size="lg"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           {contextLabel && (
             <Text size="sm" c="dimmed">
@@ -672,7 +673,7 @@ export function ProductInventoryUpdateModal({
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </ResponsiveModal>
   );
 }

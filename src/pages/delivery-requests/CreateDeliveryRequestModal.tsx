@@ -29,6 +29,7 @@ import {
 } from './deliveryRequestFormShared';
 import { RESOLVED_DELIVERY_REQUEST_VARIANT } from './deliveryRequestVariant';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { Form } from '@/components/Form';
 
 const { showListItems, seedScheduledDateFromSalesOrder } = RESOLVED_DELIVERY_REQUEST_VARIANT;
 
@@ -237,7 +238,7 @@ export function CreateDeliveryRequestModal({
       size="sm"
       centered
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <TextInput
             label={t('common.labels.salesOrder')}
@@ -329,7 +330,7 @@ export function CreateDeliveryRequestModal({
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Modal>
   );
 }

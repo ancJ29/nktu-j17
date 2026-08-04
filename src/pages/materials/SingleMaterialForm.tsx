@@ -42,6 +42,7 @@ import {
 } from '@/utils/materialConfig';
 import type { UnitConversion } from '@/types';
 import { NumberField } from '@/components/NumberField';
+import { Form } from '@/components/Form';
 
 const multiUnit = isMaterialMultiUnit();
 const unitCategory = getMaterialUnitCategory();
@@ -249,7 +250,7 @@ export function SingleMaterialForm({
   );
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <Form form={form} onSubmit={onSubmit}>
       <Stack gap="md">
         <Grid gutter="md">
           <Grid.Col span={{ base: 12, md: 7 }}>
@@ -433,6 +434,6 @@ export function SingleMaterialForm({
           </Button>
         </Group>
       </Stack>
-    </form>
+    </Form>
   );
 }

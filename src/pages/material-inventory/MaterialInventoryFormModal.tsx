@@ -12,6 +12,7 @@ import { materialHasMultipleUnits, materialToPackagingItem } from '@/utils/mater
 import { getMaterialUnitCategory } from '@/utils/materialConfig';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import type { Material } from '@/types';
+import { Form } from '@/components/Form';
 
 type Props = {
   readonly opened: boolean;
@@ -102,7 +103,7 @@ export function MaterialInventoryFormModal({ opened, onClose, available, fixedMa
       title={t('materialInventory.modal.createTitle')}
       size="md"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           {fixedMaterial ? (
             <Text size="sm" fw={500}>
@@ -153,7 +154,7 @@ export function MaterialInventoryFormModal({ opened, onClose, available, fixedMa
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </ResponsiveModal>
   );
 }

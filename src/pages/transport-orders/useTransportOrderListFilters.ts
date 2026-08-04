@@ -11,6 +11,7 @@ import {
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import { orderPlanSortKey } from './planDate';
 import type { TransportOrder, TransportOrderShipmentType } from '@/types';
 
 const DEFAULT_SORT = 'createdAt_desc';
@@ -160,9 +161,11 @@ export function useTransportOrderListFilters(
     const [field, dir] = sortField.split('_') as [string, string];
     const mult = dir === 'asc' ? 1 : -1;
     return filtered.sort((a, b) => {
-      const aVal = field === 'entryDate' ? (a.entryDate ?? '') : a.createdAt;
-      const bVal = field === 'entryDate' ? (b.entryDate ?? '') : b.createdAt;
-      return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
+      if (field === 'entryDate') {
+        const diff = orderPlanSortKey(a) - orderPlanSortKey(b);
+        return diff === 0 ? 0 : diff < 0 ? -mult : mult;
+      }
+      return a.createdAt < b.createdAt ? -mult : a.createdAt > b.createdAt ? mult : 0;
     });
   }, [
     storeOrders,

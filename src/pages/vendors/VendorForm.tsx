@@ -38,6 +38,7 @@ import { useInitFormFromFetch } from '@/hooks';
 import { perms } from '@/utils/permission';
 import { SectionCard } from '@/components/SectionCard';
 import type { Vendor, VendorContact, VendorExtra, VendorPickupAddress } from '@/types';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 
@@ -532,8 +533,8 @@ export function VendorForm({ variant }: VendorFormProps) {
 
       <Divider />
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      {}
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Grid gutter="md">
             <Grid.Col span={{ base: 12, md: 7 }}>
@@ -562,7 +563,7 @@ export function VendorForm({ variant }: VendorFormProps) {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

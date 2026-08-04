@@ -27,6 +27,7 @@ import { device } from '@credo/base-ui/utils';
 import { useInitFormFromFetch } from '@/hooks';
 import { perms } from '@/utils/permission';
 import type { Greenhouse, GreenhouseExtra } from '@/types';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 
@@ -208,8 +209,8 @@ export function GreenhouseFormPage() {
 
       <Title order={isMobile ? 4 : 3}>{pageTitle}</Title>
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      {}
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Card withBorder radius="md" padding="lg">
             <Group gap="xs" mb="xs">
@@ -311,7 +312,7 @@ export function GreenhouseFormPage() {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

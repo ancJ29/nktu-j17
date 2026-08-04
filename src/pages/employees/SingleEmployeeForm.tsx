@@ -38,6 +38,7 @@ import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { useEmployeeFieldOptions } from './useEmployeeFieldOptions';
 import { isInternal } from '@/config/env';
 import { pad } from '../fake-data/_sharedSeed';
+import { Form } from '@/components/Form';
 
 const hasEmail = hasEmailForEmployees();
 const hasDepartment = hasDepartmentForEmployees();
@@ -341,7 +342,7 @@ export function SingleEmployeeForm({
   ) : null;
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <Form form={form} onSubmit={onSubmit}>
       <Stack gap="md">
         {personalCard}
         {contactsCard}
@@ -357,6 +358,6 @@ export function SingleEmployeeForm({
           </Button>
         </Group>
       </Stack>
-    </form>
+    </Form>
   );
 }

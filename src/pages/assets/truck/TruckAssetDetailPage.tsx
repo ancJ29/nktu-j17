@@ -63,7 +63,13 @@ function useOilTankOptions() {
     if (!enabled) return undefined;
     return (items as OilTankRow[])
       .filter((tank) => tank.isActive && !tank.extra?.isDeleted)
-      .map((tank) => ({ value: tank.id, label: `${tank.code} — ${tank.name}`, code: tank.code }));
+      .map((tank) => ({
+        value: tank.id,
+        label: `${tank.code} — ${tank.name}`,
+        code: tank.code,
+
+        currentLevel: tank.extra?.currentLevel,
+      }));
   }, [enabled, items]);
 }
 

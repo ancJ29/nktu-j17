@@ -26,6 +26,8 @@ import { cMngtConnector, CallApiError } from '@credo/connectors/connector';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { SectionCard } from '@/components/SectionCard';
+import { SortHeader } from '@/components/SortHeader';
+import { QuickFilterChips } from '@/components/QuickFilterChips';
 import { formatDate } from '@/utils/dateFormat';
 import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
 import type { OperationLog, OperationLogExtra } from '@/types';
@@ -44,6 +46,7 @@ import {
   type TFn,
 } from './operationLogConfig';
 import { LogPhotoCell, LogPhotoField, LogPhotoGalleryModal } from './OperationLogPhotos';
+import { Form } from '@/components/Form';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -132,6 +135,12 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const [month, setMonth] = useState<string>('all');
 
+  const [bucket, setBucket] = useState<string>(config.quickFilters?.options[0]?.value ?? '');
+
+  const [entity, setEntity] = useState<string | null>(null);
+
+  const [sortKey, setSortKey] = useState<string>('');
+
   const [formOpened, formHandlers] = useDisclosure(false);
   const [editing, setEditing] = useState<OperationLog | null>(null);
   const [saving, setSaving] = useState(false);
@@ -180,7 +189,38 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     return logs.filter((l) => Number(datePart(l.logDate).slice(5, 7)) === m);
   }, [logs, month]);
 
-  const rows = useMemo(() => groupRows(visibleLogs, config.group), [visibleLogs, config.group]);
+  const entityOptions = useMemo(() => {
+    const valueOf = config.entityFilter?.valueOf;
+    if (!valueOf) return [];
+    const seen = new Set<string>();
+    for (const log of visibleLogs) {
+      const value = valueOf(log)?.trim();
+      if (value) seen.add(value);
+    }
+    return [...seen].sort((a, b) => a.localeCompare(b)).map((v) => ({ value: v, label: v }));
+  }, [visibleLogs, config.entityFilter]);
+
+  const filteredLogs = useMemo(() => {
+    const match = config.quickFilters?.options.find((o) => o.value === bucket)?.match;
+    const valueOf = config.entityFilter?.valueOf;
+    return visibleLogs.filter((log) => {
+      if (match && !match(log)) return false;
+      if (entity && valueOf?.(log)?.trim() !== entity) return false;
+      return true;
+    });
+  }, [visibleLogs, bucket, entity, config.quickFilters, config.entityFilter]);
+
+  const sortedLogs = useMemo(() => {
+    if (!sortKey) return filteredLogs;
+    const [field, dir] = sortKey.split('_');
+    const column = config.columns.find((c) => c.sortField === field && c.sortValue);
+    if (!column?.sortValue) return filteredLogs;
+    const mult = dir === 'asc' ? 1 : -1;
+    const valueOf = column.sortValue;
+    return [...filteredLogs].sort((a, b) => (valueOf(a) - valueOf(b)) * mult);
+  }, [filteredLogs, sortKey, config.columns]);
+
+  const rows = useMemo(() => groupRows(sortedLogs, config.group), [sortedLogs, config.group]);
 
   const load = useCallback(
     async (forYear: number) => {
@@ -265,6 +305,11 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const handleSubmit = useCallback(
     async (values: LogFormValues) => {
+      const errors = config.validateOnSubmit?.({ values, previous: editing, context, t: tr });
+      if (errors && Object.keys(errors).length > 0) {
+        form.setErrors(errors);
+        return;
+      }
       setSaving(true);
       const logDate = String(values.logDate);
 
@@ -330,7 +375,20 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         setSaving(false);
       }
     },
-    [editing, targetId, targetCode, year, config, photoCfg, tr, load, formHandlers, runAfterWrite],
+    [
+      editing,
+      targetId,
+      targetCode,
+      year,
+      config,
+      photoCfg,
+      tr,
+      load,
+      formHandlers,
+      runAfterWrite,
+      context,
+      form,
+    ],
   );
 
   const handleDelete = useCallback(async () => {
@@ -398,10 +456,25 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             onChange={switchYear}
             allowDeselect={false}
           />
+          {/* Hidden until the loaded period actually holds more than one value —
+              a picker offering a single option is a control that cannot do
+              anything, and one offering none is worse. */}
+          {config.entityFilter && entityOptions.length > 1 && (
+            <Select
+              size="xs"
+              w={160}
+              data={entityOptions}
+              value={entity}
+              onChange={setEntity}
+              placeholder={tr(config.entityFilter.labelKey)}
+              clearable
+              searchable={entityOptions.length > 8}
+            />
+          )}
           {config.export && (
             <Button
               onClick={() =>
-                config.export?.(visibleLogs, {
+                config.export?.(sortedLogs, {
                   targetId,
                   targetCode,
                   year,
@@ -416,7 +489,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               size="compact-sm"
               variant="default"
               leftSection={<IconDownload size={14} />}
-              disabled={visibleLogs.length === 0}
+              disabled={sortedLogs.length === 0}
             >
               {tr(config.exportLabelKey ?? 'operationLogs.exportExcel')}
             </Button>
@@ -434,11 +507,24 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         </Group>
       }
     >
+      {/* Above the empty-state branch on purpose: with a bucket selected and no
+          match, the chips must stay on screen or the operator has no way back
+          to the rows — only a "no entries" message and no visible cause. */}
+      {config.quickFilters && !loading && (
+        <QuickFilterChips
+          chips={config.quickFilters.options.map((option) => ({
+            key: option.value,
+            label: tr(option.labelKey),
+            active: bucket === option.value,
+            onClick: () => setBucket(option.value),
+          }))}
+        />
+      )}
       {loading ? (
         <Group justify="center" py="md">
           <Loader size="sm" />
         </Group>
-      ) : visibleLogs.length === 0 ? (
+      ) : sortedLogs.length === 0 ? (
         <Text size="sm" c="dimmed" ta="center" py="md">
           {tr(config.emptyKey, { year })}
         </Text>
@@ -450,7 +536,16 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                 {expandable && <Table.Th w={36} />}
                 {config.columns.map((col) => (
                   <Table.Th key={col.header} ta={col.align}>
-                    {tr(col.header)}
+                    {col.sortValue && col.sortField ? (
+                      <SortHeader
+                        label={tr(col.header)}
+                        field={col.sortField}
+                        current={sortKey}
+                        onChange={setSortKey}
+                      />
+                    ) : (
+                      tr(col.header)
+                    )}
                   </Table.Th>
                 ))}
                 {photoCfg && <Table.Th w={72}>{photoLabel}</Table.Th>}
@@ -459,7 +554,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             </Table.Thead>
             <Table.Tbody>
               {rows.map(({ log, grouped, firstOfGroup }, index) => {
-                const tone = config.rowTone?.(log, visibleLogs);
+                const tone = config.rowTone?.(log, sortedLogs);
                 const isOpen = expanded.has(log.id);
 
                 const locked = config.rowLocked?.(log) ?? false;
@@ -561,7 +656,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         </Table.ScrollContainer>
       )}
 
-      {!loading && visibleLogs.length > 0 && config.summary?.(visibleLogs, tr)}
+      {!loading && sortedLogs.length > 0 && config.summary?.(sortedLogs, tr)}
 
       <ResponsiveModal
         opened={formOpened}
@@ -569,7 +664,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         title={editing ? tr(config.editTitleKey) : tr(config.addTitleKey)}
         size={config.modalSize}
       >
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Form form={form} onSubmit={handleSubmit}>
           <Stack gap="md">
             {config.renderFields(form, tr, context)}
             {photoCfg && (
@@ -597,7 +692,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               </Button>
             </Group>
           </Stack>
-        </form>
+        </Form>
       </ResponsiveModal>
 
       {photoCfg && (

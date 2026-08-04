@@ -32,6 +32,7 @@ import { todayInVnDateString } from '@/utils/dateTimeField';
 import { perms } from '@/utils/permission';
 import type { OilTankExtra, OilTankRow } from '@/types';
 import { buildNextOilTankCode } from './oilTankCode';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 
@@ -238,8 +239,8 @@ export function OilTankFormPage() {
 
       <Title order={isMobile ? 4 : 3}>{pageTitle}</Title>
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      {}
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Card withBorder radius="md" padding="lg">
             <Group gap="xs" mb="xs">
@@ -353,7 +354,7 @@ export function OilTankFormPage() {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

@@ -64,6 +64,7 @@ import type {
   UnverifyEmailRequest,
   UnverifyEmailResponse,
   UpdateEmailConfigRequest,
+  UpdateProfileBody,
   UpdateEmailConfigResponse,
   UpdateProfileResponse,
   VerifyEmailRequest,
@@ -170,7 +171,7 @@ export const cSsoConnector = {
       storages: withAuth(token),
     }),
 
-  updateProfile: (token: string, profile: Record<string, unknown>) =>
+  updateProfile: (token: string, profile: UpdateProfileBody) =>
     ssoApi<UpdateProfileResponse>(SSO_ROUTES.UPDATE_PROFILE, {
       storages: withAuth(token),
       body: profile,

@@ -1,6 +1,11 @@
 import * as XLSX from 'xlsx';
 import { computeRefuelTotals, refuelConsumption } from '@/utils/refuelStats';
-import type { Material, OperationLog, Product } from '@/types';
+import type { MaintenanceLogExtra, Material, OperationLog, Product } from '@/types';
+import {
+  itemQuantity,
+  maintenanceLineTotal,
+  readMaintenanceItems,
+} from '@/pages/assets/truck/maintenanceItems';
 
 export class ExcelParseError extends Error {
   readonly missing: string[];
@@ -2050,4 +2055,87 @@ export const exportFleetRefuelLogsToExcel = (
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, safeName(periodLabel).slice(0, 31));
   XLSX.writeFile(workbook, `fleet_refuel_${fileTag}.xlsx`);
+};
+
+export const exportMaintenanceLogsToExcel = (
+  logs: ReadonlyArray<OperationLog>,
+  { language, periodLabel, fileTag, vehicleLabel }: RefuelExportOptions,
+) => {
+  const isVietnamese = language === 'vi';
+  const columns = isVietnamese
+    ? [
+        { header: 'Ngày', width: 12 },
+        { header: 'Loại', width: 16 },
+        { header: 'Nhà cung cấp', width: 20 },
+        { header: 'Hạng mục', width: 28 },
+        { header: 'Đơn giá', width: 14 },
+        { header: 'Số lượng', width: 10 },
+        { header: 'Thành tiền', width: 14 },
+        { header: 'Bảo hành (tháng)', width: 14 },
+        { header: 'Tiền công', width: 14 },
+        { header: 'Tổng cộng', width: 14 },
+        { header: 'Đã thanh toán', width: 14 },
+        { header: 'Công nợ', width: 14 },
+        { header: 'Ghi chú', width: 30 },
+      ]
+    : [
+        { header: 'Date', width: 12 },
+        { header: 'Type', width: 16 },
+        { header: 'Supplier', width: 20 },
+        { header: 'Item', width: 28 },
+        { header: 'Unit price', width: 14 },
+        { header: 'Qty', width: 10 },
+        { header: 'Line total', width: 14 },
+        { header: 'Warranty (months)', width: 16 },
+        { header: 'Labor', width: 14 },
+        { header: 'Total', width: 14 },
+        { header: 'Paid', width: 14 },
+        { header: 'Outstanding', width: 14 },
+        { header: 'Note', width: 30 },
+      ];
+
+  const dataRows: (number | string)[][] = [];
+  let totalGrand = 0;
+  let totalOutstanding = 0;
+
+  for (const log of logs) {
+    const e = (log.extra ?? {}) as MaintenanceLogExtra;
+    const items = readMaintenanceItems(e);
+    const grandTotal = Number(e.grandTotal ?? e.cost) || 0;
+    const outstanding = grandTotal - (Number(e.accountsReceived) || 0);
+    totalGrand += grandTotal;
+    totalOutstanding += outstanding;
+
+    const lines = items.length > 0 ? items : [undefined];
+    lines.forEach((item, index) => {
+      const first = index === 0;
+      dataRows.push([
+        first ? String(log.logDate).slice(0, 10) : '',
+        first ? (e.maintenanceTypeLabel ?? e.maintenanceType ?? '') : '',
+        first ? (e.supplier ?? '') : '',
+        item?.name ?? '',
+        item ? numCell(item.unitPrice) : '',
+        item ? itemQuantity(item) : '',
+        item ? maintenanceLineTotal(item) : '',
+        item?.warrantyMonths ?? '',
+        first ? numCell(e.laborCost) : '',
+        first ? grandTotal : '',
+        first ? numCell(e.accountsReceived) : '',
+        first ? outstanding : '',
+        first ? (e.note ?? '') : '',
+      ]);
+    });
+  }
+
+  const totalRow: (number | string)[] = new Array(columns.length).fill('');
+  totalRow[0] = isVietnamese ? 'Tổng' : 'Total';
+  totalRow[9] = totalGrand;
+  totalRow[11] = totalOutstanding;
+
+  const worksheet = XLSX.utils.aoa_to_sheet([columns.map((c) => c.header), ...dataRows, totalRow]);
+  worksheet['!cols'] = columns.map((c) => ({ width: c.width }));
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, safeName(periodLabel).slice(0, 31));
+  const vehiclePart = vehicleLabel ? `${safeName(vehicleLabel)}_` : '';
+  XLSX.writeFile(workbook, `maintenance_${vehiclePart}${fileTag}.xlsx`);
 };

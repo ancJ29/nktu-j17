@@ -5,7 +5,9 @@ import type { DataTableColumn } from '@credo/base-ui/components';
 import { CodeLabel, ColorBadge } from '@credo/base-ui/components';
 import { ROUTES } from '@/constants/routes';
 import { ActiveBadge } from '@/components/badges';
-import type { TruckAssetExtra, TruckAssetRow } from '@/types';
+import type { TruckAssetRow } from '@/types';
+import { SortHeader } from '@/components/SortHeader';
+import { TruckExpiryLines } from './TruckExpiryLines';
 
 type T = (key: string) => string;
 
@@ -14,6 +16,9 @@ export type TruckColumnsContext = {
   typeLabels: Map<string, string>;
   formatDate: (iso: string) => string;
   todayIso: string;
+
+  sortField?: string;
+  onSortChange?: (field: string) => void;
 };
 
 export type TruckConfig = {
@@ -25,39 +30,6 @@ export type TruckConfig = {
   cardSubtitle: (item: TruckAssetRow) => ReactNode;
   searchFields: (item: TruckAssetRow) => (string | undefined)[];
 };
-
-type ExpiryInfo = { date: string; kindKey: string; daysLeft: number; expired: boolean };
-
-function daysBetween(fromIso: string, toIso: string): number {
-  const [fy, fm, fd] = fromIso.split('-').map(Number);
-  const [ty, tm, td] = toIso.split('-').map(Number);
-  return Math.round((Date.UTC(ty, tm - 1, td) - Date.UTC(fy, fm - 1, fd)) / 86_400_000);
-}
-
-export function nearestExpiry(
-  extra: TruckAssetExtra | undefined,
-  todayIso: string,
-): ExpiryInfo | null {
-  if (!extra) return null;
-  const candidates: { date?: string; kindKey: string }[] = [
-    { date: extra.inspectionExpiry, kindKey: 'assets.truck.expiry.inspection' },
-    { date: extra.badgeExpiry, kindKey: 'assets.truck.expiry.badge' },
-    ...(extra.registrationType === 'copy'
-      ? [{ date: extra.registrationCopyExpiry, kindKey: 'assets.truck.expiry.registration' }]
-      : []),
-    ...(extra.insurances ?? []).map((i) => ({
-      date: i.expiry,
-      kindKey: 'assets.truck.expiry.insurance',
-    })),
-  ];
-  const dated = candidates.filter((c): c is { date: string; kindKey: string } => !!c.date);
-  if (dated.length === 0) return null;
-
-  dated.sort((a, b) => a.date.localeCompare(b.date));
-  const soonest = dated[0];
-  const daysLeft = daysBetween(todayIso, soonest.date);
-  return { date: soonest.date, kindKey: soonest.kindKey, daysLeft, expired: daysLeft < 0 };
-}
 
 function dimmed(value: string | number | undefined): ReactNode {
   return value !== undefined && value !== '' ? (
@@ -73,7 +45,7 @@ export const TRUCK_CONFIG: TruckConfig = {
   routes: ROUTES.ASSETS.TRUCKS,
   i18nKey: 'assets.truck',
   Icon: IconTruck,
-  columns: ({ t, typeLabels, formatDate, todayIso }) => [
+  columns: ({ t, typeLabels, formatDate, todayIso, sortField, onSortChange }) => [
     {
       key: 'name',
       header: t('common.labels.name'),
@@ -127,23 +99,20 @@ export const TRUCK_CONFIG: TruckConfig = {
     },
     {
       key: 'expiry',
-      header: t('assets.truck.columns.compliance'),
-      render: (i) => {
-        const info = nearestExpiry(i.extra, todayIso);
-        if (!info) return dimmed(undefined);
-        const color = info.expired ? 'red' : info.daysLeft <= 30 ? 'orange' : undefined;
-        return (
-          <Stack gap={0}>
-            <Text size="sm" c={color} fw={color ? 600 : undefined}>
-              {formatDate(info.date)}
-            </Text>
-            <Text size="xs" c="dimmed">
-              {t(info.kindKey)}
-              {info.expired ? ` · ${t('assets.truck.expiry.expired')}` : ''}
-            </Text>
-          </Stack>
-        );
-      },
+
+      header: (
+        <SortHeader
+          label={t('assets.truck.columns.compliance')}
+          field="expiry"
+          current={sortField}
+          onChange={onSortChange}
+          firstDir="asc"
+        />
+      ),
+
+      render: (i) => (
+        <TruckExpiryLines extra={i.extra} todayIso={todayIso} t={t} formatDate={formatDate} />
+      ),
     },
     {
       key: 'status',

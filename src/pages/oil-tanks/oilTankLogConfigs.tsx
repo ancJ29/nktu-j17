@@ -13,8 +13,13 @@ import {
   type LogFormValues,
   type OperationLogConfig,
 } from '@/pages/operation-logs/operationLogConfig';
-import { OIL_TANK_ISSUE_LOG_TYPE, OIL_TANK_REFILL_LOG_TYPE } from './oilTankBalance';
+import {
+  OIL_TANK_ISSUE_LOG_TYPE,
+  OIL_TANK_REFILL_LOG_TYPE,
+  issueExceedsStock,
+} from './oilTankBalance';
 import { applyMovementToTankLevel } from './tankMovements';
+import { IssueTruckDriverFields } from './IssueTruckDriverFields';
 
 function textCell(value: string | undefined): ReactNode {
   return value ? (
@@ -224,6 +229,9 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     litres: '',
     unitPrice: '',
     totalAmount: '',
+    truckId: '',
+    truckCode: '',
+    driverName: '',
     note: '',
   },
   columns: [
@@ -250,10 +258,28 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     litres: (v) =>
       v !== '' && Number(v) > 0 ? null : t('oilTanks.logs.validation.litresRequired'),
   }),
+
+  validateOnSubmit: ({ values, previous, context, t }) => {
+    const { refused, available } = issueExceedsStock({
+      litres: values.litres,
+      currentLevel: context?.tankCurrentLevel,
+      previousLitres: Number(previous?.extra?.litres) || 0,
+    });
+    if (!refused) return null;
+    return {
+      litres: t('oilTanks.logs.validation.exceedsStock', {
+        available: formatNumber(available ?? 0),
+      }),
+    };
+  },
   buildExtra: (values): Partial<OilTankIssueLogExtra> => ({
     ...(values.litres !== '' && { litres: Number(values.litres) }),
     ...(values.unitPrice !== '' && { unitPrice: Number(values.unitPrice) }),
     ...(values.totalAmount !== '' && { totalAmount: Number(values.totalAmount) }),
+
+    ...(String(values.truckId).trim() && { truckId: String(values.truckId).trim() }),
+    ...(String(values.truckCode).trim() && { truckCode: String(values.truckCode).trim() }),
+    ...(String(values.driverName).trim() && { driverName: String(values.driverName).trim() }),
     ...(String(values.note).trim() && { note: String(values.note).trim() }),
   }),
   toForm: (log): LogFormValues => {
@@ -263,10 +289,13 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
       litres: e.litres ?? '',
       unitPrice: e.unitPrice ?? '',
       totalAmount: e.totalAmount ?? '',
+      truckId: e.truckId ?? '',
+      truckCode: e.truckCode ?? '',
+      driverName: e.driverName ?? '',
       note: e.note ?? '',
     };
   },
-  renderFields: (form, t) => (
+  renderFields: (form, t, ctx) => (
     <>
       <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
         <DatePickerField
@@ -299,6 +328,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
           }}
         />
       </SimpleGrid>
+      <IssueTruckDriverFields form={form} t={t} ctx={ctx} />
       <Textarea
         label={t('__new__.01-common.labels.note')}
         placeholder={t('oilTanks.logs.issue.form.notePlaceholder')}

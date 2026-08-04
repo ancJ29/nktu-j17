@@ -58,6 +58,7 @@ import { useTruckFormSave } from './useTruckFormSave';
 import { syncDriverLinkFromTruck } from '@/utils/driverTruckLink';
 import { useLookupV2Options } from '@/hooks/useLookupV2Options';
 import { buildNextTruckCode, FALLBACK_PAD, FALLBACK_PREFIX, TYPE_PAD } from './truckCode';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 const ROUTES_T = ROUTES.ASSETS.TRUCKS;
@@ -483,8 +484,8 @@ export function TruckAssetFormPage() {
 
       <Title order={isMobile ? 4 : 3}>{pageTitle}</Title>
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      {}
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           {/* Two-column card layout on desktop (PC); collapses to one column on
               mobile — the tall truck form uses horizontal space rather than one
@@ -855,7 +856,7 @@ export function TruckAssetFormPage() {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

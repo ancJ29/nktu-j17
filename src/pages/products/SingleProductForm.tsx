@@ -44,6 +44,7 @@ import {
   perms,
 } from '@/utils/permission';
 import { NumberField } from '@/components/NumberField';
+import { Form } from '@/components/Form';
 
 export type ProductFormValues = {
   name: string;
@@ -713,7 +714,7 @@ export function SingleProductForm({
   ) : null;
 
   return (
-    <form onSubmit={form.onSubmit(onSubmit)}>
+    <Form form={form} onSubmit={onSubmit}>
       <Stack gap="md">
         <Grid gutter="md">
           <Grid.Col span={{ base: 12, md: 7 }}>
@@ -743,6 +744,6 @@ export function SingleProductForm({
           </Button>
         </Group>
       </Stack>
-    </form>
+    </Form>
   );
 }

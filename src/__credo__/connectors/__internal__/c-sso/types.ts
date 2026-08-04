@@ -60,9 +60,10 @@ export type GetProfileResponse<T extends Record<string, unknown> = Record<string
   mfaEnabled: boolean;
 };
 
+export type UpdateProfileBody = Record<string, unknown>;
 export type UpdateProfileRequest = {
   token: string;
-  profile: Record<string, unknown>;
+  profile: UpdateProfileBody;
 };
 export type UpdateProfileResponse = BaseResponse;
 
@@ -235,15 +236,24 @@ export type AddServiceRequest = {
 };
 export type AddServiceResponse = BaseResponse;
 
+export type EmailAction = 'verification' | 'password-reset' | 'email-change' | 'login-token';
+
+export type EmailConfigInput = {
+  emailFrom?: string;
+  emailSubject?: string;
+  emailHtml?: string;
+  emailText?: string;
+};
+export type UrlConfigInput = {
+  baseUrl?: string;
+};
+export type EmailConfigsInput = Partial<Record<EmailAction, EmailConfigInput>>;
+export type UrlConfigsInput = Partial<Record<EmailAction, UrlConfigInput>>;
+
 export type UpdateEmailConfigRequest = {
   serviceCode: string;
-  action: 'verification' | 'password-reset' | 'email-change' | 'login-token';
-  config: {
-    emailFrom?: string;
-    emailSubject?: string;
-    emailHtml?: string;
-    emailText?: string;
-  };
+  action: EmailAction;
+  config: EmailConfigInput;
 };
 export type UpdateEmailConfigResponse = BaseResponse;
 
@@ -269,23 +279,8 @@ export type AddConfigRecordRequest = {
   allowMagicLink?: boolean;
   allowForgotPassword?: boolean;
   allowResetPassword?: boolean;
-  emailConfigs: Record<
-    string,
-    | {
-        emailFrom?: string;
-        emailSubject?: string;
-        emailHtml?: string;
-        emailText?: string;
-      }
-    | undefined
-  >;
-  urlConfigs?: Record<
-    string,
-    | {
-        baseUrl?: string;
-      }
-    | undefined
-  >;
+  emailConfigs: EmailConfigsInput;
+  urlConfigs?: UrlConfigsInput;
 };
 export type AddConfigRecordResponse = BaseResponse;
 

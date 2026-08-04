@@ -63,6 +63,7 @@ import type {
 } from '@/types';
 import { TemplateDaysEditor } from './TemplateDaysEditor';
 import { WateringPlanEditor } from './WateringPlanEditor';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 
@@ -341,7 +342,7 @@ export function CropDiaryTemplateFormPage() {
     : t('cropDiaryTemplates.form.createButton');
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)}>
+    <Form form={form} onSubmit={handleSubmit}>
       <Stack gap="lg">
         {/* Top action bar — Cancel + Save reachable without scrolling past a long
             day plan. */}
@@ -500,6 +501,6 @@ export function CropDiaryTemplateFormPage() {
           </Card>
         </Stack>
       </Stack>
-    </form>
+    </Form>
   );
 }

@@ -28,6 +28,7 @@ import { applyDelta, readRowBreakdown } from '@/utils/inventoryMath';
 import { getBeginOfPeriodValue, getCurrentPeriodKey } from '@/utils/inventoryPeriod';
 import { type BeginOfPeriodMode, computeBeginOfPeriodChange } from '@/utils/inventoryBeginOfPeriod';
 import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { Form } from '@/components/Form';
 
 type Props = {
   readonly opened: boolean;
@@ -219,7 +220,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
       title={t('productInventory.beginOfPeriod.title', { period: formatPeriod(periodKey) })}
       size="lg"
     >
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <ProductSelector
             label={t('common.labels.product')}
@@ -345,7 +346,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </ResponsiveModal>
   );
 }

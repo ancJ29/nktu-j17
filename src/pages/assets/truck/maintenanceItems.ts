@@ -5,11 +5,21 @@ export function readMaintenanceItems(e: MaintenanceLogExtra | undefined): Mainte
   const legacyName = e?.item?.trim();
   const legacyPrice = e?.totalAmount ?? e?.unitPrice;
   if (!legacyName && legacyPrice == null) return [];
+
   return [{ name: legacyName ?? '', unitPrice: legacyPrice ?? 0 }];
 }
 
+export function itemQuantity(item: Pick<MaintenanceItem, 'quantity'>): number {
+  const value = Number(item.quantity);
+  return Number.isFinite(value) && value > 0 ? value : 1;
+}
+
+export function maintenanceLineTotal(item: MaintenanceItem): number {
+  return (Number(item.unitPrice) || 0) * itemQuantity(item);
+}
+
 export function maintenanceItemsTotal(items: MaintenanceItem[]): number {
-  return items.reduce((sum, it) => sum + (Number(it.unitPrice) || 0), 0);
+  return items.reduce((sum, it) => sum + maintenanceLineTotal(it), 0);
 }
 
 export function warrantyExpiry(

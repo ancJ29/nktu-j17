@@ -27,6 +27,34 @@ export function movementDelta(
   return (next ? signedLitres(next) : 0) - (previous ? signedLitres(previous) : 0);
 }
 
+export function issueHeadroom(
+  currentLevel: number | undefined | null,
+  previousLitres = 0,
+): number | null {
+  if (typeof currentLevel !== 'number' || !Number.isFinite(currentLevel)) return null;
+  const previous = Number.isFinite(previousLitres) ? previousLitres : 0;
+
+  return Math.round((currentLevel + previous) * 100) / 100;
+}
+
+export function issueExceedsStock(args: {
+  litres: unknown;
+  currentLevel: number | undefined | null;
+
+  previousLitres?: number;
+}): { refused: boolean; available: number | null } {
+  const previous = Number.isFinite(args.previousLitres) ? (args.previousLitres as number) : 0;
+  const available = issueHeadroom(args.currentLevel, previous);
+  if (available === null) return { refused: false, available };
+
+  const value = Number(args.litres);
+  if (!Number.isFinite(value) || value <= 0) return { refused: false, available };
+
+  const rounded = Math.round(value * 100) / 100;
+  if (rounded <= previous) return { refused: false, available };
+  return { refused: rounded > available, available };
+}
+
 export function movementYears(fromYear: number, toYear: number): number[] {
   if (!Number.isFinite(fromYear) || !Number.isFinite(toYear)) return [toYear];
   if (fromYear > toYear) return [toYear];

@@ -40,6 +40,7 @@ import {
   MAX_DOC_CODE_RETRIES,
   type WarehouseDocKind,
 } from './kinds';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 
@@ -431,8 +432,8 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
         </Text>
       )}
 
-      {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-      <form onSubmit={form.onSubmit(handleSubmit)}>
+      {}
+      <Form form={form} onSubmit={handleSubmit}>
         <Stack gap="md">
           <Card withBorder radius="md" padding="lg">
             <Group gap="xs" mb="xs">
@@ -611,7 +612,7 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
             </Button>
           </Group>
         </Stack>
-      </form>
+      </Form>
     </Stack>
   );
 }

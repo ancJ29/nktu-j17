@@ -71,6 +71,7 @@ import {
 } from './deliveryRequestFormShared';
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 const pricingEnabled = isPricingManagementEnabled();
@@ -525,8 +526,8 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
       <Title order={3}>{pageTitle}</Title>
 
       <Card withBorder radius="md" p="xl">
-        {/* eslint-disable-next-line react-hooks/refs -- Mantine form.onSubmit() builds the submit handler during render by design; the internal ref read is safe. */}
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        {}
+        <Form form={form} onSubmit={handleSubmit}>
           <Stack gap="md">
             <TextInput
               label={t('deliveryRequests.form.requestNumberLabel')}
@@ -745,7 +746,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
               </Button>
             </Group>
           </Stack>
-        </form>
+        </Form>
       </Card>
     </Stack>
   );

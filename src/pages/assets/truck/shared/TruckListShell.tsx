@@ -20,14 +20,34 @@ import { MobileFilterBar } from '@/components/MobileFilterBar';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { perms } from '@/utils/permission';
 import type { TruckAssetRow } from '@/types';
+import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
+import { useLookupV2Options } from '@/hooks/useLookupV2Options';
+import { expirySortKey, matchesUrgency, type ExpiryUrgency } from '../truckExpiry';
 import { TRUCK_CONFIG } from '../truckConfig';
+import { TruckExpiryLines } from '../TruckExpiryLines';
 
 const isMobile = device.isMobile;
 const canCreate = perms.truck.canCreate();
 
 type FilterStatus = 'all' | 'active' | 'inactive';
-type TruckFilters = { status: FilterStatus; search: string; page: number };
-const FILTER_DEFAULTS: TruckFilters = { status: 'active', search: '', page: 1 };
+type TruckFilters = {
+  status: FilterStatus;
+
+  truckType: string;
+  urgency: ExpiryUrgency;
+
+  sort: string;
+  search: string;
+  page: number;
+};
+const FILTER_DEFAULTS: TruckFilters = {
+  status: 'active',
+  truckType: '',
+  urgency: 'all',
+  sort: '',
+  search: '',
+  page: 1,
+};
 
 export function TruckListShell({ headerExtraActions }: { headerExtraActions?: ReactNode }) {
   const { t } = useTranslation();
@@ -58,16 +78,40 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
     clearFilters,
   } = useCachedListFilters('cmngt:truck-asset-list-filters', FILTER_DEFAULTS);
   const filter = filterState.status;
+  const { truckType, urgency, sort } = filterState;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
+  const setTruckType = useCallback(
+    (v: string | null) => updateState({ truckType: v ?? '', page: 1 }),
+    [updateState],
+  );
+  const setUrgency = useCallback(
+    (v: ExpiryUrgency) => updateState({ urgency: v, page: 1 }),
+    [updateState],
+  );
+  const setSort = useCallback((v: string) => updateState({ sort: v, page: 1 }), [updateState]);
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
+  const todayIso = todayInVnDateString();
+
+  const ordered = useMemo(() => {
+    if (!sort) return trucks;
+    const [field, dir] = sort.split('_');
+    if (field !== 'expiry') return trucks;
+    const mult = dir === 'asc' ? 1 : -1;
+    return [...trucks].sort(
+      (a, b) => (expirySortKey(a.extra, todayIso) - expirySortKey(b.extra, todayIso)) * mult,
+    );
+  }, [trucks, sort, todayIso]);
+
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
-    useListFilter(trucks, {
-      filters: { status: filter },
+    useListFilter(ordered, {
+      filters: { status: filter, truckType, urgency },
       filterFn: (item, f) => {
         if (f.status === 'active' && !item.isActive) return false;
         if (f.status === 'inactive' && item.isActive) return false;
+        if (f.truckType && item.extra?.truckType !== f.truckType) return false;
+        if (!matchesUrgency(item.extra, todayIso, f.urgency as ExpiryUrgency)) return false;
         return true;
       },
       searchFields: (item) => TRUCK_CONFIG.searchFields(item).filter((v): v is string => !!v),
@@ -77,7 +121,11 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
       onPageChange,
     });
 
-  const hasActiveFilters = !!search || filter !== FILTER_DEFAULTS.status;
+  const hasActiveFilters =
+    !!search ||
+    filter !== FILTER_DEFAULTS.status ||
+    truckType !== FILTER_DEFAULTS.truckType ||
+    urgency !== FILTER_DEFAULTS.urgency;
 
   useEffect(() => {
     if (!initialized && !error) loadAll();
@@ -95,15 +143,31 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
 
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
   const typeLabels = useLookupV2Labels('truck-type');
+
+  const typeOptions = useLookupV2Options('truck-type');
+
+  const urgencyChips: QuickFilterChip[] = useMemo(
+    () =>
+      (['all', 'within7', 'within30', 'expired'] as const).map((key) => ({
+        key,
+        label: tk(`${i18nKey}.urgency.${key}`),
+        active: urgency === key,
+        onClick: () => setUrgency(key),
+      })),
+
+    [t, i18nKey, urgency, setUrgency],
+  );
   const columns = useMemo(
     () =>
       TRUCK_CONFIG.columns({
         t: (k) => t(k as never),
         typeLabels,
         formatDate,
-        todayIso: todayInVnDateString(),
+        todayIso,
+        sortField: sort,
+        onSortChange: setSort,
       }),
-    [t, typeLabels],
+    [t, typeLabels, todayIso, sort, setSort],
   );
 
   return (
@@ -141,6 +205,14 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
+            filters={[
+              {
+                title: tk(`${i18nKey}.filters.truckType`),
+                value: truckType,
+                options: [{ value: '', label: t('__new__.01-common.filters.all') }, ...typeOptions],
+                onChange: setTruckType,
+              },
+            ]}
             hasActiveFilters={hasActiveFilters}
             onClear={clearFilters}
             labelChips
@@ -157,10 +229,22 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
+            filters={[
+              {
+                value: truckType || null,
+                onChange: setTruckType,
+                data: typeOptions,
+                placeholder: tk(`${i18nKey}.filters.truckType`),
+
+                searchable: typeOptions.length > 8,
+                w: 170,
+              },
+            ]}
             hasActiveFilters={hasActiveFilters}
             onClear={clearFilters}
           />
         )}
+        <QuickFilterChips chips={urgencyChips} />
       </StickyListChrome>
 
       {isMobile ? (
@@ -222,6 +306,17 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
                   </Text>
                 )}
               </Group>
+              {/* Compliance was desktop-only until 2026-08-05 — a phone user
+                  could not see a lapsing truck at all. `urgentOnly` keeps the
+                  card silent unless something is actually inside the window: a
+                  column has a header to justify a far-off date, a card doesn't. */}
+              <TruckExpiryLines
+                extra={item.extra}
+                todayIso={todayInVnDateString()}
+                t={tk}
+                formatDate={formatDate}
+                urgentOnly
+              />
             </Stack>
           )}
         />

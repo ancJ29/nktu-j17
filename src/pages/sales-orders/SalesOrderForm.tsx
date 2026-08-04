@@ -142,6 +142,7 @@ import {
 import { convertUnit } from '@/utils/unitConversion';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { Form } from '@/components/Form';
 
 const locationsEnabled = isLocationsEnabled();
 const deliveryRequestsEnabled = isDeliveryRequestsEnabled();
@@ -1763,13 +1764,15 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       <Title order={3}>{pageTitle}</Title>
 
       <Card withBorder radius="md" p="xl">
-        <form
-          onSubmit={form.onSubmit(handleSubmit, () => {
+        <Form
+          form={form}
+          onSubmit={handleSubmit}
+          onError={() => {
             notifications.show({
               color: 'red',
               message: t('common.validation.formInvalid'),
             });
-          })}
+          }}
         >
           <Stack gap="md">
             {/* Initial-status intent — create-only, only when the initial
@@ -2298,7 +2301,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               </Button>
             </Group>
           </Stack>
-        </form>
+        </Form>
       </Card>
 
       {/* Per-line product photos. Keyed by code so switching lines remounts it

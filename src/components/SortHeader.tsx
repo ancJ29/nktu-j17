@@ -6,11 +6,14 @@ export function SortHeader({
   field,
   current,
   onChange,
+  firstDir = 'desc',
 }: {
   readonly label: string;
   readonly field: string;
   readonly current?: string;
   readonly onChange?: (field: string) => void;
+
+  readonly firstDir?: 'asc' | 'desc';
 }) {
   if (!onChange) return <>{label}</>;
   const [curField, curDir] = (current ?? '').split('_');
@@ -21,7 +24,9 @@ export function SortHeader({
       gap={4}
       wrap="nowrap"
       onClick={() =>
-        onChange(isActive ? `${field}_${curDir === 'desc' ? 'asc' : 'desc'}` : `${field}_desc`)
+        onChange(
+          isActive ? `${field}_${curDir === 'desc' ? 'asc' : 'desc'}` : `${field}_${firstDir}`,
+        )
       }
       style={{ cursor: 'pointer', userSelect: 'none' }}
     >

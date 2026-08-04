@@ -47,6 +47,7 @@ import { todayInVnDateString } from '@/utils/dateTimeField';
 import { perms } from '@/utils/permission';
 import { CROP_CODE_PREFIX, type Crop, type CropExtra, type Greenhouse } from '@/types';
 import { CropStatusBadge } from './CropStatusBadge';
+import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
 const canView = perms.crop.canView();
@@ -432,7 +433,7 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
         onClose={formHandlers.close}
         title={t('crops.addItem')}
       >
-        <form onSubmit={form.onSubmit(handleSubmit)}>
+        <Form form={form} onSubmit={handleSubmit}>
           <Stack gap="md">
             <TextInput
               label={t('crops.form.greenhouseLabel')}
@@ -545,7 +546,7 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
               </Button>
             </Group>
           </Stack>
-        </form>
+        </Form>
       </ResponsiveModal>
     </Card>
   );

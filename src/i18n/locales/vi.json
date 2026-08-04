@@ -363,6 +363,9 @@
         "insurance": "Bảo hiểm",
         "registration": "Đăng ký"
       },
+      "filters": {
+        "truckType": "Loại xe"
+      },
       "fleetExport": {
         "button": "Xuất nhật ký dầu đội xe",
         "empty": "Không có nhật ký đổ dầu trong kỳ đã chọn",
@@ -437,8 +440,14 @@
         "yearPlaceholder": "vd. 2021"
       },
       "noItems": "Không tìm thấy xe",
-      "searchPlaceholder": "Tìm xe tải…",
+      "searchPlaceholder": "Tìm xe…",
       "title": "Quản lý xe",
+      "urgency": {
+        "all": "Tất cả",
+        "within7": "Trong 7 ngày",
+        "within30": "Trong 30 ngày",
+        "expired": "Đã quá hạn"
+      },
       "validation": {
         "capacityInvalid": "Tải trọng không được âm",
         "dimensionInvalid": "Kích thước không được âm",
@@ -2452,7 +2461,9 @@
         "editItem": "Sửa phiếu xuất",
         "empty": "Chưa có phiếu xuất nào trong năm {{year}}",
         "form": {
-          "notePlaceholder": "Ghi chú về lần xuất này"
+          "driverPlaceholder": "Tên lái xe",
+          "notePlaceholder": "Ghi chú về lần xuất này",
+          "truckPlaceholder": "Chọn xe"
         },
         "sectionTitle": "Xuất dầu",
         "summary": {
@@ -2482,6 +2493,7 @@
         }
       },
       "validation": {
+        "exceedsStock": "Số lít xuất vượt quá tồn kho hiện có, chỉ còn {{available}} L",
         "litresRequired": "Nhập số lít"
       }
     },
@@ -2575,18 +2587,25 @@
         "date": "Ngày",
         "item": "Hạng mục",
         "laborCost": "Tiền công",
+        "lineTotal": "Thành tiền",
         "odometer": "Số km",
         "outstanding": "Công nợ",
         "photos": "Hoá đơn",
+        "quantity": "Số lượng",
         "supplier": "Nhà cung cấp",
         "total": "Tổng cộng",
-        "totalAmount": "Thành tiền",
+        "totalAmount": "Tổng hạng mục",
         "type": "Loại",
         "unitPrice": "Đơn giá",
         "warranty": "Bảo hành"
       },
       "editItem": "Sửa bảo trì",
       "empty": "Chưa có lịch sử bảo trì năm {{year}}.",
+      "filters": {
+        "all": "Tất cả",
+        "settled": "Đã thanh toán đủ",
+        "unpaid": "Còn nợ"
+      },
       "form": {
         "addItemLine": "Thêm hạng mục",
         "conditionPlaceholder": "vd. Mới / Đã qua sử dụng",
@@ -2599,7 +2618,7 @@
         "outstandingHint": "Tổng cộng − Đã thanh toán (tự động)",
         "removeItemLine": "Xóa hạng mục",
         "supplierPlaceholder": "Gara / nhà cung cấp",
-        "totalAmountHint": "Tổng các hạng mục (tự động)",
+        "totalAmountHint": "Đơn giá × Số lượng (tự động)",
         "typePlaceholder": "Chọn loại bảo trì",
         "warrantyPlaceholder": "Không"
       },
@@ -3855,10 +3874,10 @@
     },
     "columns": {
       "bill": "Số B/L · B/K",
-      "billContainer": "Số B/L · Cont",
       "container": "Số cont",
+      "containerBill": "Số cont · B/L",
       "date": "Ngày",
-      "orderNumber": "Số đơn",
+      "driver": "Tài xế · Xe",
       "route": "Tuyến",
       "truck": "Xe"
     },

@@ -1,24 +1,17 @@
 import { useMemo, type Ref } from 'react';
 import { useNavigate } from 'react-router';
-import { Badge, Box, Stack, Text } from '@mantine/core';
+import { Badge, Box, Group, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { TransportOrder } from '@/types';
 import { ColorBadge, DataTable } from '@credo/base-ui/components';
-import { formatDate } from '@/utils/dateFormat';
+import { formatDate, formatTime } from '@/utils/dateFormat';
 import { SortHeader } from '@/components/SortHeader';
 import { findStatus } from './transportOrderStatuses';
 import { useShipmentTypeLabel } from './shipmentType';
+import { orderPlanAt, orderPlanDate } from './planDate';
 import { TransportRouteCell } from './TransportRouteCell';
-
-type Props = {
-  readonly orders: TransportOrder[];
-  readonly isLoading?: boolean;
-  readonly viewportRef?: Ref<HTMLDivElement>;
-
-  readonly sortField?: string;
-  readonly onSortChange?: (field: string) => void;
-};
+import { TransportDriverCell } from './TransportDriverCell';
 
 export function TransportOrderDataTable({
   orders,
@@ -26,7 +19,14 @@ export function TransportOrderDataTable({
   viewportRef,
   sortField,
   onSortChange,
-}: Props) {
+}: {
+  readonly orders: TransportOrder[];
+  readonly isLoading?: boolean;
+  readonly viewportRef?: Ref<HTMLDivElement>;
+
+  readonly sortField?: string;
+  readonly onSortChange?: (field: string) => void;
+}) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const shipmentTypeLabel = useShipmentTypeLabel();
@@ -34,23 +34,7 @@ export function TransportOrderDataTable({
   const columns = useMemo(
     () => [
       {
-        key: 'orderNumber',
-        header: t('transportOrders.columns.orderNumber'),
-        width: '150px',
-
-        render: (item: TransportOrder) => (
-          <Stack gap={4} align="flex-start">
-            <Text fz="md" fw={500}>
-              {item.orderNumber}
-            </Text>
-            {item.shipmentType && (
-              <ColorBadge size="xs" label={shipmentTypeLabel(item.shipmentType)} />
-            )}
-          </Stack>
-        ),
-      },
-      {
-        key: 'entryDate',
+        key: 'planDate',
         header: (
           <SortHeader
             label={t('transportOrders.columns.date')}
@@ -59,35 +43,69 @@ export function TransportOrderDataTable({
             onChange={onSortChange}
           />
         ),
-        width: '120px',
-        render: (item: TransportOrder) => <Text fz="sm">{formatDate(item.entryDate)}</Text>,
-      },
-      {
-        key: 'billContainer',
-        header: t('transportOrders.columns.billContainer'),
-        width: '160px',
-
-        render: (item: TransportOrder) => (
-          <Stack gap={2}>
-            <Text fz="sm" lineClamp={1}>
-              {item.billNumber || '—'}
-            </Text>
-            {item.containerNumber && (
-              <Text size="xs" c="dimmed" lineClamp={1}>
-                {item.containerNumber}
+        width: '135px',
+        render: (item: TransportOrder) => {
+          const time = formatTime(orderPlanAt(item));
+          return (
+            <Stack gap={2} align="flex-start">
+              <Group gap={6} wrap="nowrap" align="baseline">
+                <Text fz="sm" fw={500}>
+                  {formatDate(orderPlanDate(item))}
+                </Text>
+                {time && (
+                  <Text fz="xs" c="dimmed" ff="monospace">
+                    {time}
+                  </Text>
+                )}
+              </Group>
+              <Text fz="xs" c="dimmed" ff="monospace">
+                {item.orderNumber}
               </Text>
-            )}
-          </Stack>
-        ),
+            </Stack>
+          );
+        },
       },
       {
         key: 'customer',
         header: t('common.labels.customer'),
-        width: '200px',
+        width: '150px',
         render: (item: TransportOrder) => (
-          <Text fz="md" lineClamp={2}>
+          <Text fz="sm" lineClamp={2}>
             {item.customerName || '—'}
           </Text>
+        ),
+      },
+      {
+        key: 'shipmentType',
+        header: t('transportOrders.form.shipmentType'),
+        width: '110px',
+
+        render: (item: TransportOrder) =>
+          item.shipmentType ? (
+            <ColorBadge size="sm" label={shipmentTypeLabel(item.shipmentType)} />
+          ) : null,
+      },
+      {
+        key: 'driver',
+        header: t('transportOrders.columns.driver'),
+        width: '185px',
+        render: (item: TransportOrder) => <TransportDriverCell order={item} />,
+      },
+      {
+        key: 'containerBill',
+        header: t('transportOrders.columns.containerBill'),
+        width: '155px',
+        render: (item: TransportOrder) => (
+          <Stack gap={2}>
+            <Text fz="sm" ff="monospace" fw="bold" lineClamp={1}>
+              {item.containerNumber || '—'}
+            </Text>
+            {item.billNumber && (
+              <Text fz="xs" c="dimmed" ff="monospace" fw="bold" lineClamp={1}>
+                {item.billNumber}
+              </Text>
+            )}
+          </Stack>
         ),
       },
       {
@@ -100,7 +118,8 @@ export function TransportOrderDataTable({
         key: 'status',
         header: t('__new__.01-common.labels.status'),
         ta: 'center' as const,
-        width: '150px',
+
+        width: '165px',
         render: (item: TransportOrder) => {
           const status = findStatus(item.status);
           return (

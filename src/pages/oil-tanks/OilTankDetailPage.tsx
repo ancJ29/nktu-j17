@@ -24,7 +24,7 @@ import {
   IconRuler2,
   IconTruckLoading,
 } from '@tabler/icons-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 import { Tabs } from '@credo/base-ui/components';
@@ -37,15 +37,17 @@ import { SectionCard } from '@/components/SectionCard';
 import { StatPill } from '@/components/StatPill';
 import { NotFoundState } from '@/components/NotFoundState';
 import { useOilTankStore, OIL_TANK_RECORD_TARGET } from '@/stores/useOilTankStore';
+import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
+import { featureFlags } from '@/utils/features';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import { perms } from '@/utils/permission';
-import type { OilTankRow } from '@/types';
+import type { OilTankRow, TruckAssetRow } from '@/types';
 import { OperationLogSection } from '@/pages/operation-logs/OperationLogSection';
 import { OilTankDangerZone } from './OilTankDangerZone';
 import { OIL_TANK_ISSUE_LOG_CONFIG, OIL_TANK_REFILL_LOG_CONFIG } from './oilTankLogConfigs';
 import { recomputeTankLevel } from './tankMovements';
-import { fillPercent, levelTone } from './oilTankLevel';
+import { LEVEL_TONE_COLOR, barPercent, fillPercent, levelTone } from './oilTankLevel';
 
 const isMobile = device.isMobile;
 const canEdit = perms.oilTank.canEdit();
@@ -57,11 +59,31 @@ const TANK_LOG_PERMS = {
   canDelete: perms.oilTank.canDelete(),
 };
 
-const TONE_COLOR = { danger: 'red', warning: 'orange', neutral: 'primary' } as const;
+function useIssueTruckOptions() {
+  const enabled = featureFlags.trucks.enabled && perms.truck.canView();
+  const items = useTruckAssetStore((s) => s.items);
+  const initialized = useTruckAssetStore((s) => s.initialized);
+  const loadAll = useTruckAssetStore((s) => s.loadAll);
+  useEffect(() => {
+    if (enabled && !initialized) loadAll();
+  }, [enabled, initialized, loadAll]);
+  return useMemo(() => {
+    if (!enabled) return undefined;
+    return (items as TruckAssetRow[])
+      .filter((truck) => truck.isActive && !truck.extra?.isDeleted)
+      .map((truck) => ({
+        value: truck.id,
+        label: truck.extra?.plateNumber ? `${truck.name} · ${truck.extra.plateNumber}` : truck.name,
+        code: truck.code,
+        driverName: truck.extra?.driverName,
+      }));
+  }, [enabled, items]);
+}
 
 export function OilTankDetailPage() {
   const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
+  const truckOptions = useIssueTruckOptions();
 
   const [fetched, setFetched] = useState<OilTankRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -137,6 +159,7 @@ export function OilTankDetailPage() {
 
   const extra = tank.extra ?? {};
   const pct = fillPercent(extra);
+  const barPct = barPercent(extra);
   const tone = levelTone(extra);
   const hasLevel = typeof extra.currentLevel === 'number';
 
@@ -147,7 +170,8 @@ export function OilTankDetailPage() {
         label={t('oilTanks.detail.statLevel')}
         value={hasLevel ? formatNumber(extra.currentLevel) : '—'}
         suffix={hasLevel ? t('oilTanks.unitLitre') : undefined}
-        tone={tone && tone !== 'neutral' ? 'danger' : hasLevel ? 'neutral' : 'dim'}
+
+        tone={tone === 'danger' || tone === 'warning' ? 'danger' : hasLevel ? 'neutral' : 'dim'}
         compact={isMobile}
       />
       <StatPill
@@ -200,8 +224,19 @@ export function OilTankDetailPage() {
         {!isMobile && statbook}
       </Group>
       {isMobile && <Box mt="md">{statbook}</Box>}
-      {pct !== null && tone && (
-        <Progress value={pct} size="sm" color={TONE_COLOR[tone]} mt={isMobile ? 'sm' : 'md'} />
+      {/* The bar can only draw to the end of its track, so past capacity it says
+          "full" and nothing more — the percentage beside it is what carries how
+          far past. Printed only when over capacity: below it the bar is already
+          the whole answer, and a number on every tank would be noise. */}
+      {barPct !== null && tone && (
+        <Group gap="sm" wrap="nowrap" align="center" mt={isMobile ? 'sm' : 'md'}>
+          <Progress value={barPct} size="sm" color={LEVEL_TONE_COLOR[tone]} style={{ flex: 1 }} />
+          {tone === 'overfilled' && pct !== null && (
+            <Text size="sm" fw={700} c={LEVEL_TONE_COLOR.overfilled} style={{ flexShrink: 0 }}>
+              {`${pct}%`}
+            </Text>
+          )}
+        </Group>
       )}
     </Card>
   );
@@ -358,6 +393,8 @@ export function OilTankDetailPage() {
               targetId={tank.id}
               targetCode={tank.code}
               perms={TANK_LOG_PERMS}
+
+              context={{ tankCurrentLevel: extra.currentLevel, truckOptions }}
             />
           )}
         </Tabs.Panel>
