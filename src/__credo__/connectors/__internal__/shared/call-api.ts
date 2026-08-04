@@ -36,10 +36,26 @@ type Mode = 'tunnel' | 'body-encode' | 'plain';
 export type CallApiOptions = RequestInit & {
   params?: Record<string, string | undefined> | undefined;
   queryParams?: Record<string, string> | undefined;
+
+  timeoutMs?: number | null | undefined;
 };
 
+const DEFAULT_BROWSER_TIMEOUT_MS = 45_000;
+
+let defaultTimeoutMs: number | null | undefined;
+
+export function setDefaultRequestTimeout(ms: number | null): void {
+  defaultTimeoutMs = ms;
+}
+
+function getDefaultRequestTimeout(): number | null {
+  if (defaultTimeoutMs !== undefined) return defaultTimeoutMs;
+
+  return IS_BROWSER() ? DEFAULT_BROWSER_TIMEOUT_MS : null;
+}
+
 export async function callApi<T>(url: string, opts: CallApiOptions): Promise<T> {
-  const { params, queryParams, ...init } = opts;
+  const { params, queryParams, timeoutMs, ...init } = opts;
 
   let resolvedUrl = url;
   if (params) {
@@ -51,13 +67,17 @@ export async function callApi<T>(url: string, opts: CallApiOptions): Promise<T> 
     resolvedUrl = resolvedUrl.includes('?') ? `${resolvedUrl}&${qs}` : `${resolvedUrl}?${qs}`;
   }
 
-  return runWithRetry<T>(resolvedUrl, init);
+  return runWithRetry<T>(resolvedUrl, init, timeoutMs);
 }
 
-async function runWithRetry<T>(url: string, init: RequestInit): Promise<T> {
+async function runWithRetry<T>(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number | null | undefined,
+): Promise<T> {
   let attempt = 0;
   while (attempt <= MAX_RETRIES) {
-    const result = await runOnce<T>(url, init);
+    const result = await runOnce<T>(url, init, timeoutMs);
     if (result.kind === 'ok') return result.value;
     if (result.kind === 'retry') {
       attempt++;
@@ -71,7 +91,11 @@ async function runWithRetry<T>(url: string, init: RequestInit): Promise<T> {
 type OnceResult<T> =
   { kind: 'ok'; value: T } | { kind: 'retry' } | { kind: 'throw'; error: unknown };
 
-async function runOnce<T>(url: string, init: RequestInit): Promise<OnceResult<T>> {
+async function runOnce<T>(
+  url: string,
+  init: RequestInit,
+  timeoutMs: number | null | undefined,
+): Promise<OnceResult<T>> {
   if (init.method !== 'GET' && !init.body) {
     init.body = '{}';
   }
@@ -97,51 +121,63 @@ async function runOnce<T>(url: string, init: RequestInit): Promise<OnceResult<T>
   const traceCtx = configureTrace(mode === 'tunnel', parsed.pathname, built.url);
   built.url = traceCtx.url;
 
+  const budget = timeoutMs !== undefined ? timeoutMs : getDefaultRequestTimeout();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  if (budget && budget > 0 && !built.init.signal && typeof AbortController !== 'undefined') {
+    const controller = new AbortController();
+    timer = setTimeout(() => controller.abort(), budget);
+    built.init.signal = controller.signal;
+  }
+
   trace('[callApi] dispatch', {
     mode,
     fetchUrl: built.url,
     fetchOptions: built.init,
   });
 
-  let response: Response;
   try {
-    response = await fetch(built.url, built.init);
-  } catch (error) {
-    if (traceCtx.enabled) traceError('[callApi] fetch error', error);
-    return { kind: 'throw', error };
-  }
-
-  recordServerEncoding(response, origin);
-  recordVrxToken(response, origin);
-
-  if (
-    response.status === 406 &&
-    response.headers.get(ENCODING_HEADER) === 'msgpack' &&
-    mode === 'plain'
-  ) {
-    if (headers['x-trusted-service-key']) {
-      clearCredoConnectorTrustedKey();
+    let response: Response;
+    try {
+      response = await fetch(built.url, built.init);
+    } catch (error) {
+      if (traceCtx.enabled) traceError('[callApi] fetch error', error);
+      return { kind: 'throw', error };
     }
-    delete headers['x-trusted-service-key'];
-    return { kind: 'retry' };
-  }
 
-  if (!response.ok) {
-    const payload = await safeDecodeErrorPayload(response);
-    if (traceCtx.enabled) {
-      traceError('[callApi] HTTP error', {
-        url,
-        fetchUrl: built.url,
-        status: response.status,
-        payload,
-      });
+    recordServerEncoding(response, origin);
+    recordVrxToken(response, origin);
+
+    if (
+      response.status === 406 &&
+      response.headers.get(ENCODING_HEADER) === 'msgpack' &&
+      mode === 'plain'
+    ) {
+      if (headers['x-trusted-service-key']) {
+        clearCredoConnectorTrustedKey();
+      }
+      delete headers['x-trusted-service-key'];
+      return { kind: 'retry' };
     }
-    return { kind: 'throw', error: new CallApiError(response.status, payload) };
-  }
 
-  const value = await decodeOkResponse<T>(response);
-  if (traceCtx.enabled) trace('[callApi] response', { url, response: value });
-  return { kind: 'ok', value };
+    if (!response.ok) {
+      const payload = await safeDecodeErrorPayload(response);
+      if (traceCtx.enabled) {
+        traceError('[callApi] HTTP error', {
+          url,
+          fetchUrl: built.url,
+          status: response.status,
+          payload,
+        });
+      }
+      return { kind: 'throw', error: new CallApiError(response.status, payload) };
+    }
+
+    const value = await decodeOkResponse<T>(response);
+    if (traceCtx.enabled) trace('[callApi] response', { url, response: value });
+    return { kind: 'ok', value };
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
 }
 
 function selectMode(origin: string, headers: Record<string, string>): Mode {

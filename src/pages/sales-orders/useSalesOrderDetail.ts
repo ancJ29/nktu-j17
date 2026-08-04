@@ -15,9 +15,15 @@ import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
-import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/utils/photoUpload';
+import {
+  captureResultToFile,
+  photoUploadErrorKey,
+  uploadPhotoFile,
+  RECORD_WRITE_TIMEOUT_MS,
+} from '@/utils/photoUpload';
 import { writePhotosWithConflictRetry } from '@/utils/photoPersist';
-import { enqueuePhoto, pendingPhotoUrl, removePendingPhoto } from '@/utils/photoQueue';
+import { enqueuePhoto, markPendingAttached, pendingPhotoUrl } from '@/utils/photoQueue';
+import { withTimeout } from '@/utils/withTimeout';
 import { flushPhotoQueue } from '@/utils/photoQueueFlush';
 import type {
   DeliveryRequest,
@@ -1113,27 +1119,29 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         let photoUrl: string;
         let queuedId: string | null = null;
 
+        const queuePayload = {
+          blob: file,
+          contentType: file.type,
+          fileName: storedName,
+          displayName: fileName,
+          imageDirectory,
+          target: { kind: 'sales-order' as const, id },
+          meta: {
+            timestamp: result.timestamp,
+            ...(currentEmployee && {
+              userId: currentEmployee.id,
+              userName: currentEmployee.name,
+            }),
+            ...(result.location && { location: result.location }),
+            ...(result.latitude != null && { latitude: result.latitude }),
+            ...(result.longitude != null && { longitude: result.longitude }),
+          },
+        };
+
         if (uploaded.ok) {
           photoUrl = uploaded.url;
         } else {
-          const queued = await enqueuePhoto({
-            blob: file,
-            contentType: file.type,
-            fileName: storedName,
-            displayName: fileName,
-            imageDirectory,
-            target: { kind: 'sales-order', id },
-            meta: {
-              timestamp: result.timestamp,
-              ...(currentEmployee && {
-                userId: currentEmployee.id,
-                userName: currentEmployee.name,
-              }),
-              ...(result.location && { location: result.location }),
-              ...(result.latitude != null && { latitude: result.latitude }),
-              ...(result.longitude != null && { longitude: result.longitude }),
-            },
-          });
+          const queued = await enqueuePhoto(queuePayload);
 
           if (!queued) {
             notifications.show({
@@ -1161,13 +1169,20 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
         const currentPhotos: SalesOrderPhoto[] = order.extra?.photos ?? [];
         try {
-          await handlePhotosChange([...currentPhotos, newPhoto]);
+          await withTimeout(
+            handlePhotosChange([...currentPhotos, newPhoto]),
+            RECORD_WRITE_TIMEOUT_MS,
+          );
+          if (queuedId) void markPendingAttached(queuedId);
         } catch {
-          if (queuedId) void removePendingPhoto(queuedId);
+          if (!queuedId && uploaded.ok) {
+            const salvaged = await enqueuePhoto({ ...queuePayload, uploadedUrl: uploaded.url });
+            if (salvaged) queuedId = salvaged.id;
+          }
           notifications.show({
-            color: 'red',
-            title: t('photos.saveFailedTitle'),
-            message: t('photos.saveFailed', { count: 1 }),
+            color: queuedId ? 'yellow' : 'red',
+            title: queuedId ? t('photos.queuedTitle') : t('photos.saveFailedTitle'),
+            message: queuedId ? t('photos.queuedMessage') : t('photos.saveFailed', { count: 1 }),
             autoClose: 10000,
           });
           return false;

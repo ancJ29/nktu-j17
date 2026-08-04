@@ -26,6 +26,10 @@ export type PendingPhoto = {
   };
   createdAt: number;
   attempts: number;
+
+  attached: boolean;
+
+  uploadedUrl?: string;
 };
 
 export type PendingPhotoTargetKind = 'delivery-request' | 'sales-order';
@@ -112,9 +116,11 @@ function newQueueId(): string {
 }
 
 export async function enqueuePhoto(
-  entry: Omit<PendingPhoto, 'id' | 'createdAt' | 'attempts'>,
+  entry: Omit<PendingPhoto, 'id' | 'createdAt' | 'attempts' | 'attached'> &
+    Partial<Pick<PendingPhoto, 'attached'>>,
 ): Promise<PendingPhoto | null> {
   const pending: PendingPhoto = {
+    attached: false,
     ...entry,
     id: newQueueId(),
     createdAt: Date.now(),
@@ -146,6 +152,18 @@ export async function listPendingPhotos(target?: {
 export async function removePendingPhoto(id: string): Promise<void> {
   await runTx('readwrite', (store) => store.delete(id));
   notifyQueueChanged();
+}
+
+export async function markPendingAttached(id: string): Promise<void> {
+  const existing = await getPendingPhoto(id);
+  if (!existing || existing.attached) return;
+  await runTx('readwrite', (store) => store.put({ ...existing, attached: true }));
+}
+
+export async function markPendingUploaded(id: string, uploadedUrl: string): Promise<void> {
+  const existing = await getPendingPhoto(id);
+  if (!existing) return;
+  await runTx('readwrite', (store) => store.put({ ...existing, uploadedUrl }));
 }
 
 export async function bumpPendingAttempts(id: string): Promise<void> {

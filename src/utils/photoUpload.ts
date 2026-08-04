@@ -1,4 +1,5 @@
 import { dolgaConnector, r2Connector } from '@credo/connectors/connector';
+import { OperationTimeoutError, withTimeout } from '@/utils/withTimeout';
 
 /**
  * ## One upload leg, three ways to fail — and the field is where they happen
@@ -18,8 +19,9 @@ import { dolgaConnector, r2Connector } from '@credo/connectors/connector';
  *
  * What it guarantees:
  *
- * - **Bounded wait.** Every leg is capped (`PRESIGN_TIMEOUT_MS` /
- *   `UPLOAD_TIMEOUT_MS`), so a spinner always ends.
+ * - **A bounded total**, not just bounded legs. Per-leg caps alone still let
+ *   three attempts stack into minutes of spinner, which a driver reads as
+ *   frozen — see {@link PhotoUploadBudget}.
  * - **Bounded retry.** Transient failures (network drop, timeout, 5xx, 408,
  *   429) are retried with backoff; a **re-presign happens per attempt**, which
  *   is also what recovers an expired presigned URL (403).
@@ -27,10 +29,8 @@ import { dolgaConnector, r2Connector } from '@credo/connectors/connector';
  *   "you're offline" instead of "failed to upload", which is the difference
  *   between a driver retrying in ten metres and a driver giving up.
  *
- * What it deliberately does NOT do: queue for later. An offline capture is
- * still lost when the camera closes. That needs durable storage for the bytes
- * (IndexedDB) and a flush on reconnect — a bigger change than making failure
- * visible, which is what this is.
+ * It does not queue: giving up quickly is only humane because
+ * [`photoQueue.ts`](./photoQueue.ts) catches what it drops.
  */
 
 /** Why an upload failed, in the terms a user can act on. */
@@ -47,23 +47,51 @@ export type PhotoUploadFailure =
 export type PhotoUploadResult =
   { ok: true; url: string } | { ok: false; reason: PhotoUploadFailure };
 
-/** Presign is a small JSON round-trip — generous, but not unbounded. */
-const PRESIGN_TIMEOUT_MS = 15_000;
 /**
- * The bytes leg. Images are compressed to ~500KB before they get here, which
- * still takes tens of seconds on a bad mobile uplink — hence the wide budget.
+ * How long the caller is prepared to wait.
+ *
+ * The distinction is **who is watching**, and it turned out to matter more than
+ * the individual timeouts: per-leg budgets alone bounded each request but not
+ * the total, so three attempts × (presign + upload) added up to nearly four
+ * minutes of spinner. A driver reads that as "frozen" long before it ends —
+ * and reasonably, since it is longer than the delivery stop.
+ *
+ * - `interactive` — someone is staring at a spinner. Fail **fast** and hand the
+ *   photo to the offline queue; on a link this bad the queue will do a better
+ *   job than the person waiting, and they can get on with the delivery.
+ * - `background` — the queue flushing on its own. Nobody is blocked, so give
+ *   each attempt room; the alternative to patience here is another retry cycle
+ *   later, which is strictly more expensive.
  */
-const UPLOAD_TIMEOUT_MS = 60_000;
-const MAX_ATTEMPTS = 3;
-/** Backoff before attempt 2 and 3. Short — a driver is standing there. */
-const BACKOFF_MS = [800, 2_400];
+export type PhotoUploadBudget = 'interactive' | 'background';
 
-class TimeoutError extends Error {
-  constructor() {
-    super('timeout');
-    this.name = 'TimeoutError';
-  }
-}
+/**
+ * Budget for the **record write** that follows an upload.
+ *
+ * Shorter than the transport's own stuck-detector on purpose: this one runs
+ * with a person watching a spinner, and a photo whose write is slow is not a
+ * photo that is lost — the queue reconciles it. Bounding the wait costs
+ * nothing and is the difference between "saved, carry on" and a frozen button.
+ */
+export const RECORD_WRITE_TIMEOUT_MS = 15_000;
+
+const BUDGETS = {
+  interactive: {
+    presignMs: 8_000,
+    uploadMs: 20_000,
+    attempts: 2,
+    /** Hard cap on the whole call, backoff included — what the user feels. */
+    totalMs: 30_000,
+    backoffMs: [700],
+  },
+  background: {
+    presignMs: 15_000,
+    uploadMs: 60_000,
+    attempts: 3,
+    totalMs: 180_000,
+    backoffMs: [1_000, 3_000],
+  },
+} as const satisfies Record<PhotoUploadBudget, unknown>;
 
 /**
  * `navigator.onLine === false` is trustworthy in one direction only: false
@@ -72,27 +100,6 @@ class TimeoutError extends Error {
  */
 function isOffline(): boolean {
   return typeof navigator !== 'undefined' && navigator.onLine === false;
-}
-
-/**
- * Cap a promise that has no abort path of its own. The underlying request
- * keeps running — this bounds the *wait*, not the work. That's acceptable for
- * presign (a few hundred bytes); the byte upload gets a real `AbortSignal`.
- */
-function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
-  return new Promise<T>((resolve, reject) => {
-    const timer = setTimeout(() => reject(new TimeoutError()), ms);
-    promise.then(
-      (value) => {
-        clearTimeout(timer);
-        resolve(value);
-      },
-      (error) => {
-        clearTimeout(timer);
-        reject(error);
-      },
-    );
-  });
 }
 
 function sleep(ms: number): Promise<void> {
@@ -108,7 +115,7 @@ function sleep(ms: number): Promise<void> {
  * exceptions: those are the server saying "not now".
  */
 function classifyThrown(error: unknown): { reason: PhotoUploadFailure; retryable: boolean } {
-  if (error instanceof TimeoutError) return { reason: 'timeout', retryable: true };
+  if (error instanceof OperationTimeoutError) return { reason: 'timeout', retryable: true };
   if (error instanceof DOMException && error.name === 'AbortError') {
     return { reason: 'timeout', retryable: true };
   }
@@ -141,18 +148,26 @@ export async function uploadPhotoFile({
   file,
   imageDirectory,
   fileName,
+  budget = 'interactive',
 }: {
   file: File;
   imageDirectory: string;
   /** Stored name (already sanitized / timestamped by the caller). */
   fileName: string;
+  budget?: PhotoUploadBudget;
 }): Promise<PhotoUploadResult> {
+  const limits = BUDGETS[budget];
+  const startedAt = Date.now();
+  const timeLeft = () => limits.totalMs - (Date.now() - startedAt);
   let lastReason: PhotoUploadFailure = 'network';
 
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+  for (let attempt = 0; attempt < limits.attempts; attempt++) {
     if (isOffline()) return { ok: false, reason: 'offline' };
+    // Checked before every leg, not just per attempt: the whole point is that
+    // the caller's wait is bounded by `totalMs`, whatever the legs are doing.
+    if (timeLeft() <= 0) return { ok: false, reason: 'timeout' };
 
-    if (attempt > 0) await sleep(BACKOFF_MS[attempt - 1] ?? 2_400);
+    if (attempt > 0) await sleep(limits.backoffMs[attempt - 1] ?? 3_000);
 
     // ── Leg 1: presign ──
     let uploadUrl: string | undefined;
@@ -160,7 +175,7 @@ export async function uploadPhotoFile({
     try {
       const presignRes = await withTimeout(
         dolgaConnector.mediaUploadUrl({ imageDirectory, fileName }),
-        PRESIGN_TIMEOUT_MS,
+        Math.min(limits.presignMs, timeLeft()),
       );
       uploadUrl = presignRes.uploadUrl;
       fileUrl = presignRes.fileUrl;
@@ -175,9 +190,14 @@ export async function uploadPhotoFile({
     // attempt would be declined identically.
     if (!uploadUrl || !fileUrl) return { ok: false, reason: 'rejected' };
 
+    if (timeLeft() <= 0) return { ok: false, reason: 'timeout' };
+
     // ── Leg 2: the bytes ──
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), UPLOAD_TIMEOUT_MS);
+    const timer = setTimeout(
+      () => controller.abort(),
+      Math.min(limits.uploadMs, Math.max(timeLeft(), 1_000)),
+    );
     try {
       const uploadRes = await r2Connector.uploadImage({
         uploadUrl,

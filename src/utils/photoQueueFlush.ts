@@ -8,6 +8,7 @@ import { uploadPhotoFile } from '@/utils/photoUpload';
 import {
   bumpPendingAttempts,
   listPendingPhotos,
+  markPendingUploaded,
   pendingPhotoUrl,
   removePendingPhoto,
   type PendingPhoto,
@@ -50,33 +51,42 @@ async function runFlush(target?: {
   const result: PhotoQueueFlushResult = { uploaded: 0, failed: 0, updated: [] };
 
   for (const entry of pending) {
-    const uploaded = await uploadPhotoFile({
-      file: new File([entry.blob], entry.fileName, { type: entry.contentType }),
-      imageDirectory: entry.imageDirectory,
-      fileName: entry.fileName,
-    });
+    let url = entry.uploadedUrl;
 
-    if (!uploaded.ok) {
-      result.failed += 1;
-      await bumpPendingAttempts(entry.id);
+    if (!url) {
+      const uploaded = await uploadPhotoFile({
+        file: new File([entry.blob], entry.fileName, { type: entry.contentType }),
+        imageDirectory: entry.imageDirectory,
+        fileName: entry.fileName,
 
-      if (uploaded.reason === 'offline' || uploaded.reason === 'timeout') break;
-      continue;
+        budget: 'background',
+      });
+
+      if (!uploaded.ok) {
+        result.failed += 1;
+        await bumpPendingAttempts(entry.id);
+
+        if (uploaded.reason === 'offline' || uploaded.reason === 'timeout') break;
+        continue;
+      }
+      url = uploaded.url;
+
+      await markPendingUploaded(entry.id, url);
     }
 
     try {
-      const record = await attachUploadedPhoto(entry, uploaded.url);
-      if (record) {
-        result.updated.push({ kind: entry.target.kind, record });
+      const outcome = await attachUploadedPhoto(entry, url);
+      if (outcome.record) {
+        result.updated.push({ kind: entry.target.kind, record: outcome.record });
         result.uploaded += 1;
-      } else {
-        deleteMedia(uploaded.url);
+      } else if (outcome.reason === 'withdrawn') {
+        deleteMedia(url);
       }
+      // 'already-attached' → nothing to do, just drop the queue entry.
     } catch (err) {
       logger.error('[PHOTO-QUEUE] attach failed', err);
       result.failed += 1;
       await bumpPendingAttempts(entry.id);
-      deleteMedia(uploaded.url);
       continue;
     }
 
@@ -86,21 +96,35 @@ async function runFlush(target?: {
   return result;
 }
 
-async function attachUploadedPhoto(
-  entry: PendingPhoto,
-  url: string,
-): Promise<DeliveryRequest | SalesOrder | null> {
+type AttachOutcome = {
+  record: DeliveryRequest | SalesOrder | null;
+  reason?: 'withdrawn' | 'already-attached' | 'unreachable';
+};
+
+async function attachUploadedPhoto(entry: PendingPhoto, url: string): Promise<AttachOutcome> {
   const sentinel = pendingPhotoUrl(entry.id);
+
+  const resolveNext = <T extends { url: string }>(photos: T[], make: () => T): T[] | null => {
+    if (photos.some((photo) => photo.url === sentinel)) {
+      return photos.map((photo) => (photo.url === sentinel ? { ...photo, url } : photo));
+    }
+    if (photos.some((photo) => photo.url === url)) return null;
+    if (entry.attached) return null;
+    return [...photos, make()];
+  };
 
   if (entry.target.kind === 'delivery-request') {
     const request = await loadDeliveryRequest(entry.target.id);
-    if (!request) return null;
+    if (!request) return { record: null, reason: 'unreachable' };
     const photos = (request.extra as DeliveryRequestExtra | undefined)?.photos ?? [];
-    if (!photos.some((photo) => photo.url === sentinel)) return null;
+    const next = resolveNext<DeliveryRequestPhoto>(photos, () => buildPhotoFromEntry(entry, url));
+    if (!next) {
+      return { record: null, reason: entry.attached ? 'withdrawn' : 'already-attached' };
+    }
 
     const { record } = await writePhotosWithConflictRetry<DeliveryRequest, DeliveryRequestPhoto>({
       record: request,
-      next: photos.map((photo) => (photo.url === sentinel ? { ...photo, url } : photo)),
+      next,
       getPhotos: (rec) => (rec.extra as DeliveryRequestExtra | undefined)?.photos ?? [],
       save: async (rec, nextPhotos) =>
         (await useDeliveryRequestStore.getState().updateSafely({
@@ -109,17 +133,20 @@ async function attachUploadedPhoto(
           patch: { extra: { ...(rec.extra ?? {}), photos: nextPhotos } },
         })) as DeliveryRequest,
     });
-    return record;
+    return { record };
   }
 
   const order = await loadSalesOrder(entry.target.id);
-  if (!order) return null;
+  if (!order) return { record: null, reason: 'unreachable' };
   const photos = (order.extra as SalesOrderExtra | undefined)?.photos ?? [];
-  if (!photos.some((photo) => photo.url === sentinel)) return null;
+  const next = resolveNext<SalesOrderPhoto>(photos, () => buildPhotoFromEntry(entry, url));
+  if (!next) {
+    return { record: null, reason: entry.attached ? 'withdrawn' : 'already-attached' };
+  }
 
   const { record } = await writePhotosWithConflictRetry<SalesOrder, SalesOrderPhoto>({
     record: order,
-    next: photos.map((photo) => (photo.url === sentinel ? { ...photo, url } : photo)),
+    next,
     getPhotos: (rec) => (rec.extra as SalesOrderExtra | undefined)?.photos ?? [],
     save: async (rec, nextPhotos) =>
       (await useSalesOrderStore.getState().updateSafely({
@@ -128,7 +155,22 @@ async function attachUploadedPhoto(
         patch: { extra: { ...(rec.extra ?? {}), photos: nextPhotos } },
       })) as SalesOrder,
   });
-  return record;
+  return { record };
+}
+
+function buildPhotoFromEntry(entry: PendingPhoto, url: string): DeliveryRequestPhoto {
+  const { meta } = entry;
+  return {
+    url,
+    timestamp: meta.timestamp,
+    fileName: entry.displayName,
+    ...(meta.userId && { userId: meta.userId }),
+    ...(meta.userName && { userName: meta.userName }),
+    ...(meta.location && { location: meta.location }),
+    ...(meta.latitude != null && { latitude: meta.latitude }),
+    ...(meta.longitude != null && { longitude: meta.longitude }),
+    ...(meta.takenAtDelivery && { takenAtDelivery: true }),
+  };
 }
 
 async function loadDeliveryRequest(id: string): Promise<DeliveryRequest | null> {

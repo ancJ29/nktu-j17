@@ -821,11 +821,21 @@ function compressImage(
 ): Promise<string> {
   return new Promise((resolve) => {
     const img = document.createElement('img');
+
+    let settled = false;
+    const finish = (value: string) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(watchdog);
+      resolve(value);
+    };
+    const watchdog = setTimeout(() => finish(base64), 15_000);
+    img.onerror = () => finish(base64);
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       if (!ctx) {
-        resolve(base64);
+        finish(base64);
         return;
       }
 
@@ -850,7 +860,7 @@ function compressImage(
         result = canvas.toDataURL('image/jpeg', quality);
       }
 
-      resolve(result);
+      finish(result);
     };
     img.src = base64;
   });
