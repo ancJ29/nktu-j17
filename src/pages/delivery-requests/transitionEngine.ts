@@ -36,10 +36,12 @@ export type TransitionInputs = {
   note?: string;
 
   deliveredItems?: DeliveryRequestDeliveredItem[];
+
+  hasLocalProof?: boolean;
 };
 
 export async function runTransition(inputs: TransitionInputs): Promise<TransitionResult> {
-  const { request, toStatusValue, actor, note, deliveredItems } = inputs;
+  const { request, toStatusValue, actor, note, deliveredItems, hasLocalProof } = inputs;
   const fromStatusValue = (request.extra as DeliveryRequestExtra | undefined)?.status ?? '';
 
   const statusByValue = new Map<string, CMngtDeliveryRequestStatusOption>();
@@ -64,7 +66,7 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
 
   if (toStatus.stage === 'COMPLETED') {
     const photos = (request.extra as DeliveryRequestExtra | undefined)?.photos ?? [];
-    const hasPhoto = photos.some((p) => !p.isDeleted);
+    const hasPhoto = photos.some((p) => !p.isDeleted) || hasLocalProof === true;
     if (!hasPhoto) {
       return { ok: false, failure: { kind: 'photos-required' } };
     }

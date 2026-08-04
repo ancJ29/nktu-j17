@@ -18,6 +18,8 @@ type DeliveryRequestCardListProps = {
   readonly requests: DeliveryRequest[];
   readonly isLoading?: boolean;
   readonly resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
+
+  readonly pendingSyncIds?: Set<string>;
 };
 
 function DeliveryRequestCardSkeleton() {
@@ -55,6 +57,7 @@ export function DeliveryRequestCardList({
   requests,
   isLoading,
   resolveStatus,
+  pendingSyncIds,
 }: DeliveryRequestCardListProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -118,6 +121,11 @@ export function DeliveryRequestCardList({
                 {hasPendingPhotoUpload(drExtra.photos) && (
                   <Badge color="orange" variant="light" size="sm" radius="lg">
                     {t('photos.pendingBadge')}
+                  </Badge>
+                )}
+                {pendingSyncIds?.has(req.id) && (
+                  <Badge color="blue" variant="light" size="sm" radius="lg">
+                    {t('deliveryRequests.offlineCompletion.pendingBadge')}
                   </Badge>
                 )}
               </Group>

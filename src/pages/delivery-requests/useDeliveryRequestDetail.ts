@@ -12,8 +12,14 @@ import {
   RECORD_WRITE_TIMEOUT_MS,
 } from '@/utils/photoUpload';
 import { writePhotosWithConflictRetry } from '@/utils/photoPersist';
-import { enqueuePhoto, markPendingAttached, pendingPhotoUrl } from '@/utils/photoQueue';
+import {
+  enqueuePhoto,
+  listPendingPhotos,
+  markPendingAttached,
+  pendingPhotoUrl,
+} from '@/utils/photoQueue';
 import { withTimeout } from '@/utils/withTimeout';
+import { isNetworkFailure } from '@/utils/networkError';
 import { flushPhotoQueue } from '@/utils/photoQueueFlush';
 import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { cMngtConnector } from '@credo/connectors/connector';
@@ -23,28 +29,19 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import {
-  getDeliveryRequestStatusOptions,
-  isReturnShipmentEnabled,
-  perms,
-} from '@/utils/permission';
-import { applyReturnRestock } from '@/utils/deliveryRequestReturnInventory';
+import { perms } from '@/utils/permission';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
-import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
+import { runDrTransitionEffects } from './drTransitionEffects';
 import {
-  getAutoShippingTargetValue,
-  runTransition as runSoTransition,
-  statusHasCapability as soStatusHasCapability,
-} from '@/pages/sales-orders/transitionEngine';
-import { formatAutoTransitionFailure } from '@/pages/sales-orders/planFailures';
-import { runShipRecovery } from '@/pages/sales-orders/shipRecovery';
-import { statusChangeMemo } from '@/pages/sales-orders/activityMemo';
-import {
-  advanceSoIfFullyDelivered,
-  ensureReconcileStoresLoaded,
-} from '@/pages/sales-orders/reconcileFromDeliveries';
+  getQueuedTransition,
+  queueTransition,
+  removeQueuedTransition,
+  subscribeTransitionQueue,
+  type QueuedTransition,
+} from './transitionQueue';
+import { flushTransitionQueue } from './transitionQueueFlush';
 import { logActivity } from '@/utils/activityLogger';
 import { unlinkDRFromSalesOrder } from './linkToSalesOrder';
 import { inlineEditSnapshot, type DeliveryRequestInlineFields } from './activityMemo';
@@ -53,7 +50,6 @@ import {
   getInitialStatusValue,
   getStatusFlowOrder,
   runTransition,
-  type DrFollowUp,
   type TransitionFailure,
 } from './transitionEngine';
 import { deliveryRequestStatusOptions } from './useDeliveryRequestStatusOptions';
@@ -64,9 +60,6 @@ import type {
   DeliveryRequestDeliveredItem,
   DeliveryRequestExtra,
   DeliveryRequestPhoto,
-  Product,
-  SalesOrder,
-  SalesOrderExtra,
 } from '@/types';
 
 type UseDeliveryRequestDetailOptions = {
@@ -77,103 +70,6 @@ const { resolveStatus } = deliveryRequestStatusOptions;
 const canViewAll = perms.deliveryRequest.canViewAll();
 const canViewSelf = perms.deliveryRequest.canViewSelf();
 const canDeletePerm = perms.deliveryRequest.canDelete();
-
-async function dispatchDrFollowUp(
-  followUp: DrFollowUp,
-  updatedDr: DeliveryRequest,
-  currentEmployee: { id: string; name: string } | undefined,
-  t: TFunction,
-): Promise<void> {
-  switch (followUp.kind) {
-    case 'advance-so-on-full-delivery':
-      return advanceLinkedSoIfFullyDelivered(updatedDr, currentEmployee, t);
-    case 'advance-so-on-dispatch':
-      return advanceLinkedSoOnDispatch(updatedDr, currentEmployee, t);
-  }
-}
-
-async function advanceLinkedSoIfFullyDelivered(
-  closedDr: DeliveryRequest,
-  currentEmployee: { id: string; name: string } | undefined,
-  t: TFunction,
-): Promise<void> {
-  if (closedDr.direction === 'inbound') return;
-  if (!closedDr.salesOrderId) return;
-
-  const soStore = useSalesOrderStore.getState();
-  if (!soStore.initialized) await soStore.loadAll();
-  const so = useSalesOrderStore.getState().getById(closedDr.salesOrderId) as SalesOrder | undefined;
-  if (!so) return;
-  await advanceSoIfFullyDelivered({ so, actor: currentEmployee, t, freshDr: closedDr });
-}
-
-async function advanceLinkedSoOnDispatch(
-  transitionedDr: DeliveryRequest,
-  currentEmployee: { id: string; name: string } | undefined,
-  t: TFunction,
-): Promise<void> {
-  if (transitionedDr.direction === 'inbound') return;
-  if (!transitionedDr.salesOrderId) return;
-
-  await ensureReconcileStoresLoaded();
-  const so = useSalesOrderStore.getState().getById(transitionedDr.salesOrderId) as
-    SalesOrder | undefined;
-  if (!so || so.isClosed) return;
-  const soExtra = (so.extra ?? {}) as SalesOrderExtra;
-  if (soExtra.cancellation != null) return;
-  const fromStatus = soExtra.status ?? '';
-  if (!soStatusHasCapability(fromStatus, 'autoAdvanceOnDispatch')) return;
-  const targetStatus = getAutoShippingTargetValue();
-  if (!targetStatus) return;
-  if (fromStatus === targetStatus) return;
-
-  const products = useProductStore.getState().items;
-  const productsByCode = new Map<string, Product>();
-  for (const p of products) productsByCode.set(p.code, p);
-  const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
-
-  const result = await runSoTransition({
-    order: so,
-    toStatusValue: targetStatus,
-    actor: currentEmployee,
-    productsByCode,
-    inventoryByProduct,
-  });
-
-  if (result.ok) {
-    logActivity(
-      'salesOrder.statusChange',
-      so.id,
-      statusChangeMemo({
-        updated: result.updated,
-        fromStatus,
-        toStatus: targetStatus,
-        trigger: 'dr-dispatch',
-        shipPending: result.pendingShip != null,
-      }),
-    );
-    notifications.show({
-      color: 'green',
-      message: t('deliveryRequests.notifications.soAutoShippedSuccess', {
-        orderNumber: so.orderNumber,
-        status: targetStatus,
-      }),
-    });
-
-    if (result.pendingShip) {
-      await runShipRecovery({ so: result.updated, actor: currentEmployee, productsByCode, t });
-    }
-    return;
-  }
-
-  const message = formatAutoTransitionFailure(result.failure, t, productsByCode);
-  notifications.show({
-    color: 'yellow',
-    title: t('deliveryRequests.notifications.soAutoShippedFailedTitle'),
-    message,
-    autoClose: 10000,
-  });
-}
 
 export type PendingTransition = {
   toValue: string;
@@ -232,6 +128,13 @@ export type UseDeliveryRequestDetailReturn = {
   completionPhotos: DeliveryRequestPhoto[];
 
   retryPendingPhotos: () => Promise<void>;
+
+  pendingSync: QueuedTransition | null;
+
+  syncPendingCompletion: () => Promise<void>;
+  syncingCompletion: boolean;
+
+  discardPendingSync: () => Promise<void>;
 };
 
 export function useDeliveryRequestDetail(
@@ -258,6 +161,8 @@ export function useDeliveryRequestDetail(
   const [deleteOpened, { open: openDelete, close: closeDelete }] = useDisclosure(false);
 
   const [completionPhotos, setCompletionPhotos] = useState<DeliveryRequestPhoto[]>([]);
+
+  const [pendingSync, setPendingSync] = useState<QueuedTransition | null>(null);
 
   const captureModeRef = useRef<'fab' | 'completion'>('fab');
 
@@ -462,15 +367,50 @@ export function useDeliveryRequestDetail(
         quantity: deliveredQty.get(`${it.productCode}::${it.unit}`) ?? 0,
       }));
 
+      const queuedProof = await listPendingPhotos({
+        kind: 'delivery-request',
+        id: request.id,
+      });
+
       const result = await runTransition({
         request,
         toStatusValue: pending.toValue,
         actor: currentEmployee,
         ...(note.trim() && { note: note.trim() }),
         deliveredItems,
+        hasLocalProof: completionPhotos.length > 0 || queuedProof.length > 0,
       });
 
       if (!result.ok) {
+        if (result.failure.kind === 'patch-error' && isNetworkFailure(result.failure.error)) {
+          const queued = await queueTransition({
+            id: request.id,
+            drNumber: request.requestNumber,
+            toStatusValue: pending.toValue,
+            toStatusLabel: pending.toLabel,
+            ...(note.trim() && { note: note.trim() }),
+            deliveredItems,
+            ...(currentEmployee && { actor: currentEmployee }),
+          });
+
+          if (queued) {
+            setPendingSync(queued);
+            setPending(null);
+            setNote('');
+            setCompletionPhotos([]);
+            notifications.show({
+              color: 'yellow',
+              title: t('deliveryRequests.offlineCompletion.queuedTitle'),
+              message: t('deliveryRequests.offlineCompletion.queuedMessage', {
+                status: pending.toLabel,
+              }),
+              autoClose: 12000,
+            });
+            return;
+          }
+          // Couldn't even store the intent — fall through and report honestly
+          // rather than promise a sync that has nowhere to live.
+        }
         handleTransitionFailure(result.failure);
         return;
       }
@@ -482,61 +422,20 @@ export function useDeliveryRequestDetail(
       invalidateCache();
 
       const priorStatus = (request.extra as DeliveryRequestExtra | undefined)?.status ?? '';
-      logActivity('deliveryRequest.statusChange', request.id, {
-        requestNumber: result.updated.requestNumber,
-        fromStatus: priorStatus,
-        toStatus: pending.toValue,
-        ...(note.trim() && { note: note.trim() }),
-      });
-
       setPending(null);
       setNote('');
       setCompletionPhotos([]);
 
-      const updatedExtra = (result.updated.extra ?? {}) as DeliveryRequestExtra;
-      const toStage = getDeliveryRequestStatusOptions().find(
-        (o) => o.value === pending.toValue,
-      )?.stage;
-      if (
-        isReturnShipmentEnabled() &&
-        result.updated.direction === 'inbound' &&
-        updatedExtra.inboundKind === 'customer-return' &&
-        updatedExtra.returnRestock === true &&
-        !updatedExtra.returnRestockedAt &&
-        toStage === 'COMPLETED'
-      ) {
-        const restock = await applyReturnRestock(result.updated);
-        if (restock.failed > 0) {
-          notifications.show({
-            color: 'red',
-            title: t('deliveryRequests.return.restockFailedTitle'),
-            message: t('deliveryRequests.return.restockFailedMessage', { count: restock.failed }),
-            autoClose: 8000,
-          });
-        } else if (restock.succeeded > 0) {
-          try {
-            const stamped = (await useDeliveryRequestStore.getState().updateSafely({
-              id: result.updated.id,
-              version: result.updated.version,
-              patch: {
-                extra: { ...updatedExtra, returnRestockedAt: new Date().toISOString() },
-              },
-            })) as DeliveryRequest;
-            setRequest(stamped);
-          } catch {
-            // Marker lost — harmless: the status is terminal, so there's no
-            // re-entry that could double-apply the restock.
-          }
-          notifications.show({
-            color: 'green',
-            message: t('deliveryRequests.return.restockDone', { count: restock.succeeded }),
-          });
-        }
-      }
-
-      for (const followUp of result.followUps) {
-        await dispatchDrFollowUp(followUp, result.updated, currentEmployee, t);
-      }
+      const settled = await runDrTransitionEffects({
+        updated: result.updated,
+        priorStatus,
+        toStatusValue: pending.toValue,
+        ...(note.trim() && { note: note.trim() }),
+        actor: currentEmployee,
+        followUps: result.followUps,
+        t,
+      });
+      setRequest(settled);
     } finally {
       setActionLoading(false);
     }
@@ -546,6 +445,7 @@ export function useDeliveryRequestDetail(
     deliveredQty,
     note,
     currentEmployee,
+    completionPhotos,
     t,
     invalidateCache,
     handleTransitionFailure,
@@ -788,8 +688,11 @@ export function useDeliveryRequestDetail(
           ...(isCompletionCapture && { takenAtDelivery: true }),
         };
 
+        if (isCompletionCapture) setCompletionPhotos((prev) => [...prev, newPhoto]);
+
         const currentPhotos: DeliveryRequestPhoto[] =
           (request.extra as DeliveryRequestExtra | undefined)?.photos ?? [];
+        let attachFailed = false;
         try {
           await withTimeout(
             handlePhotosChange([...currentPhotos, newPhoto]),
@@ -797,20 +700,15 @@ export function useDeliveryRequestDetail(
           );
           if (queuedId) void markPendingAttached(queuedId);
         } catch {
+          attachFailed = true;
+
           if (!queuedId && uploaded.ok) {
             const salvaged = await enqueuePhoto({ ...queuePayload, uploadedUrl: uploaded.url });
             if (salvaged) queuedId = salvaged.id;
           }
-          notifications.show({
-            color: queuedId ? 'yellow' : 'red',
-            title: queuedId ? t('photos.queuedTitle') : t('photos.saveFailedTitle'),
-            message: queuedId ? t('photos.queuedMessage') : t('photos.saveFailed', { count: 1 }),
-            autoClose: 10000,
-          });
-          return false;
         }
 
-        if (queuedId) {
+        if (queuedId || attachFailed) {
           notifications.show({
             color: 'yellow',
             title: t('photos.queuedTitle'),
@@ -819,7 +717,6 @@ export function useDeliveryRequestDetail(
           });
         }
 
-        if (isCompletionCapture) setCompletionPhotos((prev) => [...prev, newPhoto]);
         closeCamera();
         return true;
       } catch {
@@ -839,6 +736,62 @@ export function useDeliveryRequestDetail(
       const updated = res.updated.find((entry) => entry.record.id === requestId);
       if (updated) setRequest(updated.record as DeliveryRequest);
     });
+  }, [requestId]);
+
+  const [syncingCompletion, setSyncingCompletion] = useState(false);
+
+  useEffect(() => {
+    if (!requestId) return;
+    let cancelled = false;
+    const read = () => {
+      void getQueuedTransition(requestId).then((queued) => {
+        if (!cancelled) setPendingSync(queued);
+      });
+    };
+    read();
+    const unsubscribe = subscribeTransitionQueue(read);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [requestId]);
+
+  const syncPendingCompletion = useCallback(async () => {
+    if (!requestId) return;
+    setSyncingCompletion(true);
+    try {
+      const res = await flushTransitionQueue(t, requestId);
+      const updated = res.updated.find((record) => record.id === requestId);
+      if (updated) setRequest(updated);
+      if (res.applied > 0) {
+        notifications.show({
+          color: 'green',
+          title: t('deliveryRequests.offlineCompletion.syncedTitle'),
+          message: t('deliveryRequests.offlineCompletion.syncedMessage'),
+        });
+      } else if (res.blocked > 0) {
+        notifications.show({
+          color: 'red',
+          title: t('deliveryRequests.offlineCompletion.blockedTitle'),
+          message: t('deliveryRequests.offlineCompletion.blockedMessage'),
+          autoClose: 12000,
+        });
+      } else {
+        notifications.show({
+          color: 'yellow',
+          message: t('deliveryRequests.offlineCompletion.syncFailed'),
+          autoClose: 8000,
+        });
+      }
+    } finally {
+      setSyncingCompletion(false);
+    }
+  }, [requestId, t]);
+
+  const discardPendingSync = useCallback(async () => {
+    if (!requestId) return;
+    await removeQueuedTransition(requestId);
+    setPendingSync(null);
   }, [requestId]);
 
   const retryPendingPhotos = useCallback(async () => {
@@ -914,5 +867,9 @@ export function useDeliveryRequestDetail(
     handleMobileCameraCapture,
     completionPhotos,
     retryPendingPhotos,
+    pendingSync,
+    syncPendingCompletion,
+    syncingCompletion,
+    discardPendingSync,
   };
 }

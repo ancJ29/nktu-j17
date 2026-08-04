@@ -194,33 +194,3 @@ async function loadSalesOrder(id: string): Promise<SalesOrder | null> {
     return null;
   }
 }
-
-const MIN_FLUSH_INTERVAL_MS = 10_000;
-let lastFlushAt = 0;
-let autoFlushStarted = false;
-
-function maybeFlush(): void {
-  const now = Date.now();
-  if (now - lastFlushAt < MIN_FLUSH_INTERVAL_MS) return;
-  lastFlushAt = now;
-  void flushPhotoQueue();
-}
-
-export function startPhotoQueueAutoFlush(): () => void {
-  if (autoFlushStarted || typeof window === 'undefined') return () => {};
-  autoFlushStarted = true;
-
-  const onVisible = () => {
-    if (document.visibilityState === 'visible') maybeFlush();
-  };
-
-  window.addEventListener('online', maybeFlush);
-  document.addEventListener('visibilitychange', onVisible);
-  maybeFlush();
-
-  return () => {
-    window.removeEventListener('online', maybeFlush);
-    document.removeEventListener('visibilitychange', onVisible);
-    autoFlushStarted = false;
-  };
-}

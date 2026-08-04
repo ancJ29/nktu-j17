@@ -49,6 +49,7 @@ import {
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { useListScrollRestoration } from '@/hooks';
 import { DeliveryRequestCardList } from './DeliveryRequestCardList';
+import { usePendingSyncIds } from './usePendingSyncIds';
 import { DeliveryRequestDataTable } from './DeliveryRequestDataTable';
 import { deliveryRequestPartyIsCustomer } from './deliveryRequestParty';
 import { DeliveryReorderModal } from './DeliveryReorderModal';
@@ -73,6 +74,7 @@ type DeliveryRequestListProps = {
 
 export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
   const { t } = useTranslation();
+  const pendingSyncIds = usePendingSyncIds();
   const scrollViewportRef = useListScrollRestoration(ROUTES.DELIVERY.LIST);
 
   const {
@@ -563,6 +565,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           requests={paginated}
           isLoading={loadingInitial}
           resolveStatus={resolveStatus}
+          pendingSyncIds={pendingSyncIds}
         />
       ) : (
         <DeliveryRequestDataTable
@@ -570,6 +573,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           isLoading={loadingInitial}
           resolveStatus={resolveStatus}
           viewportRef={scrollViewportRef}
+          pendingSyncIds={pendingSyncIds}
         />
       )}
       <ListPagination

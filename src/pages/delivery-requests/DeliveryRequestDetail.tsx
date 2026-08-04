@@ -2,6 +2,7 @@ import {
   Accordion,
   ActionIcon,
   Affix,
+  Alert,
   Badge,
   Box,
   Button,
@@ -21,6 +22,7 @@ import {
   IconArrowLeft,
   IconCamera,
   IconCheck,
+  IconCloudUpload,
   IconCopy,
   IconEdit,
   IconHistory,
@@ -129,6 +131,10 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     cameraUploading,
     handleMobileCameraCapture,
     completionPhotos,
+    pendingSync,
+    syncPendingCompletion,
+    syncingCompletion,
+    discardPendingSync,
   } = detail;
 
   const products = useProductStore((s) => s.items);
@@ -360,8 +366,52 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
           {t('photos.pendingBadge')}
         </Badge>
       )}
+      {pendingSync && (
+        <Badge color="blue" variant="light" size="sm">
+          {t('deliveryRequests.offlineCompletion.pendingBadge')}
+        </Badge>
+      )}
     </>
   );
+
+  const pendingSyncBanner = pendingSync ? (
+    <Alert
+      color={pendingSync.blocked ? 'red' : 'blue'}
+      variant="light"
+      icon={<IconCloudUpload size={18} />}
+      title={
+        pendingSync.blocked
+          ? t('deliveryRequests.offlineCompletion.blockedTitle')
+          : t('deliveryRequests.offlineCompletion.bannerTitle')
+      }
+    >
+      <Stack gap="xs">
+        <Text size="sm">
+          {pendingSync.blocked
+            ? t('deliveryRequests.offlineCompletion.blockedMessage')
+            : t('deliveryRequests.offlineCompletion.bannerMessage', {
+                status: pendingSync.toStatusLabel ?? pendingSync.toStatusValue,
+              })}
+        </Text>
+        <Group gap="xs">
+          {pendingSync.blocked ? (
+            <Button size="compact-sm" variant="light" color="red" onClick={discardPendingSync}>
+              {t('deliveryRequests.offlineCompletion.discard')}
+            </Button>
+          ) : (
+            <Button
+              size="compact-sm"
+              variant="light"
+              loading={syncingCompletion}
+              onClick={syncPendingCompletion}
+            >
+              {t('deliveryRequests.offlineCompletion.syncNow')}
+            </Button>
+          )}
+        </Group>
+      </Stack>
+    </Alert>
+  ) : null;
 
   const copyContactButton = contactCopyText ? (
     <CopyButton value={contactCopyText} timeout={1500}>
@@ -622,6 +672,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   if (isMobile) {
     return (
       <Stack gap={0}>
+        {pendingSyncBanner && <Box p="sm">{pendingSyncBanner}</Box>}
         <Tabs defaultValue="overview">
           <Tabs.List>
             <Tabs.Tab value="overview" leftSection={<IconPackage size={14} />}>
@@ -714,6 +765,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
   return (
     <Stack gap="lg">
+      {pendingSyncBanner}
       {/* Back + Edit */}
       <Group justify="space-between">
         <Button

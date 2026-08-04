@@ -1292,6 +1292,20 @@
       "updateError": "Failed to update request",
       "updateSuccess": "Request updated successfully"
     },
+    "offlineCompletion": {
+      "bannerMessage": "This delivery is marked \"{{status}}\" on this device only. It syncs by itself when the connection is back.",
+      "bannerTitle": "Completion waiting to sync",
+      "blockedMessage": "The server refused the change — the request may have moved on or its settings changed. Open it and set the status by hand.",
+      "blockedTitle": "This completion could not be synced",
+      "discard": "Discard",
+      "pendingBadge": "Waiting to sync",
+      "queuedMessage": "No connection right now — this delivery will be marked \"{{status}}\" automatically once you're back online. You can move on to the next one.",
+      "queuedTitle": "Saved on this device",
+      "syncFailed": "Still no connection. The completion is safe on this device and will keep retrying.",
+      "syncNow": "Sync now",
+      "syncedMessage": "The completion recorded offline has been saved to the server.",
+      "syncedTitle": "Delivery synced"
+    },
     "receiveSource": {
       "sample": "Sample from customer",
       "sampleDesc": "Collect a sample from a customer.",

@@ -20,6 +20,8 @@ type DeliveryRequestDataTableProps = {
   readonly isLoading?: boolean;
   readonly resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
   readonly viewportRef?: Ref<HTMLDivElement>;
+
+  readonly pendingSyncIds?: Set<string>;
 };
 
 export function DeliveryRequestDataTable({
@@ -27,6 +29,7 @@ export function DeliveryRequestDataTable({
   isLoading,
   resolveStatus,
   viewportRef,
+  pendingSyncIds,
 }: DeliveryRequestDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -123,6 +126,13 @@ export function DeliveryRequestDataTable({
                   {t('photos.pendingBadge')}
                 </Badge>
               )}
+              {/* Completed on this device, not yet on the server. Only this
+                  device can show it — see `usePendingSyncIds`. */}
+              {pendingSyncIds?.has(item.id) && (
+                <Badge color="blue" variant="light" size="sm" radius="lg">
+                  {t('deliveryRequests.offlineCompletion.pendingBadge')}
+                </Badge>
+              )}
               <Badge color={status.color} variant="filled" size="sm" radius="lg">
                 {status.label}
               </Badge>
@@ -131,7 +141,7 @@ export function DeliveryRequestDataTable({
         },
       },
     ],
-    [t, resolveStatus, resolveCustomerShortName, getVendorByCode],
+    [t, resolveStatus, resolveCustomerShortName, getVendorByCode, pendingSyncIds],
   );
 
   const handleRowClick = (item: DeliveryRequest) => {

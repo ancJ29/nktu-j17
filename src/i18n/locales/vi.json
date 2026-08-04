@@ -1292,6 +1292,20 @@
       "updateError": "Không thể cập nhật yêu cầu",
       "updateSuccess": "Cập nhật yêu cầu thành công"
     },
+    "offlineCompletion": {
+      "bannerMessage": "Chuyến giao này đang ở trạng thái \"{{status}}\" chỉ trên thiết bị của bạn. Hệ thống sẽ tự đồng bộ khi có mạng.",
+      "bannerTitle": "Hoàn thành đang chờ đồng bộ",
+      "blockedMessage": "Hệ thống từ chối thay đổi — phiếu có thể đã được cập nhật hoặc cấu hình đã đổi. Hãy mở phiếu và đổi trạng thái thủ công.",
+      "blockedTitle": "Không đồng bộ được",
+      "discard": "Bỏ qua",
+      "pendingBadge": "Chờ đồng bộ",
+      "queuedMessage": "Hiện không có kết nối — chuyến giao này sẽ được chuyển sang \"{{status}}\" tự động khi có mạng trở lại. Bạn cứ tiếp tục chuyến kế tiếp.",
+      "queuedTitle": "Đã lưu trên thiết bị",
+      "syncFailed": "Vẫn chưa có kết nối. Thông tin vẫn được giữ trên máy và sẽ tự thử lại.",
+      "syncNow": "Đồng bộ ngay",
+      "syncedMessage": "Thông tin hoàn thành lúc offline đã được lưu lên hệ thống.",
+      "syncedTitle": "Đã đồng bộ"
+    },
     "receiveSource": {
       "sample": "Lấy mẫu từ khách",
       "sampleDesc": "Lấy mẫu từ khách hàng.",
