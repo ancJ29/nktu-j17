@@ -2,7 +2,6 @@ import {
   Button,
   Group,
   Modal,
-  NumberInput,
   Stack,
   Switch,
   Table,
@@ -32,6 +31,7 @@ import {
 } from './createDeliveryRequest';
 import { toDateTimeInputOrUndefined } from './deliveryRequestFormShared';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { NumberField } from '@/components/NumberField';
 
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
 
@@ -290,7 +290,7 @@ export function CreateReturnShipmentModal({
                           </Table.Td>
                           <Table.Td>{line.unit}</Table.Td>
                           <Table.Td>
-                            <NumberInput
+                            <NumberField
                               size="xs"
                               min={0}
                               max={line.returnable}
@@ -299,11 +299,9 @@ export function CreateReturnShipmentModal({
                                 count: line.returnable,
                               })}
                               value={line.quantity}
-                              onChange={(v) =>
-                                form.setFieldValue(
-                                  `lines.${idx}.quantity`,
-                                  typeof v === 'number' ? v : 0,
-                                )
+                              emptyValue={0}
+                              onChange={(quantity) =>
+                                form.setFieldValue(`lines.${idx}.quantity`, quantity)
                               }
                             />
                           </Table.Td>

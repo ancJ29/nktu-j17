@@ -24,6 +24,7 @@ const PERM_MODULE_LABELS: Record<string, string> = {
   lookupV2: 'Lookup (v2)',
   material: 'Material',
   materialInventory: 'Material Inventory',
+  oilTank: 'Oil Tank',
   permissionManagement: 'Permission Management',
   product: 'Product',
   productInventory: 'Product Inventory',

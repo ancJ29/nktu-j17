@@ -93,6 +93,7 @@ import {
   IconArrowsMaximize,
   IconArrowsMinimize,
   IconBox,
+  IconBucketDroplet,
   IconBrush,
   IconBuilding,
   IconCalendar,
@@ -195,6 +196,11 @@ const MODULE_LABELS: Record<string, string> = {
   trucksEnabled: 'Enable Trucks',
   trucksEnabledDesc:
     'When enabled, the Trucks section is available in navigation (subject to per-user permissions).',
+  oilTanksModule: 'Oil Tanks',
+  oilTanksModuleDesc: 'On-site fuel tanks (single-mode-records stack).',
+  oilTanksEnabled: 'Enable Oil Tanks',
+  oilTanksEnabledDesc:
+    'When enabled, the Oil Tanks section is available in navigation (subject to per-user permissions). Independent of Trucks: a fleet can run entirely on external stations.',
   farmModule: 'Farm (Greenhouses, Crops & Diary)',
   farmModuleDesc:
     'Agriculture: greenhouses, the crops grown in them, and the crop diary (activity log + reusable templates).',
@@ -288,6 +294,9 @@ export function ConfigEditor({
     useState<CMngtWarehouseDocFeatures>(SCHEMA_DEFAULT_WAREHOUSE_RECEIPT_FEATURES);
   const [warehouseDeliveryNotesFeatures, setWarehouseDeliveryNotesFeatures] =
     useState<CMngtWarehouseDocFeatures>(SCHEMA_DEFAULT_WAREHOUSE_DELIVERY_NOTE_FEATURES);
+  const [oilTanksFeatures, setOilTanksFeatures] = useState<CMngtModuleFeatures>(
+    SCHEMA_DEFAULT_MODULE_FEATURES,
+  );
   const [trucksFeatures, setTrucksFeatures] = useState<CMngtModuleFeatures>(
     SCHEMA_DEFAULT_MODULE_FEATURES,
   );
@@ -382,6 +391,7 @@ export function ConfigEditor({
         lookups: lookupsFeatures,
         lookupV2: lookupV2Features,
         trucks: trucksFeatures,
+        oilTanks: oilTanksFeatures,
         farm: farmFeatures,
       },
       layout,
@@ -422,6 +432,7 @@ export function ConfigEditor({
       lookupV2Features,
       lookupsFeatures,
       trucksFeatures,
+      oilTanksFeatures,
       farmFeatures,
       layout,
       displaySettings,
@@ -468,6 +479,7 @@ export function ConfigEditor({
     });
     setLookupV2Features({ ...SCHEMA_DEFAULT_LOOKUP_FEATURES, ...cfg.features?.lookupV2 });
     setTrucksFeatures({ ...SCHEMA_DEFAULT_MODULE_FEATURES, ...cfg.features?.trucks });
+    setOilTanksFeatures({ ...SCHEMA_DEFAULT_MODULE_FEATURES, ...cfg.features?.oilTanks });
     setFarmFeatures({ ...SCHEMA_DEFAULT_MODULE_FEATURES, ...cfg.features?.farm });
     setCustomersFeatures({ ...SCHEMA_DEFAULT_CUSTOMER_FEATURES, ...cfg.features?.customers });
     setVendorsFeatures({ ...SCHEMA_DEFAULT_VENDOR_FEATURES, ...cfg.features?.vendors });
@@ -762,6 +774,7 @@ export function ConfigEditor({
     [],
   );
   const resetTrucks = useCallback(() => setTrucksFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
+  const resetOilTanks = useCallback(() => setOilTanksFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
   const resetFarm = useCallback(() => setFarmFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
   const resetVendors = useCallback(() => setVendorsFeatures(DEFAULT_VENDOR_FEATURES), []);
   const resetLookups = useCallback(() => setLookupsFeatures(SCHEMA_DEFAULT_LOOKUP_FEATURES), []);
@@ -833,6 +846,7 @@ export function ConfigEditor({
     vendors: eqDefault(vendorsFeatures, DEFAULT_VENDOR_FEATURES),
     productInventory: eqDefault(productInventoryFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     trucks: eqDefault(trucksFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
+    oilTanks: eqDefault(oilTanksFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     farm: eqDefault(farmFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     materials: eqDefault(materialsFeatures, SCHEMA_DEFAULT_MATERIAL_FEATURES),
     materialInventory: eqDefault(
@@ -1332,6 +1346,13 @@ export function ConfigEditor({
                 features: trucksFeatures,
                 setFeatures: setTrucksFeatures,
                 reset: resetTrucks,
+              },
+              {
+                key: 'oilTanks' as const,
+                icon: IconBucketDroplet,
+                features: oilTanksFeatures,
+                setFeatures: setOilTanksFeatures,
+                reset: resetOilTanks,
               },
               {
                 key: 'farm' as const,

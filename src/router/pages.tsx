@@ -101,6 +101,16 @@ export const TruckAssetFormPage = lazy(() =>
   import('../pages/assets/truck').then((m) => ({ default: m.TruckAssetFormPage })),
 );
 
+export const OilTankListPage = lazy(() =>
+  import('../pages/oil-tanks').then((m) => ({ default: m.OilTankListPage })),
+);
+export const OilTankDetailPage = lazy(() =>
+  import('../pages/oil-tanks').then((m) => ({ default: m.OilTankDetailPage })),
+);
+export const OilTankFormPage = lazy(() =>
+  import('../pages/oil-tanks').then((m) => ({ default: m.OilTankFormPage })),
+);
+
 export const GreenhouseListPage = lazy(() =>
   import('../pages/greenhouses').then((m) => ({ default: m.GreenhouseListPage })),
 );

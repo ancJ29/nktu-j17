@@ -76,6 +76,10 @@ type ImageUploadPanelProps = {
   section?: 'all' | 'upload' | 'grid';
 
   buildFileName?: (originalName: string) => string;
+
+  uploadControl?: 'auto' | 'button';
+
+  uploadButtonLabel?: string;
 };
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
@@ -93,6 +97,8 @@ export function ImageUploadPanel({
   externalCamera = false,
   section = 'all',
   buildFileName,
+  uploadControl = 'auto',
+  uploadButtonLabel,
 }: ImageUploadPanelProps) {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
@@ -301,8 +307,30 @@ export function ImageUploadPanel({
 
   return (
     <Stack gap={isMobile ? 2 : 'md'} p={isMobile ? 4 : 'md'}>
+      {/* Inline file-picker button — the modal-safe control (see `uploadControl`) */}
+      {showUpload && editable && uploadControl === 'button' && (
+        <FileButton
+          resetRef={resetRef}
+          onChange={handleUpload}
+          accept={ACCEPTED_TYPES.join(',')}
+          multiple
+        >
+          {(props) => (
+            <Button
+              {...props}
+              size="compact-sm"
+              variant="light"
+              loading={uploading}
+              leftSection={isMobile ? <IconCamera size={14} /> : <IconUpload size={14} />}
+            >
+              {uploadButtonLabel ?? t('photos.addPhotos')}
+            </Button>
+          )}
+        </FileButton>
+      )}
+
       {/* Desktop: drag-and-drop zone */}
-      {showUpload && editable && !isMobile && (
+      {showUpload && editable && uploadControl === 'auto' && !isMobile && (
         <Box
           onDragEnter={(e) => {
             e.preventDefault();
@@ -417,7 +445,7 @@ export function ImageUploadPanel({
       )}
 
       {/* Mobile: floating camera FAB (only when not externally managed) */}
-      {showUpload && editable && isMobile && !externalCamera && (
+      {showUpload && editable && uploadControl === 'auto' && isMobile && !externalCamera && (
         <Affix position={{ bottom: 80, right: 20 }} zIndex={100}>
           <ActionIcon
             size={56}
@@ -514,7 +542,7 @@ export function ImageUploadPanel({
       )}
 
       {/* Camera capture (mobile only, when not externally managed) */}
-      {showUpload && isMobile && !externalCamera && (
+      {showUpload && uploadControl === 'auto' && isMobile && !externalCamera && (
         <CameraCapture
           opened={cameraOpened}
           onClose={closeCamera}

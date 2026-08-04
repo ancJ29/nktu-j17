@@ -1,15 +1,4 @@
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Group,
-  NumberInput,
-  Select,
-  Stack,
-  Table,
-  Text,
-} from '@mantine/core';
+import { Alert, Badge, Button, Card, Group, Select, Stack, Table, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconAlertTriangle, IconBoxMultiple, IconCheck } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -37,6 +26,7 @@ import { getItemBaseUnit } from '@/utils/unitConversion';
 import { isBundleSet } from '@/utils/productSet';
 import { rebalanceForSetStockChange } from '@/utils/setRebalance';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
+import { NumberField } from '@/components/NumberField';
 const locationsEnabled = isLocationsEnabled();
 
 type Props = {
@@ -71,7 +61,7 @@ export function ProductInventoryComposeSetModal({
   const [locationCode, setLocationCode] = useState<string | null>(
     locationsEnabled ? null : DEFAULT_LOCATION_CODE,
   );
-  const [quantity, setQuantity] = useState<number | ''>(1);
+  const [quantity, setQuantity] = useState<number | undefined>(1);
   const [submitting, setSubmitting] = useState(false);
 
   const [customer, setCustomer] = useState<CustomerSelectorChange | null>(null);
@@ -541,11 +531,11 @@ export function ProductInventoryComposeSetModal({
               disabled={submitting}
             />
           )}
-          <NumberInput
+          <NumberField
             label={t('productInventory.composeSet.quantityLabel')}
             placeholder="1"
             value={quantity}
-            onChange={(v) => setQuantity(typeof v === 'number' ? v : Number(v) || '')}
+            onChange={setQuantity}
             min={1}
             disabled={submitting}
           />

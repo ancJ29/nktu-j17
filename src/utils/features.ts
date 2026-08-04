@@ -55,6 +55,9 @@ export const featureFlags = {
   trucks: {
     enabled: features?.trucks?.enabled ?? false,
   },
+  oilTanks: {
+    enabled: features?.oilTanks?.enabled ?? false,
+  },
   farm: {
     enabled: features?.farm?.enabled ?? false,
   },

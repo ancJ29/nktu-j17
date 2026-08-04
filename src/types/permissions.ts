@@ -186,6 +186,13 @@ export const BASE_PERMISSIONS: Permissions = {
       canExport: false,
     },
   },
+
+  oilTank: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
   greenhouse: {
     canView: false,
     canCreate: false,
@@ -359,6 +366,12 @@ export const DEFAULT_PERMISSIONS: Permissions = {
   },
 
   truck: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
+  oilTank: {
     canView: false,
     canCreate: false,
     canEdit: false,

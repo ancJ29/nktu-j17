@@ -16,7 +16,7 @@ import {
   IconTruck,
   IconUser,
 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { Tabs } from '@credo/base-ui/components';
@@ -27,8 +27,10 @@ import { SectionCard } from '@/components/SectionCard';
 import { StatPill } from '@/components/StatPill';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { useLookupV2Labels, useLookupV2Options } from '@/hooks/useLookupV2Options';
-import type { TruckAssetRow } from '@/types';
+import type { OilTankRow, TruckAssetRow } from '@/types';
 import { isActivityLoggingEnabled, perms } from '@/utils/permission';
+import { featureFlags } from '@/utils/features';
+import { useOilTankStore } from '@/stores/useOilTankStore';
 import { TruckDetailShell } from './shared/TruckDetailShell';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import { OperationLogSection } from '@/pages/operation-logs/OperationLogSection';
@@ -49,6 +51,22 @@ const TRUCK_LOG_PERMS = {
 
 const tabStyle = { flexShrink: 0, whiteSpace: 'nowrap' } as const;
 
+function useOilTankOptions() {
+  const enabled = featureFlags.oilTanks.enabled && perms.oilTank.canEdit();
+  const items = useOilTankStore((s) => s.items);
+  const initialized = useOilTankStore((s) => s.initialized);
+  const loadAll = useOilTankStore((s) => s.loadAll);
+  useEffect(() => {
+    if (enabled && !initialized) loadAll();
+  }, [enabled, initialized, loadAll]);
+  return useMemo(() => {
+    if (!enabled) return undefined;
+    return (items as OilTankRow[])
+      .filter((tank) => tank.isActive && !tank.extra?.isDeleted)
+      .map((tank) => ({ value: tank.id, label: `${tank.code} — ${tank.name}`, code: tank.code }));
+  }, [enabled, items]);
+}
+
 export function TruckAssetDetailPage() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<string | null>('overview');
@@ -56,6 +74,8 @@ export function TruckAssetDetailPage() {
   const truckTypeLabels = useLookupV2Labels('truck-type');
 
   const maintenanceTypeOptions = useLookupV2Options('truck-maintenance-type');
+
+  const oilTankOptions = useOilTankOptions();
 
   return (
     <TruckDetailShell
@@ -409,7 +429,7 @@ export function TruckAssetDetailPage() {
                   targetId={targetId}
                   targetCode={targetCode}
                   perms={TRUCK_LOG_PERMS}
-                  context={{ assignedDriver }}
+                  context={{ assignedDriver, oilTankOptions }}
                 />
               )}
             </Tabs.Panel>

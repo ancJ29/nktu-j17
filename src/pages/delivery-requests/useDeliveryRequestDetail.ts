@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router';
 import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { ROUTES } from '@/constants/routes';
-import { resolveClientCode } from '@/config/client-code';
+import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
 import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { asyncDeduplicator } from '@credo/base-ui/utils';
@@ -668,11 +668,10 @@ export function useDeliveryRequestDetail(
     }
   }, [request, t, invalidateCache, navigate, closeDelete]);
 
-  const imageDirectory = useMemo(() => {
-    const clientCode = resolveClientCode();
-    const today = new Date().toISOString().slice(0, 10);
-    return `/c-mngt/${clientCode}/${today}/delivery-request/${request?.id ?? ''}`;
-  }, [request?.id]);
+  const imageDirectory = useMemo(
+    () => buildExpiringUploadDirectory({ type: 'delivery-request', id: request?.id ?? '' }),
+    [request?.id],
+  );
 
   const handlePhotosChange = useCallback(
     async (photos: DeliveryRequestPhoto[]) => {

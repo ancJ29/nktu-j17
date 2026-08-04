@@ -10,7 +10,6 @@ import {
   Grid,
   Group,
   Modal,
-  NumberInput,
   rem,
   SimpleGrid,
   Stack,
@@ -61,6 +60,7 @@ import {
 } from './GoodsReceiptItemsTable';
 import { resolveBaseUnitDisplay } from './goodsReceiptUnitDisplay';
 import type { DateTimeInput, NullableDateTimeInput } from '@credo/kits/types';
+import { NumberField } from '@/components/NumberField';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -1023,10 +1023,11 @@ function QuantityEditForm({
         </Text>
       </Stack>
 
-      <NumberInput
+      <NumberField
         label={t('common.labels.quantity')}
         value={qty}
-        onChange={(v) => setQty(Number(v) || 0)}
+        emptyValue={0}
+        onChange={setQty}
         min={0}
         size="md"
         autoFocus

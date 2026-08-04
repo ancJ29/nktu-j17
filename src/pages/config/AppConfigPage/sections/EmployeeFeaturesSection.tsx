@@ -3,7 +3,6 @@ import {
   Box,
   Group,
   MultiSelect,
-  NumberInput,
   Paper,
   SimpleGrid,
   Stack,
@@ -14,6 +13,7 @@ import {
 import { memo, useMemo } from 'react';
 import { ConfigOptionEditor } from '../editors/ConfigOptionEditor';
 import { buildEmployeeCodePreview } from '../helpers';
+import { NumberField } from '@/components/NumberField';
 
 type EmpFlagKey =
   | 'enabled'
@@ -131,12 +131,11 @@ export const EmployeeFeaturesSection = memo(function EmployeeFeaturesSection({
             size="sm"
             placeholder="EMP-"
           />
-          <NumberInput
+          <NumberField
             label="Number Padding"
             value={features.codePadLength}
-            onChange={(v) =>
-              onChange({ ...features, codePadLength: typeof v === 'number' ? v : 0 })
-            }
+            emptyValue={0}
+            onChange={(codePadLength) => onChange({ ...features, codePadLength })}
             size="sm"
             min={0}
             max={12}

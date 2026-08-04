@@ -1,7 +1,30 @@
+import type { DateTimeInput } from '@credo/kits/types';
 import type { CMngtOperationLog } from '@credo/connectors/types';
 
+export type OperationLogPhoto = {
+  url: string;
+  timestamp: DateTimeInput;
+  userId?: string;
+  userName?: string;
+  fileName?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+  isDeleted?: boolean;
+};
+
+export type OperationLogSharedExtra = {
+  photos?: OperationLogPhoto[];
+};
+
 export type OperationLogType =
-  'refuel' | 'maintenance' | 'trip' | 'driver-training' | 'greenhouse-maintenance';
+  | 'refuel'
+  | 'maintenance'
+  | 'trip'
+  | 'driver-training'
+  | 'greenhouse-maintenance'
+  | 'oil-tank-refill'
+  | 'oil-tank-issue';
 
 export type RefuelLogExtra = {
   litres?: number;
@@ -19,6 +42,11 @@ export type RefuelLogExtra = {
   driverName?: string;
 
   driverId?: string;
+
+  fuelSource?: 'tank' | 'external';
+
+  oilTankId?: string;
+  oilTankCode?: string;
 
   note?: string;
   [key: string]: unknown;
@@ -111,10 +139,44 @@ export type GreenhouseMaintenanceLogExtra = {
   [key: string]: unknown;
 };
 
-export type OperationLogExtra = RefuelLogExtra &
+export type OilTankRefillLogExtra = {
+  litres?: number;
+
+  unitPrice?: number;
+
+  totalAmount?: number;
+
+  supplier?: string;
+
+  note?: string;
+  [key: string]: unknown;
+};
+
+export type OilTankIssueLogExtra = {
+  litres?: number;
+
+  unitPrice?: number;
+
+  totalAmount?: number;
+
+  truckId?: string;
+  truckCode?: string;
+
+  driverName?: string;
+
+  sourceRefuelLogId?: string;
+
+  note?: string;
+  [key: string]: unknown;
+};
+
+export type OperationLogExtra = OperationLogSharedExtra &
+  RefuelLogExtra &
   MaintenanceLogExtra &
   TripLogExtra &
   DriverTrainingLogExtra &
-  GreenhouseMaintenanceLogExtra;
+  GreenhouseMaintenanceLogExtra &
+  OilTankRefillLogExtra &
+  OilTankIssueLogExtra;
 
 export type OperationLog = CMngtOperationLog<OperationLogExtra>;

@@ -43,6 +43,7 @@ import {
   hasHideFromInventoryListForProducts,
   perms,
 } from '@/utils/permission';
+import { NumberField } from '@/components/NumberField';
 
 export type ProductFormValues = {
   name: string;
@@ -145,11 +146,12 @@ function UnitConversionsEditor({
           <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
             =
           </Text>
-          <NumberInput
+          <NumberField
             min={0.001}
             step={1}
             value={row.quantity}
-            onChange={(v) => updateRow(idx, { quantity: typeof v === 'number' ? v : 1 })}
+            emptyValue={1}
+            onChange={(quantity) => updateRow(idx, { quantity })}
             style={{ width: 90 }}
           />
           <Select
@@ -301,12 +303,13 @@ function SetCompositionEditor({
               filter={componentFilter}
               style={{ flex: 2 }}
             />
-            <NumberInput
+            <NumberField
               min={0.001}
               step={1}
               placeholder={t('common.labels.quantity')}
               value={row.quantity}
-              onChange={(v) => updateRow(idx, { quantity: typeof v === 'number' ? v : 1 })}
+              emptyValue={1}
+              onChange={(quantity) => updateRow(idx, { quantity })}
               style={{ width: 100 }}
             />
             <Select

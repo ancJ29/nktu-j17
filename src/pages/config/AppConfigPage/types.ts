@@ -17,6 +17,7 @@ export type SectionKey =
   | 'warehouseReceipts'
   | 'warehouseDeliveryNotes'
   | 'trucks'
+  | 'oilTanks'
   | 'farm'
   | 'customers'
   | 'vendors'
@@ -52,6 +53,7 @@ export const ALL_SECTIONS: SectionKey[] = [
   'warehouseReceipts',
   'warehouseDeliveryNotes',
   'trucks',
+  'oilTanks',
   'farm',
   'customers',
   'vendors',

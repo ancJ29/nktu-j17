@@ -1,6 +1,7 @@
 import type { CMngtLayoutConfig } from '@credo/kits/types';
-import { Box, Group, NumberInput, SegmentedControl, SimpleGrid, Switch, Text } from '@mantine/core';
+import { Box, Group, SegmentedControl, SimpleGrid, Switch, Text } from '@mantine/core';
 import { memo } from 'react';
+import { NumberField } from '@/components/NumberField';
 
 export const LayoutSection = memo(function LayoutSection({
   layout,
@@ -11,15 +12,11 @@ export const LayoutSection = memo(function LayoutSection({
 }) {
   return (
     <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
-      <NumberInput
+      <NumberField
         label="Navbar Width (px)"
         value={layout.navbar.width}
-        onChange={(v) =>
-          onChange({
-            ...layout,
-            navbar: { ...layout.navbar, width: typeof v === 'number' ? v : 260 },
-          })
-        }
+        emptyValue={260}
+        onChange={(width) => onChange({ ...layout, navbar: { ...layout.navbar, width } })}
         size="sm"
         min={180}
         max={400}

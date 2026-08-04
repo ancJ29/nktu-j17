@@ -320,6 +320,8 @@ export type CMngtAppConfig = AppConfig & {
 
     trucks: CMngtModuleFeatures;
 
+    oilTanks: CMngtModuleFeatures;
+
     farm: CMngtModuleFeatures;
   };
   layout: CMngtLayoutConfig;

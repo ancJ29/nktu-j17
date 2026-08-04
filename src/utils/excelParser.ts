@@ -1967,6 +1967,7 @@ function buildRefuelSheet(
         { header: 'Đơn giá', width: 12 },
         { header: 'Thành tiền', width: 14 },
         { header: 'L/100km', width: 10 },
+        { header: 'Nguồn', width: 16 },
         { header: 'Lái xe', width: 18 },
         { header: 'Ghi chú', width: 30 },
       ]
@@ -1979,6 +1980,7 @@ function buildRefuelSheet(
         { header: 'Unit price', width: 12 },
         { header: 'Amount', width: 14 },
         { header: 'L/100km', width: 10 },
+        { header: 'Source', width: 16 },
         { header: 'Driver', width: 18 },
         { header: 'Note', width: 30 },
       ];
@@ -1996,6 +1998,12 @@ function buildRefuelSheet(
       numCell(e.unitPrice),
       numCell(e.totalAmount),
       cons == null ? '' : round1(cons),
+
+      e.fuelSource === 'tank'
+        ? (e.oilTankCode ?? (isVietnamese ? 'Bồn dầu' : 'Tank'))
+        : isVietnamese
+          ? 'Ngoài'
+          : 'External',
       typeof e.driverName === 'string' ? e.driverName : '',
       typeof e.note === 'string' ? e.note : '',
     ];

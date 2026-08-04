@@ -75,6 +75,7 @@ import {
 } from './purgeTransactionalData';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
+import { NumberField } from '@/components/NumberField';
 
 const DEFAULT_INDUSTRY: IndustryName = 'food';
 
@@ -560,11 +561,12 @@ function ProductSection({ clientCode, industry, disabled, max }: ProductMaterial
         </Text>
         <Divider mb="md" />
         <Stack gap="sm">
-          <NumberInput
+          <NumberField
             label={t('fakeData.products.count')}
             description={t('fakeData.products.countHelp', { max })}
             value={count}
-            onChange={(v) => setCount(typeof v === 'number' ? v : Number(v) || 0)}
+            emptyValue={0}
+            onChange={setCount}
             min={1}
             max={max}
             w={260}
@@ -667,11 +669,12 @@ function CustomerSection({ clientCode, industry, disabled }: IndustrySectionProp
         </Text>
         <Divider mb="md" />
         <Stack gap="sm">
-          <NumberInput
+          <NumberField
             label={t('fakeData.customers.count')}
             description={t('fakeData.customers.countHelp')}
             value={count}
-            onChange={(v) => setCount(typeof v === 'number' ? v : Number(v) || 0)}
+            emptyValue={0}
+            onChange={setCount}
             min={1}
             max={CUSTOMER_MAX_COUNT}
             w={260}
@@ -774,11 +777,12 @@ function VendorSection({ clientCode, industry, disabled }: IndustrySectionProps)
         </Text>
         <Divider mb="md" />
         <Stack gap="sm">
-          <NumberInput
+          <NumberField
             label={t('fakeData.vendors.count')}
             description={t('fakeData.vendors.countHelp')}
             value={count}
-            onChange={(v) => setCount(typeof v === 'number' ? v : Number(v) || 0)}
+            emptyValue={0}
+            onChange={setCount}
             min={1}
             max={VENDOR_MAX_COUNT}
             w={260}
@@ -886,20 +890,22 @@ function GoodsReceiptSection({ clientCode, industry, disabled }: IndustrySection
         <Divider mb="md" />
         <Stack gap="sm">
           <Group gap="md" wrap="wrap">
-            <NumberInput
+            <NumberField
               label={t('fakeData.goodsReceipts.count')}
               description={t('fakeData.goodsReceipts.countHelp')}
               value={count}
-              onChange={(v) => setCount(typeof v === 'number' ? v : Number(v) || 0)}
+              emptyValue={0}
+              onChange={setCount}
               min={1}
               max={GR_MAX_COUNT}
               w={260}
             />
-            <NumberInput
+            <NumberField
               label={t('fakeData.goodsReceipts.daysBack')}
               description={t('fakeData.goodsReceipts.daysBackHelp')}
               value={daysBack}
-              onChange={(v) => setDaysBack(typeof v === 'number' ? v : Number(v) || 0)}
+              emptyValue={0}
+              onChange={setDaysBack}
               min={1}
               max={GR_MAX_DAYS_BACK}
               w={260}
@@ -1013,20 +1019,22 @@ function SalesOrderSection({ clientCode, disabled }: BaseSectionProps) {
         <Divider mb="md" />
         <Stack gap="sm">
           <Group gap="md" wrap="wrap">
-            <NumberInput
+            <NumberField
               label={t('fakeData.salesOrders.count')}
               description={t('fakeData.salesOrders.countHelp')}
               value={count}
-              onChange={(v) => setCount(typeof v === 'number' ? v : Number(v) || 0)}
+              emptyValue={0}
+              onChange={setCount}
               min={1}
               max={SO_MAX_COUNT}
               w={260}
             />
-            <NumberInput
+            <NumberField
               label={t('fakeData.salesOrders.daysBack')}
               description={t('fakeData.salesOrders.daysBackHelp')}
               value={daysBack}
-              onChange={(v) => setDaysBack(typeof v === 'number' ? v : Number(v) || 0)}
+              emptyValue={0}
+              onChange={setDaysBack}
               min={1}
               max={SO_MAX_DAYS_BACK}
               w={260}
@@ -1145,20 +1153,22 @@ function ProductInventorySection({ clientCode, disabled }: BaseSectionProps) {
         <Divider mb="md" />
         <Stack gap="sm">
           <Group gap="md" wrap="wrap">
-            <NumberInput
+            <NumberField
               label={t('fakeData.productInventory.count')}
               description={t('fakeData.productInventory.countHelp')}
               value={count}
-              onChange={(v) => setCount(typeof v === 'number' ? v : Number(v) || 0)}
+              emptyValue={0}
+              onChange={setCount}
               min={1}
               max={PINV_MAX_COUNT}
               w={260}
             />
-            <NumberInput
+            <NumberField
               label={t('fakeData.productInventory.maxQty')}
               description={t('fakeData.productInventory.maxQtyHelp')}
               value={maxQty}
-              onChange={(v) => setMaxQty(typeof v === 'number' ? v : Number(v) || 0)}
+              emptyValue={0}
+              onChange={setMaxQty}
               min={0}
               max={PINV_MAX_MAX_QTY}
               w={260}

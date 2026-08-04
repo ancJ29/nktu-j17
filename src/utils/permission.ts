@@ -587,6 +587,7 @@ export const perms = {
       canExport: () => resolve().actions?.canExport ?? false,
     };
   })(),
+  oilTank: createModulePerms('oilTank'),
   greenhouse: createModulePerms('greenhouse'),
   crop: createModulePerms('crop'),
   cropDiaryTemplate: createModulePerms('cropDiaryTemplate'),

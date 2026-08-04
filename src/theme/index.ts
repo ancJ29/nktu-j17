@@ -4,12 +4,14 @@ import {
   Accordion,
   Button,
   Drawer,
+  Input,
   Modal,
   rem,
   createTheme,
   PasswordInput,
   TextInput,
   Badge,
+  Table,
 } from '@mantine/core';
 
 const inputStyles = {
@@ -22,6 +24,11 @@ const inputStyles = {
 };
 
 const baseTheme = buildMantineTheme(themeConfig, {
+  InputWrapper: Input.Wrapper.extend({
+    defaultProps: {
+      inputWrapperOrder: ['label', 'input', 'description', 'error'],
+    },
+  }),
   Accordion: Accordion.extend({
     styles: {
       label: {
@@ -106,24 +113,17 @@ const baseTheme = buildMantineTheme(themeConfig, {
       return {};
     },
   }),
+  Table: Table.extend({
+    defaultProps: {
+      highlightOnHoverColor: 'var(--mantine-color-primary-0)',
+    },
+  }),
 });
 
 export const theme = createTheme({
   ...baseTheme,
   colors: {
     ...baseTheme.colors,
-    tomato: [
-      '#fff3e0',
-      '#ffe6ca',
-      '#ffcb99',
-      '#ffaf63',
-      '#ff922b',
-      '#ff8818',
-      '#ff8005',
-      '#e46e00',
-      '#cc6000',
-      '#b15100',
-    ],
   },
   defaultRadius: 'md',
   cursorType: 'pointer',

@@ -83,6 +83,12 @@ export const ROUTES = {
       EDIT: '/assets/trucks/:id/edit',
     },
   },
+  OIL_TANKS: {
+    LIST: '/oil-tanks',
+    NEW: '/oil-tanks/new',
+    DETAIL: '/oil-tanks/:id',
+    EDIT: '/oil-tanks/:id/edit',
+  },
   GREENHOUSES: {
     LIST: '/greenhouses',
     NEW: '/greenhouses/new',

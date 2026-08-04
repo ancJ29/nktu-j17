@@ -53,6 +53,9 @@ import {
   TruckAssetListPage,
   TruckAssetDetailPage,
   TruckAssetFormPage,
+  OilTankListPage,
+  OilTankDetailPage,
+  OilTankFormPage,
   GreenhouseListPage,
   GreenhouseDetailPage,
   GreenhouseFormPage,
@@ -127,6 +130,7 @@ const transportOrderGate = gate('transportOrder');
 const locationGate = gate('location');
 const materialGate = gate('material');
 const truckGate = gate('truck');
+const oilTankGate = gate('oilTank');
 const greenhouseGate = gate('greenhouse');
 const cropGate = gate('crop');
 const cropDiaryTemplateGate = gate('cropDiaryTemplate');
@@ -159,6 +163,16 @@ const truckAssetDetailNav = {
       icon: IconName.Truck,
       label: t('assets.truck.title'),
       path: ROUTES.ASSETS.TRUCKS.LIST,
+    },
+  ],
+};
+
+const oilTankDetailNav = {
+  detailNav: (t: (key: string) => string) => [
+    {
+      icon: IconName.BucketDroplet,
+      label: t('oilTanks.title'),
+      path: ROUTES.OIL_TANKS.LIST,
     },
   ],
 };
@@ -285,6 +299,7 @@ const productsEnabled = featureFlags.products.enabled;
 const locationsEnabled = featureFlags.locations.enabled;
 const materialsEnabled = featureFlags.materials.enabled;
 const trucksEnabled = featureFlags.trucks.enabled;
+const oilTanksEnabled = featureFlags.oilTanks.enabled;
 const farmEnabled = featureFlags.farm.enabled;
 const productInventoryEnabled = featureFlags.productInventory.enabled;
 const materialInventoryEnabled = featureFlags.materialInventory.enabled;
@@ -584,6 +599,43 @@ const truckAssetDetailRoutes: RouteObject[] = [
       TruckAssetFormPage,
     ),
     handle: truckAssetDetailNav,
+  },
+];
+
+const oilTankRoutes: RouteObject[] = [
+  {
+    path: ROUTES.OIL_TANKS.LIST,
+    element: gatedComponent(
+      { enabled: oilTanksEnabled, requires: oilTankGate.view },
+      OilTankListPage,
+    ),
+  },
+];
+
+const oilTankDetailRoutes: RouteObject[] = [
+  {
+    path: ROUTES.OIL_TANKS.NEW,
+    element: gatedComponent(
+      { enabled: oilTanksEnabled, requires: oilTankGate.create },
+      OilTankFormPage,
+    ),
+    handle: oilTankDetailNav,
+  },
+  {
+    path: ROUTES.OIL_TANKS.DETAIL,
+    element: gatedComponent(
+      { enabled: oilTanksEnabled, requires: oilTankGate.view },
+      OilTankDetailPage,
+    ),
+    handle: oilTankDetailNav,
+  },
+  {
+    path: ROUTES.OIL_TANKS.EDIT,
+    element: gatedComponent(
+      { enabled: oilTanksEnabled, requires: oilTankGate.edit },
+      OilTankFormPage,
+    ),
+    handle: oilTankDetailNav,
   },
 ];
 
@@ -943,6 +995,7 @@ const router = createBrowserRouter([
           ...warehouseDeliveryNoteRoutes,
           ...quotationRoutes,
           ...truckAssetRoutes,
+          ...oilTankRoutes,
           ...greenhouseRoutes,
           ...cropRoutes,
           ...cropDiaryTemplateRoutes,
@@ -990,6 +1043,7 @@ const router = createBrowserRouter([
           ...warehouseDeliveryNoteDetailRoutes,
           ...quotationDetailRoutes,
           ...truckAssetDetailRoutes,
+          ...oilTankDetailRoutes,
           ...greenhouseDetailRoutes,
           ...cropDetailRoutes,
           ...cropDiaryTemplateDetailRoutes,

@@ -45,10 +45,10 @@
       },
       "labels": {
         "active": "Hoạt động",
+        "inactive": "Ngừng",
         "note": "Ghi chú",
         "orderDate": "Ngày đặt hàng",
-        "status": "Trạng thái",
-        "inactive": "Ngừng"
+        "status": "Trạng thái"
       },
       "list": {
         "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…"
@@ -1078,8 +1078,8 @@
       "googleMapUrlLabel": "Link Google Maps",
       "googleMapUrlPlaceholder": "Dán link Google Maps (không bắt buộc)",
       "namePlaceholder": "Tên khách hàng",
-      "shippingAddressesAdd": "Thêm địa chỉ giao hàng",
       "shippingAddressLabel": "Địa chỉ giao hàng",
+      "shippingAddressesAdd": "Thêm địa chỉ giao hàng",
       "shortNamePlaceholder": "Tên rút gọn",
       "taxCodePlaceholder": "Mã số thuế",
       "updateButton": "Cập nhật khách hàng"
@@ -2380,6 +2380,136 @@
     "report": "Báo cáo",
     "warehouse": "Kho"
   },
+  "oilTanks": {
+    "addItem": "Thêm bồn",
+    "columns": {
+      "fuelType": "Nhiên liệu",
+      "level": "Tồn",
+      "location": "Vị trí"
+    },
+    "dangerZone": {
+      "deleteConfirm": "Xóa bồn này? Lịch sử nhập/xuất dầu sẽ không còn truy cập được.",
+      "deleteItem": "Xóa bồn",
+      "deleteItemDesc": "Xóa bồn khỏi ứng dụng. Lịch sử xuất nhập vẫn được giữ nhưng không truy cập được nữa.",
+      "disableConfirm": "Tắt bồn này?",
+      "disableItem": "Tắt bồn",
+      "disableItemDesc": "Ẩn bồn khỏi danh sách và ô chọn. Lịch sử xuất nhập vẫn được giữ.",
+      "enableConfirm": "Bật bồn này?",
+      "enableItem": "Bật bồn",
+      "enableItemDesc": "Cho phép chọn lại bồn này."
+    },
+    "detail": {
+      "activityVerbs": {
+        "create": "Đã tạo",
+        "delete": "Đã xóa",
+        "disable": "Đã tắt",
+        "enable": "Đã bật",
+        "update": "Đã cập nhật"
+      },
+      "infoTitle": "Thông tin",
+      "recompute": "Tính lại tồn",
+      "statCapacity": "Dung tích",
+      "statLevel": "Tồn",
+      "tabs": {
+        "issue": "Xuất dầu",
+        "overview": "Chi tiết",
+        "refill": "Nhập dầu"
+      }
+    },
+    "editItem": "Sửa bồn",
+    "emptyMessage": "Thêm bồn dầu đầu tiên để bắt đầu theo dõi tồn.",
+    "emptyTitle": "Chưa có bồn nào",
+    "form": {
+      "capacityHint": "Chỉ để tham khảo — nhập dầu vượt mức vẫn được ghi nhận",
+      "capacityLabel": "Dung tích",
+      "capacityPlaceholder": "Dung tích danh nghĩa",
+      "codeAuto": "Tự động sinh",
+      "createButton": "Tạo bồn",
+      "fuelTypeLabel": "Loại nhiên liệu",
+      "fuelTypePlaceholder": "VD: Dầu DO 0,05S",
+      "locationLabel": "Vị trí",
+      "locationPlaceholder": "VD: Kho A",
+      "namePlaceholder": "VD: Bồn kho A",
+      "notePlaceholder": "Ghi chú về bồn này",
+      "openingDateLabel": "Ngày chốt tồn đầu",
+      "openingHint": "Lượng dầu có sẵn khi bắt đầu quản lý trên hệ thống. Chỉ nhập một lần — các thay đổi sau được ghi bằng phiếu nhập và phiếu xuất.",
+      "openingLevelLabel": "Tồn đầu kỳ",
+      "openingLevelPlaceholder": "Số lít hiện có",
+      "openingSection": "Tồn đầu kỳ",
+      "primarySection": "Thông tin bồn"
+    },
+    "logs": {
+      "issue": {
+        "addItem": "Thêm phiếu xuất",
+        "columns": {
+          "date": "Ngày",
+          "driver": "Lái xe",
+          "litres": "Số lít",
+          "total": "Thành tiền",
+          "truck": "Số xe",
+          "unitPrice": "Đơn giá"
+        },
+        "editItem": "Sửa phiếu xuất",
+        "empty": "Chưa có phiếu xuất nào trong năm {{year}}",
+        "form": {
+          "notePlaceholder": "Ghi chú về lần xuất này"
+        },
+        "sectionTitle": "Xuất dầu",
+        "summary": {
+          "litres": "Tổng xuất"
+        }
+      },
+      "refill": {
+        "addItem": "Thêm phiếu nhập",
+        "columns": {
+          "date": "Ngày",
+          "litres": "Số lít",
+          "supplier": "Nhà cung cấp",
+          "total": "Thành tiền",
+          "unitPrice": "Đơn giá"
+        },
+        "editItem": "Sửa phiếu nhập",
+        "empty": "Chưa có phiếu nhập nào trong năm {{year}}",
+        "form": {
+          "notePlaceholder": "Ghi chú về lần nhập này",
+          "supplierPlaceholder": "Đơn vị giao dầu"
+        },
+        "photosLabel": "Phiếu giao hàng",
+        "sectionTitle": "Nhập dầu",
+        "summary": {
+          "cost": "Tổng tiền",
+          "litres": "Tổng nhập"
+        }
+      },
+      "validation": {
+        "litresRequired": "Nhập số lít"
+      }
+    },
+    "noItems": "Không tìm thấy bồn nào",
+    "notifications": {
+      "createError": "Không tạo được bồn",
+      "createSuccess": "Đã tạo bồn",
+      "deleteError": "Không xóa được bồn",
+      "deleteSuccess": "Đã xóa bồn",
+      "disableSuccess": "Đã tắt bồn",
+      "enableSuccess": "Đã bật bồn",
+      "fetchError": "Không tải được danh sách bồn",
+      "levelSyncError": "Đã lưu phiếu nhưng chưa cập nhật được tồn của bồn. Dùng “Tính lại tồn” trên bồn để dựng lại.",
+      "recomputeClean": "Đã tính lại tồn từ {{count}} phiếu — số liệu vốn đã khớp.",
+      "recomputeDrift": "Đã tính lại tồn từ sổ. Lệch {{drift}} L — có phiếu chưa được cộng/trừ vào tồn.",
+      "recomputeError": "Không tính lại được tồn từ sổ",
+      "toggleError": "Không đổi được trạng thái bồn",
+      "updateError": "Không cập nhật được bồn",
+      "updateSuccess": "Đã cập nhật bồn"
+    },
+    "searchPlaceholder": "Tìm theo tên, mã, loại nhiên liệu hoặc vị trí",
+    "title": "Bồn dầu",
+    "unitLitre": "L",
+    "validation": {
+      "capacityInvalid": "Dung tích phải từ 0 trở lên",
+      "levelInvalid": "Tồn phải từ 0 trở lên"
+    }
+  },
   "operationLogs": {
     "actions": {
       "collapse": "Ẩn chi tiết",
@@ -2447,6 +2577,7 @@
         "laborCost": "Tiền công",
         "odometer": "Số km",
         "outstanding": "Công nợ",
+        "photos": "Hoá đơn",
         "supplier": "Nhà cung cấp",
         "total": "Tổng cộng",
         "totalAmount": "Thành tiền",
@@ -2479,6 +2610,7 @@
     },
     "monthLabel": "Tháng",
     "notifications": {
+      "afterWriteError": "Đã lưu phiếu nhưng một cập nhật liên quan bị lỗi.",
       "createError": "Không lưu được",
       "createSuccess": "Đã lưu",
       "deleteError": "Không xóa được",
@@ -2486,6 +2618,11 @@
       "fetchError": "Không tải được nhật ký",
       "updateError": "Không cập nhật được",
       "updateSuccess": "Đã cập nhật"
+    },
+    "photos": {
+      "add": "Thêm ảnh",
+      "label": "Hình ảnh",
+      "view": "Xem ảnh"
     },
     "refuel": {
       "abnormalTooltip": "Mức tiêu hao cao hơn bình thường",
@@ -2498,6 +2635,8 @@
         "litres": "Số lít",
         "odometerNew": "ODO mới (km)",
         "odometerOld": "ODO cũ (km)",
+        "photos": "Hoá đơn",
+        "source": "Nguồn",
         "total": "Thành tiền",
         "unitPrice": "Đơn giá"
       },
@@ -2505,14 +2644,26 @@
       "empty": "Chưa có nhật ký đổ dầu năm {{year}}.",
       "form": {
         "driverPlaceholder": "Tên lái xe",
-        "notePlaceholder": "Ghi chú (tùy chọn)"
+        "notePlaceholder": "Ghi chú (tùy chọn)",
+        "tankLabel": "Bồn dầu",
+        "tankPlaceholder": "Chọn bồn"
+      },
+      "notifications": {
+        "tankSyncError": "Đã lưu phiếu đổ dầu nhưng chưa cập nhật được sổ của bồn. Lưu lại phiếu, hoặc bấm “Tính lại tồn” trên bồn."
       },
       "sectionTitle": "Nhật ký đổ dầu",
+      "source": {
+        "external": "Cây xăng",
+        "tank": "Bồn nhà"
+      },
       "summary": {
         "avgConsumption": "Tiêu hao TB",
         "totalCost": "Tổng chi phí",
         "totalDistance": "Tổng quãng đường",
         "totalLitres": "Tổng số lít"
+      },
+      "validation": {
+        "tankRequired": "Chọn bồn đã lấy dầu"
       }
     },
     "trip": {
@@ -2548,6 +2699,7 @@
     "yearLabel": "Năm"
   },
   "photos": {
+    "addPhotos": "Thêm ảnh",
     "capture": "Chụp",
     "dragOrClick": "Kéo ảnh vào đây, hoặc nhấp để chọn",
     "dropHere": "Thả để tải lên",
@@ -3048,6 +3200,7 @@
         "lookupV2": "Danh mục",
         "material": "Vật tư",
         "materialInventory": "Tồn kho vật tư",
+        "oilTank": "Bồn dầu",
         "permissionManagement": "Quản lý quyền hạn",
         "product": "Sản phẩm",
         "productInventory": "Tồn kho sản phẩm",
@@ -3634,9 +3787,9 @@
       "drift": "Dữ liệu giữ hàng của đơn không khớp với tồn kho ({{count}} dòng).",
       "driftLine": "đơn ghi {{snapshot}} / kho giữ {{row}}",
       "failedTitle": "Sửa thất bại",
-      "nothingToRepair": "Không có gì cần sửa — đơn đã đồng bộ.",
       "notDeductedMissing": "Đơn đã hoàn tất nhưng chưa ghi nhận trừ tồn kho cho các dòng hàng.",
       "notDeductedReserved": "Đơn đã hoàn tất nhưng hàng đang giữ chưa được trừ khỏi tồn kho.",
+      "nothingToRepair": "Không có gì cần sửa — đơn đã đồng bộ.",
       "orphans": "Tồn kho vẫn đang giữ hàng cho đơn này dù đơn không còn giữ ({{count}} dòng).",
       "repairButton": "Sửa ngay",
       "repairSuccess": "Đã sửa: {{actions}}"

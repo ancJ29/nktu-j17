@@ -1,6 +1,7 @@
-import { NumberInput, Paper, SimpleGrid, Text, TextInput } from '@mantine/core';
+import { Paper, SimpleGrid, Text, TextInput } from '@mantine/core';
 import { memo } from 'react';
 import { buildEmployeeCodePreview } from '../helpers';
+import { NumberField } from '@/components/NumberField';
 
 export const CodeFormatFields = memo(function CodeFormatFields({
   title,
@@ -40,10 +41,11 @@ export const CodeFormatFields = memo(function CodeFormatFields({
           size="sm"
           placeholder={placeholder}
         />
-        <NumberInput
+        <NumberField
           label="Number Padding"
           value={codePadLength}
-          onChange={(v) => onPadLengthChange(typeof v === 'number' ? v : 0)}
+          emptyValue={0}
+          onChange={onPadLengthChange}
           size="sm"
           min={0}
           max={12}

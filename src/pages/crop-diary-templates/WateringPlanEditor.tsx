@@ -1,9 +1,10 @@
-import { Badge, Button, Group, NumberInput, Stack, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Group, Stack, Text, TextInput } from '@mantine/core';
 import { IconDroplet } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { applyWateringRange, summarizeWatering } from '@/utils/cropDiaryTemplateModel';
 import type { CropTemplateWatering, TemplateDay, WateringRange } from '@/types';
+import { NumberField } from '@/components/NumberField';
 
 type Props = {
   readonly value: CropTemplateWatering;
@@ -35,30 +36,33 @@ export function WateringPlanEditor({ value, onChange, days, onDaysChange }: Prop
 
       {/* One sentence: from day N to day M, this much per plant. */}
       <Group gap="xs" align="flex-end" wrap="wrap">
-        <NumberInput
+        <NumberField
           w={104}
           min={1}
           max={Math.max(1, totalDays)}
           label={t('cropDiaryTemplates.watering.fromDayLabel')}
           value={range.fromDay}
-          onChange={(v) => setRange((r) => ({ ...r, fromDay: typeof v === 'number' ? v : 1 }))}
+          emptyValue={1}
+          onChange={(fromDay) => setRange((r) => ({ ...r, fromDay }))}
         />
-        <NumberInput
+        <NumberField
           w={104}
           min={1}
           max={Math.max(1, totalDays)}
           label={t('cropDiaryTemplates.watering.toDayLabel')}
           value={toDay}
-          onChange={(v) => setRange((r) => ({ ...r, toDay: typeof v === 'number' ? v : 0 }))}
+          emptyValue={0}
+          onChange={(nextToDay) => setRange((r) => ({ ...r, toDay: nextToDay }))}
         />
-        <NumberInput
+        <NumberField
           w={130}
           min={0}
           step={0.1}
           decimalScale={3}
           label={t('cropDiaryTemplates.watering.perPlantLabel')}
           value={range.perPlant}
-          onChange={(v) => setRange((r) => ({ ...r, perPlant: typeof v === 'number' ? v : 0 }))}
+          emptyValue={0}
+          onChange={(perPlant) => setRange((r) => ({ ...r, perPlant }))}
         />
         <TextInput
           w={90}

@@ -26,6 +26,7 @@ import {
   IconCategory,
   IconCircleCheck,
   IconClipboardCheck,
+  IconBucketDroplet,
   IconEdit,
   IconEyeOff,
   IconFileText,
@@ -180,6 +181,7 @@ type EntityTargetType =
   | 'customer'
   | 'vendor'
   | 'truck'
+  | 'oilTank'
   | 'salesOrder'
   | 'deliveryRequest'
   | 'goodsReceipt'
@@ -193,6 +195,7 @@ type EntityVerbI18nKey =
   | `customers.detail.activityVerbs.${CustomerVerbKey}`
   | `vendors.detail.activityVerbs.${VendorVerbKey}`
   | `assets.truck.detail.activityVerbs.${SimpleVerbKey}`
+  | `oilTanks.detail.activityVerbs.${SimpleVerbKey}`
   | `salesOrders.detail.activityVerbs.${SalesOrderVerbKey}`
   | `deliveryRequests.detail.activityVerbs.${DeliveryRequestVerbKey}`
   | `goodsReceipts.detail.activityVerbs.${GoodsReceiptVerbKey}`
@@ -542,6 +545,28 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     i18nKey: 'assets.truck.detail.activityVerbs.delete',
     targetType: 'truck',
   },
+  // oil-tank — the fuel register (client-gated). Like trucks, its movement
+  // logs (refill / issue) are NOT activity-logged: they are a domain register
+  // of their own, already visible on the tank detail.
+  'oilTank.create': {
+    icon: <IconBucketDroplet size={16} />,
+    color: 'green',
+    i18nKey: 'oilTanks.detail.activityVerbs.create',
+    targetType: 'oilTank',
+  },
+  'oilTank.update': {
+    icon: <IconEdit size={16} />,
+    color: 'blue',
+    i18nKey: 'oilTanks.detail.activityVerbs.update',
+    targetType: 'oilTank',
+    showDiff: true,
+  },
+  'oilTank.delete': {
+    icon: <IconTrash size={16} />,
+    color: 'red',
+    i18nKey: 'oilTanks.detail.activityVerbs.delete',
+    targetType: 'oilTank',
+  },
   // sales-order — module-specific memo shapes (not deepDiff) per the
   // transactional convention in `docs/memo/activity-logging.md`. The
   // memo line under the header is rendered by `SalesOrderMemoLine`.
@@ -776,6 +801,7 @@ const TOGGLE_TARGET_BY_MODULE: Record<string, EntityTargetType> = {
   customer: 'customer',
   vendor: 'vendor',
   truck: 'truck',
+  oilTank: 'oilTank',
 };
 
 function resolveEntityVerbConfig(entry: ActivityLoggerActivityEntity): EntityVerbConfig | null {
@@ -839,6 +865,8 @@ function moduleI18nNamespace(type: EntityTargetType): string {
       return 'vendors.detail';
     case 'truck':
       return 'assets.truck.detail';
+    case 'oilTank':
+      return 'oilTanks.detail';
     case 'salesOrder':
       return 'salesOrders.detail';
     case 'deliveryRequest':

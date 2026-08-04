@@ -1,8 +1,9 @@
-import { Card, Group, NumberInput, Stack, Text, TextInput } from '@mantine/core';
+import { Card, Group, Stack, Text, TextInput } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { IconDroplet } from '@tabler/icons-react';
 import { MaterialLinesEditor } from '@/components/MaterialLinesEditor';
 import type { TemplateDay } from '@/types';
+import { NumberField } from '@/components/NumberField';
 
 type Props = {
   readonly days: TemplateDay[];
@@ -35,7 +36,7 @@ export function TemplateDaysEditor({ days, onChange, waterUnit }: Props) {
               <Text fw={700} size="sm" c="primary">
                 {t('cropDiaryTemplates.dayLabel', { day: day.day })}
               </Text>
-              <NumberInput
+              <NumberField
                 w={150}
                 size="xs"
                 min={0}
@@ -53,8 +54,8 @@ export function TemplateDaysEditor({ days, onChange, waterUnit }: Props) {
                 rightSectionWidth={waterUnit ? 44 : undefined}
                 placeholder={t('cropDiaryTemplates.watering.dayPlaceholder')}
                 aria-label={t('cropDiaryTemplates.watering.dayLabel')}
-                value={day.water ?? ''}
-                onChange={(v) => patchDay(i, { water: typeof v === 'number' ? v : undefined })}
+                value={day.water}
+                onChange={(water) => patchDay(i, { water })}
               />
             </Group>
 

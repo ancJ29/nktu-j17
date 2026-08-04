@@ -21,6 +21,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { DateField } from '@/components/DateField';
+import { NumberField } from '@/components/NumberField';
 import { SegmentTabs } from '@/components/SegmentTabs';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -98,7 +99,7 @@ import {
   type ProductSelectorChange,
 } from '@/components/selectors';
 import { appConfig } from '@/config';
-import { resolveClientCode } from '@/config/client-code';
+import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
 import { ProductPhotoModal } from './ProductPhotoModal';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import {
@@ -454,11 +455,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
   const [generatedUploadId] = useState(() => Math.random().toString(36).slice(2, 10));
   const uploadId = id ?? generatedUploadId;
-  const imageDirectory = useMemo(() => {
-    const clientCode = resolveClientCode();
-    const today = new Date().toISOString().slice(0, 10);
-    return `/c-mngt/${clientCode}/${today}/sales-order/${uploadId}`;
-  }, [uploadId]);
+  const imageDirectory = useMemo(
+    () => buildExpiringUploadDirectory({ type: 'sales-order', id: uploadId }),
+    [uploadId],
+  );
 
   const currentEmployee = useMemo(() => {
     if (!user.email) return undefined;
@@ -2747,14 +2747,14 @@ function DesktopItemTable({
               </Table.Td>
               <Table.Td>
                 <Stack gap={2}>
-                  <NumberInput
+                  <NumberField
                     size="xs"
                     min={isSetParent ? 1 : 0}
                     disabled={rowLocked}
                     placeholder={t('common.labels.quantity')}
                     value={item.quantity}
-                    onChange={(v) => {
-                      const n = typeof v === 'number' ? v : Number(v) || 0;
+                    emptyValue={0}
+                    onChange={(n) => {
                       if (isSetParent) {
                         onParentQuantityChange(idx, n);
                       } else {
@@ -2765,7 +2765,7 @@ function DesktopItemTable({
                   {/* Extra ("spare") qty — standalone lines only. Shipped from
                       stock on top of the ordered qty; not billed. */}
                   {extraQtyEnabled && !isSetParent && !isSetChild && (
-                    <NumberInput
+                    <NumberField
                       size="xs"
                       min={0}
                       disabled={rowLocked}
@@ -2775,10 +2775,12 @@ function DesktopItemTable({
                         </Text>
                       }
                       placeholder={t('salesOrders.form.extraQuantityPlaceholder')}
-                      value={item.extraQuantity ?? ''}
-                      onChange={(v) => {
-                        const n = typeof v === 'number' ? v : Number(v) || 0;
-                        form.setFieldValue(`items.${idx}.extraQuantity`, n > 0 ? n : undefined);
+                      value={item.extraQuantity}
+                      onChange={(n) => {
+                        form.setFieldValue(
+                          `items.${idx}.extraQuantity`,
+                          n && n > 0 ? n : undefined,
+                        );
                       }}
                     />
                   )}

@@ -45,10 +45,10 @@
       },
       "labels": {
         "active": "Active",
+        "inactive": "Inactive",
         "note": "Note (optional)",
         "orderDate": "Order Date",
-        "status": "Status",
-        "inactive": "Inactive"
+        "status": "Status"
       },
       "list": {
         "loadingMore": "Loading {{chunk}} more of {{total}}…"
@@ -1078,8 +1078,8 @@
       "googleMapUrlLabel": "Google Maps URL",
       "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
       "namePlaceholder": "Customer name",
-      "shippingAddressesAdd": "Add shipping address",
       "shippingAddressLabel": "Shipping Address",
+      "shippingAddressesAdd": "Add shipping address",
       "shortNamePlaceholder": "Abbreviated name",
       "taxCodePlaceholder": "Tax identification number",
       "updateButton": "Update Customer"
@@ -2380,6 +2380,136 @@
     "report": "Reports",
     "warehouse": "Warehouse"
   },
+  "oilTanks": {
+    "addItem": "Add Tank",
+    "columns": {
+      "fuelType": "Fuel",
+      "level": "Stock",
+      "location": "Location"
+    },
+    "dangerZone": {
+      "deleteConfirm": "Remove this tank? Its refill and issue history will no longer be reachable.",
+      "deleteItem": "Remove tank",
+      "deleteItemDesc": "Remove the tank from the app. Its movement history is kept and can no longer be reached.",
+      "disableConfirm": "Disable this tank?",
+      "disableItem": "Disable tank",
+      "disableItemDesc": "Hide the tank from pickers and lists. Its movement history is kept.",
+      "enableConfirm": "Enable this tank?",
+      "enableItem": "Enable tank",
+      "enableItemDesc": "Make the tank selectable again."
+    },
+    "detail": {
+      "activityVerbs": {
+        "create": "Created",
+        "delete": "Deleted",
+        "disable": "Disabled",
+        "enable": "Enabled",
+        "update": "Updated"
+      },
+      "infoTitle": "Information",
+      "recompute": "Recompute stock",
+      "statCapacity": "Capacity",
+      "statLevel": "Stock",
+      "tabs": {
+        "issue": "Issues",
+        "overview": "Details",
+        "refill": "Refills"
+      }
+    },
+    "editItem": "Edit Tank",
+    "emptyMessage": "Add your first fuel tank to start tracking stock.",
+    "emptyTitle": "No tanks yet",
+    "form": {
+      "capacityHint": "Reference only — a refill above it is not rejected",
+      "capacityLabel": "Capacity",
+      "capacityPlaceholder": "Nominal capacity",
+      "codeAuto": "Generated automatically",
+      "createButton": "Create Tank",
+      "fuelTypeLabel": "Fuel type",
+      "fuelTypePlaceholder": "e.g. Diesel DO 0.05S",
+      "locationLabel": "Location",
+      "locationPlaceholder": "e.g. Warehouse A",
+      "namePlaceholder": "e.g. Warehouse A tank",
+      "notePlaceholder": "Anything worth recording about this tank",
+      "openingDateLabel": "Opening date",
+      "openingHint": "Stock on hand when the tank joins the app. Set once — later movements are recorded as refills and issues.",
+      "openingLevelLabel": "Opening stock",
+      "openingLevelPlaceholder": "Litres on hand",
+      "openingSection": "Opening balance",
+      "primarySection": "Tank details"
+    },
+    "logs": {
+      "issue": {
+        "addItem": "Add issue",
+        "columns": {
+          "date": "Date",
+          "driver": "Driver",
+          "litres": "Litres",
+          "total": "Amount",
+          "truck": "Vehicle",
+          "unitPrice": "Unit price"
+        },
+        "editItem": "Edit issue",
+        "empty": "No issues recorded for {{year}}",
+        "form": {
+          "notePlaceholder": "Anything worth recording about this issue"
+        },
+        "sectionTitle": "Issues",
+        "summary": {
+          "litres": "Litres out"
+        }
+      },
+      "refill": {
+        "addItem": "Add refill",
+        "columns": {
+          "date": "Date",
+          "litres": "Litres",
+          "supplier": "Supplier",
+          "total": "Amount",
+          "unitPrice": "Unit price"
+        },
+        "editItem": "Edit refill",
+        "empty": "No refills recorded for {{year}}",
+        "form": {
+          "notePlaceholder": "Anything worth recording about this delivery",
+          "supplierPlaceholder": "Who delivered it"
+        },
+        "photosLabel": "Delivery note",
+        "sectionTitle": "Refills",
+        "summary": {
+          "cost": "Total cost",
+          "litres": "Litres in"
+        }
+      },
+      "validation": {
+        "litresRequired": "Enter the number of litres"
+      }
+    },
+    "noItems": "No tanks found",
+    "notifications": {
+      "createError": "Failed to create tank",
+      "createSuccess": "Tank created",
+      "deleteError": "Failed to remove tank",
+      "deleteSuccess": "Tank removed",
+      "disableSuccess": "Tank disabled",
+      "enableSuccess": "Tank enabled",
+      "fetchError": "Failed to load tanks",
+      "levelSyncError": "The entry was saved, but the tank's stock could not be updated. Use “Recompute stock” on the tank to rebuild it.",
+      "recomputeClean": "Stock rebuilt from {{count}} movements — it already matched.",
+      "recomputeDrift": "Stock rebuilt from the ledger. It was off by {{drift}} L — a movement had not been applied.",
+      "recomputeError": "Failed to rebuild stock from the ledger",
+      "toggleError": "Failed to change tank status",
+      "updateError": "Failed to update tank",
+      "updateSuccess": "Tank updated"
+    },
+    "searchPlaceholder": "Search by name, code, fuel or location",
+    "title": "Oil Tanks",
+    "unitLitre": "L",
+    "validation": {
+      "capacityInvalid": "Capacity must be 0 or more",
+      "levelInvalid": "Stock must be 0 or more"
+    }
+  },
   "operationLogs": {
     "actions": {
       "collapse": "Hide details",
@@ -2447,6 +2577,7 @@
         "laborCost": "Labor cost",
         "odometer": "Odometer",
         "outstanding": "Outstanding",
+        "photos": "Invoice",
         "supplier": "Supplier",
         "total": "Total",
         "totalAmount": "Total amount",
@@ -2479,6 +2610,7 @@
     },
     "monthLabel": "Month",
     "notifications": {
+      "afterWriteError": "The entry was saved, but a follow-up update failed.",
       "createError": "Failed to save entry",
       "createSuccess": "Entry saved",
       "deleteError": "Failed to delete entry",
@@ -2486,6 +2618,11 @@
       "fetchError": "Failed to load logs",
       "updateError": "Failed to update entry",
       "updateSuccess": "Entry updated"
+    },
+    "photos": {
+      "add": "Add photo",
+      "label": "Photos",
+      "view": "View photos"
     },
     "refuel": {
       "abnormalTooltip": "Consumption is higher than normal",
@@ -2498,6 +2635,8 @@
         "litres": "Litres",
         "odometerNew": "New ODO (km)",
         "odometerOld": "Old ODO (km)",
+        "photos": "Receipt",
+        "source": "Source",
         "total": "Amount",
         "unitPrice": "Unit price"
       },
@@ -2505,14 +2644,26 @@
       "empty": "No refuel logs for {{year}} yet.",
       "form": {
         "driverPlaceholder": "Driver name",
-        "notePlaceholder": "Optional note"
+        "notePlaceholder": "Optional note",
+        "tankLabel": "Tank",
+        "tankPlaceholder": "Pick the tank"
+      },
+      "notifications": {
+        "tankSyncError": "The refuel entry was saved, but the tank's ledger could not be updated. Re-save the entry, or press “Recompute stock” on the tank."
       },
       "sectionTitle": "Refuel logs",
+      "source": {
+        "external": "Station",
+        "tank": "Own tank"
+      },
       "summary": {
         "avgConsumption": "Avg consumption",
         "totalCost": "Total cost",
         "totalDistance": "Total distance",
         "totalLitres": "Total litres"
+      },
+      "validation": {
+        "tankRequired": "Pick which tank the fuel came from"
       }
     },
     "trip": {
@@ -2548,6 +2699,7 @@
     "yearLabel": "Year"
   },
   "photos": {
+    "addPhotos": "Add photos",
     "capture": "Capture",
     "dragOrClick": "Drag photos here, or click to browse",
     "dropHere": "Drop to upload",
@@ -3048,6 +3200,7 @@
         "lookupV2": "Lookup",
         "material": "Material",
         "materialInventory": "Material Inventory",
+        "oilTank": "Oil Tank",
         "permissionManagement": "Permission Management",
         "product": "Product",
         "productInventory": "Product Inventory",
@@ -3634,9 +3787,9 @@
       "drift": "The order's reservation snapshot does not match the inventory holds ({{count}} line(s)).",
       "driftLine": "order says {{snapshot}} / inventory holds {{row}}",
       "failedTitle": "Repair failed",
-      "nothingToRepair": "Nothing to repair — the order is already in sync.",
       "notDeductedMissing": "The order is completed but no inventory deduction was recorded for its lines.",
       "notDeductedReserved": "The order is completed but its reserved stock was never deducted from inventory.",
+      "nothingToRepair": "Nothing to repair — the order is already in sync.",
       "orphans": "Inventory rows still hold stock for this order although it no longer reserves ({{count}} line(s)).",
       "repairButton": "Repair now",
       "repairSuccess": "Repair applied: {{actions}}"

@@ -37,8 +37,10 @@ import {
   warrantySummary,
 } from './maintenanceItems';
 import { exportRefuelLogsToExcel } from '@/utils/excelParser';
+import { syncTankIssue } from '@/pages/oil-tanks/tankIssueSync';
 import { LogDriverField } from './LogDriverField';
 import { ContainerSizeCell } from './ContainerSizeCell';
+import { FuelSourceCell } from './FuelSourceCell';
 
 function textCell(value: string | undefined) {
   return value ? (
@@ -99,6 +101,10 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     distanceKm: '',
     driverName: '',
     driverId: '',
+
+    fuelSource: '',
+    oilTankId: '',
+    oilTankCode: '',
     note: '',
   },
   columns: [
@@ -118,6 +124,10 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       align: 'right',
       emphasize: true,
       render: (log) => formatNumber(log.extra?.totalAmount),
+    },
+    {
+      header: 'operationLogs.refuel.columns.source',
+      render: (log) => <FuelSourceCell extra={log.extra as RefuelLogExtra | undefined} />,
     },
     {
       header: 'operationLogs.refuel.columns.odometerOld',
@@ -154,6 +164,11 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       v === '' || Number(v) >= 0 ? null : t('operationLogs.validation.litresInvalid'),
     unitPrice: (v) =>
       v === '' || Number(v) >= 0 ? null : t('operationLogs.validation.unitPriceInvalid'),
+
+    oilTankId: (v, values) =>
+      values.fuelSource !== 'tank' || String(v ?? '').trim()
+        ? null
+        : t('operationLogs.refuel.validation.tankRequired'),
   }),
   buildExtra: (values): Partial<RefuelLogExtra> => ({
     ...(values.litres !== '' && { litres: Number(values.litres) }),
@@ -164,6 +179,16 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     ...(values.distanceKm !== '' && { distanceKm: Number(values.distanceKm) }),
     ...(String(values.driverName).trim() && { driverName: String(values.driverName).trim() }),
     ...(String(values.driverId).trim() && { driverId: String(values.driverId).trim() }),
+
+    ...(values.fuelSource === 'tank' && String(values.oilTankId).trim()
+      ? {
+          fuelSource: 'tank' as const,
+          oilTankId: String(values.oilTankId).trim(),
+          ...(String(values.oilTankCode).trim() && {
+            oilTankCode: String(values.oilTankCode).trim(),
+          }),
+        }
+      : {}),
     ...(String(values.note).trim() && { note: String(values.note).trim() }),
   }),
   toForm: (log): LogFormValues => {
@@ -178,10 +203,15 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       distanceKm: e.distanceKm ?? '',
       driverName: e.driverName ?? '',
       driverId: e.driverId ?? '',
+      fuelSource: e.fuelSource === 'tank' ? 'tank' : '',
+      oilTankId: e.oilTankId ?? '',
+      oilTankCode: e.oilTankCode ?? '',
       note: e.note ?? '',
     };
   },
   renderFields: (form, t, ctx) => {
+    const tankOptions = ctx?.oilTankOptions ?? [];
+
     const syncTotal = (litres: LogFormValue, unitPrice: LogFormValue) => {
       const lit = Number(litres);
       const price = Number(unitPrice);
@@ -216,6 +246,50 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
             assignedDriver={ctx?.assignedDriver}
           />
         </SimpleGrid>
+        {/* Self-gating: the picker renders when the host says tanks are usable
+            OR when this entry is already bound to one. The second half is what
+            keeps a tank-sourced entry editable (and visibly so) by someone whose
+            permissions or feature flag would otherwise hide the control — the
+            values round-trip either way, but silently is the wrong way. */}
+        {(tankOptions.length > 0 || form.values.fuelSource === 'tank') && (
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <Select
+              label={t('operationLogs.refuel.columns.source')}
+              data={[
+                { value: 'external', label: t('operationLogs.refuel.source.external') },
+                { value: 'tank', label: t('operationLogs.refuel.source.tank') },
+              ]}
+              allowDeselect={false}
+              value={form.values.fuelSource === 'tank' ? 'tank' : 'external'}
+              onChange={(v) => {
+                form.setFieldValue('fuelSource', v === 'tank' ? 'tank' : '');
+
+                if (v !== 'tank') {
+                  form.setFieldValue('oilTankId', '');
+                  form.setFieldValue('oilTankCode', '');
+                }
+              }}
+            />
+            {form.values.fuelSource === 'tank' && (
+              <Select
+                label={t('operationLogs.refuel.form.tankLabel')}
+                placeholder={t('operationLogs.refuel.form.tankPlaceholder')}
+                data={tankOptions}
+                searchable
+                allowDeselect={false}
+                value={String(form.values.oilTankId) || null}
+                onChange={(v) => {
+                  form.setFieldValue('oilTankId', v ?? '');
+
+                  form.setFieldValue(
+                    'oilTankCode',
+                    tankOptions.find((o) => o.value === v)?.code ?? '',
+                  );
+                }}
+              />
+            )}
+          </SimpleGrid>
+        )}
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
           <NumberInput
             label={t('operationLogs.refuel.columns.litres')}
@@ -317,6 +391,11 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       ? { danger: true, tooltipKey: 'operationLogs.refuel.abnormalTooltip' }
       : undefined;
   },
+
+  photos: { directoryType: 'truck-refuel-log', labelKey: 'operationLogs.refuel.columns.photos' },
+
+  afterWrite: syncTankIssue,
+  afterWriteErrorKey: 'operationLogs.refuel.notifications.tankSyncError',
   export: (logs, meta) => {
     const periodLabel = meta.monthLabel ? `${meta.monthLabel} ${meta.year}` : String(meta.year);
     const fileTag =
@@ -416,6 +495,11 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       render: (log) => formatNumber(maintenanceOutstanding(log.extra)),
     },
   ],
+
+  photos: {
+    directoryType: 'truck-maintenance-log',
+    labelKey: 'operationLogs.maintenance.columns.photos',
+  },
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
   }),

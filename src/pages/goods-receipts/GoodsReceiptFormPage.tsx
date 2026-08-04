@@ -6,7 +6,6 @@ import {
   Card,
   FileButton,
   Group,
-  NumberInput,
   Select,
   SimpleGrid,
   Stack,
@@ -71,6 +70,7 @@ import type {
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { appConfig } from '@/config';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { NumberField } from '@/components/NumberField';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -866,12 +866,13 @@ export function GoodsReceiptFormPage() {
                             ) : null}
                           </Table.Td>
                           <Table.Td>
-                            <NumberInput
+                            <NumberField
                               size="xs"
                               min={0}
                               value={row.quantity}
-                              onChange={(v) =>
-                                form.setFieldValue(`items.${idx}.quantity`, Number(v) || 0)
+                              emptyValue={0}
+                              onChange={(quantity) =>
+                                form.setFieldValue(`items.${idx}.quantity`, quantity)
                               }
                             />
                           </Table.Td>

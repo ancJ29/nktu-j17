@@ -34,6 +34,7 @@ export type NavId =
   | 'lookups'
   | 'lookups-v2'
   | 'truck-assets'
+  | 'oil-tanks'
   | 'farm'
   | 'greenhouses'
   | 'crops'
@@ -243,6 +244,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Truck,
   },
 
+  'oil-tanks': {
+    path: ROUTES.OIL_TANKS.LIST,
+    labelKey: 'oilTanks.title',
+    label: 'Oil tanks',
+    defaultIcon: IconName.BucketDroplet,
+  },
+
   farm: {
     labelKey: 'nav.farm',
     label: 'Farm',
@@ -303,6 +311,7 @@ const DEFAULT_PC_STRUCTURE: NavStructureItem[] = [
     ],
   },
   'truck-assets',
+  'oil-tanks',
   {
     id: 'farm',
     subs: ['greenhouses', 'crops', 'crop-diary-templates'],
@@ -338,6 +347,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
     ],
   },
   'truck-assets',
+  'oil-tanks',
   {
     id: 'farm',
     subs: ['greenhouses', 'crops', 'crop-diary-templates'],
@@ -368,6 +378,7 @@ type FeatureFlags = {
   lookups?: { enabled?: boolean };
   lookupV2?: { enabled?: boolean };
   trucks?: { enabled?: boolean };
+  oilTanks?: { enabled?: boolean };
   farm?: { enabled?: boolean };
 };
 
@@ -393,6 +404,7 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   lookups: (f) => f.lookups?.enabled ?? false,
   'lookups-v2': (f) => f.lookupV2?.enabled ?? false,
   'truck-assets': (f) => f.trucks?.enabled ?? false,
+  'oil-tanks': (f) => f.oilTanks?.enabled ?? false,
   greenhouses: (f) => f.farm?.enabled ?? false,
   crops: (f) => f.farm?.enabled ?? false,
   'crop-diary-templates': (f) => f.farm?.enabled ?? false,
@@ -419,6 +431,7 @@ const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   'warehouse-delivery-notes': () => getModulePermissions('warehouseDeliveryNote').canView ?? false,
   'lookups-v2': () => getModulePermissions('lookupV2').canView ?? false,
   'truck-assets': () => getModulePermissions('truck').canView ?? false,
+  'oil-tanks': () => getModulePermissions('oilTank').canView ?? false,
   greenhouses: () => getModulePermissions('greenhouse').canView ?? false,
   crops: () => getModulePermissions('crop').canView ?? false,
   'crop-diary-templates': () => getModulePermissions('cropDiaryTemplate').canView ?? false,

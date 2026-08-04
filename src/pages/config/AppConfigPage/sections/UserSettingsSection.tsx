@@ -1,6 +1,6 @@
 import type { UserSettingsConfig } from '@credo/kits/types';
-import { NumberInput } from '@mantine/core';
 import { memo } from 'react';
+import { NumberField } from '@/components/NumberField';
 
 export const UserSettingsSection = memo(function UserSettingsSection({
   settings,
@@ -10,13 +10,12 @@ export const UserSettingsSection = memo(function UserSettingsSection({
   onChange: (settings: UserSettingsConfig) => void;
 }) {
   return (
-    <NumberInput
+    <NumberField
       label="Sync Debounce Delay (ms)"
       placeholder="e.g. 300"
       value={settings.syncDebounceDelay}
-      onChange={(v) =>
-        onChange({ ...settings, syncDebounceDelay: typeof v === 'number' ? v : 300 })
-      }
+      emptyValue={300}
+      onChange={(syncDebounceDelay) => onChange({ ...settings, syncDebounceDelay })}
       size="sm"
       min={0}
       max={10000}

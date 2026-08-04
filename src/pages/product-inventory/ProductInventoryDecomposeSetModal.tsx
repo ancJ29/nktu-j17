@@ -1,15 +1,4 @@
-import {
-  Alert,
-  Badge,
-  Button,
-  Card,
-  Group,
-  NumberInput,
-  Select,
-  Stack,
-  Table,
-  Text,
-} from '@mantine/core';
+import { Alert, Badge, Button, Card, Group, Select, Stack, Table, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconAlertTriangle, IconBoxMultiple, IconCheck } from '@tabler/icons-react';
 import { useCallback, useMemo, useState } from 'react';
@@ -26,6 +15,7 @@ import { isLocationsEnabled } from '@/utils/permission';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { isProductSet } from '@/utils/productSet';
 import { rebalanceForSetStockChange } from '@/utils/setRebalance';
+import { NumberField } from '@/components/NumberField';
 
 const locationsEnabled = isLocationsEnabled();
 
@@ -60,7 +50,7 @@ export function ProductInventoryDecomposeSetModal({
   const [locationCode, setLocationCode] = useState<string | null>(
     locationsEnabled ? null : DEFAULT_LOCATION_CODE,
   );
-  const [quantity, setQuantity] = useState<number | ''>(1);
+  const [quantity, setQuantity] = useState<number | undefined>(1);
   const [submitting, setSubmitting] = useState(false);
 
   const setProducts = useMemo(
@@ -396,11 +386,11 @@ export function ProductInventoryDecomposeSetModal({
               disabled={submitting}
             />
           )}
-          <NumberInput
+          <NumberField
             label={t('productInventory.decomposeSet.quantityLabel')}
             placeholder="1"
             value={quantity}
-            onChange={(v) => setQuantity(typeof v === 'number' ? v : Number(v) || '')}
+            onChange={setQuantity}
             min={1}
             disabled={submitting}
           />

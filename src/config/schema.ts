@@ -480,6 +480,8 @@ const FeaturesSchema = z
 
     trucks: ModuleFeaturesSchema,
 
+    oilTanks: ModuleFeaturesSchema,
+
     farm: ModuleFeaturesSchema,
   })
   .default({
@@ -501,6 +503,7 @@ const FeaturesSchema = z
     lookups: LookupFeaturesSchema.parse({}),
     lookupV2: LookupFeaturesSchema.parse({}),
     trucks: ModuleFeaturesSchema.parse({}),
+    oilTanks: ModuleFeaturesSchema.parse({}),
     farm: ModuleFeaturesSchema.parse({}),
     customers: CustomerFeaturesSchema.parse({}),
     vendors: VendorFeaturesSchema.parse({}),

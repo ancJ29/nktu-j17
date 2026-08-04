@@ -10,7 +10,6 @@ import {
   Divider,
   Grid,
   Group,
-  NumberInput,
   SimpleGrid,
   Stack,
   Table,
@@ -72,6 +71,7 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import { EditDeliveryRequestModal } from './EditDeliveryRequestModal';
 import { DeliveryRequestKindBadge } from './DeliveryRequestKindBadge';
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
+import { NumberField } from '@/components/NumberField';
 
 const isMobile = device.isMobile;
 const canEdit = perms.deliveryRequest.canEdit();
@@ -512,16 +512,15 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
                   {request.isClosed ? (
                     <Text size="sm">{delivered.toLocaleString()}</Text>
                   ) : (
-                    <NumberInput
+                    <NumberField
                       size="xs"
                       min={0}
 
                       {...(isInbound ? {} : { max: item.quantity })}
                       hideControls
                       value={delivered}
-                      onChange={(v) =>
-                        setLineDeliveredQty(key, typeof v === 'number' ? v : Number(v) || 0)
-                      }
+                      emptyValue={0}
+                      onChange={(qty) => setLineDeliveredQty(key, qty)}
                     />
                   )}
                 </Table.Td>

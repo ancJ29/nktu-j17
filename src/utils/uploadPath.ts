@@ -21,6 +21,22 @@ export function buildUploadDirectory({
   return `c-mngt/${clientCode}/${type}/${yyyy}-${mm}-${dd}/${id}`;
 }
 
+export function buildExpiringUploadDirectory({
+  type,
+  id,
+  date = new Date(),
+}: {
+  type: string;
+  id: string;
+  date?: Date;
+}): string {
+  const clientCode = resolveClientCode();
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  return `c-mngt/${clientCode}/${yyyy}-${mm}-${dd}/${type}/${id}`;
+}
+
 export function buildUploadFileName(originalName: string): string {
   const safe = originalName.replace(/[^a-zA-Z0-9._-]/g, '_');
   const ts36 = Date.now().toString(36);

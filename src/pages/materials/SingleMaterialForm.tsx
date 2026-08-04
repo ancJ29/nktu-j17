@@ -41,6 +41,7 @@ import {
   MATERIAL_CATEGORY_LOOKUP,
 } from '@/utils/materialConfig';
 import type { UnitConversion } from '@/types';
+import { NumberField } from '@/components/NumberField';
 
 const multiUnit = isMaterialMultiUnit();
 const unitCategory = getMaterialUnitCategory();
@@ -177,11 +178,12 @@ function MaterialUnitConversionsEditor({
           <Text size="sm" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
             =
           </Text>
-          <NumberInput
+          <NumberField
             min={0.001}
             step={1}
             value={row.quantity}
-            onChange={(v) => updateRow(idx, { quantity: typeof v === 'number' ? v : 1 })}
+            emptyValue={1}
+            onChange={(quantity) => updateRow(idx, { quantity })}
             style={{ width: 90 }}
           />
           <Select

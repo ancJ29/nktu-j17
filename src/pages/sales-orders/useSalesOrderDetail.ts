@@ -14,7 +14,7 @@ import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
-import { resolveClientCode } from '@/config/client-code';
+import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
 import type {
   DeliveryRequest,
   InventoryLinkage,
@@ -885,11 +885,10 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, currentEmployee, t],
   );
 
-  const imageDirectory = useMemo(() => {
-    const clientCode = resolveClientCode();
-    const today = new Date().toISOString().slice(0, 10);
-    return `/c-mngt/${clientCode}/${today}/sales-order/${id}`;
-  }, [id]);
+  const imageDirectory = useMemo(
+    () => buildExpiringUploadDirectory({ type: 'sales-order', id: id ?? '' }),
+    [id],
+  );
 
   const handlePhotosChange = useCallback(
     async (photos: SalesOrderPhoto[]) => {

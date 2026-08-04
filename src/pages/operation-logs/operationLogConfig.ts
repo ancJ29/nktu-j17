@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
-import type { OperationLog, OperationLogExtra } from '@/types';
+import type { OperationLog, OperationLogExtra, OperationLogPhoto } from '@/types';
 import type { LookupOption } from '@/hooks/useLookupOptions';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 
@@ -29,13 +29,38 @@ export type OperationLogPerms = {
 
 export type LogFormLine = Record<string, string | number>;
 
-export type LogFormValue = string | number | LogFormLine[];
+export type LogFormValue = string | number | LogFormLine[] | OperationLogPhoto[];
 export type LogFormValues = Record<string, LogFormValue>;
+
+export const PHOTOS_FIELD = 'photos';
+
+export function formPhotos(values: LogFormValues): OperationLogPhoto[] {
+  const raw = values[PHOTOS_FIELD];
+  return Array.isArray(raw) ? (raw as OperationLogPhoto[]) : [];
+}
+
+export const DRAFT_PHOTO_PREFIX = 'draft-';
+
+export function visiblePhotos(photos: OperationLogPhoto[] | undefined): OperationLogPhoto[] {
+  return (photos ?? []).filter((p) => !p.isDeleted);
+}
 
 export type OperationLogContext = {
   assignedDriver?: { id?: string; name: string };
 
   maintenanceTypeOptions?: LookupOption[];
+
+  oilTankOptions?: { value: string; label: string; code: string }[];
+};
+
+export type OperationLogWriteEvent = {
+  op: 'create' | 'update' | 'delete';
+
+  log: OperationLog;
+
+  previous: OperationLog | null;
+  targetId: string;
+  targetCode: string;
 };
 
 export type OperationLogColumn = {
@@ -76,7 +101,8 @@ export type OperationLogConfig = {
   columns: OperationLogColumn[];
 
   emptyForm: LogFormValues;
-  validate: (t: TFn) => Record<string, (value: unknown) => ReactNode>;
+
+  validate: (t: TFn) => Record<string, (value: unknown, values: LogFormValues) => ReactNode>;
 
   buildExtra: (values: LogFormValues) => Partial<OperationLogExtra>;
 
@@ -101,6 +127,16 @@ export type OperationLogConfig = {
   summary?: (logs: OperationLog[], t: TFn) => ReactNode;
 
   rowTone?: (log: OperationLog, visibleLogs: OperationLog[]) => OperationLogRowTone | undefined;
+
+  photos?: {
+    directoryType: string;
+
+    labelKey?: string;
+  };
+
+  afterWrite?: (event: OperationLogWriteEvent, t: TFn) => Promise<void>;
+
+  afterWriteErrorKey?: string;
 
   export?: (logs: OperationLog[], meta: OperationLogExportMeta) => void;
   exportLabelKey?: string;

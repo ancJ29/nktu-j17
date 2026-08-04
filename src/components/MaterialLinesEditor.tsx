@@ -1,18 +1,10 @@
-import {
-  ActionIcon,
-  Button,
-  Group,
-  NumberInput,
-  Select,
-  Stack,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { ActionIcon, Button, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import type { TemplateMaterialLine } from '@/types';
+import { NumberField } from '@/components/NumberField';
 
 type Props = {
   readonly value: TemplateMaterialLine[];
@@ -86,13 +78,13 @@ export function MaterialLinesEditor({ value, onChange }: Props) {
               value={m.materialCode || null}
               onChange={(v) => onPickMaterial(i, v)}
             />
-            <NumberInput
+            <NumberField
               w={110}
               placeholder={t('cropDiaryTemplates.form.quantityPlaceholder')}
               min={0}
               allowNegative={false}
-              value={m.quantity ?? ''}
-              onChange={(v) => patchLine(i, { quantity: typeof v === 'number' ? v : undefined })}
+              value={m.quantity}
+              onChange={(quantity) => patchLine(i, { quantity })}
             />
             <TextInput
               w={90}

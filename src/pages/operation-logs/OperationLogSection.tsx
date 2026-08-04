@@ -10,7 +10,7 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { useDisclosure } from '@mantine/hooks';
+import { randomId, useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
   IconChevronDown,
@@ -27,17 +27,23 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { SectionCard } from '@/components/SectionCard';
 import { formatDate } from '@/utils/dateFormat';
+import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
 import type { OperationLog, OperationLogExtra } from '@/types';
 import {
   datePart,
+  DRAFT_PHOTO_PREFIX,
+  formPhotos,
+  PHOTOS_FIELD,
   todayString,
   yearOf,
   type LogFormValues,
   type OperationLogConfig,
   type OperationLogContext,
   type OperationLogPerms,
+  type OperationLogWriteEvent,
   type TFn,
 } from './operationLogConfig';
+import { LogPhotoCell, LogPhotoField, LogPhotoGalleryModal } from './OperationLogPhotos';
 
 const CURRENT_YEAR = new Date().getFullYear();
 
@@ -97,8 +103,11 @@ function serverMessage(err: unknown): string | undefined {
 
 function cloneFormValues(values: LogFormValues): LogFormValues {
   return Object.fromEntries(
-    Object.entries(values).map(([k, v]) => [k, Array.isArray(v) ? v.map((r) => ({ ...r })) : v]),
-  );
+    Object.entries(values).map(([k, v]) => [
+      k,
+      Array.isArray(v) ? (v as object[]).map((r) => ({ ...r })) : v,
+    ]),
+  ) as LogFormValues;
 }
 
 type Props = {
@@ -129,6 +138,12 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const [deleteTarget, setDeleteTarget] = useState<OperationLog | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  const photoCfg = config.photos;
+
+  const [galleryLog, setGalleryLog] = useState<OperationLog | null>(null);
+
+  const [draftPhotoId, setDraftPhotoId] = useState(() => randomId(DRAFT_PHOTO_PREFIX));
 
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
   const toggleExpanded = useCallback((id: string) => {
@@ -206,32 +221,63 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const openAdd = useCallback(() => {
     setEditing(null);
-    form.setValues({ ...cloneFormValues(config.emptyForm), logDate: todayString() });
+    setDraftPhotoId(randomId(DRAFT_PHOTO_PREFIX));
+    form.setValues({
+      ...cloneFormValues(config.emptyForm),
+      logDate: todayString(),
+
+      ...(photoCfg && { [PHOTOS_FIELD]: [] }),
+    });
     form.resetDirty();
     formHandlers.open();
     // eslint-disable-next-line react-hooks/exhaustive-deps -- form identity is stable across renders
-  }, [config.emptyForm, formHandlers]);
+  }, [config.emptyForm, photoCfg, formHandlers]);
 
   const openEdit = useCallback(
     (log: OperationLog) => {
       setEditing(log);
-      form.setValues(config.toForm(log));
+      form.setValues({
+        ...config.toForm(log),
+        ...(photoCfg && { [PHOTOS_FIELD]: log.extra?.photos ?? [] }),
+      });
       form.resetDirty();
       formHandlers.open();
     },
 
-    [config, formHandlers],
+    [config, photoCfg, formHandlers],
+  );
+
+  const runAfterWrite = useCallback(
+    async (event: OperationLogWriteEvent) => {
+      if (!config.afterWrite) return;
+      try {
+        await config.afterWrite(event, tr);
+      } catch {
+        notifications.show({
+          color: 'yellow',
+          message: tr(config.afterWriteErrorKey ?? 'operationLogs.notifications.afterWriteError'),
+          autoClose: 10000,
+        });
+      }
+    },
+    [config, tr],
   );
 
   const handleSubmit = useCallback(
     async (values: LogFormValues) => {
       setSaving(true);
       const logDate = String(values.logDate);
-      const extra = config.buildExtra(values) as OperationLogExtra;
+
+      const photos = photoCfg ? formPhotos(values) : [];
+      const extra = {
+        ...config.buildExtra(values),
+        ...(photos.length > 0 && { photos }),
+      } as OperationLogExtra;
       const nextYear = yearOf(logDate);
       try {
+        let saved: OperationLog;
         if (editing) {
-          await cMngtConnector.updateOperationLog<OperationLogExtra>({
+          const res = await cMngtConnector.updateOperationLog<OperationLogExtra>({
             id: editing.id,
             targetId,
             period: String(year),
@@ -239,23 +285,33 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             logDate,
             extra,
           });
+          saved = res.operationLog as OperationLog;
           notifications.show({
             color: 'green',
             message: tr('operationLogs.notifications.updateSuccess'),
           });
         } else {
-          await cMngtConnector.createOperationLog<OperationLogExtra>({
+          const res = await cMngtConnector.createOperationLog<OperationLogExtra>({
             targetId,
             targetCode,
             logType: config.logType,
             logDate,
             extra,
           });
+          saved = res.operationLog as OperationLog;
           notifications.show({
             color: 'green',
             message: tr('operationLogs.notifications.createSuccess'),
           });
         }
+
+        await runAfterWrite({
+          op: editing ? 'update' : 'create',
+          log: saved,
+          previous: editing,
+          targetId,
+          targetCode,
+        });
         formHandlers.close();
         setEditing(null);
         setYear(nextYear);
@@ -274,7 +330,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         setSaving(false);
       }
     },
-    [editing, targetId, targetCode, year, config, tr, load, formHandlers],
+    [editing, targetId, targetCode, year, config, photoCfg, tr, load, formHandlers, runAfterWrite],
   );
 
   const handleDelete = useCallback(async () => {
@@ -291,6 +347,13 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         color: 'green',
         message: tr('operationLogs.notifications.deleteSuccess'),
       });
+      await runAfterWrite({
+        op: 'delete',
+        log: deleteTarget,
+        previous: null,
+        targetId,
+        targetCode,
+      });
       setDeleteTarget(null);
       await load(year);
     } catch (err) {
@@ -302,14 +365,16 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     } finally {
       setDeleting(false);
     }
-  }, [deleteTarget, targetId, year, tr, load]);
+  }, [deleteTarget, targetId, targetCode, year, tr, load, runAfterWrite]);
 
   if (!canView) return null;
 
   const showActions = canEdit || canDelete;
   const expandable = Boolean(config.renderExpanded);
+  const photoLabel = tr(photoCfg?.labelKey ?? 'operationLogs.photos.label');
 
-  const detailColSpan = config.columns.length + (expandable ? 1 : 0) + (showActions ? 1 : 0);
+  const detailColSpan =
+    config.columns.length + (expandable ? 1 : 0) + (photoCfg ? 1 : 0) + (showActions ? 1 : 0);
 
   return (
     <SectionCard
@@ -388,6 +453,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                     {tr(col.header)}
                   </Table.Th>
                 ))}
+                {photoCfg && <Table.Th w={72}>{photoLabel}</Table.Th>}
                 {showActions && <Table.Th w={72} />}
               </Table.Tr>
             </Table.Thead>
@@ -433,6 +499,15 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
                         {col.render(log)}
                       </Table.Td>
                     ))}
+                    {photoCfg && (
+                      <Table.Td>
+                        <LogPhotoCell
+                          photos={log.extra?.photos}
+                          onOpen={() => setGalleryLog(log)}
+                          t={tr}
+                        />
+                      </Table.Td>
+                    )}
                     {showActions && (
                       <Table.Td>
                         <Group gap={2} wrap="nowrap" justify="flex-end">
@@ -497,6 +572,20 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap="md">
             {config.renderFields(form, tr, context)}
+            {photoCfg && (
+              <LogPhotoField
+                photos={formPhotos(form.values)}
+                onChange={(next) => form.setFieldValue(PHOTOS_FIELD, next)}
+
+                directory={buildExpiringUploadDirectory({
+                  type: photoCfg.directoryType,
+                  id: editing?.id ?? draftPhotoId,
+                })}
+                label={photoLabel}
+                marker={targetCode}
+                t={tr}
+              />
+            )}
             <Group justify="flex-end" gap="sm">
               <Button variant="default" size="sm" disabled={saving} onClick={formHandlers.close}>
                 {t('__new__.01-common.actions.cancel')}
@@ -510,6 +599,16 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
           </Stack>
         </form>
       </ResponsiveModal>
+
+      {photoCfg && (
+        <LogPhotoGalleryModal
+          opened={galleryLog !== null}
+          onClose={() => setGalleryLog(null)}
+          photos={galleryLog?.extra?.photos}
+          title={`${photoLabel} — ${galleryLog ? formatDate(galleryLog.logDate) : ''}`}
+          t={tr}
+        />
+      )}
 
       <ConfirmModal
         opened={deleteTarget !== null}
