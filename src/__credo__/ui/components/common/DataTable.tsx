@@ -12,6 +12,23 @@ export type DataTableColumn<T> = {
   accessor?: keyof T;
   width?: string | number;
   hidden?: boolean;
+
+  onCellClick?: (item: T, event: React.MouseEvent) => void;
+};
+
+export type DataTableDensity = 'comfortable' | 'compact';
+
+const COMPACT_FONT_SCALE = {
+  '--mantine-font-size-sm': '0.8125rem',
+  '--mantine-font-size-xs': '0.6875rem', // 12px → 11px
+} as React.CSSProperties;
+
+const SPACING: Record<
+  DataTableDensity,
+  { vertical: string | number; horizontal: string | number }
+> = {
+  comfortable: { vertical: 'sm', horizontal: 'xs' },
+  compact: { vertical: 6, horizontal: 8 },
 };
 
 type DataTableProps<T> = {
@@ -37,6 +54,8 @@ type DataTableProps<T> = {
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;
+
+  readonly density?: DataTableDensity;
 };
 
 export function DataTable<T extends Record<string, unknown> & { id: string }>({
@@ -58,6 +77,7 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   hasMore = false,
   onLoadMore,
   loadingMoreLabel,
+  density = 'comfortable',
 }: DataTableProps<T>) {
   const visibleColumns = useMemo(() => columns.filter((column) => !column.hidden), [columns]);
 
@@ -94,7 +114,15 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
       />
 
       <ScrollWrap {...scrollProps}>
-        <Table striped highlightOnHover verticalSpacing="sm" stickyHeader={sticky}>
+        <Table
+          striped
+          highlightOnHover
+          verticalSpacing={SPACING[density].vertical}
+          horizontalSpacing={SPACING[density].horizontal}
+          stickyHeader={sticky}
+
+          style={density === 'compact' ? COMPACT_FONT_SCALE : undefined}
+        >
           <Table.Thead
             px="xs"
 
@@ -132,6 +160,9 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
                     <Table.Td
                       key={column.key}
                       style={column.width ? { width: column.width } : undefined}
+                      onClick={
+                        column.onCellClick ? (event) => column.onCellClick!(item, event) : undefined
+                      }
                     >
                       {renderCellContent(item, column)}
                     </Table.Td>

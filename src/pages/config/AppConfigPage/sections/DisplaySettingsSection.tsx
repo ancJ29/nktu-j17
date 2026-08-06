@@ -22,10 +22,14 @@ const DATE_TIME_FORMAT_OPTIONS: CMngtDisplaySettings['dateTimeFormat'][] = [
 
 export const DisplaySettingsSection = memo(function DisplaySettingsSection({
   settings,
+  tableDensity,
   onChange,
+  onTableDensityChange,
 }: {
   settings: CMngtDisplaySettings;
+  tableDensity: 'comfortable' | 'compact';
   onChange: (s: CMngtDisplaySettings) => void;
+  onTableDensityChange: (d: 'comfortable' | 'compact') => void;
 }) {
   const now = new Date();
   const preview = (fmt: string) => {
@@ -70,6 +74,17 @@ export const DisplaySettingsSection = memo(function DisplaySettingsSection({
           })
         }
         data={DATE_TIME_FORMAT_OPTIONS.map((f) => ({ value: f, label: `${f}  →  ${preview(f)}` }))}
+        size="sm"
+      />
+      <Select
+        label="Table Density"
+        description="Row height and text size on every list table. Compact fits roughly a third more rows on a screen."
+        value={tableDensity}
+        onChange={(v) => onTableDensityChange(v === 'compact' ? 'compact' : 'comfortable')}
+        data={[
+          { value: 'comfortable', label: 'Comfortable  →  default spacing' },
+          { value: 'compact', label: 'Compact  →  tighter rows, smaller text' },
+        ]}
         size="sm"
       />
     </SimpleGrid>

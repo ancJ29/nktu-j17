@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 import { useNavigate } from 'react-router';
 import { DataTable, type DataTableColumn } from '@credo/base-ui/components';
+import { tableDensity } from '@/utils/permission';
 
 type Row = { id: string };
 
@@ -52,6 +53,7 @@ export function ListDataTable<T extends Row>({
     <DataTable
       withIndex={withIndex}
       noActions
+      density={tableDensity()}
       maxHeight={maxHeight}
       viewportRef={viewportRef}
       data={data as (T & Record<string, unknown>)[]}

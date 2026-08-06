@@ -14,6 +14,7 @@ import {
   isPriceManagementEnabled,
   isProductInventoryEnabled,
   perms,
+  tableDensity,
 } from '@/utils/permission';
 import { ActiveBadge } from '@/components/badges';
 import { isNoInventoryProduct } from '@/utils/productSet';
@@ -220,6 +221,7 @@ export function ProductDataTable({
     <DataTable
       withIndex
       noActions
+      density={tableDensity()}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
       data={products as (Product & Record<string, unknown>)[]}

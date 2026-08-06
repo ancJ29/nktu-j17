@@ -11,7 +11,7 @@ import { deliveryRequestPartyIsCustomer } from './deliveryRequestParty';
 import { DataTable } from '@credo/base-ui/components';
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { type ResolvedStatusOption } from '@/utils/permission';
+import { tableDensity, type ResolvedStatusOption } from '@/utils/permission';
 import { resolveDeliveryRequestRowBg } from './urgencyRowBg';
 
 type DeliveryRequestDataTableProps = {
@@ -141,6 +141,7 @@ export function DeliveryRequestDataTable({
     <DataTable
       withIndex
       noActions
+      density={tableDensity()}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
       data={requests as (DeliveryRequest & Record<string, unknown>)[]}

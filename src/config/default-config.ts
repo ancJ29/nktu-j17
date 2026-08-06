@@ -50,6 +50,8 @@ export const DEFAULT_ENABLE_PDF_SHARING = false;
 
 export const DEFAULT_ENABLE_STATS = false;
 
+export const DEFAULT_TABLE_DENSITY: 'comfortable' | 'compact' = 'comfortable';
+
 export const DEFAULT_EMPLOYEE_FEATURES: CMngtEmployeeFeatures = {
   enabled: true,
   email: false,

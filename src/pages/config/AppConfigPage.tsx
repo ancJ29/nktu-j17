@@ -18,6 +18,7 @@ import {
   DEFAULT_LOCATION_FEATURES,
   DEFAULT_PRODUCT_FEATURES,
   DEFAULT_SALES_ORDER_FEATURES,
+  DEFAULT_TABLE_DENSITY,
   DEFAULT_THEME,
   DEFAULT_TRANSLATIONS,
   DEFAULT_USER_SETTINGS,
@@ -261,6 +262,7 @@ export function ConfigEditor({
     DEFAULT_CONFIG.features.common.enablePdfSharing,
   );
   const [enableStats, setEnableStats] = useState(DEFAULT_CONFIG.features.common.enableStats);
+  const [tableDensity, setTableDensity] = useState(DEFAULT_TABLE_DENSITY);
   const [employeeFeatures, setEmployeeFeatures] = useState<CMngtEmployeeFeatures>(
     DEFAULT_CONFIG.features.employees,
   );
@@ -370,6 +372,7 @@ export function ConfigEditor({
           languageSwitcher,
           enablePdfSharing,
           enableStats,
+          tableDensity,
         },
         employees: employeeFeatures,
         permissionManagement: permMngtFeatures,
@@ -412,6 +415,7 @@ export function ConfigEditor({
       languageSwitcher,
       enablePdfSharing,
       enableStats,
+      tableDensity,
       employeeFeatures,
       permMngtFeatures,
       activityLogFeatures,
@@ -458,6 +462,7 @@ export function ConfigEditor({
       cfg.features?.common?.enablePdfSharing ?? DEFAULT_CONFIG.features.common.enablePdfSharing,
     );
     setEnableStats(cfg.features?.common?.enableStats ?? DEFAULT_CONFIG.features.common.enableStats);
+    setTableDensity(cfg.features?.common?.tableDensity ?? DEFAULT_TABLE_DENSITY);
     setEmployeeFeatures({ ...SCHEMA_DEFAULT_EMPLOYEE_FEATURES, ...cfg.features?.employees });
     setPermMngtFeatures({
       ...SCHEMA_DEFAULT_PERM_MNGT_FEATURES,
@@ -730,6 +735,7 @@ export function ConfigEditor({
     setUserSettings(DEFAULT_USER_SETTINGS);
     setTranslations(DEFAULT_TRANSLATIONS);
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
+    setTableDensity(DEFAULT_TABLE_DENSITY);
     setCompanyInfo(DEFAULT_COMPANY_INFO);
   }, []);
 
@@ -816,7 +822,10 @@ export function ConfigEditor({
   const resetNavigation = useCallback(() => setNavigation(defaultNavigation), []);
   const resetUserSettings = useCallback(() => setUserSettings(DEFAULT_USER_SETTINGS), []);
   const resetTranslations = useCallback(() => setTranslations(DEFAULT_TRANSLATIONS), []);
-  const resetDisplaySettings = useCallback(() => setDisplaySettings(DEFAULT_DISPLAY_SETTINGS), []);
+  const resetDisplaySettings = useCallback(() => {
+    setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
+    setTableDensity(DEFAULT_TABLE_DENSITY);
+  }, []);
   const resetCompanyInfo = useCallback(() => setCompanyInfo(DEFAULT_COMPANY_INFO), []);
 
   const eqDefault = (a: unknown, b: unknown) => Object.keys(deepDiff(a, b)).length === 0;
@@ -826,7 +835,9 @@ export function ConfigEditor({
       eqDefault(languageSwitcher, DEFAULT_LANGUAGE_SWITCHER) &&
       eqDefault(enablePdfSharing, DEFAULT_ENABLE_PDF_SHARING) &&
       eqDefault(enableStats, DEFAULT_ENABLE_STATS),
-    displaySettings: eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS),
+    displaySettings:
+      eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS) &&
+      eqDefault(tableDensity, DEFAULT_TABLE_DENSITY),
     companyInfo: eqDefault(companyInfo, DEFAULT_COMPANY_INFO),
     layout: eqDefault(layout, DEFAULT_LAYOUT),
     theme: eqDefault(themeConfig, DEFAULT_THEME),
@@ -976,7 +987,12 @@ export function ConfigEditor({
             onToggle={toggleSection}
             onReset={resetDisplaySettings}
           >
-            <DisplaySettingsSection settings={displaySettings} onChange={setDisplaySettings} />
+            <DisplaySettingsSection
+              settings={displaySettings}
+              tableDensity={tableDensity}
+              onChange={setDisplaySettings}
+              onTableDensityChange={setTableDensity}
+            />
           </CollapsibleSection>
 
           <CollapsibleSection

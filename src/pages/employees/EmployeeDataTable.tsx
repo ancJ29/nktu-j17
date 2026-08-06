@@ -13,9 +13,10 @@ import type { Employee } from '@/types';
 import { DataTable, PhoneNumber } from '@credo/base-ui/components';
 import {
   hasAvatarForEmployees,
-  hasEmailForEmployees,
   hasDepartmentForEmployees,
+  hasEmailForEmployees,
   hasPositionForEmployees,
+  tableDensity,
 } from '@/utils/permission';
 
 const hasEmail = hasEmailForEmployees();
@@ -182,6 +183,7 @@ export function EmployeeDataTable({
     <DataTable
       withIndex
       noActions
+      density={tableDensity()}
       maxHeight="calc(100vh - 250px)"
       data={employees as (Employee & Record<string, unknown>)[]}
       columns={columns}

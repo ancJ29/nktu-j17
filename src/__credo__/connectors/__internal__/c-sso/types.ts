@@ -52,6 +52,10 @@ export type RefreshTokenResponse = BaseResponse & {
   refreshToken?: string;
 };
 
+export type GetPublicKeyResponse = BaseResponse & {
+  publicKey?: string;
+};
+
 export type GetProfileRequest = {
   token: string;
 };
@@ -147,7 +151,9 @@ export type OperatorAddUserRequest = {
   password: string;
   serviceCode: string;
 };
-export type OperatorAddUserResponse = BaseResponse;
+export type OperatorAddUserResponse = BaseResponse & {
+  userUuid?: string;
+};
 
 export type OperatorGenerateLoginTokenRequest = {
   serviceCode: string;

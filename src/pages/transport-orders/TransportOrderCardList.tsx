@@ -1,3 +1,4 @@
+import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Badge, Card, Group, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +22,15 @@ export function TransportOrderCardList({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const shipmentTypeLabel = useShipmentTypeLabel();
+
+  const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
+  const toggleExpanded = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }, []);
 
   if (!isLoading && orders.length === 0) {
     return (
@@ -82,7 +92,11 @@ export function TransportOrderCardList({
                   {[item.containerNumber, item.billNumber].filter(Boolean).join(' · ')}
                 </Text>
               )}
-              <TransportRouteCell order={item} />
+              <TransportRouteCell
+                order={item}
+                expanded={expandedIds.has(item.id)}
+                onToggle={() => toggleExpanded(item.id)}
+              />
               <TransportDriverCell order={item} />
               {item.customerName && (
                 <Text size="xs" c="dimmed" lineClamp={1}>

@@ -8,7 +8,12 @@ import type { SalesOrder, Employee } from '@/types';
 import { DataTable } from '@credo/base-ui/components';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission';
-import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
+import {
+  getPricingVatRate,
+  isPricingManagementEnabled,
+  perms,
+  tableDensity,
+} from '@/utils/permission';
 import { SalesOrderStatusBadgeBase } from '@/components/sales-orders/SalesOrderStatusBadgeBase';
 import { SortHeader } from '@/components/SortHeader';
 import { selectionColumn } from '@/components/selectionColumn';
@@ -512,6 +517,7 @@ export function SalesOrderDataTable({
     <DataTable
       withIndex
       noActions
+      density={tableDensity()}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
       data={orders as (SalesOrder & Record<string, unknown>)[]}

@@ -20,4 +20,4 @@ export { LoadingFallback } from './LoadingFallback';
 export { PhoneNumber } from './PhoneNumber';
 export { Tabs } from './Tabs';
 export { Tooltip } from './Tooltip';
-export type { DataTableColumn } from './DataTable';
+export type { DataTableColumn, DataTableDensity } from './DataTable';

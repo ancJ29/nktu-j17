@@ -5,6 +5,8 @@ export const C_SSO_ROUTES = {
     CONFIG: '/config',
     OPERATOR: '/operator',
     ADMIN: '/admin',
+
+    V2: '/v2',
   },
   SUB_ROUTES: {
     SSO: {
@@ -22,6 +24,9 @@ export const C_SSO_ROUTES = {
       CONFIRM_EMAIL_CHANGE: { PATH: '/confirm-email-change', METHOD: 'POST' },
       GENERATE_LOGIN_TOKEN: { PATH: '/generate-login-token', METHOD: 'POST' },
       LOGIN_WITH_TOKEN: { PATH: '/login-with-token', METHOD: 'POST' },
+    },
+    V2: {
+      GET_PUBLIC_KEY: { PATH: '/public-key', METHOD: 'GET' },
     },
     CONFIG: {
       GET_ALL_SERVICES: { PATH: '/services', METHOD: 'GET' },

@@ -18,6 +18,7 @@ export const C_MNGT_ROUTES = {
     GENERIC_RECORD: '/generic-records',
     SINGLE_RECORDS: '/single-records',
     PARTITIONED_RECORDS: '/partitioned-records',
+    AUTH: '/auth',
   },
   SUB_ROUTES: {
     EMPLOYEE: {
@@ -148,6 +149,10 @@ export const C_MNGT_ROUTES = {
       CREATE: { PATH: '/:entity', METHOD: 'POST' },
       UPDATE: { PATH: '/:entity/:id', METHOD: 'PATCH' },
       DELETE: { PATH: '/:entity/:id', METHOD: 'DELETE' },
+    },
+
+    AUTH: {
+      ME: { PATH: '/me', METHOD: 'GET' },
     },
   },
 } as const;

@@ -33,6 +33,7 @@ import type {
   GetConfigRecordResponse,
   GetEmailConfigResponse,
   GetProfileResponse,
+  GetPublicKeyResponse,
   LoginRequest,
   LoginResponse,
   LoginWithTokenRequest,
@@ -83,6 +84,7 @@ const storages = {
 registerStagePrefix(storages.baseUrl);
 
 const SSO_ROUTES = C_SSO_ROUTES.SUB_ROUTES.SSO;
+const V2_ROUTES = C_SSO_ROUTES.SUB_ROUTES.V2;
 const CONFIG_ROUTES = C_SSO_ROUTES.SUB_ROUTES.CONFIG;
 const OPERATOR_ROUTES = C_SSO_ROUTES.SUB_ROUTES.OPERATOR;
 const ADMIN_ROUTES = C_SSO_ROUTES.SUB_ROUTES.ADMIN;
@@ -97,6 +99,12 @@ const withAuth = (token: string) => ({
 const ssoApi = createApiGroup({
   storages,
   prefix: C_SSO_ROUTES.PREFIXES.SSO,
+  getBaseUrl,
+});
+
+const v2Api = createApiGroup({
+  storages,
+  prefix: C_SSO_ROUTES.PREFIXES.V2,
   getBaseUrl,
 });
 
@@ -235,6 +243,8 @@ export const cSsoConnector = {
     ssoApi<LoginWithTokenResponse>(SSO_ROUTES.LOGIN_WITH_TOKEN, {
       body: { serviceCode, token },
     }),
+
+  getPublicKey: () => v2Api<GetPublicKeyResponse>(V2_ROUTES.GET_PUBLIC_KEY),
 
   getAllServices: () => configApi<GetAllServicesResponse>(CONFIG_ROUTES.GET_ALL_SERVICES),
 

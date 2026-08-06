@@ -8,7 +8,7 @@ import type { GoodsReceipt, GoodsReceiptExtra } from '@/types';
 import { DataTable } from '@credo/base-ui/components';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { findStatus } from './goodsReceiptStatuses';
-import { isLocationsEnabled } from '@/utils/permission';
+import { isLocationsEnabled, tableDensity } from '@/utils/permission';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 
 const locationsEnabled = isLocationsEnabled();
@@ -167,6 +167,7 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
     <DataTable
       withIndex
       noActions
+      density={tableDensity()}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
       data={receipts as (GoodsReceipt & Record<string, unknown>)[]}

@@ -29,6 +29,7 @@ export type {
   GetEmailConfigResponse as CSsoGetEmailConfigResponse,
   GetProfileRequest as CSsoGetProfileRequest,
   GetProfileResponse as CSsoGetProfileResponse,
+  GetPublicKeyResponse as CSsoGetPublicKeyResponse,
   LoginRequest as CSsoLoginRequest,
   LoginResponse as CSsoLoginResponse,
   LoginWithTokenRequest as CSsoLoginWithTokenRequest,

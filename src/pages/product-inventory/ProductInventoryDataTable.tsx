@@ -9,7 +9,7 @@ import { getItemBaseUnit } from '@/utils/unitConversion';
 import { lookupLabelOf, useLookupLabels, type InboundEntry } from '@/hooks';
 import type { Location, Product, ProductInventorySummary } from '@/types';
 import { isDefaultLocation } from '@/types';
-import { isLocationsEnabled } from '@/utils/permission';
+import { isLocationsEnabled, tableDensity } from '@/utils/permission';
 import { ProductThumb } from '../products/ProductThumb';
 import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
 import { InventorySecondaryStatusBadge } from '@/components/inventory/InventorySecondaryStatusBadge';
@@ -625,6 +625,7 @@ export function ProductInventoryDataTable({
     <DataTable
       withIndex
       noActions
+      density={tableDensity()}
       maxHeight={maxHeight}
       viewportRef={viewportRef}
       data={summaries as (ProductInventorySummary & Record<string, unknown>)[]}

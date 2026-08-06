@@ -91,6 +91,10 @@ export function isStatsEnabled() {
   return featureFlags?.common?.enableStats ?? false;
 }
 
+export function tableDensity(): 'comfortable' | 'compact' {
+  return featureFlags?.common?.tableDensity ?? 'comfortable';
+}
+
 export function isProductInventoryEnabled() {
   return featureFlags?.productInventory?.enabled ?? false;
 }

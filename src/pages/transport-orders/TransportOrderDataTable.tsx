@@ -1,4 +1,4 @@
-import { useMemo, type Ref } from 'react';
+import { useCallback, useMemo, useState, type MouseEvent, type Ref } from 'react';
 import { useNavigate } from 'react-router';
 import { Badge, Box, Group, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,26 @@ import { useShipmentTypeLabel } from './shipmentType';
 import { orderPlanAt, orderPlanDate } from './planDate';
 import { TransportRouteCell } from './TransportRouteCell';
 import { TransportDriverCell } from './TransportDriverCell';
+import { tableDensity } from '@/utils/permission';
+
+const COLUMN_WIDTHS = {
+  comfortable: {
+    planDate: '135px',
+    customer: '150px',
+    shipmentType: '110px',
+    driver: '185px',
+    containerBill: '155px',
+    status: '165px',
+  },
+  compact: {
+    planDate: '110px',
+    customer: '130px',
+    shipmentType: '85px',
+    driver: '155px',
+    containerBill: '135px',
+    status: '150px',
+  },
+} as const;
 
 export function TransportOrderDataTable({
   orders,
@@ -31,6 +51,18 @@ export function TransportOrderDataTable({
   const navigate = useNavigate();
   const shipmentTypeLabel = useShipmentTypeLabel();
 
+  const density = tableDensity();
+  const widths = COLUMN_WIDTHS[density];
+
+  const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
+  const toggleExpanded = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }, []);
+
   const columns = useMemo(
     () => [
       {
@@ -43,7 +75,7 @@ export function TransportOrderDataTable({
             onChange={onSortChange}
           />
         ),
-        width: '135px',
+        width: widths.planDate,
         render: (item: TransportOrder) => {
           const time = formatTime(orderPlanAt(item));
           return (
@@ -58,7 +90,7 @@ export function TransportOrderDataTable({
                   </Text>
                 )}
               </Group>
-              <Text fz="xs" c="dimmed" ff="monospace">
+              <Text fz="sm" fw="bold">
                 {item.orderNumber}
               </Text>
             </Stack>
@@ -68,7 +100,7 @@ export function TransportOrderDataTable({
       {
         key: 'customer',
         header: t('common.labels.customer'),
-        width: '150px',
+        width: widths.customer,
         render: (item: TransportOrder) => (
           <Text fz="sm" lineClamp={2}>
             {item.customerName || '—'}
@@ -78,7 +110,7 @@ export function TransportOrderDataTable({
       {
         key: 'shipmentType',
         header: t('transportOrders.form.shipmentType'),
-        width: '110px',
+        width: widths.shipmentType,
 
         render: (item: TransportOrder) =>
           item.shipmentType ? (
@@ -88,13 +120,13 @@ export function TransportOrderDataTable({
       {
         key: 'driver',
         header: t('transportOrders.columns.driver'),
-        width: '185px',
+        width: widths.driver,
         render: (item: TransportOrder) => <TransportDriverCell order={item} />,
       },
       {
         key: 'containerBill',
         header: t('transportOrders.columns.containerBill'),
-        width: '155px',
+        width: widths.containerBill,
         render: (item: TransportOrder) => (
           <Stack gap={2}>
             <Text fz="sm" ff="monospace" fw="bold" lineClamp={1}>
@@ -112,14 +144,25 @@ export function TransportOrderDataTable({
         key: 'route',
         header: t('transportOrders.columns.route'),
 
-        render: (item: TransportOrder) => <TransportRouteCell order={item} />,
+        onCellClick: (item: TransportOrder, event: MouseEvent) => {
+          if (!item.isMultiTrip) return;
+          event.stopPropagation();
+          toggleExpanded(item.id);
+        },
+        render: (item: TransportOrder) => (
+          <TransportRouteCell
+            order={item}
+            expanded={expandedIds.has(item.id)}
+            onToggle={() => toggleExpanded(item.id)}
+          />
+        ),
       },
       {
         key: 'status',
         header: t('__new__.01-common.labels.status'),
         ta: 'center' as const,
 
-        width: '165px',
+        width: widths.status,
         render: (item: TransportOrder) => {
           const status = findStatus(item.status);
           return (
@@ -139,7 +182,16 @@ export function TransportOrderDataTable({
       },
     ],
 
-    [t, i18n.language, sortField, onSortChange, shipmentTypeLabel],
+    [
+      t,
+      i18n.language,
+      sortField,
+      onSortChange,
+      shipmentTypeLabel,
+      widths,
+      expandedIds,
+      toggleExpanded,
+    ],
   );
 
   const handleRowClick = (item: TransportOrder) => {
@@ -150,6 +202,7 @@ export function TransportOrderDataTable({
     <DataTable
       withIndex
       noActions
+      density={density}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
       data={orders as (TransportOrder & Record<string, unknown>)[]}

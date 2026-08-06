@@ -457,6 +457,8 @@ const FeaturesSchema = z
       enablePdfSharing: z.boolean().default(false),
 
       enableStats: z.boolean().default(false),
+
+      tableDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
     }),
     employees: EmployeesFeaturesSchema,
     permissionManagement: PermissionManagementFeaturesSchema,
@@ -490,6 +492,7 @@ const FeaturesSchema = z
       languageSwitcher: true,
       enablePdfSharing: false,
       enableStats: false,
+      tableDensity: 'comfortable',
     },
     employees: EmployeesFeaturesSchema.parse({}),
     permissionManagement: PermissionManagementFeaturesSchema.parse({}),

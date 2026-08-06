@@ -296,6 +296,8 @@ export type CMngtAppConfig = AppConfig & {
       languageSwitcher: boolean;
       enablePdfSharing: boolean;
       enableStats: boolean;
+
+      tableDensity?: 'comfortable' | 'compact';
     };
     employees: CMngtEmployeeFeatures;
     permissionManagement: CMngtPermissionManagementFeatures;

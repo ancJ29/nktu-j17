@@ -9,6 +9,8 @@ export type Employee<TExtra = Record<string, unknown>> = {
   position: string;
   department: string;
   isActive: boolean;
+
+  userUuid?: string;
   extra: TExtra;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
