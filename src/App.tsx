@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/next';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { lazy, Suspense, useEffect } from 'react';
 import { RouterProvider } from 'react-router';
@@ -150,6 +151,7 @@ export default function App() {
       <DebugPanel />
       {isInternal && <InternalBanner />}
       <SpeedInsights />
+      <Analytics />
     </ErrorBoundary>
   );
 }

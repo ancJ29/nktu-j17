@@ -147,6 +147,17 @@ export default function MorePage() {
           lastRow
         />
       </NavListSection>
+
+      {/* Build identity. The More page is the mobile counterpart of the PC nav
+          panel (same nav items, same account block), so this sits where that
+          panel's footer does. Deliberately NOT in the header account menu:
+          that menu holds actions, and a non-tappable row there reads as broken.
+          One line, not the PC's two — vertical room is the scarce thing here. */}
+      {appConfig.build && (
+        <Text size="xs" c="dimmed" ta="center" fs="italic">
+          {appConfig.build.version} ({appConfig.build.buildHash}) · {appConfig.build.buildTimestamp}
+        </Text>
+      )}
     </Stack>
   );
 }

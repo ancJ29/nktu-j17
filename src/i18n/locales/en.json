@@ -14,6 +14,7 @@
         "disable": "Disable",
         "edit": "Edit",
         "enable": "Enable",
+        "exportAccounting": "Export (accounting)",
         "exportExcel": "Export Excel",
         "generate": "Generate",
         "open": "Open",
@@ -133,6 +134,12 @@
         "list": {
           "searchPlaceholder": "Search by receipt #, vendor, reference..."
         },
+        "notifications": {
+          "exportEmpty": "Nothing to export — adjust the filters and try again.",
+          "exportError": "Failed to export goods receipts.",
+          "exportSuccess_one": "Exported {{count}} receipt.",
+          "exportSuccess_other": "Exported {{count}} receipts."
+        },
         "singular": "__keep__",
         "title": "__keep__"
       },
@@ -229,7 +236,6 @@
           "switchToInternalDelivery": "Switch to internal delivery"
         },
         "list": {
-          "accountingExportButton": "Export (accounting)",
           "filterExternalDelivery": "External delivery",
           "filterInternalDelivery": "Internal delivery",
           "searchPlaceholder": "Search orders..."

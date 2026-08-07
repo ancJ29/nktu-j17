@@ -14,6 +14,7 @@
         "disable": "Tắt",
         "edit": "Sửa",
         "enable": "Bật",
+        "exportAccounting": "Xuất kế toán",
         "exportExcel": "Xuất Excel",
         "generate": "Tạo",
         "open": "Mở",
@@ -133,6 +134,12 @@
         "list": {
           "searchPlaceholder": "Tìm theo mã phiếu, NCC, tham chiếu..."
         },
+        "notifications": {
+          "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
+          "exportError": "Xuất phiếu nhập kho thất bại.",
+          "exportSuccess_one": "Đã xuất {{count}} phiếu nhập kho.",
+          "exportSuccess_other": "Đã xuất {{count}} phiếu nhập kho."
+        },
         "singular": "__keep__",
         "title": "__keep__"
       },
@@ -229,7 +236,6 @@
           "switchToInternalDelivery": "Giao nội bộ"
         },
         "list": {
-          "accountingExportButton": "Xuất kế toán",
           "filterExternalDelivery": "Giao ngoài",
           "filterInternalDelivery": "Giao nội bộ",
           "searchPlaceholder": "Tìm kiếm đơn hàng..."

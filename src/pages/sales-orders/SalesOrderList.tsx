@@ -346,6 +346,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
         getCustomerByCode,
         employeeCodes,
         fallbackVatRate: getPricingVatRate(),
+        resolveStatus,
       });
       notifications.show({
         color: 'green',
@@ -638,7 +639,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
                   onClick={handleAccountingExport}
                   disabled={filtered.length === 0}
                 >
-                  {t('__new__.07-entities.salesOrders.list.accountingExportButton')}
+                  {t('__new__.01-common.actions.exportAccounting')}
                 </Button>
               )}
             </>

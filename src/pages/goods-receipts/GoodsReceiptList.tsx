@@ -1,15 +1,18 @@
-import { Drawer, Group, Stack, Text } from '@mantine/core';
+import { Button, Drawer, Group, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useEffect, useMemo, useState } from 'react';
+import { IconDownload } from '@tabler/icons-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
+import { getCurrentEmployeeId, getCurrentIsRoot } from '@/hooks/useCurrentEmployee';
 import { setGoodsReceiptQueryRange, useGoodsReceiptStore } from '@/stores/useGoodsReceiptStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { ListPagination } from '@/components/custom/ListPagination';
-import { device } from '@credo/base-ui/utils';
+import { device, logger } from '@credo/base-ui/utils';
+import { exportGoodsReceiptsToAccountingExcel } from '@/utils/goodsReceiptAccountingExcel';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useTransactionalRangeRefetch } from '@/hooks/useTransactionalRangeRefetch';
 import {
@@ -224,6 +227,48 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     [locations],
   );
 
+  const employeeCodes = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const e of employees) m.set(e.id, e.code);
+    return m;
+  }, [employees]);
+  const myDepartment = useMemo(() => {
+    const me = getCurrentEmployeeId();
+    return me ? (employees.find((e) => e.id === me)?.department ?? null) : null;
+  }, [employees]);
+  const canAccountingExport =
+    !!variant.accountingExport &&
+    (getCurrentIsRoot() ||
+      (!!myDepartment && variant.accountingExport.allowedDepartments.includes(myDepartment)));
+
+  const handleAccountingExport = useCallback(() => {
+    if (filtered.length === 0) {
+      notifications.show({
+        color: 'yellow',
+        message: t('__new__.07-entities.goodsReceipts.notifications.exportEmpty'),
+      });
+      return;
+    }
+    try {
+      exportGoodsReceiptsToAccountingExcel(filtered, {
+        employeeCodes,
+        resolveStatusLabel: (status) => t(findStatus(status).labelKey),
+      });
+      notifications.show({
+        color: 'green',
+        message: t('__new__.07-entities.goodsReceipts.notifications.exportSuccess', {
+          count: filtered.length,
+        }),
+      });
+    } catch (err) {
+      logger.error('Goods receipt accounting export failed:', err);
+      notifications.show({
+        color: 'red',
+        message: t('__new__.07-entities.goodsReceipts.notifications.exportError'),
+      });
+    }
+  }, [filtered, employeeCodes, t]);
+
   const statsCells = useMemo<ListStatCell[]>(() => {
     if (!shouldDisplayStats) return [];
     const byCounts: Record<string, number> = {};
@@ -395,6 +440,19 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
           cachedAt={cachedAt}
           loading={loading}
           onRefresh={forceRefresh}
+          extraActions={
+            canAccountingExport && (
+              <Button
+                variant="default"
+                size="sm"
+                leftSection={<IconDownload size={16} />}
+                onClick={handleAccountingExport}
+                disabled={filtered.length === 0}
+              >
+                {t('__new__.01-common.actions.exportAccounting')}
+              </Button>
+            )
+          }
           createCta={{
             to: ROUTES.GOODS_RECEIPTS.NEW,
             label: t('goodsReceipts.addItem'),
