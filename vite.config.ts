@@ -71,6 +71,7 @@ export default defineConfig(({ mode }) => {
       alias: {
         // eslint-disable-next-line no-undef
         '@': resolve(__dirname, './src'),
+        '@credo/modules': resolve(__dirname, './src/__credo__/modules'),
         '@credo/base-ui': resolve(__dirname, './src/__credo__/ui'),
         '@credo/connectors': resolve(__dirname, './src/__credo__/connectors'),
         '@credo/kits': resolve(__dirname, './src/__credo__/kits'),

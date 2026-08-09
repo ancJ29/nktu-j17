@@ -23,9 +23,10 @@
       "@credo/base-ui": ["./src/__credo__/ui/index.ts"],
       "@credo/connectors": ["./src/__credo__/connectors/index.ts"],
       "@credo/modules": ["./src/__credo__/modules/index.ts"],
+      "@credo/modules/permissions": ["./src/__credo__/modules/permissions/index.ts"],
       "@credo/kits": ["./src/__credo__/kits/index.ts"],
-      "@credo/base-ui/*": ["./src/__credo__/ui/*"],
       "@credo/connectors/*": ["./src/__credo__/connectors/*"],
+      "@credo/base-ui/*": ["./src/__credo__/ui/*"],
       "@credo/modules/*": ["./src/__credo__/modules/*"],
       "@credo/kits/*": ["./src/__credo__/kits/*"]
     }
