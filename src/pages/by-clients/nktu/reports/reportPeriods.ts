@@ -143,11 +143,6 @@ export function resolveMonth(periodKey: string): ResolvedPeriod {
   };
 }
 
-export function currentMonthKey(now: number = Date.now()): string {
-  const vn = new Date(now + VN_OFFSET_MS);
-  return `${vn.getUTCFullYear()}-${String(vn.getUTCMonth() + 1).padStart(2, '0')}`;
-}
-
 export function recentMonthKeys(count: number, now: number = Date.now()): string[] {
   const vn = new Date(now + VN_OFFSET_MS);
   let y = vn.getUTCFullYear();

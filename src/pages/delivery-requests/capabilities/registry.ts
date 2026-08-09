@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { CapabilityDefinition, CapabilityId, Stage } from './types';
+import type { CapabilityDefinition, CapabilityId } from './types';
 
 const lockLineEditsConfigSchema = z
   .object({
@@ -76,15 +76,3 @@ export const CAPABILITY_REGISTRY: Record<CapabilityId, CapabilityDefinition> = {
     configSchema: lockLineEditsConfigSchema,
   },
 };
-
-export function getCapability(id: CapabilityId): CapabilityDefinition | undefined {
-  return CAPABILITY_REGISTRY[id];
-}
-
-export function listCapabilities(): CapabilityDefinition[] {
-  return Object.values(CAPABILITY_REGISTRY);
-}
-
-export function listCapabilitiesForStage(stage: Stage): CapabilityDefinition[] {
-  return Object.values(CAPABILITY_REGISTRY).filter((c) => c.allowedStages.includes(stage));
-}

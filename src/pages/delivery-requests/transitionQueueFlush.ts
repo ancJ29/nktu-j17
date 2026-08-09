@@ -10,7 +10,6 @@ import {
   listQueuedTransitions,
   markTransitionBlocked,
   removeQueuedTransition,
-  type QueuedTransition,
 } from './transitionQueue';
 import type { TFunction } from 'i18next';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
@@ -126,9 +125,4 @@ async function loadDeliveryRequest(id: string): Promise<DeliveryRequest | null> 
   } catch {
     return null;
   }
-}
-
-export async function listPendingTransitionIds(): Promise<Set<string>> {
-  const queued = await listQueuedTransitions();
-  return new Set(queued.map((entry: QueuedTransition) => entry.id));
 }

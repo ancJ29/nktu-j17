@@ -2,7 +2,16 @@ import type { TransportOrder } from '@/types';
 
 export const PLACE_SUGGESTION_LIMIT = 12;
 
-function placeKey(value: string): string {
+export const PLACE_INPUT_STYLES = {
+  input: {
+    border: 'none',
+    borderBottom: '1px solid var(--mantine-color-primary-6)',
+    borderRadius: 0,
+    padding: 0,
+  },
+} as const;
+
+export function placeKey(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/g, ' ');
 }
 

@@ -1,5 +1,6 @@
 /**
- * Helpers for the project-wide `<DateTimeField>` component.
+ * Vietnam-anchored date/date-time string helpers, shared by `<DateField>`,
+ * `<DateTimeTextField>` and the form pages that keep dates as strings.
  *
  * Mantine 8's `DateTimePicker` works with strings in the
  * `YYYY-MM-DD HH:mm:ss` format internally. These two helpers convert to/from
@@ -19,15 +20,6 @@ function formatLocal(d: Date): string {
     `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}` +
     ` ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
   );
-}
-
-/**
- * Current local time formatted for the picker (`YYYY-MM-DD HH:mm:ss`).
- * Use as a sensible "now" default for fields like `receivedDate` where the
- * operator is most likely confirming an event that just happened.
- */
-export function nowDateTimeString(): string {
-  return formatLocal(new Date());
 }
 
 /**

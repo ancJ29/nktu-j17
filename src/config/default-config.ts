@@ -1,11 +1,5 @@
 import type { CMngtAppConfig } from '@credo/kits/types';
-import type {
-  AuthFeatures,
-  Language,
-  NavigationConfig,
-  ThemeConfig,
-  UserSettingsConfig,
-} from '@credo/kits/types';
+import type { AuthFeatures, Language, ThemeConfig, UserSettingsConfig } from '@credo/kits/types';
 import type {
   CMngtEmployeeFeatures,
   CMngtLocationFeatures,
@@ -39,8 +33,6 @@ export const DEFAULT_LANGUAGES: Language[] = [
 ];
 
 export const DEFAULT_LANGUAGE = 'vi';
-
-export const DEFAULT_NAVIGATION: NavigationConfig = { pc: [], mobile: [] };
 
 export const DEFAULT_USER_SETTINGS: UserSettingsConfig = { syncDebounceDelay: 5000 };
 
@@ -270,6 +262,7 @@ export const DEFAULT_TRANSPORT_ORDER_FEATURES: CMngtTransportOrderFeatures = {
   enabled: false,
   codePrefix: 'VC-',
   codePadLength: 3,
+  routeCodePrefix: 'TUYEN-',
 
   statusOptions: [
     {

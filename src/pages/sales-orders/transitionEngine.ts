@@ -458,10 +458,6 @@ export function getStatusFlowOrder(): string[] {
   return opts.map((o) => o.value);
 }
 
-export function getStatusFlowIndex(status: string): number {
-  return getStatusFlowOrder().indexOf(status);
-}
-
 export function getSalesOrderStatusStage(statusValue: string): Stage | undefined {
   for (const opt of getSalesOrderStatusOptions()) {
     if (opt.value === statusValue) return opt.stage as Stage;
@@ -526,18 +522,6 @@ export function shouldLockLineEdits(statusValue: string): boolean {
     return stage === 'COMPLETED' || stage === 'EXCEPTIONAL';
   }
   return false;
-}
-
-export function readCapabilityConfig(
-  statusValue: string,
-  capId: CapabilityId,
-): unknown | undefined {
-  for (const opt of getSalesOrderStatusOptions()) {
-    if (opt.value !== statusValue) continue;
-    const b = (opt.capabilities ?? []).find((x) => x.id === capId);
-    return b?.config;
-  }
-  return undefined;
 }
 
 export { CAPABILITY_REGISTRY };

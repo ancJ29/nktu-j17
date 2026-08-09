@@ -58,28 +58,3 @@ export function EntityAnchor({ to, size, anchorColor = 'inherit', children }: En
     </Anchor>
   );
 }
-
-type JoinedLinksProps<T> = {
-  size: LinkSize;
-  items: ReadonlyArray<T>;
-  keyOf: (item: T) => string;
-  renderItem: (item: T) => ReactNode;
-};
-
-export function JoinedLinks<T>({ size, items, keyOf, renderItem }: JoinedLinksProps<T>) {
-  if (items.length === 0) return <EntityDash size={size} />;
-  return (
-    <Group gap={6} wrap="wrap">
-      {items.map((item, idx) => (
-        <span key={keyOf(item)}>
-          {renderItem(item)}
-          {idx < items.length - 1 && (
-            <Text component="span" size={size} c="dimmed">
-              ,{' '}
-            </Text>
-          )}
-        </span>
-      ))}
-    </Group>
-  );
-}

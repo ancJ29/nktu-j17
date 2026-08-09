@@ -81,11 +81,13 @@ import {
   Loader,
   Modal,
   MultiSelect,
+  Paper,
   ScrollArea,
   Select,
   Stack,
   TagsInput,
   Text,
+  TextInput,
   Title,
 } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -2206,6 +2208,33 @@ export function ConfigEditor({
                       setTransportOrdersFeatures({ ...transportOrdersFeatures, codePadLength: v })
                     }
                   />
+                  {/* Deliberately NOT a second `CodeFormatFields`: that card
+                      pairs a prefix with its own padding, and a route reuses the
+                      order's padding above. Two "Number Padding" inputs writing
+                      one value is a trap, so the route contributes only its
+                      prefix. */}
+                  <Paper p="xs" withBorder>
+                    <Text fz="sm" fw={600} mb={4}>
+                      Route Code Format
+                    </Text>
+                    <Text fz="xs" c="dimmed" mb="xs">
+                      {`Auto-generated codes for saved routes (the route price list). A flat lifetime sequence, unlike the day-based order code above; it reuses the padding set there. Preview: ${
+                        transportOrdersFeatures.routeCodePrefix ?? 'TUYEN-'
+                      }${String(1).padStart(Math.max(0, transportOrdersFeatures.codePadLength), '0')}`}
+                    </Text>
+                    <TextInput
+                      label="Code Prefix"
+                      value={transportOrdersFeatures.routeCodePrefix ?? 'TUYEN-'}
+                      onChange={(e) =>
+                        setTransportOrdersFeatures({
+                          ...transportOrdersFeatures,
+                          routeCodePrefix: e.currentTarget.value,
+                        })
+                      }
+                      size="sm"
+                      placeholder="TUYEN-"
+                    />
+                  </Paper>
                   <TransportOrderConfigInvariantAlert
                     features={transportOrdersFeatures}
                     knownDepartments={

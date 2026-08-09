@@ -25,8 +25,6 @@ const CMngtNavigationConfigSchema = z.object({
 
 const TranslatableSchema = z.record(z.string(), z.string());
 
-export type Translatable = z.infer<typeof TranslatableSchema>;
-
 const OptionSchema = z.object({
   value: z.string(),
 
@@ -242,8 +240,6 @@ const CustomerFeaturesSchema = z
     customerTypeOptions: [],
   });
 
-export type CustomerTypeOption = z.infer<typeof OptionSchema>;
-
 const StatusCapabilityBindingSchema = z.object({
   id: z.string(),
   config: z.unknown().optional(),
@@ -408,6 +404,8 @@ const TransportOrderFeaturesSchema = z
     codePrefix: z.string().default('VC-'),
     codePadLength: z.number().int().min(0).max(12).default(3),
 
+    routeCodePrefix: z.string().default('TUYEN-'),
+
     statusOptions: z.array(TransportOrderStatusOptionSchema).default([]),
 
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
@@ -418,6 +416,7 @@ const TransportOrderFeaturesSchema = z
     enabled: false,
     codePrefix: 'VC-',
     codePadLength: 3,
+    routeCodePrefix: 'TUYEN-',
     statusOptions: [],
     statusTransitions: {},
     driverDepartments: [],
@@ -445,8 +444,6 @@ const DisplaySettingsSchema = z
     dateFormat: 'DD/MM/YYYY',
     dateTimeFormat: 'HH:mm DD/MM/YYYY',
   });
-
-export type DisplaySettings = z.infer<typeof DisplaySettingsSchema>;
 
 const FeaturesSchema = z
   .object({

@@ -13,7 +13,6 @@ import {
 import { IconAlertTriangle, IconListDetails, IconRobot } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import type { ReactNode } from 'react';
 import { ROUTES } from '@/constants/routes';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import type { SalesOrder, Employee } from '@/types';
@@ -21,6 +20,7 @@ import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission
 import { useMemo } from 'react';
 import { SalesOrderStatusBadgeBase } from '@/components/sales-orders/SalesOrderStatusBadgeBase';
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
+import { FieldRow } from '@/components/FieldRow';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
@@ -69,19 +69,6 @@ function SalesOrderCardSkeleton() {
         </Stack>
       </Stack>
     </Card>
-  );
-}
-
-function FieldRow({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <Group gap="xs" wrap="nowrap" align="baseline">
-      <Text size="sm" c="dimmed" style={{ flexShrink: 0 }}>
-        {label}:
-      </Text>
-      <Text size="sm" fw={500} style={{ minWidth: 0, wordBreak: 'break-word' }}>
-        {value}
-      </Text>
-    </Group>
   );
 }
 

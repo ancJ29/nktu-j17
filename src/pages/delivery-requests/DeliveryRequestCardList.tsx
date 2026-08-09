@@ -1,5 +1,6 @@
 import { Badge, Card, Divider, Group, Skeleton, Stack, Text } from '@mantine/core';
-import { useMemo, type ReactNode } from 'react';
+import { FieldRow } from '@/components/FieldRow';
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -37,19 +38,6 @@ function DeliveryRequestCardSkeleton() {
         </Stack>
       </Stack>
     </Card>
-  );
-}
-
-function FieldRow({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <Group gap="xs" wrap="nowrap" align="baseline">
-      <Text size="sm" c="dimmed" style={{ flexShrink: 0 }}>
-        {label}:
-      </Text>
-      <Text size="sm" fw={500} style={{ minWidth: 0, wordBreak: 'break-word' }}>
-        {value}
-      </Text>
-    </Group>
   );
 }
 

@@ -1,4 +1,3 @@
-import { logger } from '@credo/base-ui/utils';
 import { createIdbStore } from '@/utils/idbStore';
 import type { DateTimeInput } from '@credo/kits/types';
 
@@ -74,7 +73,6 @@ export async function enqueuePhoto(
     attempts: 0,
   };
   if (!(await store.put(pending))) return null;
-  notifyQueueChanged();
   return pending;
 }
 
@@ -95,7 +93,6 @@ export async function listPendingPhotos(target?: {
 
 export async function removePendingPhoto(id: string): Promise<void> {
   await store.remove(id);
-  notifyQueueChanged();
 }
 
 export async function markPendingAttached(id: string): Promise<void> {
@@ -114,23 +111,4 @@ export async function bumpPendingAttempts(id: string): Promise<void> {
   const existing = await store.get(id);
   if (!existing) return;
   await store.put({ ...existing, attempts: existing.attempts + 1 });
-  notifyQueueChanged();
-}
-
-type QueueListener = () => void;
-const listeners = new Set<QueueListener>();
-
-export function subscribePhotoQueue(listener: QueueListener): () => void {
-  listeners.add(listener);
-  return () => listeners.delete(listener);
-}
-
-function notifyQueueChanged(): void {
-  listeners.forEach((listener) => {
-    try {
-      listener();
-    } catch (err) {
-      logger.error('[PHOTO-QUEUE] listener threw', err);
-    }
-  });
 }

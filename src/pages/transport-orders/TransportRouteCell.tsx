@@ -2,11 +2,18 @@ import { Fragment, type CSSProperties, type MouseEvent, type ReactNode } from 'r
 import { ActionIcon, Box, Group, Stack, Text } from '@mantine/core';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { device } from '@credo/base-ui/utils';
 import type { DateTimeInput } from '@credo/kits/types';
 import type { TransportOrder } from '@/types';
 import { formatDateTime, formatTime } from '@/utils/dateFormat';
 
+const isMobile = device.isMobile;
+
 const ORIGIN_MIN_WIDTH = 104;
+
+const originStyle = isMobile ? { minWidth: 0 } : { minWidth: ORIGIN_MIN_WIDTH };
+
+const PLACE_LINE_CLAMP = isMobile ? 2 : 1;
 
 type RouteStop = { place: string; at?: DateTimeInput };
 
@@ -35,7 +42,12 @@ function StopCell({
       style={style}
       title={time ? `${stop.place} — ${formatDateTime(stop.at)}` : undefined}
     >
-      <Text fz="sm" fw={strong ? 500 : undefined} c={dimmed ? 'dimmed' : undefined} lineClamp={1}>
+      <Text
+        fz="sm"
+        fw={strong ? 500 : undefined}
+        c={dimmed ? 'dimmed' : undefined}
+        lineClamp={PLACE_LINE_CLAMP}
+      >
         {stop.place}
       </Text>
       {time && (
@@ -59,11 +71,13 @@ function RouteLine({ stops, suffix }: { stops: RouteStop[]; suffix?: ReactNode }
   const [origin, ...rest] = stops;
   const destination = rest.pop();
 
+  const wrap = isMobile ? 'wrap' : 'nowrap';
+
   return (
-    <Group gap={6} wrap="nowrap" align="flex-start" title={stops.map((s) => s.place).join(' › ')}>
-      <StopCell stop={origin ?? { place: '—' }} strong style={{ minWidth: ORIGIN_MIN_WIDTH }} />
+    <Group gap={6} wrap={wrap} align="flex-start" title={stops.map((s) => s.place).join(' › ')}>
+      <StopCell stop={origin ?? { place: '—' }} strong style={originStyle} />
       {destination && (
-        <Group gap={6} wrap="nowrap" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
+        <Group gap={6} wrap={wrap} align="flex-start" style={{ flex: 1, minWidth: 0 }}>
           {/* Intermediate stops stay on the line — dimmed and unweighted, so the
               two endpoints read first without the stuffing point being hidden. */}
           {rest.map((stop, i) => (

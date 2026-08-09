@@ -2,14 +2,7 @@ import { IconTruckDelivery } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { ROUTES } from '@/constants/routes';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
-import {
-  EntityAnchor,
-  EntityChip,
-  EntityDash,
-  JoinedLinks,
-  LINK_ICON_SIZE,
-  type LinkSize,
-} from './EntityLink';
+import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type DeliveryRequestLinkProps = {
   id: string | undefined | null;
@@ -17,12 +10,6 @@ type DeliveryRequestLinkProps = {
   color?: string;
 
   fallbackLabel?: string | null;
-};
-
-type DeliveryRequestLinksProps = {
-  ids: string[];
-  size?: LinkSize;
-  colors?: string[];
 };
 
 function DeliveryRequestIcon({ size }: { size: LinkSize }) {
@@ -53,40 +40,5 @@ export function DeliveryRequestLink({
         monospace
       />
     </EntityAnchor>
-  );
-}
-
-export function DeliveryRequestLinks({ ids, size = 'sm', colors = [] }: DeliveryRequestLinksProps) {
-  const items = useDeliveryRequestStore((s) => s.items);
-
-  const resolved = useMemo(
-    () =>
-      ids.map((id, idx) => {
-        const dr = items.find((d) => d.id === id);
-        return { id, label: dr?.requestNumber ?? id, color: colors[idx] ?? 'inherit' };
-      }),
-    [ids, items, colors],
-  );
-
-  return (
-    <JoinedLinks
-      size={size}
-      items={resolved}
-      keyOf={(dr) => dr.id}
-      renderItem={(dr) => (
-        <EntityAnchor
-          to={ROUTES.DELIVERY.DETAIL.replace(':id', dr.id)}
-          size={size}
-          anchorColor={dr.color}
-        >
-          <EntityChip
-            size={size}
-            lead={<DeliveryRequestIcon size={size} />}
-            label={dr.label}
-            monospace
-          />
-        </EntityAnchor>
-      )}
-    />
   );
 }

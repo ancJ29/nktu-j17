@@ -19,10 +19,6 @@ import i18n from '@/i18n';
 
 const featureFlags = appConfig?.features;
 
-export function isEmployeesEnabled() {
-  return featureFlags?.employees?.enabled ?? true;
-}
-
 export function isPermissionManagementEnabled() {
   return featureFlags?.permissionManagement?.enabled ?? false;
 }
@@ -47,10 +43,6 @@ export function hasEmailForEmployees() {
   return featureFlags?.employees?.email ?? false;
 }
 
-export function hasSelfManageForEmployees() {
-  return featureFlags?.employees?.selfManage ?? false;
-}
-
 export function hasPositionForEmployees() {
   return featureFlags?.employees?.position ?? false;
 }
@@ -69,14 +61,6 @@ export function isLocationsEnabled() {
 
 export function isProductsEnabled() {
   return featureFlags?.products?.enabled ?? false;
-}
-
-export function isMaterialsEnabled() {
-  return featureFlags?.materials?.enabled ?? false;
-}
-
-export function isFarmEnabled() {
-  return featureFlags?.farm?.enabled ?? false;
 }
 
 export function isPriceManagementEnabled() {
@@ -99,24 +83,12 @@ export function isProductInventoryEnabled() {
   return featureFlags?.productInventory?.enabled ?? false;
 }
 
-export function isMaterialInventoryEnabled() {
-  return featureFlags?.materialInventory?.enabled ?? false;
-}
-
-export function isLookupV2Enabled() {
-  return featureFlags?.lookupV2?.enabled ?? false;
-}
-
 export function isDeliveryRequestsEnabled() {
   return featureFlags?.deliveryRequests?.enabled ?? false;
 }
 
 export function isReturnShipmentEnabled() {
   return featureFlags?.deliveryRequests?.returnShipment?.enabled ?? false;
-}
-
-export function isReturnAutoRestockDefault() {
-  return featureFlags?.deliveryRequests?.returnShipment?.autoRestockOnComplete ?? false;
 }
 
 export function isInternalDeliveryAllowed() {
@@ -579,6 +551,8 @@ export const perms = {
       canViewPrice: () => resolve().actions?.canViewPrice ?? false,
     };
   })(),
+
+  transportRoute: createModulePerms('transportRoute'),
   location: createModulePerms('location'),
   warehouseReceipt: createModulePerms('warehouseReceipt'),
   warehouseDeliveryNote: createModulePerms('warehouseDeliveryNote'),

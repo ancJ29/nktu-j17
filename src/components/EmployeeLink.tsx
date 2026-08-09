@@ -1,8 +1,7 @@
-import { useMemo } from 'react';
 import { ROUTES } from '@/constants/routes';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { EmployeeAvatar } from '@/components/EmployeeAvatar';
-import { EntityAnchor, EntityChip, EntityDash, JoinedLinks, type LinkSize } from './EntityLink';
+import { EntityAnchor, EntityChip, EntityDash, type LinkSize } from './EntityLink';
 
 const AVATAR_SIZE: Record<LinkSize, number> = { xs: 16, sm: 18, md: 22 };
 const INITIAL_SIZE: Record<LinkSize, string> = { xs: '9px', sm: '10px', md: '12px' };
@@ -24,13 +23,6 @@ type EmployeeLinkProps = {
   id?: string | undefined | null;
   size?: LinkSize;
   noAvatar?: boolean;
-};
-
-type EmployeeLinksProps = {
-  codes?: string[];
-
-  ids?: string[];
-  size?: LinkSize;
 };
 
 export function EmployeeLink({ code, id, noAvatar = false, size = 'sm' }: EmployeeLinkProps) {
@@ -56,50 +48,5 @@ export function EmployeeLink({ code, id, noAvatar = false, size = 'sm' }: Employ
         label={name}
       />
     </EntityAnchor>
-  );
-}
-
-export function EmployeeLinks({ codes, ids, size = 'sm' }: EmployeeLinksProps) {
-  const getByCode = useEmployeeStore((s) => s.getByCode);
-  const getById = useEmployeeStore((s) => s.getById);
-
-  useEmployeeStore((s) => s.items);
-
-  const resolved = useMemo(() => {
-    const useCodes = codes && codes.length > 0;
-    const keys = useCodes ? codes! : (ids ?? []);
-    return keys.map((key) => {
-      const emp = useCodes ? getByCode(key) : getById(key);
-      return {
-        detailId: emp?.id ?? (useCodes ? undefined : key),
-        name: emp?.name ?? key,
-        profileImage: emp?.extra?.profileImage,
-        key,
-      };
-    });
-  }, [codes, ids, getByCode, getById]);
-
-  return (
-    <JoinedLinks
-      size={size}
-      items={resolved}
-      keyOf={(emp) => emp.key}
-      renderItem={(emp) => {
-        const chip = (
-          <EntityChip
-            size={size}
-            lead={<AvatarLead size={size} imageUrl={emp.profileImage} name={emp.name} />}
-            label={emp.name}
-          />
-        );
-        return emp.detailId ? (
-          <EntityAnchor to={ROUTES.EMPLOYEES.DETAIL.replace(':id', emp.detailId)} size={size}>
-            {chip}
-          </EntityAnchor>
-        ) : (
-          chip
-        );
-      }}
-    />
   );
 }

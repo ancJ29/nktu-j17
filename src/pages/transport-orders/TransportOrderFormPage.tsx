@@ -92,9 +92,16 @@ import {
   MAX_ORDER_NUMBER_RETRIES,
 } from './transportOrderWrite';
 import { appendTimelineEntry, createMemo, diffTransportOrder, isEmptyDiff } from './activityMemo';
-import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
+import { PLACE_INPUT_STYLES, PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
+import { useTransportRouteStore } from '@/stores/useTransportRouteStore';
+import { TransportRouteSuggestion } from '../transport-routes/TransportRouteSuggestion';
+import {
+  matchTransportRoutes,
+  type TransportRouteDraft,
+} from '../transport-routes/transportRouteMatch';
+import type { TransportRouteRow } from '@/types';
 import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleConflicts';
 import type { ScheduleSlot } from './scheduleConflicts';
 import { Form } from '@/components/Form';
@@ -111,15 +118,6 @@ const driverEmployeeFilter = (e: Employee) => {
     : isDriverDepartment(e.department);
 };
 const DEFAULT_VAT_PERCENT = 8;
-
-const PLACE_INPUT_STYLES = {
-  input: {
-    border: 'none',
-    borderBottom: '1px solid var(--mantine-color-primary-6)',
-    borderRadius: 0,
-    padding: 0,
-  },
-} as const;
 
 type FeeRow = {
   label: string;
@@ -168,6 +166,8 @@ type FormValues = {
   fees: FeeRow[];
 
   advanceAmount: number;
+
+  laborCost: number;
   vatRatePercent: number;
 
   roundDown: boolean;
@@ -179,6 +179,8 @@ type FormValues = {
 };
 
 const DEFAULT_FEE_LABELS = ['Phí vận chuyển', 'Phụ thu VC', 'Phí neo xe'];
+
+const FREIGHT_FEE_LABEL = DEFAULT_FEE_LABELS[0]!;
 
 function blankFee(over: Partial<FeeRow> = {}): FeeRow {
   return {
@@ -271,6 +273,7 @@ function blankValues(): FormValues {
     dropoffAt: null,
     fees: initialFees(),
     advanceAmount: 0,
+    laborCost: 0,
     vatRatePercent: DEFAULT_VAT_PERCENT,
     roundDown: false,
     transportContractNo: '',
@@ -314,6 +317,8 @@ function copiedValues(src: TransportOrder): FormValues {
 
     fees: toFeeRows(src),
     advanceAmount: 0,
+
+    laborCost: src.laborCost ?? 0,
     vatRatePercent: Math.round((src.vatRate ?? 0) * 100),
 
     roundDown: !!src.roundDown,
@@ -372,13 +377,27 @@ export function TransportOrderFormPage() {
   const ordersInit = useTransportOrderStore((s) => s.initialized);
   const loadOrders = useTransportOrderStore((s) => s.loadAll);
 
+  const savedRoutes = useTransportRouteStore((s) => s.items);
+  const routesInit = useTransportRouteStore((s) => s.initialized);
+  const loadRoutes = useTransportRouteStore((s) => s.loadAll);
+
   useEffect(() => {
     if (isMobile) return;
     if (!trucksInit) loadTrucks();
     if (!customersInit) loadCustomers();
 
     if (!ordersInit) loadOrders();
-  }, [trucksInit, loadTrucks, customersInit, loadCustomers, ordersInit, loadOrders]);
+    if (!routesInit) loadRoutes();
+  }, [
+    trucksInit,
+    loadTrucks,
+    customersInit,
+    loadCustomers,
+    ordersInit,
+    loadOrders,
+    routesInit,
+    loadRoutes,
+  ]);
 
   const truckSelectData = useMemo(
     () =>
@@ -496,6 +515,7 @@ export function TransportOrderFormPage() {
 
         fees: toFeeRows(o),
         advanceAmount: o.advanceAmount ?? 0,
+        laborCost: o.laborCost ?? 0,
         vatRatePercent: Math.round((o.vatRate ?? 0) * 100),
         roundDown: !!o.roundDown,
         transportContractNo: o.transportContractNo || '',
@@ -571,6 +591,7 @@ export function TransportOrderFormPage() {
           route,
           fees,
           advanceAmount: values.advanceAmount || 0,
+          laborCost: values.laborCost || 0,
           vatRate,
           roundDown: values.roundDown,
           transportContractNo: values.transportContractNo.trim(),
@@ -675,6 +696,69 @@ export function TransportOrderFormPage() {
         ...(id ? { excludeOrderId: id } : {}),
       }),
     [form.values, savedOrders, id],
+  );
+
+  const draftTruckType = useMemo(() => {
+    const truckId = form.values.isMultiTrip
+      ? (form.values.trips[0]?.truckId ?? '')
+      : form.values.truckId;
+    if (!truckId) return '';
+    return trucks.find((tr) => tr.id === truckId)?.extra?.truckType ?? '';
+  }, [form.values.isMultiTrip, form.values.trips, form.values.truckId, trucks]);
+
+  const routeMatches = useMemo(() => {
+    const draft: TransportRouteDraft = {
+      isMultiTrip: form.values.isMultiTrip,
+      truckType: draftTruckType,
+      containerSize: form.values.containerSize,
+      pickup: form.values.pickup,
+      dropoff: form.values.dropoff,
+      legs: form.values.trips.map((trip) => ({
+        departure: trip.departure,
+        destination: trip.destination,
+      })),
+    };
+    return matchTransportRoutes(draft, savedRoutes);
+  }, [
+    form.values.isMultiTrip,
+    form.values.containerSize,
+    form.values.pickup,
+    form.values.dropoff,
+    form.values.trips,
+    draftTruckType,
+    savedRoutes,
+  ]);
+
+  const [appliedRouteCode, setAppliedRouteCode] = useState<string | undefined>();
+
+  const applyRoute = useCallback(
+    (route: TransportRouteRow) => {
+      const fees = [...form.getValues().fees];
+      const idx = fees.findIndex(
+        (f) => f.kind !== 'passthrough' && f.label.trim() === FREIGHT_FEE_LABEL,
+      );
+      if (idx >= 0) fees[idx] = { ...fees[idx]!, amount: route.freightAmount };
+      // The operator renamed or removed the seeded line — append rather than
+      // drop the number on the floor.
+      else fees.push(blankFee({ label: FREIGHT_FEE_LABEL, amount: route.freightAmount }));
+      form.setFieldValue('fees', fees);
+
+      if (route.isMultiTrip) {
+        (route.trips ?? []).forEach((leg, i) => {
+          form.setFieldValue(`trips.${i}.laborCost`, leg.laborCost || 0);
+        });
+      } else {
+        form.setFieldValue('laborCost', route.laborCost ?? 0);
+      }
+
+      setAppliedRouteCode(route.code);
+      notifications.show({
+        color: 'green',
+        message: t('transportRoutes.suggestion.applied', { code: route.code }),
+      });
+    },
+
+    [t],
   );
 
   if (fetching) return null;
@@ -1087,6 +1171,22 @@ export function TransportOrderFormPage() {
                   />
                 </Stack>
               </SimpleGrid>
+
+              {/* LƯƠNG CHUYẾN for a single-trip job — the flat counterpart of
+                  the leg table's per-leg column, and placed the same way: at
+                  the foot of the card that describes the run, not in the fee
+                  cards. It is a cost we pay the driver, deliberately outside
+                  the customer's totals (see `TransportOrderTotals`). */}
+              <Divider my="sm" />
+              <Group justify="flex-end">
+                <NumberInput
+                  label={t('transportOrders.trips.laborCost')}
+                  thousandSeparator=","
+                  min={0}
+                  w={200}
+                  {...form.getInputProps('laborCost')}
+                />
+              </Group>
             </SectionCard>
           )}
 
@@ -1095,6 +1195,14 @@ export function TransportOrderFormPage() {
               is beside the pickers that caused it rather than at the top of a long
               form the operator has already scrolled past. */}
           <ScheduleConflictAlert conflicts={scheduleConflicts} />
+
+          {/* Under the card that owns the places, beside the conflict warning —
+              both are advisories about what the operator just typed. */}
+          <TransportRouteSuggestion
+            matches={routeMatches}
+            onApply={applyRoute}
+            appliedCode={appliedRouteCode}
+          />
 
           {/* Fees — TWO groups, split by `kind`, each its own card + Add button.
               The `Loại` picker is gone: a row's kind is the card it lives in.

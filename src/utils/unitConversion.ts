@@ -109,36 +109,3 @@ export function getItemUnits(item: { unit: string; extra?: { units?: string[] } 
   const units = item.extra?.units;
   return units && units.length > 0 ? units : [item.unit];
 }
-
-export function getConversionDisplay(
-  onHand: number,
-  baseUnit: string,
-  conversions: UnitConversion[],
-  allUnits: string[],
-): string | null {
-  if (allUnits.length <= 1 || conversions.length === 0) return null;
-
-  const graph = buildRateGraph(conversions);
-
-  let best: { unit: string; value: number } | null = null;
-
-  for (const u of allUnits) {
-    if (u === baseUnit) continue;
-    const rate = findRate(graph, baseUnit, u);
-    if (rate === null) continue;
-    const converted = onHand * rate;
-    if (converted === 0) continue;
-
-    if (!best || Math.abs(converted) < Math.abs(best.value)) {
-      best = { unit: u, value: converted };
-    }
-  }
-
-  if (!best) return null;
-
-  const formatted = Number.isInteger(best.value)
-    ? best.value.toLocaleString()
-    : best.value.toLocaleString(undefined, { maximumFractionDigits: 2 });
-
-  return `${formatted} ${best.unit}`;
-}

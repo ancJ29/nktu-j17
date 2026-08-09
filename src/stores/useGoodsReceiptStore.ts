@@ -33,10 +33,6 @@ export function setGoodsReceiptQueryRange(from: Date | null, to: Date | null): v
   currentRange = { from: fmt(from), to: fmt(to) };
 }
 
-export function getGoodsReceiptQueryRange(): { from: string; to: string } {
-  return currentRange;
-}
-
 const fetchGoodsReceipts = createPartitionedSyncFetcher<GoodsReceipt>({
   cacheKey: 'gr',
   getRange: () => currentRange,

@@ -2,8 +2,6 @@ import type { ZodType } from 'zod';
 
 export type Stage = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'EXCEPTIONAL';
 
-export const STAGES: readonly Stage[] = ['NEW', 'IN_PROGRESS', 'COMPLETED', 'EXCEPTIONAL'];
-
 export type Translatable = Record<string, string>;
 
 export type CapabilityId = string;

@@ -1,6 +1,6 @@
 import { Badge, Box, Card, Divider, Group, Stack, Table, Text } from '@mantine/core';
 import { IconBoxMultiple, IconMapPin } from '@tabler/icons-react';
-import { useEffect, useMemo, type ReactNode } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
 import { InlineTextareaField, type InlineEditLabels } from '@credo/base-ui/components';
@@ -23,6 +23,7 @@ import {
   indexInventoryByProduct,
 } from '@/utils/inventoryCommitment';
 import { ProductLink } from '@/components/ProductLink';
+import { FieldRow } from '@/components/FieldRow';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { getProductSuggestedPrice, isBelowSuggestedPrice } from '@/utils/productPricing';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
@@ -34,19 +35,6 @@ const locationsEnabled = isLocationsEnabled();
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 
 const canViewSetComponentInventory = perms.salesOrder.canViewSetComponentInventory();
-
-function FieldRow({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <Group gap="xs" wrap="nowrap" align="baseline">
-      <Text size="sm" c="dimmed" style={{ flexShrink: 0 }}>
-        {label}:
-      </Text>
-      <Text size="sm" fw={500} component="div" style={{ minWidth: 0, wordBreak: 'break-word' }}>
-        {value}
-      </Text>
-    </Group>
-  );
-}
 
 type OrderItemsTableProps = {
   items: SalesOrderItem[];

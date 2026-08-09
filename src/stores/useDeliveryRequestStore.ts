@@ -33,10 +33,6 @@ export function setDeliveryRequestQueryRange(from: Date | null, to: Date | null)
   currentRange = { from: fmt(from), to: fmt(to) };
 }
 
-export function getDeliveryRequestQueryRange(): { from: string; to: string } {
-  return currentRange;
-}
-
 const fetchDeliveryRequests = createPartitionedSyncFetcher<DeliveryRequest>({
   cacheKey: 'dr',
   getRange: () => currentRange,

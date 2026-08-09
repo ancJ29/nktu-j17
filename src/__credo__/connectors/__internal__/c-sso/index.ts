@@ -1,7 +1,7 @@
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
-import { urls } from '../shared/config';
+import { targets, urls } from '../shared/config';
 import { registerStagePrefix } from '../shared/transport-state';
 import { C_SSO_ROUTES } from './routes';
 import type {
@@ -75,13 +75,14 @@ import type {
 export * from './routes';
 
 const storages = {
+  target: targets['credoSso'] || '',
   accessKey: '',
   trustedServiceKey: '',
   stage: '$default',
   baseUrl: urls['credoSso'] || '',
 };
 
-registerStagePrefix(storages.baseUrl);
+registerStagePrefix(storages.baseUrl, storages.target);
 
 const SSO_ROUTES = C_SSO_ROUTES.SUB_ROUTES.SSO;
 const V2_ROUTES = C_SSO_ROUTES.SUB_ROUTES.V2;
@@ -130,9 +131,16 @@ const adminApi = createApiGroup({
 
 export const cSsoConnector = {
   useLocal: () => cSsoConnector.setBaseUrl(`http://localhost:${PORTS.CREDO_SSO}/dev`),
+
+  setTarget: (target: string) => {
+    storages.target = target;
+
+    registerStagePrefix(storages.baseUrl, target);
+    return cSsoConnector;
+  },
   setBaseUrl: (baseUrl: string) => {
     storages.baseUrl = baseUrl;
-    registerStagePrefix(baseUrl);
+    registerStagePrefix(baseUrl, storages.target);
     return cSsoConnector;
   },
   setAccessKey: (accessKey: string) => {

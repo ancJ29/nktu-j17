@@ -2,7 +2,7 @@ import { isBrowser } from '@credo/kits/misc';
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
-import { urls } from '../shared/config';
+import { targets, urls } from '../shared/config';
 import { C_STORAGE_ROUTES } from './routes';
 import type {
   DisableServiceRequest,
@@ -43,6 +43,7 @@ import type {
 export * from './routes';
 
 const storages = {
+  target: targets['cStorage'] || '',
   accessKey: '',
   callerService: '',
   internalAccessKey: '',
@@ -88,6 +89,11 @@ const serviceApi = createApiGroup({
 export const cStorageConnector = {
   useLocal: () => {
     return cStorageConnector.setBaseUrl(`http://localhost:${PORTS.C_STORAGE}`);
+  },
+
+  setTarget: (target: string) => {
+    storages.target = target;
+    return cStorageConnector;
   },
   setBaseUrl: (baseUrl: string) => {
     storages.baseUrl = baseUrl;

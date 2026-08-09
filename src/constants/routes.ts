@@ -46,6 +46,12 @@ export const ROUTES = {
     DETAIL: '/transport-orders/:id',
     EDIT: '/transport-orders/:id/edit',
   },
+
+  TRANSPORT_ROUTES: {
+    LIST: '/transport-routes',
+    NEW: '/transport-routes/new',
+    EDIT: '/transport-routes/:id/edit',
+  },
   INVENTORY: {
     PRODUCTS: '/inventory/products',
     MATERIALS: '/inventory/materials',

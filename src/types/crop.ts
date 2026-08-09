@@ -2,8 +2,6 @@ import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
 
 export type CropStatus = 'planned' | 'growing' | 'harvested';
 
-export const CROP_STATUS_ORDER: CropStatus[] = ['planned', 'growing', 'harvested'];
-
 export const CROP_CODE_PREFIX = 'CROP-';
 
 export type CropExtra = {

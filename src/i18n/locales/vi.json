@@ -3268,6 +3268,7 @@
         "productInventory": "Tồn kho sản phẩm",
         "salesOrder": "Đơn hàng",
         "transportOrder": "Đơn vận chuyển",
+        "transportRoute": "Tuyến vận chuyển",
         "truck": "Xe tải",
         "vendor": "Nhà cung cấp"
       },
@@ -4082,6 +4083,105 @@
       "driverRequired": "Vui lòng chọn tài xế",
       "entryDateRequired": "Vui lòng chọn ngày",
       "truckRequired": "Vui lòng chọn xe"
+    }
+  },
+  "transportRoutes": {
+    "title": "Quản lý tuyến",
+    "subtitle": "Bảng giá theo tuyến đã lưu",
+    "new": "Thêm tuyến",
+    "edit": "Sửa tuyến",
+    "noResults": "Không tìm thấy tuyến nào",
+    "empty": "Chưa có tuyến nào. Thêm tuyến để form tạo đơn có thể gợi ý giá.",
+    "search": {
+      "placeholder": "Tìm theo điểm đi / điểm đến"
+    },
+    "columns": {
+      "code": "Mã tuyến",
+      "kind": "Loại tuyến",
+      "route": "Tuyến",
+      "truckType": "Loại xe",
+      "containerSize": "Loại cont",
+      "freightAmount": "Phí vận chuyển",
+      "laborCost": "Lương chuyến",
+      "status": "Trạng thái",
+      "updatedAt": "Cập nhật"
+    },
+    "kind": {
+      "single": "1 chặng",
+      "multi": "Nhiều chặng"
+    },
+    "status": {
+      "active": "Đang áp dụng",
+      "inactive": "Ngừng áp dụng"
+    },
+    "filters": {
+      "truckType": "Loại xe",
+      "containerSize": "Loại cont",
+      "kind": "Loại tuyến",
+      "status": "Trạng thái",
+      "anyTruckType": "Tất cả loại xe",
+      "anyContainerSize": "Tất cả loại cont",
+      "anyKind": "Tất cả loại tuyến",
+      "anyStatus": "Tất cả trạng thái"
+    },
+    "form": {
+      "infoSection": "Thông tin tuyến",
+      "pricingSection": "Giá mặc định",
+      "code": "Mã tuyến",
+      "codeAuto": "Tự sinh khi lưu",
+      "codeLocked": "Không sửa được sau khi tạo",
+      "truckType": "Loại xe áp dụng",
+      "containerSize": "Loại cont áp dụng",
+      "anyContainerSize": "Tất cả",
+      "multiTrip": "Nhiều chặng",
+      "multiTripHint": "Tuyến gồm nhiều chặng — mỗi chặng có điểm đi, điểm đến và lương chuyến riêng.",
+      "freightAmount": "Phí vận chuyển mặc định",
+      "freightAmountHint": "Tính chung cho cả tuyến, áp dụng cho cả hai loại tuyến.",
+      "laborCost": "Lương chuyến mặc định",
+      "notes": "Ghi chú",
+      "status": "Trạng thái",
+      "statusHint": "Tuyến ngừng áp dụng vẫn được lưu nhưng không hiện trong gợi ý khi tạo đơn.",
+      "noTruckTypes": "Chưa có loại xe nào. Thêm tại Cấu hình → Dữ liệu danh mục → Loại xe — tuyến phải chọn đúng loại xe mà đội xe đang dùng."
+    },
+    "trips": {
+      "title": "Danh sách chặng",
+      "add": "Thêm chặng",
+      "laborTotal": "Tổng lương chuyến"
+    },
+    "validation": {
+      "pickupRequired": "Vui lòng nhập nơi lấy",
+      "dropoffRequired": "Vui lòng nhập nơi hạ",
+      "departureRequired": "Vui lòng nhập điểm đi",
+      "destinationRequired": "Vui lòng nhập điểm đến",
+      "truckTypeRequired": "Vui lòng chọn loại xe"
+    },
+    "notifications": {
+      "created": "Đã tạo tuyến",
+      "updated": "Đã cập nhật tuyến",
+      "deleted": "Đã xoá tuyến",
+      "createError": "Không thể tạo tuyến",
+      "updateError": "Không thể cập nhật tuyến",
+      "deleteError": "Không thể xoá tuyến",
+      "loadError": "Không thể tải tuyến",
+      "mobileFormBlocked": "Tuyến chỉ tạo / sửa trên máy tính"
+    },
+    "confirmDelete": {
+      "title": "Xoá tuyến",
+      "message": "Xoá tuyến {{code}}? Các đơn đã áp dụng giá từ tuyến này không bị ảnh hưởng."
+    },
+    "dangerZone": {
+      "title": "Vùng nguy hiểm",
+      "deleteHint": "Xoá sẽ gỡ tuyến khỏi danh sách. Cân nhắc chuyển sang Ngừng áp dụng thay vì xoá."
+    },
+    "suggestion": {
+      "title": "Tuyến tham chiếu",
+      "title_other": "{{count}} tuyến tham chiếu phù hợp",
+      "apply": "Áp dụng",
+      "applied": "Đã áp dụng giá từ {{code}}",
+      "freight": "Phí VC",
+      "labor": "Lương chuyến",
+      "anyTruckType": "mọi loại xe",
+      "anyContainerSize": "mọi loại cont"
     }
   },
   "vendors": {

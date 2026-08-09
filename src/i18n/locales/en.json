@@ -3268,6 +3268,7 @@
         "productInventory": "Product Inventory",
         "salesOrder": "Sales Order",
         "transportOrder": "Transport Order",
+        "transportRoute": "Transport Route",
         "truck": "Truck",
         "vendor": "Vendor"
       },
@@ -4082,6 +4083,105 @@
       "driverRequired": "Driver is required",
       "entryDateRequired": "Date is required",
       "truckRequired": "Truck is required"
+    }
+  },
+  "transportRoutes": {
+    "title": "Transport Routes",
+    "subtitle": "Saved routes and their default pricing",
+    "new": "Add route",
+    "edit": "Edit route",
+    "noResults": "No routes found",
+    "empty": "No routes saved yet. Add one so the order form can suggest its pricing.",
+    "search": {
+      "placeholder": "Search origin / destination"
+    },
+    "columns": {
+      "code": "Route code",
+      "kind": "Route type",
+      "route": "Route",
+      "truckType": "Vehicle type",
+      "containerSize": "Container type",
+      "freightAmount": "Freight fee",
+      "laborCost": "Driver pay",
+      "status": "Status",
+      "updatedAt": "Last updated"
+    },
+    "kind": {
+      "single": "Single leg",
+      "multi": "Multi-leg"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "filters": {
+      "truckType": "Vehicle type",
+      "containerSize": "Container type",
+      "kind": "Route type",
+      "status": "Status",
+      "anyTruckType": "All vehicle types",
+      "anyContainerSize": "All container types",
+      "anyKind": "All route types",
+      "anyStatus": "All statuses"
+    },
+    "form": {
+      "infoSection": "Route details",
+      "pricingSection": "Default pricing",
+      "code": "Route code",
+      "codeAuto": "Generated on save",
+      "codeLocked": "Fixed once created",
+      "truckType": "Applies to vehicle type",
+      "containerSize": "Applies to container type",
+      "anyContainerSize": "Any",
+      "multiTrip": "Multi-leg",
+      "multiTripHint": "The route runs several legs — each with its own origin, destination and driver pay.",
+      "freightAmount": "Default freight fee",
+      "freightAmountHint": "Charged once for the whole route, on both route types.",
+      "laborCost": "Default driver pay",
+      "notes": "Notes",
+      "status": "Status",
+      "statusHint": "An inactive route stays in the register but is no longer suggested on new orders.",
+      "noTruckTypes": "No vehicle types are registered yet. Add them under Configuration → Meta-data → Vehicle type — a route has to name a type its trucks actually carry."
+    },
+    "trips": {
+      "title": "Legs",
+      "add": "Add leg",
+      "laborTotal": "Total driver pay"
+    },
+    "validation": {
+      "pickupRequired": "Pickup is required",
+      "dropoffRequired": "Drop-off is required",
+      "departureRequired": "Origin is required",
+      "destinationRequired": "Destination is required",
+      "truckTypeRequired": "Vehicle type is required"
+    },
+    "notifications": {
+      "created": "Route created",
+      "updated": "Route updated",
+      "deleted": "Route deleted",
+      "createError": "Could not create the route",
+      "updateError": "Could not update the route",
+      "deleteError": "Could not delete the route",
+      "loadError": "Could not load the route",
+      "mobileFormBlocked": "Routes are created and edited on a desktop"
+    },
+    "confirmDelete": {
+      "title": "Delete route",
+      "message": "Delete route {{code}}? Orders already priced from it are unaffected."
+    },
+    "dangerZone": {
+      "title": "Danger zone",
+      "deleteHint": "Deleting removes the route from the register. Consider setting it inactive instead."
+    },
+    "suggestion": {
+      "title": "Matching saved route",
+      "title_other": "{{count}} matching saved routes",
+      "apply": "Apply",
+      "applied": "Pricing applied from {{code}}",
+      "freight": "Freight",
+      "labor": "Driver pay",
+      "anyTruckType": "any vehicle",
+      "anyContainerSize": "any container"
     }
   },
   "vendors": {

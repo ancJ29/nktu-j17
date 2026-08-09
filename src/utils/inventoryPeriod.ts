@@ -120,11 +120,3 @@ export const seedCurrentPeriodForProductInventory = async (): Promise<void> => {
     'product',
   );
 };
-
-/**
- * Test-only: reset the per-period guard so a unit test can re-run the seed.
- * Production code should never call this — the guard is intentional.
- */
-export const __resetSeedGuardsForTests = (): void => {
-  lastSeededProductPeriod = null;
-};

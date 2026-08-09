@@ -28,7 +28,6 @@ import {
   IconInfoCircle,
   IconLock,
   IconReceipt,
-  IconRoute,
   IconTrash,
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -48,6 +47,7 @@ import { StatusChangeModal } from '@/components/StatusChangeModal';
 import { DateField } from '@/components/DateField';
 import { DateTimeTextField } from '@/components/DateTimeTextField';
 import { ActivityTimeline } from '@/components/ActivityTimeline';
+import { MobileScrollPillTabs, type MobileScrollPillTab } from '@/components/MobileScrollPillTabs';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import { EmployeeLink } from '@/components/EmployeeLink';
 import { CustomerLink } from '@/components/CustomerLink';
@@ -86,13 +86,7 @@ import {
   resolveTransportOrderStatus,
   statusFlowIndex,
 } from './transportOrderStatuses';
-import {
-  formatMoney,
-  isBillableFee,
-  orderTotals,
-  orderTripLaborTotal,
-  readFeeLines,
-} from './transportOrderPricing';
+import { formatMoney, isBillableFee, orderTotals, readFeeLines } from './transportOrderPricing';
 import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activityMemo';
 import { useContainerSizeLabel } from './containerSize';
 import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
@@ -101,6 +95,7 @@ import { useShipmentTypeLabel } from './shipmentType';
 import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 import { reconcileTripLogs } from './tripLogSync';
+import { TransportTripsCard } from './TransportTripsCard';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -110,7 +105,9 @@ const canTransition = perms.transportOrder.canTransitionStatus();
 const canCancel = perms.transportOrder.canCancel();
 const canViewPrice = perms.transportOrder.canViewPrice();
 
-const activityLogTabVisible = !isMobile && isActivityLoggingEnabled();
+const activityLogTabVisible = isActivityLoggingEnabled();
+
+const cardPadding = isMobile ? 'sm' : 'lg';
 
 const toDriverDepartments = appConfig.features.transportOrders.driverDepartments ?? [];
 const driverEmployeeFilter = (e: Employee) => {
@@ -414,8 +411,6 @@ export function TransportOrderDetailPage() {
 
   const feeLines = readFeeLines(order);
 
-  const tripLaborTotal = orderTripLaborTotal(order);
-
   const nextStatuses = isCancelled ? [] : getNextStatuses(order.status, myDepartment);
   const statusFlowOrder = getTransportOrderStatusFlow();
   const currentFlowIndex = statusFlowIndex(order.status);
@@ -638,73 +633,17 @@ export function TransportOrderDetailPage() {
       </Stack>,
     );
 
-  const tripsCard = order.isMultiTrip && (
-    <SectionCard icon={<IconRoute size={14} />} title={t('transportOrders.trips.title')}>
-      <Table>
-        <Table.Thead>
-          <Table.Tr>
-            <Table.Th>{t('transportOrders.trips.departure')}</Table.Th>
-            <Table.Th>{t('transportOrders.trips.destination')}</Table.Th>
-            {/* No NGÀY column — the loading estimate carries the leg's day, and
-                the leg's stored `date` is derived from it on the form. A leg with
-                no estimate falls back to showing that date, so a pre-2026-07-21
-                multi-trip order still reads its per-leg day here. */}
-            <Table.Th>{t('transportOrders.trips.loadingAt')}</Table.Th>
-            <Table.Th>{t('transportOrders.trips.unloadingAt')}</Table.Th>
-            <Table.Th>{t('transportOrders.columns.truck')}</Table.Th>
-            <Table.Th>{t('transportOrders.form.driver')}</Table.Th>
-            <Table.Th ta="right">{t('transportOrders.trips.laborCost')}</Table.Th>
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {(order.trips ?? []).map((trip, i) => (
-            <Table.Tr key={i}>
-              <Table.Td>{trip.departure || '—'}</Table.Td>
-              <Table.Td>{trip.destination || '—'}</Table.Td>
-              {/* Estimates, so they read dimmed — the plan, not what happened.
-                  Read-only like the rest of the leg: `trips` is the source the
-                  order-level mirror derives from, so it is edited on the form. */}
-              <Table.Td c="dimmed">
-                {trip.loadingAt
-                  ? formatDateTime(trip.loadingAt)
-                  : trip.date
-                    ? formatDate(trip.date)
-                    : '—'}
-              </Table.Td>
-              <Table.Td c="dimmed">
-                {trip.unloadingAt ? formatDateTime(trip.unloadingAt) : '—'}
-              </Table.Td>
-              {/* Linked, not printed — same rule as the order-level truck/driver,
-                  and each leg carries its own plate/name snapshot to fall back on. */}
-              <Table.Td>
-                <TruckLink id={trip.truckId} fallbackLabel={trip.truckPlate} showPlate />
-              </Table.Td>
-              <Table.Td>{trip.driverId ? <EmployeeLink id={trip.driverId} /> : '—'}</Table.Td>
-              <Table.Td ta="right">{canViewPrice ? formatMoney(trip.laborCost) : '—'}</Table.Td>
-            </Table.Tr>
-          ))}
-        </Table.Tbody>
-      </Table>
-      {/* Σ driver pay — money, so `canViewPrice` gates it like every other figure.
-          It sits here rather than in the fee card because it's what the operator
-          pays out, not part of what the customer is billed. */}
-      {canViewPrice && (
-        <>
-          <Divider />
-          <Group justify="space-between">
-            <Text fw={700}>{t('transportOrders.trips.laborTotal')}</Text>
-            <Text fw={700}>{formatMoney(tripLaborTotal)}</Text>
-          </Group>
-        </>
-      )}
-    </SectionCard>
-  );
+  const tripsCard = order.isMultiTrip && <TransportTripsCard order={order} />;
 
   const overviewContent = (
     <Stack gap="lg">
       {tripsCard}
       <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-        <SectionCard icon={<IconInfoCircle size={14} />} title={t('transportOrders.detail.info')}>
+        <SectionCard
+          icon={<IconInfoCircle size={14} />}
+          title={t('transportOrders.detail.info')}
+          padding={cardPadding}
+        >
           <Box>
             <Stack gap={6}>
               {/* Inline-editable: the fields that arrive or change AFTER the job is
@@ -760,6 +699,19 @@ export function TransportOrderDetailPage() {
                   {routeStopRow('pickup')}
                   {routeStopRow('stuffing')}
                   {routeStopRow('dropoff')}
+                  {/* LƯƠNG CHUYẾN — the single-trip counterpart of the leg
+                      table's per-leg column, shown beside the run it pays for
+                      rather than in the fee card: it is what we pay the driver,
+                      not what the customer is billed. Money, so `canViewPrice`
+                      gates it exactly as it gates the per-leg figures.
+                      Form-only, like the rest of the money — an inline patch
+                      here would sit next to derived totals it can't recompute. */}
+                  {order.laborCost
+                    ? infoRow(
+                        t('transportOrders.trips.laborCost'),
+                        <Text size="sm">{canViewPrice ? formatMoney(order.laborCost) : '—'}</Text>,
+                      )
+                    : null}
                 </Stack>
               </>
             )}
@@ -792,7 +744,11 @@ export function TransportOrderDetailPage() {
           {/* One fee card since the 2026-07-16 merge — the old PHÍ CHI HỘ card is
               gone, its rows are `prepaid` + non-vatable lines in here. Read through
               `readFeeLines` so a pre-merge order shows them without a migration. */}
-          <SectionCard icon={<IconReceipt size={14} />} title={t('transportOrders.fees.title')}>
+          <SectionCard
+            icon={<IconReceipt size={14} />}
+            title={t('transportOrders.fees.title')}
+            padding={cardPadding}
+          >
             <Table>
               <Table.Tbody>
                 {feeLines.map((f, i) => {
@@ -927,18 +883,32 @@ export function TransportOrderDetailPage() {
     </Stack>
   );
 
+  const mobileTabs: MobileScrollPillTab[] = [
+    { value: 'overview', label: t('transportOrders.detail.info') },
+    { value: 'history', label: t('transportOrders.detail.tabActivity') },
+    ...(activityLogTabVisible
+      ? [{ value: 'activityLog', label: t('transportOrders.detail.tabActivityLog') }]
+      : []),
+  ];
+
   return (
     <Stack gap="lg">
       <Group justify="space-between" wrap="wrap">
         <Group gap="sm">
-          <Button
-            onClick={() => navigate(ROUTES.TRANSPORT_ORDERS.LIST)}
-            variant="subtle"
-            size="compact-sm"
-            leftSection={<IconArrowLeft size={16} />}
-          >
-            {t('__new__.01-common.actions.back')}
-          </Button>
+          {/* Desktop only: `MobileDetailLayout` already floats a back pill at the
+              bottom of a phone screen, so a second Back at the top is the same
+              affordance twice — and the top one is the harder to reach of the
+              two. SO and DR drop theirs on mobile for the same reason. */}
+          {!isMobile && (
+            <Button
+              onClick={() => navigate(ROUTES.TRANSPORT_ORDERS.LIST)}
+              variant="subtle"
+              size="compact-sm"
+              leftSection={<IconArrowLeft size={16} />}
+            >
+              {t('__new__.01-common.actions.back')}
+            </Button>
+          )}
           <Title order={3}>{order.orderNumber}</Title>
           {isCancelled ? (
             <Badge color="red" variant="light">
@@ -991,14 +961,20 @@ export function TransportOrderDetailPage() {
         </Alert>
       )}
 
-      {/* Status transitions — one verb button per status the matrix allows. */}
+      {/* Status transitions — one verb button per status the matrix allows.
+          These stay on mobile on purpose: confirming a departure away from the
+          desk is the one write a phone is the right tool for (the confirm itself
+          renders as a drawer). So they are sized for a thumb there — a row of
+          `xs`-gapped default buttons is a mis-tap waiting to happen when the
+          neighbouring button is "Hủy đơn". */}
       {canTransition && !locked && (nextStatuses.length > 0 || (canCancel && !isCancelled)) && (
-        <Group gap="xs">
+        <Group gap={isMobile ? 'sm' : 'xs'} wrap="wrap" grow={isMobile}>
           {nextStatuses.map((next) => (
             <Button
               key={next.value}
               color={next.color}
               variant="filled"
+              size={isMobile ? 'md' : undefined}
               loading={actionLoading}
               onClick={() => {
                 setStatusNote('');
@@ -1012,6 +988,7 @@ export function TransportOrderDetailPage() {
             <Button
               color="red"
               variant="outline"
+              size={isMobile ? 'md' : undefined}
               loading={actionLoading}
               onClick={() => setCancelOpen(true)}
             >
@@ -1022,19 +999,29 @@ export function TransportOrderDetailPage() {
       )}
 
       <Tabs value={activeTab} onChange={setActiveTab}>
-        <Tabs.List>
-          <Tabs.Tab value="overview" leftSection={<IconFileText size={16} />}>
-            {t('transportOrders.detail.info')}
-          </Tabs.Tab>
-          <Tabs.Tab value="history" leftSection={<IconHistory size={16} />}>
-            {t('transportOrders.detail.tabActivity')}
-          </Tabs.Tab>
-          {activityLogTabVisible && (
-            <Tabs.Tab value="activityLog" leftSection={<IconHistory size={16} />}>
-              {t('transportOrders.detail.tabActivityLog')}
+        {/* Three tabs don't fit a phone's `Tabs.List` without wrapping onto a
+            second row — the same reason SO and DR rail theirs. */}
+        {isMobile ? (
+          <MobileScrollPillTabs
+            tabs={mobileTabs}
+            value={activeTab ?? 'overview'}
+            onChange={setActiveTab}
+          />
+        ) : (
+          <Tabs.List>
+            <Tabs.Tab value="overview" leftSection={<IconFileText size={16} />}>
+              {t('transportOrders.detail.info')}
             </Tabs.Tab>
-          )}
-        </Tabs.List>
+            <Tabs.Tab value="history" leftSection={<IconHistory size={16} />}>
+              {t('transportOrders.detail.tabActivity')}
+            </Tabs.Tab>
+            {activityLogTabVisible && (
+              <Tabs.Tab value="activityLog" leftSection={<IconHistory size={16} />}>
+                {t('transportOrders.detail.tabActivityLog')}
+              </Tabs.Tab>
+            )}
+          </Tabs.List>
+        )}
 
         <Tabs.Panel value="overview" pt="md">
           {overviewContent}

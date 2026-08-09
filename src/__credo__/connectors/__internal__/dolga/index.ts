@@ -67,7 +67,8 @@ const getBaseUrl = () => storages.baseUrl;
 
 function applyTransportMode(): void {
   if (!storages.baseUrl || !storages.transportMode) return;
-  setTransportMode(new URL(storages.baseUrl).origin, storages.transportMode);
+
+  setTransportMode(new URL(storages.baseUrl).origin, undefined, storages.transportMode);
 }
 
 const api = createApiGroup({

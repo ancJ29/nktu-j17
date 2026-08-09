@@ -1,5 +1,4 @@
 export const LOGIN_TOKEN_TTL_MS = 15 * 60 * 1000;
-export const LOGIN_TOKEN_TTL_MIN = LOGIN_TOKEN_TTL_MS / 60_000;
 
 export function wrapLoginToken(token: string): string {
   return `${Date.now().toString(36)}.${token}`;

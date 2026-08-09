@@ -26,6 +26,8 @@ export type TransportOrderWriteFields = {
   fees: TransportOrderFee[];
 
   advanceAmount: number;
+
+  laborCost: number;
   vatRate: number;
 
   roundDown: boolean;
@@ -76,6 +78,8 @@ export function buildTransportOrderWrite(
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
     fees,
     trips,
+
+    laborCost: fields.isMultiTrip ? 0 : fields.laborCost,
 
     disbursements: [],
     totalAmount: subtotal,

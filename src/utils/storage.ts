@@ -7,28 +7,11 @@ export enum SharedStorageKey {
 
 export enum PcStorageKey {
   NAVBAR_OPENED = '__PC_NAVBAR_OPENED__',
-  IS_COMPACT = '__PC_IS_COMPACT__',
 }
 
 export enum MobileStorageKey {
   IS_COMPACT = '__MOBILE_IS_COMPACT__',
 }
-
-export type UserStorageKey = SharedStorageKey | PcStorageKey | MobileStorageKey;
-export const UserStorageKey = { ...SharedStorageKey, ...PcStorageKey, ...MobileStorageKey };
-
-export type SharedSettings = {
-  [SharedStorageKey.LANGUAGE]: string;
-};
-
-export type PcSettings = {
-  [PcStorageKey.NAVBAR_OPENED]: boolean;
-  [PcStorageKey.IS_COMPACT]: boolean;
-};
-
-export type MobileSettings = {
-  [MobileStorageKey.IS_COMPACT]: boolean;
-};
 
 export type UserSettings = {
   shared?: Partial<Record<SharedStorageKey, unknown>>;

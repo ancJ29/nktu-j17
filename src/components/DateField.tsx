@@ -2,7 +2,7 @@ import { DatePickerInput, type DatePickerInputProps } from '@mantine/dates';
 import { getDateFormat } from '@/utils/dateFormat';
 
 /**
- * Date-only sibling of `<DateTimeField>`. Wraps Mantine 8's `DatePickerInput`,
+ * The app's date input. Wraps Mantine 8's `DatePickerInput`,
  * which emits a `YYYY-MM-DD` string via `onChange` (not a `Date`).
  *
  * **Select-only:** the field is a calendar-popup picker — the operator can only

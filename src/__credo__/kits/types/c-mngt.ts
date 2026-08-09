@@ -261,6 +261,8 @@ export type CMngtTransportOrderFeatures = {
 
   codePadLength: number;
 
+  routeCodePrefix?: string;
+
   statusOptions: CMngtTransportOrderStatusOption[];
 
   statusTransitions?: Record<string, string[]>;

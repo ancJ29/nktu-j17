@@ -133,7 +133,7 @@ export function computeTripLaborTotal(trips: Pick<TransportOrderTrip, 'laborCost
 }
 
 export function orderTripLaborTotal(order: TransportOrder): number {
-  return order.isMultiTrip ? computeTripLaborTotal(order.trips ?? []) : 0;
+  return order.isMultiTrip ? computeTripLaborTotal(order.trips ?? []) : (order.laborCost ?? 0);
 }
 
 export function formatMoney(n: number): string {

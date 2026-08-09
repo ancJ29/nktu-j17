@@ -15,10 +15,6 @@ export function findStatus(value: string | undefined): ResolvedStatusOption {
   return createStatusResolver(transportOrderStatuses())(value);
 }
 
-export function statusLabel(value: string | undefined): string {
-  return findStatus(value).label;
-}
-
 export function getNextStatuses(
   current: string | undefined,
   myDepartment: string | null,

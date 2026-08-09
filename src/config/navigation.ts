@@ -14,6 +14,7 @@ export type NavId =
   | 'quotations'
   | 'goods-receipts'
   | 'transport-orders'
+  | 'transport-routes'
   | 'product-catalog'
   | 'materials-catalog'
   | 'warehouse'
@@ -119,6 +120,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     label: 'Transport Orders',
     defaultIcon: IconName.Truck,
     mobileNavbar: true,
+  },
+
+  'transport-routes': {
+    path: ROUTES.TRANSPORT_ROUTES.LIST,
+    labelKey: 'transportRoutes.title',
+    label: 'Transport Routes',
+    defaultIcon: IconName.Route,
   },
   configuration: {
     labelKey: 'configuration.title',
@@ -288,6 +296,7 @@ const DEFAULT_PC_STRUCTURE: NavStructureItem[] = [
   'sales-orders',
   'quotations',
   'transport-orders',
+  'transport-routes',
   'delivery',
   'goods-receipts',
   'employees',
@@ -332,6 +341,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
   'sales-orders',
   'quotations',
   'transport-orders',
+  'transport-routes',
   'delivery',
   'goods-receipts',
   'employees',
@@ -396,6 +406,8 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   delivery: (f) => f.deliveryRequests?.enabled ?? false,
   'goods-receipts': (f) => f.goodsReceipts?.enabled ?? false,
   'transport-orders': (f) => f.transportOrders?.enabled ?? false,
+
+  'transport-routes': (f) => f.transportOrders?.enabled ?? false,
   'warehouse-locations': (f) => f.locations?.enabled ?? false,
   'warehouse-product-inventory': (f) => f.productInventory?.enabled ?? false,
   'warehouse-material-inventory': (f) => f.materialInventory?.enabled ?? false,
@@ -420,6 +432,7 @@ const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   delivery: () => getModulePermissions('deliveryRequest').canView ?? false,
   'goods-receipts': () => getModulePermissions('goodsReceipt').canView ?? false,
   'transport-orders': () => getModulePermissions('transportOrder').canView ?? false,
+  'transport-routes': () => getModulePermissions('transportRoute').canView ?? false,
   'configuration-products': () => getModulePermissions('product').canView ?? false,
   'configuration-materials': () => getModulePermissions('material').canView ?? false,
   'configuration-customers': () => getModulePermissions('customer').canView ?? false,

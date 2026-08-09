@@ -10,7 +10,3 @@ export function generateInternalBarcode(options?: { clientCode?: string }): stri
   const time = Date.now().toString(36).toUpperCase();
   return `${clientCode}-${random}-${time}`;
 }
-
-export function isInternalBarcode(value: string): boolean {
-  return /^[A-Z0-9]+-\d{6}-[A-Z0-9]+$/.test(value.trim());
-}

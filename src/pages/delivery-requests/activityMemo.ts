@@ -170,19 +170,6 @@ export function partyMemo(request: {
   };
 }
 
-export function partyMemoFromRequest(record: DeliveryRequest): DeliveryRequestPartyMemo {
-  return partyMemo({
-    direction: record.direction,
-    inboundKind: (record.extra as DeliveryRequestExtra | undefined)?.inboundKind,
-    salesOrderId: record.salesOrderId,
-    salesOrderNumber: record.salesOrderNumber,
-    customerCode: (record.extra as DeliveryRequestExtra | undefined)?.customerCode,
-    customerName: record.customerName,
-    vendorCode: record.vendorCode,
-    vendorName: record.vendorName,
-  });
-}
-
 export type InlineEditSnapshot = {
   scheduledDate?: number;
   assignedDriverId?: string;

@@ -81,7 +81,7 @@ const canEdit = perms.deliveryRequest.canEdit();
 const canManagePhotos = perms.deliveryRequest.canManagePhotos();
 const pricingEnabled = isPricingManagementEnabled();
 
-const activityLogTabVisible = !isMobile && isActivityLoggingEnabled();
+const activityLogTabVisible = isActivityLoggingEnabled();
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
 const { resolveStatus } = deliveryRequestStatusOptions;
 
@@ -145,6 +145,8 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   const [activeTab, setActiveTab] = useState<string | null>('photos');
 
   const [editOpen, setEditOpen] = useState(false);
+
+  const [mobileTab, setMobileTab] = useState<string | null>('overview');
 
   const skuByCode = useMemo(() => {
     const m = new Map<string, string>();
@@ -673,11 +675,16 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     return (
       <Stack gap={0}>
         {pendingSyncBanner && <Box p="sm">{pendingSyncBanner}</Box>}
-        <Tabs defaultValue="overview">
+        <Tabs value={mobileTab} onChange={setMobileTab}>
           <Tabs.List>
             <Tabs.Tab value="overview" leftSection={<IconPackage size={14} />}>
               {t('salesOrders.detail.tabOverview')}
             </Tabs.Tab>
+            {activityLogTabVisible && (
+              <Tabs.Tab value="activityLog" leftSection={<IconHistory size={14} />}>
+                {t('deliveryRequests.detail.tabActivityLog')}
+              </Tabs.Tab>
+            )}
           </Tabs.List>
 
           <Tabs.Panel value="overview">
@@ -727,6 +734,22 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
               {actionButtons}
             </Stack>
           </Tabs.Panel>
+
+          {/* Lazy-mount on the mobile tab, not `activeTab` — that one belongs to
+              the desktop Tabs and never moves here, so reading it would leave
+              the panel permanently unmounted. */}
+          {activityLogTabVisible && (
+            <Tabs.Panel value="activityLog">
+              <Stack gap="sm" p="sm">
+                {mobileTab === 'activityLog' && (
+                  <ActivityByTargetPanel
+                    targetId={request.id}
+                    i18nNamespace="deliveryRequests.detail"
+                  />
+                )}
+              </Stack>
+            </Tabs.Panel>
+          )}
         </Tabs>
 
         {/* Floating camera FAB — placed outside Tabs so it stays visible

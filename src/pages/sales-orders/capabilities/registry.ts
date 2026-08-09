@@ -225,10 +225,6 @@ export function getCapability(id: CapabilityId): CapabilityDefinition | undefine
   return CAPABILITY_REGISTRY[id];
 }
 
-export function listCapabilities(): CapabilityDefinition[] {
-  return Object.values(CAPABILITY_REGISTRY);
-}
-
 export function listCapabilitiesForStage(stage: Stage): CapabilityDefinition[] {
   return Object.values(CAPABILITY_REGISTRY).filter((c) => c.allowedStages.includes(stage));
 }

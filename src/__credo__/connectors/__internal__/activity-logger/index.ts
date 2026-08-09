@@ -1,7 +1,7 @@
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
-import { urls } from '../shared/config';
+import { targets, urls } from '../shared/config';
 import { ACTIVITY_LOGGER_ROUTES } from './routes';
 import type {
   DeleteByClientRequest,
@@ -19,6 +19,7 @@ import type {
 export * from './routes';
 
 const storages = {
+  target: targets['activityLogger'] || '',
   internalAccessKey: '',
   trustedServiceKey: '',
   baseUrl: urls['activityLogger'] || '',
@@ -51,6 +52,11 @@ const activityApi = createApiGroup({
 export const activityLoggerConnector = {
   useLocal: () => {
     return activityLoggerConnector.setBaseUrl(`http://localhost:${PORTS.ACTIVITY_LOGGER}`);
+  },
+
+  setTarget: (target: string) => {
+    storages.target = target;
+    return activityLoggerConnector;
   },
   setBaseUrl: (baseUrl: string) => {
     storages.baseUrl = baseUrl;

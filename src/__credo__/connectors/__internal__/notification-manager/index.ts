@@ -1,7 +1,7 @@
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
-import { urls } from '../shared/config';
+import { targets, urls } from '../shared/config';
 import { NOTIFICATION_MANAGER_ROUTES } from './routes';
 import type {
   CreateNotificationsRequest,
@@ -21,6 +21,7 @@ import type {
 export * from './routes';
 
 const storages = {
+  target: targets['notificationManager'] || '',
   internalAccessKey: '',
   trustedServiceKey: '',
   baseUrl: urls['notificationManager'] || '',
@@ -55,6 +56,11 @@ export const notificationManagerConnector = {
     return notificationManagerConnector.setBaseUrl(
       `http://localhost:${PORTS.NOTIFICATION_MANAGER}`,
     );
+  },
+
+  setTarget: (target: string) => {
+    storages.target = target;
+    return notificationManagerConnector;
   },
   setBaseUrl: (baseUrl: string) => {
     storages.baseUrl = baseUrl;

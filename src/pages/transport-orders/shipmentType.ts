@@ -12,9 +12,6 @@ const BUILT_IN_LABEL_KEYS = {
   domestic: 'transportOrders.shipmentType.domestic',
 } as const;
 
-export const FALLBACK_SHIPMENT_TYPES: readonly TransportOrderShipmentType[] =
-  Object.keys(BUILT_IN_LABEL_KEYS);
-
 export const DEFAULT_SHIPMENT_TYPE: TransportOrderShipmentType = 'import';
 
 export type ShipmentTypeOption = LookupOption;

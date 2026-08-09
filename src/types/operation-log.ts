@@ -17,15 +17,6 @@ export type OperationLogSharedExtra = {
   photos?: OperationLogPhoto[];
 };
 
-export type OperationLogType =
-  | 'refuel'
-  | 'maintenance'
-  | 'trip'
-  | 'driver-training'
-  | 'greenhouse-maintenance'
-  | 'oil-tank-refill'
-  | 'oil-tank-issue';
-
 export type RefuelLogExtra = {
   litres?: number;
 

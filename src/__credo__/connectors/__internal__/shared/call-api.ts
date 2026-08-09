@@ -105,7 +105,9 @@ async function runOnce<T>(
   const headers = (init.headers ?? {}) as Record<string, string>;
   init.headers = headers;
 
-  attachCachedVrxIfAuthed(headers, origin);
+  const target = headers['x-target'];
+
+  attachCachedVrxIfAuthed(headers, origin, target);
 
   let mode = selectMode(origin, headers);
   if (mode === 'tunnel') {
@@ -144,8 +146,8 @@ async function runOnce<T>(
       return { kind: 'throw', error };
     }
 
-    recordServerEncoding(response, origin);
-    recordVrxToken(response, origin);
+    recordServerEncoding(response, origin, target);
+    recordVrxToken(response, origin, target);
 
     if (
       response.status === 406 &&
@@ -184,10 +186,12 @@ function selectMode(origin: string, headers: Record<string, string>): Mode {
   if (!IS_BROWSER()) return 'plain';
   if (headers['x-trusted-service-key']) return 'plain';
 
-  const serverMode = getEncodingMode(origin) ?? DEFAULT_MODE;
+  const target = headers['x-target'];
+
+  const serverMode = getEncodingMode(origin, target) ?? DEFAULT_MODE;
   if (serverMode === 'json') return 'plain';
 
-  const optIn = getTransportMode(origin);
+  const optIn = getTransportMode(origin, target);
   if (optIn) return optIn;
 
   if (IS_LOCAL() && getEnvVar('__NO_TUNNEL__') === 'true') {
@@ -201,13 +205,21 @@ function selectMode(origin: string, headers: Record<string, string>): Mode {
   return 'tunnel';
 }
 
-function attachCachedVrxIfAuthed(headers: Record<string, string>, origin: string): void {
+function attachCachedVrxIfAuthed(
+  headers: Record<string, string>,
+  origin: string,
+  target?: string,
+): void {
   if (!headers['Authorization']) return;
-  const cached = getVrxToken(origin);
+  const cached = getVrxToken(origin, target);
   if (cached) headers['x-vrx'] = cached;
 }
 
 type Built = { url: string; init: RequestInit };
+
+function outerRoutingHeaders(headers: Record<string, string>): Record<string, string> {
+  return headers['x-target'] ? { 'x-target': headers['x-target'] } : {};
+}
 
 function buildRequest(
   mode: Mode,
@@ -226,12 +238,14 @@ function buildTunnelRequest(
   parsed: URL,
   headers: Record<string, string>,
 ): Built {
-  const stage = getStagePrefix(parsed.origin);
+  const stage = getStagePrefix(parsed.origin, headers['x-target']);
+  const segments = parsed.pathname.split('/').filter(Boolean);
+  const hasStage = Boolean(stage) && segments[0] === stage;
+
   let envelopePath: string;
   let tunnelUrl: string;
-  if (stage) {
-    const segments = parsed.pathname.split('/');
-    envelopePath = '/' + segments.slice(2).join('/');
+  if (hasStage) {
+    envelopePath = '/' + segments.slice(1).join('/');
     tunnelUrl = `${parsed.origin}/${stage}${TUNNEL_PATH}`;
   } else {
     envelopePath = parsed.pathname;
@@ -250,7 +264,10 @@ function buildTunnelRequest(
     init: {
       method: 'POST',
       body: scrambleBytes(encode(envelope)),
-      headers: { 'Content-Type': MSGPACK_CONTENT_TYPE },
+      headers: {
+        'Content-Type': MSGPACK_CONTENT_TYPE,
+        ...outerRoutingHeaders(headers),
+      },
     },
   };
 }
@@ -275,7 +292,10 @@ function buildBodyEncodedRequest(
     init: {
       ...init,
       body: scrambleBytes(encode(envelope)),
-      headers: { 'Content-Type': MSGPACK_CONTENT_TYPE },
+      headers: {
+        'Content-Type': MSGPACK_CONTENT_TYPE,
+        ...outerRoutingHeaders(headers),
+      },
     },
   };
 }
@@ -318,17 +338,18 @@ async function safeDecodeErrorPayload(response: Response): Promise<unknown> {
   }
 }
 
-function recordServerEncoding(response: Response, origin: string): void {
+function recordServerEncoding(response: Response, origin: string, target?: string): void {
   const serverEncoding = response.headers.get(ENCODING_HEADER);
   if (serverEncoding !== 'msgpack' && serverEncoding !== 'json') return;
-  if (getEncodingMode(origin) === serverEncoding) return;
-  trace('[callApi] serverEncoding', { serverEncoding, origin });
-  setEncodingMode(origin, serverEncoding);
+  if (getEncodingMode(origin, target) === serverEncoding) return;
+  trace('[callApi] serverEncoding', { serverEncoding, origin, target });
+  setEncodingMode(origin, target, serverEncoding);
 }
 
-function recordVrxToken(response: Response, origin: string): void {
+function recordVrxToken(response: Response, origin: string, target?: string): void {
   const vrx = response.headers.get('x-vrx');
-  if (vrx) setVrxToken(origin, vrx);
+
+  if (vrx) setVrxToken(origin, target, vrx);
 }
 
 function configureTrace(

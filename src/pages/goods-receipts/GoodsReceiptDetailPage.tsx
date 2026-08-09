@@ -65,7 +65,7 @@ import { NumberField } from '@/components/NumberField';
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
 
-const activityLogTabVisible = !isMobile && isActivityLoggingEnabled();
+const activityLogTabVisible = isActivityLoggingEnabled();
 
 const STICKY_CTA_BOTTOM = 76;
 
@@ -721,6 +721,11 @@ export function GoodsReceiptDetailPage() {
         <Tabs.Tab value="info" leftSection={<IconClipboardList size={16} />}>
           {t('goodsReceipts.detail.tabInfo')}
         </Tabs.Tab>
+        {activityLogTabVisible && (
+          <Tabs.Tab value="activityLog" leftSection={<IconHistory size={16} />}>
+            {t('goodsReceipts.detail.tabActivityLog')}
+          </Tabs.Tab>
+        )}
       </Tabs.List>
       <Tabs.Panel value="items" pt="md">
         <Stack gap="md">
@@ -735,6 +740,14 @@ export function GoodsReceiptDetailPage() {
           {auditCard}
         </Stack>
       </Tabs.Panel>
+      {/* `keepMounted={false}` on the rail above is what lazy-mounts this — the
+          by-target panel fires `getByTarget` on mount, so it must not render
+          until the operator picks the tab. */}
+      {activityLogTabVisible && (
+        <Tabs.Panel value="activityLog" pt="md">
+          <ActivityByTargetPanel targetId={receipt.id} i18nNamespace="goodsReceipts.detail" />
+        </Tabs.Panel>
+      )}
     </Tabs>
   );
 

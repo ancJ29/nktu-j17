@@ -84,6 +84,8 @@ import {
   TransportOrderListPage,
   TransportOrderDetailPage,
   TransportOrderFormPage,
+  TransportRouteListPage,
+  TransportRouteFormPage,
   ProfilePage,
   AppConfigPage,
   DebugPage,
@@ -127,6 +129,7 @@ const salesOrderGate = gate('salesOrder');
 const deliveryRequestGate = gate('deliveryRequest');
 const goodsReceiptGate = gate('goodsReceipt');
 const transportOrderGate = gate('transportOrder');
+const transportRouteGate = gate('transportRoute');
 const locationGate = gate('location');
 const materialGate = gate('material');
 const truckGate = gate('truck');
@@ -283,6 +286,16 @@ const transportOrderDetailNav = {
       icon: IconName.Truck,
       label: t('transportOrders.title'),
       path: ROUTES.TRANSPORT_ORDERS.LIST,
+    },
+  ],
+};
+
+const transportRouteDetailNav = {
+  detailNav: (t: (key: string) => string) => [
+    {
+      icon: IconName.Route,
+      label: t('transportRoutes.title'),
+      path: ROUTES.TRANSPORT_ROUTES.LIST,
     },
   ],
 };
@@ -931,6 +944,35 @@ const transportOrderRoutes: RouteObject[] = [
   },
 ];
 
+const transportRouteDetailRoutes: RouteObject[] = [
+  {
+    path: ROUTES.TRANSPORT_ROUTES.NEW,
+    element: gatedComponent(
+      { enabled: transportOrdersEnabled, requires: transportRouteGate.create },
+      TransportRouteFormPage,
+    ),
+    handle: transportRouteDetailNav,
+  },
+  {
+    path: ROUTES.TRANSPORT_ROUTES.EDIT,
+    element: gatedComponent(
+      { enabled: transportOrdersEnabled, requires: transportRouteGate.edit },
+      TransportRouteFormPage,
+    ),
+    handle: transportRouteDetailNav,
+  },
+];
+
+const transportRouteRoutes: RouteObject[] = [
+  {
+    path: ROUTES.TRANSPORT_ROUTES.LIST,
+    element: gatedComponent(
+      { enabled: transportOrdersEnabled, requires: transportRouteGate.view },
+      TransportRouteListPage,
+    ),
+  },
+];
+
 const transportOrderDetailRoutes: RouteObject[] = [
   {
     path: ROUTES.TRANSPORT_ORDERS.NEW,
@@ -974,6 +1016,7 @@ const router = createBrowserRouter([
           ...salesOrderRoutes,
           ...goodsReceiptRoutes,
           ...transportOrderRoutes,
+          ...transportRouteRoutes,
           {
             path: ROUTES.LOOKUPS.LIST,
             element: gatedComponent(
@@ -1051,6 +1094,7 @@ const router = createBrowserRouter([
           ...vendorDetailRoutes,
           ...salesOrderDetailRoutes,
           ...transportOrderDetailRoutes,
+          ...transportRouteDetailRoutes,
           ...deliveryRequestDetailRoutes,
           ...goodsReceiptDetailRoutes,
         ],

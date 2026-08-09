@@ -12,7 +12,7 @@ import type {
 } from '@/types';
 import type { CMngtDeliveryRequestStatusOption } from '@credo/kits/types';
 import { CAPABILITY_REGISTRY } from './capabilities/registry';
-import type { CapabilityId, Stage, StatusCapabilityBinding } from './capabilities/types';
+import type { Stage, StatusCapabilityBinding } from './capabilities/types';
 
 export type TransitionFailure =
   | { kind: 'unknown-from-status'; status: string }
@@ -168,26 +168,6 @@ export function getInitialStatusValueForCreate(opts: {
 export function getReleaseTargetValue(): string | undefined {
   for (const opt of getDeliveryRequestStatusOptions()) {
     if ((opt.capabilities ?? []).some((b) => b.id === 'isReleaseTarget')) return opt.value;
-  }
-  return undefined;
-}
-
-export function statusHasCapability(statusValue: string, capId: CapabilityId): boolean {
-  for (const opt of getDeliveryRequestStatusOptions()) {
-    if (opt.value !== statusValue) continue;
-    return (opt.capabilities ?? []).some((b) => b.id === capId);
-  }
-  return false;
-}
-
-export function readCapabilityConfig(
-  statusValue: string,
-  capId: CapabilityId,
-): unknown | undefined {
-  for (const opt of getDeliveryRequestStatusOptions()) {
-    if (opt.value !== statusValue) continue;
-    const b = (opt.capabilities ?? []).find((x) => x.id === capId);
-    return b?.config;
   }
   return undefined;
 }

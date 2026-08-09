@@ -30,6 +30,7 @@ const PERM_MODULE_LABELS: Record<string, string> = {
   productInventory: 'Product Inventory',
   salesOrder: 'Sales Order',
   transportOrder: 'Transport Order',
+  transportRoute: 'Transport Route',
   truck: 'Truck',
   vendor: 'Vendor',
 };

@@ -17,5 +17,3 @@ export const transportOrderBundle = createPartitionedRecordsStore<TransportOrder
 export const useTransportOrderStore = transportOrderBundle.useStore;
 
 export const setTransportOrderQueryRange = transportOrderBundle.setRange;
-
-export const getTransportOrderQueryRange = transportOrderBundle.getRange;

@@ -33,10 +33,6 @@ export function setSalesOrderQueryRange(from: Date | null, to: Date | null): voi
   currentRange = { from: fmt(from), to: fmt(to) };
 }
 
-export function getSalesOrderQueryRange(): { from: string; to: string } {
-  return currentRange;
-}
-
 const fetchSalesOrders = createPartitionedSyncFetcher<SalesOrder>({
   cacheKey: 'so',
   getRange: () => currentRange,

@@ -2,7 +2,7 @@ import { NumberInput, type NumberInputProps } from '@mantine/core';
 import { useState, type FocusEvent } from 'react';
 
 /**
- * Numeric sibling of `<DateField>` / `<DateTimeField>`: a Mantine `NumberInput`
+ * Numeric sibling of `<DateField>`: a Mantine `NumberInput`
  * that is safe to drive from a plain `number` state.
  *
  * **The bug it exists to prevent** (reported by a client 2026-08-04 on the SO

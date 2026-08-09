@@ -48,6 +48,7 @@ import {
   IconUserPlus,
 } from '@tabler/icons-react';
 import type { ActivityLoggerActivityEntity } from '@credo/connectors/types';
+import { device } from '@credo/base-ui/utils';
 import { CustomerLink } from '@/components/CustomerLink';
 import { DeliveryRequestLink } from '@/components/DeliveryRequestLink';
 import { EmployeeLink } from '@/components/EmployeeLink';
@@ -95,6 +96,69 @@ import type { GoodsReceiptStatus } from '@/types';
 import { isLocationsEnabled } from '@/utils/permission';
 
 const locationsEnabled = isLocationsEnabled();
+const isMobile = device.isMobile;
+
+/**
+ * The header every activity card shares: an icon, "who did what to which
+ * record", and when.
+ *
+ * **On desktop it is one row** with the timestamp pushed to the far right — an
+ * activity list is scanned down the timestamp column, so the column has to exist.
+ *
+ * **On a phone that row was the bug** (2026-08-09, reported on the truck detail
+ * page). Every group was `nowrap` and the one holding the text carried
+ * `minWidth: 0`, which licenses flexbox to shrink its children *below their
+ * min-content width* — so "Trần Nguyễn Trọng Nghĩa" collapsed to the width of
+ * its longest word and broke one word per line, four lines tall. Meanwhile the
+ * target chip ("HOWO") could not shrink at all, so it overflowed its slot and
+ * printed *on top of* the timestamp: two labels, one set of pixels.
+ *
+ * Mobile therefore stacks instead of squeezing — the text wraps by phrase in a
+ * `wrap` group that never pushes below min-content, and the timestamp takes its
+ * own line under it. Nothing is dropped; a phone just spends height, which it
+ * has, rather than width, which it doesn't.
+ */
+function ActivityCardHeader({
+  icon,
+  createdAt,
+  children,
+}: {
+  readonly icon?: ReactNode;
+  readonly createdAt: ActivityLoggerActivityEntity['createdAt'];
+  readonly children: ReactNode;
+}) {
+  const timestamp = (
+    <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
+      {formatDateTime(createdAt)}
+    </Text>
+  );
+
+  if (isMobile) {
+    return (
+      <Group gap="sm" wrap="nowrap" align="flex-start">
+        {icon}
+        <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
+          <Group gap={6} wrap="wrap" align="center">
+            {children}
+          </Group>
+          {timestamp}
+        </Stack>
+      </Group>
+    );
+  }
+
+  return (
+    <Group gap="sm" wrap="nowrap" align="center" justify="space-between">
+      <Group gap="sm" wrap="nowrap" align="center" style={{ minWidth: 0 }}>
+        {icon}
+        <Group gap={6} wrap="nowrap" align="center" style={{ minWidth: 0 }}>
+          {children}
+        </Group>
+      </Group>
+      {timestamp}
+    </Group>
+  );
+}
 
 type Props = {
   readonly entry: ActivityLoggerActivityEntity;
@@ -902,27 +966,24 @@ function EntityActivityCard({
   return (
     <Card withBorder radius="md" padding="sm">
       <Stack gap={6}>
-        <Group gap="sm" wrap="nowrap" align="center" justify="space-between">
-          <Group gap="sm" wrap="nowrap" align="center" style={{ minWidth: 0 }}>
+        <ActivityCardHeader
+          createdAt={entry.createdAt}
+          icon={
             <ThemeIcon size="md" radius="md" variant="light" color={config.color}>
               {config.icon}
             </ThemeIcon>
-            <Group gap={6} wrap="nowrap" align="center" style={{ minWidth: 0 }}>
-              {showActor && entry.actorId && <EmployeeLink id={entry.actorId} size="sm" />}
-              <Text size="sm" fw={500}>
-                {t(config.i18nKey)}
-              </Text>
-              <EntityTargetLink
-                type={config.targetType}
-                id={entry.targetId}
-                fallbackLabel={targetLabelFromMemo}
-              />
-            </Group>
-          </Group>
-          <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-            {formatDateTime(entry.createdAt)}
+          }
+        >
+          {showActor && entry.actorId && <EmployeeLink id={entry.actorId} size="sm" />}
+          <Text size="sm" fw={500}>
+            {t(config.i18nKey)}
           </Text>
-        </Group>
+          <EntityTargetLink
+            type={config.targetType}
+            id={entry.targetId}
+            fallbackLabel={targetLabelFromMemo}
+          />
+        </ActivityCardHeader>
         {isRoot && hasDiff && <DiffList memo={memo as Record<string, FieldDiff>} />}
         {config.showInventoryMemo && memo && <InventoryMemoLine memo={memo as InventoryMemo} />}
         {config.showSalesOrderMemo && memo && (
@@ -2834,19 +2895,18 @@ function LoginActivityCard({
   const isQr = method === 'qr';
   return (
     <Card withBorder radius="md" padding="sm">
-      <Group gap="sm" wrap="nowrap" align="center" justify="space-between">
-        <Group gap="sm" wrap="nowrap" align="center">
+      <ActivityCardHeader
+        createdAt={entry.createdAt}
+        icon={
           <ThemeIcon size="md" radius="md" variant="light" color={isQr ? 'blue' : 'gray'}>
             {isQr ? <IconQrcode size={16} /> : <IconKey size={16} />}
           </ThemeIcon>
-          <Text size="sm" fw={500}>
-            {t(`employees.detail.activityLogin.${method}`)}
-          </Text>
-        </Group>
-        <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-          {formatDateTime(entry.createdAt)}
+        }
+      >
+        <Text size="sm" fw={500}>
+          {t(`employees.detail.activityLogin.${method}`)}
         </Text>
-      </Group>
+      </ActivityCardHeader>
     </Card>
   );
 }
@@ -2865,15 +2925,10 @@ function RawActivityCard({
   return (
     <Card withBorder radius="md" padding="sm">
       <Stack gap={6}>
-        <Group justify="space-between" wrap="nowrap" gap="xs">
-          <Group gap={6} wrap="nowrap" align="center" style={{ minWidth: 0 }}>
-            {showActor && entry.actorId && <EmployeeLink id={entry.actorId} size="sm" />}
-            <Code>{entry.action}</Code>
-          </Group>
-          <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
-            {formatDateTime(entry.createdAt)}
-          </Text>
-        </Group>
+        <ActivityCardHeader createdAt={entry.createdAt}>
+          {showActor && entry.actorId && <EmployeeLink id={entry.actorId} size="sm" />}
+          <Code>{entry.action}</Code>
+        </ActivityCardHeader>
         {targetLabel && (
           <Text size="xs" c="dimmed">
             → {targetLabel}

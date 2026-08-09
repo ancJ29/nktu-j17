@@ -66,7 +66,3 @@ export function setClientCode(clientCode: string): void {
   cacheReset();
   reloadPage('client-code change');
 }
-
-export async function refreshClientCode(): Promise<string | null> {
-  return null;
-}

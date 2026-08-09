@@ -8,6 +8,7 @@ const browserAtImport = (): boolean => (_browserAtImport ??= isBrowser());
 
 export type StoragesShape = {
   callerService?: string | undefined;
+  target?: string | undefined;
   internalAccessKey?: string | undefined;
   accessKey?: string | undefined;
   authToken?: string | undefined;
@@ -76,6 +77,10 @@ export function buildHeaders({
     if (storages?.callerService) {
       headers['x-service'] = storages.callerService;
     }
+  }
+
+  if (storages?.target) {
+    headers['x-target'] = storages.target;
   }
 
   if (storages?.superAdminAccessKey) {

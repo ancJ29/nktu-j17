@@ -8,12 +8,11 @@ import { todayInVnDateString } from '@/utils/dateTimeField';
 import { dateOrderFromFormat, parseDateTimeInput } from '@/utils/dateTimeParse';
 
 /**
- * **Typed** date+time field — the text-entry sibling of `<DateTimeField>`, with
- * the same `string | null` (`YYYY-MM-DD HH:mm:ss`) value contract, so the two are
- * interchangeable at a call site and the submit-time
- * `dateTimeStringToIso()` conversion is unchanged.
+ * **Typed** date+time field — the app's only date+time input, carrying a
+ * `string | null` (`YYYY-MM-DD HH:mm:ss`) value contract, with the submit-time
+ * `dateTimeStringToIso()` conversion applied by its callers.
  *
- * # Why this exists next to `<DateTimeField>` rather than replacing it
+ * # Why it is a text field and not a picker
  *
  * Mantine's `DateTimePicker` cannot be typed into at all: it is a calendar and a
  * clock, and every value costs several clicks. That is fine for the date on a
@@ -25,8 +24,13 @@ import { dateOrderFromFormat, parseDateTimeInput } from '@/utils/dateTimeParse';
  * The reverse is also true, which is why the calendar stays: picking a day three
  * weeks out is easier on a month grid than by counting. So this field is a text
  * input **plus** a popover calendar + clock — type or pick, whichever the value
- * suits. `<DateTimeField>` keeps every other date field in the app select-only,
- * the way `<DateField>`'s note asks.
+ * suits.
+ *
+ * **This used to be phrased as a sibling of a select-only `<DateTimeField>`,
+ * which was deleted 2026-08-08 with zero call sites.** Every remaining date
+ * input in the app is date-only (`<DateField>`, select-only by design — see its
+ * note); the free-text argument above applies to date+time entry specifically,
+ * and nothing else needed one.
  *
  * # The contract that makes free text safe
  *

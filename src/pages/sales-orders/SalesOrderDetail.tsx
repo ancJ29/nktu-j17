@@ -141,7 +141,7 @@ const canCreateDRPerm = perms.deliveryRequest.canCreate();
 const canEditDeliveryPackageSize = perms.salesOrder.canEditDeliveryPackageSize();
 const deliveryPackageSizeOptions = getSalesOrderDeliveryPackageSizeOptions();
 
-const activityLogTabVisible = !isMobile && isActivityLoggingEnabled();
+const activityLogTabVisible = isActivityLoggingEnabled();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
 
 const soDriverDepartments = getDeliveryRequestDriverDepartments();
@@ -1568,6 +1568,15 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       label: t('salesOrders.detail.tabChat'),
       icon: <IconMessageCircle size={14} />,
     },
+    ...(activityLogTabVisible
+      ? [
+          {
+            value: 'activityLog',
+            label: t('salesOrders.detail.tabActivityLog'),
+            icon: <IconHistory size={14} />,
+          },
+        ]
+      : []),
   ];
 
   if (isMobile) {
@@ -1659,6 +1668,19 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               onSend={handleSendChat}
             />
           </Tabs.Panel>
+
+          {/* Lazy-mount on the mobile tab, not `activeTab` — that one belongs to
+              the desktop `Tabs` and never moves here, so reading it would leave
+              the panel permanently unmounted. */}
+          {activityLogTabVisible && (
+            <Tabs.Panel value="activityLog">
+              <Stack gap="sm" p="sm">
+                {mobileTab === 'activityLog' && (
+                  <ActivityByTargetPanel targetId={order.id} i18nNamespace="salesOrders.detail" />
+                )}
+              </Stack>
+            </Tabs.Panel>
+          )}
         </Tabs>
 
         {/* Floating camera FAB */}

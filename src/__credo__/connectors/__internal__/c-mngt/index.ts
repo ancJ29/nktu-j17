@@ -1,7 +1,7 @@
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
-import { urls } from '../shared/config';
+import { targets, urls } from '../shared/config';
 import { registerStagePrefix } from '../shared/transport-state';
 import { C_MNGT_ROUTES } from './routes';
 import type {
@@ -184,6 +184,7 @@ import type {
 export * from './routes';
 
 const storages = {
+  target: targets['cMngt'] || '',
   accessKey: '',
   authToken: '',
   clientCode: '',
@@ -192,7 +193,7 @@ const storages = {
   baseUrl: urls['cMngt'] || '',
 };
 
-registerStagePrefix(storages.baseUrl);
+registerStagePrefix(storages.baseUrl, storages.target);
 
 const EMPLOYEE_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.EMPLOYEE;
 const PRODUCT_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.PRODUCT;
@@ -335,9 +336,16 @@ export const cMngtConnector = {
   useLocal: () => {
     return cMngtConnector.setBaseUrl(`http://localhost:${PORTS.C_MNGT}/dev`);
   },
+
+  setTarget: (target: string) => {
+    storages.target = target;
+
+    registerStagePrefix(storages.baseUrl, target);
+    return cMngtConnector;
+  },
   setBaseUrl: (baseUrl: string) => {
     storages.baseUrl = baseUrl;
-    registerStagePrefix(baseUrl);
+    registerStagePrefix(baseUrl, storages.target);
     return cMngtConnector;
   },
   setAccessKey: (accessKey: string) => {
