@@ -36,7 +36,7 @@ import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { queryHarvestedCrops, useCropStore } from '@/stores/useCropStores';
 import { useCropDiaryTemplateStore } from '@/stores/useCropDiaryTemplateStore';
 import { templateDayCount } from '@/utils/cropDiaryTemplateModel';
-import { autoApplyDiaryTemplateOnCreate } from '@/utils/cropDiaryTemplateApply';
+import { seedCropSheetIfMissing } from '@/utils/cropSheetSeed';
 import {
   findGrowingCropInGreenhouse,
   findOverlappingCrop,
@@ -274,12 +274,12 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
         notifications.show({ color: 'green', message: t('crops.notifications.createSuccess') });
 
         try {
-          await autoApplyDiaryTemplateOnCreate({
-            diaryTemplateCode: values.diaryTemplateCode,
-            plantCount: Number(values.numberOfSeeds) || undefined,
-            fromDate: values.fromDate,
+          await seedCropSheetIfMissing({
             cropId: created.id,
             cropCode: created.code,
+            templateCode: values.diaryTemplateCode,
+            plantCount: Number(values.numberOfSeeds) || undefined,
+            startDate: values.fromDate ?? undefined,
           });
         } catch {
           notifications.show({

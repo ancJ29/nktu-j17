@@ -1,4 +1,5 @@
 import { hashString } from '@credo/kits/crypt';
+import { cMngtConnector } from '@credo/connectors/connector';
 
 import { credoSSOApi as credoSSOApiConnector } from '../../connectors';
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '../../utils';
@@ -128,7 +129,7 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     },
 
     getProfile: async ({ token }) => {
-      const profile = await credoSSOApi.getProfile<TProfile>(token);
+      const profile = await cMngtConnector.getMe<TProfile>(token);
 
       const savedSettings = profile?.settings ?? profile?.profile?.settings;
       if (savedSettings && userStorage) {

@@ -1,5 +1,6 @@
-import { Stack } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { IconDownload } from '@tabler/icons-react';
 import { useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useTranslation } from 'react-i18next';
@@ -31,24 +32,29 @@ import { allOptionFilter, multiOptionFilter } from '@/components/mobileFilterDef
 import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { FilterPill } from '@/components/FilterPill';
 import { TransactionalFilterPillsRow } from '@/components/TransactionalFilterPillsRow';
-import { device } from '@credo/base-ui/utils';
+import { device, logger } from '@credo/base-ui/utils';
 import { perms } from '@/utils/permission';
 import { useListScrollRestoration } from '@/hooks';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useTransactionalRangeRefetch } from '@/hooks/useTransactionalRangeRefetch';
 import { EMPTY_DATE_RANGE, type DateRangePreset, type MoreFilterDef } from '@/types/date-range';
 import { formatDateRangeLabel } from '@/utils/listFilterDateRange';
+import { exportTransportOrdersToExcel } from '@/utils/transportOrderExcel';
 import { TransportOrderCardList } from './TransportOrderCardList';
 import { TransportOrderDataTable } from './TransportOrderDataTable';
+import { formatMoney, orderTotals, orderTripLaborTotal } from './transportOrderPricing';
 import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
 import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
 import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
-import { truckOptionLabel } from './truckDisplay';
+import { truckOptionLabel, useTruckPlate } from './truckDisplay';
 import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
+const canExport = perms.transportOrder.canExport();
+
+const canViewPrice = perms.transportOrder.canViewPrice();
 
 const RANGE_DAYS = 14;
 
@@ -187,6 +193,40 @@ export function TransportOrderListPage() {
   const containerSizeData = useContainerSizeOptions();
   const containerSizeLabel = useContainerSizeLabel();
 
+  const getTruckPlate = useTruckPlate();
+
+  const handleExport = () => {
+    if (filtered.length === 0) {
+      notifications.show({
+        color: 'yellow',
+        message: t('transportOrders.notifications.exportEmpty'),
+      });
+      return;
+    }
+    try {
+      exportTransportOrdersToExcel(filtered, {
+        language: i18n.language,
+        resolveStatus: statusLabel,
+        resolveShipmentType: shipmentTypeLabel,
+        resolveContainerSize: containerSizeLabel,
+        getTruckPlate,
+
+        resolveCustomer: (code) => customerData.find((c) => c.value === code)?.label,
+        includeMoney: canViewPrice,
+      });
+      notifications.show({
+        color: 'green',
+        message: t('transportOrders.notifications.exportSuccess', { count: filtered.length }),
+      });
+    } catch (err) {
+      logger.error('Transport order export failed:', err);
+      notifications.show({
+        color: 'red',
+        message: t('transportOrders.notifications.exportError'),
+      });
+    }
+  };
+
   const statusPlaceholder = useMemo(() => {
     if (filters.statusFilter.length === 0) return t('__new__.01-common.labels.status');
     if (filters.statusFilter.length === 1) return statusLabel(filters.statusFilter[0]!);
@@ -207,6 +247,20 @@ export function TransportOrderListPage() {
   const statsCells: ListStatCell[] = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const o of filtered) counts[o.status] = (counts[o.status] ?? 0) + 1;
+
+    let revenue = 0;
+    let driverPay = 0;
+    let balanceDue = 0;
+    if (canViewPrice) {
+      for (const o of filtered) {
+        if (o.extra?.cancellation) continue;
+        const totals = orderTotals(o);
+        revenue += totals.serviceSubtotal;
+        balanceDue += totals.balanceDue;
+        driverPay += orderTripLaborTotal(o);
+      }
+    }
+
     return [
       { key: 'total', label: t('transportOrders.stats.total'), value: filtered.length },
 
@@ -218,6 +272,28 @@ export function TransportOrderListPage() {
           value: counts[s.value] ?? 0,
           color: s.color,
         })),
+      ...(canViewPrice
+        ? ([
+            {
+              key: 'revenue',
+              label: t('transportOrders.stats.revenue'),
+              value: formatMoney(revenue),
+              color: 'teal',
+            },
+            {
+              key: 'driverPay',
+              label: t('transportOrders.stats.driverPay'),
+              value: formatMoney(driverPay),
+              color: 'orange',
+            },
+            {
+              key: 'balanceDue',
+              label: t('transportOrders.stats.balanceDue'),
+              value: formatMoney(balanceDue),
+              color: 'red',
+            },
+          ] as ListStatCell[])
+        : []),
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `i18n.language` is the intended key: the status resolver reads the active language internally, so labels must re-resolve on a language switch.
   }, [filtered, i18n.language, t]);
@@ -386,6 +462,19 @@ export function TransportOrderListPage() {
           cachedAt={cachedAt}
           loading={loading}
           onRefresh={forceRefresh}
+          extraActions={
+            canExport && (
+              <Button
+                variant="default"
+                size="sm"
+                leftSection={<IconDownload size={16} />}
+                onClick={handleExport}
+                disabled={filtered.length === 0}
+              >
+                {t('__new__.01-common.actions.exportExcel')}
+              </Button>
+            )
+          }
           createCta={{
             to: ROUTES.TRANSPORT_ORDERS.NEW,
             label: t('transportOrders.new'),

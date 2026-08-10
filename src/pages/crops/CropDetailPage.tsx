@@ -6,6 +6,7 @@ import {
   Grid,
   Group,
   SimpleGrid,
+  Space,
   Stack,
   Text,
   ThemeIcon,
@@ -47,6 +48,9 @@ import { perms } from '@/utils/permission';
 import type { Crop } from '@/types';
 import type { CropMaterialTotal } from '@/utils/cropMaterialSummary';
 import { CropDiarySection, MaterialSummaryTable } from '@/pages/crop-diaries';
+import { CropSheetSection } from './CropSheetSection';
+import { SheetTotalsTable } from './SheetTotalsTable';
+import type { SheetColumnTotal } from '@/utils/cropSheetModel';
 import { CropStatusBadge } from './CropStatusBadge';
 
 const isMobile = device.isMobile;
@@ -73,6 +77,8 @@ export function CropDetailPage() {
   const [transitioning, setTransitioning] = useState(false);
 
   const [materialSummary, setMaterialSummary] = useState<CropMaterialTotal[]>([]);
+
+  const [sheetTotals, setSheetTotals] = useState<SheetColumnTotal[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('details');
 
   useEffect(() => {
@@ -297,15 +303,34 @@ export function CropDetailPage() {
         {infoSection}
       </Tabs.Panel>
       <Tabs.Panel value="diary" pt="md">
+        {/* The process grid first: it is the day's work. The free-form section
+            below it holds what no process predicted — weather, pests, disease. */}
+        <CropSheetSection
+          cropId={diaryCropId}
+          cropCode={crop.code}
+          {...(extra.fromDate ? { startDate: extra.fromDate } : {})}
+          {...(extra.diaryTemplateCode ? { templateCode: extra.diaryTemplateCode } : {})}
+          {...(typeof extra.numberOfSeeds === 'number'
+            ? { fallbackPlantCount: extra.numberOfSeeds }
+            : {})}
+          onTotalsChange={setSheetTotals}
+        />
+        <Space h="md" />
         <CropDiarySection
           cropId={diaryCropId}
           cropCode={crop.code}
-          defaultStartDate={extra.fromDate}
-          plantCount={typeof extra.numberOfSeeds === 'number' ? extra.numberOfSeeds : undefined}
           onSummaryChange={setMaterialSummary}
         />
       </Tabs.Panel>
       <Tabs.Panel value="materials" pt="md">
+        {/* Two sources, kept apart on purpose: what the process consumed is a
+            derived total from the grid, while the entries below it are the
+            ad-hoc applications nobody planned. Summing them into one number
+            would hide which is which. */}
+        <Card withBorder radius="md" padding={isMobile ? 'md' : 'lg'}>
+          <SheetTotalsTable totals={sheetTotals} />
+        </Card>
+        <Space h="md" />
         <Card withBorder radius="md" padding={isMobile ? 'md' : 'lg'}>
           <MaterialSummaryTable summary={materialSummary} />
         </Card>

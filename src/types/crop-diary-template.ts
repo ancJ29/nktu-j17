@@ -1,4 +1,5 @@
 import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
+import type { CropProcessPlan } from './crop-sheet';
 
 export type CropDiaryTemplateStep = { activity: string; defaultNotes?: string };
 
@@ -17,20 +18,6 @@ export type TemplateDay = {
   water?: number;
 };
 
-export type WateringRange = {
-  fromDay: number;
-
-  toDay: number;
-
-  perPlant: number;
-};
-
-export type CropTemplateWatering = {
-  activity: string;
-
-  unit?: string;
-};
-
 export type CropDiaryTemplateExtra = {
   description?: string;
 
@@ -38,7 +25,7 @@ export type CropDiaryTemplateExtra = {
 
   days?: TemplateDay[];
 
-  watering?: CropTemplateWatering;
+  plan?: CropProcessPlan;
 
   isDeleted?: boolean;
   [key: string]: unknown;

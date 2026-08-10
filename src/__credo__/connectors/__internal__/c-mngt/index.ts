@@ -1,6 +1,8 @@
 import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
+
+import type { GetProfileResponse } from '../c-sso/types';
 import { targets, urls } from '../shared/config';
 import { registerStagePrefix } from '../shared/transport-state';
 import { C_MNGT_ROUTES } from './routes';
@@ -212,6 +214,7 @@ const ADMIN_CLIENT_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.ADMIN_CLIENT;
 const ADMIN_CONFIG_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.ADMIN_CONFIG;
 const CLIENT_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.CLIENT;
 const CONFIG_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.CONFIG;
+const AUTH_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.AUTH;
 
 const getBaseUrl = () => storages.baseUrl;
 
@@ -319,6 +322,14 @@ const partitionedRecordsApi = createApiGroup({
   getBaseUrl,
 });
 
+const authApi = createApiGroup({
+  storages,
+  prefix: C_MNGT_ROUTES.PREFIXES.AUTH,
+  getBaseUrl,
+});
+
+const withAuth = (token: string) => ({ ...storages, authToken: token });
+
 const recordTarget = <T extends { entity: string }>(
   target: T,
 ): { entity: string; headers: Record<string, string> } => {
@@ -364,6 +375,12 @@ export const cMngtConnector = {
     storages.trustedServiceKey = trustedServiceKey;
     return cMngtConnector;
   },
+
+  getMe: <T extends Record<string, unknown> = Record<string, unknown>>(token: string) =>
+    authApi<GetProfileResponse<T>>(AUTH_ROUTES.ME, {
+      storages: withAuth(token),
+      extraHeaders: { 'x-client-code': storages.clientCode },
+    }),
 
   getAllEmployees: <TExtra = Record<string, unknown>>(params?: GetAllEmployeesRequest) =>
     employeeApi<GetAllEmployeesResponse<TExtra>>(EMPLOYEE_ROUTES.GET_ALL, {

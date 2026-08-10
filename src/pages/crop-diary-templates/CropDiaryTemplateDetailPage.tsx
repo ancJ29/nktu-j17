@@ -1,5 +1,4 @@
 import {
-  Badge,
   Box,
   Button,
   Card,
@@ -15,13 +14,12 @@ import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
   IconCalendar,
-  IconDroplet,
   IconClipboardList,
   IconDownload,
   IconEdit,
   IconInfoCircle,
 } from '@tabler/icons-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
@@ -29,24 +27,18 @@ import { cMngtConnector } from '@credo/connectors/connector';
 import { asyncDeduplicator, device } from '@credo/base-ui/utils';
 import { DetailField } from '@/components/DetailField';
 import { SectionCard } from '@/components/SectionCard';
+import { ProcessPlanView } from './plan/ProcessPlanView';
 import { StatPill } from '@/components/StatPill';
 import { NotFoundState } from '@/components/NotFoundState';
 import {
   useCropDiaryTemplateStore,
   CROP_DIARY_TEMPLATE_RECORD_TARGET,
 } from '@/stores/useCropDiaryTemplateStore';
-import { useMaterialStore } from '@/stores/useMaterialStore';
 import { formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
-import {
-  daysToRows,
-  summarizeWatering,
-  templatePlanDays,
-  templateWatering,
-} from '@/utils/cropDiaryTemplateModel';
-import { exportCropDiaryTemplateRows } from '@/utils/cropDiaryTemplateExcel';
+import { exportCropSheet } from '@/utils/cropSheetExcel';
 import { perms } from '@/utils/permission';
-import type { CropDiaryTemplate } from '@/types';
+import type { CropDiaryTemplate, CropProcessPlan } from '@/types';
 
 const isMobile = device.isMobile;
 const canEdit = perms.cropDiaryTemplate.canEdit();
@@ -57,18 +49,6 @@ export function CropDiaryTemplateDetailPage() {
 
   const [template, setTemplate] = useState<CropDiaryTemplate | null>(null);
   const [loading, setLoading] = useState(true);
-
-  const materials = useMaterialStore((s) => s.items);
-  const materialsInitialized = useMaterialStore((s) => s.initialized);
-  const loadMaterials = useMaterialStore((s) => s.loadAll);
-  useEffect(() => {
-    if (!materialsInitialized) loadMaterials();
-  }, [materialsInitialized, loadMaterials]);
-  const materialName = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const m of materials) map.set(m.code, m.name);
-    return (code: string) => map.get(code) ?? code;
-  }, [materials]);
 
   useEffect(() => {
     if (!id) return;
@@ -108,10 +88,13 @@ export function CropDiaryTemplateDetailPage() {
   }
 
   const description = template.extra?.description;
-  const days = templatePlanDays(template);
-  const watering = templateWatering(template);
-  const wateringRuns = summarizeWatering(days);
-  const totalDays = template.extra?.totalDates ?? days.length;
+  const plan: CropProcessPlan = template.extra?.plan ?? {
+    columns: [],
+    stages: [],
+    totalDays: 0,
+    days: [],
+  };
+  const totalDays = plan.totalDays;
 
   const statbook = (
     <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'} style={{ flexShrink: 0 }}>
@@ -125,19 +108,17 @@ export function CropDiaryTemplateDetailPage() {
   );
 
   const handleExport = () => {
-    const rows = daysToRows(days, materialName);
-    exportCropDiaryTemplateRows(
-      rows,
+    exportCropSheet(
+      plan,
       {
-        day: t('cropDiaryTemplates.excel.colDay'),
-        activity: t('cropDiaryTemplates.excel.colActivity'),
-        material: t('cropDiaryTemplates.excel.colMaterial'),
-        quantity: t('cropDiaryTemplates.excel.colQuantity'),
-        unit: t('cropDiaryTemplates.excel.colUnit'),
-        memo: t('__new__.01-common.labels.note'),
+        stage: t('cropDiaryTemplates.plan.stage'),
+        day: t('cropDiaryTemplates.plan.day'),
+        date: 'Ngày thực tế',
+        weekday: 'Thứ',
+        totals: 'TỔNG PHÂN',
         sheetName: t('cropDiaryTemplates.excel.sheetName'),
       },
-      `crop_diary_template_${template.code}.xlsx`,
+      `crop_process_${template.code}.xlsx`,
     );
   };
 
@@ -242,38 +223,16 @@ export function CropDiaryTemplateDetailPage() {
         )}
       </SectionCard>
 
-      {watering && wateringRuns.length > 0 && (
-        <SectionCard
-          icon={<IconDroplet size={14} />}
-          title={t('cropDiaryTemplates.watering.section')}
-        >
-          <Stack gap="xs">
-            <Text size="sm" fw={600}>
-              {watering.activity}
-            </Text>
-            {/* The stage-by-stage read; each day's own figure is on its row
-                below, so this is the overview, not the source of truth. */}
-            <Group gap="xs" wrap="wrap">
-              {wateringRuns.map((run) => (
-                <Badge key={run.fromDay} variant="light" color="primary" radius="sm" tt="none">
-                  {run.fromDay === run.toDay
-                    ? t('cropDiaryTemplates.dayLabel', { day: run.fromDay })
-                    : t('cropDiaryTemplates.watering.window', { from: run.fromDay, to: run.toDay })}
-                  {` · ${formatNumber(run.perPlant)}${watering.unit ? ` ${watering.unit}` : ''}`}
-                </Badge>
-              ))}
-            </Group>
-          </Stack>
-        </SectionCard>
-      )}
-
+      {/* The process itself. Rendered from `extra.plan` — the day matrix that
+          replaced the one-activity-per-day model on 2026-08-10; a template
+          predating it simply shows no columns. */}
       <SectionCard
         icon={<IconCalendar size={14} />}
-        title={t('cropDiaryTemplates.daysTitle')}
+        title={t('cropDiaryTemplates.plan.gridSection')}
         actions={
           <Button
-            variant="default"
             size="compact-sm"
+            variant="subtle"
             leftSection={<IconDownload size={14} />}
             onClick={handleExport}
           >
@@ -281,58 +240,7 @@ export function CropDiaryTemplateDetailPage() {
           </Button>
         }
       >
-        <Stack gap="xs">
-          {days.map((day) => (
-            <Card key={day.day} withBorder radius="md" padding="sm">
-              <Stack gap={4} style={{ minWidth: 0, flex: 1 }}>
-                <Group gap={8} wrap="nowrap">
-                  <Badge variant="light" color="gray" radius="sm" size="sm">
-                    {t('cropDiaryTemplates.dayLabel', { day: day.day })}
-                  </Badge>
-                  <Text size="sm" fw={600} truncate style={{ flex: 1 }}>
-                    {day.activity || '—'}
-                  </Text>
-                  {/* The day's water reads on the row itself: "how much for day
-                      12" is the question this page is scanned for, and a rate
-                      stated once at the top forces the reader to do the lookup. */}
-                  {typeof day.water === 'number' && day.water > 0 && (
-                    <Group gap={4} wrap="nowrap" style={{ flexShrink: 0 }}>
-                      <IconDroplet size={14} color="var(--mantine-color-primary-6)" />
-                      <Text size="sm" fw={600} c="primary" style={{ whiteSpace: 'nowrap' }}>
-                        {formatNumber(day.water)}
-                        {watering?.unit ? ` ${watering.unit}` : ''}
-                      </Text>
-                    </Group>
-                  )}
-                </Group>
-                {day.memo && (
-                  <Text size="xs" c="dimmed" style={{ whiteSpace: 'pre-wrap' }}>
-                    {day.memo}
-                  </Text>
-                )}
-                {day.materials.length > 0 && (
-                  <Group gap={6} wrap="wrap" mt={2}>
-                    {day.materials.map((m, idx) => (
-                      <Badge
-                        key={idx}
-                        variant="outline"
-                        color="primary"
-                        radius="sm"
-                        size="sm"
-                        tt="none"
-                      >
-                        {materialName(m.materialCode)}
-                        {typeof m.quantity === 'number'
-                          ? ` · ${formatNumber(m.quantity)}${m.unit ? ` ${m.unit}` : ''}`
-                          : ''}
-                      </Badge>
-                    ))}
-                  </Group>
-                )}
-              </Stack>
-            </Card>
-          ))}
-        </Stack>
+        <ProcessPlanView plan={plan} />
       </SectionCard>
     </Stack>
   );

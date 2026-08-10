@@ -52,7 +52,8 @@
         "status": "Trạng thái"
       },
       "list": {
-        "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…"
+        "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…",
+        "stats": "Thống kê"
       },
       "validation": {
         "invalidDateTime": "Ngày giờ không hợp lệ — ví dụ {{example}}"
@@ -784,13 +785,6 @@
   },
   "cropDiaries": {
     "addItem": "Thêm mục",
-    "applyConfirm": {
-      "duplicateWarning": "Nhật ký này đã có {{existing}} mục từ mẫu — áp dụng lần nữa sẽ thêm một bản sao chứ không thay thế, và không thể hoàn tác hàng loạt.",
-      "message": "Áp dụng \"{{template}}\" vào nhật ký vụ mùa này? Sẽ tạo {{count}} mục, bắt đầu từ {{date}}.",
-      "title": "Áp dụng mẫu?"
-    },
-    "applyTemplateButton": "Áp dụng",
-    "applyTemplatePlaceholder": "Áp dụng mẫu…",
     "columns": {
       "activity": "Hoạt động",
       "crop": "Vụ mùa",
@@ -918,6 +912,54 @@
       "updateError": "Không cập nhật được mẫu",
       "updateSuccess": "Đã cập nhật mẫu"
     },
+    "plan": {
+      "addColumn": "Thêm cột",
+      "addPreparation": "Thêm việc chuẩn bị",
+      "addStage": "Thêm giai đoạn",
+      "adjustmentRate": "Tỉ lệ điều chỉnh",
+      "adjustmentRateHint": "Mức chạy của quy trình, dạng phân số. 0,95 nghĩa là liều bên dưới đã bằng 95% công thức gốc.",
+      "columnKind": "Loại",
+      "columnLabel": "Cột",
+      "columnLabelPlaceholder": "VD: CANXI (N)",
+      "columnMaterial": "Vật tư",
+      "columnMaterialPlaceholder": "Chọn vật tư",
+      "columnTank": "Bồn",
+      "columnsSection": "Các cột",
+      "columnsSectionHint": "Những gì ghi nhận mỗi ngày. Cột liều là vật tư thật, nên được cộng vào tổng vụ và chi phí.",
+      "day": "Ngày",
+      "gridNeedsColumns": "Hãy thêm cột trước — bảng chưa có gì để ghi.",
+      "gridSection": "Kế hoạch theo ngày",
+      "gridSectionHint": "Mỗi ngày một dòng. Ô không phải số sẽ được giữ nguyên chữ, để ngày ngưng bón vẫn ghi được.",
+      "importUnmatched": "Không khớp vật tư: {{names}}. Các cột vẫn được giữ — hãy chọn vật tư để liên kết.",
+      "importedColumns": "Đã nhập {{columns}} cột trong {{days}} ngày",
+      "kind": {
+        "material": "Liều (vật tư)",
+        "number": "Chỉ số",
+        "perPlant": "Trên mỗi cây",
+        "text": "Văn bản"
+      },
+      "moveDown": "Xuống",
+      "moveUp": "Lên",
+      "noColumns": "Chưa có cột nào.",
+      "noPreparation": "Chưa có việc chuẩn bị.",
+      "noStages": "Chưa có giai đoạn — cả vụ tính là một.",
+      "prepActivity": "Nội dung",
+      "prepLabel": "Mục",
+      "prepOffset": "Lệch ngày",
+      "preparationSection": "Trước khi xuống giống",
+      "preparationSectionHint": "Việc làm trước ngày 1 — ngâm hạt, thanh growbag, khử trùng vườn. Lưu theo độ lệch (−14 = trước khi trồng hai tuần) để một quy trình dùng cho mọi vụ; mỗi vụ tự quy ra ngày thật.",
+      "referencePlantCount": "Viết cho (số cây)",
+      "referencePlantCountHint": "Số cây mà liều bên dưới được viết cho. Vụ có số cây khác sẽ tự quy đổi.",
+      "sizingSection": "Quy mô",
+      "stage": "Giai đoạn",
+      "stageFrom": "Từ ngày",
+      "stageName": "Giai đoạn",
+      "stageTo": "Đến ngày",
+      "stagesSection": "Giai đoạn",
+      "stagesSectionHint": "Các khoảng ngày có tên. Lưu theo khoảng, nên hai ngày trong cùng khoảng không thể lệch nhau.",
+      "totalDays": "Tổng số ngày",
+      "totalsTitle": "Tổng cả vụ"
+    },
     "searchPlaceholder": "Tìm mẫu…",
     "stepCount": "{{count}} bước",
     "stepCount_one": "{{count}} bước",
@@ -931,22 +973,6 @@
       "activityRequired": "Thêm ít nhất một ngày có hoạt động",
       "stepsRequired": "Thêm ít nhất một bước có hoạt động",
       "totalDatesRequired": "Tổng số ngày phải lớn hơn 0"
-    },
-    "watering": {
-      "activityLabel": "Tên hoạt động",
-      "activityPlaceholder": "VD: Tưới nước",
-      "dayLabel": "Nước mỗi cây",
-      "dayPlaceholder": "Nước",
-      "empty": "Chưa có lịch tưới — điền một khoảng ngày ở trên, hoặc nhập trực tiếp vào từng ngày bên dưới.",
-      "fill": "Điền",
-      "fromDayLabel": "Từ ngày",
-      "perPlantLabel": "Mỗi cây",
-      "section": "Tưới nước",
-      "sectionHint": "Điền lượng nước cho một khoảng ngày — giá trị sẽ ghi vào các ngày bên dưới, và bạn có thể sửa riêng từng ngày.",
-      "toDayLabel": "Đến ngày",
-      "unitLabel": "ĐVT",
-      "unitPlaceholder": "L",
-      "window": "Ngày {{from}}–{{to}}"
     }
   },
   "crops": {
@@ -1026,6 +1052,29 @@
     "sectionEmptyActive": "Chưa có vụ mùa đang canh tác trong nhà màng này.",
     "sectionEmptyHarvested": "Không có vụ mùa đã thu hoạch trong khoảng thời gian đã chọn.",
     "sectionTitle": "Vụ mùa",
+    "sheet": {
+      "adjustmentRate": "Tỉ lệ",
+      "conflictMessage": "Người khác đã lưu quy trình của vụ này trong lúc bạn đang sửa. Thay đổi chưa lưu đã bị bỏ và bảng được tải lại — vui lòng nhập lại.",
+      "conflictTitle": "Đã tải lại — quy trình có thay đổi",
+      "empty": "Vụ này chưa có quy trình.",
+      "loadError": "Không tải được quy trình của vụ",
+      "noTotals": "Chưa tiêu hao gì.",
+      "plantCount": "Số cây",
+      "saveError": "Không lưu được quy trình",
+      "saveSuccess": "Đã lưu quy trình",
+      "seed": "Tạo từ mẫu",
+      "seedError": "Không tạo được quy trình",
+      "seedNoPlan": "Mẫu này chưa có quy trình — hãy khai báo các cột trước.",
+      "seedSuccess": "Đã tạo quy trình",
+      "title": "Quy trình & nhật ký",
+      "totalsCost": "Chi phí",
+      "totalsCostAll": "Chi phí cả vụ",
+      "totalsDays": "Số ngày",
+      "totalsForCrop": "Vụ này",
+      "totalsPlanned": "Theo mẫu",
+      "unpricedMaterials": "Chưa có giá vốn cho: {{names}}. Chi phí cả vụ bên dưới chưa gồm các mục này.",
+      "unsaved": "Chưa lưu"
+    },
     "status": {
       "growing": "Đang trồng",
       "harvested": "Đã thu hoạch",
@@ -3231,6 +3280,7 @@
         "canBulkImport": "Nhập hàng loạt qua Excel",
         "canConfirmReceived": "Xác nhận nhập kho",
         "canEditDeliveryPackageSize": "Sửa kích thước kiện hàng",
+        "canExport": "Xuất Excel",
         "canIssueMagicLink": "Tạo liên kết đăng nhập",
         "canManageInventory": "Quản lý tồn kho",
         "canManagePhotos": "Quản lý ảnh",
@@ -4031,6 +4081,10 @@
       "createError": "Tạo đơn vận chuyển thất bại",
       "created": "Đã tạo đơn vận chuyển",
       "deleted": "Đã xóa đơn vận chuyển",
+      "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
+      "exportError": "Xuất đơn vận chuyển thất bại.",
+      "exportSuccess_one": "Đã xuất {{count}} đơn vận chuyển.",
+      "exportSuccess_other": "Đã xuất {{count}} đơn vận chuyển.",
       "loadError": "Không tải được đơn vận chuyển",
       "mobileFormBlocked": "Chỉnh sửa đơn vận chuyển chỉ khả dụng trên máy tính.",
       "saveError": "Lưu thay đổi thất bại",
@@ -4057,6 +4111,9 @@
       "import": "Nhập"
     },
     "stats": {
+      "balanceDue": "Còn phải thu",
+      "driverPay": "Lương chuyến",
+      "revenue": "Doanh thu",
       "total": "Tổng"
     },
     "statusChange": {

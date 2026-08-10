@@ -562,6 +562,8 @@ const CompanyInfoSchema = z
 export type CompanyInfoConfig = z.infer<typeof CompanyInfoSchema>;
 
 export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
+  schemaVersion: z.number().int().optional(),
+
   companyInfo: CompanyInfoSchema,
   features: FeaturesSchema,
   layout: LayoutSchema,

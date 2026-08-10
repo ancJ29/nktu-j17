@@ -52,7 +52,8 @@
         "status": "Status"
       },
       "list": {
-        "loadingMore": "Loading {{chunk}} more of {{total}}…"
+        "loadingMore": "Loading {{chunk}} more of {{total}}…",
+        "stats": "Stats"
       },
       "validation": {
         "invalidDateTime": "Unrecognised date/time — e.g. {{example}}"
@@ -784,13 +785,6 @@
   },
   "cropDiaries": {
     "addItem": "Add Entry",
-    "applyConfirm": {
-      "duplicateWarning": "This diary already has {{existing}} entries from a template — applying again adds a second copy instead of replacing them, and there is no bulk undo.",
-      "message": "Apply \"{{template}}\" to this crop's diary? It creates {{count}} entries, starting {{date}}.",
-      "title": "Apply template?"
-    },
-    "applyTemplateButton": "Apply",
-    "applyTemplatePlaceholder": "Apply a template…",
     "columns": {
       "activity": "Activity",
       "crop": "Crop",
@@ -918,6 +912,54 @@
       "updateError": "Failed to update template",
       "updateSuccess": "Template updated"
     },
+    "plan": {
+      "addColumn": "Add column",
+      "addPreparation": "Add preparation job",
+      "addStage": "Add stage",
+      "adjustmentRate": "Adjustment rate",
+      "adjustmentRateHint": "How hard this process runs, as a fraction. 0.95 means the doses below are already 95% of the underlying recipe.",
+      "columnKind": "Type",
+      "columnLabel": "Column",
+      "columnLabelPlaceholder": "e.g. CANXI (N)",
+      "columnMaterial": "Material",
+      "columnMaterialPlaceholder": "Pick a material",
+      "columnTank": "Tank",
+      "columnsSection": "Columns",
+      "columnsSectionHint": "What the grid records each day. A dose column is a real material, so it reaches the season total and the cost.",
+      "day": "Day",
+      "gridNeedsColumns": "Add a column first — the grid has nothing to record yet.",
+      "gridSection": "Day plan",
+      "gridSectionHint": "One row per day. A cell that is not a number is kept as written, so a day that skips feeding can say so.",
+      "importUnmatched": "No material matched: {{names}}. The columns were kept — link them by picking a material.",
+      "importedColumns": "Imported {{columns}} columns over {{days}} days",
+      "kind": {
+        "material": "Dose (material)",
+        "number": "Measurement",
+        "perPlant": "Per plant",
+        "text": "Text"
+      },
+      "moveDown": "Move down",
+      "moveUp": "Move up",
+      "noColumns": "No columns yet.",
+      "noPreparation": "No preparation jobs.",
+      "noStages": "No stages yet — the whole cycle reads as one.",
+      "prepActivity": "What is done",
+      "prepLabel": "Section",
+      "prepOffset": "Day offset",
+      "preparationSection": "Before planting",
+      "preparationSectionHint": "Work that happens before day 1 — soaking seed, preparing growbags, sterilising the house. Stored as an offset (−14 = a fortnight before planting), so one process serves every crop; each crop turns it into real dates.",
+      "referencePlantCount": "Written for (plants)",
+      "referencePlantCountHint": "The house size the doses below were written for. A crop with a different plant count rescales them automatically.",
+      "sizingSection": "Sizing",
+      "stage": "Stage",
+      "stageFrom": "From day",
+      "stageName": "Stage",
+      "stageTo": "To day",
+      "stagesSection": "Stages",
+      "stagesSectionHint": "Named spans of the cycle. Stored as day ranges, so two days in one span can never disagree.",
+      "totalDays": "Total days",
+      "totalsTitle": "Season totals"
+    },
     "searchPlaceholder": "Search templates…",
     "stepCount": "{{count}} steps",
     "stepCount_one": "{{count}} step",
@@ -931,22 +973,6 @@
       "activityRequired": "Add at least one day with an activity",
       "stepsRequired": "Add at least one step with an activity",
       "totalDatesRequired": "Total days must be at least 1"
-    },
-    "watering": {
-      "activityLabel": "Activity name",
-      "activityPlaceholder": "e.g. Watering",
-      "dayLabel": "Water per plant",
-      "dayPlaceholder": "Water",
-      "empty": "No watering yet — fill a day range above, or type into a day below.",
-      "fill": "Fill",
-      "fromDayLabel": "From day",
-      "perPlantLabel": "Per plant",
-      "section": "Watering",
-      "sectionHint": "Fill a day range with an amount per plant — the values land on the days below, where you can adjust any single day.",
-      "toDayLabel": "To day",
-      "unitLabel": "Unit",
-      "unitPlaceholder": "L",
-      "window": "Day {{from}}–{{to}}"
     }
   },
   "crops": {
@@ -1026,6 +1052,29 @@
     "sectionEmptyActive": "No active crops in this greenhouse yet.",
     "sectionEmptyHarvested": "No harvested crops in the selected range.",
     "sectionTitle": "Crops",
+    "sheet": {
+      "adjustmentRate": "Rate",
+      "conflictMessage": "Someone else saved this crop's plan while you were editing. Your unsaved changes were dropped and the grid reloaded — re-enter them.",
+      "conflictTitle": "Reloaded — the plan changed",
+      "empty": "This crop has no plan yet.",
+      "loadError": "Could not load the crop's plan",
+      "noTotals": "Nothing consumed yet.",
+      "plantCount": "Plants",
+      "saveError": "Could not save the plan",
+      "saveSuccess": "Plan saved",
+      "seed": "Create from template",
+      "seedError": "Could not create the plan",
+      "seedNoPlan": "That template has no process yet — author its columns first.",
+      "seedSuccess": "Plan created",
+      "title": "Plan & diary",
+      "totalsCost": "Cost",
+      "totalsCostAll": "Season cost",
+      "totalsDays": "Days",
+      "totalsForCrop": "This crop",
+      "totalsPlanned": "Per template",
+      "unpricedMaterials": "No cost price set for: {{names}}. The season cost below excludes them.",
+      "unsaved": "Unsaved"
+    },
     "status": {
       "growing": "Growing",
       "harvested": "Harvested",
@@ -3231,6 +3280,7 @@
         "canBulkImport": "Bulk Import via Excel",
         "canConfirmReceived": "Confirm Received",
         "canEditDeliveryPackageSize": "Edit Delivery Package Size",
+        "canExport": "Export Excel",
         "canIssueMagicLink": "Issue Magic Link",
         "canManageInventory": "Manage Inventory",
         "canManagePhotos": "Manage Photos",
@@ -4031,6 +4081,10 @@
       "createError": "Failed to create transport order",
       "created": "Transport order created",
       "deleted": "Transport order deleted",
+      "exportEmpty": "Nothing to export — adjust the filters and try again.",
+      "exportError": "Failed to export transport orders.",
+      "exportSuccess_one": "Exported {{count}} order.",
+      "exportSuccess_other": "Exported {{count}} orders.",
       "loadError": "Failed to load transport orders",
       "mobileFormBlocked": "Transport-order editing is available on desktop only.",
       "saveError": "Failed to save changes",
@@ -4057,6 +4111,9 @@
       "import": "Import"
     },
     "stats": {
+      "balanceDue": "Balance due",
+      "driverPay": "Driver pay",
+      "revenue": "Revenue",
       "total": "Total"
     },
     "statusChange": {

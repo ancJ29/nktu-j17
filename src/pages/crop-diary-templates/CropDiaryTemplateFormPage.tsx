@@ -9,61 +9,53 @@ import {
   SimpleGrid,
   Stack,
   Text,
-  TextInput,
   Textarea,
+  TextInput,
   ThemeIcon,
   Title,
 } from '@mantine/core';
-import { useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
+  IconCalendar,
   IconClipboardList,
   IconDeviceFloppy,
   IconDownload,
-  IconDroplet,
   IconFileSpreadsheet,
   IconHash,
   IconUpload,
 } from '@tabler/icons-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useForm } from '@mantine/form';
+import { notifications } from '@mantine/notifications';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
+import { Form } from '@/components/Form';
+import { ROUTES } from '@/constants/routes';
+import { device } from '@credo/base-ui/utils';
+import { useInitFormFromFetch } from '@/hooks';
 import {
   useCropDiaryTemplateStore,
   CROP_DIARY_TEMPLATE_RECORD_TARGET,
 } from '@/stores/useCropDiaryTemplateStore';
+import { useMaterialStore } from '@/stores/useMaterialStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
-import { device } from '@credo/base-ui/utils';
-import { useInitFormFromFetch } from '@/hooks';
-import {
-  cleanDays,
-  cleanWatering,
-  dayHasContent,
-  daysToRows,
-  deriveSteps,
-  makeEmptyDay,
-  resizeDays,
-  rowsToDays,
-  templateWatering,
-} from '@/utils/cropDiaryTemplateModel';
-import {
-  downloadCropDiaryTemplateSample,
-  exportCropDiaryTemplateRows,
-  parseCropDiaryTemplateFile,
-} from '@/utils/cropDiaryTemplateExcel';
+import { cleanPlan, resizeSheetDays } from '@/utils/cropSheetModel';
+import { exportCropSheet, parseCropSheetFile } from '@/utils/cropSheetExcel';
 import { perms } from '@/utils/permission';
 import type {
   CropDiaryTemplate,
   CropDiaryTemplateExtra,
-  CropTemplateWatering,
-  TemplateDay,
+  CropProcessPlan,
+  SheetColumn,
+  PlanPreparation,
+  SheetDay,
+  SheetStage,
 } from '@/types';
-import { TemplateDaysEditor } from './TemplateDaysEditor';
-import { WateringPlanEditor } from './WateringPlanEditor';
-import { Form } from '@/components/Form';
+import { ProcessColumnsEditor } from './plan/ProcessColumnsEditor';
+import { ProcessGridEditor } from './plan/ProcessGridEditor';
+import { ProcessPreparationEditor } from './plan/ProcessPreparationEditor';
+import { ProcessStagesEditor } from './plan/ProcessStagesEditor';
 
 const isMobile = device.isMobile;
 
@@ -71,24 +63,19 @@ type FormValues = {
   code: string;
   name: string;
   description: string;
-  totalDates: number | string;
-  days: TemplateDay[];
-  watering: CropTemplateWatering;
+  totalDays: number | string;
+  columns: SheetColumn[];
+  stages: SheetStage[];
+  days: SheetDay[];
+  preparation: PlanPreparation[];
+  referencePlantCount: number | string;
+  adjustmentRate: number | string;
 };
 
-const BLANK_WATERING: CropTemplateWatering = { activity: '', unit: '' };
-
-function daysFromTemplate(tpl: CropDiaryTemplate): TemplateDay[] {
-  if (tpl.extra?.days?.length) return tpl.extra.days;
-  if (tpl.steps.length) {
-    return tpl.steps.map((s, i) => ({
-      day: i + 1,
-      activity: s.activity,
-      materials: [],
-      ...(s.defaultNotes && { memo: s.defaultNotes }),
-    }));
-  }
-  return [makeEmptyDay(1)];
+function planOf(tpl: CropDiaryTemplate): CropProcessPlan {
+  return (
+    tpl.extra?.plan ?? { columns: [], stages: [], totalDays: 1, days: [{ day: 1, values: {} }] }
+  );
 }
 
 export function CropDiaryTemplateFormPage() {
@@ -111,22 +98,42 @@ export function CropDiaryTemplateFormPage() {
   const resetFileRef = useRef<() => void>(null);
   const snapshotRef = useRef<CropDiaryTemplate | null>(null);
 
+  const materials = useMaterialStore((s) => s.items);
+  const materialsInitialized = useMaterialStore((s) => s.initialized);
+  const loadMaterials = useMaterialStore((s) => s.loadAll);
+  useEffect(() => {
+    if (!materialsInitialized) loadMaterials();
+  }, [materialsInitialized, loadMaterials]);
+
+  const resolveMaterialCode = useMemo(() => {
+    const byName = new Map<string, string>();
+    for (const m of materials) {
+      byName.set(m.name.trim().toLowerCase(), m.code);
+      byName.set(m.code.trim().toLowerCase(), m.code);
+    }
+    return (label: string) => byName.get(label.trim().toLowerCase());
+  }, [materials]);
+
   const form = useForm<FormValues>({
     initialValues: {
       code: '',
       name: '',
       description: '',
-      totalDates: 1,
-      days: [makeEmptyDay(1)],
-      watering: BLANK_WATERING,
+      totalDays: 1,
+      columns: [],
+      stages: [],
+      days: [{ day: 1, values: {} }],
+      preparation: [],
+      referencePlantCount: '',
+      adjustmentRate: '',
     },
     validate: {
       code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
-      totalDates: (v) =>
+      totalDays: (v) =>
         v !== '' && Number(v) >= 1 ? null : t('cropDiaryTemplates.validation.totalDatesRequired'),
-      days: (days) =>
-        days.some((d) => d.activity.trim())
+      columns: (columns) =>
+        columns.some((c) => c.label.trim())
           ? null
           : t('cropDiaryTemplates.validation.activityRequired'),
     },
@@ -141,14 +148,18 @@ export function CropDiaryTemplateFormPage() {
       });
       const tpl = res.item as CropDiaryTemplate;
       snapshotRef.current = tpl;
-      const days = daysFromTemplate(tpl);
+      const plan = planOf(tpl);
       return {
         code: tpl.code,
         name: tpl.name,
         description: tpl.extra?.description ?? '',
-        totalDates: days.length,
-        days,
-        watering: templateWatering(tpl) ?? BLANK_WATERING,
+        totalDays: plan.totalDays,
+        columns: plan.columns,
+        stages: plan.stages,
+        days: resizeSheetDays(plan.days, plan.totalDays),
+        preparation: plan.preparation ?? [],
+        referencePlantCount: plan.referencePlantCount ?? '',
+        adjustmentRate: plan.referenceAdjustmentRate ?? '',
       };
     },
     () => {
@@ -160,48 +171,79 @@ export function CropDiaryTemplateFormPage() {
     },
   );
 
-  const handleTotalDatesChange = useCallback(
+  const handleTotalDaysChange = useCallback(
     (v: number | string) => {
       const n = v === '' ? 0 : Math.floor(Number(v));
-      form.setFieldValue('totalDates', v);
-      form.setFieldValue('days', resizeDays(form.getValues().days, n));
+      form.setFieldValue('totalDays', v);
+      form.setFieldValue('days', resizeSheetDays(form.getValues().days, n));
     },
     [form],
   );
 
+  const handleColumnsChange = useCallback(
+    (columns: SheetColumn[]) => form.setFieldValue('columns', columns),
+    [form],
+  );
+  const handleStagesChange = useCallback(
+    (stages: SheetStage[]) => form.setFieldValue('stages', stages),
+    [form],
+  );
   const handleDaysChange = useCallback(
-    (days: TemplateDay[]) => form.setFieldValue('days', days),
+    (days: SheetDay[]) => form.setFieldValue('days', days),
+    [form],
+  );
+  const handlePreparationChange = useCallback(
+    (preparation: PlanPreparation[]) => form.setFieldValue('preparation', preparation),
     [form],
   );
 
-  const handleWateringChange = useCallback(
-    (watering: CropTemplateWatering) => form.setFieldValue('watering', watering),
-    [form],
-  );
+  const currentPlan = useCallback((): CropProcessPlan => {
+    const values = form.getValues();
+    return cleanPlan({
+      columns: values.columns,
+      stages: values.stages,
+      totalDays: Number(values.totalDays) || 0,
+      days: values.days,
+      ...(values.preparation.length && { preparation: values.preparation }),
+      ...(Number(values.referencePlantCount) > 0 && {
+        referencePlantCount: Number(values.referencePlantCount),
+      }),
+      ...(Number(values.adjustmentRate) > 0 && {
+        referenceAdjustmentRate: Number(values.adjustmentRate),
+      }),
+    });
+  }, [form]);
 
   const handleImport = useCallback(
     async (file: File | null) => {
       if (!file) return;
       try {
-        const rows = await parseCropDiaryTemplateFile(file);
-        const { days, unknownMaterials } = rowsToDays(rows, (code: string) => code);
-        if (unknownMaterials.length > 0) {
-          notifications.show({
-            color: 'red',
-            message: t('cropDiaryTemplates.excel.unknownMaterials', {
-              names: unknownMaterials.join(', '),
-            }),
-            autoClose: 10000,
-          });
-          return;
-        }
-        const next = days.length ? days : [makeEmptyDay(1)];
-        form.setFieldValue('totalDates', next.length);
-        form.setFieldValue('days', next);
+        const parsed = await parseCropSheetFile(file, { resolveMaterialCode });
+        form.setFieldValue('totalDays', parsed.plan.totalDays);
+        form.setFieldValue('columns', parsed.plan.columns);
+        form.setFieldValue('stages', parsed.plan.stages);
+        form.setFieldValue('days', parsed.plan.days);
+        form.setFieldValue('referencePlantCount', parsed.plan.referencePlantCount ?? '');
+        form.setFieldValue('adjustmentRate', parsed.plan.referenceAdjustmentRate ?? '');
+
         notifications.show({
           color: 'green',
-          message: t('cropDiaryTemplates.excel.importSuccess', { count: next.length }),
+          message: t('cropDiaryTemplates.plan.importedColumns', {
+            columns: parsed.plan.columns.length,
+            days: parsed.plan.totalDays,
+          }),
         });
+
+        const unlinked = parsed.plan.columns
+          .filter((c) => c.kind === 'material' && !c.materialCode)
+          .map((c) => c.label);
+        if (unlinked.length) {
+          notifications.show({
+            color: 'yellow',
+            message: t('cropDiaryTemplates.plan.importUnmatched', { names: unlinked.join(', ') }),
+            autoClose: 12000,
+          });
+        }
       } catch {
         notifications.show({
           color: 'red',
@@ -212,64 +254,40 @@ export function CropDiaryTemplateFormPage() {
         resetFileRef.current?.();
       }
     },
-    [form, t],
-  );
-
-  const excelLabels = useCallback(
-    () => ({
-      day: t('cropDiaryTemplates.excel.colDay'),
-      activity: t('cropDiaryTemplates.excel.colActivity'),
-      material: t('cropDiaryTemplates.excel.colMaterial'),
-      quantity: t('cropDiaryTemplates.excel.colQuantity'),
-      unit: t('cropDiaryTemplates.excel.colUnit'),
-      memo: t('__new__.01-common.labels.note'),
-      sheetName: t('cropDiaryTemplates.excel.sheetName'),
-    }),
-    [t],
+    [form, t, resolveMaterialCode],
   );
 
   const handleExport = useCallback(() => {
-    const days = cleanDays(form.getValues().days);
-    if (!days.some(dayHasContent)) {
+    const plan = currentPlan();
+    if (!plan.columns.length) {
       notifications.show({ color: 'red', message: t('cropDiaryTemplates.excel.nothingToExport') });
       return;
     }
-    const rows = daysToRows(days, (code: string) => code);
     const code = form.getValues().code.trim() || 'template';
-    exportCropDiaryTemplateRows(rows, excelLabels(), `crop_diary_template_${code}.xlsx`);
-  }, [form, t, excelLabels]);
-
-  const handleDownloadSample = useCallback(() => {
-    const placeholder = t('cropDiaryTemplates.excel.sampleMaterial');
-    downloadCropDiaryTemplateSample(
-      excelLabels(),
+    exportCropSheet(
+      plan,
       {
-        activityWithMaterial: t('cropDiaryTemplates.excel.sampleActivityWithMaterial'),
-        activityPlain: t('cropDiaryTemplates.excel.sampleActivityPlain'),
-        memo: t('cropDiaryTemplates.excel.sampleMemo'),
-        materialNames: [placeholder, placeholder],
-        unit: 'kg',
+        stage: t('cropDiaryTemplates.plan.stage'),
+        day: t('cropDiaryTemplates.plan.day'),
+        date: 'Ngày thực tế',
+        weekday: 'Thứ',
+        totals: 'TỔNG PHÂN',
+        sheetName: t('cropDiaryTemplates.excel.sheetName'),
       },
-      'crop_diary_template_sample.xlsx',
+      `crop_process_${code}.xlsx`,
     );
-  }, [t, excelLabels]);
+  }, [currentPlan, form, t]);
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
       setLoading(true);
       try {
-        const days = cleanDays(values.days);
-        const steps = deriveSteps(days);
+        const plan = currentPlan();
         const buildExtra = (base?: CropDiaryTemplateExtra): CropDiaryTemplateExtra => {
           const extra: CropDiaryTemplateExtra = { ...(base ?? {}) };
           if (values.description.trim()) extra.description = values.description.trim();
           else delete extra.description;
-          extra.totalDates = days.length;
-          extra.days = days;
-
-          const watering = cleanWatering(values.watering);
-          if (watering) extra.watering = watering;
-          else delete extra.watering;
+          extra.plan = plan;
           return extra;
         };
 
@@ -282,7 +300,6 @@ export function CropDiaryTemplateFormPage() {
             patch: {
               code: values.code.trim(),
               name: values.name.trim(),
-              steps,
               extra: buildExtra(snapshot.extra),
             },
           });
@@ -297,7 +314,8 @@ export function CropDiaryTemplateFormPage() {
             patch: {
               code: values.code.trim(),
               name: values.name.trim(),
-              steps,
+
+              steps: [],
               extra: buildExtra(),
             },
           });
@@ -311,7 +329,7 @@ export function CropDiaryTemplateFormPage() {
         if (err instanceof EntityConflictError) {
           if (err.latest) snapshotRef.current = err.latest as CropDiaryTemplate;
           notifications.show({
-            color: 'yellow',
+            color: 'red',
             title: t('common.conflict.title'),
             message: t('common.conflict.message'),
             autoClose: 8000,
@@ -329,7 +347,7 @@ export function CropDiaryTemplateFormPage() {
         setLoading(false);
       }
     },
-    [isEdit, id, t, navigate],
+    [currentPlan, id, isEdit, navigate, t],
   );
 
   const navigateToList = useCallback(() => navigate(ROUTES.CROP_DIARY_TEMPLATES.LIST), [navigate]);
@@ -340,12 +358,13 @@ export function CropDiaryTemplateFormPage() {
   const saveLabel = isEdit
     ? t('__new__.01-common.actions.save')
     : t('cropDiaryTemplates.form.createButton');
+  const values = form.getValues();
 
   return (
     <Form form={form} onSubmit={handleSubmit}>
       <Stack gap="lg">
-        {/* Top action bar — Cancel + Save reachable without scrolling past a long
-            day plan. */}
+        {/* Top action bar — Cancel + Save reachable without scrolling past a
+            65-row grid. */}
         <Group justify="space-between">
           <Button
             onClick={() => window.history.back()}
@@ -401,20 +420,6 @@ export function CropDiaryTemplateFormPage() {
                   {...form.getInputProps('code')}
                 />
               </SimpleGrid>
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                <NumberInput
-                  label={t('cropDiaryTemplates.form.totalDatesLabel')}
-                  placeholder={t('cropDiaryTemplates.form.totalDatesPlaceholder')}
-                  withAsterisk
-                  min={1}
-                  max={365}
-                  allowNegative={false}
-                  allowDecimal={false}
-                  value={form.getValues().totalDates}
-                  onChange={handleTotalDatesChange}
-                  error={form.errors.totalDates}
-                />
-              </SimpleGrid>
               <Textarea
                 label={t('cropDiaryTemplates.form.descriptionLabel')}
                 placeholder={t('cropDiaryTemplates.form.descriptionPlaceholder')}
@@ -426,42 +431,101 @@ export function CropDiaryTemplateFormPage() {
             </Stack>
           </Card>
 
-          {/* Above the day plan: watering is the job that runs through every day
-              of the cycle, so it reads as the backdrop the dated work sits on. */}
+          {/* Sizing sits above the grid because it changes what every dose in it
+              means — the same numbers read differently at another house size. */}
           <Card withBorder radius="md" padding="lg">
-            <Group gap="xs" mb="xs">
-              <ThemeIcon size={28} radius="md" variant="light" color="primary">
-                <IconDroplet size={16} stroke={1.75} />
-              </ThemeIcon>
-              <Text fw={600} size="sm">
-                {t('cropDiaryTemplates.watering.section')}
-              </Text>
-            </Group>
-            <Text size="xs" c="dimmed" mb="md">
-              {t('cropDiaryTemplates.watering.sectionHint')}
+            <Text fw={600} size="sm" mb="xs">
+              {t('cropDiaryTemplates.plan.sizingSection')}
             </Text>
-            <WateringPlanEditor
-              value={form.getValues().watering}
-              onChange={handleWateringChange}
-              days={form.getValues().days}
-              onDaysChange={handleDaysChange}
+            <Divider mb="md" />
+            <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
+              <NumberInput
+                label={t('cropDiaryTemplates.plan.totalDays')}
+                description={' '}
+                withAsterisk
+                min={1}
+                max={365}
+                allowNegative={false}
+                allowDecimal={false}
+                value={values.totalDays}
+                onChange={handleTotalDaysChange}
+                error={form.errors.totalDays}
+              />
+              <NumberInput
+                label={t('cropDiaryTemplates.plan.referencePlantCount')}
+                description={t('cropDiaryTemplates.plan.referencePlantCountHint')}
+                min={0}
+                allowNegative={false}
+                allowDecimal={false}
+                thousandSeparator=","
+                {...form.getInputProps('referencePlantCount')}
+              />
+              <NumberInput
+                label={t('cropDiaryTemplates.plan.adjustmentRate')}
+                description={t('cropDiaryTemplates.plan.adjustmentRateHint')}
+                min={0}
+                max={2}
+                step={0.05}
+                decimalScale={3}
+                allowNegative={false}
+                {...form.getInputProps('adjustmentRate')}
+              />
+            </SimpleGrid>
+          </Card>
+
+          <Card withBorder radius="md" padding="lg">
+            <Text fw={600} size="sm">
+              {t('cropDiaryTemplates.plan.columnsSection')}
+            </Text>
+            <Text size="xs" c="dimmed" mb="md">
+              {t('cropDiaryTemplates.plan.columnsSectionHint')}
+            </Text>
+            <ProcessColumnsEditor columns={values.columns} onChange={handleColumnsChange} />
+            {typeof form.errors.columns === 'string' && (
+              <Text size="xs" c="red" mt="xs">
+                {form.errors.columns}
+              </Text>
+            )}
+          </Card>
+
+          <Card withBorder radius="md" padding="lg">
+            <Text fw={600} size="sm">
+              {t('cropDiaryTemplates.plan.preparationSection')}
+            </Text>
+            <Text size="xs" c="dimmed" mb="md">
+              {t('cropDiaryTemplates.plan.preparationSectionHint')}
+            </Text>
+            <ProcessPreparationEditor
+              preparation={values.preparation}
+              onChange={handlePreparationChange}
+            />
+          </Card>
+
+          <Card withBorder radius="md" padding="lg">
+            <Text fw={600} size="sm">
+              {t('cropDiaryTemplates.plan.stagesSection')}
+            </Text>
+            <Text size="xs" c="dimmed" mb="md">
+              {t('cropDiaryTemplates.plan.stagesSectionHint')}
+            </Text>
+            <ProcessStagesEditor
+              stages={values.stages}
+              totalDays={Number(values.totalDays) || 1}
+              onChange={handleStagesChange}
             />
           </Card>
 
           <Card withBorder radius="md" padding="lg">
             <Group justify="space-between" mb="xs" wrap="wrap">
-              <Text fw={600} size="sm">
-                {t('cropDiaryTemplates.form.daysSection')}
-              </Text>
               <Group gap="xs">
-                <Button
-                  size="compact-sm"
-                  variant="subtle"
-                  leftSection={<IconFileSpreadsheet size={14} />}
-                  onClick={handleDownloadSample}
-                >
-                  {t('cropDiaryTemplates.excel.sample')}
-                </Button>
+                <ThemeIcon size={28} radius="md" variant="light" color="primary">
+                  <IconCalendar size={16} stroke={1.75} />
+                </ThemeIcon>
+                <Text fw={600} size="sm">
+                  {t('cropDiaryTemplates.plan.gridSection')}
+                </Text>
+              </Group>
+              <Group gap="xs">
                 <FileButton onChange={handleImport} accept=".xlsx,.xls" resetRef={resetFileRef}>
                   {(props) => (
                     <Button
@@ -484,20 +548,20 @@ export function CropDiaryTemplateFormPage() {
                 </Button>
               </Group>
             </Group>
+            <Text size="xs" c="dimmed" mb="md">
+              <IconFileSpreadsheet size={12} style={{ verticalAlign: 'middle', marginRight: 4 }} />
+              {t('cropDiaryTemplates.plan.gridSectionHint')}
+            </Text>
             <Divider mb="md" />
-            {/* Bounded scroll region so a long day plan stays inside the card. */}
-            <ScrollArea.Autosize mah="calc(100vh - 420px)" type="auto" offsetScrollbars>
-              <TemplateDaysEditor
-                days={form.getValues().days}
+            {/* Bounded scroll region so a 65-day grid stays inside the card. */}
+            <ScrollArea.Autosize mah="calc(100vh - 340px)" type="auto" offsetScrollbars>
+              <ProcessGridEditor
+                columns={values.columns}
+                days={values.days}
+                stages={values.stages}
                 onChange={handleDaysChange}
-                waterUnit={form.getValues().watering.unit?.trim() || undefined}
               />
             </ScrollArea.Autosize>
-            {typeof form.errors.days === 'string' && (
-              <Text size="xs" c="red" mt="xs">
-                {form.errors.days}
-              </Text>
-            )}
           </Card>
         </Stack>
       </Stack>

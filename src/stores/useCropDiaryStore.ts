@@ -11,9 +11,10 @@ export async function queryCropDiary(cropId: string): Promise<CropDiaryEntry[]> 
   const res = await cMngtConnector.queryPartitionedRecordsSync(CROP_DIARY_TARGET, {
     partitionKeys: [cropId],
   });
-  const entries: CropDiaryEntry[] = res.changed
+  const records: CropDiaryEntry[] = res.changed
     ? ((res.updated[cropId] ?? []) as CropDiaryEntry[])
     : [];
+  const entries = records.filter((r) => (r as { kind?: string }).kind !== 'sheet');
   return entries.sort((a, b) =>
     String(b.entryDate).slice(0, 10).localeCompare(String(a.entryDate).slice(0, 10)),
   );
@@ -27,6 +28,7 @@ export async function createCropDiaryEntry(input: {
   extra?: CropDiaryExtra;
 }): Promise<CropDiaryEntry> {
   const item: Record<string, unknown> = {
+    kind: 'event',
     cropId: input.cropId,
     cropCode: input.cropCode,
     entryDate: input.entryDate,

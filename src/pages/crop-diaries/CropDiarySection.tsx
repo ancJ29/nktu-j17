@@ -5,7 +5,6 @@ import {
   Divider,
   Group,
   Loader,
-  Select,
   SimpleGrid,
   Stack,
   Text,
@@ -16,14 +15,13 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconFileText, IconPencil, IconPlus, IconTemplate, IconTrash } from '@tabler/icons-react';
+import { IconFileText, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { DatePickerField } from '@/components/DatePickerField';
 import { MaterialLinesEditor } from '@/components/MaterialLinesEditor';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
-import { useCropDiaryTemplateStore } from '@/stores/useCropDiaryTemplateStore';
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import {
   createCropDiaryEntry,
@@ -31,19 +29,12 @@ import {
   queryCropDiary,
   updateCropDiaryEntry,
 } from '@/stores/useCropDiaryStore';
-import { applyTemplateToCropDiary } from '@/utils/cropDiaryTemplateApply';
 import { aggregateCropMaterials, type CropMaterialTotal } from '@/utils/cropMaterialSummary';
-import { buildAllTemplateEntries } from '@/utils/cropDiaryTemplateModel';
 import { formatDate } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { formatNumber } from '@/utils/number';
 import { perms } from '@/utils/permission';
-import type {
-  CropDiaryEntry,
-  CropDiaryExtra,
-  CropDiaryTemplate,
-  TemplateMaterialLine,
-} from '@/types';
+import type { CropDiaryEntry, CropDiaryExtra, TemplateMaterialLine } from '@/types';
 import { Form } from '@/components/Form';
 
 function cleanMaterialLines(lines: TemplateMaterialLine[]): TemplateMaterialLine[] {
@@ -64,10 +55,6 @@ type Props = {
   readonly cropId: string;
   readonly cropCode: string;
 
-  readonly defaultStartDate?: string;
-
-  readonly plantCount?: number;
-
   readonly onSummaryChange?: (summary: CropMaterialTotal[]) => void;
 };
 
@@ -75,7 +62,6 @@ const canView = perms.cropDiary.canView();
 const canCreate = perms.cropDiary.canCreate();
 const canEdit = perms.cropDiary.canEdit();
 const canDelete = perms.cropDiary.canDelete();
-const canViewTemplates = perms.cropDiaryTemplate.canView();
 
 type EntryFormValues = {
   entryDate: string;
@@ -84,26 +70,11 @@ type EntryFormValues = {
   materials: TemplateMaterialLine[];
 };
 
-export function CropDiarySection({
-  cropId,
-  cropCode,
-  defaultStartDate,
-  plantCount,
-  onSummaryChange,
-}: Props) {
+export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
   const { t } = useTranslation();
 
   const [entries, setEntries] = useState<CropDiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const [applying, setApplying] = useState(false);
-  const [templateCode, setTemplateCode] = useState<string | null>(null);
-  const [applyDate, setApplyDate] = useState(defaultStartDate ?? todayInVnDateString());
-
-  const [pendingApply, setPendingApply] = useState<{
-    template: CropDiaryTemplate;
-    count: number;
-  } | null>(null);
 
   const [formOpened, formHandlers] = useDisclosure(false);
   const [editing, setEditing] = useState<CropDiaryEntry | null>(null);
@@ -111,10 +82,6 @@ export function CropDiarySection({
 
   const [deleteTarget, setDeleteTarget] = useState<CropDiaryEntry | null>(null);
   const [deleting, setDeleting] = useState(false);
-
-  const templates = useCropDiaryTemplateStore((s) => s.items);
-  const templatesInit = useCropDiaryTemplateStore((s) => s.initialized);
-  const loadTemplates = useCropDiaryTemplateStore((s) => s.loadAll);
 
   const materials = useMaterialStore((s) => s.items);
   const materialsInit = useMaterialStore((s) => s.initialized);
@@ -148,14 +115,8 @@ export function CropDiarySection({
     if (!canView) return;
 
     load();
-    if (canViewTemplates && !templatesInit) loadTemplates();
     if (!materialsInit) loadMaterials();
-  }, [load, templatesInit, loadTemplates, materialsInit, loadMaterials]);
-
-  const templateOptions = useMemo(
-    () => templates.map((tpl) => ({ value: tpl.code, label: `${tpl.name} (${tpl.code})` })),
-    [templates],
-  );
+  }, [load, materialsInit, loadMaterials]);
 
   const materialSummary = useMemo(() => aggregateCropMaterials(entries), [entries]);
   useEffect(() => {
@@ -245,50 +206,6 @@ export function CropDiarySection({
     [editing, cropId, cropCode, t, load, formHandlers],
   );
 
-  const templatedCount = useMemo(
-    () => entries.filter((e) => e.extra?.templateCode).length,
-    [entries],
-  );
-
-  const requestApply = useCallback(() => {
-    if (!templateCode) return;
-    const template = templates.find((x) => x.code === templateCode);
-    if (!template) return;
-
-    const count = buildAllTemplateEntries(template, { startDate: applyDate, plantCount }).length;
-    setPendingApply({ template, count });
-  }, [templateCode, templates, applyDate, plantCount]);
-
-  const handleApply = useCallback(async () => {
-    if (!pendingApply) return;
-    const tpl = pendingApply.template;
-    setApplying(true);
-    try {
-      const count = await applyTemplateToCropDiary({
-        cropId,
-        cropCode,
-        template: tpl,
-        startDate: applyDate,
-        plantCount,
-      });
-      notifications.show({
-        color: 'green',
-        message: t('cropDiaries.notifications.applyTemplateSuccess', { count }),
-      });
-      setTemplateCode(null);
-      setPendingApply(null);
-      await load();
-    } catch {
-      notifications.show({
-        color: 'red',
-        message: t('cropDiaries.notifications.applyTemplateError'),
-        autoClose: 8000,
-      });
-    } finally {
-      setApplying(false);
-    }
-  }, [pendingApply, applyDate, plantCount, cropId, cropCode, t, load]);
-
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return;
     setDeleting(true);
@@ -332,41 +249,6 @@ export function CropDiarySection({
           </Button>
         )}
       </Group>
-
-      {canCreate && canViewTemplates && templateOptions.length > 0 && (
-        <>
-          <Group gap="xs" align="flex-end" wrap="nowrap" mb="md">
-            <Select
-              style={{ flex: 1 }}
-              size="sm"
-              placeholder={t('cropDiaries.applyTemplatePlaceholder')}
-              data={templateOptions}
-              searchable
-              value={templateCode}
-              onChange={setTemplateCode}
-              leftSection={<IconTemplate size={14} />}
-            />
-            <DatePickerField
-              size="sm"
-              clearable={false}
-              value={applyDate}
-              onChange={(v) => {
-                if (v) setApplyDate(v);
-              }}
-            />
-            <Button
-              size="sm"
-              variant="light"
-              disabled={!templateCode}
-              loading={applying}
-              onClick={requestApply}
-            >
-              {t('cropDiaries.applyTemplateButton')}
-            </Button>
-          </Group>
-          <Divider mb="md" />
-        </>
-      )}
 
       {loading ? (
         <Group justify="center" py="md">
@@ -485,26 +367,6 @@ export function CropDiarySection({
           </Stack>
         </Form>
       </ResponsiveModal>
-
-      <ConfirmModal
-        opened={pendingApply !== null}
-        onClose={() => setPendingApply(null)}
-        onConfirm={handleApply}
-        title={t('cropDiaries.applyConfirm.title')}
-        message={
-          t('cropDiaries.applyConfirm.message', {
-            template: pendingApply?.template.name ?? '',
-            count: pendingApply?.count ?? 0,
-            date: formatDate(applyDate),
-          }) +
-          (templatedCount > 0
-            ? ` ${t('cropDiaries.applyConfirm.duplicateWarning', { existing: templatedCount })}`
-            : '')
-        }
-        confirmLabel={t('cropDiaries.applyTemplateButton')}
-        confirmColor={templatedCount > 0 ? 'red' : 'primary'}
-        loading={applying}
-      />
 
       <ConfirmModal
         opened={deleteTarget !== null}

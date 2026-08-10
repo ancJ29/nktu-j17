@@ -549,6 +549,7 @@ export const perms = {
       canCancel: () => resolve().actions?.canCancel ?? false,
 
       canViewPrice: () => resolve().actions?.canViewPrice ?? false,
+      canExport: () => resolve().actions?.canExport ?? false,
     };
   })(),
 

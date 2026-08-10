@@ -113,6 +113,7 @@ export const BASE_PERMISSIONS: Permissions = {
       canTransitionStatus: false,
       canCancel: false,
       canViewPrice: false,
+      canExport: false,
     },
   },
   location: {

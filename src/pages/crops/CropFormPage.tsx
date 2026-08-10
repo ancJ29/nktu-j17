@@ -30,7 +30,7 @@ import { DateField } from '@/components/DateField';
 import { EmployeeSelector } from '@/components/selectors';
 import { useInitFormFromFetch } from '@/hooks';
 import { templateDayCount } from '@/utils/cropDiaryTemplateModel';
-import { autoApplyDiaryTemplateOnCreate } from '@/utils/cropDiaryTemplateApply';
+import { seedCropSheetIfMissing } from '@/utils/cropSheetSeed';
 import {
   findGrowingCropInGreenhouse,
   findOverlappingCrop,
@@ -265,12 +265,12 @@ export function CropFormPage() {
           notifications.show({ color: 'green', message: t('crops.notifications.createSuccess') });
 
           try {
-            await autoApplyDiaryTemplateOnCreate({
-              diaryTemplateCode: values.diaryTemplateCode,
-              plantCount: Number(values.numberOfSeeds) || undefined,
-              fromDate: values.fromDate,
+            await seedCropSheetIfMissing({
               cropId: created.id,
               cropCode: created.code,
+              templateCode: values.diaryTemplateCode,
+              plantCount: Number(values.numberOfSeeds) || undefined,
+              startDate: values.fromDate ?? undefined,
             });
           } catch {
             notifications.show({
