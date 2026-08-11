@@ -209,12 +209,10 @@ export function getSequentialAvailability(
   for (const row of rows) {
     onHand += recomputeOnHand(product, readRowBreakdown(row, baseUnit));
     for (const [salesOrderId, entry] of Object.entries(row.extra?.reservedBySalesOrder ?? {})) {
-      // // @ts-ignore
       const qty = recomputeOnHand(product, entry.byUnit);
       if (!qty) continue;
       const prev = heldByOrder.get(salesOrderId);
       heldByOrder.set(salesOrderId, {
-        // @ts-ignore
         orderNumber: entry.orderNumber,
         qty: (prev?.qty ?? 0) + qty,
       });
