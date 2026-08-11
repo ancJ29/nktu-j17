@@ -1,4 +1,9 @@
-import { defaultAppConfig, type GoodsReceiptFeatures, type ProductFeatures } from '@/config/schema';
+import {
+  defaultAppConfig,
+  type GoodsReceiptFeatures,
+  type ProductFeatures,
+  type QuotationFeatures,
+} from '@/config/schema';
 import type {
   AuthFeatures,
   CMngtActivityLogFeatures,
@@ -66,6 +71,9 @@ export const SCHEMA_DEFAULT_DELIVERY_REQUEST_FEATURES: CMngtDeliveryRequestFeatu
 };
 export const SCHEMA_DEFAULT_GOODS_RECEIPT_FEATURES: GoodsReceiptFeatures =
   defaultAppConfig.features.goodsReceipts;
+
+export const SCHEMA_DEFAULT_QUOTATION_FEATURES: QuotationFeatures =
+  defaultAppConfig.features.quotations;
 export const SCHEMA_DEFAULT_TRANSPORT_ORDER_FEATURES: CMngtTransportOrderFeatures = {
   enabled: false,
   codePrefix: 'VC-',

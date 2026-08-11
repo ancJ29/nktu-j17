@@ -117,6 +117,14 @@ const PricingFeaturesSchema = z
   })
   .default({ enabled: true, vatRate: 0.08 });
 
+const QuotationFeaturesSchema = z
+  .object({
+    priceByMinQuantity: z.boolean().default(false),
+  })
+  .default({ priceByMinQuantity: false });
+
+export type QuotationFeatures = z.infer<typeof QuotationFeaturesSchema>;
+
 const ModuleFeaturesSchema = z
   .object({
     enabled: z.boolean().default(false),
@@ -274,6 +282,7 @@ export type SalesOrderStatusOption = z.infer<typeof SalesOrderStatusOptionSchema
 export type DeliveryRequestStatusOption = z.infer<typeof DeliveryRequestStatusOptionSchema>;
 export type TagOption = z.infer<typeof TagOptionSchema>;
 export type TransportOrderStatusOptionConfig = z.infer<typeof TransportOrderStatusOptionSchema>;
+export type TransportOrderBangKeTemplateConfig = z.infer<typeof TransportOrderBangKeTemplateSchema>;
 
 const SalesOrderFeaturesSchema = z
   .object({
@@ -363,6 +372,8 @@ const GoodsReceiptFeaturesSchema = z
     picDepartments: z.array(z.string()).default([]),
 
     allowNoInventoryProducts: z.boolean().default(false),
+
+    defaultListStatuses: z.array(z.string()).default([]),
   })
   .default({
     enabled: false,
@@ -370,6 +381,7 @@ const GoodsReceiptFeaturesSchema = z
     codePadLength: 4,
     picDepartments: [],
     allowNoInventoryProducts: false,
+    defaultListStatuses: [],
   });
 
 export type GoodsReceiptFeatures = z.infer<typeof GoodsReceiptFeaturesSchema>;
@@ -398,6 +410,20 @@ const TransportOrderStatusOptionSchema = OptionSchema.extend({
   allowedDepartments: z.array(z.string()).default([]),
 });
 
+const TransportOrderBangKeTemplateSchema = z.object({
+  name: z.string().default(''),
+
+  customerCodes: z.array(z.string()).default([]),
+
+  serviceFeeColumns: z.array(z.string()).default([]),
+
+  otherFeesColumn: z.boolean().default(true),
+
+  noteColumn: z.enum(['auto', 'always', 'never']).default('auto'),
+
+  footerSummary: z.boolean().default(true),
+});
+
 const TransportOrderFeaturesSchema = z
   .object({
     enabled: z.boolean().default(false),
@@ -406,20 +432,29 @@ const TransportOrderFeaturesSchema = z
 
     routeCodePrefix: z.string().default('TUYEN-'),
 
+    nonContainerTruckTypes: z.array(z.string()).default([]),
+
     statusOptions: z.array(TransportOrderStatusOptionSchema).default([]),
 
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
 
     driverDepartments: z.array(z.string()).default([]),
+
+    defaultListStatuses: z.array(z.string()).default([]),
+
+    bangKeTemplates: z.array(TransportOrderBangKeTemplateSchema).default([]),
   })
   .default({
     enabled: false,
     codePrefix: 'VC-',
     codePadLength: 3,
     routeCodePrefix: 'TUYEN-',
+    nonContainerTruckTypes: [],
     statusOptions: [],
     statusTransitions: {},
     driverDepartments: [],
+    defaultListStatuses: [],
+    bangKeTemplates: [],
   });
 
 const DisplaySettingsSchema = z
@@ -466,6 +501,7 @@ const FeaturesSchema = z
     customers: CustomerFeaturesSchema,
     vendors: VendorFeaturesSchema,
     salesOrders: SalesOrderFeaturesSchema,
+    quotations: QuotationFeaturesSchema,
     deliveryRequests: DeliveryRequestFeaturesSchema,
     goodsReceipts: GoodsReceiptFeaturesSchema,
     warehouseReceipts: WarehouseReceiptFeaturesSchema,
@@ -508,6 +544,7 @@ const FeaturesSchema = z
     customers: CustomerFeaturesSchema.parse({}),
     vendors: VendorFeaturesSchema.parse({}),
     salesOrders: SalesOrderFeaturesSchema.parse({}),
+    quotations: QuotationFeaturesSchema.parse({}),
     deliveryRequests: DeliveryRequestFeaturesSchema.parse({}),
     goodsReceipts: GoodsReceiptFeaturesSchema.parse({}),
     warehouseReceipts: WarehouseReceiptFeaturesSchema.parse({}),

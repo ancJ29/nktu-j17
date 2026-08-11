@@ -1,4 +1,5 @@
 import type { TransportRouteRow } from '@/types';
+import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
 
 export type RouteEndpoints = { from: string; to: string };
 
@@ -25,4 +26,12 @@ export function routePlaces(
     for (const leg of route.trips ?? []) places.push(leg.departure, leg.destination);
   }
   return places.filter((p): p is string => !!p && p.trim().length > 0);
+}
+
+export function routeContainerDisplay(
+  route: Pick<TransportRouteRow, 'truckType' | 'containerSize'>,
+  nonContainerTruckTypes: readonly string[],
+): 'value' | 'any' | 'none' {
+  if (route.containerSize) return 'value';
+  return truckTypeCarriesContainer(route.truckType, nonContainerTruckTypes) ? 'any' : 'none';
 }

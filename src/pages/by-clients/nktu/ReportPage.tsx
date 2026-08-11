@@ -17,22 +17,23 @@ import {
   IconChevronRight,
   IconReportAnalytics,
   IconTruckDelivery,
+  IconUsers,
   type TablerIcon,
 } from '@tabler/icons-react';
 import type { TFunction } from 'i18next';
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
+import CustomerProductReportView from './reports/CustomerProductReportView';
 import DeliveryReportView from './reports/DeliveryReportView';
 import SalesReportView from './reports/SalesReportView';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
 import { ForbiddenState } from '@/components/ForbiddenState';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useCanAccessReports } from '@/pages/reports/reportAccess';
 
 const isMobile = device.isMobile;
 
-type ReportView = 'menu' | 'sales-monthly' | 'sales-weekly' | 'inventory' | 'delivery';
+type ReportView =
+  'menu' | 'sales-monthly' | 'sales-weekly' | 'sales-customer' | 'inventory' | 'delivery';
 type ReportKind = Exclude<ReportView, 'menu'>;
 
 interface ReportRoute {
@@ -41,7 +42,13 @@ interface ReportRoute {
   period?: string;
 }
 
-const KNOWN_VIEWS: ReportView[] = ['sales-monthly', 'sales-weekly', 'inventory', 'delivery'];
+const KNOWN_VIEWS: ReportView[] = [
+  'sales-monthly',
+  'sales-weekly',
+  'sales-customer',
+  'inventory',
+  'delivery',
+];
 
 function typeLabels(t: TFunction, kind: ReportKind): { title: string; desc: string } {
   switch (kind) {
@@ -49,6 +56,8 @@ function typeLabels(t: TFunction, kind: ReportKind): { title: string; desc: stri
       return { title: t('report.types.monthly.title'), desc: t('report.types.monthly.desc') };
     case 'sales-weekly':
       return { title: t('report.types.weekly.title'), desc: t('report.types.weekly.desc') };
+    case 'sales-customer':
+      return { title: t('report.types.customer.title'), desc: t('report.types.customer.desc') };
     case 'inventory':
       return { title: t('report.types.inventory.title'), desc: t('report.types.inventory.desc') };
     case 'delivery':
@@ -96,27 +105,14 @@ interface MenuEntry {
 const MENU: MenuEntry[] = [
   { view: 'sales-monthly', icon: IconCalendarStats, color: 'primary' },
   { view: 'sales-weekly', icon: IconCalendarWeek, color: 'teal' },
+  { view: 'sales-customer', icon: IconUsers, color: 'indigo' },
 
   { view: 'delivery', icon: IconTruckDelivery, color: 'grape' },
 ];
 
-const MANAGER_DEPARTMENT_CODE = 'manager';
-
-function useCanAccessReportMenu(): boolean {
-  const { items: employees } = useEmployeeStore();
-  const currentEmployee = useMemo(
-    () =>
-      getCurrentEmployeeId() ? employees.find((e) => e.id === getCurrentEmployeeId()) : undefined,
-    [employees],
-  );
-
-  const isRootUser = useAuthStore((s) => !!s.user?.isRoot);
-  return currentEmployee?.department === MANAGER_DEPARTMENT_CODE || isRootUser;
-}
-
 function ReportMenu({ onOpen }: { onOpen: (view: ReportKind) => void }) {
   const { t } = useTranslation();
-  const canAccess = useCanAccessReportMenu();
+  const canAccess = useCanAccessReports();
   if (!canAccess) {
     return <ForbiddenState />;
   }
@@ -172,7 +168,7 @@ function ReportMenu({ onOpen }: { onOpen: (view: ReportKind) => void }) {
 function ReportFrame({ onBack, children }: { onBack: () => void; children: ReactNode }) {
   const { t } = useTranslation();
 
-  const canAccess = useCanAccessReportMenu();
+  const canAccess = useCanAccessReports();
   if (!canAccess) {
     return <ForbiddenState />;
   }
@@ -232,6 +228,14 @@ export default function ReportPage() {
       <SalesReportView
         title={typeLabels(t, kind).title}
         kind={kind}
+        period={route.period}
+        onPeriodChange={(period) => go({ view: kind, period })}
+      />
+    );
+  } else if (kind === 'sales-customer') {
+    body = (
+      <CustomerProductReportView
+        title={typeLabels(t, kind).title}
         period={route.period}
         onPeriodChange={(period) => go({ view: kind, period })}
       />

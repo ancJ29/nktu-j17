@@ -1,5 +1,6 @@
 import type { TransportOrder, TransportOrderExtra } from '@/types';
 import { orderTotals, orderTripLaborTotal, readFeeLines } from './transportOrderPricing';
+import { isExternalTruck } from './externalTruck';
 
 export type TransportOrderFieldDelta = {
   from?: string | number;
@@ -33,6 +34,9 @@ export type TransportOrderCreateMemo = {
   orderNumber: string;
   truckId: string;
   driverId: string;
+
+  externalTruck?: string;
+  externalDriver?: string;
   customerCode?: string;
   route: string;
   containerNumber?: string;
@@ -72,6 +76,13 @@ export function createMemo(order: TransportOrder): TransportOrderCreateMemo {
     orderNumber: order.orderNumber,
     truckId: order.truckId,
     driverId: order.driverId,
+
+    ...(isExternalTruck(order)
+      ? {
+          ...(order.truckPlate?.trim() ? { externalTruck: order.truckPlate.trim() } : {}),
+          ...(order.driverName?.trim() ? { externalDriver: order.driverName.trim() } : {}),
+        }
+      : {}),
     ...(order.customerCode ? { customerCode: order.customerCode } : {}),
     route: routeMemo(order),
     ...(order.containerNumber ? { containerNumber: order.containerNumber } : {}),
@@ -88,6 +99,14 @@ export function createMemo(order: TransportOrder): TransportOrderCreateMemo {
         }
       : {}),
   };
+}
+
+function vehicleKey(order: Pick<TransportOrder, 'truckId' | 'truckPlate'>): string {
+  return order.truckId || (order.truckPlate ?? '').trim();
+}
+
+function driverKey(order: Pick<TransportOrder, 'driverId' | 'driverName'>): string {
+  return order.driverId || (order.driverName ?? '').trim();
 }
 
 function delta(
@@ -116,8 +135,9 @@ export function diffTransportOrder(
   };
 
   set('entryDate', delta(String(before.entryDate ?? ''), String(after.entryDate ?? '')));
-  set('truckId', delta(before.truckId, after.truckId));
-  set('driverId', delta(before.driverId, after.driverId));
+
+  set('truckId', delta(vehicleKey(before), vehicleKey(after)));
+  set('driverId', delta(driverKey(before), driverKey(after)));
   set('customerCode', delta(before.customerCode, after.customerCode));
   set('billNumber', delta(before.billNumber, after.billNumber));
   set('containerNumber', delta(before.containerNumber, after.containerNumber));

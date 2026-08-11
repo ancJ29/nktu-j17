@@ -58,6 +58,12 @@ export type CropProcessPlan = {
   referenceAdjustmentRate?: number;
 
   preparation?: PlanPreparation[];
+
+  target?: string;
+
+  referenceSeedCount?: number;
+
+  memos?: string[];
 };
 
 export type CropSheetExtra = {
@@ -70,6 +76,11 @@ export type CropSheetExtra = {
   adjustmentRate?: number;
 
   plantCount?: number;
+
+  target?: string;
+  seedCount?: number;
+
+  memos?: string[];
   [key: string]: unknown;
 };
 

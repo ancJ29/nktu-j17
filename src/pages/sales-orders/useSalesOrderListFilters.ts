@@ -10,6 +10,10 @@ import {
 } from '@/utils/listFilterDateRange';
 import { EMPTY_DATE_RANGE, defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import {
+  isDefaultStatusSelection,
+  shouldEncodeStatusSelection,
+} from '@/utils/listFilterStatusDefault';
 import { getSalesOrderDefaultListStatuses } from '@/utils/permission';
 import { getSalesOrderReadyDate, getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
 import type { SalesOrder } from '@/types';
@@ -37,7 +41,7 @@ type SalesOrderUrlState = {
 function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   const r: SalesOrderUrlState = {};
 
-  if (state.s?.length || (state.s && DEFAULT_STATUS.length > 0)) r.s = state.s;
+  if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.c) r.c = state.c;
   if (state.f) r.f = state.f;
   if (state.u) r.u = true;
@@ -194,9 +198,7 @@ export function useSalesOrderListFilters(
   ]);
 
   const statusFilterIsDefault = useMemo(
-    () =>
-      statusFilter.length === DEFAULT_STATUS.length &&
-      statusFilter.every((v) => DEFAULT_STATUS.includes(v)),
+    () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
   );
 

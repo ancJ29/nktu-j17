@@ -6,6 +6,7 @@ import {
   Group,
   Loader,
   SimpleGrid,
+  Space,
   Stack,
   Text,
   TextInput,
@@ -15,8 +16,8 @@ import {
 import { useForm } from '@mantine/form';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconFileText, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { IconFileText, IconPencil, IconPlus, IconSeeding, IconTrash } from '@tabler/icons-react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { DatePickerField } from '@/components/DatePickerField';
@@ -55,7 +56,11 @@ type Props = {
   readonly cropId: string;
   readonly cropCode: string;
 
+  readonly startDate?: string;
+
   readonly onSummaryChange?: (summary: CropMaterialTotal[]) => void;
+
+  readonly children?: ReactNode;
 };
 
 const canView = perms.cropDiary.canView();
@@ -70,7 +75,13 @@ type EntryFormValues = {
   materials: TemplateMaterialLine[];
 };
 
-export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
+export function CropDiarySection({
+  cropId,
+  cropCode,
+  startDate,
+  onSummaryChange,
+  children,
+}: Props) {
   const { t } = useTranslation();
 
   const [entries, setEntries] = useState<CropDiaryEntry[]>([]);
@@ -117,6 +128,14 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
     load();
     if (!materialsInit) loadMaterials();
   }, [load, materialsInit, loadMaterials]);
+
+  const { prep, events } = useMemo(() => {
+    if (!startDate) return { prep: [] as CropDiaryEntry[], events: entries };
+    return {
+      prep: entries.filter((e) => datePart(e.entryDate) < startDate),
+      events: entries.filter((e) => datePart(e.entryDate) >= startDate),
+    };
+  }, [entries, startDate]);
 
   const materialSummary = useMemo(() => aggregateCropMaterials(entries), [entries]);
   useEffect(() => {
@@ -225,103 +244,83 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
     }
   }, [deleteTarget, cropId, t, load]);
 
-  if (!canView) return null;
+  if (!canView) return <>{children}</>;
 
   return (
-    <Card withBorder radius="md" padding="lg">
-      <Group justify="space-between" mb="xs">
-        <Group gap="xs">
-          <ThemeIcon size={28} radius="md" variant="light" color="primary">
-            <IconFileText size={16} stroke={1.75} />
-          </ThemeIcon>
-          <Text fw={600} size="sm">
-            {t('cropDiaries.sectionTitle')}
-          </Text>
-        </Group>
-        {canCreate && (
-          <Button
-            onClick={openAdd}
-            size="compact-sm"
-            variant="light"
-            leftSection={<IconPlus size={14} />}
-          >
-            {t('cropDiaries.addItem')}
-          </Button>
-        )}
-      </Group>
-
-      {loading ? (
-        <Group justify="center" py="md">
-          <Loader size="sm" />
-        </Group>
-      ) : entries.length === 0 ? (
-        <Text size="sm" c="dimmed" ta="center" py="md">
-          {t('cropDiaries.sectionEmpty')}
-        </Text>
-      ) : (
-        <Stack gap={0}>
-          {entries.map((entry, i) => (
-            <div key={entry.id}>
-              {i > 0 && <Divider />}
-              <Group justify="space-between" wrap="nowrap" py="sm" gap="sm" align="flex-start">
-                <Stack gap={4} style={{ minWidth: 0, flex: 1 }}>
-                  <Group gap={6} wrap="wrap" align="baseline">
-                    <Text size="sm" fw={600}>
-                      {entry.activity}
-                    </Text>
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
-                      ({formatDate(entry.entryDate)})
-                    </Text>
-                  </Group>
-                  {entry.extra?.notes && (
-                    <Text size="xs" c="dimmed" style={{ whiteSpace: 'pre-wrap' }}>
-                      {entry.extra.notes}
-                    </Text>
-                  )}
-                  {entry.extra?.materials && entry.extra.materials.length > 0 && (
-                    <Stack gap={1} mt={2}>
-                      <Text size="xs" c="dimmed" fw={600}>
-                        {t('cropDiaries.materialsLabel')}
-                      </Text>
-                      {entry.extra.materials.map((m, idx) => (
-                        <Text key={idx} size="xs" c="primary">
-                          {'• '}
-                          {materialName(m.materialCode)}
-                          {typeof m.quantity === 'number'
-                            ? ` · ${formatNumber(m.quantity)}${m.unit ? ` ${m.unit}` : ''}`
-                            : ''}
-                        </Text>
-                      ))}
-                    </Stack>
-                  )}
-                </Stack>
-                <Group gap={4} wrap="nowrap">
-                  {canEdit && (
-                    <ActionIcon
-                      variant="subtle"
-                      color="gray"
-                      size="sm"
-                      onClick={() => openEdit(entry)}
-                    >
-                      <IconPencil size={15} />
-                    </ActionIcon>
-                  )}
-                  {canDelete && (
-                    <ActionIcon
-                      variant="subtle"
-                      color="red"
-                      size="sm"
-                      onClick={() => setDeleteTarget(entry)}
-                    >
-                      <IconTrash size={15} />
-                    </ActionIcon>
-                  )}
-                </Group>
-              </Group>
-            </div>
-          ))}
-        </Stack>
+    <>
+      {/* Preparation sits **above** the season, because that is when it
+          happened: soaking seed and sterilising the house are day −10, and a
+          register that listed them under the grid was telling the story
+          backwards. Its own card rather than a band inside the grid's — the
+          jobs are dated work with edit and delete, not a header. */}
+      {prep.length > 0 && (
+        <>
+          <Card withBorder radius="md" padding="lg">
+            <Group gap="xs" mb="xs">
+              <ThemeIcon size={28} radius="md" variant="light" color="primary">
+                <IconSeeding size={16} stroke={1.75} />
+              </ThemeIcon>
+              <Text fw={600} size="sm">
+                {t('cropDiaries.prepTitle')}
+              </Text>
+            </Group>
+            <EntryGroup
+              entries={prep}
+              materialName={materialName}
+              onEdit={openEdit}
+              onDelete={setDeleteTarget}
+            />
+          </Card>
+          <Space h="md" />
+        </>
       )}
+
+      {/* The season itself — passed in rather than imported, so this component
+          keeps owning the crop's event register (one read, one form) while the
+          page decides what sits between its two halves. */}
+      {children}
+
+      {children ? <Space h="md" /> : null}
+
+      <Card withBorder radius="md" padding="lg">
+        <Group justify="space-between" mb="xs">
+          <Group gap="xs">
+            <ThemeIcon size={28} radius="md" variant="light" color="primary">
+              <IconFileText size={16} stroke={1.75} />
+            </ThemeIcon>
+            <Text fw={600} size="sm">
+              {t('cropDiaries.eventsTitle')}
+            </Text>
+          </Group>
+          {canCreate && (
+            <Button
+              onClick={openAdd}
+              size="compact-sm"
+              variant="light"
+              leftSection={<IconPlus size={14} />}
+            >
+              {t('cropDiaries.addItem')}
+            </Button>
+          )}
+        </Group>
+
+        {loading ? (
+          <Group justify="center" py="md">
+            <Loader size="sm" />
+          </Group>
+        ) : events.length === 0 ? (
+          <Text size="sm" c="dimmed" ta="center" py="md">
+            {t('cropDiaries.sectionEmpty')}
+          </Text>
+        ) : (
+          <EntryGroup
+            entries={events}
+            materialName={materialName}
+            onEdit={openEdit}
+            onDelete={setDeleteTarget}
+          />
+        )}
+      </Card>
 
       <ResponsiveModal
         opened={formOpened}
@@ -376,6 +375,82 @@ export function CropDiarySection({ cropId, cropCode, onSummaryChange }: Props) {
         message={t('cropDiaries.deleteConfirm.message', { activity: deleteTarget?.activity ?? '' })}
         loading={deleting}
       />
-    </Card>
+    </>
+  );
+}
+
+function EntryGroup({
+  title,
+  entries,
+  materialName,
+  onEdit,
+  onDelete,
+}: {
+  readonly title?: string;
+  readonly entries: CropDiaryEntry[];
+  readonly materialName: (code: string) => string;
+  readonly onEdit: (entry: CropDiaryEntry) => void;
+  readonly onDelete: (entry: CropDiaryEntry) => void;
+}) {
+  const { t } = useTranslation();
+
+  return (
+    <Stack gap={0}>
+      {title && (
+        <Text size="xs" c="dimmed" tt="uppercase" fw={600} style={{ letterSpacing: 0.3 }} mb={4}>
+          {title}
+        </Text>
+      )}
+      {entries.map((entry, i) => (
+        <div key={entry.id}>
+          {i > 0 && <Divider />}
+          <Group justify="space-between" wrap="nowrap" py="sm" gap="sm" align="flex-start">
+            <Stack gap={4} style={{ minWidth: 0, flex: 1 }}>
+              <Group gap={6} wrap="wrap" align="baseline">
+                <Text size="sm" fw={600}>
+                  {entry.activity}
+                </Text>
+                <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>
+                  ({formatDate(entry.entryDate)})
+                </Text>
+              </Group>
+              {entry.extra?.notes && (
+                <Text size="xs" c="dimmed" style={{ whiteSpace: 'pre-wrap' }}>
+                  {entry.extra.notes}
+                </Text>
+              )}
+              {entry.extra?.materials && entry.extra.materials.length > 0 && (
+                <Stack gap={1} mt={2}>
+                  <Text size="xs" c="dimmed" fw={600}>
+                    {t('cropDiaries.materialsLabel')}
+                  </Text>
+                  {entry.extra.materials.map((m, idx) => (
+                    <Text key={idx} size="xs" c="primary">
+                      {'• '}
+                      {materialName(m.materialCode)}
+                      {typeof m.quantity === 'number'
+                        ? ` · ${formatNumber(m.quantity)}${m.unit ? ` ${m.unit}` : ''}`
+                        : ''}
+                    </Text>
+                  ))}
+                </Stack>
+              )}
+            </Stack>
+            <Group gap={4} wrap="nowrap">
+              {canEdit && (
+                <ActionIcon variant="subtle" color="gray" size="sm" onClick={() => onEdit(entry)}>
+                  <IconPencil size={15} />
+                </ActionIcon>
+              )}
+              {canDelete && (
+                <ActionIcon variant="subtle" color="red" size="sm" onClick={() => onDelete(entry)}>
+                  <IconTrash size={15} />
+                </ActionIcon>
+              )}
+            </Group>
+          </Group>
+        </div>
+      ))}
+    </Stack>
   );
 }

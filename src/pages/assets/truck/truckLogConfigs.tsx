@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Button,
   Card,
+  Checkbox,
   Group,
   NumberInput,
   Select,
@@ -35,6 +36,8 @@ import {
   maintenanceItemsTotal,
   maintenanceLineTotal,
   maintenanceOutstanding,
+  maintenanceVat,
+  maintenanceVatAmount,
   readMaintenanceItems,
   warrantyExpiry,
 } from './maintenanceItems';
@@ -443,6 +446,8 @@ function monthsLabel(t: TFn, months: number): string {
   return t('operationLogs.maintenance.months', { count: months });
 }
 
+const MAINTENANCE_DEFAULT_VAT_PERCENT = 8;
+
 function blankMaintenanceItem(): LogFormLine {
   return { name: '', unitPrice: '', quantity: 1, warrantyMonths: '' };
 }
@@ -489,6 +494,8 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     condition: '',
     odometer: '',
     laborCost: '',
+
+    vatPercent: '',
     accountsReceived: '',
     note: '',
 
@@ -586,6 +593,9 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
 
     const totalAmount = maintenanceItemsTotal(items);
     const laborCost = values.laborCost === '' ? 0 : Number(values.laborCost);
+
+    const vatRate = values.vatPercent === '' ? 0 : Number(values.vatPercent) / 100;
+    const vatAmount = maintenanceVatAmount(totalAmount + laborCost, vatRate);
     return {
       ...(String(values.maintenanceType).trim() && {
         maintenanceType: String(values.maintenanceType).trim(),
@@ -600,7 +610,8 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       ...(values.odometer !== '' && { odometer: Number(values.odometer) }),
       totalAmount,
       ...(values.laborCost !== '' && { laborCost }),
-      grandTotal: totalAmount + laborCost,
+      ...(vatRate > 0 && { vatRate }),
+      grandTotal: totalAmount + laborCost + vatAmount,
       ...(values.accountsReceived !== '' && { accountsReceived: Number(values.accountsReceived) }),
       ...(String(values.note).trim() && { note: String(values.note).trim() }),
     };
@@ -621,6 +632,8 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       condition: e.condition ?? '',
       odometer: e.odometer ?? '',
       laborCost: e.laborCost ?? '',
+
+      vatPercent: e.vatRate ? e.vatRate * 100 : '',
       accountsReceived: e.accountsReceived ?? '',
       note: e.note ?? '',
 
@@ -631,7 +644,13 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     const rows = itemRows(form);
     const totalAmount = draftItemsTotal(rows);
     const laborCost = form.values.laborCost === '' ? 0 : Number(form.values.laborCost);
-    const grandTotal = totalAmount + laborCost;
+
+    const vatOn = form.values.vatPercent !== '';
+    const vatAmount = maintenanceVatAmount(
+      totalAmount + laborCost,
+      vatOn ? Number(form.values.vatPercent) / 100 : 0,
+    );
+    const grandTotal = totalAmount + laborCost + vatAmount;
     const outstanding =
       grandTotal - (form.values.accountsReceived === '' ? 0 : Number(form.values.accountsReceived));
 
@@ -778,7 +797,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             {...form.getInputProps('odometer')}
           />
         </SimpleGrid>
-        <SimpleGrid cols={{ base: 1, sm: 2, md: 5 }} spacing="md">
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 6 }} spacing="md">
           <NumberInput
             label={t('operationLogs.maintenance.columns.totalAmount')}
             description={t('operationLogs.maintenance.form.totalAmountHint')}
@@ -793,6 +812,42 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             thousandSeparator=","
             {...form.getInputProps('laborCost')}
           />
+          {/* VAT — the rate is authored, and the đồng it adds shows underneath
+              rather than in a cell of its own, because what an operator checks
+              against the paper invoice is the money, not the percentage. The
+              cell keeps its place in the arithmetic row (hạng mục + tiền công +
+              VAT = tổng) whether or not VAT applies; one that appeared and
+              disappeared would reflow the whole line.
+
+              **The input is deliberately never disabled.** Emptiness is the off
+              state, so disabling it while empty would trap the operator halfway
+              through editing 8 → 10: backspacing the 8 empties the field, which
+              would switch VAT off and grey out the box they are still typing in.
+              Typing a rate IS turning VAT on; the checkbox is the shortcut. */}
+          <Stack gap={4}>
+            <NumberInput
+              label={t('operationLogs.maintenance.columns.vat')}
+              description={
+                vatOn ? `+ ${formatNumber(vatAmount)}` : t('operationLogs.maintenance.form.vatHint')
+              }
+              min={0}
+              max={100}
+              suffix=" %"
+              {...form.getInputProps('vatPercent')}
+            />
+            <Checkbox
+              size="xs"
+              label={t('operationLogs.maintenance.form.vatEnabled')}
+              checked={vatOn}
+
+              onChange={(ev) =>
+                form.setFieldValue(
+                  'vatPercent',
+                  ev.currentTarget.checked ? MAINTENANCE_DEFAULT_VAT_PERCENT : '',
+                )
+              }
+            />
+          </Stack>
           <NumberInput
             label={t('operationLogs.maintenance.columns.total')}
             description={t('operationLogs.maintenance.form.grandTotalHint')}
@@ -885,12 +940,22 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             )}
           </Table.Tbody>
         </Table>
-        <SimpleGrid cols={{ base: 2, sm: 3, md: 5 }} spacing="md">
+        <SimpleGrid cols={{ base: 2, sm: 3, md: 6 }} spacing="md">
           {detailStat(
             t('operationLogs.maintenance.columns.totalAmount'),
             formatNumber(e.totalAmount),
           )}
           {detailStat(t('operationLogs.maintenance.columns.laborCost'), formatNumber(e.laborCost))}
+          {/* Printed on every visit, dash included: "this invoice carried no
+              VAT" is the thing an operator reconciling a Tổng cộng against a
+              paper invoice needs stated, not left to inference from a missing
+              cell. The rate rides in the label so the đồng can be checked. */}
+          {detailStat(
+            e.vatRate
+              ? `${t('operationLogs.maintenance.columns.vat')} ${e.vatRate * 100}%`
+              : t('operationLogs.maintenance.columns.vat'),
+            e.vatRate ? formatNumber(maintenanceVat(e)) : '—',
+          )}
           {detailStat(
             t('operationLogs.maintenance.columns.accountsReceived'),
             formatNumber(e.accountsReceived),

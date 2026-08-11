@@ -22,6 +22,20 @@ export function maintenanceItemsTotal(items: MaintenanceItem[]): number {
   return items.reduce((sum, it) => sum + maintenanceLineTotal(it), 0);
 }
 
+export function maintenanceVatBase(e: MaintenanceLogExtra | undefined): number {
+  return (Number(e?.totalAmount) || 0) + (Number(e?.laborCost) || 0);
+}
+
+export function maintenanceVatAmount(base: number, rate: number | undefined): number {
+  const value = Number(rate);
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return Math.round((Number(base) || 0) * value);
+}
+
+export function maintenanceVat(e: MaintenanceLogExtra | undefined): number {
+  return maintenanceVatAmount(maintenanceVatBase(e), e?.vatRate);
+}
+
 export function maintenanceOutstanding(e: MaintenanceLogExtra | undefined): number | undefined {
   const total = e?.grandTotal ?? e?.cost;
   if (total == null) return undefined;

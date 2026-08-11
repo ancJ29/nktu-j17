@@ -1,6 +1,6 @@
 import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
 
-export type NktuReportKind = 'dr-weekly' | 'sales-monthly' | 'sales-weekly';
+export type NktuReportKind = 'dr-weekly' | 'sales-monthly' | 'sales-weekly' | 'sales-customer';
 
 export interface ReportKpi {
   key: string;
@@ -87,6 +87,55 @@ export interface SalesReportData {
   methods: SalesMethodRow[];
 }
 
+export interface CustomerEntry {
+  key: string;
+  name: string;
+
+  code?: string;
+  orders: number;
+
+  amount: number;
+
+  completedOrders: number;
+  completedAmount: number;
+}
+
+export interface ProductEntry {
+  key: string;
+  name: string;
+
+  code?: string;
+
+  unit: string;
+
+  qty: number;
+  amount: number;
+  orders: number;
+
+  customers: number;
+}
+
+export interface SalesMatrixCell {
+  c: string;
+
+  p: string;
+  qty: number;
+  amount: number;
+
+  orders: number;
+}
+
+export interface CustomerProductReportData {
+  periodLabel: string;
+  periodRange: string;
+  kpis: ReportKpi[];
+
+  customers: CustomerEntry[];
+
+  products: ProductEntry[];
+  cells: SalesMatrixCell[];
+}
+
 export type NktuReport = SingleRecordRow & {
   reportKey: string;
   kind: NktuReportKind;
@@ -99,6 +148,6 @@ export type NktuReport = SingleRecordRow & {
 
   sourceHash: string;
 
-  data: DeliveryWeeklyReportData | SalesReportData;
+  data: DeliveryWeeklyReportData | SalesReportData | CustomerProductReportData;
   extra?: { isDeleted?: boolean; [k: string]: unknown };
 };

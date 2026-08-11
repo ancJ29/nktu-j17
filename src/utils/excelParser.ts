@@ -4,6 +4,7 @@ import type { MaintenanceLogExtra, Material, OperationLog, Product } from '@/typ
 import {
   itemQuantity,
   maintenanceLineTotal,
+  maintenanceVat,
   readMaintenanceItems,
 } from '@/pages/assets/truck/maintenanceItems';
 
@@ -2073,6 +2074,7 @@ export const exportMaintenanceLogsToExcel = (
         { header: 'Thành tiền', width: 14 },
         { header: 'Bảo hành (tháng)', width: 14 },
         { header: 'Tiền công', width: 14 },
+        { header: 'VAT', width: 14 },
         { header: 'Tổng cộng', width: 14 },
         { header: 'Đã thanh toán', width: 14 },
         { header: 'Công nợ', width: 14 },
@@ -2088,6 +2090,7 @@ export const exportMaintenanceLogsToExcel = (
         { header: 'Line total', width: 14 },
         { header: 'Warranty (months)', width: 16 },
         { header: 'Labor', width: 14 },
+        { header: 'VAT', width: 14 },
         { header: 'Total', width: 14 },
         { header: 'Paid', width: 14 },
         { header: 'Outstanding', width: 14 },
@@ -2118,7 +2121,8 @@ export const exportMaintenanceLogsToExcel = (
         item ? itemQuantity(item) : '',
         item ? maintenanceLineTotal(item) : '',
         item?.warrantyMonths ?? '',
-        first ? numCell(e.laborCost) : '',
+
+        first ? (e.vatRate ? maintenanceVat(e) : '') : '',
         first ? grandTotal : '',
         first ? numCell(e.accountsReceived) : '',
         first ? outstanding : '',
@@ -2129,8 +2133,9 @@ export const exportMaintenanceLogsToExcel = (
 
   const totalRow: (number | string)[] = new Array(columns.length).fill('');
   totalRow[0] = isVietnamese ? 'Tổng' : 'Total';
-  totalRow[9] = totalGrand;
-  totalRow[11] = totalOutstanding;
+
+  totalRow[10] = totalGrand;
+  totalRow[12] = totalOutstanding;
 
   const worksheet = XLSX.utils.aoa_to_sheet([columns.map((c) => c.header), ...dataRows, totalRow]);
   worksheet['!cols'] = columns.map((c) => ({ width: c.width }));

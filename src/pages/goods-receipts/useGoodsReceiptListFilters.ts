@@ -11,11 +11,16 @@ import {
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import {
+  isDefaultStatusSelection,
+  shouldEncodeStatusSelection,
+} from '@/utils/listFilterStatusDefault';
+import { getGoodsReceiptDefaultListStatuses } from '@/utils/permission';
 import type { GoodsReceipt } from '@/types';
 
 const DEFAULT_PAGE = 1;
 
-const EMPTY_STATUS: readonly string[] = [];
+const DEFAULT_STATUS: readonly string[] = getGoodsReceiptDefaultListStatuses();
 
 type GoodsReceiptUrlState = {
   s?: string[];
@@ -30,7 +35,8 @@ type GoodsReceiptUrlState = {
 
 function compactState(state: GoodsReceiptUrlState): GoodsReceiptUrlState {
   const r: GoodsReceiptUrlState = {};
-  if (state.s?.length) r.s = state.s;
+
+  if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.v) r.v = state.v;
   if (state.f) r.f = state.f;
   if (state.l) r.l = state.l;
@@ -47,7 +53,7 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     compactState,
   });
 
-  const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
+  const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const vendorFilter = state.v ?? null;
   const staffFilter = state.f ?? null;
   const locationFilter = state.l ?? null;
@@ -60,7 +66,7 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
   const page = state.pg ?? DEFAULT_PAGE;
 
   const setStatusFilter = useCallback(
-    (values: string[]) => updateState({ s: values.length > 0 ? values : undefined, pg: undefined }),
+    (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
   );
 
@@ -126,8 +132,13 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     receivedDateRange,
   ]);
 
+  const statusFilterIsDefault = useMemo(
+    () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
+    [statusFilter],
+  );
+
   const hasActiveFilters = !!(
-    statusFilter.length > 0 ||
+    !statusFilterIsDefault ||
     vendorFilter ||
     staffFilter ||
     locationFilter ||
@@ -138,6 +149,8 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
   return {
     statusFilter,
     setStatusFilter,
+
+    statusFilterIsDefault,
     vendorFilter,
     setVendorFilter,
     staffFilter,

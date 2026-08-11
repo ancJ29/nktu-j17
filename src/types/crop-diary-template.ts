@@ -28,6 +28,8 @@ export type CropDiaryTemplateExtra = {
   plan?: CropProcessPlan;
 
   isDeleted?: boolean;
+
+  copyFromId?: string;
   [key: string]: unknown;
 };
 
@@ -38,4 +40,13 @@ export type CropDiaryTemplate = SingleRecordRow & {
   createdAt: number;
   updatedAt: number;
   extra?: CropDiaryTemplateExtra;
+};
+
+export type CropDiaryTemplateCopyFrom = Pick<CropDiaryTemplate, 'name'> & {
+  description?: string;
+  plan: CropProcessPlan;
+
+  sourceId: string;
+
+  sourceCode: string;
 };

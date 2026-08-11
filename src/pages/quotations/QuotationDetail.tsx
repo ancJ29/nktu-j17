@@ -59,6 +59,7 @@ import {
   getPricingVatRate,
   hasImagesForProducts,
   isPdfSharingEnabled,
+  isQuotationTierPricingEnabled,
   perms,
 } from '@/utils/permission';
 import { EntityConflictError } from '@/stores/createEntityStore';
@@ -84,6 +85,8 @@ const canViewAll = perms.salesOrder.canViewAll();
 const canViewSelf = perms.salesOrder.canViewSelf();
 
 const canSharePdf = isPdfSharingEnabled();
+
+const showPriceTiers = isQuotationTierPricingEnabled();
 
 function canViewQuotation(q: Quotation): boolean {
   if (canViewAll) return true;
@@ -321,6 +324,7 @@ export function QuotationDetail() {
       unitPrice: l.unitPrice,
       lineTotal: l.quantity * l.unitPrice,
       photoUrl: photoByCode.get(l.productCode),
+      ...(showPriceTiers && l.priceTiers?.length ? { priceTiers: l.priceTiers } : {}),
     }));
     const subtotal = quotationTotal(q.extra.lines ?? []);
     const vatRate = includeVat ? getPricingVatRate() : 0;
@@ -623,6 +627,15 @@ export function QuotationDetail() {
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'right' }}>
                           <Text>{formatNumber(l.unitPrice)}</Text>
+                          {showPriceTiers &&
+                            l.priceTiers?.map((tier) => (
+                              <Text key={tier.minQuantity} size="xs" c="dimmed" lh={1.3}>
+                                {t('quotations.form.priceTiers.rung', {
+                                  quantity: formatNumber(tier.minQuantity),
+                                  price: formatNumber(tier.unitPrice),
+                                })}
+                              </Text>
+                            ))}
                         </Table.Td>
                         <Table.Td style={{ textAlign: 'right' }}>
                           <Text fw={600}>{formatNumber(l.quantity * l.unitPrice)}</Text>

@@ -25,9 +25,17 @@ import {
   DEFAULT_VENDOR_FEATURES,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
-import type { CompanyInfoConfig, GoodsReceiptFeatures, ProductFeatures } from '@/config/schema';
+import type {
+  CompanyInfoConfig,
+  GoodsReceiptFeatures,
+  ProductFeatures,
+  QuotationFeatures,
+  TransportOrderBangKeTemplateConfig,
+} from '@/config/schema';
+import type { GoodsReceiptStatus } from '@/types';
 import { LOOKUP_CATEGORIES } from '@/pages/lookups/categoryRegistry';
 import { LOOKUP_V2_CATEGORIES } from '@/pages/lookup-v2/categoryRegistry';
+import { useLookupV2Options } from '@/hooks/useLookupV2Options';
 import {
   formatInvariantError,
   validateSalesOrderConfig,
@@ -115,6 +123,7 @@ import {
   IconRotate,
   IconSettings,
   IconShield,
+  IconFileInvoice,
   IconShoppingCart,
   IconTransfer,
   IconTruck,
@@ -161,6 +170,7 @@ import {
   SCHEMA_DEFAULT_PERM_MNGT_FEATURES,
   SCHEMA_DEFAULT_PRICING_FEATURES,
   SCHEMA_DEFAULT_PRODUCT_FEATURES,
+  SCHEMA_DEFAULT_QUOTATION_FEATURES,
   SCHEMA_DEFAULT_SALES_ORDER_FEATURES,
   SCHEMA_DEFAULT_THEME,
   SCHEMA_DEFAULT_VENDOR_FEATURES,
@@ -169,6 +179,7 @@ import {
   StatusAllowedDepartmentsMatrixEditor,
   StatusTransitionMatrixEditor,
   ThemeConfigSection,
+  TransportOrderBangKeTemplateEditor,
   TransportOrderConfigInvariantAlert,
   TransportOrderStatusOptionEditor,
   TranslationsSection,
@@ -234,6 +245,12 @@ function toStatusMultiSelectData(
     return { value: s.value, label: `${label} (${s.value})` };
   });
 }
+
+const goodsReceiptStatusMultiSelectData: { value: GoodsReceiptStatus; label: string }[] = [
+  { value: 'draft', label: 'Draft (draft)' },
+  { value: 'received', label: 'Received (received)' },
+  { value: 'cancelled', label: 'Cancelled (cancelled)' },
+];
 
 export function ConfigEditor({
   accessKey,
@@ -315,6 +332,9 @@ export function ConfigEditor({
   const [salesOrdersFeatures, setSalesOrdersFeatures] = useState<CMngtSalesOrderFeatures>(
     DEFAULT_SALES_ORDER_FEATURES,
   );
+  const [quotationsFeatures, setQuotationsFeatures] = useState<QuotationFeatures>(
+    SCHEMA_DEFAULT_QUOTATION_FEATURES,
+  );
   const [deliveryRequestsFeatures, setDeliveryRequestsFeatures] =
     useState<CMngtDeliveryRequestFeatures>(DEFAULT_DELIVERY_REQUEST_FEATURES);
   const [goodsReceiptsFeatures, setGoodsReceiptsFeatures] = useState<GoodsReceiptFeatures>(
@@ -322,6 +342,8 @@ export function ConfigEditor({
   );
   const [transportOrdersFeatures, setTransportOrdersFeatures] =
     useState<CMngtTransportOrderFeatures>(DEFAULT_TRANSPORT_ORDER_FEATURES);
+
+  const truckTypeOptions = useLookupV2Options('truck-type');
   const [lookupsFeatures, setLookupsFeatures] = useState<CMngtLookupFeatures>(
     SCHEMA_DEFAULT_LOOKUP_FEATURES,
   );
@@ -351,6 +373,10 @@ export function ConfigEditor({
   const deliveryRequestStatusMultiSelectData = useMemo(
     () => toStatusMultiSelectData(deliveryRequestsFeatures.statusOptions),
     [deliveryRequestsFeatures.statusOptions],
+  );
+  const transportOrderStatusMultiSelectData = useMemo(
+    () => toStatusMultiSelectData(transportOrdersFeatures.statusOptions),
+    [transportOrdersFeatures.statusOptions],
   );
 
   const buildConfigPayload = useCallback(
@@ -388,6 +414,7 @@ export function ConfigEditor({
         warehouseReceipts: warehouseReceiptsFeatures,
         warehouseDeliveryNotes: warehouseDeliveryNotesFeatures,
         salesOrders: salesOrdersFeatures,
+        quotations: quotationsFeatures,
         deliveryRequests: deliveryRequestsFeatures,
         goodsReceipts: goodsReceiptsFeatures,
         transportOrders: transportOrdersFeatures,
@@ -430,6 +457,7 @@ export function ConfigEditor({
       customersFeatures,
       vendorsFeatures,
       salesOrdersFeatures,
+      quotationsFeatures,
       deliveryRequestsFeatures,
       goodsReceiptsFeatures,
       transportOrdersFeatures,
@@ -506,6 +534,10 @@ export function ConfigEditor({
     setSalesOrdersFeatures({
       ...SCHEMA_DEFAULT_SALES_ORDER_FEATURES,
       ...cfg.features?.salesOrders,
+    });
+    setQuotationsFeatures({
+      ...SCHEMA_DEFAULT_QUOTATION_FEATURES,
+      ...cfg.features?.quotations,
     });
     setDeliveryRequestsFeatures({
       ...SCHEMA_DEFAULT_DELIVERY_REQUEST_FEATURES,
@@ -725,6 +757,7 @@ export function ConfigEditor({
     setVendorsFeatures(DEFAULT_VENDOR_FEATURES);
     setLookupsFeatures(SCHEMA_DEFAULT_LOOKUP_FEATURES);
     setSalesOrdersFeatures(DEFAULT_SALES_ORDER_FEATURES);
+    setQuotationsFeatures(SCHEMA_DEFAULT_QUOTATION_FEATURES);
     setDeliveryRequestsFeatures(DEFAULT_DELIVERY_REQUEST_FEATURES);
     setGoodsReceiptsFeatures(DEFAULT_GOODS_RECEIPT_FEATURES);
     setTransportOrdersFeatures(DEFAULT_TRANSPORT_ORDER_FEATURES);
@@ -789,6 +822,10 @@ export function ConfigEditor({
   const resetCustomers = useCallback(() => setCustomersFeatures(DEFAULT_CUSTOMER_FEATURES), []);
   const resetSalesOrders = useCallback(
     () => setSalesOrdersFeatures(DEFAULT_SALES_ORDER_FEATURES),
+    [],
+  );
+  const resetQuotations = useCallback(
+    () => setQuotationsFeatures(SCHEMA_DEFAULT_QUOTATION_FEATURES),
     [],
   );
   const resetDeliveryRequests = useCallback(
@@ -878,6 +915,7 @@ export function ConfigEditor({
     lookupV2: eqDefault(lookupV2Features, SCHEMA_DEFAULT_LOOKUP_FEATURES),
     customers: eqDefault(customersFeatures, DEFAULT_CUSTOMER_FEATURES),
     salesOrders: eqDefault(salesOrdersFeatures, DEFAULT_SALES_ORDER_FEATURES),
+    quotations: eqDefault(quotationsFeatures, SCHEMA_DEFAULT_QUOTATION_FEATURES),
     deliveryRequests: eqDefault(deliveryRequestsFeatures, DEFAULT_DELIVERY_REQUEST_FEATURES),
     goodsReceipts: eqDefault(goodsReceiptsFeatures, DEFAULT_GOODS_RECEIPT_FEATURES),
     transportOrders: eqDefault(transportOrdersFeatures, DEFAULT_TRANSPORT_ORDER_FEATURES),
@@ -1969,6 +2007,27 @@ export function ConfigEditor({
               )}
             </Stack>
           </CollapsibleSection>
+          {/* Quotations — behaviour flags only; the module itself is never gated
+              (it rides on salesOrder permissions + the nav item). */}
+          <CollapsibleSection
+            icon={IconFileInvoice}
+            title="Quotations"
+            description="Behaviour options for the quotation module (the module itself is always on, gated by sales-order permissions and the nav item)"
+            sectionKey="quotations"
+            isDefault={sectionIsDefault.quotations}
+            opened={openSections.has('quotations')}
+            onToggle={toggleSection}
+            onReset={resetQuotations}
+          >
+            <FeatureToggleRow
+              label="Price by Minimum Order Quantity"
+              description="Lets the operator quote a price ladder per line (from 100 → 90,000; from 500 → 85,000). The line's unit price auto-fills from the quantity typed, and the ladder prints under the item on the quotation PDF. Off hides the editor and the ladder; tiers already saved are kept untouched"
+              checked={quotationsFeatures.priceByMinQuantity}
+              onChange={(checked) =>
+                setQuotationsFeatures({ ...quotationsFeatures, priceByMinQuantity: checked })
+              }
+            />
+          </CollapsibleSection>
           {/* Delivery Requests — dedicated section with status options */}
           <CollapsibleSection
             icon={IconTruck}
@@ -2170,6 +2229,22 @@ export function ConfigEditor({
                 clearable
                 nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
               />
+
+              {/* GR statuses are a fixed vocabulary (draft/received/cancelled),
+                  so the options are static — no status editor above to feed
+                  from, unlike SO/DR/TO. Consumed via
+                  `getGoodsReceiptDefaultListStatuses()`. */}
+              <MultiSelect
+                label="Default List Statuses"
+                description="Statuses the Goods Receipts list opens narrowed to, so operators land on the working set instead of every receipt in the window. Leave empty to show all statuses. Operators can still widen to all, and 'Clear filters' comes back to this set."
+                placeholder="All statuses (no default narrowing)"
+                data={goodsReceiptStatusMultiSelectData}
+                value={goodsReceiptsFeatures.defaultListStatuses ?? []}
+                onChange={(v) =>
+                  setGoodsReceiptsFeatures({ ...goodsReceiptsFeatures, defaultListStatuses: v })
+                }
+                clearable
+              />
             </Stack>
           </CollapsibleSection>
           {/* Transport Orders — client-specific trucking/freight module */}
@@ -2235,6 +2310,40 @@ export function ConfigEditor({
                       placeholder="TUYEN-"
                     />
                   </Paper>
+                  {/* Which vehicle types haul no container. The app cannot work
+                      this out — `truck-type` is a per-client lookup of free
+                      strings — and it is stated as the EXCLUSION list so that
+                      empty means "unchanged", and adding a new container type
+                      needs no edit here. */}
+                  <Paper p="xs" withBorder>
+                    <Text fz="sm" fw={600} mb={4}>
+                      Vehicle Types Without Containers
+                    </Text>
+                    <Text fz="xs" c="dimmed" mb="xs">
+                      Pick the vehicle types that do not haul containers (e.g. Xe Tải). The
+                      &ldquo;Container type&rdquo; field is hidden — and cleared — on routes and
+                      orders using them. Leave empty if every type carries containers; nothing
+                      changes then.
+                    </Text>
+                    <MultiSelect
+                      data={truckTypeOptions}
+                      value={transportOrdersFeatures.nonContainerTruckTypes ?? []}
+                      onChange={(v) =>
+                        setTransportOrdersFeatures({
+                          ...transportOrdersFeatures,
+                          nonContainerTruckTypes: v,
+                        })
+                      }
+                      placeholder={
+                        truckTypeOptions.length === 0
+                          ? 'No vehicle types configured under Meta-data'
+                          : 'None — every type carries containers'
+                      }
+                      size="sm"
+                      searchable
+                      clearable
+                    />
+                  </Paper>
                   <TransportOrderConfigInvariantAlert
                     features={transportOrdersFeatures}
                     knownDepartments={
@@ -2276,6 +2385,30 @@ export function ConfigEditor({
                       })
                     }
                   />
+                  {/* Schema-only field (absent from the kits
+                      `CMngtTransportOrderFeatures` mirror), so read/written via
+                      a local cast; it round-trips because load/save spread the
+                      whole object. Consumed via
+                      `getTransportOrderDefaultListStatuses()`. */}
+                  <MultiSelect
+                    label="Default List Statuses"
+                    description="Statuses the Transport Orders list opens narrowed to, so operators land on the working set instead of every order in the window. Leave empty to show all statuses. Operators can still widen to all, and 'Clear filters' comes back to this set."
+                    placeholder="All statuses (no default narrowing)"
+                    data={transportOrderStatusMultiSelectData}
+                    value={
+                      (transportOrdersFeatures as { defaultListStatuses?: string[] })
+                        .defaultListStatuses ?? []
+                    }
+                    onChange={(v) =>
+                      setTransportOrdersFeatures({
+                        ...transportOrdersFeatures,
+                        defaultListStatuses: v,
+                      } as CMngtTransportOrderFeatures)
+                    }
+                    searchable
+                    clearable
+                    nothingFoundMessage="No statuses configured yet — add them under the status options above."
+                  />
                   <MultiSelect
                     label="Driver Departments"
                     description="Restrict the driver picker to employees in these departments. Leave empty to allow any active employee."
@@ -2291,6 +2424,25 @@ export function ConfigEditor({
                     searchable
                     clearable
                     nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
+                  />
+                  {/* Schema-only field like `defaultListStatuses` above (absent
+                      from the kits mirror) — read/written via a local cast; it
+                      round-trips because load/save spread the whole object.
+                      Consumed via `resolveTransportOrderBangKeTemplate()`. */}
+                  <TransportOrderBangKeTemplateEditor
+                    templates={
+                      (
+                        transportOrdersFeatures as {
+                          bangKeTemplates?: TransportOrderBangKeTemplateConfig[];
+                        }
+                      ).bangKeTemplates ?? []
+                    }
+                    onChange={(tpls) =>
+                      setTransportOrdersFeatures({
+                        ...transportOrdersFeatures,
+                        bangKeTemplates: tpls,
+                      } as CMngtTransportOrderFeatures)
+                    }
                   />
                 </>
               )}

@@ -9,6 +9,7 @@
         "clearFilters": "Clear all filters",
         "clearSearch": "Clear search",
         "clearValue": "Clear",
+        "close": "Close",
         "copy": "Copy",
         "copyLink": "Copy link",
         "disable": "Disable",
@@ -798,6 +799,7 @@
     "editItem": "Edit Entry",
     "emptyMessage": "Log an activity for a crop, or apply a template.",
     "emptyTitle": "No diary entries yet",
+    "eventsTitle": "Events",
     "filterCropPlaceholder": "Crop",
     "form": {
       "activityLabel": "Activity",
@@ -831,9 +833,10 @@
       "updateError": "Failed to update diary entry",
       "updateSuccess": "Diary entry updated"
     },
+    "prepTitle": "Before planting",
     "searchPlaceholder": "Search diary…",
     "sectionEmpty": "No diary entries for this crop yet.",
-    "sectionTitle": "Diary",
+    "sectionTitle": "Events & preparation",
     "title": "Crop Diary",
     "validation": {
       "activityRequired": "Activity is required",
@@ -883,6 +886,7 @@
       "addMaterial": "Add material",
       "addStep": "Add step",
       "codePlaceholder": "e.g. TPL-001",
+      "copyingFrom": "Copying from {{code}}",
       "createButton": "Create Template",
       "daysSection": "Day-by-day plan",
       "descriptionLabel": "Description",
@@ -914,6 +918,7 @@
     },
     "plan": {
       "addColumn": "Add column",
+      "addMemo": "Add note",
       "addPreparation": "Add preparation job",
       "addStage": "Add stage",
       "adjustmentRate": "Adjustment rate",
@@ -938,6 +943,9 @@
         "perPlant": "Per plant",
         "text": "Text"
       },
+      "memoPlaceholder": "e.g. ÁP DỤNG CHO GIÁ THỂ XƠ DỪA",
+      "memosSection": "General notes",
+      "memosSectionHint": "Caveats that apply to the whole process",
       "moveDown": "Move down",
       "moveUp": "Move up",
       "noColumns": "No columns yet.",
@@ -950,6 +958,8 @@
       "preparationSectionHint": "Work that happens before day 1 — soaking seed, preparing growbags, sterilising the house. Stored as an offset (−14 = a fortnight before planting), so one process serves every crop; each crop turns it into real dates.",
       "referencePlantCount": "Written for (plants)",
       "referencePlantCountHint": "The house size the doses below were written for. A crop with a different plant count rescales them automatically.",
+      "seedCount": "Seeds sown",
+      "seedCountHint": "Not the plant count — the sheets state both",
       "sizingSection": "Sizing",
       "stage": "Stage",
       "stageFrom": "From day",
@@ -957,6 +967,8 @@
       "stageTo": "To day",
       "stagesSection": "Stages",
       "stagesSectionHint": "Named spans of the cycle. Stored as day ranges, so two days in one span can never disagree.",
+      "target": "Variety / target",
+      "targetHint": "What is being grown, e.g. PI 52",
       "totalDays": "Total days",
       "totalsTitle": "Season totals"
     },
@@ -1056,6 +1068,20 @@
       "adjustmentRate": "Rate",
       "conflictMessage": "Someone else saved this crop's plan while you were editing. Your unsaved changes were dropped and the grid reloaded — re-enter them.",
       "conflictTitle": "Reloaded — the plan changed",
+      "day": {
+        "amount": "Need",
+        "changed": "Differs from plan",
+        "dose": "Per plan",
+        "events": "Recorded this day",
+        "measures": "Water & readings",
+        "noWork": "The process plans no work for this day. Fill anything in that was actually done.",
+        "notes": "Notes",
+        "open": "Open day {{day}}",
+        "otherDoses": "Other materials",
+        "reset": "Back to plan",
+        "title": "Day {{day}} / {{total}}",
+        "today": "Today"
+      },
       "empty": "This crop has no plan yet.",
       "loadError": "Could not load the crop's plan",
       "noTotals": "Nothing consumed yet.",
@@ -2669,6 +2695,7 @@
         "totalAmount": "Items total",
         "type": "Type",
         "unitPrice": "Unit price",
+        "vat": "VAT",
         "warranty": "Warranty"
       },
       "editItem": "Edit maintenance",
@@ -2681,7 +2708,7 @@
       "form": {
         "addItemLine": "Add item",
         "conditionPlaceholder": "e.g. New / Used",
-        "grandTotalHint": "Items + labor (auto)",
+        "grandTotalHint": "Items + labor + VAT (auto)",
         "itemName": "Item name",
         "itemPlaceholder": "e.g. Oil change, brake pads",
         "monthsSuffix": "mo",
@@ -2692,6 +2719,8 @@
         "supplierPlaceholder": "Garage / vendor",
         "totalAmountHint": "Unit price × Qty (auto)",
         "typePlaceholder": "Select maintenance type",
+        "vatEnabled": "Has VAT",
+        "vatHint": "Off — tick to apply",
         "warrantyPlaceholder": "None"
       },
       "months_one": "{{count}} month",
@@ -3415,6 +3444,16 @@
       "noLines": "No products yet. Add products, quantities and prices.",
       "note": "Note",
       "priceLabel": "Unit price",
+      "priceTiers": {
+        "addTier": "Add tier",
+        "count_one": "{{count}} tier",
+        "count_other": "{{count}} tiers",
+        "editTooltip": "Price by minimum order quantity",
+        "minQuantity": "Min. quantity",
+        "modalHint": "Quote a unit price per minimum order quantity. The line's unit price fills in from the quantity entered, and the ladder is printed under the item on the PDF.",
+        "modalTitle": "Price by minimum order quantity",
+        "rung": "≥ {{quantity}}: {{price}}"
+      },
       "productLabel": "Product",
       "productPlaceholder": "Select product",
       "quantityLabel": "Quantity",
@@ -3496,11 +3535,33 @@
       "print": "Print report",
       "sample": "SAMPLE DATA"
     },
+    "customerProduct": {
+      "completed": "Of which completed",
+      "customersHeading": "Customers that ordered it",
+      "empty": "No orders in this period.",
+      "pickCustomer": "Search a customer",
+      "pickHeading": "Pick a customer or a product",
+      "pickProduct": "Search a product",
+      "pivotCustomer": "By customer",
+      "pivotProduct": "By product",
+      "productsHeading": "Products ordered"
+    },
+    "entityTab": {
+      "basis": "non-cancelled orders, VAT excluded",
+      "failed": "Couldn't build the report.",
+      "generate": "Generate",
+      "generatedAt": "Generated at {{at}}",
+      "loading": "Loading the report…",
+      "noSnapshot": "No report has been built for {{period}} yet. Press Generate to build it.",
+      "recompute": "Recompute",
+      "title": "Sales"
+    },
     "kpi": {
       "avgOrder": "Avg. per order",
       "customers": "Customers served",
       "newCustomers": "new customers",
       "orders": "Orders",
+      "products": "Products",
       "revenue": "Total revenue",
       "vsPrev": "vs. previous period"
     },
@@ -3522,6 +3583,10 @@
       "perDay": "/day"
     },
     "types": {
+      "customer": {
+        "desc": "What each customer ordered in a month — products, quantity and money (and who bought a product).",
+        "title": "Sales by customer"
+      },
       "delivery": {
         "desc": "On-time rate, delays, and performance by driver.",
         "title": "Delivery report"
@@ -3544,7 +3609,9 @@
       "customersShort": "cust.",
       "million": "M ₫",
       "orders": "orders",
-      "pieces": "pcs"
+      "pieces": "pcs",
+      "productsShort": "items",
+      "vnd": "₫"
     },
     "wip": {
       "desc": "This report is under development and will be available soon.",
@@ -3705,6 +3772,7 @@
       "fromLocation": "From location",
       "itemMemo": "Memo",
       "itemsTitle": "Order Items",
+      "linkedDRsLoading": "Loading deliveries…",
       "noDRsCreatable": "No delivery requests yet. Use \"Create Delivery Request\" once the order is ready.",
       "noDRsReadonly": "No delivery requests for this order yet.",
       "photosFromDR": "Photos from delivery requests",
@@ -3945,6 +4013,9 @@
     "actions": {
       "cancel": "Cancel order"
     },
+    "bangKe": {
+      "export": "Export statement"
+    },
     "billing": {
       "advance": "Advance",
       "balanceDue": "Balance due",
@@ -4058,12 +4129,17 @@
     },
     "filters": {
       "createdDate": "Created date",
-      "hideCancelled": "Hide cancelled"
+      "hideCancelled": "Hide cancelled",
+      "truckType": "Vehicle type"
     },
     "form": {
       "containerSize": "Container size",
       "customer": "Customer",
       "driver": "Driver",
+      "externalDriver": "Driver / hauler",
+      "externalPlate": "Plate number",
+      "externalTruck": "External truck",
+      "externalTruckHint": "Hired truck — not in the fleet register",
       "jobSection": "Job details",
       "metaSection": "Additional info",
       "multiTrip": "Multi-trip",
@@ -4090,7 +4166,10 @@
       "saveError": "Failed to save changes",
       "tripLogSyncError": "The truck trip log could not be updated. It will retry the next time this order is opened.",
       "updateError": "Failed to update transport order",
-      "updated": "Transport order updated"
+      "updated": "Transport order updated",
+      "bangKeNeedCustomer": "Pick a customer in the filter to export the statement.",
+      "bangKeSuccess_one": "Exported statement with {{count}} order.",
+      "bangKeSuccess_other": "Exported statement with {{count}} orders."
     },
     "route": {
       "collapse": "Collapse trips",
@@ -4139,6 +4218,7 @@
       "customerRequired": "Customer is required",
       "driverRequired": "Driver is required",
       "entryDateRequired": "Date is required",
+      "plateRequired": "Plate number is required",
       "truckRequired": "Truck is required"
     }
   },
@@ -4238,7 +4318,11 @@
       "freight": "Freight",
       "labor": "Driver pay",
       "anyTruckType": "any vehicle",
-      "anyContainerSize": "any container"
+      "anyContainerSize": "any container",
+      "truckMismatch": "The selected vehicle is not the type route {{code}} is priced for — the fee and driver pay may not apply.",
+      "truckMismatchLeg": "Leg {{leg}}: the selected vehicle is not the type route {{code}} is priced for — the fee and driver pay may not apply.",
+      "truckMissing": "No vehicle selected — the fee and driver pay are still applied from route {{code}}.",
+      "truckMissingLeg": "Leg {{leg}}: no vehicle selected — the fee and driver pay are still applied from route {{code}}."
     }
   },
   "vendors": {

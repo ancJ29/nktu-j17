@@ -73,6 +73,7 @@ import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
 import { resolveTransportOrderStatus } from '@/pages/transport-orders/transportOrderStatuses';
+import { ExternalTruckChip } from '@/pages/transport-orders/TransportVehicle';
 import type {
   SalesOrderCustomerDiff,
   SalesOrderInlineFields,
@@ -2956,6 +2957,13 @@ type TransportOrderMemo = {
   // create
   truckId?: string;
   driverId?: string;
+  /**
+   * XE NGOÀI — the plate / hauler name of a **hired** truck, which has no record
+   * to link to. Only present when the id beside it is empty (see
+   * `pages/transport-orders/externalTruck.ts`).
+   */
+  externalTruck?: string;
+  externalDriver?: string;
   customerCode?: string;
   route?: string;
   containerNumber?: string;
@@ -3027,7 +3035,15 @@ function TransportOrderCreateBody({ memo }: { readonly memo: TransportOrderMemo 
       )}
       <Group gap={8} wrap="wrap" align="baseline">
         {memo.truckId && <TruckLink id={memo.truckId} size="xs" />}
+        {/* A hired truck has no record to link — the plate is the whole record
+            of which vehicle ran the job, so the entry prints it. */}
+        {memo.externalTruck && <ExternalTruckChip plate={memo.externalTruck} size="xs" />}
         {memo.driverId && <EmployeeLink id={memo.driverId} size="xs" />}
+        {memo.externalDriver && (
+          <Text size="xs" c="dimmed">
+            {memo.externalDriver}
+          </Text>
+        )}
         {memo.customerCode && <CustomerLink code={memo.customerCode} size="xs" />}
       </Group>
       <Group gap={8} wrap="wrap" align="baseline">

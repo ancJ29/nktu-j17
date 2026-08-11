@@ -9,7 +9,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SheetStage } from '@/types';
 
@@ -19,7 +19,11 @@ type Props = {
   readonly onChange: (stages: SheetStage[]) => void;
 };
 
-export function ProcessStagesEditor({ stages, totalDays, onChange }: Props) {
+export const ProcessStagesEditor = memo(function ProcessStagesEditor({
+  stages,
+  totalDays,
+  onChange,
+}: Props) {
   const { t } = useTranslation();
 
   const patch = useCallback(
@@ -115,4 +119,4 @@ export function ProcessStagesEditor({ stages, totalDays, onChange }: Props) {
       </Group>
     </Stack>
   );
-}
+});

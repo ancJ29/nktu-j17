@@ -26,6 +26,8 @@ export type QuotationPrintLine = {
   lineTotal: number;
 
   photoUrl?: string;
+
+  priceTiers?: { minQuantity: number; unitPrice: number }[];
 };
 
 export type QuotationPrintData = {

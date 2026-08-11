@@ -1,9 +1,11 @@
 import { cMngtConnector } from '@credo/connectors/connector';
 import type { SalesOrder, SalesOrderExtra } from '@/types';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { buildSalesReport, salesOrderAnchorDate } from './buildSalesReport';
 import { addDays, resolveMonth, resolveWeekPeriod, type ResolvedPeriod } from './reportPeriods';
+import { createReportCustomerResolver } from './reportCustomerIdentity';
 import { sourceHashOf } from './sourceHash';
 import type { NktuReportKind, SalesReportData } from './types';
 
@@ -35,13 +37,14 @@ export async function aggregateSalesReport(
     return d >= period.startStr && d <= period.endStr;
   });
 
-  await useEmployeeStore.getState().loadAll();
+  await Promise.all([useEmployeeStore.getState().loadAll(), useCustomerStore.getState().loadAll()]);
   const empName = new Map(useEmployeeStore.getState().items.map((e) => [e.id, e.name]));
 
   const data = buildSalesReport(period, orders, {
     statusOptions: salesOrderFieldOptions.statusOptions,
     employeeName: (id) => (id ? empName.get(id) : undefined),
     methodLabel: (code) => salesOrderFieldOptions.resolveDeliveryMethod(code),
+    customerOf: createReportCustomerResolver(useCustomerStore.getState().items),
   });
 
   return { data, sourceHash: sourceHashOf(orders) };

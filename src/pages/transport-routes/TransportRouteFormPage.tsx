@@ -51,11 +51,14 @@ import type { TransportRouteExtra, TransportRouteLeg, TransportRouteRow } from '
 import { PLACE_INPUT_STYLES, PLACE_SUGGESTION_LIMIT } from '../transport-orders/placeSuggestions';
 import { usePlaceSuggestions } from '../transport-orders/usePlaceSuggestions';
 import { useContainerSizeOptions } from '../transport-orders/containerSize';
+import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useTruckTypeOptions } from './truckType';
 import { buildTransportRouteWrite } from './transportRouteWrite';
 
 const isMobile = device.isMobile;
+
+const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
 const MAX_CODE_RETRIES = 20;
 
@@ -232,7 +235,10 @@ export function TransportRouteFormPage() {
           route: { pickup: values.pickup, stuffing: values.stuffing, dropoff: values.dropoff },
           trips: values.trips,
           truckType: values.truckType,
-          containerSize: values.containerSize,
+
+          containerSize: truckTypeCarriesContainer(values.truckType, NON_CONTAINER_TRUCK_TYPES)
+            ? values.containerSize
+            : '',
           freightAmount: values.freightAmount,
           laborCost: values.laborCost,
           isActive: values.isActive,
@@ -339,6 +345,11 @@ export function TransportRouteFormPage() {
       ? [...options, { value: current, label: current }]
       : options;
 
+  const showContainerSize = truckTypeCarriesContainer(
+    form.values.truckType,
+    NON_CONTAINER_TRUCK_TYPES,
+  );
+
   const containerSizeData = [
     { value: '', label: t('transportRoutes.form.anyContainerSize') },
     ...withCurrent(containerSizeOptions, form.values.containerSize),
@@ -388,19 +399,28 @@ export function TransportRouteFormPage() {
                 label={t('transportRoutes.form.truckType')}
                 data={withCurrent(truckTypeOptions, form.values.truckType)}
                 value={form.values.truckType || null}
-                onChange={(v) => form.setFieldValue('truckType', v ?? '')}
+                onChange={(v) => {
+                  const next = v ?? '';
+                  form.setFieldValue('truckType', next);
+
+                  if (!truckTypeCarriesContainer(next, NON_CONTAINER_TRUCK_TYPES)) {
+                    form.setFieldValue('containerSize', '');
+                  }
+                }}
                 error={form.errors.truckType}
                 searchable
                 clearable
               />
-              <Select
-                label={t('transportRoutes.form.containerSize')}
-                data={containerSizeData}
-                value={form.values.containerSize}
-                onChange={(v) => form.setFieldValue('containerSize', v ?? '')}
-                searchable
-                allowDeselect={false}
-              />
+              {showContainerSize && (
+                <Select
+                  label={t('transportRoutes.form.containerSize')}
+                  data={containerSizeData}
+                  value={form.values.containerSize}
+                  onChange={(v) => form.setFieldValue('containerSize', v ?? '')}
+                  searchable
+                  allowDeselect={false}
+                />
+              )}
               <Switch
                 mt="md"
                 label={

@@ -1,8 +1,15 @@
 import * as XLSX from 'xlsx';
 import { ExcelParseError } from './excelParser';
 import { parseCropSheetGrid, type CropSheetImport, type SheetGrid } from './cropSheetImport';
-import { columnScale, numericValue, type SheetCropContext } from './cropSheetModel';
-import type { CropProcessPlan } from '@/types';
+import {
+  columnScale,
+  numericValue,
+  sheetHeader,
+  weekdayLabel,
+  type SheetCropContext,
+} from './cropSheetModel';
+import { addDays } from './cropSchedule';
+import type { CropProcessPlan, CropSheetExtra } from '@/types';
 
 export function workbookToGrid(workbook: XLSX.WorkBook): SheetGrid {
   const name = workbook.SheetNames[0];
@@ -36,10 +43,22 @@ export type CropSheetExportLabels = {
   sheetName: string;
 };
 
+const META = {
+  target: 'Giống',
+  seeds: 'Hạt',
+  plants: 'Số lượng cây',
+  memo: 'Ghi chú chung',
+} as const;
+
 export function buildCropSheetRows(
   plan: CropProcessPlan,
   labels: CropSheetExportLabels,
-  opts?: SheetCropContext & { startDate?: string; dayDate?: (day: number) => string | undefined },
+  opts?: SheetCropContext & {
+    startDate?: string;
+    dayDate?: (day: number) => string | undefined;
+
+    crop?: Partial<CropSheetExtra>;
+  },
 ): (string | number)[][] {
   const header = [
     labels.stage,
@@ -49,9 +68,32 @@ export function buildCropSheetRows(
     ...plan.columns.map((c) => c.label),
   ];
   const groups = plan.columns.map((c) => c.group ?? '');
-  const rows: (string | number)[][] = groups.some(Boolean)
-    ? [['', '', '', '', ...groups], header]
-    : [header];
+
+  const meta = sheetHeader(plan, opts?.crop);
+  const rows: (string | number)[][] = meta.memos.map((memo) => [META.memo, memo]);
+  if (meta.target) rows.push([META.target, meta.target]);
+  if (meta.seedCount !== undefined) rows.push([META.seeds, meta.seedCount]);
+  if (meta.plantCount !== undefined) {
+    rows.push([
+      META.plants,
+      meta.plantCount,
+      ...(meta.adjustmentRate ? [meta.adjustmentRate] : []),
+    ]);
+  }
+
+  for (const job of plan.preparation ?? []) {
+    const date =
+      (opts?.startDate ? addDays(opts.startDate, job.dayOffset) : undefined) ?? undefined;
+    rows.push([
+      job.label ?? '',
+      date ?? job.dayOffset,
+      date ? weekdayLabel(date) : '',
+      job.activity,
+    ]);
+  }
+
+  if (groups.some(Boolean)) rows.push(['', '', '', '', ...groups]);
+  rows.push(header);
 
   const stageStart = new Map(plan.stages.map((s) => [s.fromDay, s.name]));
   const totals = plan.columns.map(() => 0);
@@ -66,11 +108,13 @@ export function buildCropSheetRows(
       if (column.kind === 'material' || column.kind === 'perPlant') totals[i] += value;
       return value;
     });
+
+    const date = opts?.dayDate?.(day.day) ?? '';
     rows.push([
       stageStart.get(day.day) ?? '',
       day.day,
-      opts?.dayDate?.(day.day) ?? '',
-      '',
+      date,
+      date ? weekdayLabel(date) : '',
       ...cells,
     ]);
   }
@@ -91,7 +135,11 @@ export function exportCropSheet(
   plan: CropProcessPlan,
   labels: CropSheetExportLabels,
   filename: string,
-  opts?: SheetCropContext & { dayDate?: (day: number) => string | undefined },
+  opts?: SheetCropContext & {
+    startDate?: string;
+    dayDate?: (day: number) => string | undefined;
+    crop?: Partial<CropSheetExtra>;
+  },
 ): void {
   const workbook = XLSX.utils.book_new();
   const sheet = XLSX.utils.aoa_to_sheet(buildCropSheetRows(plan, labels, opts));

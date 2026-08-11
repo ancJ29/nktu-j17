@@ -93,6 +93,8 @@ import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { useShipmentTypeLabel } from './shipmentType';
 import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
+import { isExternalTruck } from './externalTruck';
+import { ExternalTruckChip } from './TransportVehicle';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 import { reconcileTripLogs } from './tripLogSync';
 import { TransportTripsCard } from './TransportTripsCard';
@@ -441,11 +443,38 @@ export function TransportOrderDetailPage() {
     .filter(driverEmployeeFilter)
     .map((e) => ({ value: e.id, label: driverWithPlate(e) }));
 
-  const truckField = (
+  const externalTruck = isExternalTruck(order);
+
+  const truckField = externalTruck ? (
+    <InlineEditField<string>
+      canEdit={canEditMeta}
+      value={order.truckPlate ?? ''}
+      onSave={async (next) => handleMetaPatch({ truckPlate: next.trim() })}
+      labels={inlineEditLabels}
+      submitOnEnter
+      renderDisplay={(v) => <ExternalTruckChip plate={v} />}
+      renderEditor={({ value: v, onChange }) => (
+        <TextInput
+          value={v}
+          onChange={(e) => onChange(e.currentTarget.value)}
+          placeholder={t('transportOrders.form.externalPlate')}
+          data-autofocus
+          autoFocus
+        />
+      )}
+    />
+  ) : (
     <InlineSelectField
       canEdit={canEditMeta}
       value={order.truckId ?? ''}
       onSave={async (next) => {
+        if (!next) {
+          notifications.show({
+            color: 'red',
+            message: t('transportOrders.validation.truckRequired'),
+          });
+          throw new Error('truck is required');
+        }
         const picked = trucks.find((tr) => tr.id === next);
         await handleMetaPatch({ truckId: next, truckPlate: picked?.name ?? '' });
       }}
@@ -456,7 +485,15 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  const driverField = (
+  const driverField = externalTruck ? (
+    <InlineTextField
+      canEdit={canEditMeta}
+      value={order.driverName ?? ''}
+      onSave={async (next) => handleMetaPatch({ driverName: next.trim() })}
+      placeholder={t('transportOrders.form.externalDriver')}
+      labels={inlineEditLabels}
+    />
+  ) : (
     <InlineSelectField
       canEdit={canEditMeta}
       value={order.driverId ?? ''}

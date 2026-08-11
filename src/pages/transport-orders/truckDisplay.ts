@@ -24,6 +24,18 @@ export function useTruckPlate(): (truckId: string | undefined | null) => string 
   }, [items]);
 }
 
+export function useTruckTypeOf(): (truckId: string | undefined | null) => string | undefined {
+  const items = useTruckAssetStore((s) => s.items);
+  return useMemo(() => {
+    const map = new Map<string, string>();
+    for (const tr of items) {
+      const type = tr.extra?.truckType?.trim();
+      if (type) map.set(tr.id, type);
+    }
+    return (id) => (id ? map.get(id) : undefined);
+  }, [items]);
+}
+
 export function useDriverWithPlate(): (employee: Pick<Employee, 'name' | 'extra'>) => string {
   const plateOf = useTruckPlate();
   return (employee) => truckNameWithPlate(employee.name, plateOf(employee.extra?.truckAssetId));

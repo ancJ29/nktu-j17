@@ -9,6 +9,7 @@ import {
 import {
   DEFAULT_QUOTATION_PRINT_OPTIONS,
   type QuotationPrintData,
+  type QuotationPrintLine,
   type QuotationPrintOptions,
 } from './quotationPrint';
 
@@ -16,6 +17,15 @@ const DOC_TITLE = 'BÁO GIÁ';
 
 function decimal2(n: number): string {
   return n.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function tiersHtml(tiers: QuotationPrintLine['priceTiers'], unit: string): string {
+  if (!tiers?.length) return '';
+  const unitSuffix = unit ? ` ${unit}` : '';
+  const rungs = tiers
+    .map((t) => `Từ ${t.minQuantity.toLocaleString('vi-VN')}${unitSuffix}: ${money(t.unitPrice)}đ`)
+    .join(' · ');
+  return `<div class="tiers">Giá theo số lượng — ${escapeHtml(rungs)}</div>`;
 }
 
 function buildParts(
@@ -45,7 +55,7 @@ function buildParts(
               ? `<td class="c photo">${line.photoUrl ? `<img src="${escapeHtml(line.photoUrl)}" alt="" />` : ''}</td>`
               : ''
           }
-          <td>${escapeHtml(line.name)}</td>
+          <td>${escapeHtml(line.name)}${tiersHtml(line.priceTiers, line.unit)}</td>
           <td class="c">${escapeHtml(line.unit)}</td>
           <td class="r">${decimal2(line.quantity)}</td>
           <td class="r">${decimal2(line.unitPrice)}</td>
@@ -109,6 +119,7 @@ function buildParts(
     margin: 0 auto;
   }
   tbody tr { page-break-inside: avoid; }
+  .tiers { margin-top: 2px; font-size: ${baseFontPx - 1.5}px; color: #555; font-style: italic; }
   tr.sum td { font-weight: 600; }
   tr.grand td { font-weight: 700; font-size: ${baseFontPx + 1}px; background: #f0f0f0; }
   thead { display: table-header-group; }

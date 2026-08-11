@@ -11,13 +11,20 @@ import {
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import {
+  isDefaultStatusSelection,
+  shouldEncodeStatusSelection,
+} from '@/utils/listFilterStatusDefault';
+import { getTransportOrderDefaultListStatuses } from '@/utils/permission';
 import { orderPlanSortKey } from './planDate';
+import { useTruckTypeOf } from './truckDisplay';
+import { usesTruckType } from './truckTypeMatch';
 import type { TransportOrder, TransportOrderShipmentType } from '@/types';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
 
-const EMPTY_STATUS: readonly string[] = [];
+const DEFAULT_STATUS: readonly string[] = getTransportOrderDefaultListStatuses();
 
 function usesTruck(order: TransportOrder, truckId: string): boolean {
   if (order.truckId === truckId) return true;
@@ -36,6 +43,8 @@ type TransportOrderUrlState = {
   s?: string[];
   c?: string;
   tk?: string;
+
+  tt?: string;
   dv?: string;
 
   sh?: TransportOrderShipmentType;
@@ -50,9 +59,11 @@ type TransportOrderUrlState = {
 function compactState(state: TransportOrderUrlState): TransportOrderUrlState {
   const r: TransportOrderUrlState = {};
   if (state.q) r.q = state.q;
-  if (state.s?.length) r.s = state.s;
+
+  if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.c) r.c = state.c;
   if (state.tk) r.tk = state.tk;
+  if (state.tt) r.tt = state.tt;
   if (state.dv) r.dv = state.dv;
   if (state.sh) r.sh = state.sh;
   if (state.cz) r.cz = state.cz;
@@ -74,10 +85,14 @@ export function useTransportOrderListFilters(
     compactState,
   });
 
+  const truckTypeOf = useTruckTypeOf();
+
   const search = state.q ?? '';
-  const statusFilter = (state.s ?? EMPTY_STATUS) as string[];
+
+  const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const customerFilter = state.c ?? null;
   const truckFilter = state.tk ?? null;
+  const truckTypeFilter = state.tt ?? null;
   const driverFilter = state.dv ?? null;
   const shipmentFilter: TransportOrderShipmentFilter = state.sh ?? 'all';
   const containerSizeFilter = state.cz ?? null;
@@ -94,8 +109,9 @@ export function useTransportOrderListFilters(
     (v: string) => updateState({ q: v || undefined, pg: undefined }),
     [updateState],
   );
+
   const setStatusFilter = useCallback(
-    (v: string[]) => updateState({ s: v.length > 0 ? v : undefined, pg: undefined }),
+    (v: string[]) => updateState({ s: v, pg: undefined }),
     [updateState],
   );
   const setCustomerFilter = useCallback(
@@ -104,6 +120,10 @@ export function useTransportOrderListFilters(
   );
   const setTruckFilter = useCallback(
     (v: string | null) => updateState({ tk: v || undefined, pg: undefined }),
+    [updateState],
+  );
+  const setTruckTypeFilter = useCallback(
+    (v: string | null) => updateState({ tt: v || undefined, pg: undefined }),
     [updateState],
   );
   const setDriverFilter = useCallback(
@@ -149,6 +169,7 @@ export function useTransportOrderListFilters(
       if (statusFilter.length > 0 && !statusFilter.includes(o.status)) return false;
       if (customerFilter && o.customerCode !== customerFilter) return false;
       if (truckFilter && !usesTruck(o, truckFilter)) return false;
+      if (truckTypeFilter && !usesTruckType(o, truckTypeFilter, truckTypeOf)) return false;
       if (driverFilter && !usesDriver(o, driverFilter)) return false;
       if (shipmentFilter !== 'all' && o.shipmentType !== shipmentFilter) return false;
       if (containerSizeFilter && o.containerSize !== containerSizeFilter) return false;
@@ -173,6 +194,8 @@ export function useTransportOrderListFilters(
     statusFilter,
     customerFilter,
     truckFilter,
+    truckTypeFilter,
+    truckTypeOf,
     driverFilter,
     shipmentFilter,
     containerSizeFilter,
@@ -181,10 +204,16 @@ export function useTransportOrderListFilters(
     sortField,
   ]);
 
+  const statusFilterIsDefault = useMemo(
+    () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
+    [statusFilter],
+  );
+
   const hasActiveFilters = !!(
-    statusFilter.length > 0 ||
+    !statusFilterIsDefault ||
     customerFilter ||
     truckFilter ||
+    truckTypeFilter ||
     driverFilter ||
     shipmentFilter !== 'all' ||
     containerSizeFilter ||
@@ -198,10 +227,14 @@ export function useTransportOrderListFilters(
     setSearch,
     statusFilter,
     setStatusFilter,
+
+    statusFilterIsDefault,
     customerFilter,
     setCustomerFilter,
     truckFilter,
     setTruckFilter,
+    truckTypeFilter,
+    setTruckTypeFilter,
     driverFilter,
     setDriverFilter,
     shipmentFilter,

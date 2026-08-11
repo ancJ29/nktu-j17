@@ -303,24 +303,28 @@ export function CropDetailPage() {
         {infoSection}
       </Tabs.Panel>
       <Tabs.Panel value="diary" pt="md">
-        {/* The process grid first: it is the day's work. The free-form section
-            below it holds what no process predicted — weather, pests, disease. */}
-        <CropSheetSection
-          cropId={diaryCropId}
-          cropCode={crop.code}
-          {...(extra.fromDate ? { startDate: extra.fromDate } : {})}
-          {...(extra.diaryTemplateCode ? { templateCode: extra.diaryTemplateCode } : {})}
-          {...(typeof extra.numberOfSeeds === 'number'
-            ? { fallbackPlantCount: extra.numberOfSeeds }
-            : {})}
-          onTotalsChange={setSheetTotals}
-        />
-        <Space h="md" />
+        {/* Read top to bottom, this tab is the season in order: what was done
+            before planting, the process itself, then what nobody planned —
+            weather, pests, disease. The diary section owns the crop's event
+            register (one read, one form) and renders its two halves around the
+            grid, which is why the grid is nested rather than a sibling. */}
         <CropDiarySection
           cropId={diaryCropId}
           cropCode={crop.code}
+          {...(extra.fromDate ? { startDate: extra.fromDate } : {})}
           onSummaryChange={setMaterialSummary}
-        />
+        >
+          <CropSheetSection
+            cropId={diaryCropId}
+            cropCode={crop.code}
+            {...(extra.fromDate ? { startDate: extra.fromDate } : {})}
+            {...(extra.diaryTemplateCode ? { templateCode: extra.diaryTemplateCode } : {})}
+            {...(typeof extra.numberOfSeeds === 'number'
+              ? { fallbackPlantCount: extra.numberOfSeeds }
+              : {})}
+            onTotalsChange={setSheetTotals}
+          />
+        </CropDiarySection>
       </Tabs.Panel>
       <Tabs.Panel value="materials" pt="md">
         {/* Two sources, kept apart on purpose: what the process consumed is a

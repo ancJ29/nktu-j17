@@ -204,6 +204,7 @@ export const DEFAULT_GOODS_RECEIPT_FEATURES: GoodsReceiptFeatures = {
   codePadLength: 4,
   picDepartments: [],
   allowNoInventoryProducts: false,
+  defaultListStatuses: [],
 };
 
 export const DEFAULT_DELIVERY_REQUEST_FEATURES: CMngtDeliveryRequestFeatures = {
@@ -263,6 +264,7 @@ export const DEFAULT_TRANSPORT_ORDER_FEATURES: CMngtTransportOrderFeatures = {
   codePrefix: 'VC-',
   codePadLength: 3,
   routeCodePrefix: 'TUYEN-',
+  nonContainerTruckTypes: [],
 
   statusOptions: [
     {

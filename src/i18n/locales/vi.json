@@ -9,6 +9,7 @@
         "clearFilters": "Xóa bộ lọc",
         "clearSearch": "Xóa tìm kiếm",
         "clearValue": "Xóa",
+        "close": "Đóng",
         "copy": "Sao chép",
         "copyLink": "Sao chép link",
         "disable": "Tắt",
@@ -798,6 +799,7 @@
     "editItem": "Sửa mục",
     "emptyMessage": "Ghi lại hoạt động cho vụ mùa, hoặc áp dụng mẫu.",
     "emptyTitle": "Chưa có mục nhật ký",
+    "eventsTitle": "Sự kiện",
     "filterCropPlaceholder": "Vụ mùa",
     "form": {
       "activityLabel": "Hoạt động",
@@ -831,9 +833,10 @@
       "updateError": "Không cập nhật được mục nhật ký",
       "updateSuccess": "Đã cập nhật mục nhật ký"
     },
+    "prepTitle": "Chuẩn bị trước khi trồng",
     "searchPlaceholder": "Tìm nhật ký…",
     "sectionEmpty": "Vụ mùa này chưa có mục nhật ký nào.",
-    "sectionTitle": "Nhật ký",
+    "sectionTitle": "Sự kiện & chuẩn bị",
     "title": "Nhật ký vụ mùa",
     "validation": {
       "activityRequired": "Vui lòng nhập hoạt động",
@@ -883,6 +886,7 @@
       "addMaterial": "Thêm nguyên liệu",
       "addStep": "Thêm bước",
       "codePlaceholder": "VD: TPL-001",
+      "copyingFrom": "Sao chép từ {{code}}",
       "createButton": "Tạo mẫu",
       "daysSection": "Kế hoạch theo ngày",
       "descriptionLabel": "Mô tả",
@@ -914,6 +918,7 @@
     },
     "plan": {
       "addColumn": "Thêm cột",
+      "addMemo": "Thêm ghi chú",
       "addPreparation": "Thêm việc chuẩn bị",
       "addStage": "Thêm giai đoạn",
       "adjustmentRate": "Tỉ lệ điều chỉnh",
@@ -938,6 +943,9 @@
         "perPlant": "Trên mỗi cây",
         "text": "Văn bản"
       },
+      "memoPlaceholder": "vd. ÁP DỤNG CHO GIÁ THỂ XƠ DỪA",
+      "memosSection": "Ghi chú chung",
+      "memosSectionHint": "Lưu ý áp dụng cho cả quy trình",
       "moveDown": "Xuống",
       "moveUp": "Lên",
       "noColumns": "Chưa có cột nào.",
@@ -950,6 +958,8 @@
       "preparationSectionHint": "Việc làm trước ngày 1 — ngâm hạt, thanh growbag, khử trùng vườn. Lưu theo độ lệch (−14 = trước khi trồng hai tuần) để một quy trình dùng cho mọi vụ; mỗi vụ tự quy ra ngày thật.",
       "referencePlantCount": "Viết cho (số cây)",
       "referencePlantCountHint": "Số cây mà liều bên dưới được viết cho. Vụ có số cây khác sẽ tự quy đổi.",
+      "seedCount": "Số hạt",
+      "seedCountHint": "Khác số lượng cây — sổ ghi cả hai",
       "sizingSection": "Quy mô",
       "stage": "Giai đoạn",
       "stageFrom": "Từ ngày",
@@ -957,6 +967,8 @@
       "stageTo": "Đến ngày",
       "stagesSection": "Giai đoạn",
       "stagesSectionHint": "Các khoảng ngày có tên. Lưu theo khoảng, nên hai ngày trong cùng khoảng không thể lệch nhau.",
+      "target": "Giống",
+      "targetHint": "Giống cây trồng, vd. PI 52",
       "totalDays": "Tổng số ngày",
       "totalsTitle": "Tổng cả vụ"
     },
@@ -1056,6 +1068,20 @@
       "adjustmentRate": "Tỉ lệ",
       "conflictMessage": "Người khác đã lưu quy trình của vụ này trong lúc bạn đang sửa. Thay đổi chưa lưu đã bị bỏ và bảng được tải lại — vui lòng nhập lại.",
       "conflictTitle": "Đã tải lại — quy trình có thay đổi",
+      "day": {
+        "amount": "Cần dùng",
+        "changed": "Khác kế hoạch",
+        "dose": "Định mức",
+        "events": "Đã ghi trong ngày",
+        "measures": "Nước & chỉ số",
+        "noWork": "Quy trình không có việc cho ngày này. Có làm gì thêm thì cứ nhập vào.",
+        "notes": "Ghi chép",
+        "open": "Mở ngày {{day}}",
+        "otherDoses": "Vật tư khác",
+        "reset": "Về đúng kế hoạch",
+        "title": "Ngày {{day}} / {{total}}",
+        "today": "Hôm nay"
+      },
       "empty": "Vụ này chưa có quy trình.",
       "loadError": "Không tải được quy trình của vụ",
       "noTotals": "Chưa tiêu hao gì.",
@@ -2669,6 +2695,7 @@
         "totalAmount": "Tổng hạng mục",
         "type": "Loại",
         "unitPrice": "Đơn giá",
+        "vat": "VAT",
         "warranty": "Bảo hành"
       },
       "editItem": "Sửa bảo trì",
@@ -2681,7 +2708,7 @@
       "form": {
         "addItemLine": "Thêm hạng mục",
         "conditionPlaceholder": "vd. Mới / Đã qua sử dụng",
-        "grandTotalHint": "Hạng mục + tiền công (tự động)",
+        "grandTotalHint": "Hạng mục + tiền công + VAT (tự động)",
         "itemName": "Tên hạng mục",
         "itemPlaceholder": "vd. Thay nhớt, má phanh",
         "monthsSuffix": "tháng",
@@ -2692,6 +2719,8 @@
         "supplierPlaceholder": "Gara / nhà cung cấp",
         "totalAmountHint": "Đơn giá × Số lượng (tự động)",
         "typePlaceholder": "Chọn loại bảo trì",
+        "vatEnabled": "Có VAT",
+        "vatHint": "Tắt — tích để áp dụng",
         "warrantyPlaceholder": "Không"
       },
       "months_one": "{{count}} tháng",
@@ -3415,6 +3444,16 @@
       "noLines": "Chưa có sản phẩm. Thêm sản phẩm, số lượng và đơn giá.",
       "note": "Diễn giải",
       "priceLabel": "Đơn giá",
+      "priceTiers": {
+        "addTier": "Thêm bậc giá",
+        "count_one": "{{count}} bậc giá",
+        "count_other": "{{count}} bậc giá",
+        "editTooltip": "Giá theo số lượng đặt tối thiểu",
+        "minQuantity": "SL tối thiểu",
+        "modalHint": "Nhập đơn giá theo từng mức số lượng đặt tối thiểu. Đơn giá của dòng sẽ tự điền theo số lượng nhập, và bảng bậc giá được in dưới sản phẩm trên file PDF.",
+        "modalTitle": "Giá theo số lượng đặt tối thiểu",
+        "rung": "Từ {{quantity}}: {{price}}"
+      },
       "productLabel": "Sản phẩm",
       "productPlaceholder": "Chọn sản phẩm",
       "quantityLabel": "Số lượng",
@@ -3496,11 +3535,33 @@
       "print": "In báo cáo",
       "sample": "DỮ LIỆU MẪU"
     },
+    "customerProduct": {
+      "completed": "Trong đó đã hoàn thành",
+      "customersHeading": "Khách hàng đã đặt",
+      "empty": "Không có đơn hàng trong kỳ.",
+      "pickCustomer": "Tìm khách hàng",
+      "pickHeading": "Chọn khách hàng hoặc mặt hàng",
+      "pickProduct": "Tìm mặt hàng",
+      "pivotCustomer": "Theo khách hàng",
+      "pivotProduct": "Theo mặt hàng",
+      "productsHeading": "Mặt hàng đã đặt"
+    },
+    "entityTab": {
+      "basis": "đơn chưa huỷ, chưa gồm VAT",
+      "failed": "Không tổng hợp được báo cáo.",
+      "generate": "Tổng hợp",
+      "generatedAt": "Cập nhật lúc {{at}}",
+      "loading": "Đang tải báo cáo…",
+      "noSnapshot": "Chưa tổng hợp báo cáo cho {{period}}. Bấm Tổng hợp để tạo.",
+      "recompute": "Cập nhật lại",
+      "title": "Doanh số"
+    },
     "kpi": {
       "avgOrder": "Giá trị TB / đơn",
       "customers": "Khách hàng đã mua",
       "newCustomers": "khách mới",
       "orders": "Số đơn hàng",
+      "products": "Mặt hàng",
       "revenue": "Tổng doanh số",
       "vsPrev": "so với kỳ trước"
     },
@@ -3522,6 +3583,10 @@
       "perDay": "/ngày"
     },
     "types": {
+      "customer": {
+        "desc": "Khách hàng đã đặt những mặt hàng nào trong tháng — sản lượng, thành tiền (và ai đã mua một mặt hàng).",
+        "title": "Doanh số theo khách hàng"
+      },
       "delivery": {
         "desc": "Tỷ lệ đúng hẹn, đơn trễ, hiệu suất theo tài xế.",
         "title": "Báo cáo giao hàng"
@@ -3544,7 +3609,9 @@
       "customersShort": "KH",
       "million": "triệu ₫",
       "orders": "đơn",
-      "pieces": "con"
+      "pieces": "con",
+      "productsShort": "mặt hàng",
+      "vnd": "₫"
     },
     "wip": {
       "desc": "Báo cáo này đang được phát triển và sẽ sớm ra mắt.",
@@ -3705,6 +3772,7 @@
       "fromLocation": "Lấy từ kho",
       "itemMemo": "Ghi chú",
       "itemsTitle": "Danh sách sản phẩm",
+      "linkedDRsLoading": "Đang tải yêu cầu giao hàng…",
       "noDRsCreatable": "Chưa có yêu cầu giao hàng. Sử dụng \"Tạo yêu cầu giao hàng\" khi đơn hàng đã sẵn sàng.",
       "noDRsReadonly": "Chưa có yêu cầu giao hàng cho đơn hàng này.",
       "photosFromDR": "Ảnh từ yêu cầu giao nhận",
@@ -3945,6 +4013,9 @@
     "actions": {
       "cancel": "Hủy đơn"
     },
+    "bangKe": {
+      "export": "Xuất bảng kê"
+    },
     "billing": {
       "advance": "Tạm ứng",
       "balanceDue": "Còn lại",
@@ -4058,12 +4129,17 @@
     },
     "filters": {
       "createdDate": "Ngày tạo",
-      "hideCancelled": "Ẩn đơn đã hủy"
+      "hideCancelled": "Ẩn đơn đã hủy",
+      "truckType": "Loại xe"
     },
     "form": {
       "containerSize": "Loại cont",
       "customer": "Khách hàng",
       "driver": "Tài xế",
+      "externalDriver": "Tài xế / Nhà xe",
+      "externalPlate": "Biển số xe",
+      "externalTruck": "Xe ngoài",
+      "externalTruckHint": "Xe thuê ngoài — không có trong danh sách xe quản lý",
       "jobSection": "Thông tin chuyến",
       "metaSection": "Thông tin khác",
       "multiTrip": "Nhiều chặng",
@@ -4090,7 +4166,10 @@
       "saveError": "Lưu thay đổi thất bại",
       "tripLogSyncError": "Chưa cập nhật được nhật ký chuyến của xe. Hệ thống sẽ thử lại khi mở đơn này lần sau.",
       "updateError": "Cập nhật đơn vận chuyển thất bại",
-      "updated": "Đã cập nhật đơn vận chuyển"
+      "updated": "Đã cập nhật đơn vận chuyển",
+      "bangKeNeedCustomer": "Chọn một khách hàng ở bộ lọc để xuất bảng kê.",
+      "bangKeSuccess_one": "Đã xuất bảng kê ({{count}} đơn).",
+      "bangKeSuccess_other": "Đã xuất bảng kê ({{count}} đơn)."
     },
     "route": {
       "collapse": "Thu gọn",
@@ -4139,6 +4218,7 @@
       "customerRequired": "Vui lòng chọn khách hàng",
       "driverRequired": "Vui lòng chọn tài xế",
       "entryDateRequired": "Vui lòng chọn ngày",
+      "plateRequired": "Vui lòng nhập biển số xe",
       "truckRequired": "Vui lòng chọn xe"
     }
   },
@@ -4238,7 +4318,11 @@
       "freight": "Phí VC",
       "labor": "Lương chuyến",
       "anyTruckType": "mọi loại xe",
-      "anyContainerSize": "mọi loại cont"
+      "anyContainerSize": "mọi loại cont",
+      "truckMismatch": "Xe đã chọn không đúng loại xe của tuyến tham chiếu {{code}}, phí có thể không chính xác.",
+      "truckMismatchLeg": "Chặng {{leg}}: xe đã chọn không đúng loại xe của tuyến tham chiếu {{code}}, phí có thể không chính xác.",
+      "truckMissing": "Chưa chọn xe — phí và lương chuyến vẫn đang áp dụng theo tuyến {{code}}.",
+      "truckMissingLeg": "Chặng {{leg}}: chưa chọn xe — phí và lương chuyến vẫn đang áp dụng theo tuyến {{code}}."
     }
   },
   "vendors": {

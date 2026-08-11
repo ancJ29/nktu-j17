@@ -1,8 +1,8 @@
-import { Button, Drawer, Group, SegmentedControl, Stack, Text } from '@mantine/core';
+import { Button, Group, SegmentedControl, Stack } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { IconDownload, IconTruckDelivery } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { getCurrentEmployeeId, getCurrentIsRoot } from '@/hooks/useCurrentEmployee';
@@ -11,7 +11,10 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
+import {
+  setDeliveryRequestQueryRange,
+  useDeliveryRequestStore,
+} from '@/stores/useDeliveryRequestStore';
 import { ListPagination } from '@/components/custom/ListPagination';
 import { device, logger } from '@credo/base-ui/utils';
 import { exportSalesOrdersToExcel } from '@/utils/salesOrderExcel';
@@ -63,11 +66,11 @@ import { useListScrollRestoration } from '@/hooks';
 import { SalesOrderCardList } from './SalesOrderCardList';
 import { SalesOrderDataTable } from './SalesOrderDataTable';
 import { SalesOrderFinanceTotals } from './SalesOrderFinanceTotals';
-import { OrderItemsTable } from './OrderItemsTable';
+import { SalesOrderItemsPreviewDrawer } from './SalesOrderItemsPreviewDrawer';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import { useSalesOrderListFilters } from './useSalesOrderListFilters';
 import type { SalesOrderListVariant } from './salesOrderListVariant';
-import type { SalesOrder } from '@/types';
+import type { DeliveryRequest, SalesOrder } from '@/types';
 
 const isMobile = device.isMobile;
 
@@ -137,8 +140,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   } = useEmployeeStore();
 
   const deliveryRequests = useDeliveryRequestStore((s) => s.items);
-  const drInitialized = useDeliveryRequestStore((s) => s.initialized);
-  const loadDeliveryRequests = useDeliveryRequestStore((s) => s.loadAll);
 
   const visibleStoreOrders = useMemo(() => {
     const live = storeOrders.filter((o) => !o.extra?.isDeleted);
@@ -159,25 +160,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     if (!initialized && !error) loadAll();
     if (!customersInit) loadCustomers();
     if (!employeesInit) loadEmployees();
-
-    if (
-      ((canBulkCreateDeliveries && variant.bulkDrMode === 'selection') || isRootUser) &&
-      !drInitialized
-    )
-      loadDeliveryRequests();
-  }, [
-    initialized,
-    error,
-    loadAll,
-    customersInit,
-    loadCustomers,
-    employeesInit,
-    loadEmployees,
-    drInitialized,
-    loadDeliveryRequests,
-    variant.bulkDrMode,
-    isRootUser,
-  ]);
+  }, [initialized, error, loadAll, customersInit, loadCustomers, employeesInit, loadEmployees]);
 
   useEffect(() => {
     if (error) {
@@ -195,6 +178,23 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     setStoreRange: setSalesOrderQueryRange,
     forceRefresh,
   });
+
+  const needDeliveryRequests =
+    (canBulkCreateDeliveries && variant.bulkDrMode === 'selection') ||
+    isRootUser ||
+    (variant.showItemsPreview && itemsOrder !== null);
+  const [drsReady, setDrsReady] = useState(false);
+  const drSyncStartedRef = useRef(false);
+  useEffect(() => {
+    if (!needDeliveryRequests || drSyncStartedRef.current) return;
+    drSyncStartedRef.current = true;
+    setDeliveryRequestQueryRange(fetchRange.from, fetchRange.to);
+
+    void useDeliveryRequestStore
+      .getState()
+      .forceRefresh()
+      .finally(() => setDrsReady(true));
+  }, [needDeliveryRequests, fetchRange]);
 
   const {
     search,
@@ -270,12 +270,19 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     return s;
   }, [deliveryRequests]);
 
+  const itemsOrderDRs = useMemo<DeliveryRequest[]>(() => {
+    if (!itemsOrder) return [];
+    return deliveryRequests.filter(
+      (d) => d.salesOrderId === itemsOrder.id && !d.extra?.isDeleted,
+    ) as DeliveryRequest[];
+  }, [itemsOrder, deliveryRequests]);
+
   const vacuousCompletionIds = useMemo(
     () =>
-      isRootUser && drInitialized
+      isRootUser && drsReady
         ? collectVacuouslyCompletedSalesOrderIds(paginated, ordersWithDR)
         : undefined,
-    [isRootUser, drInitialized, paginated, ordersWithDR],
+    [isRootUser, drsReady, paginated, ordersWithDR],
   );
 
   const selectedOrders = useMemo(
@@ -837,31 +844,16 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
         ))}
 
       {variant.showItemsPreview && (
-        <Drawer
-          opened={itemsOrder !== null}
+        <SalesOrderItemsPreviewDrawer
+          order={itemsOrder}
           onClose={() => setItemsOrder(null)}
-          position="bottom"
-          size={isMobile ? '85%' : '60%'}
-          title={
-            itemsOrder && (
-              <Group gap="xs" wrap="nowrap">
-                <Text fw={700}>{t('salesOrders.detail.itemsTitle')}</Text>
-                <Text fw={500}>{itemsOrder.orderNumber}</Text>
-                <Text c="dimmed">
-                  {resolveSalesOrderCustomerName(itemsOrder, getCustomerByCode) ?? ''}
-                </Text>
-              </Group>
-            )
+          customerName={
+            itemsOrder ? resolveSalesOrderCustomerName(itemsOrder, getCustomerByCode) : undefined
           }
-        >
-          {itemsOrder && (
-            <OrderItemsTable
-              items={itemsOrder.items}
-              totalAmount={itemsOrder.totalAmount}
-              showShortageAlert={false}
-            />
-          )}
-        </Drawer>
+          linkedDRs={itemsOrderDRs}
+          drsLoaded={drsReady}
+          statusBadgeVariant={variant.statusBadge}
+        />
       )}
     </Stack>
   );

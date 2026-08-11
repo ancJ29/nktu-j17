@@ -9,7 +9,7 @@ import {
   TextInput,
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PlanPreparation } from '@/types';
 
@@ -18,7 +18,10 @@ type Props = {
   readonly onChange: (preparation: PlanPreparation[]) => void;
 };
 
-export function ProcessPreparationEditor({ preparation, onChange }: Props) {
+export const ProcessPreparationEditor = memo(function ProcessPreparationEditor({
+  preparation,
+  onChange,
+}: Props) {
   const { t } = useTranslation();
 
   const patch = useCallback(
@@ -98,4 +101,4 @@ export function ProcessPreparationEditor({ preparation, onChange }: Props) {
       </Group>
     </Stack>
   );
-}
+});

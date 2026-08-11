@@ -10,7 +10,15 @@ import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useContainerSizeLabel } from '../transport-orders/containerSize';
 import { useTruckTypeLabel } from './truckType';
-import { routeEndpoints, routeLaborTotal, routeLegCount } from './routeSummary';
+import {
+  routeContainerDisplay,
+  routeEndpoints,
+  routeLaborTotal,
+  routeLegCount,
+} from './routeSummary';
+import { appConfig } from '@/config';
+
+const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
 type Props = {
   readonly routes: TransportRouteRow[];
@@ -82,14 +90,16 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         width: '120px',
         header: t('transportRoutes.columns.containerSize'),
 
-        render: (r: TransportRouteRow) =>
-          r.containerSize ? (
-            <Text size="sm">{containerSizeLabel(r.containerSize)}</Text>
-          ) : (
+        render: (r: TransportRouteRow) => {
+          const display = routeContainerDisplay(r, NON_CONTAINER_TRUCK_TYPES);
+          if (display === 'value')
+            return <Text size="sm">{containerSizeLabel(r.containerSize)}</Text>;
+          return (
             <Text size="sm" c="dimmed" fs="italic">
-              {t('transportRoutes.form.anyContainerSize')}
+              {display === 'any' ? t('transportRoutes.form.anyContainerSize') : '—'}
             </Text>
-          ),
+          );
+        },
       },
       {
         key: 'freightAmount',

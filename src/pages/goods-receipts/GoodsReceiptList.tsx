@@ -191,6 +191,8 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
 
   const hasActiveFilters = filters.hasActiveFilters || !!search;
 
+  const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
+
   const statusFilterData = useMemo(
     () =>
       GOODS_RECEIPT_STATUSES.map((s) => ({
@@ -509,14 +511,17 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
             presetLabels,
           }}
         >
-          {filters.statusFilter.map((sf) => (
-            <FilterPill
-              key={sf}
-              onClose={() => filters.setStatusFilter(filters.statusFilter.filter((v) => v !== sf))}
-            >
-              {t(findStatus(sf as 'draft' | 'received' | 'cancelled').labelKey)}
-            </FilterPill>
-          ))}
+          {showStatusPills &&
+            filters.statusFilter.map((sf) => (
+              <FilterPill
+                key={sf}
+                onClose={() =>
+                  filters.setStatusFilter(filters.statusFilter.filter((v) => v !== sf))
+                }
+              >
+                {t(findStatus(sf as 'draft' | 'received' | 'cancelled').labelKey)}
+              </FilterPill>
+            ))}
           {filters.vendorFilter && (
             <FilterPill onClose={() => filters.setVendorFilter(null)}>
               {vendorFilterData.find((v) => v.value === filters.vendorFilter)?.label ??

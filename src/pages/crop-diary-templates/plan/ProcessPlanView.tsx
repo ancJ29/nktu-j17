@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '@/utils/number';
 import { seasonTotals, stageOf, makeCropSheetExtra } from '@/utils/cropSheetModel';
+import { SHEET_GRID_W, sheetTableMinWidth } from '@/utils/sheetGridLayout';
 import type { CropProcessPlan } from '@/types';
 
 type Props = {
@@ -28,6 +29,16 @@ export function ProcessPlanView({ plan }: Props) {
         <Badge variant="light" color="primary" radius="sm">
           {t('cropDiaryTemplates.dayCount', { count: plan.totalDays })}
         </Badge>
+        {plan.target ? (
+          <Badge variant="light" color="gray" radius="sm">
+            {t('cropDiaryTemplates.plan.target')}: {plan.target}
+          </Badge>
+        ) : null}
+        {plan.referenceSeedCount ? (
+          <Badge variant="light" color="gray" radius="sm">
+            {t('cropDiaryTemplates.plan.seedCount')}: {formatNumber(plan.referenceSeedCount)}
+          </Badge>
+        ) : null}
         {plan.referencePlantCount ? (
           <Badge variant="light" color="gray" radius="sm">
             {t('cropDiaryTemplates.plan.referencePlantCount')}:{' '}
@@ -40,6 +51,21 @@ export function ProcessPlanView({ plan }: Props) {
           </Badge>
         ) : null}
       </Group>
+
+      {plan.memos?.length ? (
+        <Box>
+          <Text size="xs" fw={600} c="dimmed" mb={4}>
+            {t('cropDiaryTemplates.plan.memosSection')}
+          </Text>
+          <Stack gap={2}>
+            {plan.memos.map((memo, i) => (
+              <Text key={i} size="xs">
+                {memo}
+              </Text>
+            ))}
+          </Stack>
+        </Box>
+      ) : null}
 
       {plan.preparation?.length ? (
         <Box>
@@ -76,13 +102,19 @@ export function ProcessPlanView({ plan }: Props) {
       )}
 
       <Box style={{ overflowX: 'auto' }}>
-        <Table striped withTableBorder verticalSpacing={2} horizontalSpacing={6} miw={640}>
+        <Table
+          striped
+          withTableBorder
+          verticalSpacing={2}
+          horizontalSpacing={6}
+          miw={sheetTableMinWidth(plan.columns.length, SHEET_GRID_W.day + SHEET_GRID_W.stage)}
+        >
           <Table.Thead>
             <Table.Tr>
-              <Table.Th w={54}>{t('cropDiaryTemplates.plan.day')}</Table.Th>
-              <Table.Th w={150}>{t('cropDiaryTemplates.plan.stage')}</Table.Th>
+              <Table.Th w={SHEET_GRID_W.day}>{t('cropDiaryTemplates.plan.day')}</Table.Th>
+              <Table.Th w={SHEET_GRID_W.stage}>{t('cropDiaryTemplates.plan.stage')}</Table.Th>
               {plan.columns.map((column) => (
-                <Table.Th key={column.key} miw={100}>
+                <Table.Th key={column.key} miw={SHEET_GRID_W.column}>
                   <Text size="xs" fw={600} lh={1.2}>
                     {column.label || column.key}
                   </Text>

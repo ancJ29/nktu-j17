@@ -202,6 +202,10 @@ export type CMngtSalesOrderFeatures = {
   picDepartments?: string[];
 };
 
+export type CMngtQuotationFeatures = {
+  priceByMinQuantity: boolean;
+};
+
 export type CMngtDeliveryRequestStage = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'EXCEPTIONAL';
 
 export type CMngtDeliveryRequestStatusOption = ConfigOption & {
@@ -263,6 +267,8 @@ export type CMngtTransportOrderFeatures = {
 
   routeCodePrefix?: string;
 
+  nonContainerTruckTypes?: string[];
+
   statusOptions: CMngtTransportOrderStatusOption[];
 
   statusTransitions?: Record<string, string[]>;
@@ -313,6 +319,8 @@ export type CMngtAppConfig = AppConfig & {
     warehouseReceipts: CMngtWarehouseDocFeatures;
     warehouseDeliveryNotes: CMngtWarehouseDocFeatures;
     salesOrders: CMngtSalesOrderFeatures;
+
+    quotations?: CMngtQuotationFeatures;
     deliveryRequests: CMngtDeliveryRequestFeatures;
     goodsReceipts: CMngtGoodsReceiptFeatures;
     transportOrders: CMngtTransportOrderFeatures;

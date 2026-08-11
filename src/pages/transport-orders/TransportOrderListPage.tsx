@@ -1,6 +1,6 @@
 import { Button, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconDownload } from '@tabler/icons-react';
+import { IconDownload, IconFileSpreadsheet } from '@tabler/icons-react';
 import { useEffect, useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { useTranslation } from 'react-i18next';
@@ -33,13 +33,15 @@ import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { FilterPill } from '@/components/FilterPill';
 import { TransactionalFilterPillsRow } from '@/components/TransactionalFilterPillsRow';
 import { device, logger } from '@credo/base-ui/utils';
-import { perms } from '@/utils/permission';
+import { perms, resolveTransportOrderBangKeTemplate } from '@/utils/permission';
 import { useListScrollRestoration } from '@/hooks';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useTransactionalRangeRefetch } from '@/hooks/useTransactionalRangeRefetch';
 import { EMPTY_DATE_RANGE, type DateRangePreset, type MoreFilterDef } from '@/types/date-range';
 import { formatDateRangeLabel } from '@/utils/listFilterDateRange';
 import { exportTransportOrdersToExcel } from '@/utils/transportOrderExcel';
+import { exportTransportOrderBangKe } from '@/utils/transportOrderBangKeExcel';
+import { getCompanyInfo } from '@/config/companyInfo';
 import { TransportOrderCardList } from './TransportOrderCardList';
 import { TransportOrderDataTable } from './TransportOrderDataTable';
 import { formatMoney, orderTotals, orderTripLaborTotal } from './transportOrderPricing';
@@ -48,6 +50,7 @@ import { useTransportOrderListFilters } from './useTransportOrderListFilters';
 import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
 import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
 import { truckOptionLabel, useTruckPlate } from './truckDisplay';
+import { useTruckTypeLabel, useTruckTypeOptions } from '../transport-routes/truckType';
 import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
@@ -193,6 +196,9 @@ export function TransportOrderListPage() {
   const containerSizeData = useContainerSizeOptions();
   const containerSizeLabel = useContainerSizeLabel();
 
+  const truckTypeData = useTruckTypeOptions();
+  const truckTypeLabel = useTruckTypeLabel();
+
   const getTruckPlate = useTruckPlate();
 
   const handleExport = () => {
@@ -220,6 +226,57 @@ export function TransportOrderListPage() {
       });
     } catch (err) {
       logger.error('Transport order export failed:', err);
+      notifications.show({
+        color: 'red',
+        message: t('transportOrders.notifications.exportError'),
+      });
+    }
+  };
+
+  const handleExportBangKe = () => {
+    const code = filters.customerFilter;
+    if (!code) {
+      notifications.show({
+        color: 'yellow',
+        message: t('transportOrders.notifications.bangKeNeedCustomer'),
+      });
+      return;
+    }
+    const customer = customers.find((c) => c.code === code);
+
+    const shipmentSuffix =
+      filters.shipmentFilter !== 'all'
+        ? `- ${shipmentTypeLabel(filters.shipmentFilter).toLocaleUpperCase('vi')}`
+        : undefined;
+    try {
+      const count = exportTransportOrderBangKe(filtered, {
+        seller: getCompanyInfo(),
+        customer: {
+          name: customer?.name ?? filtered.find((o) => o.customerName)?.customerName ?? code,
+          address: customer?.address,
+          taxCode: customer?.extra?.taxCode,
+        },
+        resolveShipmentType: shipmentTypeLabel,
+        resolveContainerSize: containerSizeLabel,
+        getTruckPlate,
+
+        template: resolveTransportOrderBangKeTemplate(code),
+        titleSuffix: shipmentSuffix,
+        fileTag: code,
+      });
+      if (count === 0) {
+        notifications.show({
+          color: 'yellow',
+          message: t('transportOrders.notifications.exportEmpty'),
+        });
+        return;
+      }
+      notifications.show({
+        color: 'green',
+        message: t('transportOrders.notifications.bangKeSuccess', { count }),
+      });
+    } catch (err) {
+      logger.error('Transport order bảng kê export failed:', err);
       notifications.show({
         color: 'red',
         message: t('transportOrders.notifications.exportError'),
@@ -373,6 +430,20 @@ export function TransportOrderListPage() {
       value: filters.entryDateRange,
       onChange: filters.setEntryDateRange,
     },
+
+    ...(truckTypeData.length > 0
+      ? ([
+          {
+            type: 'select',
+            key: 'truckType',
+            title: t('transportOrders.filters.truckType'),
+            placeholder: t('__new__.01-common.filters.all'),
+            value: filters.truckTypeFilter,
+            options: truckTypeData,
+            onChange: filters.setTruckTypeFilter,
+          },
+        ] as MoreFilterDef[])
+      : []),
     {
       type: 'select',
       key: 'driver',
@@ -452,6 +523,8 @@ export function TransportOrderListPage() {
   const clearAll = filters.clearFilters;
 
   const showBarPills = !isMobile;
+
+  const showStatusPills = showBarPills && !filters.statusFilterIsDefault;
   const showShipmentPill = !isMobile || !shipmentChipsShown;
 
   return (
@@ -464,15 +537,32 @@ export function TransportOrderListPage() {
           onRefresh={forceRefresh}
           extraActions={
             canExport && (
-              <Button
-                variant="default"
-                size="sm"
-                leftSection={<IconDownload size={16} />}
-                onClick={handleExport}
-                disabled={filtered.length === 0}
-              >
-                {t('__new__.01-common.actions.exportExcel')}
-              </Button>
+              <>
+                <Button
+                  variant="default"
+                  size="sm"
+                  leftSection={<IconDownload size={16} />}
+                  onClick={handleExport}
+                  disabled={filtered.length === 0}
+                >
+                  {t('__new__.01-common.actions.exportExcel')}
+                </Button>
+                {/* The statement is a billing artifact — money is its whole
+                    point, so it needs the price gate on top of canExport.
+                    Stays enabled without a customer filter: the click explains
+                    what to pick, which beats a silently dead button. */}
+                {canViewPrice && (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    leftSection={<IconFileSpreadsheet size={16} />}
+                    onClick={handleExportBangKe}
+                    disabled={filtered.length === 0}
+                  >
+                    {t('transportOrders.bangKe.export')}
+                  </Button>
+                )}
+              </>
             )
           }
           createCta={{
@@ -532,7 +622,7 @@ export function TransportOrderListPage() {
             presetLabels,
           }}
         >
-          {showBarPills &&
+          {showStatusPills &&
             filters.statusFilter.map((s) => (
               <FilterPill
                 key={s}
@@ -549,6 +639,11 @@ export function TransportOrderListPage() {
           {filters.customerFilter && (
             <FilterPill onClose={() => filters.setCustomerFilter(null)}>
               {t('transportOrders.form.customer')}: {customerLabel(filters.customerFilter)}
+            </FilterPill>
+          )}
+          {filters.truckTypeFilter && (
+            <FilterPill onClose={() => filters.setTruckTypeFilter(null)}>
+              {t('transportOrders.filters.truckType')}: {truckTypeLabel(filters.truckTypeFilter)}
             </FilterPill>
           )}
           {filters.driverFilter && (

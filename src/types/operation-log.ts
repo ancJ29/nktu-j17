@@ -75,6 +75,8 @@ export type MaintenanceLogExtra = {
 
   laborCost?: number;
 
+  vatRate?: number;
+
   grandTotal?: number;
 
   accountsReceived?: number;

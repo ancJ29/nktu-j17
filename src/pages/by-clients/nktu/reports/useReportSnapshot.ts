@@ -11,6 +11,8 @@ export interface UseReportSnapshotParams {
   periodKey: string;
 
   aggregate: (periodKey: string) => Promise<{ data: NktuReport['data']; sourceHash: string }>;
+
+  auto?: boolean;
 }
 
 export interface ReportSnapshotState {
@@ -29,6 +31,7 @@ export function useReportSnapshot({
   kind,
   periodKey,
   aggregate,
+  auto = true,
 }: UseReportSnapshotParams): ReportSnapshotState {
   const items = useNktuReportStore((s) => s.items);
   const initialized = useNktuReportStore((s) => s.initialized);
@@ -112,9 +115,13 @@ export function useReportSnapshot({
 
   useEffect(() => {
     latestKeyRef.current = periodKey;
+    if (!auto) {
+      void loadAll();
+      return;
+    }
 
     void runEnsure(periodKey, false);
-  }, [periodKey, runEnsure]);
+  }, [auto, loadAll, periodKey, runEnsure]);
 
   const refresh = useCallback(() => void runEnsure(periodKey, true), [runEnsure, periodKey]);
 

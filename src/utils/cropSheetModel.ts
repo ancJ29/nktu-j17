@@ -33,6 +33,46 @@ export function hasValue(value: number | string | undefined): boolean {
   return typeof value === 'number' ? Number.isFinite(value) : !!value?.trim();
 }
 
+export type SheetHeader = {
+  target?: string;
+  seedCount?: number;
+  plantCount?: number;
+  adjustmentRate?: number;
+  memos: string[];
+};
+
+export function sheetHeader(plan: CropProcessPlan, crop?: Partial<CropSheetExtra>): SheetHeader {
+  return {
+    ...((crop?.target ?? plan.target) && { target: crop?.target ?? plan.target }),
+    ...((crop?.seedCount ?? plan.referenceSeedCount) !== undefined && {
+      seedCount: crop?.seedCount ?? plan.referenceSeedCount,
+    }),
+    ...((crop?.plantCount ?? plan.referencePlantCount) !== undefined && {
+      plantCount: crop?.plantCount ?? plan.referencePlantCount,
+    }),
+    ...((crop?.adjustmentRate ?? plan.referenceAdjustmentRate) !== undefined && {
+      adjustmentRate: crop?.adjustmentRate ?? plan.referenceAdjustmentRate,
+    }),
+
+    memos: crop?.memos ?? plan.memos ?? [],
+  };
+}
+
+export function weekdayLabel(isoDate: string): string {
+  const ms = Date.parse(`${isoDate}T00:00:00Z`);
+  if (Number.isNaN(ms)) return '';
+  const dow = new Date(ms).getUTCDay();
+  return dow === 0 ? 'Chủ nhật' : `Thứ ${dow + 1}`;
+}
+
+export function sheetCellValue(raw: string): number | string | undefined {
+  const trimmed = raw.trim();
+  if (!trimmed) return undefined;
+  const cleaned = trimmed.replace(/,/g, '');
+  const n = Number(cleaned);
+  return Number.isFinite(n) && String(n) === cleaned ? n : raw;
+}
+
 export function makeEmptySheetDay(day: number): SheetDay {
   return { day, values: {} };
 }
@@ -126,6 +166,13 @@ export function cleanPlan(plan: CropProcessPlan): CropProcessPlan {
         referenceAdjustmentRate: plan.referenceAdjustmentRate,
       }),
     ...(plan.preparation?.length && { preparation: cleanPreparation(plan.preparation) }),
+
+    ...(plan.target?.trim() && { target: plan.target.trim() }),
+    ...(plan.referenceSeedCount &&
+      plan.referenceSeedCount > 0 && { referenceSeedCount: plan.referenceSeedCount }),
+    ...(plan.memos?.some((m) => m.trim()) && {
+      memos: plan.memos.map((m) => m.trim()).filter(Boolean),
+    }),
   };
 }
 
@@ -238,6 +285,79 @@ function sameValue(a: number | string | undefined, b: number | string | undefine
   const nb = numericValue(b);
   if (na !== undefined && nb !== undefined) return na === nb;
   return String(a).trim() === String(b).trim();
+}
+
+export type SheetDayLine = {
+  column: SheetColumn;
+
+  value?: number | string;
+
+  planned?: number | string;
+  changed: boolean;
+
+  amount?: number;
+};
+
+export type SheetDayGroup = {
+  name?: string;
+  lines: SheetDayLine[];
+};
+
+export type SheetDayView = {
+  day: number;
+  totalDays: number;
+  date?: string;
+
+  weekday?: string;
+  stage?: string;
+
+  doses: SheetDayGroup[];
+
+  measures: SheetDayLine[];
+
+  notes: SheetDayLine[];
+
+  changed: boolean;
+
+  empty: boolean;
+};
+
+export function sheetDayView(row: SheetRow, totalDays: number): SheetDayView {
+  const doses: SheetDayGroup[] = [];
+  const measures: SheetDayLine[] = [];
+  const notes: SheetDayLine[] = [];
+
+  for (const cell of row.cells) {
+    const line: SheetDayLine = {
+      column: cell.column,
+      ...(cell.value !== undefined && { value: cell.value }),
+      ...(cell.planned !== undefined && { planned: cell.planned }),
+      changed: cell.changed,
+      ...(cell.dayTotal !== undefined && { amount: cell.dayTotal }),
+    };
+    if (cell.column.kind === 'material') {
+      const name = cell.column.group;
+      const group = doses.find((g) => g.name === name);
+      if (group) group.lines.push(line);
+      else doses.push({ ...(name && { name }), lines: [line] });
+    } else if (cell.column.kind === 'text') {
+      notes.push(line);
+    } else {
+      measures.push(line);
+    }
+  }
+
+  return {
+    day: row.day,
+    totalDays,
+    ...(row.date && { date: row.date, weekday: weekdayLabel(row.date) }),
+    ...(row.stage && { stage: row.stage }),
+    doses,
+    measures,
+    notes,
+    changed: row.cells.some((c) => c.changed),
+    empty: !row.cells.some((c) => hasValue(c.value)),
+  };
 }
 
 export type SheetColumnTotal = {

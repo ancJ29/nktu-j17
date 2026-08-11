@@ -1,6 +1,6 @@
 import { ActionIcon, Group, Select, Stack, Table, Text, TextInput, Button } from '@mantine/core';
 import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import type { SheetColumn, SheetColumnKind } from '@/types';
@@ -10,7 +10,10 @@ type Props = {
   readonly onChange: (columns: SheetColumn[]) => void;
 };
 
-export function ProcessColumnsEditor({ columns, onChange }: Props) {
+export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
+  columns,
+  onChange,
+}: Props) {
   const { t } = useTranslation();
 
   const materials = useMaterialStore((s) => s.items);
@@ -211,4 +214,4 @@ export function ProcessColumnsEditor({ columns, onChange }: Props) {
       </Group>
     </Stack>
   );
-}
+});

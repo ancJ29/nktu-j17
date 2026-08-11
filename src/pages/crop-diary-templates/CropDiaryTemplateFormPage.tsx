@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Card,
   Divider,
@@ -18,6 +19,7 @@ import {
   IconArrowLeft,
   IconCalendar,
   IconClipboardList,
+  IconCopy,
   IconDeviceFloppy,
   IconDownload,
   IconFileSpreadsheet,
@@ -28,7 +30,7 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { Form } from '@/components/Form';
 import { ROUTES } from '@/constants/routes';
@@ -45,6 +47,7 @@ import { exportCropSheet, parseCropSheetFile } from '@/utils/cropSheetExcel';
 import { perms } from '@/utils/permission';
 import type {
   CropDiaryTemplate,
+  CropDiaryTemplateCopyFrom,
   CropDiaryTemplateExtra,
   CropProcessPlan,
   SheetColumn,
@@ -54,6 +57,7 @@ import type {
 } from '@/types';
 import { ProcessColumnsEditor } from './plan/ProcessColumnsEditor';
 import { ProcessGridEditor } from './plan/ProcessGridEditor';
+import { ProcessMemosEditor } from './plan/ProcessMemosEditor';
 import { ProcessPreparationEditor } from './plan/ProcessPreparationEditor';
 import { ProcessStagesEditor } from './plan/ProcessStagesEditor';
 
@@ -64,12 +68,27 @@ type FormValues = {
   name: string;
   description: string;
   totalDays: number | string;
+  referencePlantCount: number | string;
+  adjustmentRate: number | string;
+  target: string;
+  seedCount: number | string;
+};
+
+type PlanDraft = {
   columns: SheetColumn[];
   stages: SheetStage[];
   days: SheetDay[];
   preparation: PlanPreparation[];
-  referencePlantCount: number | string;
-  adjustmentRate: number | string;
+
+  memos: string[];
+};
+
+const EMPTY_PLAN: PlanDraft = {
+  columns: [],
+  stages: [],
+  days: [{ day: 1, values: {} }],
+  preparation: [],
+  memos: [],
 };
 
 function planOf(tpl: CropDiaryTemplate): CropProcessPlan {
@@ -81,6 +100,7 @@ function planOf(tpl: CropDiaryTemplate): CropProcessPlan {
 export function CropDiaryTemplateFormPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
@@ -114,28 +134,40 @@ export function CropDiaryTemplateFormPage() {
     return (label: string) => byName.get(label.trim().toLowerCase());
   }, [materials]);
 
+  const copyFrom = !isEdit
+    ? (location.state as { copyFrom?: CropDiaryTemplateCopyFrom } | null)?.copyFrom
+    : undefined;
+
+  const [plan, setPlan] = useState<PlanDraft>(() =>
+    copyFrom
+      ? {
+          columns: copyFrom.plan.columns,
+          stages: copyFrom.plan.stages,
+          days: resizeSheetDays(copyFrom.plan.days, copyFrom.plan.totalDays),
+          preparation: copyFrom.plan.preparation ?? [],
+          memos: copyFrom.plan.memos ?? [],
+        }
+      : EMPTY_PLAN,
+  );
+
+  const [columnsError, setColumnsError] = useState<string | null>(null);
+
   const form = useForm<FormValues>({
     initialValues: {
       code: '',
-      name: '',
-      description: '',
-      totalDays: 1,
-      columns: [],
-      stages: [],
-      days: [{ day: 1, values: {} }],
-      preparation: [],
-      referencePlantCount: '',
-      adjustmentRate: '',
+      name: copyFrom?.name ?? '',
+      description: copyFrom?.description ?? '',
+      totalDays: copyFrom?.plan.totalDays ?? 1,
+      referencePlantCount: copyFrom?.plan.referencePlantCount ?? '',
+      adjustmentRate: copyFrom?.plan.referenceAdjustmentRate ?? '',
+      target: copyFrom?.plan.target ?? '',
+      seedCount: copyFrom?.plan.referenceSeedCount ?? '',
     },
     validate: {
       code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       totalDays: (v) =>
         v !== '' && Number(v) >= 1 ? null : t('cropDiaryTemplates.validation.totalDatesRequired'),
-      columns: (columns) =>
-        columns.some((c) => c.label.trim())
-          ? null
-          : t('cropDiaryTemplates.validation.activityRequired'),
     },
   });
 
@@ -148,18 +180,24 @@ export function CropDiaryTemplateFormPage() {
       });
       const tpl = res.item as CropDiaryTemplate;
       snapshotRef.current = tpl;
-      const plan = planOf(tpl);
+      const loaded = planOf(tpl);
+
+      setPlan({
+        columns: loaded.columns,
+        stages: loaded.stages,
+        days: resizeSheetDays(loaded.days, loaded.totalDays),
+        preparation: loaded.preparation ?? [],
+        memos: loaded.memos ?? [],
+      });
       return {
         code: tpl.code,
         name: tpl.name,
         description: tpl.extra?.description ?? '',
-        totalDays: plan.totalDays,
-        columns: plan.columns,
-        stages: plan.stages,
-        days: resizeSheetDays(plan.days, plan.totalDays),
-        preparation: plan.preparation ?? [],
-        referencePlantCount: plan.referencePlantCount ?? '',
-        adjustmentRate: plan.referenceAdjustmentRate ?? '',
+        totalDays: loaded.totalDays,
+        referencePlantCount: loaded.referencePlantCount ?? '',
+        adjustmentRate: loaded.referenceAdjustmentRate ?? '',
+        target: loaded.target ?? '',
+        seedCount: loaded.referenceSeedCount ?? '',
       };
     },
     () => {
@@ -171,60 +209,71 @@ export function CropDiaryTemplateFormPage() {
     },
   );
 
-  const handleTotalDaysChange = useCallback(
-    (v: number | string) => {
-      const n = v === '' ? 0 : Math.floor(Number(v));
-      form.setFieldValue('totalDays', v);
-      form.setFieldValue('days', resizeSheetDays(form.getValues().days, n));
-    },
-    [form],
-  );
+  const formRef = useRef(form);
+  useEffect(() => {
+    formRef.current = form;
+  });
 
-  const handleColumnsChange = useCallback(
-    (columns: SheetColumn[]) => form.setFieldValue('columns', columns),
-    [form],
-  );
+  const handleTotalDaysChange = useCallback((v: number | string) => {
+    const n = v === '' ? 0 : Math.floor(Number(v));
+    formRef.current.setFieldValue('totalDays', v);
+    setPlan((p) => ({ ...p, days: resizeSheetDays(p.days, n) }));
+  }, []);
+
+  const handleColumnsChange = useCallback((columns: SheetColumn[]) => {
+    setPlan((p) => ({ ...p, columns }));
+    setColumnsError(null);
+  }, []);
   const handleStagesChange = useCallback(
-    (stages: SheetStage[]) => form.setFieldValue('stages', stages),
-    [form],
+    (stages: SheetStage[]) => setPlan((p) => ({ ...p, stages })),
+    [],
   );
-  const handleDaysChange = useCallback(
-    (days: SheetDay[]) => form.setFieldValue('days', days),
-    [form],
-  );
+  const handleDaysChange = useCallback((days: SheetDay[]) => setPlan((p) => ({ ...p, days })), []);
+  const handleMemosChange = useCallback((memos: string[]) => setPlan((p) => ({ ...p, memos })), []);
   const handlePreparationChange = useCallback(
-    (preparation: PlanPreparation[]) => form.setFieldValue('preparation', preparation),
-    [form],
+    (preparation: PlanPreparation[]) => setPlan((p) => ({ ...p, preparation })),
+    [],
   );
 
   const currentPlan = useCallback((): CropProcessPlan => {
-    const values = form.getValues();
+    const values = formRef.current.getValues();
     return cleanPlan({
-      columns: values.columns,
-      stages: values.stages,
+      columns: plan.columns,
+      stages: plan.stages,
       totalDays: Number(values.totalDays) || 0,
-      days: values.days,
-      ...(values.preparation.length && { preparation: values.preparation }),
+      days: plan.days,
+      ...(plan.preparation.length && { preparation: plan.preparation }),
       ...(Number(values.referencePlantCount) > 0 && {
         referencePlantCount: Number(values.referencePlantCount),
       }),
       ...(Number(values.adjustmentRate) > 0 && {
         referenceAdjustmentRate: Number(values.adjustmentRate),
       }),
+      ...(values.target.trim() && { target: values.target.trim() }),
+      ...(Number(values.seedCount) > 0 && { referenceSeedCount: Number(values.seedCount) }),
+      ...(plan.memos.length && { memos: plan.memos }),
     });
-  }, [form]);
+  }, [plan]);
 
   const handleImport = useCallback(
     async (file: File | null) => {
       if (!file) return;
       try {
         const parsed = await parseCropSheetFile(file, { resolveMaterialCode });
-        form.setFieldValue('totalDays', parsed.plan.totalDays);
-        form.setFieldValue('columns', parsed.plan.columns);
-        form.setFieldValue('stages', parsed.plan.stages);
-        form.setFieldValue('days', parsed.plan.days);
-        form.setFieldValue('referencePlantCount', parsed.plan.referencePlantCount ?? '');
-        form.setFieldValue('adjustmentRate', parsed.plan.referenceAdjustmentRate ?? '');
+        formRef.current.setFieldValue('totalDays', parsed.plan.totalDays);
+        formRef.current.setFieldValue('referencePlantCount', parsed.plan.referencePlantCount ?? '');
+        formRef.current.setFieldValue('adjustmentRate', parsed.plan.referenceAdjustmentRate ?? '');
+        formRef.current.setFieldValue('target', parsed.plan.target ?? '');
+        formRef.current.setFieldValue('seedCount', parsed.plan.referenceSeedCount ?? '');
+        setPlan((p) => ({
+          ...p,
+          columns: parsed.plan.columns,
+          stages: parsed.plan.stages,
+          days: parsed.plan.days,
+          ...(parsed.plan.preparation && { preparation: parsed.plan.preparation }),
+          ...(parsed.plan.memos && { memos: parsed.plan.memos }),
+        }));
+        setColumnsError(null);
 
         notifications.show({
           color: 'green',
@@ -254,7 +303,7 @@ export function CropDiaryTemplateFormPage() {
         resetFileRef.current?.();
       }
     },
-    [form, t, resolveMaterialCode],
+    [t, resolveMaterialCode],
   );
 
   const handleExport = useCallback(() => {
@@ -280,14 +329,18 @@ export function CropDiaryTemplateFormPage() {
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
+      if (!plan.columns.some((c) => c.label.trim())) {
+        setColumnsError(t('cropDiaryTemplates.validation.activityRequired'));
+        return;
+      }
       setLoading(true);
       try {
-        const plan = currentPlan();
+        const built = currentPlan();
         const buildExtra = (base?: CropDiaryTemplateExtra): CropDiaryTemplateExtra => {
           const extra: CropDiaryTemplateExtra = { ...(base ?? {}) };
           if (values.description.trim()) extra.description = values.description.trim();
           else delete extra.description;
-          extra.plan = plan;
+          extra.plan = built;
           return extra;
         };
 
@@ -316,7 +369,8 @@ export function CropDiaryTemplateFormPage() {
               name: values.name.trim(),
 
               steps: [],
-              extra: buildExtra(),
+
+              extra: buildExtra(copyFrom ? { copyFromId: copyFrom.sourceId } : undefined),
             },
           });
           notifications.show({
@@ -347,7 +401,7 @@ export function CropDiaryTemplateFormPage() {
         setLoading(false);
       }
     },
-    [currentPlan, id, isEdit, navigate, t],
+    [currentPlan, plan.columns, copyFrom, id, isEdit, navigate, t],
   );
 
   const navigateToList = useCallback(() => navigate(ROUTES.CROP_DIARY_TEMPLATES.LIST), [navigate]);
@@ -390,6 +444,16 @@ export function CropDiaryTemplateFormPage() {
         </Group>
 
         <Title order={3}>{pageTitle}</Title>
+
+        {/* Without this, a form that arrives already holding 65 days of someone
+            else's doses reads as a bug. It also makes the one lossy part of
+            routing through `location.state` visible: refresh drops the copy,
+            and the banner going away is the signal. */}
+        {copyFrom && (
+          <Alert icon={<IconCopy size={16} />} color="blue" variant="light" radius="md" py="xs">
+            {t('cropDiaryTemplates.form.copyingFrom', { code: copyFrom.sourceCode })}
+          </Alert>
+        )}
 
         <Stack gap="md">
           <Card withBorder radius="md" padding="lg">
@@ -438,6 +502,23 @@ export function CropDiaryTemplateFormPage() {
               {t('cropDiaryTemplates.plan.sizingSection')}
             </Text>
             <Divider mb="md" />
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md" mb="md">
+              <TextInput
+                label={t('cropDiaryTemplates.plan.target')}
+                description={t('cropDiaryTemplates.plan.targetHint')}
+                placeholder="PI 52"
+                {...form.getInputProps('target')}
+              />
+              <NumberInput
+                label={t('cropDiaryTemplates.plan.seedCount')}
+                description={t('cropDiaryTemplates.plan.seedCountHint')}
+                min={0}
+                allowNegative={false}
+                allowDecimal={false}
+                thousandSeparator=","
+                {...form.getInputProps('seedCount')}
+              />
+            </SimpleGrid>
             <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
               <NumberInput
                 label={t('cropDiaryTemplates.plan.totalDays')}
@@ -480,12 +561,22 @@ export function CropDiaryTemplateFormPage() {
             <Text size="xs" c="dimmed" mb="md">
               {t('cropDiaryTemplates.plan.columnsSectionHint')}
             </Text>
-            <ProcessColumnsEditor columns={values.columns} onChange={handleColumnsChange} />
-            {typeof form.errors.columns === 'string' && (
+            <ProcessColumnsEditor columns={plan.columns} onChange={handleColumnsChange} />
+            {columnsError && (
               <Text size="xs" c="red" mt="xs">
-                {form.errors.columns}
+                {columnsError}
               </Text>
             )}
+          </Card>
+
+          <Card withBorder radius="md" padding="lg">
+            <Text fw={600} size="sm">
+              {t('cropDiaryTemplates.plan.memosSection')}
+            </Text>
+            <Text size="xs" c="dimmed" mb="md">
+              {t('cropDiaryTemplates.plan.memosSectionHint')}
+            </Text>
+            <ProcessMemosEditor memos={plan.memos} onChange={handleMemosChange} />
           </Card>
 
           <Card withBorder radius="md" padding="lg">
@@ -496,7 +587,7 @@ export function CropDiaryTemplateFormPage() {
               {t('cropDiaryTemplates.plan.preparationSectionHint')}
             </Text>
             <ProcessPreparationEditor
-              preparation={values.preparation}
+              preparation={plan.preparation}
               onChange={handlePreparationChange}
             />
           </Card>
@@ -509,7 +600,7 @@ export function CropDiaryTemplateFormPage() {
               {t('cropDiaryTemplates.plan.stagesSectionHint')}
             </Text>
             <ProcessStagesEditor
-              stages={values.stages}
+              stages={plan.stages}
               totalDays={Number(values.totalDays) || 1}
               onChange={handleStagesChange}
             />
@@ -556,9 +647,9 @@ export function CropDiaryTemplateFormPage() {
             {/* Bounded scroll region so a 65-day grid stays inside the card. */}
             <ScrollArea.Autosize mah="calc(100vh - 340px)" type="auto" offsetScrollbars>
               <ProcessGridEditor
-                columns={values.columns}
-                days={values.days}
-                stages={values.stages}
+                columns={plan.columns}
+                days={plan.days}
+                stages={plan.stages}
                 onChange={handleDaysChange}
               />
             </ScrollArea.Autosize>

@@ -30,6 +30,7 @@ import {
   IconBoxMultiple,
   IconBuildingWarehouse,
   IconCategory,
+  IconChartBar,
   IconCheck,
   IconCircleCheck,
   IconCopy,
@@ -82,6 +83,8 @@ import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
 import type { Product, ProductExtra, ProductImageEntry } from '@/types';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
+import EntitySalesPanel from '@/pages/reports/EntitySalesPanel';
+import { useCanAccessReports } from '@/pages/reports/reportAccess';
 import { ProductInventorySection } from './ProductInventorySection';
 import { ProductLink } from '@/components/ProductLink';
 import { ProductThumb } from './ProductThumb';
@@ -184,6 +187,8 @@ export function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string | null>(initialTab);
+
+  const salesTabVisible = useCanAccessReports();
 
   const descEdit = useCardEdit<string>();
   const specsEdit = useCardEdit<Array<{ key: string; value: string }>>();
@@ -1447,6 +1452,11 @@ export function ProductDetailPage() {
                 {t('products.detail.tab.images')}
               </Tabs.Tab>
             )}
+            {salesTabVisible && (
+              <Tabs.Tab value="sales" leftSection={<IconChartBar size={16} />}>
+                {t('report.entityTab.title')}
+              </Tabs.Tab>
+            )}
             {activityTabVisible && (
               <Tabs.Tab value="activity" leftSection={<IconHistory size={16} />}>
                 {t('products.detail.tab.activity')}
@@ -1465,6 +1475,16 @@ export function ProductDetailPage() {
           {imagesEnabled && (
             <Tabs.Panel value="images" pt="md">
               {imagesContent}
+            </Tabs.Panel>
+          )}
+          {salesTabVisible && (
+            <Tabs.Panel value="sales" pt="md">
+              {/* Lazy-mount: only load the report chunk + store when selected. */}
+              {activeTab === 'sales' && (
+                <EntitySalesPanel
+                  target={{ kind: 'product', code: product.code, name: product.name }}
+                />
+              )}
             </Tabs.Panel>
           )}
           {activityTabVisible && (

@@ -2,6 +2,7 @@ import type { ResolvedStatusOption } from '@/utils/permission';
 import type { SalesOrder } from '@/types';
 import { businessDateString } from '@/utils/code';
 import type { ResolvedPeriod } from './reportPeriods';
+import type { CustomerIdentity } from './reportCustomerIdentity';
 import type {
   ReportKpi,
   SalesMethodRow,
@@ -22,6 +23,8 @@ export interface SalesBuildDeps {
   employeeName: (id: string | undefined) => string | undefined;
 
   methodLabel: (code: string | undefined) => string;
+
+  customerOf: (order: SalesOrder) => CustomerIdentity;
 }
 
 function coerceMillis(v: unknown): number | null {
@@ -99,9 +102,7 @@ export function buildSalesReport(
   const revenueOf = new Map(revenueOrders.map((o) => [o.id, orderRevenue(o)]));
   const totalRevenue = revenueOrders.reduce((a, o) => a + (revenueOf.get(o.id) ?? 0), 0);
   const orderCount = revenueOrders.length;
-  const distinctCustomers = new Set(
-    revenueOrders.map((o) => o.extra?.customerName?.trim()).filter((n): n is string => !!n),
-  ).size;
+  const distinctCustomers = new Set(revenueOrders.map((o) => deps.customerOf(o).key)).size;
 
   const perBucket = new Array<number>(period.buckets.length).fill(0);
   for (const o of revenueOrders) {
@@ -116,15 +117,14 @@ export function buildSalesReport(
   const staff = rankOrders(
     revenueOrders,
     revenueOf,
-    (o) => deps.employeeName(o.extra?.assignedStaff)?.trim() || null,
+    (o) => {
+      const name = deps.employeeName(o.extra?.assignedStaff)?.trim();
+      return name ? { key: name, name } : null;
+    },
     'Chưa gán NV',
   );
-  const customers = rankOrders(
-    revenueOrders,
-    revenueOf,
-    (o) => o.extra?.customerName?.trim() || null,
-    'Không rõ',
-  );
+
+  const customers = rankOrders(revenueOrders, revenueOf, (o) => deps.customerOf(o), 'Không rõ');
   const products = rankProducts(revenueOrders);
 
   const methodCounts = new Map<string, number>();
@@ -169,20 +169,20 @@ export function buildSalesReport(
 function rankOrders(
   orders: SalesOrder[],
   revenueOf: Map<string, number>,
-  keyOf: (o: SalesOrder) => string | null,
+  groupOf: (o: SalesOrder) => { key: string; name: string } | null,
   fallback: string,
   limit = 8,
 ): SalesRankRow[] {
-  const agg = new Map<string, { amount: number; orders: number }>();
+  const agg = new Map<string, { name: string; amount: number; orders: number }>();
   for (const o of orders) {
-    const name = keyOf(o) ?? fallback;
-    const cur = agg.get(name) ?? { amount: 0, orders: 0 };
+    const group = groupOf(o) ?? { key: fallback, name: fallback };
+    const cur = agg.get(group.key) ?? { name: group.name, amount: 0, orders: 0 };
     cur.amount += revenueOf.get(o.id) ?? 0;
     cur.orders += 1;
-    agg.set(name, cur);
+    agg.set(group.key, cur);
   }
-  return [...agg.entries()]
-    .map(([name, v]) => ({ name, amount: v.amount, orders: v.orders }))
+  return [...agg.values()]
+    .map((v) => ({ name: v.name, amount: v.amount, orders: v.orders }))
     .sort((a, b) => b.amount - a.amount)
     .slice(0, limit);
 }

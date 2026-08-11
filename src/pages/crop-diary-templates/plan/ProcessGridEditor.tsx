@@ -1,7 +1,9 @@
-import { Box, Table, Text, TextInput } from '@mantine/core';
-import { memo, useCallback, useMemo } from 'react';
+import { Box, Table, Text } from '@mantine/core';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { stageOf } from '@/utils/cropSheetModel';
+import { SheetGridCellInput } from '@/components/SheetGridCellInput';
+import { sheetCellValue, stageOf } from '@/utils/cropSheetModel';
+import { SHEET_GRID_W, sheetTableMinWidth } from '@/utils/sheetGridLayout';
 import type { SheetColumn, SheetDay, SheetStage } from '@/types';
 
 type Props = {
@@ -13,35 +15,35 @@ type Props = {
 
 export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
   const { t } = useTranslation();
+  const dayLabel = t('cropDiaryTemplates.plan.day');
 
   const stageNameFor = useMemo(() => {
     const map = new Map<number, string>();
-    for (const day of days) {
-      const stage = stageOf(day.day, stages);
-
-      if (stage && stage.fromDay === day.day) map.set(day.day, stage.name);
+    for (const stage of stages) {
+      if (stageOf(stage.fromDay, stages) === stage) map.set(stage.fromDay, stage.name);
     }
     return map;
-  }, [days, stages]);
+  }, [stages]);
 
-  const setCell = useCallback(
-    (day: number, key: string, raw: string) => {
-      onChange(
-        days.map((d) => {
-          if (d.day !== day) return d;
-          const values = { ...d.values };
-          const trimmed = raw.trim();
-          if (!trimmed) delete values[key];
-          else {
-            const n = Number(trimmed.replace(/,/g, ''));
-            values[key] = trimmed !== '' && Number.isFinite(n) ? n : raw;
-          }
-          return { day: d.day, values };
-        }),
-      );
-    },
-    [days, onChange],
-  );
+  const latest = useRef({ days, onChange });
+  useEffect(() => {
+    latest.current = { days, onChange };
+  });
+
+  const setCell = useCallback((day: number, key: string, raw: string) => {
+    const { days, onChange } = latest.current;
+    onChange(
+      days.map((d) => {
+        if (d.day !== day) return d;
+        const values = { ...d.values };
+
+        const next = sheetCellValue(raw);
+        if (next === undefined) delete values[key];
+        else values[key] = next;
+        return { day: d.day, values };
+      }),
+    );
+  }, []);
 
   if (!columns.length) {
     return (
@@ -53,15 +55,21 @@ export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
 
   return (
     <Box style={{ overflowX: 'auto' }}>
-      <Table striped withTableBorder verticalSpacing={2} horizontalSpacing={4} miw={640}>
+      <Table
+        striped
+        withTableBorder
+        verticalSpacing={2}
+        horizontalSpacing={4}
+        miw={sheetTableMinWidth(columns.length, SHEET_GRID_W.day + SHEET_GRID_W.stage)}
+      >
         <Table.Thead>
           <Table.Tr>
-            <Table.Th w={54} style={STICKY_DAY}>
+            <Table.Th w={SHEET_GRID_W.day} style={STICKY_DAY}>
               {t('cropDiaryTemplates.plan.day')}
             </Table.Th>
-            <Table.Th w={150}>{t('cropDiaryTemplates.plan.stage')}</Table.Th>
+            <Table.Th w={SHEET_GRID_W.stage}>{t('cropDiaryTemplates.plan.stage')}</Table.Th>
             {columns.map((column) => (
-              <Table.Th key={column.key} miw={110}>
+              <Table.Th key={column.key} miw={SHEET_GRID_W.column}>
                 <Text size="xs" fw={600} lh={1.2}>
                   {column.label || column.key}
                 </Text>
@@ -74,17 +82,25 @@ export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
             ))}
           </Table.Tr>
         </Table.Thead>
-        <Table.Tbody>
+        {/* Plain `tbody`/`tr`/`td` below, not `Table.*`. Every Mantine table
+            cell is a context consumer and `Table` hands its provider a **fresh
+            object literal** on each render, so a context update reaches all
+            ~1,200 cells and re-renders them straight through `memo` — the
+            bailout does not apply to context. Measured at ~30 ms per keystroke
+            on a 69×17 sheet for nothing but that. The row styling those
+            components would have supplied lives in `SheetGridCellInput.css`. */}
+        <tbody>
           {days.map((day) => (
             <GridRow
               key={day.day}
               day={day}
               columns={columns}
               stageName={stageNameFor.get(day.day)}
+              dayLabel={dayLabel}
               onCellChange={setCell}
             />
           ))}
-        </Table.Tbody>
+        </tbody>
       </Table>
     </Box>
   );
@@ -101,38 +117,32 @@ const GridRow = memo(function GridRow({
   day,
   columns,
   stageName,
+  dayLabel,
   onCellChange,
 }: {
   readonly day: SheetDay;
   readonly columns: SheetColumn[];
   readonly stageName?: string;
+
+  readonly dayLabel: string;
   readonly onCellChange: (day: number, key: string, raw: string) => void;
 }) {
   return (
-    <Table.Tr>
-      <Table.Td style={STICKY_DAY}>
-        <Text size="xs" fw={600} ta="center">
-          {day.day}
-        </Text>
-      </Table.Td>
-      <Table.Td>
-        {stageName ? (
-          <Text size="xs" fw={600} c="primary" lh={1.2}>
-            {stageName}
-          </Text>
-        ) : null}
-      </Table.Td>
+    <tr className="sheet-grid-row">
+      <td className="sheet-grid-day" style={STICKY_DAY}>
+        {day.day}
+      </td>
+      <td className="sheet-grid-stage">{stageName ?? ''}</td>
       {columns.map((column) => (
-        <Table.Td key={column.key}>
-          <TextInput
-            size="xs"
-            variant="unstyled"
-            styles={{ input: { minHeight: 24, height: 24 } }}
+        <td key={column.key}>
+          <SheetGridCellInput
+            name={`d${day.day}-${column.key}`}
+            label={`${column.label || column.key} — ${dayLabel} ${day.day}`}
             value={String(day.values[column.key] ?? '')}
-            onChange={(e) => onCellChange(day.day, column.key, e.currentTarget.value)}
+            onChange={(value) => onCellChange(day.day, column.key, value)}
           />
-        </Table.Td>
+        </td>
       ))}
-    </Table.Tr>
+    </tr>
   );
 });

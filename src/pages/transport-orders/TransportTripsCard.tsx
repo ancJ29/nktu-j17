@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
 import { SectionCard } from '@/components/SectionCard';
 import { EmployeeLink } from '@/components/EmployeeLink';
-import { TruckLink } from '@/components/TruckLink';
 import { FieldRow } from '@/components/FieldRow';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { perms } from '@/utils/permission';
 import type { TransportOrder, TransportOrderTrip } from '@/types';
 import { formatMoney, orderTripLaborTotal } from './transportOrderPricing';
+import { TransportVehicle } from './TransportVehicle';
 
 const isMobile = device.isMobile;
 const canViewPrice = perms.transportOrder.canViewPrice();
@@ -132,11 +132,14 @@ function TripsTable({ trips }: { readonly trips: readonly TransportOrderTrip[] }
               {trip.unloadingAt ? formatDateTime(trip.unloadingAt) : '—'}
             </Table.Td>
             {/* Linked, not printed — same rule as the order-level truck/driver, and
-                each leg carries its own plate/name snapshot to fall back on. */}
+                each leg carries its own plate/name snapshot to fall back on. A
+                hired leg has no record to link, so it reads as a XE NGOÀI chip. */}
             <Table.Td>
-              <TruckLink id={trip.truckId} fallbackLabel={trip.truckPlate} showPlate />
+              <TransportVehicle truckId={trip.truckId} truckPlate={trip.truckPlate} />
             </Table.Td>
-            <Table.Td>{trip.driverId ? <EmployeeLink id={trip.driverId} /> : '—'}</Table.Td>
+            <Table.Td>
+              {trip.driverId ? <EmployeeLink id={trip.driverId} /> : trip.driverName || '—'}
+            </Table.Td>
             <Table.Td ta="right">{canViewPrice ? formatMoney(trip.laborCost) : '—'}</Table.Td>
           </Table.Tr>
         ))}
@@ -175,11 +178,11 @@ function TripCard({ index, trip }: { readonly index: number; readonly trip: Tran
           />
           <FieldRow
             label={t('transportOrders.columns.truck')}
-            value={<TruckLink id={trip.truckId} fallbackLabel={trip.truckPlate} showPlate />}
+            value={<TransportVehicle truckId={trip.truckId} truckPlate={trip.truckPlate} />}
           />
           <FieldRow
             label={t('transportOrders.form.driver')}
-            value={trip.driverId ? <EmployeeLink id={trip.driverId} /> : '—'}
+            value={trip.driverId ? <EmployeeLink id={trip.driverId} /> : trip.driverName || '—'}
           />
           {/* The reason the card exists: on the table this column was off-screen
               and unreachable. Gated like every other figure. */}

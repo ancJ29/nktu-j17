@@ -57,7 +57,7 @@ if (storageHashStale) {
 
 // TODO: remove this later
 const redirectConfigs: Record<string, string> = {
-  'dung-uy.internal.cr3do.dev': 'https://dung-uy.cr3do.dev/',
+  // 'try-credo.internal.cr3do.dev': 'https://use-credo.cr3do.dev/',
 };
 
 if (redirectConfigs[window.location.host]) {

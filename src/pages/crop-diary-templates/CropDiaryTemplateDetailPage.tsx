@@ -15,13 +15,14 @@ import {
   IconArrowLeft,
   IconCalendar,
   IconClipboardList,
+  IconCopy,
   IconDownload,
   IconEdit,
   IconInfoCircle,
 } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { Link, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { asyncDeduplicator, device } from '@credo/base-ui/utils';
@@ -38,13 +39,16 @@ import { formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import { exportCropSheet } from '@/utils/cropSheetExcel';
 import { perms } from '@/utils/permission';
-import type { CropDiaryTemplate, CropProcessPlan } from '@/types';
+import type { CropDiaryTemplate, CropDiaryTemplateCopyFrom, CropProcessPlan } from '@/types';
 
 const isMobile = device.isMobile;
 const canEdit = perms.cropDiaryTemplate.canEdit();
 
+const canCreate = perms.cropDiaryTemplate.canCreate();
+
 export function CropDiaryTemplateDetailPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
 
   const [template, setTemplate] = useState<CropDiaryTemplate | null>(null);
@@ -107,6 +111,17 @@ export function CropDiaryTemplateDetailPage() {
     </Group>
   );
 
+  const handleCopy = () => {
+    const copyFrom: CropDiaryTemplateCopyFrom = {
+      name: template.name,
+      ...(template.extra?.description && { description: template.extra.description }),
+      plan,
+      sourceId: template.id,
+      sourceCode: template.code,
+    };
+    navigate(ROUTES.CROP_DIARY_TEMPLATES.NEW, { state: { copyFrom } });
+  };
+
   const handleExport = () => {
     exportCropSheet(
       plan,
@@ -134,17 +149,29 @@ export function CropDiaryTemplateDetailPage() {
           >
             {t('__new__.01-common.actions.back')}
           </Button>
-          {canEdit && (
-            <Button
-              component={Link}
-              to={ROUTES.CROP_DIARY_TEMPLATES.EDIT.replace(':id', template.id)}
-              variant="light"
-              size="compact-sm"
-              leftSection={<IconEdit size={14} />}
-            >
-              {t('__new__.01-common.actions.edit')}
-            </Button>
-          )}
+          <Group gap="xs">
+            {canCreate && (
+              <Button
+                onClick={handleCopy}
+                variant="default"
+                size="compact-sm"
+                leftSection={<IconCopy size={14} />}
+              >
+                {t('__new__.01-common.actions.copy')}
+              </Button>
+            )}
+            {canEdit && (
+              <Button
+                component={Link}
+                to={ROUTES.CROP_DIARY_TEMPLATES.EDIT.replace(':id', template.id)}
+                variant="light"
+                size="compact-sm"
+                leftSection={<IconEdit size={14} />}
+              >
+                {t('__new__.01-common.actions.edit')}
+              </Button>
+            )}
+          </Group>
         </Group>
       )}
 

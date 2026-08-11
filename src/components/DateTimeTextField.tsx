@@ -191,11 +191,15 @@ export function DateTimeTextField({
         onKeyDown?.(e);
       }}
       rightSectionPointerEvents="all"
-      // Deliberately tight. The narrowest caller is the leg table's 165px column,
-      // whose budget was trimmed to what the old picker needed — anything wider
-      // here eats into the two free-text place columns, which the leg table's
-      // width rule (see modules/transport-orders.md) says never to do.
-      rightSectionWidth={clearable && text ? 48 : 30}
+      /**
+       * Tight, but no longer *cramped*. It used to be sized against the leg
+       * table's 165px column, where `HH:mm DD/MM/YYYY` (17 chars) ran under the
+       * calendar icon — product reported the overlap 2026-08-11. That column is
+       * gone: each time input now sits under the place it belongs to and takes
+       * the place column's full width, so the placeholder fits with room to
+       * spare. The value here is back to being what the two icons actually need.
+       */
+      rightSectionWidth={clearable && text ? 48 : 32}
       rightSection={
         rightSection ?? (
           <Group gap={0} wrap="nowrap" justify="flex-end" pr={2}>

@@ -1,0 +1,130 @@
+/* Sheet-grid styling: the cell input, plus the row chrome Mantine's
+   `Table.Tr`/`Table.Td` would otherwise supply.
+   See SheetGridCellInput.tsx for why neither Mantine component is used here —
+   both are hot at ~1,200 instances, for different reasons. */
+
+.sheet-grid-row > td {
+  padding: 2px 4px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--mantine-color-default-border);
+}
+
+/* `striped` on the Mantine table it replaces. `nth-of-type` counts within the
+   tbody, so the header does not shift the parity. */
+.sheet-grid-row:nth-of-type(odd) > td {
+  background-color: var(--mantine-color-gray-0);
+}
+
+[data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td {
+  background-color: var(--mantine-color-dark-6);
+}
+
+/* The frozen leading columns (see `SHEET_STICKY` for the offsets) must be
+   opaque — a transparent sticky cell shows the dose columns sliding under it —
+   *and* must keep the stripe, which is why the background is here rather than
+   inline: these selectors sit under the stripe rule at equal specificity, and
+   the stripe re-declaration below outranks both. */
+.sheet-grid-row > td.sheet-grid-day,
+.sheet-grid-row > td.sheet-grid-date,
+.sheet-grid-row > td.sheet-grid-stage {
+  background-color: var(--mantine-color-body);
+}
+
+.sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
+.sheet-grid-row:nth-of-type(odd) > td.sheet-grid-date,
+.sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage {
+  background-color: var(--mantine-color-gray-0);
+}
+
+[data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
+[data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-date,
+[data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage {
+  background-color: var(--mantine-color-dark-6);
+}
+
+/* The day cell's own text styling. */
+.sheet-grid-row > td.sheet-grid-day {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  text-align: center;
+}
+
+.sheet-grid-row > td.sheet-grid-date {
+  font-size: var(--mantine-font-size-xs);
+  color: var(--mantine-color-dimmed);
+}
+
+.sheet-grid-row > td.sheet-grid-date[data-today='true'] {
+  font-weight: 700;
+  color: var(--mantine-primary-color-filled);
+}
+
+.sheet-grid-row > td.sheet-grid-stage {
+  font-size: var(--mantine-font-size-xs);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--mantine-primary-color-filled);
+}
+
+/* The day/date cells open the day view. Styled to look like the text they
+   replace — the affordance is the hover, so the grid still reads as a sheet
+   rather than as a column of buttons. */
+.sheet-grid-open {
+  width: 100%;
+  padding: 0;
+  border: none;
+  border-radius: var(--mantine-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+.sheet-grid-open:hover {
+  color: var(--mantine-primary-color-filled);
+  text-decoration: underline;
+}
+
+.sheet-grid-open:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}
+
+/* Reproduces Mantine's `variant="unstyled"` TextInput for sheet-grid cells. */
+.sheet-grid-cell {
+  width: 100%;
+  min-width: 0;
+  height: 24px;
+  padding: 0 2px;
+  border: none;
+  border-radius: var(--mantine-radius-sm);
+  background-color: transparent;
+  color: var(--mantine-color-text);
+  font-family: inherit;
+  font-size: var(--mantine-font-size-xs);
+  line-height: 1.2;
+}
+
+/* The crop sheet packs one more row into the same height than the template
+   editor does; its grid is read far more often than it is typed into. */
+.sheet-grid-cell[data-dense='true'] {
+  height: 22px;
+}
+
+.sheet-grid-cell:focus,
+.sheet-grid-cell:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
+}
+
+.sheet-grid-cell:read-only {
+  cursor: default;
+}
+
+/* Drift from the plan (I4) — the one signal the previous diary model could not
+   express at all, so it is deliberately loud. */
+.sheet-grid-cell[data-changed='true'] {
+  font-weight: 700;
+  color: var(--mantine-color-orange-7);
+}

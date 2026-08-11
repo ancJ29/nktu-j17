@@ -26,6 +26,7 @@ export {
   SCHEMA_DEFAULT_PERM_MNGT_FEATURES,
   SCHEMA_DEFAULT_PRICING_FEATURES,
   SCHEMA_DEFAULT_PRODUCT_FEATURES,
+  SCHEMA_DEFAULT_QUOTATION_FEATURES,
   SCHEMA_DEFAULT_SALES_ORDER_FEATURES,
   SCHEMA_DEFAULT_TRANSPORT_ORDER_FEATURES,
   SCHEMA_DEFAULT_THEME,
@@ -47,6 +48,7 @@ export { SalesOrderStatusOptionEditor } from './editors/SalesOrderStatusOptionEd
 export { SalesOrderTagOptionEditor } from './editors/SalesOrderTagOptionEditor';
 export { StatusAllowedDepartmentsMatrixEditor } from './editors/StatusAllowedDepartmentsMatrixEditor';
 export { StatusTransitionMatrixEditor } from './editors/StatusTransitionMatrixEditor';
+export { TransportOrderBangKeTemplateEditor } from './editors/TransportOrderBangKeTemplateEditor';
 export { TransportOrderConfigInvariantAlert } from './editors/TransportOrderConfigInvariantAlert';
 export { TransportOrderStatusOptionEditor } from './editors/TransportOrderStatusOptionEditor';
 

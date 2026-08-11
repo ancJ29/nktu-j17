@@ -61,13 +61,18 @@ export function findHeaderRow(grid: SheetGrid): { row: number; dateIndex: number
 
 function readDataRow(
   row: (string | number)[],
+  dateIndex: number,
 ): { day: number; date: string; at: number } | undefined {
   const at = row.findIndex((c) => DATE_CELL.test(text(c)));
-  if (at < 1) return undefined;
-  const day = parseNumber(cell(row, at - 1));
-  const date = parseSheetDate(cell(row, at));
-  if (day === undefined || !date || day < 1) return undefined;
-  return { day, date, at };
+  if (at >= 1) {
+    const day = parseNumber(cell(row, at - 1));
+    const date = parseSheetDate(cell(row, at));
+    if (day !== undefined && date && day >= 1) return { day, date, at };
+  }
+
+  const day = parseNumber(cell(row, dateIndex - 1));
+  if (day === undefined || day < 1 || !Number.isInteger(day)) return undefined;
+  return { day, date: '', at: dateIndex };
 }
 
 function columnKindFor(label: string, values: string[], group?: string): SheetColumnKind {
@@ -139,7 +144,7 @@ export function parseCropSheetGrid(
       }
       continue;
     }
-    const located = readDataRow(current);
+    const located = readDataRow(current, header.dateIndex);
     if (!located) continue;
     parsed.push({
       day: located.day,
@@ -234,6 +239,9 @@ export function parseCropSheetGrid(
     : [];
   const referencePlantCount = findPlantCount(grid);
   const referenceAdjustmentRate = findAdjustmentRate(grid);
+  const target = findTarget(grid);
+  const referenceSeedCount = findSeedCount(grid);
+  const memos = findMemos(grid);
 
   return {
     plan: {
@@ -244,12 +252,47 @@ export function parseCropSheetGrid(
       ...(referencePlantCount && { referencePlantCount }),
       ...(referenceAdjustmentRate && { referenceAdjustmentRate }),
       ...(preparation.length && { preparation }),
+      ...(target && { target }),
+      ...(referenceSeedCount && { referenceSeedCount }),
+      ...(memos.length && { memos }),
     },
     events,
     ...(startDate && { startDate }),
     footerValues,
     derivedColumns,
   };
+}
+
+function labelledCells(grid: SheetGrid, label: RegExp): string[] {
+  const out: string[] = [];
+  for (const row of grid) {
+    const at = (row ?? []).findIndex((c) => label.test(text(c)));
+    if (at < 0) continue;
+    for (let i = at + 1; i < row.length; i++) {
+      const value = cell(row, i);
+      if (value) {
+        out.push(value);
+        break;
+      }
+    }
+  }
+  return out;
+}
+
+export function findTarget(grid: SheetGrid): string | undefined {
+  return labelledCells(grid, /^\s*giống\s*$/i)[0];
+}
+
+export function findSeedCount(grid: SheetGrid): number | undefined {
+  for (const value of labelledCells(grid, /^\s*hạt(\s*giống)?\s*$/i)) {
+    const n = parseNumber(value);
+    if (n !== undefined && n > 0) return n;
+  }
+  return undefined;
+}
+
+export function findMemos(grid: SheetGrid): string[] {
+  return labelledCells(grid, /ghi\s*chú\s*chung/i);
 }
 
 export function findPlantCount(grid: SheetGrid): number | undefined {

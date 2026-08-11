@@ -20,6 +20,7 @@ import {
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
+  IconAlertTriangle,
   IconArrowLeft,
   IconCashBanknote,
   IconCopy,
@@ -75,12 +76,14 @@ import {
   readFeeLines,
 } from './transportOrderPricing';
 import { useContainerSizeOptions } from './containerSize';
+import { truckTypeCarriesContainer } from './containerTruckType';
 import {
   DEFAULT_SHIPMENT_TYPE,
   useShipmentTypeLabel,
   useShipmentTypeOptions,
 } from './shipmentType';
-import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
+import { truckOptionLabel, useDriverWithPlate, useTruckTypeOf } from './truckDisplay';
+import { isExternalTruck } from './externalTruck';
 import {
   getInitialTransportOrderStatus,
   isTransportOrderLocked,
@@ -119,6 +122,8 @@ const driverEmployeeFilter = (e: Employee) => {
 };
 const DEFAULT_VAT_PERCENT = 8;
 
+const NON_CONTAINER_TRUCK_TYPES = toFeatures.nonContainerTruckTypes ?? [];
+
 type FeeRow = {
   label: string;
   amount: number;
@@ -137,6 +142,8 @@ type TripRow = {
   loadingAt: string | null;
 
   unloadingAt: string | null;
+
+  externalTruck: boolean;
   truckId: string;
   truckPlate: string;
   driverId: string;
@@ -144,10 +151,14 @@ type TripRow = {
   laborCost: number;
 };
 
+type RouteTruckIssue = { leg: number; kind: 'missing' | 'mismatch' };
+
 type FormValues = {
   isMultiTrip: boolean;
   trips: TripRow[];
   entryDate: string | null;
+
+  externalTruck: boolean;
   truckId: string;
   truckPlate: string;
   driverId: string;
@@ -222,12 +233,19 @@ function blankTrip(): TripRow {
 
     loadingAt: null,
     unloadingAt: null,
+
+    externalTruck: false,
     truckId: '',
     truckPlate: '',
     driverId: '',
     driverName: '',
     laborCost: 0,
   };
+}
+
+function legAt(values: FormValues, path: string): TripRow | undefined {
+  const index = Number(path.split('.')[1]);
+  return Number.isInteger(index) ? values.trips[index] : undefined;
 }
 
 function draftScheduleSlots(values: FormValues): ScheduleSlot[] {
@@ -257,13 +275,16 @@ function blankValues(): FormValues {
     isMultiTrip: false,
     trips: [],
     entryDate: todayInVnDateString(),
+
+    externalTruck: false,
     truckId: '',
     truckPlate: '',
     driverId: '',
     driverName: '',
     billNumber: '',
     containerNumber: '',
-    containerSize: '20',
+
+    containerSize: '',
     shipmentType: DEFAULT_SHIPMENT_TYPE,
     pickup: '',
     stuffing: '',
@@ -293,6 +314,8 @@ function copiedValues(src: TransportOrder): FormValues {
       date: todayInVnDateString(),
       loadingAt: null,
       unloadingAt: null,
+
+      externalTruck: isExternalTruck(trip),
       truckId: trip.truckId,
       truckPlate: trip.truckPlate,
       driverId: trip.driverId,
@@ -300,6 +323,7 @@ function copiedValues(src: TransportOrder): FormValues {
       laborCost: trip.laborCost || 0,
     })),
     entryDate: todayInVnDateString(),
+    externalTruck: isExternalTruck(src),
     truckId: src.truckId,
     truckPlate: src.truckPlate,
     driverId: src.driverId,
@@ -422,6 +446,8 @@ export function TransportOrderFormPage() {
 
   const driverWithPlate = useDriverWithPlate();
 
+  const truckTypeOf = useTruckTypeOf();
+
   const placeSuggestions = usePlaceSuggestions();
 
   const shipmentTypeOptions = useShipmentTypeOptions();
@@ -431,17 +457,33 @@ export function TransportOrderFormPage() {
     initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(),
     validate: {
       truckId: (v, values) =>
-        !values.isMultiTrip && !v ? t('transportOrders.validation.truckRequired') : null,
+        !values.isMultiTrip && !values.externalTruck && !v
+          ? t('transportOrders.validation.truckRequired')
+          : null,
+      truckPlate: (v, values) =>
+        !values.isMultiTrip && values.externalTruck && !v.trim()
+          ? t('transportOrders.validation.plateRequired')
+          : null,
       driverId: (v, values) =>
-        !values.isMultiTrip && !v ? t('transportOrders.validation.driverRequired') : null,
+        !values.isMultiTrip && !values.externalTruck && !v
+          ? t('transportOrders.validation.driverRequired')
+          : null,
       entryDate: (v, values) =>
         !values.isMultiTrip && !v ? t('transportOrders.validation.entryDateRequired') : null,
       customerCode: (v) => (!v ? t('transportOrders.validation.customerRequired') : null),
       trips: {
-        truckId: (v: string, values: FormValues) =>
-          values.isMultiTrip && !v ? t('transportOrders.validation.truckRequired') : null,
-        driverId: (v: string, values: FormValues) =>
-          values.isMultiTrip && !v ? t('transportOrders.validation.driverRequired') : null,
+        truckId: (v: string, values: FormValues, path: string) =>
+          values.isMultiTrip && !legAt(values, path)?.externalTruck && !v
+            ? t('transportOrders.validation.truckRequired')
+            : null,
+        truckPlate: (v: string, values: FormValues, path: string) =>
+          values.isMultiTrip && legAt(values, path)?.externalTruck && !v.trim()
+            ? t('transportOrders.validation.plateRequired')
+            : null,
+        driverId: (v: string, values: FormValues, path: string) =>
+          values.isMultiTrip && !legAt(values, path)?.externalTruck && !v
+            ? t('transportOrders.validation.driverRequired')
+            : null,
         // `date` lost its rule with its input: the leg no longer authors one (it
         // falls out of `loadingAt` — see `tripDate`), and a required check on a
         // field with no visible input is an unfixable save-blocker.
@@ -491,6 +533,8 @@ export function TransportOrderFormPage() {
           date: trip.date ? isoToVnDateString(trip.date) : null,
           loadingAt: isoToDateTimeString(trip.loadingAt),
           unloadingAt: isoToDateTimeString(trip.unloadingAt),
+
+          externalTruck: isExternalTruck(trip),
           truckId: trip.truckId,
           truckPlate: trip.truckPlate,
           driverId: trip.driverId,
@@ -498,6 +542,7 @@ export function TransportOrderFormPage() {
           laborCost: trip.laborCost || 0,
         })),
         entryDate: isoToVnDateString(o.entryDate),
+        externalTruck: isExternalTruck(o),
         truckId: o.truckId,
         truckPlate: o.truckPlate,
         driverId: o.driverId,
@@ -702,9 +747,8 @@ export function TransportOrderFormPage() {
     const truckId = form.values.isMultiTrip
       ? (form.values.trips[0]?.truckId ?? '')
       : form.values.truckId;
-    if (!truckId) return '';
-    return trucks.find((tr) => tr.id === truckId)?.extra?.truckType ?? '';
-  }, [form.values.isMultiTrip, form.values.trips, form.values.truckId, trucks]);
+    return truckTypeOf(truckId) ?? '';
+  }, [form.values.isMultiTrip, form.values.trips, form.values.truckId, truckTypeOf]);
 
   const routeMatches = useMemo(() => {
     const draft: TransportRouteDraft = {
@@ -729,7 +773,43 @@ export function TransportOrderFormPage() {
     savedRoutes,
   ]);
 
-  const [appliedRouteCode, setAppliedRouteCode] = useState<string | undefined>();
+  const [appliedRoute, setAppliedRoute] = useState<TransportRouteRow | undefined>();
+  const appliedRouteCode = appliedRoute?.code;
+
+  const showContainerSize = truckTypeCarriesContainer(draftTruckType, NON_CONTAINER_TRUCK_TYPES);
+
+  useEffect(() => {
+    if (showContainerSize) return;
+    if (!form.getValues().containerSize) return;
+    form.setFieldValue('containerSize', '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine mints a new `form` object every render; values are read through `getValues()`.
+  }, [showContainerSize]);
+
+  const routeTruckIssues = useMemo(() => {
+    const wanted = appliedRoute?.truckType;
+    if (!wanted) return [];
+
+    const check = (leg: number, truckId: string, external: boolean): RouteTruckIssue[] => {
+      if (external) return [];
+      if (!truckId) return [{ leg, kind: 'missing' }];
+      const type = truckTypeOf(truckId) ?? '';
+      return type && type !== wanted ? [{ leg, kind: 'mismatch' }] : [];
+    };
+
+    if (form.values.isMultiTrip) {
+      return form.values.trips.flatMap((trip, i) =>
+        check(i + 1, trip.truckId, !!trip.externalTruck),
+      );
+    }
+    return check(WHOLE_ORDER, form.values.truckId, !!form.values.externalTruck);
+  }, [
+    appliedRoute,
+    truckTypeOf,
+    form.values.isMultiTrip,
+    form.values.trips,
+    form.values.truckId,
+    form.values.externalTruck,
+  ]);
 
   const applyRoute = useCallback(
     (route: TransportRouteRow) => {
@@ -751,7 +831,7 @@ export function TransportOrderFormPage() {
         form.setFieldValue('laborCost', route.laborCost ?? 0);
       }
 
-      setAppliedRouteCode(route.code);
+      setAppliedRoute(route);
       notifications.show({
         color: 'green',
         message: t('transportRoutes.suggestion.applied', { code: route.code }),
@@ -780,6 +860,22 @@ export function TransportOrderFormPage() {
       form.setFieldValue(`trips.${i}.driverId`, truck.extra.driverId);
       form.setFieldValue(`trips.${i}.driverName`, truck.extra.driverName ?? '');
     }
+  };
+
+  const setExternalTruck = (checked: boolean) => {
+    form.setFieldValue('externalTruck', checked);
+    form.setFieldValue('truckId', '');
+    form.setFieldValue('truckPlate', '');
+    form.setFieldValue('driverId', '');
+    form.setFieldValue('driverName', '');
+  };
+
+  const setTripExternalTruck = (i: number, checked: boolean) => {
+    form.setFieldValue(`trips.${i}.externalTruck`, checked);
+    form.setFieldValue(`trips.${i}.truckId`, '');
+    form.setFieldValue(`trips.${i}.truckPlate`, '');
+    form.setFieldValue(`trips.${i}.driverId`, '');
+    form.setFieldValue(`trips.${i}.driverName`, '');
   };
 
   const setTripDriver = (
@@ -887,48 +983,77 @@ export function TransportOrderFormPage() {
                     label={t('transportOrders.columns.date')}
                     {...form.getInputProps('entryDate')}
                   />
-                  <Select
-                    withAsterisk
-                    label={t('transportOrders.columns.truck')}
-                    data={truckSelectData}
-                    value={form.values.truckId || null}
-                    onChange={(v) => {
-                      const picked = truckSelectData.find((tr) => tr.value === v);
-                      form.setFieldValue('truckId', v ?? '');
-                      form.setFieldValue('truckPlate', picked?.plate ?? '');
+                  {/* The vehicle cell carries its own mode switch, because the
+                      choice is per JOB, not per client: the same dispatcher books
+                      a fleet truck and hires one on the next call. The checkbox
+                      sits under the input it reshapes — a header switch would be
+                      too far from the field, and could not repeat per leg below. */}
+                  <Stack gap={4}>
+                    {form.values.externalTruck ? (
+                      <TextInput
+                        withAsterisk
+                        label={t('transportOrders.form.externalPlate')}
+                        {...form.getInputProps('truckPlate')}
+                      />
+                    ) : (
+                      <Select
+                        withAsterisk
+                        label={t('transportOrders.columns.truck')}
+                        data={truckSelectData}
+                        value={form.values.truckId || null}
+                        onChange={(v) => {
+                          const picked = truckSelectData.find((tr) => tr.value === v);
+                          form.setFieldValue('truckId', v ?? '');
+                          form.setFieldValue('truckPlate', picked?.plate ?? '');
 
-                      const truck = v ? trucks.find((a) => a.id === v) : undefined;
-                      if (truck?.extra?.driverId) {
-                        form.setFieldValue('driverId', truck.extra.driverId);
-                        form.setFieldValue('driverName', truck.extra.driverName ?? '');
-                      }
-                    }}
-                    error={form.errors.truckId}
-                    searchable
-                    clearable
-                    nothingFoundMessage={t('transportOrders.form.noTrucks')}
-                  />
-                  <EmployeeSelector
-                    withAsterisk
-                    label={t('transportOrders.form.driver')}
-                    value={form.values.driverId || null}
-                    onChange={(sel) => {
-                      form.setFieldValue('driverId', sel?.id ?? '');
-                      form.setFieldValue('driverName', sel?.name ?? '');
+                          const truck = v ? trucks.find((a) => a.id === v) : undefined;
+                          if (truck?.extra?.driverId) {
+                            form.setFieldValue('driverId', truck.extra.driverId);
+                            form.setFieldValue('driverName', truck.extra.driverName ?? '');
+                          }
+                        }}
+                        error={form.errors.truckId}
+                        searchable
+                        clearable
+                        nothingFoundMessage={t('transportOrders.form.noTrucks')}
+                      />
+                    )}
+                    <Checkbox
+                      size="xs"
+                      label={t('transportOrders.form.externalTruck')}
+                      description={t('transportOrders.form.externalTruckHint')}
+                      checked={form.values.externalTruck}
+                      onChange={(e) => setExternalTruck(e.currentTarget.checked)}
+                    />
+                  </Stack>
+                  {form.values.externalTruck ? (
+                    <TextInput
+                      label={t('transportOrders.form.externalDriver')}
+                      {...form.getInputProps('driverName')}
+                    />
+                  ) : (
+                    <EmployeeSelector
+                      withAsterisk
+                      label={t('transportOrders.form.driver')}
+                      value={form.values.driverId || null}
+                      onChange={(sel) => {
+                        form.setFieldValue('driverId', sel?.id ?? '');
+                        form.setFieldValue('driverName', sel?.name ?? '');
 
-                      const linkedId = sel?.employee.extra?.truckAssetId;
-                      const linkedTruck = linkedId
-                        ? truckSelectData.find((tr) => tr.value === linkedId)
-                        : undefined;
-                      if (linkedTruck) {
-                        form.setFieldValue('truckId', linkedTruck.value);
-                        form.setFieldValue('truckPlate', linkedTruck.plate);
-                      }
-                    }}
-                    error={form.errors.driverId}
-                    filter={driverEmployeeFilter}
-                    optionLabel={driverWithPlate}
-                  />
+                        const linkedId = sel?.employee.extra?.truckAssetId;
+                        const linkedTruck = linkedId
+                          ? truckSelectData.find((tr) => tr.value === linkedId)
+                          : undefined;
+                        if (linkedTruck) {
+                          form.setFieldValue('truckId', linkedTruck.value);
+                          form.setFieldValue('truckPlate', linkedTruck.plate);
+                        }
+                      }}
+                      error={form.errors.driverId}
+                      filter={driverEmployeeFilter}
+                      optionLabel={driverWithPlate}
+                    />
+                  )}
                 </>
               )}
               <TextInput
@@ -939,16 +1064,22 @@ export function TransportOrderFormPage() {
                 label={t('transportOrders.columns.container')}
                 {...form.getInputProps('containerNumber')}
               />
-              <Select
-                label={t('transportOrders.form.containerSize')}
-                data={containerSizeData}
-                value={form.values.containerSize || null}
-                onChange={(v) =>
-                  form.setFieldValue('containerSize', (v as TransportOrderContainerSize) ?? '20')
-                }
-                searchable
-                allowDeselect={false}
-              />
+              {/* Hidden for a Xe Tải job — that vehicle hauls no container, so
+                  the field has nothing to say. `showContainerSize` also drives
+                  the effect that clears a value stranded by a late truck pick. */}
+              {showContainerSize && (
+                <Select
+                  label={t('transportOrders.form.containerSize')}
+                  data={containerSizeData}
+                  value={form.values.containerSize || null}
+
+                  onChange={(v) =>
+                    form.setFieldValue('containerSize', (v as TransportOrderContainerSize) ?? '')
+                  }
+                  searchable
+                  clearable
+                />
+              )}
               <Select
                 label={t('transportOrders.form.shipmentType')}
                 data={shipmentTypeData}
@@ -1023,14 +1154,28 @@ export function TransportOrderFormPage() {
                         figure), so the leftover lands on the places. Don't grow one
                         back without taking the width from somewhere other than
                         them. */}
-                    <Table.Th>{t('transportOrders.trips.departure')}</Table.Th>
-                    <Table.Th>{t('transportOrders.trips.destination')}</Table.Th>
-                    {/* The warehouse's plan for this leg — day + hour, at each end
-                        of it. There is no NGÀY column: a full loading datetime
-                        already carries the day, so the leg's date is derived from
-                        it (`tripDate`) rather than typed a second time. */}
-                    <Table.Th w={165}>{t('transportOrders.trips.loadingAt')}</Table.Th>
-                    <Table.Th w={165}>{t('transportOrders.trips.unloadingAt')}</Table.Th>
+                    {/* Each end of the leg is ONE column: the place, and under
+                        it the time the warehouse expects the truck there. Two
+                        stacked headers rather than four side-by-side ones — see
+                        the width note in `modules/transport-orders.md`. There is
+                        still no NGÀY column: a loading datetime already carries
+                        the day, so the leg's date derives from it (`tripDate`). */}
+                    <Table.Th>
+                      <Stack gap={0}>
+                        <Text inherit>{t('transportOrders.trips.departure')}</Text>
+                        <Text fz="xs" c="dimmed" fw={400} tt="none">
+                          {t('transportOrders.trips.loadingAt')}
+                        </Text>
+                      </Stack>
+                    </Table.Th>
+                    <Table.Th>
+                      <Stack gap={0}>
+                        <Text inherit>{t('transportOrders.trips.destination')}</Text>
+                        <Text fz="xs" c="dimmed" fw={400} tt="none">
+                          {t('transportOrders.trips.unloadingAt')}
+                        </Text>
+                      </Stack>
+                    </Table.Th>
                     <Table.Th w={175}>{t('transportOrders.columns.truck')}</Table.Th>
                     <Table.Th w={175}>{t('transportOrders.form.driver')}</Table.Th>
                     <Table.Th w={120}>{t('transportOrders.trips.laborCost')}</Table.Th>
@@ -1048,49 +1193,73 @@ export function TransportOrderFormPage() {
                           is telling four similar-looking addresses apart. Capped at
                           4 rows so one pasted paragraph can't swallow the form. */}
                       <Table.Td>
-                        <Autocomplete
-                          data={placeSuggestions}
-                          limit={PLACE_SUGGESTION_LIMIT}
-                          styles={PLACE_INPUT_STYLES}
+                        <Stack gap={4}>
+                          <Autocomplete
+                            data={placeSuggestions}
+                            limit={PLACE_SUGGESTION_LIMIT}
+                            styles={PLACE_INPUT_STYLES}
 
-                          title={form.values.trips[i]!.departure || undefined}
-                          {...form.getInputProps(`trips.${i}.departure`)}
-                        />
+                            title={form.values.trips[i]!.departure || undefined}
+                            {...form.getInputProps(`trips.${i}.departure`)}
+                          />
+                          <DateTimeTextField {...form.getInputProps(`trips.${i}.loadingAt`)} />
+                        </Stack>
                       </Table.Td>
                       <Table.Td>
-                        <Autocomplete
-                          data={placeSuggestions}
-                          limit={PLACE_SUGGESTION_LIMIT}
-                          styles={PLACE_INPUT_STYLES}
-                          title={form.values.trips[i]!.destination || undefined}
-                          {...form.getInputProps(`trips.${i}.destination`)}
-                        />
+                        <Stack gap={4}>
+                          <Autocomplete
+                            data={placeSuggestions}
+                            limit={PLACE_SUGGESTION_LIMIT}
+                            styles={PLACE_INPUT_STYLES}
+                            title={form.values.trips[i]!.destination || undefined}
+                            {...form.getInputProps(`trips.${i}.destination`)}
+                          />
+                          <DateTimeTextField {...form.getInputProps(`trips.${i}.unloadingAt`)} />
+                        </Stack>
+                      </Table.Td>
+                      {/* Per LEG, not per order: a reefer job routinely runs one
+                          fleet leg to the port and a hired one back. */}
+                      <Table.Td>
+                        <Stack gap={4}>
+                          {form.values.trips[i]!.externalTruck ? (
+                            <TextInput
+                              placeholder={t('transportOrders.form.externalPlate')}
+                              {...form.getInputProps(`trips.${i}.truckPlate`)}
+                            />
+                          ) : (
+                            <Select
+                              data={truckSelectData}
+                              value={form.values.trips[i]!.truckId || null}
+                              onChange={(v) => setTripTruck(i, v)}
+                              error={form.errors[`trips.${i}.truckId`]}
+                              searchable
+                              clearable
+                              nothingFoundMessage={t('transportOrders.form.noTrucks')}
+                            />
+                          )}
+                          <Checkbox
+                            size="xs"
+                            label={t('transportOrders.form.externalTruck')}
+                            checked={form.values.trips[i]!.externalTruck}
+                            onChange={(e) => setTripExternalTruck(i, e.currentTarget.checked)}
+                          />
+                        </Stack>
                       </Table.Td>
                       <Table.Td>
-                        <DateTimeTextField {...form.getInputProps(`trips.${i}.loadingAt`)} />
-                      </Table.Td>
-                      <Table.Td>
-                        <DateTimeTextField {...form.getInputProps(`trips.${i}.unloadingAt`)} />
-                      </Table.Td>
-                      <Table.Td>
-                        <Select
-                          data={truckSelectData}
-                          value={form.values.trips[i]!.truckId || null}
-                          onChange={(v) => setTripTruck(i, v)}
-                          error={form.errors[`trips.${i}.truckId`]}
-                          searchable
-                          clearable
-                          nothingFoundMessage={t('transportOrders.form.noTrucks')}
-                        />
-                      </Table.Td>
-                      <Table.Td>
-                        <EmployeeSelector
-                          value={form.values.trips[i]!.driverId || null}
-                          onChange={(sel) => setTripDriver(i, sel)}
-                          error={form.errors[`trips.${i}.driverId`]}
-                          filter={driverEmployeeFilter}
-                          optionLabel={driverWithPlate}
-                        />
+                        {form.values.trips[i]!.externalTruck ? (
+                          <TextInput
+                            placeholder={t('transportOrders.form.externalDriver')}
+                            {...form.getInputProps(`trips.${i}.driverName`)}
+                          />
+                        ) : (
+                          <EmployeeSelector
+                            value={form.values.trips[i]!.driverId || null}
+                            onChange={(sel) => setTripDriver(i, sel)}
+                            error={form.errors[`trips.${i}.driverId`]}
+                            filter={driverEmployeeFilter}
+                            optionLabel={driverWithPlate}
+                          />
+                        )}
                       </Table.Td>
                       <Table.Td>
                         <NumberInput
@@ -1198,6 +1367,23 @@ export function TransportOrderFormPage() {
 
           {/* Under the card that owns the places, beside the conflict warning —
               both are advisories about what the operator just typed. */}
+          {routeTruckIssues.length > 0 && appliedRoute && (
+            <Alert color="yellow" variant="light" icon={<IconAlertTriangle size={16} />}>
+              <Stack gap={4}>
+                {routeTruckIssues.map((issue) => (
+                  <Text key={`${issue.leg}-${issue.kind}`} size="sm">
+                    {t(
+                      issue.leg === WHOLE_ORDER
+                        ? `transportRoutes.suggestion.${issue.kind === 'missing' ? 'truckMissing' : 'truckMismatch'}`
+                        : `transportRoutes.suggestion.${issue.kind === 'missing' ? 'truckMissingLeg' : 'truckMismatchLeg'}`,
+                      { code: appliedRoute.code, leg: issue.leg },
+                    )}
+                  </Text>
+                ))}
+              </Stack>
+            </Alert>
+          )}
+
           <TransportRouteSuggestion
             matches={routeMatches}
             onApply={applyRoute}

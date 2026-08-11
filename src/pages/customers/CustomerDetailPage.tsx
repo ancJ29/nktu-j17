@@ -17,6 +17,7 @@ import {
   IconAddressBook,
   IconArrowLeft,
   IconBan,
+  IconChartBar,
   IconCircleCheck,
   IconEdit,
   IconHistory,
@@ -44,6 +45,8 @@ import { NotesSection } from '@/components/NotesSection';
 import { SectionCard } from '@/components/SectionCard';
 import { TimestampLine } from '@/components/TimestampLine';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
+import EntitySalesPanel from '@/pages/reports/EntitySalesPanel';
+import { useCanAccessReports } from '@/pages/reports/reportAccess';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useCustomerStore, fetchCustomerById } from '@/stores/useCustomerStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
@@ -91,6 +94,8 @@ export function CustomerDetailPage() {
     useDisclosure(false);
   const [toggling, setToggling] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('details');
+
+  const canSeeSales = useCanAccessReports();
 
   useEffect(() => {
     if (!id) return;
@@ -564,6 +569,8 @@ export function CustomerDetailPage() {
       </DangerZoneCard>
     ) : null;
 
+  const salesTabVisible = canSeeSales && !!customer.code;
+
   const body = (
     <Grid gutter="md">
       <Grid.Col span={{ base: 12, md: 7 }}>
@@ -608,6 +615,18 @@ export function CustomerDetailPage() {
         </Accordion.Control>
         <Accordion.Panel>{notesCard}</Accordion.Panel>
       </Accordion.Item>
+      {salesTabVisible && (
+        <Accordion.Item value="sales">
+          <Accordion.Control icon={<IconChartBar size={16} />}>
+            {t('report.entityTab.title')}
+          </Accordion.Control>
+          <Accordion.Panel>
+            <EntitySalesPanel
+              target={{ kind: 'customer', code: customer.code, name: customer.name }}
+            />
+          </Accordion.Panel>
+        </Accordion.Item>
+      )}
       {activityEnabled && (
         <Accordion.Item value="activity">
           <Accordion.Control icon={<IconHistory size={16} />}>
@@ -629,25 +648,44 @@ export function CustomerDetailPage() {
         <Divider />
         {isMobile ? (
           mobileContent
-        ) : activityTabVisible ? (
+        ) : activityTabVisible || salesTabVisible ? (
           <Tabs value={activeTab} onChange={(v) => v && setActiveTab(v)}>
             <Tabs.List>
               <Tabs.Tab value="details" leftSection={<IconInfoCircle size={16} />}>
                 {t('customers.detail.tab.details')}
               </Tabs.Tab>
-              <Tabs.Tab value="activity" leftSection={<IconHistory size={16} />}>
-                {t('customers.detail.tab.activity')}
-              </Tabs.Tab>
+              {salesTabVisible && (
+                <Tabs.Tab value="sales" leftSection={<IconChartBar size={16} />}>
+                  {t('report.entityTab.title')}
+                </Tabs.Tab>
+              )}
+              {activityTabVisible && (
+                <Tabs.Tab value="activity" leftSection={<IconHistory size={16} />}>
+                  {t('customers.detail.tab.activity')}
+                </Tabs.Tab>
+              )}
             </Tabs.List>
             <Tabs.Panel value="details" pt="md">
               {body}
             </Tabs.Panel>
-            <Tabs.Panel value="activity" pt="md">
-              {/* Lazy-mount: only fetch when this tab is selected. */}
-              {activeTab === 'activity' && (
-                <ActivityByTargetPanel targetId={customer.id} i18nNamespace="customers.detail" />
-              )}
-            </Tabs.Panel>
+            {salesTabVisible && (
+              <Tabs.Panel value="sales" pt="md">
+                {/* Lazy-mount: only load the report chunk + store when selected. */}
+                {activeTab === 'sales' && (
+                  <EntitySalesPanel
+                    target={{ kind: 'customer', code: customer.code, name: customer.name }}
+                  />
+                )}
+              </Tabs.Panel>
+            )}
+            {activityTabVisible && (
+              <Tabs.Panel value="activity" pt="md">
+                {/* Lazy-mount: only fetch when this tab is selected. */}
+                {activeTab === 'activity' && (
+                  <ActivityByTargetPanel targetId={customer.id} i18nNamespace="customers.detail" />
+                )}
+              </Tabs.Panel>
+            )}
           </Tabs>
         ) : (
           body

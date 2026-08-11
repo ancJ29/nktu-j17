@@ -9,6 +9,7 @@ import {
 import {
   DEFAULT_QUOTATION_PRINT_OPTIONS,
   type QuotationPrintData,
+  type QuotationPrintLine,
   type QuotationPrintOptions,
 } from './quotationPrint';
 
@@ -17,6 +18,15 @@ const ACCENT = '#dd7a2e';
 
 function decimal2(n: number): string {
   return n.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function tiersHtml(tiers: QuotationPrintLine['priceTiers'], unit: string): string {
+  if (!tiers?.length) return '';
+  const unitSuffix = unit ? ` ${unit}` : '';
+  const rungs = tiers
+    .map((t) => `Từ ${t.minQuantity.toLocaleString('vi-VN')}${unitSuffix}: ${money(t.unitPrice)}đ`)
+    .join(' · ');
+  return `<div class="tiers">Giá theo số lượng — ${escapeHtml(rungs)}</div>`;
 }
 
 function buildParts(
@@ -47,7 +57,7 @@ function buildParts(
               ? `<td class="c photo">${line.photoUrl ? `<img src="${escapeHtml(line.photoUrl)}" alt="" />` : ''}</td>`
               : ''
           }
-          <td class="name">${escapeHtml(line.name)}</td>
+          <td class="name">${escapeHtml(line.name)}${tiersHtml(line.priceTiers, line.unit)}</td>
           <td class="c">${escapeHtml(line.unit)}</td>
           <td class="r">${decimal2(line.quantity)}</td>
           <td class="r">${decimal2(line.unitPrice)}</td>
@@ -113,6 +123,10 @@ function buildParts(
   td.c { text-align: center; }
   td.r { text-align: right; }
   td.name { font-weight: 500; }
+  td.name .tiers {
+    margin-top: 2px; font-weight: 400; font-style: italic;
+    font-size: ${baseFontPx - 1.5}px; color: #6b6b6b;
+  }
   td.photo { padding: 3px; width: ${photoPx + 8}px; }
   td.photo img {
     display: block; width: ${photoPx}px; height: ${photoPx}px; object-fit: contain;

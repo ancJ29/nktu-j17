@@ -8,6 +8,10 @@ import {
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
+import {
+  isDefaultStatusSelection,
+  shouldEncodeStatusSelection,
+} from '@/utils/listFilterStatusDefault';
 import { getDeliveryRequestDefaultListStatuses } from '@/utils/permission';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
 import { deliveryRequestPartyKey } from './deliveryRequestParty';
@@ -40,7 +44,7 @@ type DeliveryRequestUrlState = {
 function compactState(state: DeliveryRequestUrlState): DeliveryRequestUrlState {
   const r: DeliveryRequestUrlState = {};
 
-  if (state.s?.length || (state.s && DEFAULT_STATUS.length > 0)) r.s = state.s;
+  if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.o) r.o = state.o;
   if (state.dv) r.dv = state.dv;
   if (state.pt) r.pt = state.pt;
@@ -161,9 +165,7 @@ export function useDeliveryRequestListFilters(
   ]);
 
   const statusFilterIsDefault = useMemo(
-    () =>
-      statusFilter.length === DEFAULT_STATUS.length &&
-      statusFilter.every((v) => DEFAULT_STATUS.includes(v)),
+    () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
   );
 

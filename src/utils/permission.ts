@@ -4,9 +4,11 @@ import type {
   DepartmentOption,
   SalesOrderStatusOption,
   DeliveryRequestStatusOption,
+  TransportOrderBangKeTemplateConfig,
   TransportOrderStatusOptionConfig,
   TagOption,
 } from '@/config/schema';
+import type { GoodsReceiptStatus } from '@/types';
 import {
   BASE_PERMISSIONS,
   type Permissions,
@@ -69,6 +71,10 @@ export function isPriceManagementEnabled() {
 
 export function isPdfSharingEnabled() {
   return featureFlags?.common?.enablePdfSharing ?? false;
+}
+
+export function isQuotationTierPricingEnabled() {
+  return featureFlags?.quotations?.priceByMinQuantity ?? false;
 }
 
 export function isStatsEnabled() {
@@ -183,6 +189,15 @@ export function getTransportOrderStatusOptions(): TransportOrderStatusOptionConf
   );
 }
 
+export function getTransportOrderDefaultListStatuses(): string[] {
+  const configured =
+    (appConfig as { features?: { transportOrders?: { defaultListStatuses?: string[] } } })?.features
+      ?.transportOrders?.defaultListStatuses ?? [];
+  if (configured.length === 0) return [];
+  const known = new Set(getTransportOrderStatusOptions().map((s) => s.value));
+  return configured.filter((v) => known.has(v));
+}
+
 export function getTransportOrderStatusTransitions(): Record<string, string[]> {
   return (
     (
@@ -191,6 +206,18 @@ export function getTransportOrderStatusTransitions(): Record<string, string[]> {
       }
     )?.features?.transportOrders?.statusTransitions ?? {}
   );
+}
+
+export function resolveTransportOrderBangKeTemplate(
+  customerCode: string,
+): TransportOrderBangKeTemplateConfig | undefined {
+  const templates =
+    (
+      appConfig as {
+        features?: { transportOrders?: { bangKeTemplates?: TransportOrderBangKeTemplateConfig[] } };
+      }
+    )?.features?.transportOrders?.bangKeTemplates ?? [];
+  return templates.find((t) => (t.customerCodes ?? []).includes(customerCode));
 }
 
 export function getDeliveryRequestDriverDepartments(): string[] {
@@ -225,6 +252,21 @@ export function getGoodsReceiptPicDepartments(): string[] {
 
 export function allowsNoInventoryProductsForGoodsReceipts(): boolean {
   return featureFlags?.goodsReceipts?.allowNoInventoryProducts ?? false;
+}
+
+const GOODS_RECEIPT_STATUS_VALUES = [
+  'draft',
+  'received',
+  'cancelled',
+] as const satisfies readonly GoodsReceiptStatus[];
+
+export function getGoodsReceiptDefaultListStatuses(): string[] {
+  const configured =
+    (appConfig as { features?: { goodsReceipts?: { defaultListStatuses?: string[] } } })?.features
+      ?.goodsReceipts?.defaultListStatuses ?? [];
+  if (configured.length === 0) return [];
+  const known = new Set<string>(GOODS_RECEIPT_STATUS_VALUES);
+  return configured.filter((v) => known.has(v));
 }
 
 export function makeEmployeeDepartmentFilter(
