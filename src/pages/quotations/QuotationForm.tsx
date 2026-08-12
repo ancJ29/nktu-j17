@@ -65,6 +65,7 @@ import {
   MAX_QUOTATION_CODE_RETRIES,
 } from './code';
 import {
+  isQuotationEditable,
   normalizePriceTiers,
   quotationTotal,
   resolveTierPrice,
@@ -214,7 +215,7 @@ export function QuotationForm() {
         navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
         return null;
       }
-      if (target.extra.status && target.extra.status !== 'draft') {
+      if (!isQuotationEditable(target.extra.status ?? 'draft')) {
         navigate(detailRoute(target.id), { replace: true });
         return null;
       }

@@ -27,6 +27,8 @@ function mirrorExtra(refuel: OperationLog, truckCode: string): OperationLogExtra
     ...(typeof e.unitPrice === 'number' && { unitPrice: e.unitPrice }),
     ...(typeof e.totalAmount === 'number' && { totalAmount: e.totalAmount }),
     ...(typeof e.driverName === 'string' && e.driverName && { driverName: e.driverName }),
+
+    ...(typeof e.driverId === 'string' && e.driverId && { driverId: e.driverId }),
     truckId: refuel.targetId,
     ...(truckCode && { truckCode }),
     sourceRefuelLogId: refuel.id,

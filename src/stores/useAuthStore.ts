@@ -105,6 +105,13 @@ export function takeSessionExpiredNotice(): SessionExpiredNotice | null {
 let lastAuthToken = useAuthStore.getState().token;
 
 cMngtConnector.setAuthToken(lastAuthToken ?? '');
+
+cMngtConnector.setBeforeRequest(() =>
+  useAuthStore
+    .getState()
+    .checkAndRefreshToken()
+    .catch(() => undefined),
+);
 useAuthStore.subscribe((state) => {
   const next = state.token;
   if (next === lastAuthToken) return;

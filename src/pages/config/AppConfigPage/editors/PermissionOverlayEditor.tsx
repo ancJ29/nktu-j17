@@ -28,6 +28,7 @@ const PERM_MODULE_LABELS: Record<string, string> = {
   permissionManagement: 'Permission Management',
   product: 'Product',
   productInventory: 'Product Inventory',
+  report: 'Report',
   salesOrder: 'Sales Order',
   transportOrder: 'Transport Order',
   transportRoute: 'Transport Route',

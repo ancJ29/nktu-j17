@@ -2,9 +2,10 @@ import { NumberInput, SimpleGrid, Stack, Text, Textarea, TextInput } from '@mant
 import { IconDroplet, IconTruckLoading } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { DatePickerField } from '@/components/DatePickerField';
+import { EmployeeLink } from '@/components/EmployeeLink';
 import { TruckLink } from '@/components/TruckLink';
 import { formatDate } from '@/utils/dateFormat';
-import { formatNumber } from '@/utils/number';
+import { formatNumber, LITRE_DECIMAL_SCALE } from '@/utils/number';
 import type { OilTankIssueLogExtra, OilTankRefillLogExtra } from '@/types';
 import {
   datePart,
@@ -148,7 +149,7 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
           label={t('oilTanks.logs.refill.columns.litres')}
           withAsterisk
           min={0}
-          decimalScale={2}
+          decimalScale={LITRE_DECIMAL_SCALE}
           suffix=" L"
           {...form.getInputProps('litres')}
           onChange={(v) => {
@@ -232,6 +233,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     truckId: '',
     truckCode: '',
     driverName: '',
+    driverId: '',
     note: '',
   },
   columns: [
@@ -241,7 +243,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
 
       render: (log) =>
         log.extra?.truckId ? (
-          <TruckLink id={log.extra.truckId} fallbackLabel={log.extra.truckCode} />
+          <TruckLink id={log.extra.truckId} fallbackLabel={log.extra.truckCode} showPlate />
         ) : (
           textCell(log.extra?.truckCode)
         ),
@@ -249,7 +251,13 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     ...moneyColumns('oilTanks.logs.issue'),
     {
       header: 'oilTanks.logs.issue.columns.driver',
-      render: (log) => textCell(log.extra?.driverName),
+
+      render: (log) =>
+        log.extra?.driverId ? (
+          <EmployeeLink id={log.extra.driverId} fallbackLabel={log.extra.driverName} />
+        ) : (
+          textCell(log.extra?.driverName)
+        ),
     },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
@@ -280,6 +288,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     ...(String(values.truckId).trim() && { truckId: String(values.truckId).trim() }),
     ...(String(values.truckCode).trim() && { truckCode: String(values.truckCode).trim() }),
     ...(String(values.driverName).trim() && { driverName: String(values.driverName).trim() }),
+    ...(String(values.driverId).trim() && { driverId: String(values.driverId).trim() }),
     ...(String(values.note).trim() && { note: String(values.note).trim() }),
   }),
   toForm: (log): LogFormValues => {
@@ -292,6 +301,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
       truckId: e.truckId ?? '',
       truckCode: e.truckCode ?? '',
       driverName: e.driverName ?? '',
+      driverId: e.driverId ?? '',
       note: e.note ?? '',
     };
   },
@@ -309,7 +319,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
           label={t('oilTanks.logs.issue.columns.litres')}
           withAsterisk
           min={0}
-          decimalScale={2}
+          decimalScale={LITRE_DECIMAL_SCALE}
           suffix=" L"
           {...form.getInputProps('litres')}
           onChange={(v) => {

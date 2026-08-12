@@ -193,6 +193,7 @@ const storages = {
   trustedServiceKey: '',
   stage: '$default',
   baseUrl: urls['cMngt'] || '',
+  beforeRequest: undefined as (() => Promise<unknown>) | undefined,
 };
 
 registerStagePrefix(storages.baseUrl, storages.target);
@@ -365,6 +366,11 @@ export const cMngtConnector = {
   },
   setAuthToken: (token: string) => {
     storages.authToken = token;
+    return cMngtConnector;
+  },
+
+  setBeforeRequest: (hook: (() => Promise<unknown>) | undefined) => {
+    storages.beforeRequest = hook;
     return cMngtConnector;
   },
   setClientCode: (clientId: string) => {

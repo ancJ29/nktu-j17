@@ -60,7 +60,13 @@ export type OperationLogContext = {
 
   tankCurrentLevel?: number;
 
-  truckOptions?: { value: string; label: string; code: string; driverName?: string }[];
+  truckOptions?: {
+    value: string;
+    label: string;
+    code: string;
+    driverName?: string;
+    driverId?: string;
+  }[];
 };
 
 export type OperationLogWriteEvent = {

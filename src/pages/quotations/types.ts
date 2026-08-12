@@ -1,6 +1,22 @@
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 
-export type QuotationStatus = 'draft' | 'sent' | 'cancelled' | 'converted';
+export type QuotationStatus = 'draft' | 'sent' | 'confirmed' | 'cancelled' | 'converted';
+
+const QUOTATION_TRANSITIONS: Record<QuotationStatus, QuotationStatus[]> = {
+  draft: ['sent', 'cancelled'],
+  sent: ['confirmed', 'cancelled'],
+  confirmed: ['cancelled'],
+  converted: [],
+  cancelled: [],
+};
+
+export function canTransitionQuotation(from: QuotationStatus, to: QuotationStatus): boolean {
+  return QUOTATION_TRANSITIONS[from]?.includes(to) ?? false;
+}
+
+export function isQuotationEditable(status: QuotationStatus): boolean {
+  return status === 'draft' || status === 'sent';
+}
 
 export type QuotationPriceTier = {
   minQuantity: number;
@@ -61,6 +77,8 @@ export type QuotationExtra = {
 
   sentAt?: number;
 
+  confirmedAt?: number;
+
   convertedAt?: number;
 
   generatedSalesOrderId?: string;
@@ -80,11 +98,14 @@ export function quotationTotal(lines: QuotationLine[]): number {
 
 export function quotationListDate(q: Quotation): {
   at: number;
-  kind: 'created' | 'sent' | 'po';
+  kind: 'created' | 'sent' | 'confirmed' | 'po';
 } {
   const status = q.extra.status ?? 'draft';
   if (status === 'converted') {
     return { at: q.extra.convertedAt ?? q.updatedAt ?? q.createdAt, kind: 'po' };
+  }
+  if (status === 'confirmed') {
+    return { at: q.extra.confirmedAt ?? q.updatedAt ?? q.createdAt, kind: 'confirmed' };
   }
   if (status === 'sent') {
     return { at: q.extra.sentAt ?? q.updatedAt ?? q.createdAt, kind: 'sent' };
@@ -97,6 +118,7 @@ export function quotationBadgeProps(status: QuotationStatus): {
   variant: 'filled' | 'light';
 } {
   if (status === 'sent') return { color: 'green', variant: 'filled' };
+  if (status === 'confirmed') return { color: 'teal', variant: 'filled' };
   if (status === 'converted') return { color: 'blue', variant: 'filled' };
   if (status === 'cancelled') return { color: 'red', variant: 'light' };
   return { color: 'gray', variant: 'light' };

@@ -31,14 +31,24 @@ export function IssueTruckDriverFields({
           form.setFieldValue('truckId', value ?? '');
           form.setFieldValue('truckCode', picked?.code ?? '');
 
-          if (picked?.driverName) form.setFieldValue('driverName', picked.driverName);
-          if (!value) form.setFieldValue('driverName', '');
+          if (picked?.driverName) {
+            form.setFieldValue('driverName', picked.driverName);
+            form.setFieldValue('driverId', picked.driverId ?? '');
+          }
+          if (!value) {
+            form.setFieldValue('driverName', '');
+            form.setFieldValue('driverId', '');
+          }
         }}
       />
       <TextInput
         label={t('oilTanks.logs.issue.columns.driver')}
         placeholder={t('oilTanks.logs.issue.form.driverPlaceholder')}
         {...form.getInputProps('driverName')}
+        onChange={(event) => {
+          form.setFieldValue('driverName', event.currentTarget.value);
+          form.setFieldValue('driverId', '');
+        }}
       />
     </SimpleGrid>
   );

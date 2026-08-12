@@ -23,6 +23,8 @@ export type AuthFeatures = {
 
 export type ThemeConfig = {
   mainColor: string;
+
+  customPalette?: string[];
 };
 
 export type Language = {

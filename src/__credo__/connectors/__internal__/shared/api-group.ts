@@ -30,24 +30,36 @@ export function createApiGroup(config: ApiGroupConfig) {
       ...headerOpts
     } = opts ?? {};
 
-    const headers = {
-      ...buildHeadersWithRoute({
-        ...config.defaults,
-        ...headerOpts,
-        params: params as Record<string, string> | undefined,
-        storages: callStorages !== undefined ? callStorages : config.storages,
-        route,
-        prefix: config.prefix,
-      }),
-      ...extraHeaders,
+    const storages = callStorages !== undefined ? callStorages : config.storages;
+
+    const send = () => {
+      const headers = {
+        ...buildHeadersWithRoute({
+          ...config.defaults,
+          ...headerOpts,
+          params: params as Record<string, string> | undefined,
+          storages,
+          route,
+          prefix: config.prefix,
+        }),
+        ...extraHeaders,
+      };
+
+      return callApi<T>(`${config.getBaseUrl()}${config.prefix}${route.PATH}`, {
+        method: route.METHOD,
+        params,
+        queryParams,
+        headers,
+        body: body !== undefined ? JSON.stringify(body) : null,
+      });
     };
 
-    return callApi<T>(`${config.getBaseUrl()}${config.prefix}${route.PATH}`, {
-      method: route.METHOD,
-      params,
-      queryParams,
-      headers,
-      body: body !== undefined ? JSON.stringify(body) : null,
-    });
+    const gate = storages?.beforeRequest;
+    if (!gate) return send();
+
+    return Promise.resolve()
+      .then(gate)
+      .catch(() => undefined)
+      .then(send);
   };
 }

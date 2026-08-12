@@ -76,6 +76,7 @@ function useIssueTruckOptions() {
         label: truck.extra?.plateNumber ? `${truck.name} · ${truck.extra.plateNumber}` : truck.name,
         code: truck.code,
         driverName: truck.extra?.driverName,
+        driverId: truck.extra?.driverId,
       }));
   }, [enabled, items]);
 }

@@ -2,6 +2,7 @@ import { ROUTES } from '@/constants/routes';
 import { IconName } from '@credo/base-ui/components';
 import type { NavigationItem } from '@/types';
 import { getModulePermissions } from '@/utils/permissionReader';
+import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import { isAdmin } from './env';
 
 export type NavId =
@@ -448,6 +449,10 @@ const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   greenhouses: () => getModulePermissions('greenhouse').canView ?? false,
   crops: () => getModulePermissions('crop').canView ?? false,
   'crop-diary-templates': () => getModulePermissions('cropDiaryTemplate').canView ?? false,
+
+  report: () =>
+    (getModulePermissions('report').canView ?? false) ||
+    sharedUserStorage.get<string>(SharedStorageKey.DEPARTMENT) === 'manager',
 };
 
 function resolveItem(id: NavId, iconOverride?: IconName, navbarOverride?: boolean): NavigationItem {

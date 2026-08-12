@@ -194,5 +194,13 @@ exports[`resolvePermissions — BASE → CLIENT → DEPARTMENT → EMPLOYEE > pr
   "transportRoute c-e VCE-",
   "transportRoute -de -CE-",
   "transportRoute cde VCE-",
+  "report --- ----",
+  "report c-- VC--",
+  "report -d- ----",
+  "report cd- V---",
+  "report --e -CE-",
+  "report c-e VCE-",
+  "report -de -CE-",
+  "report cde VCE-",
 ]
 `;

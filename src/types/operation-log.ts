@@ -159,6 +159,8 @@ export type OilTankIssueLogExtra = {
 
   driverName?: string;
 
+  driverId?: string;
+
   sourceRefuelLogId?: string;
 
   note?: string;

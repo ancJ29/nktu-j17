@@ -225,3 +225,22 @@ export const brandPalettes: Record<string, MantineColorsTuple> = {
 export function getColorPalette(name: string): MantineColorsTuple {
   return colorPalettes[name] || olive;
 }
+
+export const PALETTE_SHADE_COUNT = 10;
+
+const HEX_COLOR_RE = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
+
+export function parsePalette(colors: unknown): MantineColorsTuple | null {
+  if (!Array.isArray(colors) || colors.length !== PALETTE_SHADE_COUNT) return null;
+  const trimmed = colors.map((c) => (typeof c === 'string' ? c.trim() : ''));
+  if (!trimmed.every((c) => HEX_COLOR_RE.test(c))) return null;
+  return trimmed as unknown as MantineColorsTuple;
+}
+
+export function applyCustomPalette(mainColor: string, colors: unknown): boolean {
+  if (colors === undefined) return false;
+  const palette = parsePalette(colors);
+  if (!palette || !(mainColor in brandPalettes)) return false;
+  colorPalettes[mainColor] = palette;
+  return true;
+}

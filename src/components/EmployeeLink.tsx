@@ -21,32 +21,46 @@ function AvatarLead({ size, imageUrl, name }: { size: LinkSize; imageUrl?: strin
 type EmployeeLinkProps = {
   code?: string | undefined | null;
   id?: string | undefined | null;
+
+  fallbackLabel?: string | null;
   size?: LinkSize;
   noAvatar?: boolean;
 };
 
-export function EmployeeLink({ code, id, noAvatar = false, size = 'sm' }: EmployeeLinkProps) {
+export function EmployeeLink({
+  code,
+  id,
+  fallbackLabel,
+  noAvatar = false,
+  size = 'sm',
+}: EmployeeLinkProps) {
   const employee = useEmployeeStore((s) =>
     code ? s.getByCode(code) : id ? s.getById(id) : undefined,
   );
 
-  const name = employee?.name ?? '';
+  const name = employee?.name ?? fallbackLabel ?? '';
 
   const detailId = employee?.id ?? (code ? undefined : (id ?? undefined));
 
-  if (!name || !detailId) return <EntityDash size={size} />;
+  if (!name) return <EntityDash size={size} />;
+
+  const chip = (
+    <EntityChip
+      size={size}
+      lead={
+        noAvatar ? undefined : (
+          <AvatarLead size={size} imageUrl={employee?.extra?.profileImage} name={name} />
+        )
+      }
+      label={name}
+    />
+  );
+
+  if (!detailId) return chip;
 
   return (
     <EntityAnchor to={ROUTES.EMPLOYEES.DETAIL.replace(':id', detailId)} size={size}>
-      <EntityChip
-        size={size}
-        lead={
-          noAvatar ? undefined : (
-            <AvatarLead size={size} imageUrl={employee?.extra?.profileImage} name={name} />
-          )
-        }
-        label={name}
-      />
+      {chip}
     </EntityAnchor>
   );
 }

@@ -20,6 +20,7 @@ import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
   IconBan,
+  IconCheck,
   IconCopy,
   IconEdit,
   IconFileInvoice,
@@ -75,7 +76,14 @@ import {
 import { shareQuotationPdf } from './quotationPdf';
 import { readVietnameseMoney } from '@/utils/vietnameseNumberToWords';
 import { quotationBundle, useQuotationStore } from './useQuotationStore';
-import { quotationBadgeProps, quotationTotal, type Quotation, type QuotationStatus } from './types';
+import {
+  canTransitionQuotation,
+  isQuotationEditable,
+  quotationBadgeProps,
+  quotationTotal,
+  type Quotation,
+  type QuotationStatus,
+} from './types';
 
 const isMobile = device.isMobile;
 const canCreate = perms.salesOrder.canCreate();
@@ -107,10 +115,13 @@ export function QuotationDetail() {
   const [quotation, setQuotation] = useState<Quotation | null>(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [cancelling, setCancelling] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [sendModalOpened, { open: openSendModal, close: closeSendModal }] = useDisclosure(false);
+  const [confirmModalOpened, { open: openConfirmModal, close: closeConfirmModal }] =
+    useDisclosure(false);
   const [cancelModalOpened, { open: openCancelModal, close: closeCancelModal }] =
     useDisclosure(false);
   const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
@@ -180,9 +191,14 @@ export function QuotationDetail() {
 
   const status: QuotationStatus = quotation?.extra.status ?? 'draft';
   const isReady = status === 'sent';
+  const isConfirmed = status === 'confirmed';
   const isCancelled = status === 'cancelled';
   const isConverted = status === 'converted';
   const isDraft = status === 'draft';
+
+  const isEditable = isQuotationEditable(status);
+
+  const isIssued = isReady || isConfirmed;
   const lines = useMemo(() => quotation?.extra.lines ?? [], [quotation]);
   const total = useMemo(() => quotationTotal(lines), [lines]);
 
@@ -198,6 +214,7 @@ export function QuotationDetail() {
               ...target.extra,
               status: next,
               ...(next === 'sent' && { sentAt: Date.now() }),
+              ...(next === 'confirmed' && { confirmedAt: Date.now() }),
             },
           },
         }) as Promise<Quotation>;
@@ -208,9 +225,7 @@ export function QuotationDetail() {
           const latest = err.latest as Quotation;
           const from = latest.extra.status ?? 'draft';
           if (from === next) return latest;
-          const stillValid =
-            next === 'sent' ? from === 'draft' : from === 'draft' || from === 'sent';
-          if (stillValid) return await write(latest);
+          if (canTransitionQuotation(from, next)) return await write(latest);
           setQuotation(latest);
         }
         throw err;
@@ -249,6 +264,37 @@ export function QuotationDetail() {
       setSending(false);
     }
   }, [quotation, flipStatus, t, closeSendModal]);
+
+  const handleConfirmAgreement = useCallback(async () => {
+    if (!quotation) return;
+    setConfirming(true);
+    try {
+      setQuotation(await flipStatus('confirmed'));
+      notifications.show({
+        color: 'green',
+        message: t('quotations.notifications.confirmSuccess'),
+      });
+      closeConfirmModal();
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        notifications.show({
+          color: 'yellow',
+          title: t('common.conflict.title'),
+          message: t('common.conflict.message'),
+          autoClose: 8000,
+        });
+        closeConfirmModal();
+      } else {
+        notifications.show({
+          color: 'red',
+          message: t('quotations.notifications.confirmError'),
+          autoClose: 8000,
+        });
+      }
+    } finally {
+      setConfirming(false);
+    }
+  }, [quotation, flipStatus, t, closeConfirmModal]);
 
   const handleCancel = useCallback(async () => {
     if (!quotation) return;
@@ -355,8 +401,8 @@ export function QuotationDetail() {
   }, [quotation, customers, photoByCode, showProductPhoto, unitLabels, includeVat]);
 
   const handlePrint = useCallback(() => {
-    const st = quotation?.extra.status;
-    if (!quotation || (st !== 'sent' && st !== 'converted')) return;
+    const st = quotation?.extra.status ?? 'draft';
+    if (!quotation || (st !== 'sent' && st !== 'confirmed' && st !== 'converted')) return;
     const ok = printQuotation(buildNoteData(), { paperSize, orientation });
     closePrintModal();
     if (!ok) {
@@ -369,8 +415,8 @@ export function QuotationDetail() {
   }, [quotation, buildNoteData, paperSize, orientation, closePrintModal, t]);
 
   const handleShare = useCallback(async () => {
-    const st = quotation?.extra.status;
-    if (!quotation || (st !== 'sent' && st !== 'converted')) return;
+    const st = quotation?.extra.status ?? 'draft';
+    if (!quotation || (st !== 'sent' && st !== 'confirmed' && st !== 'converted')) return;
     setSharing(true);
     try {
       const result = await shareQuotationPdf(buildNoteData(), { paperSize, orientation });
@@ -459,7 +505,7 @@ export function QuotationDetail() {
               {t('__new__.01-common.actions.back')}
             </Button>
             <Group gap="sm">
-              {(isReady || isConverted) && (
+              {(isIssued || isConverted) && (
                 <Button
                   variant="light"
                   color="gray"
@@ -470,7 +516,7 @@ export function QuotationDetail() {
                   {t('quotations.actions.exportPdf')}
                 </Button>
               )}
-              {canSharePdf && (isReady || isConverted) && (
+              {canSharePdf && (isIssued || isConverted) && (
                 <Button
                   variant="light"
                   color="teal"
@@ -481,7 +527,7 @@ export function QuotationDetail() {
                   {t('quotations.actions.sharePdf')}
                 </Button>
               )}
-              {isReady && generateSalesOrderButton}
+              {isIssued && generateSalesOrderButton}
               {canEdit && isDraft && (
                 <Button
                   color="green"
@@ -490,6 +536,16 @@ export function QuotationDetail() {
                   onClick={openSendModal}
                 >
                   {t('quotations.actions.markReady')}
+                </Button>
+              )}
+              {canEdit && isReady && (
+                <Button
+                  color="teal"
+                  size="compact-sm"
+                  leftSection={<IconCheck size={14} />}
+                  onClick={openConfirmModal}
+                >
+                  {t('quotations.actions.markConfirmed')}
                 </Button>
               )}
               {canEdit && !isCancelled && !isConverted && (
@@ -516,7 +572,7 @@ export function QuotationDetail() {
                   {t('quotations.actions.copy')}
                 </Button>
               )}
-              {canEdit && isDraft && (
+              {canEdit && isEditable && (
                 <Button
                   component={Link}
                   to={editRoute(quotation.id)}
@@ -697,7 +753,17 @@ export function QuotationDetail() {
                   {t('quotations.actions.markReady')}
                 </Button>
               )}
-              {isMobile && (isReady || isConverted) && (
+              {isMobile && canEdit && isReady && (
+                <Button
+                  color="teal"
+                  leftSection={<IconCheck size={16} />}
+                  fullWidth
+                  onClick={openConfirmModal}
+                >
+                  {t('quotations.actions.markConfirmed')}
+                </Button>
+              )}
+              {isMobile && (isIssued || isConverted) && (
                 <Button
                   variant="light"
                   color="gray"
@@ -708,7 +774,7 @@ export function QuotationDetail() {
                   {t('quotations.actions.exportPdf')}
                 </Button>
               )}
-              {isMobile && canSharePdf && (isReady || isConverted) && (
+              {isMobile && canSharePdf && (isIssued || isConverted) && (
                 <Button
                   variant="light"
                   color="teal"
@@ -756,19 +822,23 @@ export function QuotationDetail() {
                 </Card>
               )}
 
-              {(isReady || isCancelled) && (
+              {/* Status note — only for the states that STOP the operator:
+                  `confirmed` locks the document (the customer agreed to these
+                  numbers) and `cancelled` withdraws it. `sent` is editable now,
+                  so it says nothing rather than claiming a lock it doesn't have. */}
+              {(isConfirmed || isCancelled) && (
                 <Card withBorder radius="md" padding="md">
                   <Group gap="sm" wrap="nowrap">
                     <ThemeIcon
                       size={32}
                       radius="md"
                       variant="light"
-                      color={isCancelled ? 'red' : 'gray'}
+                      color={isCancelled ? 'red' : 'teal'}
                     >
                       {isCancelled ? <IconBan size={16} /> : <IconLock size={16} />}
                     </ThemeIcon>
                     <Text size="sm" c="dimmed">
-                      {t(isCancelled ? 'quotations.cancelledNote' : 'quotations.lockedNote')}
+                      {t(isCancelled ? 'quotations.cancelledNote' : 'quotations.confirmedNote')}
                     </Text>
                   </Group>
                 </Card>
@@ -800,6 +870,16 @@ export function QuotationDetail() {
         confirmLabel={t('quotations.actions.markReady')}
         confirmColor="green"
         loading={sending}
+      />
+      <ConfirmModal
+        opened={confirmModalOpened}
+        onClose={closeConfirmModal}
+        onConfirm={handleConfirmAgreement}
+        title={t('quotations.confirmAgreement.title')}
+        message={t('quotations.confirmAgreement.message')}
+        confirmLabel={t('quotations.actions.markConfirmed')}
+        confirmColor="teal"
+        loading={confirming}
       />
       <ConfirmModal
         opened={cancelModalOpened}

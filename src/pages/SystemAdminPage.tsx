@@ -118,7 +118,7 @@ type Secrets = Record<SecretField, string>;
 function readSecret(field: SecretField): string {
   try {
     if (isInternal) {
-      let value = localStorage.getItem(STORAGE_KEYS[field]) ?? '';
+      const value = localStorage.getItem(STORAGE_KEYS[field]) ?? '';
       if (value) return value;
     }
     return sessionStorage.getItem(STORAGE_KEYS[field]) ?? '';

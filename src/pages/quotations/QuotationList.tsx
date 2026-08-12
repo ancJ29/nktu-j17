@@ -149,6 +149,7 @@ export function QuotationList() {
     () => [
       { value: 'draft', label: t('quotations.status.draft') },
       { value: 'sent', label: t('quotations.status.sent') },
+      { value: 'confirmed', label: t('quotations.status.confirmed') },
       { value: 'converted', label: t('quotations.status.converted') },
       { value: 'cancelled', label: t('quotations.status.cancelled') },
     ],

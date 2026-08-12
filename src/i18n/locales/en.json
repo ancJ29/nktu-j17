@@ -3345,6 +3345,7 @@
         "permissionManagement": "Permission Management",
         "product": "Product",
         "productInventory": "Product Inventory",
+        "report": "Report",
         "salesOrder": "Sales Order",
         "transportOrder": "Transport Order",
         "transportRoute": "Transport Route",
@@ -3396,6 +3397,7 @@
       "copy": "Copy",
       "exportPdf": "Export PDF",
       "generateSalesOrder": "Generate sales order",
+      "markConfirmed": "Customer confirmed",
       "markReady": "Mark as ready",
       "new": "New quotation",
       "sharePdf": "Share PDF"
@@ -3408,6 +3410,11 @@
     "columns": {
       "date": "Date"
     },
+    "confirmAgreement": {
+      "message": "Mark this quotation as agreed by the customer. It will be locked and can no longer be edited — you can still export the PDF and generate a sales order. Continue?",
+      "title": "Record the customer’s agreement?"
+    },
+    "confirmedNote": "The customer has agreed to this quotation, so it is locked. Copy it to quote different terms.",
     "convertedNote": "A sales order has been generated from this quotation.",
     "copiedFrom": "Copied from {{code}} — adjust and save as a new draft.",
     "countLabel_one": "{{count}} quotation",
@@ -3417,6 +3424,7 @@
       "deleteItemDesc": "Permanently remove this quotation"
     },
     "dateKind": {
+      "confirmed": "Confirmed",
       "created": "Created",
       "po": "PO date",
       "sent": "Sent"
@@ -3461,11 +3469,12 @@
       "unitLabel": "Unit"
     },
     "fromQuotation": "From quotation",
-    "lockedNote": "This quotation is marked ready and locked. Copy it to make changes.",
     "newTitle": "New quotation",
     "notifications": {
       "cancelError": "Failed to cancel quotation",
       "cancelSuccess": "Quotation cancelled",
+      "confirmError": "Failed to record the customer agreement",
+      "confirmSuccess": "Customer agreement recorded",
       "createError": "Failed to create quotation",
       "createSuccess": "Quotation created",
       "deleteError": "Failed to delete quotation",
@@ -3487,7 +3496,7 @@
       "portrait": "Portrait"
     },
     "sendConfirm": {
-      "message": "Once marked ready, this quotation is locked and can no longer be edited. Continue?",
+      "message": "Mark this quotation as ready to send to the customer. You can still edit it until the customer confirms. Continue?",
       "title": "Mark this quotation as ready?"
     },
     "share": {
@@ -3497,6 +3506,7 @@
     },
     "status": {
       "cancelled": "Cancelled",
+      "confirmed": "Confirmed",
       "converted": "Converted",
       "draft": "Draft",
       "sent": "Ready"

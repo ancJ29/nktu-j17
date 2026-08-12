@@ -15,6 +15,8 @@ export type StoragesShape = {
   adminKey?: string | undefined;
   superAdminAccessKey?: string | undefined;
   trustedServiceKey?: string | undefined;
+
+  beforeRequest?: (() => Promise<unknown>) | undefined;
 };
 
 export type BuildHeadersOptions = {

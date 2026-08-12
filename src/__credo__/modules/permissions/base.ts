@@ -209,4 +209,11 @@ export const BASE_PERMISSIONS: Permissions = {
     canEdit: false,
     canDelete: false,
   },
+
+  report: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
 };

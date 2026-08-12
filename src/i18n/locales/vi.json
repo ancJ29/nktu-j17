@@ -3345,6 +3345,7 @@
         "permissionManagement": "Quản lý quyền hạn",
         "product": "Sản phẩm",
         "productInventory": "Tồn kho sản phẩm",
+        "report": "Báo cáo",
         "salesOrder": "Đơn hàng",
         "transportOrder": "Đơn vận chuyển",
         "transportRoute": "Tuyến vận chuyển",
@@ -3396,6 +3397,7 @@
       "copy": "Sao chép",
       "exportPdf": "Xuất PDF",
       "generateSalesOrder": "Tạo đơn hàng",
+      "markConfirmed": "Khách đã chốt",
       "markReady": "Đánh dấu sẵn sàng",
       "new": "Báo giá mới",
       "sharePdf": "Chia sẻ PDF"
@@ -3408,6 +3410,11 @@
     "columns": {
       "date": "Ngày"
     },
+    "confirmAgreement": {
+      "message": "Đánh dấu khách hàng đã đồng ý báo giá này. Báo giá sẽ bị khóa và không thể chỉnh sửa — vẫn xuất được PDF và tạo đơn hàng. Tiếp tục?",
+      "title": "Ghi nhận khách đã chốt?"
+    },
+    "confirmedNote": "Khách hàng đã chốt báo giá này nên báo giá bị khóa. Sao chép để báo giá với điều kiện khác.",
     "convertedNote": "Đã tạo đơn hàng từ báo giá này.",
     "copiedFrom": "Sao chép từ {{code}} — chỉnh sửa và lưu thành bản nháp mới.",
     "countLabel_one": "{{count}} báo giá",
@@ -3417,6 +3424,7 @@
       "deleteItemDesc": "Xóa vĩnh viễn báo giá này"
     },
     "dateKind": {
+      "confirmed": "Ngày chốt",
       "created": "Ngày tạo",
       "po": "Ngày đặt hàng",
       "sent": "Ngày gửi"
@@ -3461,11 +3469,12 @@
       "unitLabel": "Đơn vị"
     },
     "fromQuotation": "Từ báo giá",
-    "lockedNote": "Báo giá đã sẵn sàng và bị khóa. Sao chép để chỉnh sửa.",
     "newTitle": "Báo giá mới",
     "notifications": {
       "cancelError": "Hủy báo giá thất bại",
       "cancelSuccess": "Đã hủy báo giá",
+      "confirmError": "Ghi nhận khách chốt thất bại",
+      "confirmSuccess": "Đã ghi nhận khách chốt báo giá",
       "createError": "Tạo báo giá thất bại",
       "createSuccess": "Đã tạo báo giá",
       "deleteError": "Xóa báo giá thất bại",
@@ -3487,7 +3496,7 @@
       "portrait": "Dọc"
     },
     "sendConfirm": {
-      "message": "Sau khi đánh dấu sẵn sàng, báo giá sẽ bị khóa và không thể chỉnh sửa. Tiếp tục?",
+      "message": "Đánh dấu báo giá sẵn sàng gửi khách. Vẫn có thể chỉnh sửa cho đến khi khách chốt. Tiếp tục?",
       "title": "Đánh dấu báo giá này sẵn sàng?"
     },
     "share": {
@@ -3497,6 +3506,7 @@
     },
     "status": {
       "cancelled": "Đã hủy",
+      "confirmed": "Đã chốt",
       "converted": "Đã tạo đơn",
       "draft": "Nháp",
       "sent": "Sẵn sàng"

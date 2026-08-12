@@ -34,8 +34,14 @@ export const AuthFeaturesSchema = z.object({
 
 export type AuthFeatures = z.infer<typeof AuthFeaturesSchema>;
 
+const PaletteShadeSchema = z.string().regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, {
+  message: 'must be a hex color, e.g. #3e618c',
+});
+
 export const ThemeConfigSchema = z.object({
   mainColor: z.enum(BRAND_PALETTE_NAMES),
+
+  customPalette: z.array(PaletteShadeSchema).length(10).optional(),
 });
 
 export type StorableThemeConfig = z.infer<typeof ThemeConfigSchema>;

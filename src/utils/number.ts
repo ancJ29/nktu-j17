@@ -1,3 +1,5 @@
+export const LITRE_DECIMAL_SCALE = 3;
+
 export function formatNumber(number: unknown, defaultValue: string = '—'): string {
   const value = Number(number);
   if (Number.isNaN(value)) return defaultValue;

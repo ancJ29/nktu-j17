@@ -19,7 +19,7 @@ import { IconGasStation, IconPlus, IconRoad, IconTool, IconTrash } from '@tabler
 import { DatePickerField } from '@/components/DatePickerField';
 import { TransportOrderLink } from '@/components/TransportOrderLink';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { formatNumber } from '@/utils/number';
+import { formatNumber, LITRE_DECIMAL_SCALE } from '@/utils/number';
 import { computeRefuelTotals, formatConsumption, refuelConsumption } from '@/utils/refuelStats';
 import type { MaintenanceItem, MaintenanceLogExtra, RefuelLogExtra, TripLogExtra } from '@/types';
 import {
@@ -327,7 +327,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
           <NumberInput
             label={t('operationLogs.refuel.columns.litres')}
             min={0}
-            decimalScale={2}
+            decimalScale={LITRE_DECIMAL_SCALE}
             suffix=" L"
             {...form.getInputProps('litres')}
             onChange={(v) => {

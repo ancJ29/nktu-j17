@@ -1,4 +1,5 @@
 import * as XLSX from 'xlsx';
+import { LITRE_DECIMAL_SCALE } from '@/utils/number';
 import { computeRefuelTotals, refuelConsumption } from '@/utils/refuelStats';
 import type { MaintenanceLogExtra, Material, OperationLog, Product } from '@/types';
 import {
@@ -1949,6 +1950,11 @@ export type RefuelExportOptions = {
 
 const round1 = (n: number) => Math.round(n * 10) / 10;
 
+const roundLitres = (n: number) => {
+  const f = 10 ** LITRE_DECIMAL_SCALE;
+  return Math.round(n * f) / f;
+};
+
 const numCell = (v: unknown): number | string => {
   const n = Number(v);
   return Number.isFinite(n) ? n : '';
@@ -2021,7 +2027,7 @@ function buildRefuelSheet(
   const off = withVehicle ? 1 : 0;
   totalRow[0] = isVietnamese ? 'Tổng' : 'Total';
   totalRow[off + 3] = round1(distance);
-  totalRow[off + 4] = round1(litres);
+  totalRow[off + 4] = roundLitres(litres);
   totalRow[off + 6] = round1(cost);
   totalRow[off + 7] = avgConsumption == null ? '' : round1(avgConsumption);
 

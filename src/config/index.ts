@@ -1,4 +1,5 @@
 import {
+  applyCustomPalette,
   buildThemeConfig,
   logger,
   setDynamicDocumentTitle,
@@ -51,6 +52,19 @@ const { config: validated, warnings } = validateConfig(
 
 if (warnings.length > 0) {
   warnings.forEach((w) => logger.warn(w));
+}
+
+if (validated.themeConfig.customPalette) {
+  const applied = applyCustomPalette(
+    validated.themeConfig.mainColor,
+    validated.themeConfig.customPalette,
+  );
+  if (!applied) {
+    logger.warn(
+      'themeConfig.customPalette rejected — falling back to the named palette',
+      validated.themeConfig.mainColor,
+    );
+  }
 }
 
 const validatedConfig = validated as CMngtAppConfig;
