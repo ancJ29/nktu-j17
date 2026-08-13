@@ -48,6 +48,7 @@ import { formatMoney, orderTotals, orderTripLaborTotal } from './transportOrderP
 import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
 import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
+import { useFeeNameLabel } from './feeName';
 import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
 import { truckOptionLabel, useTruckPlate } from './truckDisplay';
 import { useTruckTypeLabel, useTruckTypeOptions } from '../transport-routes/truckType';
@@ -196,6 +197,8 @@ export function TransportOrderListPage() {
   const containerSizeData = useContainerSizeOptions();
   const containerSizeLabel = useContainerSizeLabel();
 
+  const feeNameLabel = useFeeNameLabel();
+
   const truckTypeData = useTruckTypeOptions();
   const truckTypeLabel = useTruckTypeLabel();
 
@@ -258,6 +261,7 @@ export function TransportOrderListPage() {
         },
         resolveShipmentType: shipmentTypeLabel,
         resolveContainerSize: containerSizeLabel,
+        resolveFeeName: feeNameLabel,
         getTruckPlate,
 
         template: resolveTransportOrderBangKeTemplate(code),

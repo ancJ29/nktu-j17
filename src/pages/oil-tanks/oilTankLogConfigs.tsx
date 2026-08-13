@@ -20,6 +20,7 @@ import {
   issueExceedsStock,
 } from './oilTankBalance';
 import { applyMovementToTankLevel } from './tankMovements';
+import { syncTruckRefuelMirror } from './truckRefuelMirrorSync';
 import { IssueTruckDriverFields } from './IssueTruckDriverFields';
 
 function textCell(value: string | undefined): ReactNode {
@@ -150,6 +151,7 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
           withAsterisk
           min={0}
           decimalScale={LITRE_DECIMAL_SCALE}
+          thousandSeparator=","
           suffix=" L"
           {...form.getInputProps('litres')}
           onChange={(v) => {
@@ -320,6 +322,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
           withAsterisk
           min={0}
           decimalScale={LITRE_DECIMAL_SCALE}
+          thousandSeparator=","
           suffix=" L"
           {...form.getInputProps('litres')}
           onChange={(v) => {
@@ -366,6 +369,10 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
       </SimpleGrid>
     );
   },
-  afterWrite: applyMovementToTankLevel,
+
+  afterWrite: async (event, t) => {
+    await applyMovementToTankLevel(event);
+    await syncTruckRefuelMirror(event, t);
+  },
   afterWriteErrorKey: 'oilTanks.notifications.levelSyncError',
 };

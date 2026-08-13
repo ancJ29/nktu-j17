@@ -1,5 +1,7 @@
 import type { OperationLog } from '@/types';
 
+export const REFUEL_LOG_TYPE = 'refuel';
+
 export function refuelConsumption(log: OperationLog): number | null {
   const litres = Number(log.extra?.litres);
   const distance = Number(log.extra?.distanceKm);

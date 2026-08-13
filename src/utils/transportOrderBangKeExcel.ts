@@ -37,6 +37,8 @@ export type TransportOrderBangKeOptions = {
   resolveShipmentType: (value: string) => string;
   resolveContainerSize: (value: string) => string;
 
+  resolveFeeName: (value: string) => string;
+
   getTruckPlate: (truckId: string | undefined | null) => string | undefined;
 
   template?: BangKeTemplateSettings;
@@ -69,8 +71,14 @@ function bangKePeriodLabel(orders: ReadonlyArray<TransportOrder>): string {
   return `TỪ ${formatDate(earliest)} ĐẾN ${formatDate(latest)}`;
 }
 
-function billedLines(order: TransportOrder, kind: TransportOrderFee['kind']): TransportOrderFee[] {
-  return readFeeLines(order).filter((f) => f.kind === kind && isBillableFee(f));
+function billedLines(
+  order: TransportOrder,
+  kind: TransportOrderFee['kind'],
+  resolveFeeName: (value: string) => string,
+): TransportOrderFee[] {
+  return readFeeLines(order)
+    .filter((f) => f.kind === kind && isBillableFee(f))
+    .map((f) => ({ ...f, label: resolveFeeName(f.label) }));
 }
 
 export function buildTransportOrderBangKeWorkbook(
@@ -80,6 +88,7 @@ export function buildTransportOrderBangKeWorkbook(
     customer,
     resolveShipmentType,
     resolveContainerSize,
+    resolveFeeName,
     getTruckPlate,
     template,
     titleSuffix,
@@ -108,7 +117,7 @@ export function buildTransportOrderBangKeWorkbook(
     feeCols.push({ key: OTHER_FEES_KEY, header: 'PHÍ KHÁC' });
   }
   for (const o of rows) {
-    for (const fee of billedLines(o, 'service')) {
+    for (const fee of billedLines(o, 'service', resolveFeeName)) {
       if (!feeColIndex.has(feeKey(fee.label)) && otherColIndex < 0) addFeeCol(fee.label);
     }
   }
@@ -122,7 +131,8 @@ export function buildTransportOrderBangKeWorkbook(
   if (sizeValues.length === 0) sizeValues.push('20', '40');
 
   let chiHoGroups = 0;
-  for (const o of rows) chiHoGroups = Math.max(chiHoGroups, billedLines(o, 'passthrough').length);
+  for (const o of rows)
+    chiHoGroups = Math.max(chiHoGroups, billedLines(o, 'passthrough', resolveFeeName).length);
 
   const noteMode = template?.noteColumn ?? 'auto';
   const hasNotes =
@@ -247,7 +257,7 @@ export function buildTransportOrderBangKeWorkbook(
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
-    for (const fee of billedLines(o, 'service')) {
+    for (const fee of billedLines(o, 'service', resolveFeeName)) {
       const c = C_FEE0 + feeColOf(fee.label);
       const prev = typeof row[c] === 'number' ? (row[c] as number) : 0;
       const next = prev + (fee.amount || 0);
@@ -260,7 +270,7 @@ export function buildTransportOrderBangKeWorkbook(
     if (serviceTotal !== 0) row[C_TOTAL] = serviceTotal;
     if (hasNotes) row[C_NOTE] = o.notes ?? '';
 
-    billedLines(o, 'passthrough').forEach((fee, g) => {
+    billedLines(o, 'passthrough', resolveFeeName).forEach((fee, g) => {
       const c = C_CHIHO0 + g * 3;
       if (fee.amount) row[c] = fee.amount;
       row[c + 1] = fee.invoiceNo ?? '';
@@ -285,7 +295,7 @@ export function buildTransportOrderBangKeWorkbook(
     feeCols.forEach((_col, f) => {
       let sum = 0;
       for (const o of rows) {
-        for (const fee of billedLines(o, 'service')) {
+        for (const fee of billedLines(o, 'service', resolveFeeName)) {
           if (feeColOf(fee.label) === f) sum += fee.amount || 0;
         }
       }
@@ -295,7 +305,7 @@ export function buildTransportOrderBangKeWorkbook(
     row[C_TOTAL] = sumService + sumVat;
     for (let g = 0; g < chiHoGroups; g++) {
       let sum = 0;
-      for (const o of rows) sum += billedLines(o, 'passthrough')[g]?.amount ?? 0;
+      for (const o of rows) sum += billedLines(o, 'passthrough', resolveFeeName)[g]?.amount ?? 0;
       row[C_CHIHO0 + g * 3] = sum;
     }
     aoa.push(row);

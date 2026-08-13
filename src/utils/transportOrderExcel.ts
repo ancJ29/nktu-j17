@@ -53,7 +53,9 @@ export const exportTransportOrdersToExcel = (
     | 'advanceAmount'
     | 'balanceDue'
     | 'cancelled'
-    | 'notes';
+    | 'notes'
+    | 'feeName';
+
   type Column = { key: ColumnKey; header: string; width: number };
 
   const labels: Record<ColumnKey, string> = isVietnamese
@@ -61,6 +63,7 @@ export const exportTransportOrdersToExcel = (
         orderNumber: 'Số đơn hàng',
         date: 'Ngày',
         shipmentType: 'Loại hình',
+        feeName: 'Chi phí',
         containerNumber: 'Số cont',
         containerSize: 'Loại cont',
         billNumber: 'Số B/L',
@@ -82,6 +85,7 @@ export const exportTransportOrdersToExcel = (
         orderNumber: 'Order Number',
         date: 'Date',
         shipmentType: 'Shipment Type',
+        feeName: 'Fee Name',
         containerNumber: 'Container No.',
         containerSize: 'Container Size',
         billNumber: 'B/L No.',
@@ -150,7 +154,7 @@ export const exportTransportOrdersToExcel = (
 
     const cells: Record<ColumnKey, string | number> = {
       orderNumber: o.orderNumber,
-
+      feeName: '',
       date: formatDate(orderPlanDate(o)),
       shipmentType: o.shipmentType ? resolveShipmentType(o.shipmentType) : '',
       containerNumber: o.containerNumber ?? '',

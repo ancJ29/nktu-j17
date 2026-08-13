@@ -2119,6 +2119,7 @@
     "addItem": "Add",
     "categories": {
       "containerSize": "Container Size",
+      "feeName": "Fee Name",
       "maintenanceType": "Maintenance Type",
       "materialCategory": "Material Category",
       "materialUnit": "Material Unit",
@@ -2606,6 +2607,7 @@
       "recomputeDrift": "Stock rebuilt from the ledger. It was off by {{drift}} L — a movement had not been applied.",
       "recomputeError": "Failed to rebuild stock from the ledger",
       "toggleError": "Failed to change tank status",
+      "truckLogSyncError": "The withdrawal was saved, but the truck's refuel log could not be updated. Re-save the entry to sync it.",
       "updateError": "Failed to update tank",
       "updateSuccess": "Tank updated"
     },

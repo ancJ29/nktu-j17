@@ -39,6 +39,8 @@ export type RefuelLogExtra = {
   oilTankId?: string;
   oilTankCode?: string;
 
+  sourceIssueLogId?: string;
+
   note?: string;
   [key: string]: unknown;
 };

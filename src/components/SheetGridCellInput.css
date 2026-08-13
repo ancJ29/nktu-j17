@@ -91,19 +91,40 @@
   outline-offset: -2px;
 }
 
-/* Reproduces Mantine's `variant="unstyled"` TextInput for sheet-grid cells. */
+/* A sheet cell: a quiet field, not a borderless string.
+
+   Two numbers sit in every dose cell — the process's dose, which the operator
+   types, and this crop's real amount underneath, which is derived and can only
+   be changed by changing the first. Rendered as plain text they looked
+   identical, so the grid read as a printed report and the client did not know
+   it could be typed in at all.
+
+   **The box is the message: what is inside it is yours to change.** It is drawn
+   as faintly as it can be and still be seen, because there are ~1,200 of them
+   and a grid of loud inputs would be a form, not a sheet. */
 .sheet-grid-cell {
   width: 100%;
   min-width: 0;
   height: 24px;
-  padding: 0 2px;
-  border: none;
+  padding: 0 4px;
+  border: 1px solid var(--mantine-color-gray-3);
   border-radius: var(--mantine-radius-sm);
-  background-color: transparent;
+  background-color: var(--mantine-color-white);
   color: var(--mantine-color-text);
   font-family: inherit;
   font-size: var(--mantine-font-size-xs);
   line-height: 1.2;
+}
+
+[data-mantine-color-scheme='dark'] .sheet-grid-cell {
+  border-color: var(--mantine-color-dark-4);
+  background-color: var(--mantine-color-dark-7);
+}
+
+/* Confirms the cell under the pointer before the click, which matters most on
+   the columns furthest from the frozen day. */
+.sheet-grid-cell:hover:not(:read-only) {
+  border-color: var(--mantine-primary-color-filled);
 }
 
 /* The crop sheet packs one more row into the same height than the template
@@ -118,8 +139,12 @@
   outline-offset: -2px;
 }
 
+/* A reader gets no field: an affordance that leads to a refusal is worse than
+   none, so a cell nobody may edit goes back to being text. */
 .sheet-grid-cell:read-only {
   cursor: default;
+  border-color: transparent;
+  background-color: transparent;
 }
 
 /* Drift from the plan (I4) — the one signal the previous diary model could not
@@ -127,4 +152,10 @@
 .sheet-grid-cell[data-changed='true'] {
   font-weight: 700;
   color: var(--mantine-color-orange-7);
+}
+
+/* Drift colours the field too — but only where there is a field, so a reader's
+   cell stays plain text rather than growing a border the reader cannot use. */
+.sheet-grid-cell[data-changed='true']:not(:read-only) {
+  border-color: var(--mantine-color-orange-4);
 }

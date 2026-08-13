@@ -97,7 +97,7 @@ export function TransportOrderBangKeTemplateEditor({
             />
             <TagsInput
               label="Service fee columns (in order)"
-              description="Fee names exactly as operators type them on orders (case-insensitive), e.g. Phí vận chuyển, Phụ thu VC, Bốc xếp, Phí neo xe. Leave empty to derive the columns from the exported orders."
+              description="Fee names as they appear on the statement (case-insensitive) — i.e. the labels of the Meta-data › Fee Name entries, e.g. Phí vận chuyển, Phụ thu VC, Bốc xếp, Phí neo xe. Leave empty to derive the columns from the exported orders."
               value={tpl.serviceFeeColumns ?? []}
               onChange={(v) => patch(idx, { serviceFeeColumns: v })}
               placeholder="Type a fee name and press Enter"

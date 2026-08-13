@@ -9,6 +9,8 @@ export type DeliveryRequestVariant = {
 
   showListItems: boolean;
 
+  showPricing: boolean;
+
   seedScheduledDateFromSalesOrder: boolean;
 
   inboundStartsPending: boolean;
@@ -31,6 +33,7 @@ export const DEFAULT_DELIVERY_REQUEST_VARIANT: DeliveryRequestVariant = {
   mobileQuickCreate: false,
   editMode: 'route',
   showListItems: true,
+  showPricing: true,
   seedScheduledDateFromSalesOrder: true,
   inboundStartsPending: false,
   skipViewScopeGuard: false,
@@ -42,6 +45,7 @@ export const NKTU_DELIVERY_REQUEST_VARIANT: DeliveryRequestVariant = {
   mobileQuickCreate: true,
   editMode: 'modal',
   showListItems: false,
+  showPricing: false,
   seedScheduledDateFromSalesOrder: false,
   inboundStartsPending: true,
   skipViewScopeGuard: true,

@@ -89,6 +89,7 @@ import {
 import { formatMoney, isBillableFee, orderTotals, readFeeLines } from './transportOrderPricing';
 import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activityMemo';
 import { useContainerSizeLabel } from './containerSize';
+import { useFeeNameLabel } from './feeName';
 import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { useShipmentTypeLabel } from './shipmentType';
@@ -147,6 +148,8 @@ export function TransportOrderDetailPage() {
 
   const containerSizeLabel = useContainerSizeLabel();
   const shipmentTypeLabel = useShipmentTypeLabel();
+
+  const feeNameLabel = useFeeNameLabel();
 
   const driverWithPlate = useDriverWithPlate();
 
@@ -798,7 +801,7 @@ export function TransportOrderDetailPage() {
                               record, but it is not part of what they're charged, and
                               nothing below adds it up. */}
                           <Text size="sm" c={billed ? undefined : 'dimmed'}>
-                            {f.label}
+                            {feeNameLabel(f.label)}
                           </Text>
                           {/* Operator note on the line — free text, only when set. */}
                           {f.memo && (

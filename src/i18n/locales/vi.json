@@ -2119,6 +2119,7 @@
     "addItem": "Thêm",
     "categories": {
       "containerSize": "Loại cont",
+      "feeName": "Tên phí",
       "maintenanceType": "Loại bảo trì",
       "materialCategory": "Danh mục vật tư",
       "materialUnit": "Đơn vị vật tư",
@@ -2606,6 +2607,7 @@
       "recomputeDrift": "Đã tính lại tồn từ sổ. Lệch {{drift}} L — có phiếu chưa được cộng/trừ vào tồn.",
       "recomputeError": "Không tính lại được tồn từ sổ",
       "toggleError": "Không đổi được trạng thái bồn",
+      "truckLogSyncError": "Đã lưu phiếu xuất nhưng chưa cập nhật được nhật ký đổ dầu của xe. Lưu lại phiếu để đồng bộ.",
       "updateError": "Không cập nhật được bồn",
       "updateSuccess": "Đã cập nhật bồn"
     },

@@ -91,6 +91,8 @@ type DeliveryRequestDetailProps = {
 
 export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   const shouldShowListItems = variant.showListItems;
+
+  const shouldShowPricing = pricingEnabled && variant.showPricing;
   const { t } = useTranslation();
   const detail = useDeliveryRequestDetail(t, {
     skipViewScopeGuard: variant.skipViewScopeGuard,
@@ -490,7 +492,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
         {salesOrderLinkContent && (
           <DetailField label={t('common.labels.salesOrder')}>{salesOrderLinkContent}</DetailField>
         )}
-        {pricingEnabled && (
+        {shouldShowPricing && (
           <DetailField label={t('common.columns.totalAmount')}>
             <Text size="sm" fw={500}>
               {request.totalAmount?.toLocaleString() ?? '-'}
@@ -520,7 +522,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
         {salesOrderLinkContent && (
           <DetailField label={t('common.labels.salesOrder')}>{salesOrderLinkContent}</DetailField>
         )}
-        {pricingEnabled && (
+        {shouldShowPricing && (
           <DetailField label={t('common.columns.totalAmount')}>
             <Text size="sm" fw={500}>
               {request.totalAmount?.toLocaleString() ?? '-'}
@@ -557,7 +559,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
             <Table.Th style={{ textAlign: 'right' }}>{t('common.labels.quantity')}</Table.Th>
             <Table.Th>{t('common.labels.unit')}</Table.Th>
             <Table.Th style={{ textAlign: 'right', width: 140 }}>{deliveredColumnHeader}</Table.Th>
-            {pricingEnabled && (
+            {shouldShowPricing && (
               <>
                 <Table.Th style={{ textAlign: 'right' }}>{t('common.labels.unitPrice')}</Table.Th>
                 <Table.Th style={{ textAlign: 'right' }}>{t('common.detail.lineTotal')}</Table.Th>
@@ -592,7 +594,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
                     />
                   )}
                 </Table.Td>
-                {pricingEnabled && (
+                {shouldShowPricing && (
                   <>
                     <Table.Td style={{ textAlign: 'right' }}>
                       {item.unitPrice.toLocaleString()}

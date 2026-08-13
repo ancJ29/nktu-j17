@@ -78,6 +78,12 @@ import {
 import { useContainerSizeOptions } from './containerSize';
 import { truckTypeCarriesContainer } from './containerTruckType';
 import {
+  FALLBACK_FEE_NAMES,
+  feeNameSelectData,
+  useFeeNameOptions,
+  useFreightFeeName,
+} from './feeName';
+import {
   DEFAULT_SHIPMENT_TYPE,
   useShipmentTypeLabel,
   useShipmentTypeOptions,
@@ -189,10 +195,6 @@ type FormValues = {
   notes: string;
 };
 
-const DEFAULT_FEE_LABELS = ['Phí vận chuyển', 'Phụ thu VC', 'Phí neo xe'];
-
-const FREIGHT_FEE_LABEL = DEFAULT_FEE_LABELS[0]!;
-
 function blankFee(over: Partial<FeeRow> = {}): FeeRow {
   return {
     label: '',
@@ -207,7 +209,22 @@ function blankFee(over: Partial<FeeRow> = {}): FeeRow {
 }
 
 function initialFees(): FeeRow[] {
-  return DEFAULT_FEE_LABELS.map((label) => blankFee({ label, vatable: label !== 'Phí neo xe' }));
+  return FALLBACK_FEE_NAMES.map(({ value }) =>
+    blankFee({ label: value, vatable: value !== 'Phí neo xe' }),
+  );
+}
+
+function isSeedFees(fees: FeeRow[]): boolean {
+  return (
+    fees.length === FALLBACK_FEE_NAMES.length &&
+    fees.every(
+      (f) =>
+        !f.amount &&
+        !f.invoiceNo.trim() &&
+        !f.memo.trim() &&
+        FALLBACK_FEE_NAMES.some((o) => o.value === f.label),
+    )
+  );
 }
 
 function toFeeRows(order: Pick<TransportOrder, 'fees' | 'disbursements'>): FeeRow[] {
@@ -451,6 +468,9 @@ export function TransportOrderFormPage() {
   const placeSuggestions = usePlaceSuggestions();
 
   const shipmentTypeOptions = useShipmentTypeOptions();
+
+  const feeNameOptions = useFeeNameOptions();
+  const freightFeeName = useFreightFeeName();
   const shipmentTypeLabel = useShipmentTypeLabel();
 
   const form = useForm<FormValues>({
@@ -508,6 +528,16 @@ export function TransportOrderFormPage() {
     form.setFieldValue('shipmentType', shipmentTypeOptions[0]!.value);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine re-creates `form` every render; the ref makes this a one-shot on the options arriving.
   }, [isEdit, isCopyCreate, shipmentTypeOptions]);
+
+  const seededFeeNamesRef = useRef(false);
+  useEffect(() => {
+    if (isEdit || isCopyCreate || seededFeeNamesRef.current) return;
+    if (feeNameOptions === FALLBACK_FEE_NAMES) return;
+    seededFeeNamesRef.current = true;
+    if (!isSeedFees(form.getValues().fees)) return;
+    form.setFieldValue('fees', [blankFee({ label: freightFeeName })]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine re-creates `form` every render; the ref makes this a one-shot on the options arriving.
+  }, [isEdit, isCopyCreate, feeNameOptions, freightFeeName]);
 
   const fetching = useInitFormFromFetch(
     form,
@@ -815,12 +845,12 @@ export function TransportOrderFormPage() {
     (route: TransportRouteRow) => {
       const fees = [...form.getValues().fees];
       const idx = fees.findIndex(
-        (f) => f.kind !== 'passthrough' && f.label.trim() === FREIGHT_FEE_LABEL,
+        (f) => f.kind !== 'passthrough' && f.label.trim() === freightFeeName,
       );
       if (idx >= 0) fees[idx] = { ...fees[idx]!, amount: route.freightAmount };
-      // The operator renamed or removed the seeded line — append rather than
-      // drop the number on the floor.
-      else fees.push(blankFee({ label: FREIGHT_FEE_LABEL, amount: route.freightAmount }));
+      // The operator removed the seeded line, or the order predates the client's
+      // current freight name — append rather than drop the number on the floor.
+      else fees.push(blankFee({ label: freightFeeName, amount: route.freightAmount }));
       form.setFieldValue('fees', fees);
 
       if (route.isMultiTrip) {
@@ -838,7 +868,7 @@ export function TransportOrderFormPage() {
       });
     },
 
-    [t],
+    [t, freightFeeName],
   );
 
   if (fetching) return null;
@@ -1427,7 +1457,18 @@ export function TransportOrderFormPage() {
                 {serviceFeeRows.map(({ i }) => (
                   <Table.Tr key={i}>
                     <Table.Td>
-                      <TextInput {...form.getInputProps(`fees.${i}.label`)} />
+                      {/* Picked from the `fee-name` register, not typed: the
+                          statement's PHÍ DỊCH VỤ columns ARE these strings, so a
+                          spelling variant splits a customer's column in two.
+                          `feeNameSelectData` keeps a stored name selectable even
+                          once it leaves the register — see `feeName.ts`. */}
+                      <Select
+                        data={feeNameSelectData(feeNameOptions, form.values.fees[i]!.label)}
+                        value={form.values.fees[i]!.label || null}
+                        onChange={(v) => form.setFieldValue(`fees.${i}.label`, v ?? '')}
+                        searchable
+                        error={form.getInputProps(`fees.${i}.label`).error}
+                      />
                     </Table.Td>
                     <Table.Td>
                       <NumberInput
@@ -1501,7 +1542,15 @@ export function TransportOrderFormPage() {
                 {passthroughFeeRows.map(({ i }) => (
                   <Table.Tr key={i}>
                     <Table.Td>
-                      <TextInput {...form.getInputProps(`fees.${i}.label`)} />
+                      {/* Same register as the service card — one vocabulary for
+                          both kinds (see `useFeeNameOptions`). */}
+                      <Select
+                        data={feeNameSelectData(feeNameOptions, form.values.fees[i]!.label)}
+                        value={form.values.fees[i]!.label || null}
+                        onChange={(v) => form.setFieldValue(`fees.${i}.label`, v ?? '')}
+                        searchable
+                        error={form.getInputProps(`fees.${i}.label`).error}
+                      />
                     </Table.Td>
                     <Table.Td>
                       <NumberInput

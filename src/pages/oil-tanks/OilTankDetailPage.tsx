@@ -60,7 +60,7 @@ const TANK_LOG_PERMS = {
 };
 
 function useIssueTruckOptions() {
-  const enabled = featureFlags.trucks.enabled && perms.truck.canView();
+  const enabled = featureFlags.trucks.enabled && perms.truck.canEdit();
   const items = useTruckAssetStore((s) => s.items);
   const initialized = useTruckAssetStore((s) => s.initialized);
   const loadAll = useTruckAssetStore((s) => s.loadAll);

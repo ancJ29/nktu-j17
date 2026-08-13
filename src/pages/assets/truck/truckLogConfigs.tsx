@@ -328,6 +328,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
             label={t('operationLogs.refuel.columns.litres')}
             min={0}
             decimalScale={LITRE_DECIMAL_SCALE}
+            thousandSeparator=","
             suffix=" L"
             {...form.getInputProps('litres')}
             onChange={(v) => {
@@ -426,6 +427,8 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
   },
 
   photos: { directoryType: 'truck-refuel-log', labelKey: 'operationLogs.refuel.columns.photos' },
+
+  rowLocked: (log) => Boolean(log.extra?.sourceIssueLogId),
 
   afterWrite: syncTankIssue,
   afterWriteErrorKey: 'operationLogs.refuel.notifications.tankSyncError',

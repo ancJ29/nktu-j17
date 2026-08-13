@@ -3,7 +3,7 @@ import type { OperationLog, OperationLogExtra, RefuelLogExtra } from '@/types';
 import type { OperationLogWriteEvent } from '@/pages/operation-logs/operationLogConfig';
 import { datePart, yearOf } from '@/pages/operation-logs/operationLogConfig';
 import { OIL_TANK_ISSUE_LOG_TYPE } from './oilTankBalance';
-import { planTankMirror, tankBindingOf, type TankBinding } from './tankIssuePlan';
+import { planWriteEvent, tankBindingOf, type MirrorBinding } from './tankBridgePlan';
 import { applyMovementToTankLevel } from './tankMovements';
 
 async function findMirror(
@@ -36,7 +36,7 @@ function mirrorExtra(refuel: OperationLog, truckCode: string): OperationLogExtra
 }
 
 async function createMirror(
-  tank: TankBinding,
+  tank: MirrorBinding,
   refuel: OperationLog,
   truckCode: string,
 ): Promise<void> {
@@ -73,7 +73,7 @@ async function removeMirror(tankId: string, mirror: OperationLog): Promise<void>
 }
 
 async function updateMirror(
-  tank: TankBinding,
+  tank: MirrorBinding,
   mirror: OperationLog,
   refuel: OperationLog,
   truckCode: string,
@@ -101,20 +101,17 @@ export async function syncTankIssue(event: OperationLogWriteEvent): Promise<void
   const refuel = event.log;
   const truckCode = event.targetCode;
 
-  const plan = planTankMirror(
-    tankBindingOf(event.op === 'update' ? event.previous : null),
-    tankBindingOf(event.op === 'delete' ? null : refuel),
-  );
+  const plan = planWriteEvent(event, tankBindingOf);
 
   if (plan.kind === 'none') return;
 
   const previousYear = yearOf(datePart((event.previous ?? refuel).logDate));
 
   if (plan.kind === 'reconcile') {
-    const mirror = await findMirror(plan.tank.id, previousYear, refuel.id);
+    const mirror = await findMirror(plan.target.id, previousYear, refuel.id);
 
-    if (mirror) await updateMirror(plan.tank, mirror, refuel, truckCode);
-    else await createMirror(plan.tank, refuel, truckCode);
+    if (mirror) await updateMirror(plan.target, mirror, refuel, truckCode);
+    else await createMirror(plan.target, refuel, truckCode);
     return;
   }
 
