@@ -37,7 +37,6 @@ import { useAuthStore } from '@/stores/useAuthStore';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { useEmployeeFieldOptions } from './useEmployeeFieldOptions';
 import { isInternal } from '@/config/env';
-import { pad } from '../fake-data/_sharedSeed';
 import { Form } from '@/components/Form';
 
 const hasEmail = hasEmailForEmployees();
@@ -296,7 +295,7 @@ export function SingleEmployeeForm({
                 variant="default"
                 size="xs"
                 onClick={() => {
-                  const phone = `09${pad(Math.floor(Math.random() * 100_000_000), 8)}`;
+                  const phone = `09${String(Math.floor(Math.random() * 100_000_000)).padStart(8, '0')}`;
                   form.setFieldValue('phone', phone);
                 }}
               >
@@ -315,7 +314,7 @@ export function SingleEmployeeForm({
                 variant="default"
                 size="xs"
                 onClick={() => {
-                  const phone = `09${pad(Math.floor(Math.random() * 100_000_000), 8)}`;
+                  const phone = `09${String(Math.floor(Math.random() * 100_000_000)).padStart(8, '0')}`;
                   form.setFieldValue('personalPhoneNumber', phone);
                 }}
               >

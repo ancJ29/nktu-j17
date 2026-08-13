@@ -303,6 +303,7 @@ export type CMngtAppConfig = AppConfig & {
       darkMode: boolean;
       languageSwitcher: boolean;
       enablePdfSharing: boolean;
+      authViaBff: boolean;
       enableStats: boolean;
 
       tableDensity?: 'comfortable' | 'compact';

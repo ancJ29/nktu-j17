@@ -40,7 +40,7 @@ import { useOilTankStore, OIL_TANK_RECORD_TARGET } from '@/stores/useOilTankStor
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { featureFlags } from '@/utils/features';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { formatNumber } from '@/utils/number';
+import { formatLitres } from '@/utils/number';
 import { perms } from '@/utils/permission';
 import type { OilTankRow, TruckAssetRow } from '@/types';
 import { OperationLogSection } from '@/pages/operation-logs/OperationLogSection';
@@ -169,7 +169,7 @@ export function OilTankDetailPage() {
       <StatPill
         icon={<IconDroplet size={isMobile ? 12 : 14} />}
         label={t('oilTanks.detail.statLevel')}
-        value={hasLevel ? formatNumber(extra.currentLevel) : '—'}
+        value={hasLevel ? formatLitres(extra.currentLevel) : '—'}
         suffix={hasLevel ? t('oilTanks.unitLitre') : undefined}
 
         tone={tone === 'danger' || tone === 'warning' ? 'danger' : hasLevel ? 'neutral' : 'dim'}
@@ -178,7 +178,7 @@ export function OilTankDetailPage() {
       <StatPill
         icon={<IconRuler2 size={isMobile ? 12 : 14} />}
         label={t('oilTanks.detail.statCapacity')}
-        value={extra.capacity ? formatNumber(extra.capacity) : '—'}
+        value={extra.capacity ? formatLitres(extra.capacity) : '—'}
         suffix={extra.capacity ? t('oilTanks.unitLitre') : undefined}
         compact={isMobile}
       />
@@ -254,10 +254,10 @@ export function OilTankDetailPage() {
         <DetailField label={t('oilTanks.form.fuelTypeLabel')}>{extra.fuelType || '—'}</DetailField>
         <DetailField label={t('oilTanks.form.locationLabel')}>{extra.location || '—'}</DetailField>
         <DetailField label={t('oilTanks.form.capacityLabel')}>
-          {extra.capacity ? `${formatNumber(extra.capacity)} ${t('oilTanks.unitLitre')}` : '—'}
+          {extra.capacity ? `${formatLitres(extra.capacity)} ${t('oilTanks.unitLitre')}` : '—'}
         </DetailField>
         <DetailField label={t('oilTanks.detail.statLevel')}>
-          {hasLevel ? `${formatNumber(extra.currentLevel)} ${t('oilTanks.unitLitre')}` : '—'}
+          {hasLevel ? `${formatLitres(extra.currentLevel)} ${t('oilTanks.unitLitre')}` : '—'}
         </DetailField>
       </SimpleGrid>
     </SectionCard>
@@ -272,7 +272,7 @@ export function OilTankDetailPage() {
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
         <DetailField label={t('oilTanks.form.openingLevelLabel')}>
           {typeof extra.openingLevel === 'number'
-            ? `${formatNumber(extra.openingLevel)} ${t('oilTanks.unitLitre')}`
+            ? `${formatLitres(extra.openingLevel)} ${t('oilTanks.unitLitre')}`
             : '—'}
         </DetailField>
         <DetailField label={t('oilTanks.form.openingDateLabel')}>

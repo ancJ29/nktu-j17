@@ -11,7 +11,7 @@ import type { NavigationItem } from '@/types';
 import { stripRootOnlyNavItems } from '@/config/navigation';
 import { ScrollToTopButton } from '@/components/ScrollToTopButton';
 import { Container } from '@mantine/core';
-import { Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
+import { Suspense, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { reloadPage } from '@credo/base-ui/utils';
@@ -20,27 +20,19 @@ import { useClearCacheConfirm } from '@/hooks/useClearCacheConfirm';
 
 export function MobileAppLayout() {
   const { t, i18n } = useTranslation();
-  const { token, user, loadProfile, saveProfile, isProfileLoaded } = useAuthStore();
+  const { token, user, loadProfile, isProfileLoaded } = useAuthStore();
 
   useLanguageSync({ isProfileLoaded });
   useCurrentEmployee({ isProfileLoaded, email: user?.email, token });
-
-  const hasInitialSaved = useRef(false);
-  useEffect(() => {
-    if (!isProfileLoaded || hasInitialSaved.current) return;
-    hasInitialSaved.current = true;
-    saveProfile().catch(() => {});
-  }, [isProfileLoaded, saveProfile]);
 
   const handleLanguageChange = useCallback(
     async (languageCode: string) => {
       sharedUserStorage.set(SharedStorageKey.LANGUAGE, languageCode);
       await i18n.changeLanguage(languageCode);
-      await saveProfile().catch(() => {});
       cacheFlush();
       reloadPage('language change');
     },
-    [i18n, saveProfile],
+    [i18n],
   );
 
   const getNavLabel = useCallback(

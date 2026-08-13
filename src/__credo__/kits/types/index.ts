@@ -8,7 +8,6 @@ export type {
   NavigationConfig,
   NavigationItem,
   ThemeConfig,
-  UserSettingsConfig,
 } from './app-config';
 
 export type {

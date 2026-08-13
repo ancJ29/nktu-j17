@@ -126,12 +126,6 @@ export type NavigationConfig = {
   mobile: CredoNavigationItem[];
 };
 
-export const UserSettingsSchema = z.object({
-  syncDebounceDelay: z.number().min(0),
-});
-
-export type UserSettingsConfig = z.infer<typeof UserSettingsSchema>;
-
 export const CredoAppConfigSchema = z.object({
   version: z.string().min(1),
   app: AppInfoSchema,
@@ -140,7 +134,6 @@ export const CredoAppConfigSchema = z.object({
   languages: z.array(LanguageSchema).min(1),
   defaultLanguage: z.string().min(2).max(5),
   navigation: NavigationConfigSchema,
-  userSettings: UserSettingsSchema,
 });
 
 export type CredoAppConfig = Omit<z.infer<typeof CredoAppConfigSchema>, 'themeConfig'> & {

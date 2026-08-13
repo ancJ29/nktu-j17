@@ -88,7 +88,7 @@ export function MobileAppLayout({
   onRefresh,
   children,
   showLanguageSwitcher = true,
-  showRefreshConfig = false,
+  showRefreshConfig = true,
   onRefreshConfig,
   onClearCache,
 }: MobileAppLayoutProps) {

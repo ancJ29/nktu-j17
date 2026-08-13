@@ -55,7 +55,7 @@ const hasViewPermsRight = permMngtEnabled && perms.permissionManagement.canView(
 export function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { resolveDepartment, resolvePosition } = useEmployeeFieldOptions();
-  const { user, saveProfile } = useAuthStore();
+  const { user } = useAuthStore();
   const isRootUser = user?.isRoot ?? false;
   const canViewPerms = hasViewPermsRight && (!permMngtRootUserOnly || isRootUser);
   const employees = useEmployeeStore((s) => s.items);
@@ -82,11 +82,10 @@ export function ProfilePage() {
     async (code: string) => {
       sharedUserStorage.set(SharedStorageKey.LANGUAGE, code);
       await i18n.changeLanguage(code);
-      await saveProfile().catch(() => {});
       cacheFlush();
       reloadPage('language change');
     },
-    [i18n, saveProfile],
+    [i18n],
   );
 
   const hasAnyPreference = hasLanguageSwitcher;

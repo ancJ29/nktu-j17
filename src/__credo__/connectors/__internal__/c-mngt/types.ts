@@ -290,8 +290,12 @@ export type DisableClientResponse<TExtra = Record<string, unknown>> = BaseMutati
 export type RemoveClientRequest = BaseMutationRequest & {
   clientServiceCode: string;
   version: string;
+
+  ssoAdminAccessKey?: string;
 };
-export type RemoveClientResponse = BaseDeleteResponse;
+export type RemoveClientResponse = BaseDeleteResponse & {
+  ssoIssues?: string[];
+};
 
 export type GetClientByServiceCodeRequest = {
   clientServiceCode: string;

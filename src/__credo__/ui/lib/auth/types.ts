@@ -91,23 +91,10 @@ export type LoginWithTokenResponse = {
   error?: string;
 };
 
-export type SaveProfileParams = {
-  token: string;
-  name: string;
-  email: string;
-  profile?: Record<string, unknown>;
-};
-
-export type SaveProfileResponse = {
-  success: boolean;
-  error?: string;
-};
-
 export type AuthApi<TProfile extends BaseProfile = BaseProfile> = {
   login: (params: LoginParams) => Promise<LoginResponse>;
   refreshToken: (params: RefreshTokenParams) => Promise<RefreshTokenResponse>;
   getProfile: (params: GetProfileParams) => Promise<TProfile | undefined>;
-  saveProfile?: (params: SaveProfileParams) => Promise<SaveProfileResponse>;
   register?: (params: RegisterParams) => Promise<RegisterResponse>;
   forgotPassword?: (params: ForgotPasswordParams) => Promise<ForgotPasswordResponse>;
   resetPassword?: (params: ResetPasswordParams) => Promise<ResetPasswordResponse>;
@@ -181,8 +168,6 @@ export type AuthState<TProfile extends BaseProfile = BaseProfile> = {
   logout: (reason?: LogoutReason) => { success: boolean };
 
   loadProfile: () => Promise<void>;
-
-  saveProfile: () => Promise<void>;
 
   checkAndRefreshToken: () => Promise<TokenRefreshOutcome>;
 

@@ -2,13 +2,6 @@ import { appConfig } from '@/config';
 import { resolveServiceCode } from '@/config/client-code';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { cacheGet, cacheSet } from '@/utils/appCache';
-import {
-  compositeUserStorage,
-  sharedUserStorage,
-  pcUserStorage,
-  mobileUserStorage,
-} from '@/utils/storage';
-import { fn } from '@credo/kits';
 import type { AuthStorage, PersistStorage } from '@credo/base-ui/lib';
 import type { BaseProfile } from '@credo/base-ui/lib';
 import { createCredoAuthStore } from '@credo/base-ui/lib';
@@ -54,10 +47,11 @@ const encodedPersistStorage: PersistStorage = {
 
 export const useAuthStore = createCredoAuthStore<Profile>({
   serviceCode: resolveServiceCode(),
+
+  useBffAuth: () => appConfig.features?.common?.authViaBff ?? false,
   deviceIdPrefix: 'C-MNGT',
   isDev: appConfig.env?.IS_DEV ?? false,
   devProfile: { name: 'Dev User' },
-  userStorage: compositeUserStorage,
   storage: encodedAuthStorage,
   persistStorage: encodedPersistStorage,
 
@@ -65,20 +59,6 @@ export const useAuthStore = createCredoAuthStore<Profile>({
   rememberRefreshDuration: 180 * ONE_DAY,
   sessionRefreshDuration: ONE_DAY,
 });
-
-const debouncedSaveProfile = fn.debounce(() => {
-  const state = useAuthStore.getState();
-
-  if (state.token) {
-    state.saveProfile().catch((error) => {
-      logger.error('Failed to auto-save profile settings:', error);
-    });
-  }
-}, appConfig.userSettings.syncDebounceDelay);
-
-sharedUserStorage.onChange(debouncedSaveProfile);
-pcUserStorage.onChange(debouncedSaveProfile);
-mobileUserStorage.onChange(debouncedSaveProfile);
 
 export const SESSION_EXPIRED_NOTICE_KEY = 'sessionExpiredNotice';
 

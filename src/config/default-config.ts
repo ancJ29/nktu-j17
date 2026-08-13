@@ -1,5 +1,5 @@
 import type { CMngtAppConfig } from '@credo/kits/types';
-import type { AuthFeatures, Language, ThemeConfig, UserSettingsConfig } from '@credo/kits/types';
+import type { AuthFeatures, Language, ThemeConfig } from '@credo/kits/types';
 import type {
   CMngtEmployeeFeatures,
   CMngtLocationFeatures,
@@ -34,11 +34,11 @@ export const DEFAULT_LANGUAGES: Language[] = [
 
 export const DEFAULT_LANGUAGE = 'vi';
 
-export const DEFAULT_USER_SETTINGS: UserSettingsConfig = { syncDebounceDelay: 5000 };
-
 export const DEFAULT_LANGUAGE_SWITCHER = true;
 
 export const DEFAULT_ENABLE_PDF_SHARING = false;
+
+export const DEFAULT_AUTH_VIA_BFF = false;
 
 export const DEFAULT_ENABLE_STATS = false;
 

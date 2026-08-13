@@ -5,7 +5,7 @@ import { DatePickerField } from '@/components/DatePickerField';
 import { EmployeeLink } from '@/components/EmployeeLink';
 import { TruckLink } from '@/components/TruckLink';
 import { formatDate } from '@/utils/dateFormat';
-import { formatNumber, LITRE_DECIMAL_SCALE } from '@/utils/number';
+import { formatLitres, formatNumber, LITRE_INPUT_PROPS } from '@/utils/number';
 import type { OilTankIssueLogExtra, OilTankRefillLogExtra } from '@/types';
 import {
   datePart,
@@ -51,7 +51,7 @@ function moneyColumns(prefix: string): OperationLogConfig['columns'] {
       header: `${prefix}.columns.litres`,
       align: 'right',
       emphasize: true,
-      render: (log) => formatNumber(log.extra?.litres),
+      render: (log) => formatLitres(log.extra?.litres),
     },
     {
       header: `${prefix}.columns.unitPrice`,
@@ -149,10 +149,7 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
         <NumberInput
           label={t('oilTanks.logs.refill.columns.litres')}
           withAsterisk
-          min={0}
-          decimalScale={LITRE_DECIMAL_SCALE}
-          thousandSeparator=","
-          suffix=" L"
+          {...LITRE_INPUT_PROPS}
           {...form.getInputProps('litres')}
           onChange={(v) => {
             form.setFieldValue('litres', v);
@@ -201,7 +198,7 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
             {t('oilTanks.logs.refill.summary.litres')}
           </Text>
           <Text size="sm" fw={600}>
-            {formatNumber(litres)}
+            {formatLitres(litres)}
           </Text>
         </Stack>
         <Stack gap={2}>
@@ -278,7 +275,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     if (!refused) return null;
     return {
       litres: t('oilTanks.logs.validation.exceedsStock', {
-        available: formatNumber(available ?? 0),
+        available: formatLitres(available ?? 0),
       }),
     };
   },
@@ -320,10 +317,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
         <NumberInput
           label={t('oilTanks.logs.issue.columns.litres')}
           withAsterisk
-          min={0}
-          decimalScale={LITRE_DECIMAL_SCALE}
-          thousandSeparator=","
-          suffix=" L"
+          {...LITRE_INPUT_PROPS}
           {...form.getInputProps('litres')}
           onChange={(v) => {
             form.setFieldValue('litres', v);
@@ -363,7 +357,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
             {t('oilTanks.logs.issue.summary.litres')}
           </Text>
           <Text size="sm" fw={600}>
-            {formatNumber(litres)}
+            {formatLitres(litres)}
           </Text>
         </Stack>
       </SimpleGrid>

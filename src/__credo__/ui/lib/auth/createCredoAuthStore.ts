@@ -1,4 +1,3 @@
-import { hashString } from '@credo/kits/crypt';
 import { cMngtConnector } from '@credo/connectors/connector';
 
 import { credoSSOApi as credoSSOApiConnector } from '../../connectors';
@@ -6,16 +5,6 @@ import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '../../utils';
 
 import { createAuthStore } from './createAuthStore';
 import type { AuthApi, AuthStorage, AuthStorageKeys, BaseProfile, PersistStorage } from './types';
-
-function settingsVersion(obj: Record<string, unknown>): string {
-  return hashString(JSON.stringify(obj));
-}
-
-type UserStorage = {
-  exportSettings: () => Record<string, unknown>;
-  importSettings: (settings: Record<string, unknown>) => void;
-  onChange: (callback: () => void) => void;
-};
 
 const DEFAULT_STORAGE_KEYS: AuthStorageKeys = {
   AUTH: '__AUTH__',
@@ -73,7 +62,7 @@ type CreateCredoAuthStoreOptions<TProfile extends BaseProfile = BaseProfile> = {
 
   api?: typeof credoSSOApiConnector;
 
-  userStorage?: UserStorage;
+  useBffAuth?: () => boolean;
 
   persistStorage?: PersistStorage;
 };
@@ -93,22 +82,23 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     storage = defaultStorage,
     storageKeys = DEFAULT_STORAGE_KEYS,
     api: credoSSOApi = credoSSOApiConnector,
-    userStorage,
+    useBffAuth = () => false,
     persistStorage,
   } = options;
 
-  let lastSavedVersion = '';
-
   const authApi: AuthApi<TProfile> = {
     login: async ({ email, password, tokenExpiration, refreshTokenExpiration, deviceId }) => {
-      const response = await credoSSOApi.login({
+      const params = {
         serviceCode,
         email,
         password,
         tokenExpiration,
         refreshTokenExpiration,
         deviceId,
-      });
+      };
+      const response = useBffAuth()
+        ? await cMngtConnector.login(params)
+        : await credoSSOApi.login(params);
 
       return {
         success: true,
@@ -119,7 +109,9 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     },
 
     refreshToken: async ({ refreshToken }) => {
-      const response = await credoSSOApi.refreshToken({ refreshToken });
+      const response = useBffAuth()
+        ? await cMngtConnector.refreshToken({ refreshToken })
+        : await credoSSOApi.refreshToken({ refreshToken });
       return {
         success: response.success,
         token: response.token,
@@ -129,34 +121,8 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     },
 
     getProfile: async ({ token }) => {
-      const profile = await cMngtConnector.getMe<TProfile>(token);
-
-      const savedSettings = profile?.settings ?? profile?.profile?.settings;
-      if (savedSettings && userStorage) {
-        userStorage.importSettings(savedSettings as Record<string, unknown>);
-
-        lastSavedVersion = settingsVersion(userStorage.exportSettings());
-      }
-
-      return profile;
+      return cMngtConnector.getMe<TProfile>(token);
     },
-
-    saveProfile: userStorage
-      ? async ({ token, name, email }) => {
-          const settings = userStorage.exportSettings();
-          const currentVersion = settingsVersion(settings);
-          if (currentVersion === lastSavedVersion) {
-            return { success: true };
-          }
-          await credoSSOApi.updateProfile(token, {
-            name,
-            email,
-            settings,
-          });
-          lastSavedVersion = currentVersion;
-          return { success: true };
-        }
-      : undefined,
 
     register: async ({ username, email }) => {
       console.info('Register attempt:', { username, email });
@@ -178,10 +144,10 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     },
 
     loginWithToken: async ({ token }) => {
-      const response = await credoSSOApi.loginWithToken({
-        serviceCode,
-        token,
-      });
+      const params = { serviceCode, token };
+      const response = useBffAuth()
+        ? await cMngtConnector.loginWithToken(params)
+        : await credoSSOApi.loginWithToken(params);
 
       return {
         success: true,

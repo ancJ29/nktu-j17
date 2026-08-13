@@ -48,10 +48,6 @@ export type NavigationConfig = {
   mobile: NavigationItem[];
 };
 
-export type UserSettingsConfig = {
-  syncDebounceDelay: number;
-};
-
 export type AppConfig = {
   version: string;
   schemaVersion?: number;
@@ -61,5 +57,4 @@ export type AppConfig = {
   languages: Language[];
   defaultLanguage: string;
   navigation: NavigationConfig;
-  userSettings: UserSettingsConfig;
 };

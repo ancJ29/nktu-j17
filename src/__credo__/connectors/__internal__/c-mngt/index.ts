@@ -2,7 +2,15 @@ import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
 
-import type { GetProfileResponse } from '../c-sso/types';
+import type {
+  GetProfileResponse,
+  LoginRequest,
+  LoginResponse,
+  LoginWithTokenRequest,
+  LoginWithTokenResponse,
+  RefreshTokenRequest,
+  RefreshTokenResponse,
+} from '../c-sso/types';
 import { targets, urls } from '../shared/config';
 import { registerStagePrefix } from '../shared/transport-state';
 import { C_MNGT_ROUTES } from './routes';
@@ -385,6 +393,24 @@ export const cMngtConnector = {
   getMe: <T extends Record<string, unknown> = Record<string, unknown>>(token: string) =>
     authApi<GetProfileResponse<T>>(AUTH_ROUTES.ME, {
       storages: withAuth(token),
+      extraHeaders: { 'x-client-code': storages.clientCode },
+    }),
+
+  login: (body: LoginRequest) =>
+    authApi<LoginResponse>(AUTH_ROUTES.LOGIN, {
+      body,
+      extraHeaders: { 'x-client-code': storages.clientCode },
+    }),
+
+  refreshToken: (body: RefreshTokenRequest) =>
+    authApi<RefreshTokenResponse>(AUTH_ROUTES.REFRESH, {
+      body,
+      extraHeaders: { 'x-client-code': storages.clientCode },
+    }),
+
+  loginWithToken: (body: LoginWithTokenRequest) =>
+    authApi<LoginWithTokenResponse>(AUTH_ROUTES.LOGIN_WITH_TOKEN, {
+      body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 

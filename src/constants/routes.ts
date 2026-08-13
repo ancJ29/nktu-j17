@@ -146,7 +146,6 @@ export const ROUTES = {
   CONFIGURATION: {
     APP_CONFIG: '/app-config',
     DEBUG: '/debug',
-    FAKE_DATA: '/fake-data',
   },
   NOT_FOUND: '/404-not-found',
   FORBIDDEN: '/403-forbidden',

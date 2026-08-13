@@ -8,7 +8,7 @@ import { device } from '@credo/base-ui/utils';
 import { useOilTankStore } from '@/stores/useOilTankStore';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
-import { formatNumber } from '@/utils/number';
+import { formatLitres } from '@/utils/number';
 import { ActiveBadge } from '@/components/badges';
 import { DesktopFilterBar } from '@/components/DesktopFilterBar';
 import { ListCardList } from '@/components/ListCardList';
@@ -90,7 +90,7 @@ export function OilTankListPage() {
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
 
   const columns = useMemo(
-    () => OIL_TANK_CONFIG.columns({ t: (k) => t(k as never), formatNumber }),
+    () => OIL_TANK_CONFIG.columns({ t: (k) => t(k as never), formatLitres }),
     [t],
   );
 
@@ -213,7 +213,7 @@ export function OilTankListPage() {
                 {/* The level is why anyone opens this list on a phone — it's the
                     one figure a depot check needs, so it rides the card rather
                     than hiding behind a tap. */}
-                {levelCell(item, (k) => t(k as never), formatNumber)}
+                {levelCell(item, (k) => t(k as never), formatLitres)}
               </Group>
             </Stack>
           )}

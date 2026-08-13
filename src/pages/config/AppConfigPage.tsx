@@ -21,8 +21,8 @@ import {
   DEFAULT_TABLE_DENSITY,
   DEFAULT_THEME,
   DEFAULT_TRANSLATIONS,
-  DEFAULT_USER_SETTINGS,
   DEFAULT_VENDOR_FEATURES,
+  DEFAULT_AUTH_VIA_BFF,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
 import type {
@@ -30,7 +30,6 @@ import type {
   GoodsReceiptFeatures,
   ProductFeatures,
   QuotationFeatures,
-  TransportOrderBangKeTemplateConfig,
 } from '@/config/schema';
 import type { GoodsReceiptStatus } from '@/types';
 import { LOOKUP_CATEGORIES } from '@/pages/lookups/categoryRegistry';
@@ -76,7 +75,6 @@ import type {
   Language,
   NavigationConfig,
   ThemeConfig,
-  UserSettingsConfig,
 } from '@credo/kits/types';
 import {
   Alert,
@@ -121,7 +119,6 @@ import {
   IconPackageImport,
   IconPlant2,
   IconRotate,
-  IconSettings,
   IconShield,
   IconFileInvoice,
   IconShoppingCart,
@@ -179,11 +176,10 @@ import {
   StatusAllowedDepartmentsMatrixEditor,
   StatusTransitionMatrixEditor,
   ThemeConfigSection,
-  TransportOrderBangKeTemplateEditor,
+  CustomerReportTypeEditor,
   TransportOrderConfigInvariantAlert,
   TransportOrderStatusOptionEditor,
   TranslationsSection,
-  UserSettingsSection,
   ALL_SECTIONS,
   type AppInfo,
   type SectionKey,
@@ -274,13 +270,13 @@ export function ConfigEditor({
   const [languages, setLanguages] = useState<Language[]>(DEFAULT_CONFIG.languages);
   const [defaultLanguage, setDefaultLanguage] = useState(DEFAULT_CONFIG.defaultLanguage);
   const [navigation, setNavigation] = useState<NavigationConfig>(DEFAULT_CONFIG.navigation);
-  const [userSettings, setUserSettings] = useState<UserSettingsConfig>(DEFAULT_CONFIG.userSettings);
   const [languageSwitcher, setLanguageSwitcher] = useState(
     DEFAULT_CONFIG.features.common.languageSwitcher,
   );
   const [enablePdfSharing, setEnablePdfSharing] = useState(
     DEFAULT_CONFIG.features.common.enablePdfSharing,
   );
+  const [authViaBff, setAuthViaBff] = useState(DEFAULT_CONFIG.features.common.authViaBff);
   const [enableStats, setEnableStats] = useState(DEFAULT_CONFIG.features.common.enableStats);
   const [tableDensity, setTableDensity] = useState(DEFAULT_TABLE_DENSITY);
   const [employeeFeatures, setEmployeeFeatures] = useState<CMngtEmployeeFeatures>(
@@ -394,12 +390,12 @@ export function ConfigEditor({
         pc: stripHiddenNavItems(navigation.pc),
         mobile: stripHiddenNavItems(navigation.mobile),
       },
-      userSettings,
       features: {
         common: {
           darkMode: DEFAULT_CONFIG.features.common.darkMode,
           languageSwitcher,
           enablePdfSharing,
+          authViaBff,
           enableStats,
           tableDensity,
         },
@@ -441,9 +437,9 @@ export function ConfigEditor({
       languages,
       defaultLanguage,
       navigation,
-      userSettings,
       languageSwitcher,
       enablePdfSharing,
+      authViaBff,
       enableStats,
       tableDensity,
       employeeFeatures,
@@ -485,13 +481,13 @@ export function ConfigEditor({
     setLanguages(cfg.languages ?? DEFAULT_CONFIG.languages);
     setDefaultLanguage(cfg.defaultLanguage ?? DEFAULT_CONFIG.defaultLanguage);
     setNavigation(cfg.navigation ?? DEFAULT_CONFIG.navigation);
-    setUserSettings({ ...DEFAULT_CONFIG.userSettings, ...cfg.userSettings });
     setLanguageSwitcher(
       cfg.features?.common?.languageSwitcher ?? DEFAULT_CONFIG.features.common.languageSwitcher,
     );
     setEnablePdfSharing(
       cfg.features?.common?.enablePdfSharing ?? DEFAULT_CONFIG.features.common.enablePdfSharing,
     );
+    setAuthViaBff(cfg.features?.common?.authViaBff ?? DEFAULT_CONFIG.features.common.authViaBff);
     setEnableStats(cfg.features?.common?.enableStats ?? DEFAULT_CONFIG.features.common.enableStats);
     setTableDensity(cfg.features?.common?.tableDensity ?? DEFAULT_TABLE_DENSITY);
     setEmployeeFeatures({ ...SCHEMA_DEFAULT_EMPLOYEE_FEATURES, ...cfg.features?.employees });
@@ -740,6 +736,7 @@ export function ConfigEditor({
   const resetAll = useCallback(() => {
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
+    setAuthViaBff(DEFAULT_AUTH_VIA_BFF);
     setEnableStats(DEFAULT_ENABLE_STATS);
     setAuth(DEFAULT_AUTH);
     setEmployeeFeatures(DEFAULT_EMPLOYEE_FEATURES);
@@ -768,7 +765,6 @@ export function ConfigEditor({
     setLanguages(DEFAULT_LANGUAGES);
     setDefaultLanguage(DEFAULT_LANGUAGE);
     setNavigation(defaultNavigation);
-    setUserSettings(DEFAULT_USER_SETTINGS);
     setTranslations(DEFAULT_TRANSLATIONS);
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
     setTableDensity(DEFAULT_TABLE_DENSITY);
@@ -779,6 +775,7 @@ export function ConfigEditor({
     setAppInfo(DEFAULT_APP_INFO);
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
+    setAuthViaBff(DEFAULT_AUTH_VIA_BFF);
     setEnableStats(DEFAULT_ENABLE_STATS);
   }, []);
   const resetAuth = useCallback(() => setAuth(DEFAULT_AUTH), []);
@@ -860,7 +857,6 @@ export function ConfigEditor({
     setDefaultLanguage(DEFAULT_LANGUAGE);
   }, []);
   const resetNavigation = useCallback(() => setNavigation(defaultNavigation), []);
-  const resetUserSettings = useCallback(() => setUserSettings(DEFAULT_USER_SETTINGS), []);
   const resetTranslations = useCallback(() => setTranslations(DEFAULT_TRANSLATIONS), []);
   const resetDisplaySettings = useCallback(() => {
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
@@ -874,6 +870,7 @@ export function ConfigEditor({
       eqDefault(appInfo, DEFAULT_APP_INFO) &&
       eqDefault(languageSwitcher, DEFAULT_LANGUAGE_SWITCHER) &&
       eqDefault(enablePdfSharing, DEFAULT_ENABLE_PDF_SHARING) &&
+      eqDefault(authViaBff, DEFAULT_AUTH_VIA_BFF) &&
       eqDefault(enableStats, DEFAULT_ENABLE_STATS),
     displaySettings:
       eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS) &&
@@ -882,7 +879,6 @@ export function ConfigEditor({
     layout: eqDefault(layout, DEFAULT_LAYOUT),
     theme: eqDefault(themeConfig, DEFAULT_THEME),
     languages: eqDefault(languages, DEFAULT_LANGUAGES) && defaultLanguage === DEFAULT_LANGUAGE,
-    userSettings: eqDefault(userSettings, DEFAULT_USER_SETTINGS),
     permissionManagement: eqDefault(permMngtFeatures, SCHEMA_DEFAULT_PERM_MNGT_FEATURES),
     permissions: Object.keys(permissions).length === 0,
     deptPermissions: (employeeFeatures.departmentOptions ?? []).every(
@@ -1008,11 +1004,13 @@ export function ConfigEditor({
               languageSwitcher={languageSwitcher}
               enablePdfSharing={enablePdfSharing}
               enableStats={enableStats}
+              authViaBff={authViaBff}
               onChange={setAppInfo}
               onVersionChange={setVersion}
               onLanguageSwitcherChange={setLanguageSwitcher}
               onEnablePdfSharingChange={setEnablePdfSharing}
               onEnableStatsChange={setEnableStats}
+              onAuthViaBffChange={setAuthViaBff}
             />
           </CollapsibleSection>
 
@@ -1089,19 +1087,6 @@ export function ConfigEditor({
               onDefaultChange={setDefaultLanguage}
             />
           </CollapsibleSection>
-          <CollapsibleSection
-            icon={IconSettings}
-            title="User Settings"
-            description="User-level settings defaults"
-            sectionKey="userSettings"
-            isDefault={sectionIsDefault.userSettings}
-            opened={openSections.has('userSettings')}
-            onToggle={toggleSection}
-            onReset={resetUserSettings}
-          >
-            <UserSettingsSection settings={userSettings} onChange={setUserSettings} />
-          </CollapsibleSection>
-
           <Divider my="xs" />
 
           <CollapsibleSection
@@ -2429,19 +2414,16 @@ export function ConfigEditor({
                   {/* Schema-only field like `defaultListStatuses` above (absent
                       from the kits mirror) — read/written via a local cast; it
                       round-trips because load/save spread the whole object.
-                      Consumed via `resolveTransportOrderBangKeTemplate()`. */}
-                  <TransportOrderBangKeTemplateEditor
-                    templates={
-                      (
-                        transportOrdersFeatures as {
-                          bangKeTemplates?: TransportOrderBangKeTemplateConfig[];
-                        }
-                      ).bangKeTemplates ?? []
+                      Consumed via `resolveCustomerReportType()`. */}
+                  <CustomerReportTypeEditor
+                    assignments={
+                      (transportOrdersFeatures as { customerReportTypes?: Record<string, number> })
+                        .customerReportTypes ?? {}
                     }
-                    onChange={(tpls) =>
+                    onChange={(next) =>
                       setTransportOrdersFeatures({
                         ...transportOrdersFeatures,
-                        bangKeTemplates: tpls,
+                        customerReportTypes: next,
                       } as CMngtTransportOrderFeatures)
                     }
                   />

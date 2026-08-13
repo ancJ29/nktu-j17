@@ -32,7 +32,6 @@ export type NavId =
   | 'configuration-vendors'
   | 'configuration-app-config'
   | 'configuration-debug'
-  | 'configuration-fake-data'
   | 'lookups'
   | 'lookups-v2'
   | 'truck-assets'
@@ -223,13 +222,6 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Activity,
     adminOnly: true,
   },
-  'configuration-fake-data': {
-    path: ROUTES.CONFIGURATION.FAKE_DATA,
-    labelKey: 'configuration.fakeData',
-    label: 'Fake Data',
-    defaultIcon: IconName.Database,
-    adminOnly: true,
-  },
 
   lookups: {
     path: ROUTES.LOOKUPS.LIST,
@@ -332,7 +324,7 @@ const DEFAULT_PC_STRUCTURE: NavStructureItem[] = [
   },
   {
     id: 'configuration',
-    subs: ['configuration-app-config', 'configuration-debug', 'configuration-fake-data'],
+    subs: ['configuration-app-config', 'configuration-debug'],
   },
   'report',
 ];

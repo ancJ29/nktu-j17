@@ -282,7 +282,6 @@ export type SalesOrderStatusOption = z.infer<typeof SalesOrderStatusOptionSchema
 export type DeliveryRequestStatusOption = z.infer<typeof DeliveryRequestStatusOptionSchema>;
 export type TagOption = z.infer<typeof TagOptionSchema>;
 export type TransportOrderStatusOptionConfig = z.infer<typeof TransportOrderStatusOptionSchema>;
-export type TransportOrderBangKeTemplateConfig = z.infer<typeof TransportOrderBangKeTemplateSchema>;
 
 const SalesOrderFeaturesSchema = z
   .object({
@@ -410,20 +409,6 @@ const TransportOrderStatusOptionSchema = OptionSchema.extend({
   allowedDepartments: z.array(z.string()).default([]),
 });
 
-const TransportOrderBangKeTemplateSchema = z.object({
-  name: z.string().default(''),
-
-  customerCodes: z.array(z.string()).default([]),
-
-  serviceFeeColumns: z.array(z.string()).default([]),
-
-  otherFeesColumn: z.boolean().default(true),
-
-  noteColumn: z.enum(['auto', 'always', 'never']).default('auto'),
-
-  footerSummary: z.boolean().default(true),
-});
-
 const TransportOrderFeaturesSchema = z
   .object({
     enabled: z.boolean().default(false),
@@ -442,7 +427,7 @@ const TransportOrderFeaturesSchema = z
 
     defaultListStatuses: z.array(z.string()).default([]),
 
-    bangKeTemplates: z.array(TransportOrderBangKeTemplateSchema).default([]),
+    customerReportTypes: z.record(z.string(), z.number().int().positive()).default({}),
   })
   .default({
     enabled: false,
@@ -454,7 +439,7 @@ const TransportOrderFeaturesSchema = z
     statusTransitions: {},
     driverDepartments: [],
     defaultListStatuses: [],
-    bangKeTemplates: [],
+    customerReportTypes: {},
   });
 
 const DisplaySettingsSchema = z
@@ -487,6 +472,8 @@ const FeaturesSchema = z
       languageSwitcher: z.boolean().default(true),
 
       enablePdfSharing: z.boolean().default(false),
+
+      authViaBff: z.boolean().default(false),
 
       enableStats: z.boolean().default(false),
 
@@ -524,6 +511,7 @@ const FeaturesSchema = z
       darkMode: false,
       languageSwitcher: true,
       enablePdfSharing: false,
+      authViaBff: false,
       enableStats: false,
       tableDensity: 'comfortable',
     },
@@ -637,10 +625,6 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
   defaultLanguage: 'vi',
 
   navigation: defaultNavigation,
-
-  userSettings: {
-    syncDebounceDelay: 5000,
-  },
 }) satisfies Omit<AppConfig, 'env' | 'navigation' | 'translations'>;
 
 export type CMngtAppConfig = z.infer<typeof CMngtAppConfigSchema> & CredoAppConfig;

@@ -130,7 +130,7 @@ export function PCAppLayout({
   displayIconWhenCollapsed = false,
   showLanguageSwitcher = true,
   onRefresh,
-  showRefreshConfig = false,
+  showRefreshConfig = true,
   onRefreshConfig,
   showInstallApp = false,
   onInstallApp,

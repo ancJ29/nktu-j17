@@ -89,7 +89,6 @@ import {
   ProfilePage,
   AppConfigPage,
   DebugPage,
-  FakeDataPage,
   LookupsPage,
   ErrorPage,
   NotFoundPage,
@@ -1067,10 +1066,6 @@ const router = createBrowserRouter([
           {
             path: ROUTES.CONFIGURATION.DEBUG,
             element: gatedComponent({ enabled: isAdmin }, DebugPage),
-          },
-          {
-            path: ROUTES.CONFIGURATION.FAKE_DATA,
-            element: gatedComponent({ enabled: isAdmin }, FakeDataPage),
           },
         ],
       },

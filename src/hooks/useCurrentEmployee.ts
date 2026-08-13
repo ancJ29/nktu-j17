@@ -226,7 +226,7 @@ function syncProfileIfNeeded(employeeName: string, employeeEmail: string) {
     },
   });
 
-  state.saveProfile?.().catch((err: unknown) => {
-    logger.error('Failed to sync profile from employee', err);
-  });
+  // Deliberately local-only since 2026-08-13: the SSO profile's `name`/`email`
+  // are no longer written back. `currentEmployee.name` already wins wherever
+  // both are shown, so a stale SSO name changes nothing the user sees.
 }

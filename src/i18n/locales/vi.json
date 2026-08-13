@@ -780,7 +780,6 @@
   "configuration": {
     "appConfig": "Cấu hình ứng dụng",
     "debug": "Gỡ lỗi",
-    "fakeData": "Dữ liệu giả",
     "materials": "Vật tư",
     "title": "Cấu hình"
   },
@@ -1641,167 +1640,6 @@
     "unexpected": {
       "message": "Không mở được trang này. Vui lòng tải lại; nếu vẫn lỗi, hãy liên hệ quản trị viên.",
       "title": "Đã xảy ra lỗi"
-    }
-  },
-  "fakeData": {
-    "changeSecrets": "Thay đổi bảo mật",
-    "clientCode": "Mã khách hàng",
-    "configureSecrets": "Cấu hình bảo mật",
-    "customers": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả khách hàng của \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
-      "confirmTitle": "Ghi đè tất cả khách hàng?",
-      "count": "Số khách hàng",
-      "countHelp": "Tên công ty lấy từ pool theo ngành (food: nhà hàng/quán cafe; mechanical: nhà máy/nhà thầu). Mã sinh tự động (CST-NNNN).",
-      "description": "Ghi đè TẤT CẢ khách hàng hiện có. Dùng làm nguồn dữ liệu cho đơn bán hàng.",
-      "title": "Tạo khách hàng giả"
-    },
-    "employees": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả bản ghi nhân viên hiện có của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới và tạo tài khoản SSO tương ứng. Tiếp tục?",
-      "confirmBodyRandom": "Thao tác này sẽ GHI ĐÈ lên tất cả hồ sơ nhân viên hiện có cho khách hàng {{clientCode}} — tạo ra 2-5 nhân viên mỗi phòng ban từ Cấu hình ứng dụng và tạo người dùng SSO tương ứng. Bạn muốn tiếp tục?",
-      "confirmTitle": "Ghi đè tất cả nhân viên?",
-      "count": "Số lượng nhân viên",
-      "description": "Ghi đè TẤT CẢ nhân viên hiện có và tạo tài khoản SSO tương ứng.",
-      "jsonEmpty": "Cần có ít nhất một dòng.",
-      "jsonHelp": "Mảng các dòng. Các trường (đều tùy chọn): name, firstName, lastName, department, phone, personalPhone, email, position, code, gender. Lưu vào localStorage theo khách hàng.",
-      "jsonInvalid": "JSON không hợp lệ: {{error}}",
-      "jsonLabel": "JSON nhân viên",
-      "jsonNotArray": "JSON phải là một mảng.",
-      "parsedRows": "Số dòng đã phân tích",
-      "randomCoverage": "Chế độ ngẫu nhiên sẽ duyệt qua từng phòng ban được cấu hình trong Cấu hình ứng dụng và chọn ngẫu nhiên từ 2 đến 5 nhân viên mỗi phòng ban. Tổng số lượng sẽ được xác định trong quá trình chạy.",
-      "skipSso": "Bỏ qua tạo SSO",
-      "skipSsoHelp": "Khi bật, chỉ ghi bản ghi nhân viên — không tạo tài khoản SSO.",
-      "source": "Nguồn dữ liệu",
-      "title": "Tạo nhân viên giả"
-    },
-    "failures": "Lỗi SSO",
-    "goodsReceipts": {
-      "confirmBody": "Thao tác này sẽ tạo {{count}} phiếu nhập kho mới cho khách hàng \"{{clientCode}}\" trải đều trong {{daysBack}} ngày gần nhất. Các phiếu hiện có cùng ngày sẽ bị GHI ĐÈ. Tiếp tục?",
-      "confirmTitle": "Tạo phiếu nhập kho?",
-      "count": "Số phiếu",
-      "countHelp": "Số phiếu nhập kho cần tạo. Sẽ trải ngẫu nhiên trong khoảng ngày đã chọn.",
-      "daysBack": "Trải trong (ngày)",
-      "daysBackHelp": "Khoảng ngày để trải các phiếu. Mặc định 14 ngày — khớp với khoảng query của trang danh sách.",
-      "description": "Tạo phiếu nhập kho phân vùng theo ngày trong N ngày gần nhất. Lấy vendor / kho từ master data hiện có, vật tư từ pool sản phẩm + vật tư của ngành. Tỉ lệ trạng thái: ~60% draft, ~30% received, ~10% cancelled.",
-      "inventoryWarning": "Bypass BFF — phiếu trạng thái \"received\" KHÔNG cập nhật tồn kho. Dùng nút Xác nhận trên UI để kiểm thử side-effect cập nhật tồn kho.",
-      "title": "Tạo phiếu nhập kho"
-    },
-    "industry": {
-      "description": "Chọn file JSON nguồn (scripts/faker/data/*.json) dùng cho lookups, sản phẩm và vật tư. Mã cố định trong JSON giữ cho liên kết đơn hàng ổn định qua mỗi lần chạy lại.",
-      "label": "Ngành",
-      "lookups": "Số lookup",
-      "materials": "Số vật tư",
-      "products": "Số sản phẩm",
-      "title": "Danh mục theo ngành"
-    },
-    "log": "Nhật ký",
-    "lookupsSeed": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả lookup của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới ở tất cả danh mục. Tiếp tục?",
-      "confirmTitle": "Ghi đè tất cả lookups?",
-      "description": "Ghi đè TẤT CẢ các dòng lookup hiện có cho mọi danh mục (product-category, product-tag, unit, material-category, material-unit).",
-      "jsonEmpty": "Cần có ít nhất một dòng.",
-      "jsonHelp": "Mảng dòng. Bắt buộc: category, value (hoặc label). Tùy chọn: label (mặc định = value), sortOrder (tự động). Categories: product-category, product-tag, unit, material-category, material-unit. Lưu vào localStorage theo khách hàng.",
-      "jsonInvalid": "JSON không hợp lệ: {{error}}",
-      "jsonLabel": "JSON lookups",
-      "jsonMissingFields": "Mỗi dòng cần có \"category\" và một trong \"value\" hoặc \"label\".",
-      "jsonNotArray": "JSON phải là một mảng.",
-      "parsedRows": "Số dòng đã phân tích",
-      "title": "Tạo dữ liệu meta-data"
-    },
-    "materialInventory": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ toàn bộ tồn kho vật tư của khách hàng \"{{clientCode}}\" bằng tối đa {{count}} dòng mới. Tiếp tục?",
-      "confirmTitle": "Ghi đè tồn kho vật tư?",
-      "count": "Số dòng",
-      "countHelp": "Số cặp (vật tư, vị trí) sẽ tạo. Giới hạn bởi vật tư × vị trí.",
-      "description": "Ghi đè TẤT CẢ tồn kho vật tư hiện có. Vật tư và vị trí phải tồn tại trước (lấy trực tiếp từ BFF). Lượng đặt giữ luôn để trống.",
-      "maxQty": "Tồn tối đa (đơn vị gốc)",
-      "maxQtyHelp": "Tồn của từng dòng được lấy ngẫu nhiên từ 0 đến giá trị này, theo đơn vị gốc của vật tư.",
-      "multiUnitSplit": "Cho phép tách đa đơn vị",
-      "multiUnitSplitHelp": "Nếu vật tư có quy đổi đơn vị, đặt thêm tồn ở đơn vị khác (ví dụ KG + BAO_5KG).",
-      "overwriteWarning": "Dữ liệu tồn kho sẽ thay thế toàn bộ envelope material-inventory — không gộp. Các dòng hiện có của khách hàng này sẽ bị xóa.",
-      "title": "Tạo tồn kho vật tư giả"
-    },
-    "materials": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả vật tư của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
-      "confirmTitle": "Ghi đè tất cả vật tư?",
-      "count": "Số lượng vật tư",
-      "countHelp": "Lấy N dòng đầu từ JSON của ngành (tối đa {{max}}).",
-      "description": "Ghi đè TẤT CẢ vật tư hiện có bằng danh mục của ngành đã chọn. Mã cố định (ví dụ MAT-FLOUR-WHEAT-T00) để các tham chiếu sau này ổn định.",
-      "title": "Tạo vật tư giả"
-    },
-    "missingSecrets": "Cần nhập thông tin khóa bảo mật để tiếp tục.",
-    "productInventory": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ toàn bộ tồn kho sản phẩm của khách hàng \"{{clientCode}}\" bằng tối đa {{count}} dòng mới. Tiếp tục?",
-      "confirmTitle": "Ghi đè tồn kho sản phẩm?",
-      "count": "Số dòng",
-      "countHelp": "Số cặp (sản phẩm, vị trí) sẽ tạo. Giới hạn bởi sản phẩm × vị trí.",
-      "description": "Ghi đè TẤT CẢ tồn kho sản phẩm hiện có. Sản phẩm và vị trí phải tồn tại trước (lấy trực tiếp từ BFF). Lượng đặt giữ luôn để trống.",
-      "maxQty": "Tồn tối đa (đơn vị gốc)",
-      "maxQtyHelp": "Tồn của từng dòng được lấy ngẫu nhiên từ 0 đến giá trị này, theo đơn vị gốc của sản phẩm.",
-      "multiUnitSplit": "Cho phép tách đa đơn vị",
-      "multiUnitSplitHelp": "Nếu sản phẩm có quy đổi đơn vị, đặt thêm tồn ở đơn vị khác (ví dụ KG + BAO_5KG).",
-      "overwriteWarning": "Dữ liệu tồn kho sẽ thay thế toàn bộ envelope product-inventory — không gộp. Các dòng hiện có của khách hàng này sẽ bị xóa.",
-      "title": "Tạo tồn kho sản phẩm giả"
-    },
-    "products": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả sản phẩm của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
-      "confirmTitle": "Ghi đè tất cả sản phẩm?",
-      "count": "Số lượng sản phẩm",
-      "countHelp": "Lấy N dòng đầu từ JSON của ngành (tối đa {{max}}).",
-      "description": "Ghi đè TẤT CẢ sản phẩm hiện có bằng danh mục của ngành đã chọn. Mã cố định (ví dụ PRD-NOODLE-SHRIMP) để các tham chiếu sau này ổn định.",
-      "title": "Tạo sản phẩm giả"
-    },
-    "purge": {
-      "button": "Xóa toàn bộ dữ liệu (trừ nhân viên)",
-      "confirmBody": "Thao tác này sẽ XÓA VĨNH VIỄN toàn bộ dữ liệu giả của khách hàng \"{{clientCode}}\" — sản phẩm, vật tư, khách hàng, nhà cung cấp, lookups, đơn bán, yêu cầu giao hàng, phiếu nhập kho, và toàn bộ tồn kho. Nhân viên và vị trí kho sẽ được giữ lại. Không thể hoàn tác. Tiếp tục?",
-      "confirmOk": "Đồng ý, xóa hết",
-      "confirmTitle": "Xóa toàn bộ dữ liệu trừ nhân viên?",
-      "description": "Xóa mọi prefix dữ liệu giả thuộc về client này. Nhân viên và vị trí kho được giữ lại để admin không bị mất quyền đăng nhập và các seeder vẫn dùng được vị trí có sẵn.",
-      "runSuccess": "Đã xóa.",
-      "summaryRemoved": "Đã xóa: {{count}} bản ghi",
-      "title": "Xóa dữ liệu (trừ nhân viên)",
-      "warning": "Hành động phá hủy. Sẽ xóa TẤT CẢ master data, dữ liệu giao dịch và tồn kho của client này. Không thể hoàn tác."
-    },
-    "runError": "Lỗi: {{error}}",
-    "runSuccess": "Hoàn tất.",
-    "salesOrders": {
-      "confirmBody": "Thao tác này sẽ tạo {{count}} đơn bán mới cho khách hàng \"{{clientCode}}\" trong khoảng thời gian {{daysBack}} ngày qua. Các đơn bán trong cùng ngày sẽ bị GHI ĐÈ. Tiếp tục?",
-      "confirmTitle": "Tạo đơn hàng?",
-      "count": "Số đơn hàng",
-      "countHelp": "Số đơn hàng mới sẽ được phân bố ngẫu nhiên trong khoảng thời gian {{daysBack}} ngày.",
-      "daysBack": "Phân bố trong khoảng thời gian (ngày)",
-      "daysBackHelp": "Khoảng thời gian để phân bố đơn hàng. Mặc định là 14 ngày để khớp với khoảng thời gian truy vấn của trang danh sách.",
-      "description": "Tạo đơn hàng phân tách theo ngày. Lấy khách hàng, sản phẩm, nhân viên và vị trí từ BFF và sử dụng trạng thái / phương thức giao hàng / tag được cấu hình. Tỷ lệ mix: ~25% NEW, ~45% IN_PROGRESS, ~25% COMPLETED, ~5% EXCEPTIONAL — plus a ~5% cancellation flag overlay.",
-      "inventoryWarning": "Đơn bán trong trạng thái reservesStock / shipsStock sẽ không ảnh hưởng đến tồn kho. Sử dụng trạng thái chuyển đổi trên UI để kiểm tra chuỗi tồn kho.",
-      "title": "Tạo đơn hàng giả"
-    },
-    "secretsHelp": "Chỉ lưu trong sessionStorage — sẽ xóa khi đóng tab.",
-    "secretsTitle": "Thông tin bảo mật",
-    "source": "Nguồn dữ liệu",
-    "sourceJson": "Từ JSON",
-    "sourceRandom": "Ngẫu nhiên",
-    "subtitle": "Tạo dữ liệu mẫu cho khách hàng hiện tại — chỉ dùng cho dev/test.",
-    "summary": "Kết quả",
-    "summaryRecords": "Số bản ghi: {{count}}",
-    "summarySso": "SSO: tạo {{created}}, thất bại {{failed}}",
-    "title": "Công cụ tạo dữ liệu giả",
-    "transactionalPurge": {
-      "button": "Xóa dữ liệu giao dịch",
-      "confirmBody": "Thao tác này sẽ XÓA VĨNH VIỄN tất cả phiếu nhập kho, đơn hàng và yêu cầu giao hàng cho khách hàng \"{{clientCode}}\" trong tất cả các ngày phân tách. Dữ liệu master và tồn kho sẽ được giữ lại. Không thể hoàn tác. Tiếp tục?",
-      "confirmOk": "Đồng ý, xóa dữ liệu giao dịch",
-      "confirmTitle": "Xóa dữ liệu giao dịch?",
-      "description": "Xóa các bản ghi giao dịch phân tách theo ngày: phiếu nhập kho, đơn hàng và yêu cầu giao hàng. Dữ liệu master (nhân viên, sản phẩm, vật tư, khách hàng, nhà cung cấp, lookups, vị trí) và tồn kho sẽ được giữ lại để operator có thể replay flows mà không cần seed lại.",
-      "runSuccess": "Dữ liệu giao dịch đã xóa.",
-      "summaryRemoved": "Đã xóa: {{count}} bản ghi",
-      "title": "Xóa dữ liệu giao dịch",
-      "warning": "Hành động phá hủy. Sẽ xóa TẤT CẢ phiếu nhập kho, đơn hàng và yêu cầu giao hàng cho khách hàng này. Không thể hoàn tác."
-    },
-    "vendors": {
-      "confirmBody": "Thao tác này sẽ GHI ĐÈ tất cả nhà cung cấp của khách hàng \"{{clientCode}}\" bằng {{count}} dòng mới. Tiếp tục?",
-      "confirmTitle": "Ghi đè tất cả nhà cung cấp?",
-      "count": "Số nhà cung cấp",
-      "countHelp": "Tên công ty lấy từ pool theo ngành (food / mechanical). Mã sinh tự động (VND-NNNN).",
-      "description": "Ghi đè TẤT CẢ nhà cung cấp hiện có. Cần seed nhà cung cấp trước khi tạo phiếu nhập kho.",
-      "title": "Tạo nhà cung cấp giả"
     }
   },
   "goodsReceipts": {
@@ -4025,9 +3863,6 @@
     "actions": {
       "cancel": "Hủy đơn"
     },
-    "bangKe": {
-      "export": "Xuất bảng kê"
-    },
     "billing": {
       "advance": "Tạm ứng",
       "balanceDue": "Còn lại",
@@ -4070,6 +3905,9 @@
       "wholeOrder": "Đơn này"
     },
     "copiedFrom": "Sao chép từ {{code}} — điều chỉnh và lưu thành đơn mới.",
+    "customerReport": {
+      "export": "Xuất bảng kê khách hàng"
+    },
     "detail": {
       "activitiesError": "Không tải được hoạt động.",
       "activitiesLoadMore": "Tải thêm",
@@ -4168,6 +4006,9 @@
       "cancelled": "Đã hủy đơn vận chuyển",
       "createError": "Tạo đơn vận chuyển thất bại",
       "created": "Đã tạo đơn vận chuyển",
+      "customerReportNeedCustomer": "Chọn một khách hàng ở bộ lọc để xuất bảng kê.",
+      "customerReportSuccess_one": "Đã xuất bảng kê ({{count}} đơn).",
+      "customerReportSuccess_other": "Đã xuất bảng kê ({{count}} đơn).",
       "deleted": "Đã xóa đơn vận chuyển",
       "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
       "exportError": "Xuất đơn vận chuyển thất bại.",
@@ -4178,10 +4019,7 @@
       "saveError": "Lưu thay đổi thất bại",
       "tripLogSyncError": "Chưa cập nhật được nhật ký chuyến của xe. Hệ thống sẽ thử lại khi mở đơn này lần sau.",
       "updateError": "Cập nhật đơn vận chuyển thất bại",
-      "updated": "Đã cập nhật đơn vận chuyển",
-      "bangKeNeedCustomer": "Chọn một khách hàng ở bộ lọc để xuất bảng kê.",
-      "bangKeSuccess_one": "Đã xuất bảng kê ({{count}} đơn).",
-      "bangKeSuccess_other": "Đã xuất bảng kê ({{count}} đơn)."
+      "updated": "Đã cập nhật đơn vận chuyển"
     },
     "route": {
       "collapse": "Thu gọn",

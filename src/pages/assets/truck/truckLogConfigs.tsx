@@ -19,7 +19,7 @@ import { IconGasStation, IconPlus, IconRoad, IconTool, IconTrash } from '@tabler
 import { DatePickerField } from '@/components/DatePickerField';
 import { TransportOrderLink } from '@/components/TransportOrderLink';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { formatNumber, LITRE_DECIMAL_SCALE } from '@/utils/number';
+import { formatLitres, formatNumber, LITRE_INPUT_PROPS } from '@/utils/number';
 import { computeRefuelTotals, formatConsumption, refuelConsumption } from '@/utils/refuelStats';
 import type { MaintenanceItem, MaintenanceLogExtra, RefuelLogExtra, TripLogExtra } from '@/types';
 import {
@@ -119,7 +119,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     {
       header: 'operationLogs.refuel.columns.litres',
       align: 'right',
-      render: (log) => formatNumber(log.extra?.litres),
+      render: (log) => formatLitres(log.extra?.litres),
     },
     {
       header: 'operationLogs.refuel.columns.unitPrice',
@@ -199,7 +199,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     if (!refused) return null;
     return {
       litres: t('oilTanks.logs.validation.exceedsStock', {
-        available: formatNumber(available ?? 0),
+        available: formatLitres(available ?? 0),
       }),
     };
   },
@@ -326,10 +326,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
           <NumberInput
             label={t('operationLogs.refuel.columns.litres')}
-            min={0}
-            decimalScale={LITRE_DECIMAL_SCALE}
-            thousandSeparator=","
-            suffix=" L"
+            {...LITRE_INPUT_PROPS}
             {...form.getInputProps('litres')}
             onChange={(v) => {
               form.setFieldValue('litres', v);
@@ -401,7 +398,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     return (
       <Card withBorder radius="md" padding="sm" mt="xs" bg="var(--mantine-color-default-hover)">
         <SimpleGrid cols={{ base: 2, sm: 4 }} spacing="md">
-          {summaryStat(t('operationLogs.refuel.summary.totalLitres'), `${formatNumber(litres)} L`)}
+          {summaryStat(t('operationLogs.refuel.summary.totalLitres'), `${formatLitres(litres)} L`)}
           {summaryStat(t('operationLogs.refuel.summary.totalCost'), `${formatNumber(cost)} ₫`)}
           {summaryStat(
             t('operationLogs.refuel.summary.totalDistance'),

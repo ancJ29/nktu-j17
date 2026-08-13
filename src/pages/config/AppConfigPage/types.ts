@@ -36,7 +36,6 @@ export type SectionKey =
   | 'layout'
   | 'languages'
   | 'navigation'
-  | 'userSettings'
   | 'translations';
 
 export const ALL_SECTIONS: SectionKey[] = [
@@ -73,7 +72,6 @@ export const ALL_SECTIONS: SectionKey[] = [
   'layout',
   'languages',
   'navigation',
-  'userSettings',
   'translations',
 ];
 

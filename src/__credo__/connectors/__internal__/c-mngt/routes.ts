@@ -153,6 +153,10 @@ export const C_MNGT_ROUTES = {
 
     AUTH: {
       ME: { PATH: '/me', METHOD: 'GET' },
+
+      LOGIN: { PATH: '/login', METHOD: 'POST' },
+      REFRESH: { PATH: '/refresh', METHOD: 'POST' },
+      LOGIN_WITH_TOKEN: { PATH: '/login-with-token', METHOD: 'POST' },
     },
   },
 } as const;

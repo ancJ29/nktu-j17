@@ -279,27 +279,6 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
 
             return { success: response.success };
           },
-
-          saveProfile: async () => {
-            if (!api.saveProfile) {
-              logger.warn('Save profile not implemented');
-              return;
-            }
-
-            const state = get();
-            const token = state.token;
-            if (!token) {
-              logger.warn('Cannot save profile: no token');
-              return;
-            }
-
-            const user = state.user;
-            await api.saveProfile({
-              token,
-              name: user.name || '',
-              email: user.email || '',
-            });
-          },
         }),
         {
           name: persistKey,

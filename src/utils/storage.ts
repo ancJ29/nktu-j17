@@ -9,16 +9,6 @@ export enum PcStorageKey {
   NAVBAR_OPENED = '__PC_NAVBAR_OPENED__',
 }
 
-export enum MobileStorageKey {
-  IS_COMPACT = '__MOBILE_IS_COMPACT__',
-}
-
-export type UserSettings = {
-  shared?: Partial<Record<SharedStorageKey, unknown>>;
-  pc?: Partial<Record<PcStorageKey, unknown>>;
-  mobile?: Partial<Record<MobileStorageKey, unknown>>;
-};
-
 type Namespace = 'shared' | 'pc' | 'mobile';
 
 function createUserStorage<K extends string>(namespace: Namespace) {
@@ -67,28 +57,3 @@ function createUserStorage<K extends string>(namespace: Namespace) {
 export const sharedUserStorage = createUserStorage<SharedStorageKey>('shared');
 
 export const pcUserStorage = createUserStorage<PcStorageKey>('pc');
-
-export const mobileUserStorage = createUserStorage<MobileStorageKey>('mobile');
-
-export const compositeUserStorage = {
-  exportSettings(): Record<string, unknown> {
-    return {
-      shared: sharedUserStorage.exportSettings(),
-      pc: pcUserStorage.exportSettings(),
-      mobile: mobileUserStorage.exportSettings(),
-    };
-  },
-
-  importSettings(settings: Record<string, unknown>): void {
-    const s = settings as UserSettings;
-    if (s.shared) sharedUserStorage.importSettings(s.shared as Record<string, unknown>);
-    if (s.pc) pcUserStorage.importSettings(s.pc as Record<string, unknown>);
-    if (s.mobile) mobileUserStorage.importSettings(s.mobile as Record<string, unknown>);
-  },
-
-  onChange(callback: () => void): void {
-    sharedUserStorage.onChange(callback);
-    pcUserStorage.onChange(callback);
-    mobileUserStorage.onChange(callback);
-  },
-};

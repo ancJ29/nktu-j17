@@ -780,7 +780,6 @@
   "configuration": {
     "appConfig": "App Config",
     "debug": "Debug",
-    "fakeData": "Fake Data",
     "materials": "Materials",
     "title": "Configuration"
   },
@@ -1641,167 +1640,6 @@
     "unexpected": {
       "message": "This page couldn't be opened. Reload to try again — if it keeps happening, contact your administrator.",
       "title": "Something went wrong"
-    }
-  },
-  "fakeData": {
-    "changeSecrets": "Change secrets",
-    "clientCode": "Client code",
-    "configureSecrets": "Configure secrets",
-    "customers": {
-      "confirmBody": "This will OVERWRITE all existing customer records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
-      "confirmTitle": "Overwrite all customers?",
-      "count": "Customer count",
-      "countHelp": "Names use industry-aware customer-type pools (food: restaurants/cafes; mechanical: factories/contractors). Codes are sequential (CST-NNNN).",
-      "description": "Replaces ALL existing customer records for this client. Used as the source of truth for sales orders.",
-      "title": "Seed Customers"
-    },
-    "employees": {
-      "confirmBody": "This will OVERWRITE all existing employee records for client \"{{clientCode}}\" with {{count}} new row(s) and create matching SSO users. Continue?",
-      "confirmBodyRandom": "This will OVERWRITE all existing employee records for client \"{{clientCode}}\" — generating 2-5 employees per department from App Config and creating matching SSO users. Continue?",
-      "confirmTitle": "Overwrite all employees?",
-      "count": "Employee count",
-      "description": "Replaces ALL existing employee records for this client and creates matching SSO users.",
-      "jsonEmpty": "Provide at least one employee row.",
-      "jsonHelp": "Array of rows. Fields (all optional): name, firstName, lastName, department, phone, personalPhone, email, position, code, gender. Persisted per client in localStorage.",
-      "jsonInvalid": "Invalid JSON: {{error}}",
-      "jsonLabel": "Employees JSON",
-      "jsonNotArray": "JSON root must be an array of employee rows.",
-      "parsedRows": "Parsed rows",
-      "randomCoverage": "Random mode walks every department configured in App Config and seeds 2-5 employees per department. The total count is determined at run time.",
-      "skipSso": "Skip SSO user creation",
-      "skipSsoHelp": "When on, only the employee records are written — no SSO login accounts are created.",
-      "source": "Data source",
-      "title": "Seed Employees"
-    },
-    "failures": "SSO failures",
-    "goodsReceipts": {
-      "confirmBody": "This will write {{count}} new goods-receipt record(s) for client \"{{clientCode}}\" spread across the last {{daysBack}} day(s). Existing receipts in the same date partitions will be OVERWRITTEN. Continue?",
-      "confirmTitle": "Seed goods receipts?",
-      "count": "Receipt count",
-      "countHelp": "How many GR records to generate. They will be spread randomly across the chosen day window.",
-      "daysBack": "Spread over (days)",
-      "daysBackHelp": "Date window to scatter receipts in. Defaults to 14 days to match the list page query window.",
-      "description": "Seeds partitioned goods-receipt records for the last N days. Picks vendors and locations from existing master data, items from the chosen industry pool. Status mix: ~60% draft, ~30% received, ~10% cancelled.",
-      "inventoryWarning": "This bypasses the BFF, so receipts marked \"received\" do NOT bump inventory. Use the UI Confirm action to test the inventory side-effect chain.",
-      "title": "Seed Goods Receipts"
-    },
-    "industry": {
-      "description": "Selects the source JSON (scripts/faker/data/*.json) used by lookups, products and materials. Fixed codes from the JSON keep order references stable across reruns.",
-      "label": "Industry",
-      "lookups": "Lookup entries",
-      "materials": "Materials in pool",
-      "products": "Products in pool",
-      "title": "Industry catalog"
-    },
-    "log": "Progress log",
-    "lookupsSeed": {
-      "confirmBody": "This will OVERWRITE all lookup rows for client \"{{clientCode}}\" with {{count}} new entr(y/ies) across every category. Continue?",
-      "confirmTitle": "Overwrite all lookups?",
-      "description": "Replaces ALL existing lookup rows for this client across every category (product-category, product-tag, unit, material-category, material-unit).",
-      "jsonEmpty": "Provide at least one lookup row.",
-      "jsonHelp": "Array of rows. Required: category, value (or label). Optional: label (defaults to value), sortOrder (auto). Categories: product-category, product-tag, unit, material-category, material-unit. Persisted per client in localStorage.",
-      "jsonInvalid": "Invalid JSON: {{error}}",
-      "jsonLabel": "Lookups JSON",
-      "jsonMissingFields": "Every row must include \"category\" and either \"value\" or \"label\".",
-      "jsonNotArray": "JSON root must be an array of lookup rows.",
-      "parsedRows": "Parsed rows",
-      "title": "Seed Meta-data (Lookups)"
-    },
-    "materialInventory": {
-      "confirmBody": "This will OVERWRITE all existing material-inventory rows for client \"{{clientCode}}\" with up to {{count}} new row(s). Continue?",
-      "confirmTitle": "Overwrite all material inventory?",
-      "count": "Row count",
-      "countHelp": "Number of (material, location) pairs to seed. Capped at materials × locations.",
-      "description": "Replaces ALL existing material-inventory rows. Materials and locations must already exist (fetched live from BFF). Reservations are intentionally left empty.",
-      "maxQty": "Max base-unit qty",
-      "maxQtyHelp": "Per-row on-hand is sampled uniformly from 0 to this number, in the material's base unit.",
-      "multiUnitSplit": "Allow multi-unit split",
-      "multiUnitSplitHelp": "When the material has unit conversions, also place some stock in a non-base unit (e.g. some KG, some BAG_5KG).",
-      "overwriteWarning": "Inventory rows replace the entire material-inventory envelope — there is no merge. Existing rows for this client are dropped.",
-      "title": "Seed Material Inventory"
-    },
-    "materials": {
-      "confirmBody": "This will OVERWRITE all existing material records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
-      "confirmTitle": "Overwrite all materials?",
-      "count": "Material count",
-      "countHelp": "Takes the first N rows from the industry JSON (max {{max}}).",
-      "description": "Replaces ALL existing material records with the selected industry catalog. Codes are fixed (e.g. MAT-FLOUR-WHEAT-T00) so downstream references stay stable.",
-      "title": "Seed Materials"
-    },
-    "missingSecrets": "Provide the trusted service credentials to enable seeding.",
-    "productInventory": {
-      "confirmBody": "This will OVERWRITE all existing product-inventory rows for client \"{{clientCode}}\" with up to {{count}} new row(s). Continue?",
-      "confirmTitle": "Overwrite all product inventory?",
-      "count": "Row count",
-      "countHelp": "Number of (product, location) pairs to seed. Capped at products × locations.",
-      "description": "Replaces ALL existing product-inventory rows. Products and locations must already exist (fetched live from BFF). Reservations are intentionally left empty.",
-      "maxQty": "Max base-unit qty",
-      "maxQtyHelp": "Per-row on-hand is sampled uniformly from 0 to this number, in the product's base unit.",
-      "multiUnitSplit": "Allow multi-unit split",
-      "multiUnitSplitHelp": "When the product has unit conversions, also place some stock in a non-base unit (e.g. some KG, some BAG_5KG).",
-      "overwriteWarning": "Inventory rows replace the entire product-inventory envelope — there is no merge. Existing rows for this client are dropped.",
-      "title": "Seed Product Inventory"
-    },
-    "products": {
-      "confirmBody": "This will OVERWRITE all existing product records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
-      "confirmTitle": "Overwrite all products?",
-      "count": "Product count",
-      "countHelp": "Takes the first N rows from the industry JSON (max {{max}}).",
-      "description": "Replaces ALL existing product records with the selected industry catalog. Codes are fixed (e.g. PRD-NOODLE-SHRIMP) so downstream references stay stable.",
-      "title": "Seed Products"
-    },
-    "purge": {
-      "button": "Delete all data (except employees)",
-      "confirmBody": "This will permanently DELETE every fake-data record for client \"{{clientCode}}\" — products, materials, customers, vendors, lookups, sales orders, delivery requests, goods receipts, and all inventory rows. Employees and locations will be kept. This cannot be undone. Continue?",
-      "confirmOk": "Yes, delete everything",
-      "confirmTitle": "Delete all data except employees?",
-      "description": "Removes every fake-data prefix scoped to this client. Employees and locations are preserved so admins keep their logins and the seeders can still use existing locations.",
-      "runSuccess": "Purge complete.",
-      "summaryRemoved": "Removed: {{count}} record(s)",
-      "title": "Purge data (except employees)",
-      "warning": "Destructive action. This deletes ALL master data, transactional data, and inventory for this client. There is no undo."
-    },
-    "runError": "Seeding failed: {{error}}",
-    "runSuccess": "Seeding complete.",
-    "salesOrders": {
-      "confirmBody": "This will write {{count}} new sales-order record(s) for client \"{{clientCode}}\" spread across the last {{daysBack}} day(s). Existing orders in the same date partitions will be OVERWRITTEN. Continue?",
-      "confirmTitle": "Seed sales orders?",
-      "count": "Order count",
-      "countHelp": "How many SO records to generate. They will be spread randomly across the chosen day window.",
-      "daysBack": "Spread over (days)",
-      "daysBackHelp": "Date window to scatter orders in. Defaults to 14 days to match the list page query window.",
-      "description": "Seeds partitioned sales-order records for the last N days. Pulls customers, products, employees and locations LIVE from the BFF and uses your configured statuses / delivery methods / tags. Stage mix: ~25% NEW, ~45% IN_PROGRESS, ~25% COMPLETED, ~5% EXCEPTIONAL — plus a ~5% cancellation flag overlay.",
-      "inventoryWarning": "This bypasses the BFF transition engine, so orders that land in a reservesStock / shipsStock status do NOT touch product-inventory. Use the UI status transitions to test the inventory chain.",
-      "title": "Seed Sales Orders"
-    },
-    "secretsHelp": "Stored in sessionStorage only — cleared when you close this tab.",
-    "secretsTitle": "Seed credentials",
-    "source": "Data source",
-    "sourceJson": "From JSON",
-    "sourceRandom": "Random",
-    "subtitle": "Seed fake records for the current client — dev/test only.",
-    "summary": "Result",
-    "summaryRecords": "Records: {{count}}",
-    "summarySso": "SSO: created {{created}}, failed {{failed}}",
-    "title": "Fake Data Generator",
-    "transactionalPurge": {
-      "button": "Delete transactional data",
-      "confirmBody": "This will permanently DELETE every goods-receipt, sales-order, and delivery-request record for client \"{{clientCode}}\" across all date partitions. Master data and inventory rows will be kept. This cannot be undone. Continue?",
-      "confirmOk": "Yes, delete transactional data",
-      "confirmTitle": "Delete transactional data?",
-      "description": "Removes date-partitioned transactional records only: goods receipts, sales orders, delivery requests. Master data (employees, products, materials, customers, vendors, lookups, locations) and inventory rows are preserved so the operator can replay flows without re-seeding.",
-      "runSuccess": "Transactional data deleted.",
-      "summaryRemoved": "Removed: {{count}} record(s)",
-      "title": "Delete transactional data",
-      "warning": "Destructive action. This deletes ALL goods receipts, sales orders, and delivery requests for this client. There is no undo."
-    },
-    "vendors": {
-      "confirmBody": "This will OVERWRITE all existing vendor records for client \"{{clientCode}}\" with {{count}} new row(s). Continue?",
-      "confirmTitle": "Overwrite all vendors?",
-      "count": "Vendor count",
-      "countHelp": "Names use industry-aware company-type pools (food vs mechanical). Codes are sequential (VND-NNNN).",
-      "description": "Replaces ALL existing vendor records for this client. Vendors are required by the Goods Receipts seeder.",
-      "title": "Seed Vendors"
     }
   },
   "goodsReceipts": {
@@ -4025,9 +3863,6 @@
     "actions": {
       "cancel": "Cancel order"
     },
-    "bangKe": {
-      "export": "Export statement"
-    },
     "billing": {
       "advance": "Advance",
       "balanceDue": "Balance due",
@@ -4070,6 +3905,9 @@
       "wholeOrder": "This order"
     },
     "copiedFrom": "Copied from {{code}} — adjust and save as a new order.",
+    "customerReport": {
+      "export": "Export customer report"
+    },
     "detail": {
       "activitiesError": "Failed to load activities.",
       "activitiesLoadMore": "Load more",
@@ -4168,6 +4006,9 @@
       "cancelled": "Transport order cancelled",
       "createError": "Failed to create transport order",
       "created": "Transport order created",
+      "customerReportNeedCustomer": "Pick a customer in the filter to export their report.",
+      "customerReportSuccess_one": "Exported customer report with {{count}} order.",
+      "customerReportSuccess_other": "Exported customer report with {{count}} orders.",
       "deleted": "Transport order deleted",
       "exportEmpty": "Nothing to export — adjust the filters and try again.",
       "exportError": "Failed to export transport orders.",
@@ -4178,10 +4019,7 @@
       "saveError": "Failed to save changes",
       "tripLogSyncError": "The truck trip log could not be updated. It will retry the next time this order is opened.",
       "updateError": "Failed to update transport order",
-      "updated": "Transport order updated",
-      "bangKeNeedCustomer": "Pick a customer in the filter to export the statement.",
-      "bangKeSuccess_one": "Exported statement with {{count}} order.",
-      "bangKeSuccess_other": "Exported statement with {{count}} orders."
+      "updated": "Transport order updated"
     },
     "route": {
       "collapse": "Collapse trips",

@@ -12,7 +12,8 @@ type T = (key: string, options?: Record<string, unknown>) => string;
 
 export type OilTankColumnsContext = {
   t: T;
-  formatNumber: (value: number | undefined) => string;
+
+  formatLitres: (value: number | undefined) => string;
 };
 
 function dimmed(value: string | undefined): ReactNode {
@@ -25,7 +26,7 @@ function dimmed(value: string | undefined): ReactNode {
   );
 }
 
-export function levelCell(item: OilTankRow, t: T, formatNumber: (v?: number) => string): ReactNode {
+export function levelCell(item: OilTankRow, t: T, formatLitres: (v?: number) => string): ReactNode {
   const { currentLevel, capacity } = item.extra ?? {};
   if (typeof currentLevel !== 'number') {
     return (
@@ -45,11 +46,11 @@ export function levelCell(item: OilTankRow, t: T, formatNumber: (v?: number) => 
           fw={600}
           c={tone && tone !== 'neutral' ? LEVEL_TONE_COLOR[tone] : undefined}
         >
-          {formatNumber(currentLevel)}
+          {formatLitres(currentLevel)}
         </Text>
         {typeof capacity === 'number' && capacity > 0 && (
           <Text size="xs" c="dimmed">
-            / {formatNumber(capacity)} {t('oilTanks.unitLitre')}
+            / {formatLitres(capacity)} {t('oilTanks.unitLitre')}
           </Text>
         )}
       </Group>
@@ -74,7 +75,7 @@ export const OIL_TANK_CONFIG = {
   routes: ROUTES.OIL_TANKS,
   i18nKey: 'oilTanks',
   Icon: IconBucketDroplet,
-  columns: ({ t, formatNumber }: OilTankColumnsContext): DataTableColumn<OilTankRow>[] => [
+  columns: ({ t, formatLitres }: OilTankColumnsContext): DataTableColumn<OilTankRow>[] => [
     {
       key: 'name',
       header: t('common.labels.name'),
@@ -102,7 +103,7 @@ export const OIL_TANK_CONFIG = {
       key: 'level',
       header: t('oilTanks.columns.level'),
       ta: 'right',
-      render: (item: OilTankRow) => levelCell(item, t, formatNumber),
+      render: (item: OilTankRow) => levelCell(item, t, formatLitres),
     },
     {
       key: 'status',

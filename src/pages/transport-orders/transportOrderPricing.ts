@@ -60,6 +60,8 @@ export function isBillableFee(fee: Pick<TransportOrderFee, 'kind' | 'payer'>): b
   return true;
 }
 
+export const feeKey = (label: string) => label.trim().replace(/\s+/g, ' ').toLocaleLowerCase('vi');
+
 export type TransportOrderTotals = {
   serviceSubtotal: number;
 

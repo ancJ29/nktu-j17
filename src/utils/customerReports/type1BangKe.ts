@@ -3,10 +3,12 @@ import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
 import { orderPlanDate, orderPlanSortKey } from '@/pages/transport-orders/planDate';
 import {
+  feeKey,
   isBillableFee,
   orderTotals,
   readFeeLines,
 } from '@/pages/transport-orders/transportOrderPricing';
+import type { CustomerReportBuilder } from './types';
 
 type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
 type CellValue = string | number;
@@ -19,36 +21,23 @@ const FMT_MONEY = '#,##0';
 
 const FMT_MONEY_DASH = '#,##0;-#,##0;"-"';
 
-export type BangKeTemplateSettings = {
-  serviceFeeColumns?: string[];
+const PAYMENT_BLOCKS = [
+  {
+    intro:
+      'Vui lòng thanh toán cho công ty chúng tôi PHÍ VẬN CHUYỂN trên bằng chuyển khoản theo thông tin:',
 
-  otherFeesColumn?: boolean;
-
-  noteColumn?: 'auto' | 'always' | 'never';
-
-  footerSummary?: boolean;
-};
-
-export type TransportOrderBangKeOptions = {
-  seller: { name: string; address: string; taxCode: string };
-
-  customer: { name: string; address?: string; taxCode?: string };
-
-  resolveShipmentType: (value: string) => string;
-  resolveContainerSize: (value: string) => string;
-
-  resolveFeeName: (value: string) => string;
-
-  getTruckPlate: (truckId: string | undefined | null) => string | undefined;
-
-  template?: BangKeTemplateSettings;
-
-  titleSuffix?: string;
-};
-
-const feeKey = (label: string) => label.trim().replace(/\s+/g, ' ').toLocaleLowerCase('vi');
-
-const OTHER_FEES_KEY = '__other__';
+    beneficiaryLabel: 'Công ty thụ hưởng:',
+    beneficiary: undefined as string | undefined,
+    account: '102 796 7777  Tại ngân hàng Vietcombank, Chi nhánh Hồ Chí Minh',
+  },
+  {
+    intro:
+      'Vui lòng thanh toán PHÍ CHI HỘ cho chúng tôi số tiền nêu trên bằng chuyển khoản theo thông tin:',
+    beneficiaryLabel: 'Người thụ hưởng:',
+    beneficiary: 'VÕ VĂN HÀO',
+    account: '19038044220014 Tại Ngân hàng kỹ thương Việt Nam (Techcombank)',
+  },
+] as const;
 
 function bangKePeriodLabel(orders: ReadonlyArray<TransportOrder>): string {
   let earliest = Number.POSITIVE_INFINITY;
@@ -81,8 +70,8 @@ function billedLines(
     .map((f) => ({ ...f, label: resolveFeeName(f.label) }));
 }
 
-export function buildTransportOrderBangKeWorkbook(
-  orders: ReadonlyArray<TransportOrder>,
+export const buildCustomerReportType1: CustomerReportBuilder = (
+  orders,
   {
     seller,
     customer,
@@ -90,10 +79,9 @@ export function buildTransportOrderBangKeWorkbook(
     resolveContainerSize,
     resolveFeeName,
     getTruckPlate,
-    template,
     titleSuffix,
-  }: TransportOrderBangKeOptions,
-): { workbook: XLSX.WorkBook; rowCount: number } {
+  },
+) => {
   const rows = orders
     .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
     .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
@@ -104,25 +92,13 @@ export function buildTransportOrderBangKeWorkbook(
     feeColIndex.set(feeKey(label), feeCols.length);
     feeCols.push({ key: feeKey(label), header: label.trim().toLocaleUpperCase('vi') });
   };
-  const configuredColumns = (template?.serviceFeeColumns ?? [])
-    .map((l) => l.trim())
-    .filter(Boolean);
-  for (const label of configuredColumns) {
-    if (!feeColIndex.has(feeKey(label))) addFeeCol(label);
-  }
-
-  let otherColIndex = -1;
-  if (configuredColumns.length > 0 && (template?.otherFeesColumn ?? true)) {
-    otherColIndex = feeCols.length;
-    feeCols.push({ key: OTHER_FEES_KEY, header: 'PHÍ KHÁC' });
-  }
   for (const o of rows) {
     for (const fee of billedLines(o, 'service', resolveFeeName)) {
-      if (!feeColIndex.has(feeKey(fee.label)) && otherColIndex < 0) addFeeCol(fee.label);
+      if (!feeColIndex.has(feeKey(fee.label))) addFeeCol(fee.label);
     }
   }
 
-  const feeColOf = (label: string) => feeColIndex.get(feeKey(label)) ?? otherColIndex;
+  const feeColOf = (label: string) => feeColIndex.get(feeKey(label)) ?? -1;
 
   const sizeValues: string[] = [];
   for (const o of rows) {
@@ -130,14 +106,10 @@ export function buildTransportOrderBangKeWorkbook(
   }
   if (sizeValues.length === 0) sizeValues.push('20', '40');
 
-  let chiHoGroups = 0;
-  for (const o of rows)
-    chiHoGroups = Math.max(chiHoGroups, billedLines(o, 'passthrough', resolveFeeName).length);
+  const hasChiHo = rows.some((o) => billedLines(o, 'passthrough', resolveFeeName).length > 0);
 
-  const noteMode = template?.noteColumn ?? 'auto';
-  const hasNotes =
-    noteMode === 'always' || (noteMode === 'auto' && rows.some((o) => !!o.notes?.trim()));
-  const showFooter = template?.footerSummary ?? true;
+  const hasNotes = rows.some((o) => !!o.notes?.trim());
+  const showFooter = true;
 
   const rates = new Set(rows.map((o) => o.vatRate ?? 0));
   const uniformRate = rates.size === 1 ? [...rates][0]! : undefined;
@@ -159,7 +131,7 @@ export function buildTransportOrderBangKeWorkbook(
   const C_TOTAL = C_VAT + 1;
   const C_NOTE = hasNotes ? C_TOTAL + 1 : -1;
   const C_CHIHO0 = (hasNotes ? C_NOTE : C_TOTAL) + 1;
-  const colCount = C_CHIHO0 + chiHoGroups * 3;
+  const colCount = C_CHIHO0 + (hasChiHo ? 3 : 0);
   const lastCol = colCount - 1;
 
   const aoa: CellValue[][] = [];
@@ -216,14 +188,7 @@ export function buildTransportOrderBangKeWorkbook(
   group(C_FEE0, C_VAT, 'PHÍ DỊCH VỤ', [...feeCols.map((f) => f.header), vatHeader]);
   leaf(C_TOTAL, 'TỔNG CỘNG');
   if (hasNotes) leaf(C_NOTE, 'NOTE');
-  if (chiHoGroups > 0) {
-    group(
-      C_CHIHO0,
-      lastCol,
-      'PHÍ CHI HỘ',
-      Array.from({ length: chiHoGroups }, () => ['SỐ TIỀN', 'SỐ HĐ', 'TÊN PHÍ']).flat(),
-    );
-  }
+  if (hasChiHo) group(C_CHIHO0, lastCol, 'PHÍ CHI HỘ', ['SỐ TIỀN', 'SỐ HĐ', 'TÊN PHÍ']);
   aoa.push(head1, head2);
 
   const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
@@ -270,13 +235,18 @@ export function buildTransportOrderBangKeWorkbook(
     if (serviceTotal !== 0) row[C_TOTAL] = serviceTotal;
     if (hasNotes) row[C_NOTE] = o.notes ?? '';
 
-    billedLines(o, 'passthrough', resolveFeeName).forEach((fee, g) => {
-      const c = C_CHIHO0 + g * 3;
-      if (fee.amount) row[c] = fee.amount;
-      row[c + 1] = fee.invoiceNo ?? '';
-      row[c + 2] = fee.label;
-      sumChiHo += fee.amount || 0;
-    });
+    if (hasChiHo) {
+      const lines = billedLines(o, 'passthrough', resolveFeeName);
+      const amount = lines.reduce((sum, f) => sum + (f.amount || 0), 0);
+      if (amount) row[C_CHIHO0] = amount;
+
+      row[C_CHIHO0 + 1] = lines
+        .map((f) => f.invoiceNo?.trim())
+        .filter(Boolean)
+        .join('; ');
+      row[C_CHIHO0 + 2] = lines.map((f) => f.label).join('; ');
+      sumChiHo += amount;
+    }
 
     sumService += totals.serviceSubtotal;
     sumVat += totals.vatAmount;
@@ -303,11 +273,8 @@ export function buildTransportOrderBangKeWorkbook(
     });
     row[C_VAT] = sumVat;
     row[C_TOTAL] = sumService + sumVat;
-    for (let g = 0; g < chiHoGroups; g++) {
-      let sum = 0;
-      for (const o of rows) sum += billedLines(o, 'passthrough', resolveFeeName)[g]?.amount ?? 0;
-      row[C_CHIHO0 + g * 3] = sum;
-    }
+
+    if (hasChiHo) row[C_CHIHO0] = sumChiHo;
     aoa.push(row);
   }
 
@@ -327,6 +294,36 @@ export function buildTransportOrderBangKeWorkbook(
     rFirstSummary = summary('Số tiền cước vận chuyển:', sumService + sumVat);
     summary('Số tiền chi hộ:', sumChiHo);
     rLastSummary = summary('Tổng số tiền cần thanh toán:', sumService + sumVat + sumChiHo);
+  }
+
+  const paymentLines: number[] = [];
+  const introRows = new Set<number>();
+  const fullWidthRow = (text: string): number => {
+    const r = aoa.length;
+    const row: CellValue[] = new Array(colCount).fill('');
+    row[0] = text;
+    aoa.push(row);
+    merges.push({ s: { r, c: 0 }, e: { r, c: colCount - 1 } });
+    paymentLines.push(r);
+    return r;
+  };
+  for (const block of PAYMENT_BLOCKS) {
+    blankRow();
+    introRows.add(fullWidthRow(block.intro));
+    fullWidthRow(`${block.beneficiaryLabel} ${block.beneficiary ?? seller.name}`);
+    fullWidthRow(`Số tài khoản: ${block.account}`);
+  }
+
+  blankRow();
+  const rSign = aoa.length;
+  const cSignRight = Math.ceil(colCount / 2);
+  {
+    const row: CellValue[] = new Array(colCount).fill('');
+    row[0] = customer.name;
+    row[cSignRight] = seller.name;
+    aoa.push(row);
+    merges.push({ s: { r: rSign, c: 0 }, e: { r: rSign, c: cSignRight - 1 } });
+    merges.push({ s: { r: rSign, c: cSignRight }, e: { r: rSign, c: colCount - 1 } });
   }
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
@@ -400,24 +397,18 @@ export function buildTransportOrderBangKeWorkbook(
     setFmt(r, C_TOTAL, FMT_MONEY);
   }
 
+  for (const r of paymentLines) {
+    setStyle(r, 0, {
+      font: { bold: introRows.has(r), italic: introRows.has(r) },
+      alignment: { horizontal: 'left', vertical: 'center' },
+    });
+  }
+
+  for (const c of [0, cSignRight]) {
+    setStyle(rSign, c, { font: { bold: true }, alignment: { horizontal: 'center' } });
+  }
+
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
   return { workbook, rowCount: rows.length };
-}
-
-export function exportTransportOrderBangKe(
-  orders: ReadonlyArray<TransportOrder>,
-  options: TransportOrderBangKeOptions & {
-    fileTag?: string;
-  },
-): number {
-  const { workbook, rowCount } = buildTransportOrderBangKeWorkbook(orders, options);
-  if (rowCount === 0) return 0;
-  const now = new Date();
-  const yyyy = now.getFullYear();
-  const mm = String(now.getMonth() + 1).padStart(2, '0');
-  const dd = String(now.getDate()).padStart(2, '0');
-  const tag = options.fileTag ? `${options.fileTag}_` : '';
-  XLSX.writeFile(workbook, `bang_ke_${tag}${yyyy}-${mm}-${dd}.xlsx`);
-  return rowCount;
-}
+};

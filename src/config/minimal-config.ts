@@ -66,7 +66,6 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
       },
     ],
   },
-  userSettings: { syncDebounceDelay: 5000 },
 
   features: {
     common: {

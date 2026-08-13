@@ -48,7 +48,7 @@ export { SalesOrderStatusOptionEditor } from './editors/SalesOrderStatusOptionEd
 export { SalesOrderTagOptionEditor } from './editors/SalesOrderTagOptionEditor';
 export { StatusAllowedDepartmentsMatrixEditor } from './editors/StatusAllowedDepartmentsMatrixEditor';
 export { StatusTransitionMatrixEditor } from './editors/StatusTransitionMatrixEditor';
-export { TransportOrderBangKeTemplateEditor } from './editors/TransportOrderBangKeTemplateEditor';
+export { CustomerReportTypeEditor } from './editors/CustomerReportTypeEditor';
 export { TransportOrderConfigInvariantAlert } from './editors/TransportOrderConfigInvariantAlert';
 export { TransportOrderStatusOptionEditor } from './editors/TransportOrderStatusOptionEditor';
 
@@ -65,4 +65,3 @@ export { LayoutSection } from './sections/LayoutSection';
 export { PermissionsConfigSection } from './sections/PermissionsConfigSection';
 export { ThemeConfigSection } from './sections/ThemeConfigSection';
 export { TranslationsSection } from './sections/TranslationsSection';
-export { UserSettingsSection } from './sections/UserSettingsSection';

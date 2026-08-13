@@ -4,11 +4,12 @@ import type {
   DepartmentOption,
   SalesOrderStatusOption,
   DeliveryRequestStatusOption,
-  TransportOrderBangKeTemplateConfig,
   TransportOrderStatusOptionConfig,
   TagOption,
 } from '@/config/schema';
 import type { GoodsReceiptStatus } from '@/types';
+
+import { DEFAULT_CUSTOMER_REPORT_TYPE } from '@/utils/customerReports/types';
 import {
   BASE_PERMISSIONS,
   type Permissions,
@@ -208,16 +209,14 @@ export function getTransportOrderStatusTransitions(): Record<string, string[]> {
   );
 }
 
-export function resolveTransportOrderBangKeTemplate(
-  customerCode: string,
-): TransportOrderBangKeTemplateConfig | undefined {
-  const templates =
+export function resolveCustomerReportType(customerCode: string): number {
+  const map =
     (
       appConfig as {
-        features?: { transportOrders?: { bangKeTemplates?: TransportOrderBangKeTemplateConfig[] } };
+        features?: { transportOrders?: { customerReportTypes?: Record<string, number> } };
       }
-    )?.features?.transportOrders?.bangKeTemplates ?? [];
-  return templates.find((t) => (t.customerCodes ?? []).includes(customerCode));
+    )?.features?.transportOrders?.customerReportTypes ?? {};
+  return map[customerCode] ?? DEFAULT_CUSTOMER_REPORT_TYPE;
 }
 
 export function getDeliveryRequestDriverDepartments(): string[] {
