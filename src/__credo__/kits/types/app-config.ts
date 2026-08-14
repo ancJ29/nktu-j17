@@ -1,5 +1,7 @@
 export type AppInfo = {
   name: string;
+
+  nameHtml?: string;
   description?: string;
   logoUrl?: string;
 

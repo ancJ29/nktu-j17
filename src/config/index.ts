@@ -231,6 +231,11 @@ setDynamicManifest({
 
 export const { themeConfig } = appConfig;
 
+export const appBrand = {
+  name: appConfig.app.name,
+  nameHtml: appConfig.app.nameHtml,
+} as const;
+
 export const featureFlags = (validated as import('./schema').CMngtAppConfig).features;
 
 refreshConfigFromBackend().catch(console.error);

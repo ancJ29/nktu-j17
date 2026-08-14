@@ -10,6 +10,8 @@ export type IconComponent = ComponentType<IconProps>;
 
 export type AuthBranding = {
   appName?: string;
+
+  appNameHtml?: string;
   description?: string;
   logoUrl?: string;
 };

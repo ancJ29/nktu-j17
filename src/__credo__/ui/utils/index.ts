@@ -15,5 +15,6 @@ export * from './mantine-theme';
 export * from './misc';
 export * from './nav';
 export * from './palettes';
+export * from './sanitize-html';
 export * from './storage';
 export * from './string';

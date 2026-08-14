@@ -1,4 +1,4 @@
-import { appConfig, themeConfig } from '@/config';
+import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { Auth, IconName } from '@credo/base-ui/components';
@@ -84,7 +84,8 @@ function RegisterForm() {
         login: ROUTES.AUTH.LOGIN,
       }}
       branding={{
-        appName: appConfig.app.name,
+        appName: appBrand.name,
+        appNameHtml: appBrand.nameHtml,
         logoUrl: appConfig.app.logoUrl,
         description: appConfig.app.description,
       }}

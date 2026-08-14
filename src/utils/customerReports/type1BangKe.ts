@@ -21,6 +21,82 @@ const FMT_MONEY = '#,##0';
 
 const FMT_MONEY_DASH = '#,##0;-#,##0;"-"';
 
+const SIZE_BUCKETS = [
+  { key: '20', header: '20ft' },
+  { key: '40', header: '40ft' },
+] as const;
+
+function sizeBucketIndex(containerSize: string | undefined): number {
+  const digits = (containerSize ?? '').trim().match(/^(\d+)/)?.[1];
+  return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
+}
+
+type Type1FeeColumnKey = 'freight' | 'surcharge' | 'handling' | 'demurrage' | 'other';
+
+const SERVICE_FEE_COLUMNS: ReadonlyArray<{ key: Type1FeeColumnKey; header: string }> = [
+  { key: 'freight', header: 'PHÍ VẬN CHUYỂN' },
+  { key: 'surcharge', header: 'PHỤ THU VC' },
+  { key: 'handling', header: 'BỐC XẾP' },
+  { key: 'demurrage', header: 'PHÍ NEO XE' },
+  { key: 'other', header: 'PHÍ KHÁC' },
+];
+
+const FALLBACK_FEE_COLUMN: Type1FeeColumnKey = 'other';
+
+const FEE_NAME_COLUMN: Readonly<Record<string, Type1FeeColumnKey>> = {
+  PHI_VAN_CHUYEN: 'freight',
+  PHI_GUI: 'other',
+  PHI_HA_SOM: 'other',
+  PHI_KHAC: 'other',
+  PHI_NEO_XE: 'demurrage',
+  PHI_TRAM: 'surcharge',
+  PHI_ĐIEN_KHOAN: 'other',
+
+  PHU_THU_VAN_CHUYEN: 'surcharge',
+  BOC_XEP: 'handling',
+  VE_TRAM_PHU_HUU: 'surcharge',
+  VE_TRAM_XLHN: 'surcharge',
+  PHI_THAO_NHAN: 'other',
+  LO_XE: 'other',
+  VE_SINH_CONT: 'other', // Vệ sinh cont
+};
+
+export const CHI_HO_FEE_NAMES: ReadonlyArray<string> = [
+  'PHI_CAN_XE',
+  'PHI_NANG',
+  'PHI_HA',
+  'PHI_QUA_KHAU', // Phí qua khẩu
+];
+
+const NORMALIZED_FEE_COLUMN: ReadonlyMap<string, Type1FeeColumnKey> = new Map(
+  Object.entries(FEE_NAME_COLUMN).map(([value, col]) => [feeKey(value), col]),
+);
+
+function serviceFeeColumnOf(
+  storedValue: string,
+  resolvedLabel: string,
+  labelKeyed: ReadonlyMap<string, Type1FeeColumnKey>,
+): Type1FeeColumnKey {
+  const direct = FEE_NAME_COLUMN[storedValue];
+  if (direct) return direct;
+
+  const normalized = NORMALIZED_FEE_COLUMN.get(feeKey(storedValue));
+  if (normalized) return normalized;
+
+  return labelKeyed.get(feeKey(resolvedLabel)) ?? FALLBACK_FEE_COLUMN;
+}
+
+function buildLabelKeyedColumns(
+  resolveFeeName: (value: string) => string,
+): Map<string, Type1FeeColumnKey> {
+  const map = new Map<string, Type1FeeColumnKey>();
+  for (const [value, col] of Object.entries(FEE_NAME_COLUMN)) {
+    const label = resolveFeeName(value);
+    if (label) map.set(feeKey(label), col);
+  }
+  return map;
+}
+
 const PAYMENT_BLOCKS = [
   {
     intro:
@@ -76,7 +152,7 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     seller,
     customer,
     resolveShipmentType,
-    resolveContainerSize,
+
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -86,27 +162,17 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
     .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
 
-  const feeCols: { key: string; header: string }[] = [];
-  const feeColIndex = new Map<string, number>();
-  const addFeeCol = (label: string) => {
-    feeColIndex.set(feeKey(label), feeCols.length);
-    feeCols.push({ key: feeKey(label), header: label.trim().toLocaleUpperCase('vi') });
-  };
+  const feeCols = SERVICE_FEE_COLUMNS;
+  const labelKeyed = buildLabelKeyedColumns(resolveFeeName);
+  const feeColIndexOf = (key: Type1FeeColumnKey) => feeCols.findIndex((c) => c.key === key);
+
+  const feeColOf = (fee: TransportOrderFee) =>
+    feeColIndexOf(serviceFeeColumnOf(fee.label, resolveFeeName(fee.label), labelKeyed));
+
+  let chiHoGroups = 0;
   for (const o of rows) {
-    for (const fee of billedLines(o, 'service', resolveFeeName)) {
-      if (!feeColIndex.has(feeKey(fee.label))) addFeeCol(fee.label);
-    }
+    chiHoGroups = Math.max(chiHoGroups, billedLines(o, 'passthrough', resolveFeeName).length);
   }
-
-  const feeColOf = (label: string) => feeColIndex.get(feeKey(label)) ?? -1;
-
-  const sizeValues: string[] = [];
-  for (const o of rows) {
-    if (o.containerSize && !sizeValues.includes(o.containerSize)) sizeValues.push(o.containerSize);
-  }
-  if (sizeValues.length === 0) sizeValues.push('20', '40');
-
-  const hasChiHo = rows.some((o) => billedLines(o, 'passthrough', resolveFeeName).length > 0);
 
   const hasNotes = rows.some((o) => !!o.notes?.trim());
   const showFooter = true;
@@ -122,7 +188,7 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
   const C_BL = 3;
   const C_CONT = 4;
   const C_SIZE0 = 5;
-  const C_TYPE = C_SIZE0 + sizeValues.length;
+  const C_TYPE = C_SIZE0 + SIZE_BUCKETS.length;
   const C_PICKUP = C_TYPE + 1;
   const C_STUFFING = C_PICKUP + 1;
   const C_DROPOFF = C_STUFFING + 1;
@@ -131,7 +197,7 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
   const C_TOTAL = C_VAT + 1;
   const C_NOTE = hasNotes ? C_TOTAL + 1 : -1;
   const C_CHIHO0 = (hasNotes ? C_NOTE : C_TOTAL) + 1;
-  const colCount = C_CHIHO0 + (hasChiHo ? 3 : 0);
+  const colCount = C_CHIHO0 + chiHoGroups * 3;
   const lastCol = colCount - 1;
 
   const aoa: CellValue[][] = [];
@@ -179,16 +245,23 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
   leaf(C_CONT, 'SỐ CONT');
   group(
     C_SIZE0,
-    C_SIZE0 + sizeValues.length - 1,
+    C_SIZE0 + SIZE_BUCKETS.length - 1,
     'SẢN LƯỢNG',
-    sizeValues.map((v) => resolveContainerSize(v)),
+    SIZE_BUCKETS.map((b) => b.header),
   );
   leaf(C_TYPE, 'LOẠI HÌNH');
   group(C_PICKUP, C_DROPOFF, 'TUYẾN DỊCH VỤ', ['NƠI LẤY', 'NƠI ĐÓNG/RÚT HÀNG', 'NƠI HẠ']);
   group(C_FEE0, C_VAT, 'PHÍ DỊCH VỤ', [...feeCols.map((f) => f.header), vatHeader]);
   leaf(C_TOTAL, 'TỔNG CỘNG');
   if (hasNotes) leaf(C_NOTE, 'NOTE');
-  if (hasChiHo) group(C_CHIHO0, lastCol, 'PHÍ CHI HỘ', ['SỐ TIỀN', 'SỐ HĐ', 'TÊN PHÍ']);
+  if (chiHoGroups > 0) {
+    group(
+      C_CHIHO0,
+      lastCol,
+      'PHÍ CHI HỘ',
+      Array.from({ length: chiHoGroups }, () => ['SỐ TIỀN', 'SỐ HĐ', 'TÊN PHÍ']).flat(),
+    );
+  }
   aoa.push(head1, head2);
 
   const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
@@ -213,17 +286,16 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     }
     row[C_BL] = o.billNumber ?? '';
     row[C_CONT] = o.containerNumber ?? '';
-    if (o.containerSize) {
-      const s = sizeValues.indexOf(o.containerSize);
-      if (s >= 0) row[C_SIZE0 + s] = 1;
-    }
+
+    const s = sizeBucketIndex(o.containerSize);
+    if (s >= 0) row[C_SIZE0 + s] = 1;
     row[C_TYPE] = o.shipmentType ? resolveShipmentType(o.shipmentType).toLocaleUpperCase('vi') : '';
     row[C_PICKUP] = o.route?.pickup ?? '';
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
     for (const fee of billedLines(o, 'service', resolveFeeName)) {
-      const c = C_FEE0 + feeColOf(fee.label);
+      const c = C_FEE0 + feeColOf(fee);
       const prev = typeof row[c] === 'number' ? (row[c] as number) : 0;
       const next = prev + (fee.amount || 0);
       if (next !== 0) row[c] = next;
@@ -235,18 +307,13 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     if (serviceTotal !== 0) row[C_TOTAL] = serviceTotal;
     if (hasNotes) row[C_NOTE] = o.notes ?? '';
 
-    if (hasChiHo) {
-      const lines = billedLines(o, 'passthrough', resolveFeeName);
-      const amount = lines.reduce((sum, f) => sum + (f.amount || 0), 0);
-      if (amount) row[C_CHIHO0] = amount;
-
-      row[C_CHIHO0 + 1] = lines
-        .map((f) => f.invoiceNo?.trim())
-        .filter(Boolean)
-        .join('; ');
-      row[C_CHIHO0 + 2] = lines.map((f) => f.label).join('; ');
-      sumChiHo += amount;
-    }
+    billedLines(o, 'passthrough', resolveFeeName).forEach((fee, g) => {
+      const c = C_CHIHO0 + g * 3;
+      if (fee.amount) row[c] = fee.amount;
+      row[c + 1] = fee.invoiceNo ?? '';
+      row[c + 2] = fee.label;
+      sumChiHo += fee.amount || 0;
+    });
 
     sumService += totals.serviceSubtotal;
     sumVat += totals.vatAmount;
@@ -259,14 +326,14 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     const row: CellValue[] = new Array(colCount).fill('');
     row[C_STT] = 'TOTAL';
     merges.push({ s: { r: rTotalRow, c: C_STT }, e: { r: rTotalRow, c: C_CONT } });
-    sizeValues.forEach((v, s) => {
-      row[C_SIZE0 + s] = rows.filter((o) => o.containerSize === v).length;
+    SIZE_BUCKETS.forEach((_bucket, s) => {
+      row[C_SIZE0 + s] = rows.filter((o) => sizeBucketIndex(o.containerSize) === s).length;
     });
     feeCols.forEach((_col, f) => {
       let sum = 0;
       for (const o of rows) {
         for (const fee of billedLines(o, 'service', resolveFeeName)) {
-          if (feeColOf(fee.label) === f) sum += fee.amount || 0;
+          if (feeColOf(fee) === f) sum += fee.amount || 0;
         }
       }
       row[C_FEE0 + f] = sum;
@@ -274,7 +341,11 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     row[C_VAT] = sumVat;
     row[C_TOTAL] = sumService + sumVat;
 
-    if (hasChiHo) row[C_CHIHO0] = sumChiHo;
+    for (let g = 0; g < chiHoGroups; g++) {
+      let sum = 0;
+      for (const o of rows) sum += billedLines(o, 'passthrough', resolveFeeName)[g]?.amount ?? 0;
+      row[C_CHIHO0 + g * 3] = sum;
+    }
     aoa.push(row);
   }
 
@@ -381,7 +452,7 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     setStyle(r, C_STT, { alignment: { horizontal: 'center' } });
     setStyle(r, C_DATE, { alignment: { horizontal: 'center' } });
     setStyle(r, C_TYPE, { alignment: { horizontal: 'center' } });
-    for (let s = 0; s < sizeValues.length; s++) {
+    for (let s = 0; s < SIZE_BUCKETS.length; s++) {
       setStyle(r, C_SIZE0 + s, { alignment: { horizontal: 'center' } });
     }
   }

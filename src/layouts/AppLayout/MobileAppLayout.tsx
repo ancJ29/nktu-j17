@@ -1,4 +1,4 @@
-import { appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
+import { appBrand, appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useCurrentEmployee, useLanguageSync } from '@/hooks';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -17,6 +17,13 @@ import { Outlet } from 'react-router';
 import { reloadPage } from '@credo/base-ui/utils';
 import { showRefreshConfig } from '@/config/menu-access';
 import { useClearCacheConfirm } from '@/hooks/useClearCacheConfirm';
+import { getHeaderVariant } from '@/utils/permission';
+
+const headerVariant = getHeaderVariant();
+const logoSrc =
+  headerVariant === 'light'
+    ? appConfig.app.logoUrl || '/logo.svg'
+    : appConfig.app.logoDarkBgUrl || appConfig.app.logoUrl || '/logo-white.svg';
 
 export function MobileAppLayout() {
   const { t, i18n } = useTranslation();
@@ -70,9 +77,11 @@ export function MobileAppLayout() {
     <MobileAppLayoutUI
       navigation={navbarItems as CredoNavigationItem[]}
       getNavLabel={getNavLabel}
-      appName={appConfig.app.name}
-      logoSrc={appConfig.app.logoDarkBgUrl || appConfig.app.logoUrl || '/logo-white.svg'}
+      appName={appBrand.name}
+      appNameHtml={appBrand.nameHtml}
+      logoSrc={logoSrc}
       mainColor={themeConfig.mainColor}
+      headerVariant={headerVariant}
       languageSwitcher={{
         languages: appConfig.languages,
         currentLanguage: i18n.language,

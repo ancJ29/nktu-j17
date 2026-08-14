@@ -8,6 +8,8 @@ const BRAND_PALETTE_NAMES = Object.keys(brandPalettes) as [string, ...string[]];
 export const AppInfoSchema = z.object({
   name: z.string().max(100),
 
+  nameHtml: z.string().max(1000).optional(),
+
   description: z.string().optional(),
 
   logoUrl: z.string().optional(),

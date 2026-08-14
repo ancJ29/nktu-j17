@@ -1,6 +1,7 @@
 import type { MantineColor } from '@mantine/core';
 import { Box, Group, Image, Paper, Stack, Text, useMantineTheme } from '@mantine/core';
 import { type ReactNode, useCallback, useState } from 'react';
+import { AppBrandName } from '../../app/AppBrandName';
 import type { AuthBranding } from '../types';
 
 type AuthCardProps = {
@@ -31,7 +32,9 @@ export function AuthCard({
   const resolvedBorderColor = getColor(borderColor);
   const gradientStart = getColor(topGradientStart);
   const gradientEnd = getColor(topGradientEnd);
-  const hasBranding = branding && (branding.logoUrl || branding.appName || branding.description);
+  const hasBranding =
+    branding &&
+    (branding.logoUrl || branding.appName || branding.appNameHtml || branding.description);
 
   return (
     <Paper
@@ -93,11 +96,13 @@ function CardBrandingHeader({ branding }: { branding: AuthBranding }) {
           </Box>
         )}
         <Stack gap={2}>
-          {branding.appName && (
-            <Text fw={700} size="md" lh={1.2}>
-              {branding.appName}
-            </Text>
-          )}
+          <AppBrandName
+            name={branding.appName ?? ''}
+            nameHtml={branding.appNameHtml}
+            fw={700}
+            size="md"
+            lh={1.2}
+          />
           {branding.description && (
             <Text size="xs" c="dimmed" lh={1.3}>
               {branding.description}

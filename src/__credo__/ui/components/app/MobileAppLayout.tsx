@@ -6,11 +6,10 @@ import {
   Group,
   Image,
   Menu,
-  Text,
   UnstyledButton,
   useMantineTheme,
 } from '@mantine/core';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { Link, Navigate, useLocation } from 'react-router';
 import type { CredoNavigationItem, Language } from '../../types';
@@ -19,6 +18,7 @@ import { Icon } from '../common/Icon';
 import { LoadingFallback } from '../common/LoadingFallback';
 import { IconName } from '../types';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
+import { AppBrandName } from './AppBrandName';
 import { PullToRefresh } from './PullToRefresh';
 import './MobileAppLayout.css';
 
@@ -46,6 +46,8 @@ type MobileAppLayoutProps = {
   navigation: CredoNavigationItem[];
   getNavLabel: (item: CredoNavigationItem) => string;
   appName: string;
+
+  appNameHtml?: string;
   logoSrc: string;
   mainColor: string;
   languageSwitcher: {
@@ -67,6 +69,8 @@ type MobileAppLayoutProps = {
   showRefreshConfig?: boolean;
   onRefreshConfig?: () => void;
   onClearCache?: () => void;
+
+  headerVariant?: 'dark' | 'light';
 };
 
 export type { MobileAppLayoutLabels, MobileAppLayoutProps };
@@ -76,6 +80,7 @@ const MAX_VISIBLE_NAV = 4;
 export function MobileAppLayout({
   navigation,
   appName,
+  appNameHtml,
   logoSrc,
   mainColor,
   languageSwitcher,
@@ -91,6 +96,7 @@ export function MobileAppLayout({
   showRefreshConfig = true,
   onRefreshConfig,
   onClearCache,
+  headerVariant = 'dark',
 }: MobileAppLayoutProps) {
   const theme = useMantineTheme();
   const location = useLocation();
@@ -110,6 +116,12 @@ export function MobileAppLayout({
     return `linear-gradient(135deg, ${getColor(`${mainColor}.7`)} 0%, ${getColor(`${mainColor}.9`)} 100%)`;
   }, [getColor, mainColor]);
 
+  const isLightHeader = headerVariant === 'light';
+  const headerBackground = isLightHeader ? getColor('neutral.0') : headerGradient;
+  const headerTextColor = isLightHeader ? getColor('neutral.8') : 'white';
+  const headerIconColor = isLightHeader ? getColor('neutral.7') : 'white';
+  const headerButtonHoverBg = isLightHeader ? 'rgba(0, 0, 0, 0.06)' : 'rgba(255, 255, 255, 0.25)';
+
   const visibleNav = useMemo(
     () => navigation.filter((item) => !item.hidden).slice(0, MAX_VISIBLE_NAV),
     [navigation],
@@ -127,12 +139,15 @@ export function MobileAppLayout({
     <AppShell header={{ height: HEADER_HEIGHT }} padding="xs" pb={BOTTOM_NAV_HEIGHT}>
       {/* Header */}
       <AppShell.Header
-        style={{
-          background: headerGradient,
-          borderBottom: 'none',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
-          zIndex: 100,
-        }}
+        style={
+          {
+            background: headerBackground,
+            borderBottom: isLightHeader ? `1px solid ${getColor('neutral.2')}` : 'none',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            zIndex: 100,
+            '--credo-mobile-header-button-hover-bg': headerButtonHoverBg,
+          } as CSSProperties
+        }
       >
         <Group h="100%" px="md" justify="space-between" wrap="nowrap">
           {/* Logo. Shrinkable with a clamped name: a long client brand must
@@ -141,11 +156,14 @@ export function MobileAppLayout({
             <Box component={Link} to="/" style={{ display: 'flex', alignItems: 'center' }}>
               <Image src={logoSrc} alt={appName} height={36} />
             </Box>
-            {appName && (
-              <Text size="lg" fw={600} c="white" lineClamp={1}>
-                {appName}
-              </Text>
-            )}
+            <AppBrandName
+              name={appName}
+              nameHtml={appNameHtml}
+              size="lg"
+              fw={600}
+              c={headerTextColor}
+              lineClamp={1}
+            />
           </Group>
 
           {/* Right side. Deliberately at most two controls: the app name is
@@ -161,7 +179,7 @@ export function MobileAppLayout({
                 onLanguageChange={languageSwitcher.onLanguageChange}
                 tooltipLabel={labels.languageTooltip}
                 size={18}
-                lightIcon
+                lightIcon={!isLightHeader}
               />
             )}
             {(onRefresh || onClearCache || (showRefreshConfig && onRefreshConfig)) && (
@@ -171,7 +189,7 @@ export function MobileAppLayout({
                     className={classes.headerButton}
                     aria-label={labels.accountTooltip}
                   >
-                    <Icon name={IconName.User} size={20} color="white" />
+                    <Icon name={IconName.User} size={20} color={headerIconColor} />
                   </UnstyledButton>
                 </Menu.Target>
                 <Menu.Dropdown>

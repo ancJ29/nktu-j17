@@ -1,4 +1,4 @@
-import { appConfig, themeConfig } from '@/config';
+import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { takeSessionExpiredNotice, useAuthStore } from '@/stores/useAuthStore';
 import { resolveLoginIdentifier } from '@/utils/loginEmail';
@@ -117,7 +117,8 @@ export function LoginPage() {
       showRegister={appConfig.auth.register}
       showQrLogin={appConfig.auth.loginViaQRCode}
       branding={{
-        appName: appConfig.app.name,
+        appName: appBrand.name,
+        appNameHtml: appBrand.nameHtml,
         logoUrl: appConfig.app.logoUrl,
         description: appConfig.app.description,
       }}

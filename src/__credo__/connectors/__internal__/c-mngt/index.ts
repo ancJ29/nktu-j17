@@ -339,6 +339,8 @@ const authApi = createApiGroup({
 
 const withAuth = (token: string) => ({ ...storages, authToken: token });
 
+const withoutFreshnessGate = () => ({ ...storages, beforeRequest: undefined });
+
 const recordTarget = <T extends { entity: string }>(
   target: T,
 ): { entity: string; headers: Record<string, string> } => {
@@ -399,18 +401,21 @@ export const cMngtConnector = {
   login: (body: LoginRequest) =>
     authApi<LoginResponse>(AUTH_ROUTES.LOGIN, {
       body,
+      storages: withoutFreshnessGate(),
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
   refreshToken: (body: RefreshTokenRequest) =>
     authApi<RefreshTokenResponse>(AUTH_ROUTES.REFRESH, {
       body,
+      storages: withoutFreshnessGate(),
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
   loginWithToken: (body: LoginWithTokenRequest) =>
     authApi<LoginWithTokenResponse>(AUTH_ROUTES.LOGIN_WITH_TOKEN, {
       body,
+      storages: withoutFreshnessGate(),
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 

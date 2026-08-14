@@ -40,7 +40,8 @@ async function patchLevel(
 }
 
 export async function applyMovementToTankLevel(event: OperationLogWriteEvent): Promise<void> {
-  const previous = event.op === 'update' ? event.previous : null;
+  const previous =
+    event.op === 'create' ? null : event.op === 'update' ? event.previous : event.log;
   const next = event.op === 'delete' ? null : event.log;
   const delta = movementDelta(previous, next);
   if (delta === 0) return;

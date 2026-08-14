@@ -1,4 +1,4 @@
-import { appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
+import { appBrand, appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useCurrentEmployee, useLanguageSync, useNavbarSync } from '@/hooks';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -108,7 +108,8 @@ export function PCAppLayout() {
     <PCAppLayoutUI
       navigation={pcNavigation as CredoNavigationItem[]}
       getNavLabel={getNavLabel}
-      appName={appConfig.app.name}
+      appName={appBrand.name}
+      appNameHtml={appBrand.nameHtml}
       logoSrc={logoSrc}
       user={user ? { name: user.name } : undefined}
       mainColor={themeConfig.mainColor}

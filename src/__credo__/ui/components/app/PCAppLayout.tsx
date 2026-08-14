@@ -25,6 +25,7 @@ import { Icon } from '../common/Icon';
 import { LoadingFallback } from '../common/LoadingFallback';
 import { IconName } from '../types';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
+import { AppBrandName } from './AppBrandName';
 import './PCAppLayout.css';
 
 const classes = {
@@ -65,6 +66,8 @@ type PCAppLayoutProps = {
   navigation: CredoNavigationItem[];
   getNavLabel: (item: CredoNavigationItem) => string;
   appName: string;
+
+  appNameHtml?: string;
   logoSrc: string;
   user?: UserInfo;
   mainColor: string;
@@ -112,6 +115,7 @@ export function PCAppLayout({
   navigation,
   getNavLabel,
   appName,
+  appNameHtml,
   logoSrc,
   user,
   mainColor,
@@ -258,11 +262,13 @@ export function PCAppLayout({
             <Link to="/">
               <Image src={logoSrc} alt={appName} height={36} />
             </Link>
-            {appName && (
-              <Text size="lg" fw={600} c={headerTextColor}>
-                {appName}
-              </Text>
-            )}
+            <AppBrandName
+              name={appName}
+              nameHtml={appNameHtml}
+              size="lg"
+              fw={600}
+              c={headerTextColor}
+            />
             <UnstyledButton
               onClick={toggleNavbar}
               w={32}

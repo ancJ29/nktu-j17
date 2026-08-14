@@ -23,6 +23,7 @@ import {
   Title,
   Tooltip,
 } from '@mantine/core';
+import { AppBrandName } from '@credo/base-ui/components';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import {
@@ -45,7 +46,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { SectionCard } from '@/components/SectionCard';
-import { appConfig, themeConfig } from '@/config';
+import { appBrand, appConfig, themeConfig } from '@/config';
 import { minimalAppConfig } from '@/config/minimal-config';
 import { CMngtAppConfigSchema } from '@/config/schema';
 import { ConfigEditor } from '@/pages/config/AppConfigPage';
@@ -261,7 +262,6 @@ function BrandedShell({
   const mainColor = themeConfig.mainColor;
   const headerBg = `var(--mantine-color-${mainColor}-9)`;
   const logoUrl = appConfig.app.logoDarkBgUrl || appConfig.app.logoUrl || '/logo-white.svg';
-  const appName = appConfig.app.name;
 
   return (
     <Box mih="100vh" bg="var(--mantine-color-gray-0)">
@@ -281,9 +281,7 @@ function BrandedShell({
                 w={28}
                 style={{ objectFit: 'contain' }}
               />
-              <Text fw={700} size="lg">
-                {appName}
-              </Text>
+              <AppBrandName {...appBrand} fw={700} size="lg" />
               <Badge size="sm" color="orange" variant="filled" tt="uppercase">
                 System Admin
               </Badge>

@@ -1,4 +1,4 @@
-import { appConfig, themeConfig } from '@/config';
+import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { cacheFlush } from '@/utils/appCache';
@@ -183,7 +183,8 @@ function LoginViaQRCodeContent() {
       layout={authTheme.layout}
       card={authTheme.card}
       branding={{
-        appName: appConfig.app.name,
+        appName: appBrand.name,
+        appNameHtml: appBrand.nameHtml,
         logoUrl: appConfig.app.logoUrl,
         description: appConfig.app.description,
       }}

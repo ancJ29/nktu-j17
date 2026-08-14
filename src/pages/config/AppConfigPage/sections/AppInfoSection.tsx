@@ -1,5 +1,7 @@
-import { Box, Group, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
+import { Box, Group, SimpleGrid, Stack, Switch, Text, Textarea, TextInput } from '@mantine/core';
 import { memo } from 'react';
+import { AppBrandName } from '@credo/base-ui/components';
+import { themeConfig } from '@/config';
 import type { AppInfo } from '../types';
 
 export const AppInfoSection = memo(function AppInfoSection({
@@ -47,6 +49,35 @@ export const AppInfoSection = memo(function AppInfoSection({
           size="sm"
         />
       </SimpleGrid>
+      <Textarea
+        label="App Name (HTML)"
+        description="Optional. Rendered in the app header instead of App Name — for two-tone / styled brands. Leave empty to show the plain App Name. Allowed: div, span, b, strong, i, em, u, s, small, sub, sup, br + style/class; anything else is stripped."
+        placeholder={
+          '<div><span style="color: #1062ac;">CLIENT</span> <span style="color: #f28526;">NAME</span></div>'
+        }
+        value={app.nameHtml ?? ''}
+        onChange={(e) => onChange({ ...app, nameHtml: e.currentTarget.value || undefined })}
+        autosize
+        minRows={2}
+        size="sm"
+        styles={{ input: { fontFamily: 'monospace' } }}
+      />
+      {app.nameHtml?.trim() && (
+        <Box>
+          <Text size="xs" c="dimmed" mb={4}>
+            Preview (sanitized, on the header background)
+          </Text>
+          {/* The running app's own header colour — the editor may be pointed at
+              another client, but this preview is about the markup, not the theme. */}
+          <Box
+            p="sm"
+            style={{ borderRadius: 4 }}
+            bg={`var(--mantine-color-${themeConfig.mainColor}-9)`}
+          >
+            <AppBrandName name={app.name} nameHtml={app.nameHtml} size="lg" fw={600} c="white" />
+          </Box>
+        </Box>
+      )}
       <TextInput
         label="Description"
         placeholder="Short description of the app"

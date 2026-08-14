@@ -80,7 +80,9 @@
     background-color: var(--hover-bg);
   }
 
+  /* Declared on AppShell.Header per header variant — a white wash is invisible
+     on the light header. Falls back to the dark-header value. */
   .credo-mobile-headerButton:hover {
-    background-color: rgba(255, 255, 255, 0.25);
+    background-color: var(--credo-mobile-header-button-hover-bg, rgba(255, 255, 255, 0.25));
   }
 }

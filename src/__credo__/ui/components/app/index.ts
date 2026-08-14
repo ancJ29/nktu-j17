@@ -1,3 +1,4 @@
+export { AppBrandName } from './AppBrandName';
 export { MobileAppLayout } from './MobileAppLayout';
 export type { MobileAppLayoutProps, MobileAppLayoutLabels } from './MobileAppLayout';
 export { MobileDetailLayout } from './MobileDetailLayout';
