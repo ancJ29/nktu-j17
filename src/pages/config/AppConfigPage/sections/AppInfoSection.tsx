@@ -11,12 +11,14 @@ export const AppInfoSection = memo(function AppInfoSection({
   enablePdfSharing,
   enableStats,
   authViaBff,
+  notifyNewVersion,
   onChange,
   onVersionChange,
   onLanguageSwitcherChange,
   onEnablePdfSharingChange,
   onEnableStatsChange,
   onAuthViaBffChange,
+  onNotifyNewVersionChange,
 }: {
   app: AppInfo;
   version: string;
@@ -24,12 +26,14 @@ export const AppInfoSection = memo(function AppInfoSection({
   enablePdfSharing: boolean;
   enableStats: boolean;
   authViaBff: boolean;
+  notifyNewVersion: boolean;
   onChange: (app: AppInfo) => void;
   onVersionChange: (v: string) => void;
   onLanguageSwitcherChange: (v: boolean) => void;
   onEnablePdfSharingChange: (v: boolean) => void;
   onEnableStatsChange: (v: boolean) => void;
   onAuthViaBffChange: (v: boolean) => void;
+  onNotifyNewVersionChange: (v: boolean) => void;
 }) {
   return (
     <Stack gap="sm">
@@ -213,6 +217,28 @@ export const AppInfoSection = memo(function AppInfoSection({
         <Switch
           checked={enableStats}
           onChange={(e) => onEnableStatsChange(e.currentTarget.checked)}
+          style={{ flexShrink: 0 }}
+        />
+      </Group>
+      <Group
+        justify="space-between"
+        p="xs"
+        style={{ borderRadius: 'var(--mantine-radius-sm)' }}
+        bg={notifyNewVersion ? undefined : 'var(--mantine-color-default-hover)'}
+        wrap="nowrap"
+      >
+        <Box style={{ flex: 1, minWidth: 0 }}>
+          <Text fz="sm" fw={500}>
+            New Version Notice
+          </Text>
+          <Text fz="xs" c="dimmed">
+            Announce a newly deployed version with a toast. Off (the default) does not stop the
+            update — the app just updates silently instead of asking.
+          </Text>
+        </Box>
+        <Switch
+          checked={notifyNewVersion}
+          onChange={(e) => onNotifyNewVersionChange(e.currentTarget.checked)}
           style={{ flexShrink: 0 }}
         />
       </Group>

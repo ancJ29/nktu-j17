@@ -82,6 +82,10 @@ export function isStatsEnabled() {
   return featureFlags?.common?.enableStats ?? false;
 }
 
+export function isNewVersionNotificationEnabled() {
+  return featureFlags?.common?.notifyNewVersion ?? false;
+}
+
 export function tableDensity(): 'comfortable' | 'compact' {
   return featureFlags?.common?.tableDensity ?? 'comfortable';
 }

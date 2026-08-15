@@ -26,6 +26,8 @@ export type UsePWAOptions = {
     updateServiceWorker: (reloadPage?: boolean) => Promise<void>;
   };
 
+  notify?: boolean;
+
   labels?: Partial<UsePWALabels>;
 
   color?: string;
@@ -64,10 +66,11 @@ if (isNaN(lastCheck)) {
   lastCheck = 0;
 }
 
-export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWAOptions) {
+export function usePWA({ bundledBuild, sw, labels, color, successColor, notify }: UsePWAOptions) {
   const { offlineReady, needRefresh, updateServiceWorker } = sw;
   const notifColor = color ?? 'primary';
   const notifSuccessColor = successColor ?? 'primary';
+  const announceUpdates = notify ?? true;
 
   const {
     newVersionAvailable = 'New Version Available',
@@ -116,22 +119,26 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
 
       if (isSafari() && isStandalone()) {
         await clearSafariCaches();
-        notifications.show({
-          id: 'safari-update',
-          title: newVersionAvailable,
-          message: closeCompletelyInstructions,
-          color: notifColor,
-          autoClose: false,
-          withCloseButton: true,
-        });
-      } else if (isChromium() && autoUpdate) {
-        notifications.show({
-          id: 'auto-update',
-          title: updating,
-          message: reloadIn3Seconds,
-          color: notifColor,
-          autoClose: 3000,
-        });
+        if (announceUpdates) {
+          notifications.show({
+            id: 'safari-update',
+            title: newVersionAvailable,
+            message: closeCompletelyInstructions,
+            color: notifColor,
+            autoClose: false,
+            withCloseButton: true,
+          });
+        }
+      } else if ((isChromium() && autoUpdate) || !announceUpdates) {
+        if (announceUpdates) {
+          notifications.show({
+            id: 'auto-update',
+            title: updating,
+            message: reloadIn3Seconds,
+            color: notifColor,
+            autoClose: 3000,
+          });
+        }
         setTimeout(() => {
           const now = Date.now();
           localStorage.setItem(LAST_UPDATE_CHECK_KEY, now.toString());
@@ -156,6 +163,7 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
     }
   }, [
     autoUpdate,
+    announceUpdates,
     updateServiceWorker,
     bundledBuild,
     newVersionAvailable,
@@ -192,14 +200,16 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
       const recentlyNotified = now - lastNotificationTime.current < 5 * 60 * 1000;
       if (recentlyNotified) return;
 
-      if (isChromium() && autoUpdate) {
-        notifications.show({
-          id: 'pwa-updating',
-          title: updating,
-          message: reloadAutomatically,
-          color: notifColor,
-          autoClose: 3000,
-        });
+      if ((isChromium() && autoUpdate) || !announceUpdates) {
+        if (announceUpdates) {
+          notifications.show({
+            id: 'pwa-updating',
+            title: updating,
+            message: reloadAutomatically,
+            color: notifColor,
+            autoClose: 3000,
+          });
+        }
         setTimeout(() => {
           updateServiceWorker(true);
           reloadPage('PWA update detected');
@@ -223,6 +233,7 @@ export function usePWA({ bundledBuild, sw, labels, color, successColor }: UsePWA
   }, [
     needRefresh,
     autoUpdate,
+    announceUpdates,
     updateServiceWorker,
     updating,
     reloadAutomatically,

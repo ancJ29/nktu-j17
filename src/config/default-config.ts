@@ -42,6 +42,8 @@ export const DEFAULT_AUTH_VIA_BFF = false;
 
 export const DEFAULT_ENABLE_STATS = false;
 
+export const DEFAULT_NOTIFY_NEW_VERSION = false;
+
 export const DEFAULT_TABLE_DENSITY: 'comfortable' | 'compact' = 'comfortable';
 
 export const DEFAULT_EMPLOYEE_FEATURES: CMngtEmployeeFeatures = {

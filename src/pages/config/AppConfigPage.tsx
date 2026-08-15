@@ -16,6 +16,7 @@ import {
   DEFAULT_LANGUAGES,
   DEFAULT_LAYOUT,
   DEFAULT_LOCATION_FEATURES,
+  DEFAULT_NOTIFY_NEW_VERSION,
   DEFAULT_PRODUCT_FEATURES,
   DEFAULT_SALES_ORDER_FEATURES,
   DEFAULT_TABLE_DENSITY,
@@ -278,6 +279,7 @@ export function ConfigEditor({
   );
   const [authViaBff, setAuthViaBff] = useState(DEFAULT_CONFIG.features.common.authViaBff);
   const [enableStats, setEnableStats] = useState(DEFAULT_CONFIG.features.common.enableStats);
+  const [notifyNewVersion, setNotifyNewVersion] = useState(DEFAULT_NOTIFY_NEW_VERSION);
   const [tableDensity, setTableDensity] = useState(DEFAULT_TABLE_DENSITY);
   const [employeeFeatures, setEmployeeFeatures] = useState<CMngtEmployeeFeatures>(
     DEFAULT_CONFIG.features.employees,
@@ -397,6 +399,7 @@ export function ConfigEditor({
           enablePdfSharing,
           authViaBff,
           enableStats,
+          notifyNewVersion,
           tableDensity,
         },
         employees: employeeFeatures,
@@ -441,6 +444,7 @@ export function ConfigEditor({
       enablePdfSharing,
       authViaBff,
       enableStats,
+      notifyNewVersion,
       tableDensity,
       employeeFeatures,
       permMngtFeatures,
@@ -489,6 +493,7 @@ export function ConfigEditor({
     );
     setAuthViaBff(cfg.features?.common?.authViaBff ?? DEFAULT_CONFIG.features.common.authViaBff);
     setEnableStats(cfg.features?.common?.enableStats ?? DEFAULT_CONFIG.features.common.enableStats);
+    setNotifyNewVersion(cfg.features?.common?.notifyNewVersion ?? DEFAULT_NOTIFY_NEW_VERSION);
     setTableDensity(cfg.features?.common?.tableDensity ?? DEFAULT_TABLE_DENSITY);
     setEmployeeFeatures({ ...SCHEMA_DEFAULT_EMPLOYEE_FEATURES, ...cfg.features?.employees });
     setPermMngtFeatures({
@@ -738,6 +743,7 @@ export function ConfigEditor({
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
     setAuthViaBff(DEFAULT_AUTH_VIA_BFF);
     setEnableStats(DEFAULT_ENABLE_STATS);
+    setNotifyNewVersion(DEFAULT_NOTIFY_NEW_VERSION);
     setAuth(DEFAULT_AUTH);
     setEmployeeFeatures(DEFAULT_EMPLOYEE_FEATURES);
     setPermMngtFeatures(SCHEMA_DEFAULT_PERM_MNGT_FEATURES);
@@ -777,6 +783,7 @@ export function ConfigEditor({
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
     setAuthViaBff(DEFAULT_AUTH_VIA_BFF);
     setEnableStats(DEFAULT_ENABLE_STATS);
+    setNotifyNewVersion(DEFAULT_NOTIFY_NEW_VERSION);
   }, []);
   const resetAuth = useCallback(() => setAuth(DEFAULT_AUTH), []);
   const resetEmployees = useCallback(() => setEmployeeFeatures(DEFAULT_EMPLOYEE_FEATURES), []);
@@ -871,7 +878,8 @@ export function ConfigEditor({
       eqDefault(languageSwitcher, DEFAULT_LANGUAGE_SWITCHER) &&
       eqDefault(enablePdfSharing, DEFAULT_ENABLE_PDF_SHARING) &&
       eqDefault(authViaBff, DEFAULT_AUTH_VIA_BFF) &&
-      eqDefault(enableStats, DEFAULT_ENABLE_STATS),
+      eqDefault(enableStats, DEFAULT_ENABLE_STATS) &&
+      eqDefault(notifyNewVersion, DEFAULT_NOTIFY_NEW_VERSION),
     displaySettings:
       eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS) &&
       eqDefault(tableDensity, DEFAULT_TABLE_DENSITY),
@@ -1005,12 +1013,14 @@ export function ConfigEditor({
               enablePdfSharing={enablePdfSharing}
               enableStats={enableStats}
               authViaBff={authViaBff}
+              notifyNewVersion={notifyNewVersion}
               onChange={setAppInfo}
               onVersionChange={setVersion}
               onLanguageSwitcherChange={setLanguageSwitcher}
               onEnablePdfSharingChange={setEnablePdfSharing}
               onEnableStatsChange={setEnableStats}
               onAuthViaBffChange={setAuthViaBff}
+              onNotifyNewVersionChange={setNotifyNewVersion}
             />
           </CollapsibleSection>
 

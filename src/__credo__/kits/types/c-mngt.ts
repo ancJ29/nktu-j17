@@ -306,6 +306,8 @@ export type CMngtAppConfig = AppConfig & {
       authViaBff: boolean;
       enableStats: boolean;
 
+      notifyNewVersion?: boolean;
+
       tableDensity?: 'comfortable' | 'compact';
     };
     employees: CMngtEmployeeFeatures;

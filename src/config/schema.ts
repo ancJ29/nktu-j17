@@ -477,6 +477,8 @@ const FeaturesSchema = z
 
       enableStats: z.boolean().default(false),
 
+      notifyNewVersion: z.boolean().default(false),
+
       tableDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
     }),
     employees: EmployeesFeaturesSchema,
@@ -513,6 +515,7 @@ const FeaturesSchema = z
       enablePdfSharing: false,
       authViaBff: false,
       enableStats: false,
+      notifyNewVersion: false,
       tableDensity: 'comfortable',
     },
     employees: EmployeesFeaturesSchema.parse({}),
