@@ -8,7 +8,7 @@ import {
   orderTotals,
   readFeeLines,
 } from '@/pages/transport-orders/transportOrderPricing';
-import type { CustomerReportBuilder } from './types';
+import type { CustomerReportBuilder, CustomerReportInput, CustomerReportResult } from './types';
 
 type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
 type CellValue = string | number;
@@ -33,7 +33,7 @@ function sizeBucketIndex(containerSize: string | undefined): number {
 
 type Type1FeeColumnKey = 'freight' | 'surcharge' | 'handling' | 'demurrage' | 'other';
 
-const SERVICE_FEE_COLUMNS: ReadonlyArray<{ key: Type1FeeColumnKey; header: string }> = [
+export const SERVICE_FEE_COLUMNS: ReadonlyArray<{ key: Type1FeeColumnKey; header: string }> = [
   { key: 'freight', header: 'PHÍ VẬN CHUYỂN' },
   { key: 'surcharge', header: 'PHỤ THU VC' },
   { key: 'handling', header: 'BỐC XẾP' },
@@ -58,7 +58,8 @@ const FEE_NAME_COLUMN: Readonly<Record<string, Type1FeeColumnKey>> = {
   VE_TRAM_XLHN: 'surcharge',
   PHI_THAO_NHAN: 'other',
   LO_XE: 'other',
-  VE_SINH_CONT: 'other', // Vệ sinh cont
+  VE_SINH_CONT: 'other',
+  PHU_PHI_DAU: 'other', // Phụ phí đầu
 };
 
 export const CHI_HO_FEE_NAMES: ReadonlyArray<string> = [
@@ -146,8 +147,37 @@ function billedLines(
     .map((f) => ({ ...f, label: resolveFeeName(f.label) }));
 }
 
-export const buildCustomerReportType1: CustomerReportBuilder = (
-  orders,
+type ChiHoSlot = 'amount' | 'invoiceNo' | 'name';
+
+const CHI_HO_SLOT_HEADER: Record<ChiHoSlot, string> = {
+  amount: 'SỐ TIỀN',
+  invoiceNo: 'SỐ HĐ',
+  name: 'TÊN PHÍ',
+};
+
+type ServiceColumn =
+  | { key: Type1FeeColumnKey; header: string; feeValue?: undefined }
+  | { key?: undefined; header: string; feeValue: string };
+
+export type BangKeLayout = {
+  serviceColumns: ReadonlyArray<ServiceColumn>;
+
+  chiHoSlots: ReadonlyArray<ChiHoSlot>;
+
+  reservedChiHo?: ReadonlyArray<{
+    feeValue: string;
+    header: string;
+    slots: ReadonlyArray<ChiHoSlot>;
+  }>;
+};
+
+const TYPE1_LAYOUT: BangKeLayout = {
+  serviceColumns: SERVICE_FEE_COLUMNS,
+  chiHoSlots: ['amount', 'invoiceNo', 'name'],
+};
+
+export const buildBangKeSheet = (
+  orders: ReadonlyArray<TransportOrder>,
   {
     seller,
     customer,
@@ -156,23 +186,82 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
-  },
-) => {
+  }: CustomerReportInput,
+  layout: BangKeLayout,
+): CustomerReportResult => {
   const rows = orders
     .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
     .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
 
-  const feeCols = SERVICE_FEE_COLUMNS;
+  const feeCols = layout.serviceColumns;
   const labelKeyed = buildLabelKeyedColumns(resolveFeeName);
-  const feeColIndexOf = (key: Type1FeeColumnKey) => feeCols.findIndex((c) => c.key === key);
 
-  const feeColOf = (fee: TransportOrderFee) =>
-    feeColIndexOf(serviceFeeColumnOf(fee.label, resolveFeeName(fee.label), labelKeyed));
+  const feeColIndexOf = (key: Type1FeeColumnKey) => {
+    const i = feeCols.findIndex((c) => c.key === key);
+    if (i >= 0) return i;
+    return Math.max(
+      0,
+      feeCols.findIndex((c) => c.key === FALLBACK_FEE_COLUMN),
+    );
+  };
 
-  let chiHoGroups = 0;
+  const pinnedFeeKeys = feeCols.map((c) =>
+    c.feeValue === undefined ? undefined : feeKey(resolveFeeName(c.feeValue)),
+  );
+
+  const feeColOf = (fee: TransportOrderFee) => {
+    const key = feeKey(fee.label);
+    const pinned = pinnedFeeKeys.findIndex((k) => k !== undefined && k === key);
+    if (pinned >= 0) return pinned;
+    return feeColIndexOf(serviceFeeColumnOf(fee.label, resolveFeeName(fee.label), labelKeyed));
+  };
+
+  const chiHoLines = (o: TransportOrder) =>
+    billedLines(o, 'passthrough', resolveFeeName).filter((f) => (f.amount || 0) !== 0);
+
+  const reservedFees = layout.reservedChiHo ?? [];
+  const reservedKeys = reservedFees.map((r) => feeKey(resolveFeeName(r.feeValue)));
+
+  const splitChiHo = (o: TransportOrder) => {
+    const lines = chiHoLines(o);
+    const taken = new Set<number>();
+    const reserved = reservedKeys.map((key) => {
+      const i = lines.findIndex((f, k) => !taken.has(k) && feeKey(f.label) === key);
+      if (i < 0) return undefined;
+      taken.add(i);
+      return lines[i];
+    });
+    return { reserved, rest: lines.filter((_, k) => !taken.has(k)) };
+  };
+
+  let dynamicGroups = 0;
   for (const o of rows) {
-    chiHoGroups = Math.max(chiHoGroups, billedLines(o, 'passthrough', resolveFeeName).length);
+    dynamicGroups = Math.max(dynamicGroups, splitChiHo(o).rest.length);
   }
+
+  const chiHoGroupLine = (o: TransportOrder, g: number) => {
+    const { reserved, rest } = splitChiHo(o);
+    return g < reservedFees.length ? reserved[g] : rest[g - reservedFees.length];
+  };
+
+  const chiHoColumns: ReadonlyArray<{ group: number; slot: ChiHoSlot; header: string }> = [
+    ...reservedFees.flatMap((r, g) =>
+      r.slots.map((slot, s) => ({
+        group: g,
+        slot,
+        header: s === 0 ? r.header : CHI_HO_SLOT_HEADER[slot],
+      })),
+    ),
+    ...Array.from({ length: dynamicGroups }, (_, k) =>
+      layout.chiHoSlots.map((slot) => ({
+        group: reservedFees.length + k,
+        slot,
+        header: CHI_HO_SLOT_HEADER[slot],
+      })),
+    ).flat(),
+  ];
+
+  const chiHoSlotAt = (c: number) => chiHoColumns[c - C_CHIHO0]?.slot;
 
   const hasNotes = rows.some((o) => !!o.notes?.trim());
   const showFooter = true;
@@ -197,7 +286,7 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
   const C_TOTAL = C_VAT + 1;
   const C_NOTE = hasNotes ? C_TOTAL + 1 : -1;
   const C_CHIHO0 = (hasNotes ? C_NOTE : C_TOTAL) + 1;
-  const colCount = C_CHIHO0 + chiHoGroups * 3;
+  const colCount = C_CHIHO0 + chiHoColumns.length;
   const lastCol = colCount - 1;
 
   const aoa: CellValue[][] = [];
@@ -254,12 +343,12 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
   group(C_FEE0, C_VAT, 'PHÍ DỊCH VỤ', [...feeCols.map((f) => f.header), vatHeader]);
   leaf(C_TOTAL, 'TỔNG CỘNG');
   if (hasNotes) leaf(C_NOTE, 'NOTE');
-  if (chiHoGroups > 0) {
+  if (chiHoColumns.length > 0) {
     group(
       C_CHIHO0,
       lastCol,
       'PHÍ CHI HỘ',
-      Array.from({ length: chiHoGroups }, () => ['SỐ TIỀN', 'SỐ HĐ', 'TÊN PHÍ']).flat(),
+      chiHoColumns.map((col) => col.header),
     );
   }
   aoa.push(head1, head2);
@@ -307,13 +396,18 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     if (serviceTotal !== 0) row[C_TOTAL] = serviceTotal;
     if (hasNotes) row[C_NOTE] = o.notes ?? '';
 
-    billedLines(o, 'passthrough', resolveFeeName).forEach((fee, g) => {
-      const c = C_CHIHO0 + g * 3;
-      if (fee.amount) row[c] = fee.amount;
-      row[c + 1] = fee.invoiceNo ?? '';
-      row[c + 2] = fee.label;
-      sumChiHo += fee.amount || 0;
+    chiHoColumns.forEach((col, i) => {
+      const fee = chiHoGroupLine(o, col.group);
+      if (!fee) return;
+      row[C_CHIHO0 + i] =
+        col.slot === 'amount'
+          ? fee.amount
+          : col.slot === 'invoiceNo'
+            ? (fee.invoiceNo ?? '')
+            : fee.label;
     });
+
+    for (const fee of chiHoLines(o)) sumChiHo += fee.amount;
 
     sumService += totals.serviceSubtotal;
     sumVat += totals.vatAmount;
@@ -341,11 +435,12 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     row[C_VAT] = sumVat;
     row[C_TOTAL] = sumService + sumVat;
 
-    for (let g = 0; g < chiHoGroups; g++) {
+    chiHoColumns.forEach((col, i) => {
+      if (col.slot !== 'amount') return;
       let sum = 0;
-      for (const o of rows) sum += billedLines(o, 'passthrough', resolveFeeName)[g]?.amount ?? 0;
-      row[C_CHIHO0 + g * 3] = sum;
-    }
+      for (const o of rows) sum += chiHoGroupLine(o, col.group)?.amount ?? 0;
+      row[C_CHIHO0 + i] = sum;
+    });
     aoa.push(row);
   }
 
@@ -408,8 +503,12 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     if (c === C_TYPE) return { wch: 10 };
     if (c >= C_PICKUP && c <= C_DROPOFF) return { wch: 26 };
     if (c === C_NOTE) return { wch: 22 };
-    if (c >= C_CHIHO0 && (c - C_CHIHO0) % 3 === 1) return { wch: 10 };
-    if (c >= C_CHIHO0 && (c - C_CHIHO0) % 3 === 2) return { wch: 14 };
+
+    if (c >= C_CHIHO0) {
+      const slot = chiHoSlotAt(c);
+      if (slot === 'invoiceNo') return { wch: 10 };
+      if (slot === 'name') return { wch: 14 };
+    }
     return { wch: 13 }; // fee / VAT / TỔNG CỘNG / chi hộ SỐ TIỀN
   });
 
@@ -427,7 +526,7 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
     }
   };
   const isMoneyCol = (c: number) =>
-    (c >= C_FEE0 && c <= C_TOTAL) || (c >= C_CHIHO0 && (c - C_CHIHO0) % 3 === 0);
+    (c >= C_FEE0 && c <= C_TOTAL) || (c >= C_CHIHO0 && chiHoSlotAt(c) === 'amount');
 
   setStyle(rSeller, 0, { font: { bold: true, sz: 13 } });
   setStyle(rTitle, 0, { font: { bold: true, sz: 15 }, alignment: { horizontal: 'center' } });
@@ -483,3 +582,6 @@ export const buildCustomerReportType1: CustomerReportBuilder = (
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
   return { workbook, rowCount: rows.length };
 };
+
+export const buildCustomerReportType1: CustomerReportBuilder = (orders, input) =>
+  buildBangKeSheet(orders, input, TYPE1_LAYOUT);
