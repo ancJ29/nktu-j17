@@ -11,6 +11,13 @@ import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { ListPagination } from '@/components/custom/ListPagination';
 import { device } from '@credo/base-ui/utils';
+import {
+  parseColumnFilters,
+  serializeColumnFilters,
+  useColumnFilters,
+  type ColumnFilterDef,
+  type ColumnFilterValues,
+} from '@credo/base-ui/hooks';
 import { useListScrollRestoration, useLookupLabels, useLookupOptions } from '@/hooks';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
@@ -27,9 +34,10 @@ import {
 import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { perms } from '@/utils/permission';
-import type { Product, ProductInventorySummary } from '@/types';
+import { isDefaultLocation, type Product, type ProductInventorySummary } from '@/types';
 import { buildProductInventorySummaries } from '@/utils/productInventorySummaries';
 
+import { buildProductInventoryColumnFilterDefs } from './productInventoryColumnFilters';
 import { ProductInventoryCardList } from './ProductInventoryCardList';
 import { ProductInventoryBeginOfPeriodModal } from './ProductInventoryBeginOfPeriodModal';
 import { ProductInventoryComposeSetModal } from './ProductInventoryComposeSetModal';
@@ -69,6 +77,8 @@ type ProductInventoryFilters = {
   secondary: SecondaryFilter;
   search: string;
   page: number;
+
+  columnFilters: string;
 };
 const FILTER_DEFAULTS: ProductInventoryFilters = {
   location: null,
@@ -77,6 +87,7 @@ const FILTER_DEFAULTS: ProductInventoryFilters = {
   secondary: null,
   search: '',
   page: 1,
+  columnFilters: '',
 };
 
 type ProductInventoryListProps = {
@@ -152,11 +163,73 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [products, allRows, locationFilter, inboundIndex],
   );
 
+  const columnFilterValues = useMemo(
+    () => parseColumnFilters(filterState.columnFilters),
+    [filterState.columnFilters],
+  );
+  const setColumnFilterValues = useCallback(
+    (next: ColumnFilterValues) => updateState({ columnFilters: serializeColumnFilters(next) }),
+    [updateState],
+  );
+  const columnFilterLabels = useMemo(
+    () => ({
+      search: t('__new__.01-common.filters.columnFilter.search'),
+      selectAll: t('__new__.01-common.filters.columnFilter.selectAll'),
+      clear: t('__new__.01-common.filters.columnFilter.clear'),
+      empty: t('__new__.01-common.filters.columnFilter.empty'),
+    }),
+    [t],
+  );
+  const secondaryStatusLabels: Record<string, string> = useMemo(
+    () => ({
+      outOfStock: t('common.secondaryStatus.outOfStock'),
+      mustOrder: t('common.secondaryStatus.mustOrder'),
+      ok: t('common.secondaryStatus.ok'),
+    }),
+    [t],
+  );
+  const locationNameByCode = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const l of locations) map.set(l.code, l.name);
+    return map;
+  }, [locations]);
+
+  const columnFilterDefs: ColumnFilterDef<ProductInventorySummary>[] = useMemo(
+    () =>
+      variant.showColumnHeaderFilters
+        ? buildProductInventoryColumnFilterDefs({
+            locationLabelOf: (code) =>
+              isDefaultLocation(code)
+                ? t('productInventory.defaultLocationBadge')
+                : (locationNameByCode.get(code) ?? code),
+            secondaryStatusLabelOf: (value) => secondaryStatusLabels[value] ?? value,
+            inboundIndex,
+            locationsEnabled,
+            labels: columnFilterLabels,
+          })
+        : [],
+    [
+      variant.showColumnHeaderFilters,
+      t,
+      locationNameByCode,
+      secondaryStatusLabels,
+      inboundIndex,
+      columnFilterLabels,
+    ],
+  );
+
+  const columnFilters = useColumnFilters(summaries, columnFilterDefs, {
+    value: columnFilterValues,
+    onChange: setColumnFilterValues,
+  });
+
   const filters = {
     locationCode: locationFilter,
     category: categoryFilter,
     stock: stockFilter,
     secondary: secondaryFilter,
+
+    columnFilters: filterState.columnFilters,
   };
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
@@ -175,6 +248,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           if (typeof min !== 'number' || s.totalOnHand <= 0 || s.totalOnHand > min) return false;
         }
         if (f.secondary && s.secondaryStatus !== f.secondary) return false;
+
+        if (!columnFilters.predicate(s)) return false;
         return true;
       },
       searchFields: (s) => [s.product.name, s.product.extra?.sku ?? '', s.product.code],
@@ -311,11 +386,11 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const secondaryOptions = useMemo(
     () => [
-      { value: 'outOfStock', label: t('common.secondaryStatus.outOfStock') },
-      { value: 'mustOrder', label: t('common.secondaryStatus.mustOrder') },
-      { value: 'ok', label: t('common.secondaryStatus.ok') },
+      { value: 'outOfStock', label: secondaryStatusLabels.outOfStock },
+      { value: 'mustOrder', label: secondaryStatusLabels.mustOrder },
+      { value: 'ok', label: secondaryStatusLabels.ok },
     ],
-    [t],
+    [secondaryStatusLabels],
   );
 
   const desktopFilters: SelectFilter[] = useMemo(
@@ -690,6 +765,12 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             hideStatus
             filters={desktopFilters}
             onClear={clearFilters}
+
+            hasActiveFilters={
+              !!search ||
+              desktopFilters.some((f) => f.value !== null) ||
+              columnFilters.hasActiveFilters
+            }
           />
         )}
       </StickyListChrome>
@@ -710,6 +791,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           onRowClick={handleRowClick}
           inboundIndex={inboundIndex}
           viewportRef={scrollViewportRef}
+          getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}
         />
       )}
 

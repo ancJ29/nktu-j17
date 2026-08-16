@@ -2,6 +2,10 @@ import React, { useCallback, useMemo, useRef } from 'react';
 
 import { Box, Center, LoadingOverlay, ScrollArea, Table, Text } from '@mantine/core';
 
+import {
+  DataTableFilterableHeader,
+  type DataTableColumnFilterConfig,
+} from './DataTableColumnFilter';
 import { InfiniteScrollSentinel } from './InfiniteScrollSentinel';
 
 export type DataTableColumn<T> = {
@@ -14,6 +18,8 @@ export type DataTableColumn<T> = {
   hidden?: boolean;
 
   onCellClick?: (item: T, event: React.MouseEvent) => void;
+
+  filter?: DataTableColumnFilterConfig;
 };
 
 export type DataTableDensity = 'comfortable' | 'compact';
@@ -136,7 +142,15 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
                   style={column.width ? { width: column.width } : undefined}
                   ta={column.ta ? column.ta : undefined}
                 >
-                  {column.header}
+                  {column.filter ? (
+                    <DataTableFilterableHeader
+                      header={column.header}
+                      filter={column.filter}
+                      ta={column.ta}
+                    />
+                  ) : (
+                    column.header
+                  )}
                 </Table.Th>
               ))}
               {!noActions && renderActions ? <Table.Th w={60}>{actionsHeader}</Table.Th> : null}

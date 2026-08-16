@@ -40,7 +40,13 @@
         "noNote": "No description"
       },
       "filters": {
-        "all": "All"
+        "all": "All",
+        "columnFilter": {
+          "clear": "Clear filter",
+          "empty": "No values",
+          "search": "Search values",
+          "selectAll": "Select all"
+        }
       },
       "hints": {
         "openInMaps": "View on Google Maps"

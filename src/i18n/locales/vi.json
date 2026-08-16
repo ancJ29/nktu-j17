@@ -40,7 +40,13 @@
         "noNote": "Chưa có ghi chú"
       },
       "filters": {
-        "all": "Tất cả"
+        "all": "Tất cả",
+        "columnFilter": {
+          "clear": "Xóa lọc",
+          "empty": "Không có giá trị",
+          "search": "Tìm giá trị",
+          "selectAll": "Chọn tất cả"
+        }
       },
       "hints": {
         "openInMaps": "Xem trên Google Maps"

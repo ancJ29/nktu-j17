@@ -8,6 +8,8 @@ export type ProductInventoryListVariant = {
   quickChipMode: 'stock' | 'secondary';
 
   showBeginOfPeriod: boolean;
+
+  showColumnHeaderFilters: boolean;
 };
 
 export const DEFAULT_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = {
@@ -16,6 +18,7 @@ export const DEFAULT_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant
   showStockFilter: true,
   quickChipMode: 'stock',
   showBeginOfPeriod: false,
+  showColumnHeaderFilters: false,
 };
 
 export const NKTU_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = {
@@ -24,4 +27,5 @@ export const NKTU_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = 
   showStockFilter: false,
   quickChipMode: 'secondary',
   showBeginOfPeriod: true,
+  showColumnHeaderFilters: true,
 };

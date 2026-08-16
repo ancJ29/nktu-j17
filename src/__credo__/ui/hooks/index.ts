@@ -1,3 +1,13 @@
+export {
+  useColumnFilters,
+  serializeColumnFilters,
+  parseColumnFilters,
+  COLUMN_FILTER_BLANK,
+  type ColumnFilterDef,
+  type ColumnFilterValues,
+  type DataTableColumnFilterConfig,
+  type DataTableColumnFilterLabels,
+} from './useColumnFilters';
 export { useDebounce } from './useDebounce';
 export { useDevice } from './useDevice';
 export { usePWA, type UsePWALabels, type UsePWAOptions } from './usePWA';

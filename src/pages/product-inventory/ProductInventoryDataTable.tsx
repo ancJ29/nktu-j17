@@ -3,7 +3,12 @@ import { Badge, Box, Group, HoverCard, Stack, Text, Tooltip } from '@mantine/cor
 import { IconAlertTriangle, IconMapPin } from '@tabler/icons-react';
 import { ProductSetBadge } from '@/components/ProductSetBadge';
 import { useTranslation } from 'react-i18next';
-import { CodeLabel, DataTable } from '@credo/base-ui/components';
+import {
+  CodeLabel,
+  DataTable,
+  type DataTableColumn,
+  type DataTableColumnFilterConfig,
+} from '@credo/base-ui/components';
 import { formatDateTime } from '@/utils/dateFormat';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { lookupLabelOf, useLookupLabels, type InboundEntry } from '@/hooks';
@@ -30,6 +35,8 @@ type Props = {
   readonly maxHeight?: number | string;
 
   readonly viewportRef?: Ref<HTMLDivElement>;
+
+  readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
 };
 
 function PlaceholderCell() {
@@ -262,6 +269,7 @@ export function ProductInventoryDataTable({
   inboundIndex,
   maxHeight = 'calc(100vh - 300px)',
   viewportRef,
+  getColumnFilter,
 }: Props) {
   const { t } = useTranslation();
   const unitLabels = useLookupLabels('unit');
@@ -277,6 +285,7 @@ export function ProductInventoryDataTable({
       [
         {
           key: 'product',
+          filter: getColumnFilter?.('product'),
           header: t('common.labels.product'),
           width: '250px',
           render: (s: ProductInventorySummary) => {
@@ -327,6 +336,7 @@ export function ProductInventoryDataTable({
               {
                 key: 'location',
                 header: t('common.labels.location'),
+                filter: getColumnFilter?.('location'),
                 render: (s: ProductInventorySummary) => {
                   if (s.rows.length === 0) {
                     return (
@@ -372,6 +382,7 @@ export function ProductInventoryDataTable({
 
         {
           key: 'minStock',
+          filter: getColumnFilter?.('minStock'),
           header: (
             <Tooltip label={t('common.columns.minStockTooltip')} withArrow>
               <Text size="sm" fw="bold" ta="right">
@@ -399,6 +410,7 @@ export function ProductInventoryDataTable({
         },
         {
           key: 'beginOfPeriod',
+          filter: getColumnFilter?.('beginOfPeriod'),
           header: (
             <Tooltip label={t('common.columns.beginOfPeriodTooltip')} withArrow>
               <Text size="sm" fw="bold" ta="right">
@@ -426,6 +438,7 @@ export function ProductInventoryDataTable({
         },
         {
           key: 'onHand',
+          filter: getColumnFilter?.('onHand'),
           header: t('common.columns.onHand'),
           ta: 'right' as const,
           render: (s: ProductInventorySummary) => {
@@ -491,6 +504,7 @@ export function ProductInventoryDataTable({
         },
         {
           key: 'incoming',
+          filter: getColumnFilter?.('incoming'),
           header: (
             <Tooltip label={t('productInventory.columns.incomingTooltip')} withArrow>
               <Text size="sm" fw="bold" ta="right">
@@ -509,6 +523,7 @@ export function ProductInventoryDataTable({
         },
         {
           key: 'outgoing',
+          filter: getColumnFilter?.('outgoing'),
           header: (
             <Tooltip label={t('productInventory.columns.outgoingTooltip')} withArrow>
               <Text size="sm" fw="bold" ta="right">
@@ -569,6 +584,7 @@ export function ProductInventoryDataTable({
         },
         {
           key: 'forecasted',
+          filter: getColumnFilter?.('forecasted'),
           header: (
             <Tooltip label={t('productInventory.columns.forecastedTooltip')} withArrow>
               <Text size="sm" fw="bold" ta="right">
@@ -595,6 +611,7 @@ export function ProductInventoryDataTable({
             </Tooltip>
           ),
           ta: 'center' as const,
+          filter: getColumnFilter?.('secondaryStatus'),
           render: (s: ProductInventorySummary) => (
             <Box ta="center">
               <InventorySecondaryStatusBadge status={s.secondaryStatus} />
@@ -612,13 +629,8 @@ export function ProductInventoryDataTable({
             </Text>
           ),
         },
-      ] as {
-        key: string;
-        header: string;
-        render: (item: ProductInventorySummary) => React.ReactNode;
-        ta?: 'left' | 'center' | 'right';
-      }[],
-    [t, locationByCode, unitLabels, inboundIndex],
+      ] as DataTableColumn<ProductInventorySummary>[],
+    [t, locationByCode, unitLabels, inboundIndex, getColumnFilter],
   );
 
   return (
