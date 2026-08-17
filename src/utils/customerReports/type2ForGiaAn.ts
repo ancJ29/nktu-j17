@@ -6,7 +6,7 @@ const TYPE2_LAYOUT: BangKeLayout = {
     c.key === 'freight' ? [c, { feeValue: 'PHU_PHI_DAU', header: 'PHỤ PHÍ DẦU' }] : [c],
   ),
 
-  chiHoSlots: ['name', 'amount', 'invoiceNo'],
+  chiHoSlots: ['amount', 'invoiceNo', 'name'],
 
   reservedChiHo: [{ feeValue: 'PHI_NEO_XE', header: 'PHÍ NEO XE', slots: ['amount'] }],
 };
