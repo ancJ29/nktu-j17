@@ -126,6 +126,8 @@ export type TransportOrder = PartitionedRecordRow & {
 
   billNumber: string;
 
+  declarationNumber?: string;
+
   containerNumber: string;
   containerSize: TransportOrderContainerSize;
   shipmentType: TransportOrderShipmentType;

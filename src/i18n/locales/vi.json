@@ -3892,6 +3892,7 @@
     },
     "columns": {
       "bill": "Số B/L · B/K",
+      "declaration": "Số tờ khai",
       "container": "Số cont",
       "containerBill": "Số cont · B/L",
       "date": "Ngày",
@@ -3928,6 +3929,7 @@
         "fees_other": "{{count}} dòng phí",
         "fieldAdvanceAmount": "Tạm ứng",
         "fieldBillNumber": "Số B/L",
+        "fieldDeclarationNumber": "Số tờ khai",
         "fieldContainerNumber": "Số container",
         "fieldContainerSize": "Loại container",
         "fieldContractNo": "Số hợp đồng",

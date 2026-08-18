@@ -3892,6 +3892,7 @@
     },
     "columns": {
       "bill": "B/L · Booking",
+      "declaration": "Customs declaration",
       "container": "Container",
       "containerBill": "Container · B/L",
       "date": "Date",
@@ -3928,6 +3929,7 @@
         "fees_other": "{{count}} fee lines",
         "fieldAdvanceAmount": "Advance",
         "fieldBillNumber": "B/L no.",
+        "fieldDeclarationNumber": "Customs declaration no.",
         "fieldContainerNumber": "Container no.",
         "fieldContainerSize": "Container size",
         "fieldContractNo": "Contract no.",

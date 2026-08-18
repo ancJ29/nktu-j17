@@ -18,6 +18,8 @@ export type TransportOrderWriteFields = {
   driverId: string;
   driverName: string;
   billNumber: string;
+
+  declarationNumber: string;
   containerNumber: string;
   containerSize: TransportOrderContainerSize;
   shipmentType: TransportOrderShipmentType;

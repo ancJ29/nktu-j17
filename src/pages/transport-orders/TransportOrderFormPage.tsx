@@ -170,6 +170,7 @@ type FormValues = {
   driverId: string;
   driverName: string;
   billNumber: string;
+  declarationNumber: string;
   containerNumber: string;
   containerSize: TransportOrderContainerSize;
   shipmentType: TransportOrderShipmentType;
@@ -299,6 +300,7 @@ function blankValues(): FormValues {
     driverId: '',
     driverName: '',
     billNumber: '',
+    declarationNumber: '',
     containerNumber: '',
 
     containerSize: '',
@@ -346,6 +348,7 @@ function copiedValues(src: TransportOrder): FormValues {
     driverId: src.driverId,
     driverName: src.driverName,
     billNumber: src.billNumber || '',
+    declarationNumber: src.declarationNumber || '',
     containerNumber: src.containerNumber || '',
     containerSize: src.containerSize,
     shipmentType: src.shipmentType,
@@ -578,6 +581,7 @@ export function TransportOrderFormPage() {
         driverId: o.driverId,
         driverName: o.driverName,
         billNumber: o.billNumber || '',
+        declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
         containerSize: o.containerSize,
         shipmentType: o.shipmentType,
@@ -660,6 +664,7 @@ export function TransportOrderFormPage() {
           driverId: values.driverId,
           driverName: values.driverName.trim(),
           billNumber: values.billNumber.trim(),
+          declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
           containerSize: values.containerSize,
           shipmentType: values.shipmentType,
@@ -1089,6 +1094,10 @@ export function TransportOrderFormPage() {
               <TextInput
                 label={t('transportOrders.columns.bill')}
                 {...form.getInputProps('billNumber')}
+              />
+              <TextInput
+                label={t('transportOrders.columns.declaration')}
+                {...form.getInputProps('declarationNumber')}
               />
               <TextInput
                 label={t('transportOrders.columns.container')}

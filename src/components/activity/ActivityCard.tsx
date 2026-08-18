@@ -2996,6 +2996,7 @@ const TRANSPORT_ORDER_FIELD_LABEL: Record<string, string> = {
   driverId: 'fieldDriver',
   customerCode: 'fieldCustomer',
   billNumber: 'fieldBillNumber',
+  declarationNumber: 'fieldDeclarationNumber',
   containerNumber: 'fieldContainerNumber',
   containerSize: 'fieldContainerSize',
   shipmentType: 'fieldShipmentType',

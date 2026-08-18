@@ -546,6 +546,15 @@ export function TransportOrderDetailPage() {
     />
   );
 
+  const declarationNumberField = (
+    <InlineTextField
+      canEdit={canEditMeta}
+      value={order.declarationNumber ?? ''}
+      onSave={async (next) => handleMetaPatch({ declarationNumber: next.trim() })}
+      labels={inlineEditLabels}
+    />
+  );
+
   const containerNumberField = (
     <InlineEditField<string>
       canEdit={canEditMeta}
@@ -708,6 +717,7 @@ export function TransportOrderDetailPage() {
                 </>
               )}
               {infoRow(t('transportOrders.columns.bill'), billNumberField)}
+              {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
               {infoRow(t('transportOrders.columns.container'), containerNumberField)}
               {infoRow(
                 t('transportOrders.form.containerSize'),
