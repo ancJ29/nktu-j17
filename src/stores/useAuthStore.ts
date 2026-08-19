@@ -47,8 +47,6 @@ const encodedPersistStorage: PersistStorage = {
 
 export const useAuthStore = createCredoAuthStore<Profile>({
   serviceCode: resolveServiceCode(),
-
-  useBffAuth: () => appConfig.features?.common?.authViaBff ?? false,
   deviceIdPrefix: 'C-MNGT',
   isDev: appConfig.env?.IS_DEV ?? false,
   devProfile: { name: 'Dev User' },

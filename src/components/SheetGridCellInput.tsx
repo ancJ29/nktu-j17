@@ -11,7 +11,7 @@ type Props = {
 
   readonly changed?: boolean;
 
-  readonly dense?: boolean;
+  readonly multiline?: boolean;
 };
 
 export function SheetGridCellInput({
@@ -21,8 +21,23 @@ export function SheetGridCellInput({
   label,
   readOnly,
   changed,
-  dense,
+  multiline,
 }: Props) {
+  if (multiline) {
+    return (
+      <textarea
+        className="sheet-grid-cell sheet-grid-cell--area"
+        name={name}
+        aria-label={label}
+        rows={2}
+        autoComplete="off"
+        value={value}
+        readOnly={readOnly}
+        data-changed={changed ? 'true' : undefined}
+        onChange={(e) => onChange(e.currentTarget.value)}
+      />
+    );
+  }
   return (
     <input
       className="sheet-grid-cell"
@@ -33,7 +48,6 @@ export function SheetGridCellInput({
       value={value}
       readOnly={readOnly}
       data-changed={changed ? 'true' : undefined}
-      data-dense={dense ? 'true' : undefined}
       onChange={(e) => onChange(e.currentTarget.value)}
     />
   );

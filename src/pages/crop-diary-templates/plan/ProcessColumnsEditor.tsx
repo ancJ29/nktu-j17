@@ -1,8 +1,7 @@
 import { ActionIcon, Group, Select, Stack, Table, Text, TextInput, Button } from '@mantine/core';
 import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
-import { memo, useCallback, useEffect, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMaterialStore } from '@/stores/useMaterialStore';
 import type { SheetColumn, SheetColumnKind } from '@/types';
 
 type Props = {
@@ -16,27 +15,10 @@ export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
 }: Props) {
   const { t } = useTranslation();
 
-  const materials = useMaterialStore((s) => s.items);
-  const materialsInitialized = useMaterialStore((s) => s.initialized);
-  const loadMaterials = useMaterialStore((s) => s.loadAll);
-  useEffect(() => {
-    if (!materialsInitialized) loadMaterials();
-  }, [materialsInitialized, loadMaterials]);
-
-  const materialOptions = useMemo(
-    () =>
-      materials
-        .filter((m) => !m.extra?.isDeleted)
-        .map((m) => ({ value: m.code, label: `${m.name} (${m.code})` })),
-    [materials],
-  );
-  const materialByCode = useMemo(() => new Map(materials.map((m) => [m.code, m])), [materials]);
-
   const kindOptions: { value: SheetColumnKind; label: string }[] = useMemo(
     () => [
-      { value: 'material', label: t('cropDiaryTemplates.plan.kind.material') },
-      { value: 'perPlant', label: t('cropDiaryTemplates.plan.kind.perPlant') },
-      { value: 'number', label: t('cropDiaryTemplates.plan.kind.number') },
+      { value: 'ratio', label: t('cropDiaryTemplates.plan.kind.ratio') },
+      { value: 'activity', label: t('cropDiaryTemplates.plan.kind.activity') },
       { value: 'text', label: t('cropDiaryTemplates.plan.kind.text') },
     ],
     [t],
@@ -68,21 +50,8 @@ export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
     const used = new Set(columns.map((c) => c.key));
     let n = columns.length + 1;
     while (used.has(`c${n}`)) n++;
-    onChange([...columns, { key: `c${n}`, kind: 'material', label: '' }]);
+    onChange([...columns, { key: `c${n}`, kind: 'ratio', label: '' }]);
   }, [columns, onChange]);
-
-  const pickMaterial = useCallback(
-    (index: number, code: string | null) => {
-      const material = code ? materialByCode.get(code) : undefined;
-      const current = columns[index];
-      patch(index, {
-        materialCode: code ?? undefined,
-        ...(material && !current.label.trim() && { label: material.name }),
-        ...(material && !current.unit && { unit: material.extra?.units?.[0] }),
-      });
-    },
-    [columns, materialByCode, patch],
-  );
 
   return (
     <Stack gap="sm">
@@ -96,9 +65,7 @@ export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
             <Table.Tr>
               <Table.Th w={190}>{t('cropDiaryTemplates.plan.columnLabel')}</Table.Th>
               <Table.Th w={140}>{t('cropDiaryTemplates.plan.columnKind')}</Table.Th>
-              <Table.Th w={220}>{t('cropDiaryTemplates.plan.columnMaterial')}</Table.Th>
-              <Table.Th w={110}>{t('cropDiaryTemplates.plan.columnTank')}</Table.Th>
-              <Table.Th w={90}>{t('cropDiaryTemplates.excel.colUnit')}</Table.Th>
+              <Table.Th w={110}>{t('cropDiaryTemplates.plan.columnGroup')}</Table.Th>
               <Table.Th w={96} />
             </Table.Tr>
           </Table.Thead>
@@ -124,45 +91,22 @@ export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
                       patch(index, {
                         kind: value as SheetColumnKind,
 
-                        ...(value !== 'material' && { materialCode: undefined, group: undefined }),
+                        ...(value !== 'ratio' && { materialCode: undefined }),
                       })
                     }
                   />
                 </Table.Td>
                 <Table.Td>
-                  <Select
-                    size="xs"
-                    searchable
-                    clearable
-                    disabled={column.kind !== 'material'}
-                    placeholder={
-                      column.kind === 'material'
-                        ? t('cropDiaryTemplates.plan.columnMaterialPlaceholder')
-                        : '—'
-                    }
-                    data={materialOptions}
-                    value={column.materialCode ?? null}
-                    onChange={(value) => pickMaterial(index, value)}
-                  />
-                </Table.Td>
-                <Table.Td>
                   {/* Free text, not a lookup category: a new lookup category
                       ships hidden to this client (their enabledCategories is a
-                      subset), so it would arrive with no vocabulary at all. */}
+                      subset), so it would arrive with no vocabulary at all.
+                      Open to every kind — a sheet groups its measurements and
+                      its prose under headings as readily as its tanks. */}
                   <TextInput
                     size="xs"
-                    disabled={column.kind !== 'material'}
-                    placeholder={column.kind === 'material' ? 'Bồn A' : '—'}
+                    placeholder={column.kind === 'ratio' ? 'Bồn A' : ''}
                     value={column.group ?? ''}
                     onChange={(e) => patch(index, { group: e.currentTarget.value || undefined })}
-                  />
-                </Table.Td>
-                <Table.Td>
-                  <TextInput
-                    size="xs"
-                    disabled={column.kind === 'text'}
-                    value={column.unit ?? ''}
-                    onChange={(e) => patch(index, { unit: e.currentTarget.value || undefined })}
                   />
                 </Table.Td>
                 <Table.Td>

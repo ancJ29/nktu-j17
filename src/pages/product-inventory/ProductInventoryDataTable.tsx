@@ -19,6 +19,7 @@ import { ProductThumb } from '../products/ProductThumb';
 import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
 import { InventorySecondaryStatusBadge } from '@/components/inventory/InventorySecondaryStatusBadge';
 import { SalesOrderLink } from '@/components/SalesOrderLink';
+import type { CustomerShortNameResolver } from '@/utils/customerDisplay';
 import { hasImagesForProducts } from '@/utils/permission';
 
 const imagesEnabled = hasImagesForProducts();
@@ -31,6 +32,8 @@ type Props = {
   readonly onRowClick: (product: Product) => void;
 
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
+
+  readonly resolveCustomerName?: CustomerShortNameResolver;
 
   readonly maxHeight?: number | string;
 
@@ -199,13 +202,16 @@ function ForecastedCell({
   );
 }
 
-function rollupReservationsBySO(
-  summary: ProductInventorySummary,
-): { id: string; orderNumber: string; byUnit: Record<string, number> }[] {
-  const map = new Map<
-    string,
-    { id: string; orderNumber: string; byUnit: Record<string, number> }
-  >();
+type ReservationRollup = {
+  id: string;
+  orderNumber: string;
+  customerCode?: string;
+  customerName?: string;
+  byUnit: Record<string, number>;
+};
+
+function rollupReservationsBySO(summary: ProductInventorySummary): ReservationRollup[] {
+  const map = new Map<string, ReservationRollup>();
   for (const row of summary.rows) {
     const m = row.extra?.reservedBySalesOrder;
     if (!m) continue;
@@ -219,6 +225,8 @@ function rollupReservationsBySO(
         map.set(soId, {
           id: soId,
           orderNumber: entry.orderNumber,
+          customerCode: entry.customerCode,
+          customerName: entry.customerName,
           byUnit: { ...entry.byUnit },
         });
       }
@@ -230,9 +238,11 @@ function rollupReservationsBySO(
 function OutgoingDropdown({
   reservations,
   unitLabels,
+  resolveCustomerName,
 }: {
-  reservations: ReturnType<typeof rollupReservationsBySO>;
+  reservations: ReservationRollup[];
   unitLabels: ReturnType<typeof useLookupLabels>;
+  resolveCustomerName?: CustomerShortNameResolver;
 }) {
   const { t } = useTranslation();
   const shown = reservations.slice(0, MAX_REFS_IN_POPOVER);
@@ -243,14 +253,24 @@ function OutgoingDropdown({
         {t('__new__.07-entities.productInventory.fromOrders')}
       </Text>
       <Stack gap={4}>
-        {shown.map((r) => (
-          <Group key={r.id} gap={8} wrap="nowrap" justify="space-between">
-            <SalesOrderLink id={r.id} fallbackLabel={r.orderNumber} size="xs" />
-            <Text size="xs" c="dimmed">
-              {formatByUnit(r.byUnit, unitLabels)}
-            </Text>
-          </Group>
-        ))}
+        {shown.map((r) => {
+          const customer = resolveCustomerName?.(r.customerName, r.customerCode);
+          return (
+            <Group key={r.id} gap={8} wrap="nowrap" justify="space-between" align="flex-start">
+              <Stack gap={0} style={{ minWidth: 0 }}>
+                <SalesOrderLink id={r.id} fallbackLabel={r.orderNumber} size="xs" />
+                {customer && (
+                  <Text size="xs" c="dimmed" lineClamp={1}>
+                    {customer}
+                  </Text>
+                )}
+              </Stack>
+              <Text size="xs" c="dimmed">
+                {formatByUnit(r.byUnit, unitLabels)}
+              </Text>
+            </Group>
+          );
+        })}
         {extra > 0 && (
           <Text size="xs" c="dimmed">
             {t('productInventory.outgoing.moreOrders', { count: extra })}
@@ -267,6 +287,7 @@ export function ProductInventoryDataTable({
   isLoading,
   onRowClick,
   inboundIndex,
+  resolveCustomerName,
   maxHeight = 'calc(100vh - 300px)',
   viewportRef,
   getColumnFilter,
@@ -576,7 +597,11 @@ export function ProductInventoryDataTable({
                   <Box style={{ cursor: 'help' }}>{cell}</Box>
                 </HoverCard.Target>
                 <HoverCard.Dropdown>
-                  <OutgoingDropdown reservations={reservations} unitLabels={unitLabels} />
+                  <OutgoingDropdown
+                    reservations={reservations}
+                    unitLabels={unitLabels}
+                    resolveCustomerName={resolveCustomerName}
+                  />
                 </HoverCard.Dropdown>
               </HoverCard>
             );
@@ -630,7 +655,7 @@ export function ProductInventoryDataTable({
           ),
         },
       ] as DataTableColumn<ProductInventorySummary>[],
-    [t, locationByCode, unitLabels, inboundIndex, getColumnFilter],
+    [t, locationByCode, unitLabels, inboundIndex, resolveCustomerName, getColumnFilter],
   );
 
   return (

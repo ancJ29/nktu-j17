@@ -18,9 +18,9 @@ import {
   readRowReserved,
   recomputeOnHand,
 } from './inventoryMath';
-import { getItemBaseUnit } from './unitConversion';
+import { convertUnit, getItemBaseUnit } from './unitConversion';
 import { getOwnReservedAtLocation, getProductLocationAvailability } from './inventoryCommitment';
-import { groupLinesBySet, isBundleSet, isNoInventoryProduct } from './productSet';
+import { getSetItems, groupLinesBySet, isBundleSet, isNoInventoryProduct } from './productSet';
 import {
   breakdownRowKey,
   buildBreakdownParentIndex,
@@ -165,6 +165,64 @@ function expandBreakdownLine(
   return out;
 }
 
+function expandStandaloneBundleSetLine(
+  line: SalesOrderItem,
+  setProduct: Product,
+  productsByCode: Map<string, Product>,
+  inventoryByProduct: Map<string, ProductInventoryRow[]>,
+  ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[],
+): SalesOrderItem[] {
+  const physicalQty = getLinePhysicalQuantity(line);
+  if (physicalQty <= 0) return [line];
+  if (line.unit !== getItemBaseUnit(setProduct)) return [line];
+
+  const loc = line.fromLocationCode || DEFAULT_LOCATION_CODE;
+  const base = getProductLocationAvailability(setProduct, loc, inventoryByProduct);
+  const ownBack = getOwnReservedAtLocation(setProduct, loc, ownReservedSnapshot);
+  const setAvailable = base.available + ownBack;
+
+  const setReserveQty = Math.max(0, Math.min(physicalQty, setAvailable));
+  const parentShort = physicalQty - setReserveQty;
+  if (parentShort <= 0) return [line];
+
+  const { extraQuantity: _extra, ...rest } = stripSetFields(line);
+  const components: SalesOrderItem[] = [];
+  for (const c of getSetItems(setProduct)) {
+    const componentProduct = productsByCode.get(c.productCode);
+    if (!componentProduct) return [line];
+    const pool = componentProduct.extra?.units?.length
+      ? componentProduct.extra.units
+      : [componentProduct.unit];
+    let unit = c.unit;
+    let quantity = c.quantity * parentShort;
+    if (!pool.includes(unit)) {
+      const primaryUnit = pool[0];
+      const converted = convertUnit(
+        quantity,
+        unit,
+        primaryUnit,
+        componentProduct.extra?.unitConversions ?? [],
+      );
+      if (converted === null) return [line];
+      quantity = converted;
+      unit = primaryUnit;
+    }
+    if (quantity <= 0) continue;
+    components.push({
+      ...rest,
+      productCode: componentProduct.code,
+      productName: componentProduct.name,
+      quantity,
+      unit,
+    });
+  }
+
+  const out: SalesOrderItem[] = [];
+  if (setReserveQty > 0) out.push({ ...rest, quantity: setReserveQty });
+  out.push(...components);
+  return out;
+}
+
 export function expandSetReservationItems(
   items: readonly SalesOrderItem[],
   productsByCode: Map<string, Product>,
@@ -177,6 +235,19 @@ export function expandSetReservationItems(
   for (const group of groupLinesBySet(items)) {
     if (group.groupId === null) {
       for (const line of group.lines) {
+        const lineProduct = line.productCode ? productsByCode.get(line.productCode) : undefined;
+        if (lineProduct && isBundleSet(lineProduct)) {
+          out.push(
+            ...expandStandaloneBundleSetLine(
+              line,
+              lineProduct,
+              productsByCode,
+              inventoryByProduct,
+              ownReservedSnapshot,
+            ),
+          );
+          continue;
+        }
         out.push(
           ...expandBreakdownLine(
             line,
@@ -447,7 +518,13 @@ function nextReservedBySalesOrder(
   if (action === 'reserve') {
     const byUnit: OnHandByUnit = {};
     for (const [u, q] of Object.entries(deltas)) if (q > 0) byUnit[u] = q;
-    next[so.id] = { orderNumber: so.orderNumber, byUnit };
+    next[so.id] = {
+      orderNumber: so.orderNumber,
+
+      ...(so.extra?.customerCode ? { customerCode: so.extra.customerCode } : {}),
+      ...(so.extra?.customerName ? { customerName: so.extra.customerName } : {}),
+      byUnit,
+    };
   } else {
     delete next[so.id];
   }

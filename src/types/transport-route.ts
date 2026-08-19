@@ -16,6 +16,26 @@ export type TransportRouteStops = {
   dropoff: string;
 };
 
+export type TransportRouteSegment = {
+  from: string;
+
+  to: string;
+
+  distanceKm: number;
+};
+
+export type TransportRouteCostItem = {
+  name: string;
+
+  unit: string;
+
+  quantity: number;
+
+  amount: number;
+
+  note?: string;
+};
+
 export type TransportRouteExtra = {
   isDeleted?: boolean;
 
@@ -41,6 +61,12 @@ export type TransportRouteRow = SingleRecordRow & {
   freightAmount: number;
 
   laborCost?: number;
+
+  segments?: TransportRouteSegment[];
+
+  costItems?: TransportRouteCostItem[];
+
+  markupPercent?: number;
   createdAt: number;
   updatedAt: number;
   extra?: TransportRouteExtra;

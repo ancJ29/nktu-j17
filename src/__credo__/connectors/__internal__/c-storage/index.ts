@@ -92,15 +92,21 @@ export const cStorageConnector = {
   },
 
   setTarget: (target: string) => {
-    storages.target = target;
+    if (target) {
+      storages.target = target;
+    }
     return cStorageConnector;
   },
   setBaseUrl: (baseUrl: string) => {
-    storages.baseUrl = baseUrl;
+    if (baseUrl) {
+      storages.baseUrl = baseUrl;
+    }
     return cStorageConnector;
   },
   setSuperAdminAccessKey: (superAdminAccessKey: string) => {
-    storages.superAdminAccessKey = superAdminAccessKey;
+    if (superAdminAccessKey) {
+      storages.superAdminAccessKey = superAdminAccessKey;
+    }
     return cStorageConnector;
   },
   clearSuperAdminAccessKey: () => {
@@ -108,14 +114,23 @@ export const cStorageConnector = {
     return cStorageConnector;
   },
   setCallerService: (service: string) => {
-    storages.callerService = service;
+    if (service) {
+      storages.callerService = service;
+    }
     return cStorageConnector;
   },
   setAccessKey: (accessKey: string) => {
+    if (!accessKey) {
+      return cStorageConnector;
+    }
     storages.accessKey = accessKey;
     return cStorageConnector;
   },
   setInternalAccessKey: (internalAccessKey: string) => {
+    if (!internalAccessKey) {
+      return cStorageConnector;
+    }
+
     if (isBrowser()) {
       console.warn(
         '[cStorageConnector] setInternalAccessKey is disabled in browser context. c-storage is not intended for direct FE access.',
@@ -126,19 +141,9 @@ export const cStorageConnector = {
     return cStorageConnector;
   },
   setTrustedServiceKey: (trustedServiceKey: string) => {
-    storages.trustedServiceKey = trustedServiceKey;
-    return cStorageConnector;
-  },
-
-  configureForAdmin: (keys: {
-    superAdminAccessKey: string;
-    internalAccessKey: string;
-    accessKey?: string;
-  }) => {
-    storages.superAdminAccessKey = keys.superAdminAccessKey;
-    storages.internalAccessKey = keys.internalAccessKey;
-    if (keys.accessKey) storages.accessKey = keys.accessKey;
-    storages.callerService = 'credo-admin';
+    if (trustedServiceKey) {
+      storages.trustedServiceKey = trustedServiceKey;
+    }
     return cStorageConnector;
   },
 

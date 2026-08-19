@@ -5,6 +5,4 @@ export * from './utils';
 
 export * from './lib';
 
-export * from './connectors';
-
 export * from './utils/build-version-check';

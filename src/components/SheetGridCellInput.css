@@ -25,19 +25,16 @@
    inline: these selectors sit under the stripe rule at equal specificity, and
    the stripe re-declaration below outranks both. */
 .sheet-grid-row > td.sheet-grid-day,
-.sheet-grid-row > td.sheet-grid-date,
 .sheet-grid-row > td.sheet-grid-stage {
   background-color: var(--mantine-color-body);
 }
 
 .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
-.sheet-grid-row:nth-of-type(odd) > td.sheet-grid-date,
 .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage {
   background-color: var(--mantine-color-gray-0);
 }
 
 [data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
-[data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-date,
 [data-mantine-color-scheme='dark'] .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage {
   background-color: var(--mantine-color-dark-6);
 }
@@ -49,14 +46,52 @@
   text-align: center;
 }
 
-.sheet-grid-row > td.sheet-grid-date {
-  font-size: var(--mantine-font-size-xs);
+/* The calendar date, under its day number in the same cell — one answer to
+   one question, and the frozen block gives a column's width back to the
+   doses. */
+.sheet-grid-daydate {
+  display: block;
   color: var(--mantine-color-dimmed);
+  font-weight: 400;
 }
 
-.sheet-grid-row > td.sheet-grid-date[data-today='true'] {
+.sheet-grid-row > td.sheet-grid-day[data-today='true'] .sheet-grid-daydate {
   font-weight: 700;
   color: var(--mantine-primary-color-filled);
+}
+
+/* The crop grid is unstriped: merged stage cells span rows (one cell cannot
+   wear five stripes), and with tall two-line rows the zebra read as extra
+   structure rather than as a reading aid. The row border alone carries the
+   separation. Scoped — the template editor keeps its stripe. */
+.crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td,
+[data-mantine-color-scheme='dark'] .crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td {
+  background-color: transparent;
+}
+
+/* A merged stage cell reads like the sheet's own merged cell: the label sits
+   at the top of its span, where the stage begins — centered, it floats
+   between days and looks attached to none of them. */
+.crop-sheet-grid .sheet-grid-row > td.sheet-grid-stage {
+  padding-top: 10px;
+  vertical-align: top;
+}
+
+/* The frozen columns stay opaque on the one background the grid now has —
+   a transparent sticky cell shows the doses sliding under it. */
+.crop-sheet-grid .sheet-grid-row > td.sheet-grid-day,
+.crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
+.crop-sheet-grid .sheet-grid-row > td.sheet-grid-stage,
+.crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage,
+[data-mantine-color-scheme='dark']
+  .crop-sheet-grid
+  .sheet-grid-row:nth-of-type(odd)
+  > td.sheet-grid-day,
+[data-mantine-color-scheme='dark']
+  .crop-sheet-grid
+  .sheet-grid-row:nth-of-type(odd)
+  > td.sheet-grid-stage {
+  background-color: var(--mantine-color-body);
 }
 
 .sheet-grid-row > td.sheet-grid-stage {
@@ -127,10 +162,60 @@
   border-color: var(--mantine-primary-color-filled);
 }
 
-/* The crop sheet packs one more row into the same height than the template
-   editor does; its grid is read far more often than it is typed into. */
-.sheet-grid-cell[data-dense='true'] {
-  height: 22px;
+/* An activity cell is a sentence — "Không bón phân, chỉ tưới nước" — and one
+   truncated line hides exactly the words that distinguish two similar jobs. */
+.sheet-grid-cell--area {
+  display: block;
+  height: auto;
+  min-height: 44px;
+  padding: 3px 4px;
+  line-height: 1.35;
+  resize: none;
+}
+
+/* The crop sheet is worked standing at the tanks, often on a phone held at
+   arm's length — the template editor's density would be the wrong trade
+   there, so the room lives on the crop grid only. */
+.crop-sheet-grid .sheet-grid-row > td {
+  padding: 5px 4px;
+}
+
+.crop-sheet-grid .sheet-grid-cell {
+  height: 28px;
+  font-size: 13px;
+}
+
+.crop-sheet-grid .sheet-grid-cell--area {
+  height: auto;
+  min-height: 48px;
+}
+
+/* Opens the material log of an activity cell. A real button so it is
+   focusable and spoken, styled as a quiet line under the textarea — the
+   loud version × 65 rows would out-shout the work it annotates. */
+.sheet-grid-matbtn {
+  display: block;
+  width: 100%;
+  margin-top: 2px;
+  padding: 1px 4px;
+  border: none;
+  border-radius: var(--mantine-radius-sm);
+  background: transparent;
+  color: var(--mantine-primary-color-filled);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.sheet-grid-matbtn:hover {
+  text-decoration: underline;
+}
+
+.sheet-grid-matbtn:focus-visible {
+  outline: 2px solid var(--mantine-primary-color-filled);
+  outline-offset: -2px;
 }
 
 .sheet-grid-cell:focus,

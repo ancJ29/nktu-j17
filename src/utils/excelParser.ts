@@ -1112,6 +1112,10 @@ export type ProductExportOptions = {
   unitLabels?: Record<string, string>;
 
   hasHideFromInventoryList?: boolean;
+
+  hasInventory?: boolean;
+
+  onHandByCode?: ReadonlyMap<string, number>;
 };
 
 export const exportProductsToExcel = (
@@ -1123,6 +1127,8 @@ export const exportProductsToExcel = (
     tagLabels,
     unitLabels,
     hasHideFromInventoryList = false,
+    hasInventory = false,
+    onHandByCode,
   }: ProductExportOptions = {},
 ) => {
   const isVietnamese = language === 'vi';
@@ -1138,6 +1144,7 @@ export const exportProductsToExcel = (
     | 'tags'
     | 'alternativeNames'
     | 'attributes'
+    | 'onHand'
     | 'minInventoryValue'
     | 'minInventoryUnit'
     | 'price'
@@ -1159,6 +1166,7 @@ export const exportProductsToExcel = (
         tags: 'Thẻ',
         alternativeNames: 'Tên gọi khác',
         attributes: 'Thuộc tính',
+        onHand: 'Tồn kho hiện tại',
         minInventoryValue: 'Tồn kho tối thiểu',
         minInventoryUnit: 'Đơn vị tồn kho tối thiểu',
         price: 'Giá bán',
@@ -1178,6 +1186,7 @@ export const exportProductsToExcel = (
         tags: 'Tags',
         alternativeNames: 'Alternative names',
         attributes: 'Attributes',
+        onHand: 'On hand',
         minInventoryValue: 'Min stock',
         minInventoryUnit: 'Min stock unit',
         price: 'Price',
@@ -1198,6 +1207,8 @@ export const exportProductsToExcel = (
     { key: 'tags', header: labels.tags, width: 24 },
     { key: 'alternativeNames', header: labels.alternativeNames, width: 28 },
     { key: 'attributes', header: labels.attributes, width: 36 },
+
+    ...(hasInventory ? [{ key: 'onHand' as const, header: labels.onHand, width: 14 }] : []),
     { key: 'minInventoryValue', header: labels.minInventoryValue, width: 14 },
     { key: 'minInventoryUnit', header: labels.minInventoryUnit, width: 16 },
     ...(hasPrice
@@ -1246,6 +1257,8 @@ export const exportProductsToExcel = (
           .filter((a) => a.key.trim() && a.value.trim())
           .map((a) => `${a.key.trim()}=${a.value.trim()}`)
           .join('; '),
+
+        onHand: e.noInventory ? '' : (onHandByCode?.get(p.code) ?? 0),
         minInventoryValue: typeof min?.value === 'number' && min.value > 0 ? min.value : '',
         minInventoryUnit: resolveLabel(min?.unit, unitLabels),
         price: typeof p.price === 'number' && p.price > 0 ? p.price : '',

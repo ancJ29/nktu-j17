@@ -1,4 +1,10 @@
-import type { TransportRouteLeg, TransportRouteRow, TransportRouteExtra } from '@/types';
+import type {
+  TransportRouteCostItem,
+  TransportRouteExtra,
+  TransportRouteLeg,
+  TransportRouteRow,
+  TransportRouteSegment,
+} from '@/types';
 
 export type TransportRouteWriteInput = {
   isMultiTrip: boolean;
@@ -11,6 +17,11 @@ export type TransportRouteWriteInput = {
   freightAmount: number;
 
   laborCost: number;
+
+  segments: TransportRouteSegment[];
+
+  costItems: TransportRouteCostItem[];
+  markupPercent: number;
   isActive: boolean;
   extra: TransportRouteExtra;
 };
@@ -25,8 +36,38 @@ export type TransportRouteWrite = Pick<
   | 'containerSize'
   | 'freightAmount'
   | 'laborCost'
+  | 'segments'
+  | 'costItems'
+  | 'markupPercent'
   | 'extra'
 >;
+
+function normalizeSegment(seg: TransportRouteSegment): TransportRouteSegment {
+  return {
+    from: seg.from.trim(),
+    to: seg.to.trim(),
+    distanceKm: seg.distanceKm || 0,
+  };
+}
+
+function isBlankSegment(seg: TransportRouteSegment): boolean {
+  return !seg.from && !seg.to && !seg.distanceKm;
+}
+
+function normalizeCostItem(item: TransportRouteCostItem): TransportRouteCostItem {
+  const note = (item.note ?? '').trim();
+  return {
+    name: item.name.trim(),
+    unit: item.unit.trim(),
+    quantity: item.quantity || 0,
+    amount: item.amount || 0,
+    ...(note ? { note } : {}),
+  };
+}
+
+function isBlankCostItem(item: TransportRouteCostItem): boolean {
+  return !item.name && !item.amount && !item.quantity;
+}
 
 function normalizeLeg(leg: TransportRouteLeg): TransportRouteLeg {
   return {
@@ -46,6 +87,10 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
 
     containerSize,
     freightAmount: input.freightAmount || 0,
+
+    segments: input.segments.map(normalizeSegment).filter((s) => !isBlankSegment(s)),
+    costItems: input.costItems.map(normalizeCostItem).filter((i) => !isBlankCostItem(i)),
+    markupPercent: input.markupPercent || 0,
     extra: input.extra,
   };
 

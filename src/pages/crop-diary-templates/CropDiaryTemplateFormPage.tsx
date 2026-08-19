@@ -43,9 +43,10 @@ import {
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { cleanPlan, resizeSheetDays } from '@/utils/cropSheetModel';
-import { exportCropSheet, parseCropSheetFile } from '@/utils/cropSheetExcel';
+import { cropSheetExportLabels, exportCropSheet, parseCropSheetFile } from '@/utils/cropSheetExcel';
 import { perms } from '@/utils/permission';
 import type {
+  PlanMemo,
   CropDiaryTemplate,
   CropDiaryTemplateCopyFrom,
   CropDiaryTemplateExtra,
@@ -80,7 +81,7 @@ type PlanDraft = {
   days: SheetDay[];
   preparation: PlanPreparation[];
 
-  memos: string[];
+  memos: PlanMemo[];
 };
 
 const EMPTY_PLAN: PlanDraft = {
@@ -229,7 +230,10 @@ export function CropDiaryTemplateFormPage() {
     [],
   );
   const handleDaysChange = useCallback((days: SheetDay[]) => setPlan((p) => ({ ...p, days })), []);
-  const handleMemosChange = useCallback((memos: string[]) => setPlan((p) => ({ ...p, memos })), []);
+  const handleMemosChange = useCallback(
+    (memos: PlanMemo[]) => setPlan((p) => ({ ...p, memos })),
+    [],
+  );
   const handlePreparationChange = useCallback(
     (preparation: PlanPreparation[]) => setPlan((p) => ({ ...p, preparation })),
     [],
@@ -284,7 +288,7 @@ export function CropDiaryTemplateFormPage() {
         });
 
         const unlinked = parsed.plan.columns
-          .filter((c) => c.kind === 'material' && !c.materialCode)
+          .filter((c) => c.kind === 'ratio' && !c.materialCode)
           .map((c) => c.label);
         if (unlinked.length) {
           notifications.show({
@@ -313,18 +317,7 @@ export function CropDiaryTemplateFormPage() {
       return;
     }
     const code = form.getValues().code.trim() || 'template';
-    exportCropSheet(
-      plan,
-      {
-        stage: t('cropDiaryTemplates.plan.stage'),
-        day: t('cropDiaryTemplates.plan.day'),
-        date: 'Ngày thực tế',
-        weekday: 'Thứ',
-        totals: 'TỔNG PHÂN',
-        sheetName: t('cropDiaryTemplates.excel.sheetName'),
-      },
-      `crop_process_${code}.xlsx`,
-    );
+    exportCropSheet(plan, cropSheetExportLabels(t), `crop_process_${code}.xlsx`);
   }, [currentPlan, form, t]);
 
   const handleSubmit = useCallback(
@@ -556,6 +549,16 @@ export function CropDiaryTemplateFormPage() {
 
           <Card withBorder radius="md" padding="lg">
             <Text fw={600} size="sm">
+              {t('cropDiaryTemplates.plan.memosSection')}
+            </Text>
+            <Text size="xs" c="dimmed" mb="md">
+              {t('cropDiaryTemplates.plan.memosSectionHint')}
+            </Text>
+            <ProcessMemosEditor memos={plan.memos} onChange={handleMemosChange} />
+          </Card>
+
+          <Card withBorder radius="md" padding="lg">
+            <Text fw={600} size="sm">
               {t('cropDiaryTemplates.plan.columnsSection')}
             </Text>
             <Text size="xs" c="dimmed" mb="md">
@@ -567,16 +570,6 @@ export function CropDiaryTemplateFormPage() {
                 {columnsError}
               </Text>
             )}
-          </Card>
-
-          <Card withBorder radius="md" padding="lg">
-            <Text fw={600} size="sm">
-              {t('cropDiaryTemplates.plan.memosSection')}
-            </Text>
-            <Text size="xs" c="dimmed" mb="md">
-              {t('cropDiaryTemplates.plan.memosSectionHint')}
-            </Text>
-            <ProcessMemosEditor memos={plan.memos} onChange={handleMemosChange} />
           </Card>
 
           <Card withBorder radius="md" padding="lg">

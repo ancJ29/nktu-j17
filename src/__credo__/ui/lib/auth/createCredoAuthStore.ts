@@ -1,6 +1,5 @@
 import { cMngtConnector } from '@credo/connectors/connector';
 
-import { credoSSOApi as credoSSOApiConnector } from '../../connectors';
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '../../utils';
 
 import { createAuthStore } from './createAuthStore';
@@ -60,10 +59,6 @@ type CreateCredoAuthStoreOptions<TProfile extends BaseProfile = BaseProfile> = {
 
   storageKeys?: AuthStorageKeys;
 
-  api?: typeof credoSSOApiConnector;
-
-  useBffAuth?: () => boolean;
-
   persistStorage?: PersistStorage;
 };
 
@@ -81,8 +76,6 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     devProfile = { name: 'Dev User' } as TProfile,
     storage = defaultStorage,
     storageKeys = DEFAULT_STORAGE_KEYS,
-    api: credoSSOApi = credoSSOApiConnector,
-    useBffAuth = () => false,
     persistStorage,
   } = options;
 
@@ -96,9 +89,7 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
         refreshTokenExpiration,
         deviceId,
       };
-      const response = useBffAuth()
-        ? await cMngtConnector.login(params)
-        : await credoSSOApi.login(params);
+      const response = await cMngtConnector.login(params);
 
       return {
         success: true,
@@ -109,9 +100,7 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     },
 
     refreshToken: async ({ refreshToken }) => {
-      const response = useBffAuth()
-        ? await cMngtConnector.refreshToken({ refreshToken })
-        : await credoSSOApi.refreshToken({ refreshToken });
+      const response = await cMngtConnector.refreshToken({ refreshToken });
       return {
         success: response.success,
         token: response.token,
@@ -145,9 +134,7 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
 
     loginWithToken: async ({ token }) => {
       const params = { serviceCode, token };
-      const response = useBffAuth()
-        ? await cMngtConnector.loginWithToken(params)
-        : await credoSSOApi.loginWithToken(params);
+      const response = await cMngtConnector.loginWithToken(params);
 
       return {
         success: true,

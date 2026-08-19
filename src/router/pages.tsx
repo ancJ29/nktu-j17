@@ -281,6 +281,9 @@ export const TransportRouteListPage = lazy(() =>
 export const TransportRouteFormPage = lazy(() =>
   import('../pages/transport-routes').then((m) => ({ default: m.TransportRouteFormPage })),
 );
+export const CostNormPage = lazy(() =>
+  import('../pages/cost-norms').then((m) => ({ default: m.CostNormPage })),
+);
 
 export const ProfilePage = lazy(() =>
   import('../pages/profile').then((m) => ({ default: m.ProfilePage })),

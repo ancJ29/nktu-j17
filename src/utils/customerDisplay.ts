@@ -17,9 +17,14 @@ export function resolveSalesOrderCustomerName(
   return name;
 }
 
+export type CustomerShortNameResolver = (
+  storedName: string | undefined | null,
+  customerCode?: string | null,
+) => string | undefined;
+
 export function createCustomerShortNameResolver(
   customers: readonly Customer[],
-): (storedName: string | undefined | null, customerCode?: string | null) => string | undefined {
+): CustomerShortNameResolver {
   const byName = new Map<string, Customer>();
   const byCode = new Map<string, Customer>();
   for (const c of customers) {

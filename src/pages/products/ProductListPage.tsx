@@ -30,6 +30,7 @@ import {
 import {
   isBreakdownSet,
   isBundleSet,
+  isHiddenFromInventoryListProduct,
   isNoInventoryProduct,
   isProductSet,
 } from '@/utils/productSet';
@@ -141,6 +142,9 @@ export function ProductListPage() {
 
       if (inventoryEnabled && f.stock) {
         if (f.stock === 'notManaged') return isNoInventoryProduct(item);
+
+        if (f.stock === 'hiddenFromList')
+          return hideFromInventoryListEnabled && isHiddenFromInventoryListProduct(item);
         if (isNoInventoryProduct(item)) return false;
         const onHand = onHandByCode.get(item.code) ?? 0;
         if (f.stock === 'inStock' && onHand <= 0) return false;
@@ -233,6 +237,10 @@ export function ProductListPage() {
       { value: 'outOfStock', label: t('products.filterStockOutOfStock') },
       { value: 'lowStock', label: t('products.filterStockLowStock') },
       { value: 'notManaged', label: t('products.filterStockNotManaged') },
+
+      ...(hideFromInventoryListEnabled
+        ? [{ value: 'hiddenFromList', label: t('products.filterStockHiddenFromList') }]
+        : []),
     ],
     [t],
   );
@@ -375,6 +383,8 @@ export function ProductListPage() {
         tagLabels,
         unitLabels,
         hasHideFromInventoryList: hideFromInventoryListEnabled,
+        hasInventory: inventoryEnabled,
+        onHandByCode,
       });
       logActivity('product.export', undefined, { count: allProducts.length });
     } catch {
@@ -385,7 +395,7 @@ export function ProductListPage() {
     } finally {
       setIsExporting(false);
     }
-  }, [allProducts, categoryLookups, tagLookups, unitLookups, i18n.language, t]);
+  }, [allProducts, categoryLookups, tagLookups, unitLookups, onHandByCode, i18n.language, t]);
 
   return (
     <>

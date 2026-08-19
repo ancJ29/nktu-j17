@@ -14,6 +14,7 @@ const PERM_MODULE_LABELS: Record<string, string> = {
   crop: 'Crop',
   cropDiary: 'Crop Diary',
   cropDiaryTemplate: 'Crop Diary Template',
+  costNorm: 'Cost Norm',
   customer: 'Customer',
   deliveryRequest: 'Delivery Request',
   employee: 'Employee',

@@ -52,6 +52,10 @@ export const ROUTES = {
     NEW: '/transport-routes/new',
     EDIT: '/transport-routes/:id/edit',
   },
+
+  COST_NORMS: {
+    LIST: '/cost-norms',
+  },
   INVENTORY: {
     PRODUCTS: '/inventory/products',
     MATERIALS: '/inventory/materials',

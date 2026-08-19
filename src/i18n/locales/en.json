@@ -789,14 +789,67 @@
     "materials": "Materials",
     "title": "Configuration"
   },
+  "costNorms": {
+    "title": "Cost Norms",
+    "subtitle": "Fuel norms and the diesel price every route's cost is computed from",
+    "price": {
+      "currentLabel": "Current diesel price",
+      "perLiter": "đ / litre",
+      "effectiveSince": "Effective from {{date}}",
+      "none": "No diesel price registered yet — route fuel costs read as 0.",
+      "update": "Update diesel price",
+      "newPrice": "New price",
+      "effectiveDate": "Effective date",
+      "notes": "Note"
+    },
+    "norms": {
+      "title": "Fuel consumption norm by vehicle type",
+      "unit": "L/100km",
+      "unset": "Not set",
+      "empty": "No vehicle types yet.",
+      "noTruckTypes": "No vehicle types registered. Add them under Meta-data → Vehicle type — a norm applies to a vehicle class the fleet actually uses.",
+      "missingWarning_one": "{{count}} vehicle type has no norm yet. Routes using it are costed with no fuel expense.",
+      "missingWarning_other": "{{count}} vehicle types have no norm yet. Routes using them are costed with no fuel expense.",
+      "orphaned": "Retired type",
+      "orphanedHint": "This norm points at a vehicle type the client no longer offers. It is kept so the figure stays visible."
+    },
+    "history": {
+      "title": "Diesel price history",
+      "hint": "Every update is appended; nothing is overwritten.",
+      "empty": "No price has been registered yet.",
+      "scheduled": "Scheduled",
+      "inForce": "In force"
+    },
+    "columns": {
+      "truckType": "Vehicle type",
+      "litersPer100km": "Norm (L/100km)",
+      "updatedAt": "Updated",
+      "updatedBy": "Updated by",
+      "effectiveDate": "Effective date",
+      "price": "Price",
+      "notes": "Note"
+    },
+    "validation": {
+      "priceRequired": "Enter a price greater than 0",
+      "effectiveDateRequired": "Pick an effective date"
+    },
+    "notifications": {
+      "priceSaved": "Diesel price updated",
+      "priceError": "Could not save the diesel price",
+      "normSaved": "Norm updated",
+      "normError": "Could not save the norm"
+    }
+  },
   "cropDiaries": {
     "addItem": "Add Entry",
+    "addPrep": "Add preparation job",
     "columns": {
       "activity": "Activity",
       "crop": "Crop",
       "entryDate": "Date",
       "template": "Template"
     },
+    "completedOn": "Done · {{date}}",
     "deleteConfirm": {
       "message": "Delete \"{{activity}}\"? This cannot be undone.",
       "title": "Delete diary entry?"
@@ -813,10 +866,18 @@
       "cropLabel": "Crop",
       "cropPlaceholder": "Select a crop",
       "entryDateLabel": "Date",
+      "isPrepHint": "Before planting on {{date}} — this entry sits under Preparation.",
+      "materialLocked": "Turn on \"uses material\" to record",
       "noCrops": "No crops available",
       "notesPlaceholder": "Details, quantities, observations…",
-      "primarySection": "Diary entry"
+      "primarySection": "Diary entry",
+      "usesMaterialLabel": "This job uses material"
     },
+    "logMaterial": "Log material",
+    "markDone": "Mark done",
+    "markUndone": "Undo",
+    "materialExpectedHint": "Record what was actually used, and how much. Leave it empty if nothing was needed.",
+    "materialPending": "Material not logged",
     "materialSummaryEmpty": "No materials logged yet",
     "materialSummaryTitle": "Materials used",
     "materialTable": {
@@ -838,6 +899,7 @@
       "updateError": "Failed to update diary entry",
       "updateSuccess": "Diary entry updated"
     },
+    "prepEmpty": "No before-planting jobs yet.",
     "prepTitle": "Before planting",
     "searchPlaceholder": "Search diary…",
     "sectionEmpty": "No diary entries for this crop yet.",
@@ -852,14 +914,11 @@
   "cropDiaryTemplates": {
     "addItem": "Add Template",
     "columns": {
-      "days": "Days",
-      "steps": "Steps"
+      "days": "Days"
     },
     "dayCount": "{{count}} days",
     "dayCount_one": "{{count}} day",
     "dayCount_other": "{{count}} days",
-    "dayLabel": "Day {{day}}",
-    "daysTitle": "Day-by-day plan",
     "detail": {
       "infoTitle": "Information",
       "statDays": "Days"
@@ -868,48 +927,24 @@
     "emptyMessage": "Create a checklist of activities to apply to a crop.",
     "emptyTitle": "No templates yet",
     "excel": {
-      "colActivity": "Activity",
-      "colDay": "Day",
-      "colMaterial": "Material",
-      "colQuantity": "Quantity",
-      "colUnit": "Unit",
       "import": "Import Excel",
       "importError": "Could not import the Excel file",
       "importSuccess": "Imported {{count}} days from Excel",
       "nothingToExport": "Add at least one day before exporting",
-      "sample": "Download template",
-      "sampleActivityPlain": "Water",
-      "sampleActivityWithMaterial": "Sow seeds",
-      "sampleMaterial": "Material name",
-      "sampleMemo": "5L per plant",
-      "sheetName": "Plan",
-      "unknownMaterials": "Unknown materials (not in master data): {{names}}"
+      "sheetName": "Plan"
     },
     "form": {
-      "activityLabel": "Activity",
-      "activityPlaceholder": "e.g. Irrigation",
       "addMaterial": "Add material",
-      "addStep": "Add step",
       "codePlaceholder": "e.g. TPL-001",
       "copyingFrom": "Copying from {{code}}",
       "createButton": "Create Template",
-      "daysSection": "Day-by-day plan",
       "descriptionLabel": "Description",
       "descriptionPlaceholder": "When to use this template",
       "materialPlaceholder": "Select material",
       "materialsLabel": "Materials",
-      "memoPlaceholder": "e.g. 5L per plant",
       "namePlaceholder": "e.g. Seedling week 1",
       "primarySection": "Template details",
       "quantityPlaceholder": "Qty",
-      "removeMaterial": "Remove material",
-      "removeStep": "Remove step",
-      "stepActivityHeader": "Activity",
-      "stepActivityPlaceholder": "e.g. Irrigation",
-      "stepNotesHeader": "Default notes",
-      "stepNotesPlaceholder": "e.g. 5L per plant",
-      "totalDatesLabel": "Total days",
-      "totalDatesPlaceholder": "e.g. 14",
       "unitPlaceholder": "Unit"
     },
     "noItems": "No templates found",
@@ -928,12 +963,10 @@
       "addStage": "Add stage",
       "adjustmentRate": "Adjustment rate",
       "adjustmentRateHint": "How hard this process runs, as a fraction. 0.95 means the doses below are already 95% of the underlying recipe.",
+      "columnGroup": "Group",
       "columnKind": "Type",
       "columnLabel": "Column",
       "columnLabelPlaceholder": "e.g. CANXI (N)",
-      "columnMaterial": "Material",
-      "columnMaterialPlaceholder": "Pick a material",
-      "columnTank": "Tank",
       "columnsSection": "Columns",
       "columnsSectionHint": "What the grid records each day. A dose column is a real material, so it reaches the season total and the cost.",
       "day": "Day",
@@ -943,11 +976,11 @@
       "importUnmatched": "No material matched: {{names}}. The columns were kept — link them by picking a material.",
       "importedColumns": "Imported {{columns}} columns over {{days}} days",
       "kind": {
-        "material": "Dose (material)",
-        "number": "Measurement",
-        "perPlant": "Per plant",
-        "text": "Text"
+        "activity": "Activity (uses material)",
+        "ratio": "Amount (by plant count)",
+        "text": "Note"
       },
+      "memoKeyPlaceholder": "Name (e.g. Substrate)",
       "memoPlaceholder": "e.g. ÁP DỤNG CHO GIÁ THỂ XƠ DỪA",
       "memosSection": "General notes",
       "memosSectionHint": "Caveats that apply to the whole process",
@@ -957,6 +990,9 @@
       "noPreparation": "No preparation jobs.",
       "noStages": "No stages yet — the whole cycle reads as one.",
       "prepActivity": "What is done",
+      "prepKind": "Kind",
+      "prepKindMaterial": "Uses material",
+      "prepKindWork": "No material",
       "prepLabel": "Section",
       "prepOffset": "Day offset",
       "preparationSection": "Before planting",
@@ -978,17 +1014,12 @@
       "totalsTitle": "Season totals"
     },
     "searchPlaceholder": "Search templates…",
-    "stepCount": "{{count}} steps",
-    "stepCount_one": "{{count}} step",
-    "stepCount_other": "{{count}} steps",
-    "stepsTitle": "Steps",
     "summary": {
       "total": "{{count}} templates"
     },
     "title": "Diary Templates",
     "validation": {
       "activityRequired": "Add at least one day with an activity",
-      "stepsRequired": "Add at least one step with an activity",
       "totalDatesRequired": "Total days must be at least 1"
     }
   },
@@ -1074,11 +1105,12 @@
       "conflictMessage": "Someone else saved this crop's plan while you were editing. Your unsaved changes were dropped and the grid reloaded — re-enter them.",
       "conflictTitle": "Reloaded — the plan changed",
       "day": {
-        "amount": "Need",
+        "activities": "Activities",
+        "activityPlaceholder": "What was done today…",
+        "amount": "Per process",
         "changed": "Differs from plan",
-        "dose": "Per plan",
+        "dose": "Use",
         "events": "Recorded this day",
-        "measures": "Water & readings",
         "noWork": "The process plans no work for this day. Fill anything in that was actually done.",
         "notes": "Notes",
         "open": "Open day {{day}}",
@@ -1089,6 +1121,12 @@
       },
       "empty": "This crop has no plan yet.",
       "loadError": "Could not load the crop's plan",
+      "materialConfig": "Material config",
+      "materialsHint": "Pick the material and unit for each column of this crop. The process says what a column is; the crop says which material and in what unit.",
+      "materialsNoColumns": "This process has no column needing a material or a unit.",
+      "materialsPlaceholder": "Pick a material",
+      "materialsUnit": "Unit",
+      "materialsWord": "materials",
       "noTotals": "Nothing consumed yet.",
       "plantCount": "Plants",
       "saveError": "Could not save the plan",
@@ -1104,7 +1142,8 @@
       "totalsForCrop": "This crop",
       "totalsPlanned": "Per template",
       "unpricedMaterials": "No cost price set for: {{names}}. The season cost below excludes them.",
-      "unsaved": "Unsaved"
+      "unsaved": "Unsaved",
+      "viewTemplate": "Origin template"
     },
     "status": {
       "growing": "Growing",
@@ -3041,6 +3080,7 @@
     "filterKindSingle": "Single products",
     "filterKindTitle": "Type",
     "filterStockAll": "All stock levels",
+    "filterStockHiddenFromList": "Hidden from inventory list",
     "filterStockInStock": "In stock",
     "filterStockLowStock": "Below minimum",
     "filterStockNotManaged": "Not inventory-managed",
@@ -3175,6 +3215,7 @@
       },
       "modules": {
         "asset": "Asset",
+        "costNorm": "Cost Norm",
         "crop": "Crop",
         "cropDiary": "Crop Diary",
         "cropDiaryTemplate": "Diary Template",
@@ -3881,7 +3922,13 @@
       "serviceSubtotal": "Service subtotal",
       "title": "Billing",
       "vatAmount": "VAT ({{rate}}%)",
-      "vatRate": "VAT rate"
+      "vatRate": "VAT rate",
+      "costPrice": "Cost price (from route {{code}})",
+      "quotedPrice": "Quoted to customer (pre-VAT)",
+      "margin": "Difference",
+      "marginPercent": "{{percent}}% over cost",
+      "marginNoPercent": "no cost basis",
+      "costPriceHint": "Computed live from the applied route and the current cost norms. Not stored on the order — an order keeps the numbers it was saved with."
     },
     "cancel": {
       "confirmMessage": "Cancel this transport order? It stays on record with a cancelled badge.",
@@ -4136,7 +4183,24 @@
       "notes": "Notes",
       "status": "Status",
       "statusHint": "An inactive route stays in the register but is no longer suggested on new orders.",
-      "noTruckTypes": "No vehicle types are registered yet. Add them under Configuration → Meta-data → Vehicle type — a route has to name a type its trucks actually carry."
+      "noTruckTypes": "No vehicle types are registered yet. Add them under Configuration → Meta-data → Vehicle type — a route has to name a type its trucks actually carry.",
+      "costSection": "Cost structure",
+      "segmentsTitle": "Distance by leg",
+      "addSegment": "Add leg",
+      "segmentFrom": "From",
+      "segmentTo": "To",
+      "distanceKm": "Distance (km)",
+      "distanceTotal": "Total distance",
+      "costItemsTitle": "Cost items",
+      "addCostItem": "Add item",
+      "costItemName": "Cost name",
+      "costItemUnit": "Unit",
+      "costItemQuantity": "Qty",
+      "costItemAmount": "Amount",
+      "costItemNote": "Note",
+      "costItemsHint": "Driver pay is not entered here — the route already stores it and the breakdown below reads that figure.",
+      "markupPercent": "Markup (%)",
+      "markupHint": "Default profit margin used to suggest a quote for this route."
     },
     "trips": {
       "title": "Legs",
@@ -4181,6 +4245,22 @@
       "truckMismatchLeg": "Leg {{leg}}: the selected vehicle is not the type route {{code}} is priced for — the fee and driver pay may not apply.",
       "truckMissing": "No vehicle selected — the fee and driver pay are still applied from route {{code}}.",
       "truckMissingLeg": "Leg {{leg}}: no vehicle selected — the fee and driver pay are still applied from route {{code}}."
+    },
+    "costing": {
+      "title": "Cost price (auto)",
+      "distance": "Total distance",
+      "km": "km",
+      "liters": "L",
+      "fuelCost": "Fuel cost",
+      "fuelFormula": "{{km}} km / 100 × {{norm}} L/100km × {{price}} đ/L",
+      "fuelFormulaShort": "Fuel",
+      "laborTotal": "Driver pay",
+      "itemsTotal": "Other cost items",
+      "costPrice": "Cost price",
+      "suggestedPrice": "Suggested quote (+{{markup}}%)",
+      "missingNorm": "No fuel norm registered for this vehicle type — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
+      "missingPrice": "No diesel price registered — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
+      "noNorm": "no norm"
     }
   },
   "vendors": {

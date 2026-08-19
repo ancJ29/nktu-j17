@@ -16,6 +16,7 @@ export type NavId =
   | 'goods-receipts'
   | 'transport-orders'
   | 'transport-routes'
+  | 'cost-norms'
   | 'product-catalog'
   | 'materials-catalog'
   | 'warehouse'
@@ -127,6 +128,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     labelKey: 'transportRoutes.title',
     label: 'Transport Routes',
     defaultIcon: IconName.Route,
+  },
+
+  'cost-norms': {
+    path: ROUTES.COST_NORMS.LIST,
+    labelKey: 'costNorms.title',
+    label: 'Cost Norms',
+    defaultIcon: IconName.GasStation,
   },
   configuration: {
     labelKey: 'configuration.title',
@@ -290,6 +298,7 @@ const DEFAULT_PC_STRUCTURE: NavStructureItem[] = [
   'quotations',
   'transport-orders',
   'transport-routes',
+  'cost-norms',
   'delivery',
   'goods-receipts',
   'employees',
@@ -335,6 +344,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
   'quotations',
   'transport-orders',
   'transport-routes',
+  'cost-norms',
   'delivery',
   'goods-receipts',
   'employees',
@@ -401,6 +411,8 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'transport-orders': (f) => f.transportOrders?.enabled ?? false,
 
   'transport-routes': (f) => f.transportOrders?.enabled ?? false,
+
+  'cost-norms': (f) => f.transportOrders?.enabled ?? false,
   'warehouse-locations': (f) => f.locations?.enabled ?? false,
   'warehouse-product-inventory': (f) => f.productInventory?.enabled ?? false,
   'warehouse-material-inventory': (f) => f.materialInventory?.enabled ?? false,
@@ -426,6 +438,7 @@ const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   'goods-receipts': () => getModulePermissions('goodsReceipt').canView ?? false,
   'transport-orders': () => getModulePermissions('transportOrder').canView ?? false,
   'transport-routes': () => getModulePermissions('transportRoute').canView ?? false,
+  'cost-norms': () => getModulePermissions('costNorm').canView ?? false,
   'configuration-products': () => getModulePermissions('product').canView ?? false,
   'configuration-materials': () => getModulePermissions('material').canView ?? false,
   'configuration-customers': () => getModulePermissions('customer').canView ?? false,

@@ -1,6 +1,8 @@
 import type {
   CropProcessPlan,
+  PlanMemo,
   PlanPreparation,
+  PrepActivityKind,
   SheetColumn,
   SheetColumnKind,
   SheetDay,
@@ -13,13 +15,16 @@ const DATE_CELL = /^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})$/;
 
 const DATE_HEADER = /ngày\s*thực\s*tế/i;
 
-const DERIVED_HEADER = /nước\s*\/\s*ngày/i;
+const DERIVED_HEADER = /nước\s*\/\s*cây/i;
 
-const PER_PLANT_HEADER = /nước\s*\/\s*cây/i;
+const WATER_TOTAL_HEADER = /nước\s*\/\s*ngày/i;
 const MEASURE_HEADER = /^\s*(ec|ph)\s*$/i;
-const TEXT_HEADER = /phun|chạy\s*gốc|thuốc|ghi\s*chú|note/i;
+const ACTIVITY_HEADER = /phun|chạy\s*gốc|thuốc/i;
+const NOTE_HEADER = /ghi\s*chú|note/i;
 
 const TOTALS_ROW = /^tổng/i;
+
+const PREP_MATERIAL_CELL = /^vật\s*tư$/i;
 
 function text(value: string | number | undefined): string {
   if (typeof value === 'number') return Number.isFinite(value) ? String(value) : '';
@@ -76,16 +81,18 @@ function readDataRow(
 }
 
 function columnKindFor(label: string, values: string[], group?: string): SheetColumnKind {
-  if (PER_PLANT_HEADER.test(label)) return 'perPlant';
-  if (MEASURE_HEADER.test(label)) return 'number';
-  if (TEXT_HEADER.test(label)) return 'text';
+  if (WATER_TOTAL_HEADER.test(label)) return 'ratio';
+
+  if (MEASURE_HEADER.test(label) || NOTE_HEADER.test(label)) return 'text';
+
+  if (ACTIVITY_HEADER.test(label)) return 'activity';
 
   const filled = values.filter(Boolean);
 
-  if (!filled.length) return group ? 'material' : 'text';
+  if (!filled.length) return group ? 'ratio' : 'text';
 
   const numeric = filled.filter((v) => parseNumber(v) !== undefined).length;
-  return numeric >= filled.length / 2 ? 'material' : 'text';
+  return numeric >= filled.length / 2 ? 'ratio' : 'text';
 }
 
 function columnKey(label: string, index: number): string {
@@ -98,7 +105,13 @@ function columnKey(label: string, index: number): string {
   return slug ? `${slug}-${index}` : `col-${index}`;
 }
 
-export type ImportedEvent = { entryDate: string; activity: string; label?: string };
+export type ImportedEvent = {
+  entryDate: string;
+  activity: string;
+  label?: string;
+
+  kind?: PrepActivityKind;
+};
 
 export type CropSheetImport = {
   plan: CropProcessPlan;
@@ -165,12 +178,18 @@ export function parseCropSheetGrid(
     if (!entryDate) continue;
 
     const texts = current.slice(at + 1).map((c) => text(c));
-    const activity = texts.reduce((best, t) => (t.length > best.length ? t : best), '');
+
+    const kind: PrepActivityKind | undefined = texts.some((t) => PREP_MATERIAL_CELL.test(t))
+      ? 'material'
+      : undefined;
+    const activity = texts
+      .filter((t) => !PREP_MATERIAL_CELL.test(t))
+      .reduce((best, t) => (t.length > best.length ? t : best), '');
     if (!activity) continue;
 
     let label = '';
     for (let i = at - 1; i >= 0 && !label; i--) label = cell(current, i);
-    events.push({ entryDate, activity, ...(label && { label }) });
+    events.push({ entryDate, activity, ...(label && { label }), ...(kind && { kind }) });
   }
 
   const derivedColumns: string[] = [];
@@ -184,14 +203,14 @@ export function parseCropSheetGrid(
     }
     const values = parsed.map((p) => p.values[i] ?? '');
     const kind = columnKindFor(label, values, groups[i]);
-    const materialCode = kind === 'material' ? opts?.resolveMaterialCode?.(label) : undefined;
+    const materialCode = kind === 'ratio' ? opts?.resolveMaterialCode?.(label) : undefined;
     columns.push({
       key: columnKey(label, i),
       kind,
       label,
       ...(materialCode && { materialCode }),
 
-      ...(kind === 'material' && groups[i] && { group: groups[i] }),
+      ...(kind === 'ratio' && groups[i] && { group: groups[i] }),
     });
     keptIndexes.push(i);
   });
@@ -235,6 +254,7 @@ export function parseCropSheetGrid(
         ),
         activity: e.activity,
         ...(e.label && { label: e.label }),
+        ...(e.kind && { kind: e.kind }),
       }))
     : [];
   const referencePlantCount = findPlantCount(grid);
@@ -291,8 +311,17 @@ export function findSeedCount(grid: SheetGrid): number | undefined {
   return undefined;
 }
 
-export function findMemos(grid: SheetGrid): string[] {
-  return labelledCells(grid, /ghi\s*chú\s*chung/i);
+export function findMemos(grid: SheetGrid): PlanMemo[] {
+  const out: PlanMemo[] = [];
+  for (const row of grid) {
+    const at = (row ?? []).findIndex((c) => /ghi\s*chú\s*chung/i.test(text(c)));
+    if (at < 0) continue;
+    const key = cell(row, at + 1);
+    const value = cell(row, at + 2);
+    if (value) out.push({ key, value });
+    else if (key) out.push({ key: '', value: key });
+  }
+  return out;
 }
 
 export function findPlantCount(grid: SheetGrid): number | undefined {

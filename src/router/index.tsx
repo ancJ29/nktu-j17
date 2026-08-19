@@ -86,6 +86,7 @@ import {
   TransportOrderFormPage,
   TransportRouteListPage,
   TransportRouteFormPage,
+  CostNormPage,
   ProfilePage,
   AppConfigPage,
   DebugPage,
@@ -129,6 +130,7 @@ const deliveryRequestGate = gate('deliveryRequest');
 const goodsReceiptGate = gate('goodsReceipt');
 const transportOrderGate = gate('transportOrder');
 const transportRouteGate = gate('transportRoute');
+const costNormGate = gate('costNorm');
 const locationGate = gate('location');
 const materialGate = gate('material');
 const truckGate = gate('truck');
@@ -972,6 +974,16 @@ const transportRouteRoutes: RouteObject[] = [
   },
 ];
 
+const costNormRoutes: RouteObject[] = [
+  {
+    path: ROUTES.COST_NORMS.LIST,
+    element: gatedComponent(
+      { enabled: transportOrdersEnabled, requires: costNormGate.view },
+      CostNormPage,
+    ),
+  },
+];
+
 const transportOrderDetailRoutes: RouteObject[] = [
   {
     path: ROUTES.TRANSPORT_ORDERS.NEW,
@@ -1016,6 +1028,7 @@ const router = createBrowserRouter([
           ...goodsReceiptRoutes,
           ...transportOrderRoutes,
           ...transportRouteRoutes,
+          ...costNormRoutes,
           {
             path: ROUTES.LOOKUPS.LIST,
             element: gatedComponent(

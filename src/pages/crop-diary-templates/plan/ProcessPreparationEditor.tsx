@@ -3,13 +3,14 @@ import {
   Button,
   Group,
   NumberInput,
+  Select,
   Stack,
   Table,
   Text,
   TextInput,
 } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PlanPreparation } from '@/types';
 
@@ -30,6 +31,14 @@ export const ProcessPreparationEditor = memo(function ProcessPreparationEditor({
     [preparation, onChange],
   );
 
+  const kindOptions = useMemo(
+    () => [
+      { value: 'work', label: t('cropDiaryTemplates.plan.prepKindWork') },
+      { value: 'material', label: t('cropDiaryTemplates.plan.prepKindMaterial') },
+    ],
+    [t],
+  );
+
   return (
     <Stack gap="sm">
       {preparation.length === 0 ? (
@@ -43,6 +52,7 @@ export const ProcessPreparationEditor = memo(function ProcessPreparationEditor({
               <Table.Th w={110}>{t('cropDiaryTemplates.plan.prepOffset')}</Table.Th>
               <Table.Th w={150}>{t('cropDiaryTemplates.plan.prepLabel')}</Table.Th>
               <Table.Th>{t('cropDiaryTemplates.plan.prepActivity')}</Table.Th>
+              <Table.Th w={140}>{t('cropDiaryTemplates.plan.prepKind')}</Table.Th>
               <Table.Th w={44} />
             </Table.Tr>
           </Table.Thead>
@@ -70,6 +80,20 @@ export const ProcessPreparationEditor = memo(function ProcessPreparationEditor({
                     size="xs"
                     value={job.activity}
                     onChange={(e) => patch(index, { activity: e.currentTarget.value })}
+                  />
+                </Table.Td>
+                <Table.Td>
+                  {/* Never empty: a job whose kind was never chosen is labour,
+                      which is the ordinary case — an unset select would read as
+                      a question the author still owes an answer to. */}
+                  <Select
+                    size="xs"
+                    allowDeselect={false}
+                    data={kindOptions}
+                    value={job.kind === 'material' ? 'material' : 'work'}
+                    onChange={(v) =>
+                      patch(index, v === 'material' ? { kind: 'material' } : { kind: undefined })
+                    }
                   />
                 </Table.Td>
                 <Table.Td>

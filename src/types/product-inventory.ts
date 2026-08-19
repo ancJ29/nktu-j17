@@ -13,7 +13,15 @@ export type ProductInventoryExtra = {
 
   reservedByUnit?: Record<string, number>;
 
-  reservedBySalesOrder?: Record<string, { orderNumber: string; byUnit: Record<string, number> }>;
+  reservedBySalesOrder?: Record<
+    string,
+    {
+      orderNumber: string;
+      customerCode?: string;
+      customerName?: string;
+      byUnit: Record<string, number>;
+    }
+  >;
 
   receivedByGoodsReceipt?: Record<
     string,

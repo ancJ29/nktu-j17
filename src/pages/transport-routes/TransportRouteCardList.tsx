@@ -9,6 +9,7 @@ import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useContainerSizeLabel } from '../transport-orders/containerSize';
 import { useTruckTypeLabel } from './truckType';
 import { routeEndpoints, routeLaborTotal, routeLegCount } from './routeSummary';
+import { useRouteCosting } from './useRouteCosting';
 
 type Props = {
   readonly routes: TransportRouteRow[];
@@ -19,6 +20,7 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
   const { t } = useTranslation();
   const truckTypeLabel = useTruckTypeLabel();
   const containerSizeLabel = useContainerSizeLabel();
+  const { costOf } = useRouteCosting();
 
   return (
     <ListCardList
@@ -29,6 +31,7 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
       skeletonLines={3}
       renderCard={(r) => {
         const { from, to } = routeEndpoints(r);
+        const costing = costOf(r);
         return (
           <Stack gap={6}>
             <Group justify="space-between" wrap="nowrap">
@@ -84,6 +87,17 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
                 {t('transportRoutes.suggestion.labor')}{' '}
                 <Text span size="sm" c="dark">
                   {formatMoney(routeLaborTotal(r))}
+                </Text>
+              </Text>
+              {/* Carried onto the card for the same reason the money is: this
+                  register is READ on a phone, and giá vốn is now the figure that
+                  makes a price legible. Amber marks an under-estimate, as in the
+                  table — there is no hover here to explain it, so the colour is
+                  the whole signal. */}
+              <Text size="xs" c="dimmed">
+                {t('transportRoutes.costing.costPrice')}{' '}
+                <Text span size="sm" c={costing.missing.length > 0 ? 'orange' : 'dark'}>
+                  {formatMoney(costing.costPrice)}
                 </Text>
               </Text>
             </Group>

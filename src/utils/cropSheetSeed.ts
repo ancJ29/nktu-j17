@@ -3,7 +3,7 @@ import { addDays } from '@/utils/cropSchedule';
 import { createCropSheet, queryCropPartition } from '@/stores/useCropSheetStore';
 import { createCropDiaryEntry } from '@/stores/useCropDiaryStore';
 import { useCropDiaryTemplateStore } from '@/stores/useCropDiaryTemplateStore';
-import type { CropSheet, CropSheetExtra } from '@/types';
+import type { CropDiaryExtra, CropSheet, CropSheetExtra } from '@/types';
 
 /**
  * Give a new crop its sheet — one write, from the chosen process template.
@@ -53,13 +53,21 @@ export async function seedCropSheet(input: {
     for (const job of plan.preparation) {
       const entryDate = addDays(input.startDate, job.dayOffset);
       if (!entryDate) continue;
+      // The job's kind travels with it: once the line is an ordinary dated
+      // event there is nothing left pointing back at the plan, so an entry that
+      // does not say "this one consumes material" cannot be told apart from one
+      // that needs nothing — see `CropDiaryExtra.prepKind`.
+      const extra: CropDiaryExtra = {
+        ...(job.label && { notes: job.label }),
+        ...(job.kind === 'material' && { prepKind: job.kind }),
+      };
       try {
         await createCropDiaryEntry({
           cropId: input.cropId,
           cropCode: input.cropCode,
           entryDate,
           activity: job.activity,
-          ...(job.label && { extra: { notes: job.label } }),
+          ...(Object.keys(extra).length > 0 && { extra }),
         });
       } catch {
         // Reported by the caller's own failure path if the sheet write failed;

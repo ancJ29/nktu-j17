@@ -25,6 +25,21 @@ export function SheetTotalsTable({ totals }: Props) {
     return sheetCost([...totals], (code) => priceByCode.get(code) ?? undefined);
   }, [totals, materials]);
 
+  const materialName = useMemo(() => {
+    const byCode = new Map(materials.map((m) => [m.code, m.name]));
+    return (code: string) => byCode.get(code) ?? code;
+  }, [materials]);
+
+  const splitColumns = useMemo(() => {
+    const seen = new Set<string>();
+    const split = new Set<string>();
+    for (const line of totals) {
+      if (seen.has(line.columnKey)) split.add(line.columnKey);
+      seen.add(line.columnKey);
+    }
+    return split;
+  }, [totals]);
+
   if (!totals.length) {
     return (
       <Text size="sm" c="dimmed">
@@ -53,12 +68,24 @@ export function SheetTotalsTable({ totals }: Props) {
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
+          {/* Keyed on the pair: `columnKey` alone collides the moment a column
+              splits, and React would then reuse one row's DOM for the other. */}
           {cost.lines.map((total) => (
-            <Table.Tr key={total.columnKey}>
+            <Table.Tr key={`${total.columnKey}:${total.materialCode ?? ''}`}>
               <Table.Td>
                 <Text size="sm" fw={600}>
                   {total.label}
                 </Text>
+                {/* Named only when a column split into more than one material
+                    — an activity worked with two different chemicals over the
+                    season — since one label against two numbers reads as a
+                    bug. Activity lines always carry a code, so there is no
+                    no-material branch to render. */}
+                {splitColumns.has(total.columnKey) && total.materialCode && (
+                  <Text size="xs" c="primary">
+                    {materialName(total.materialCode)}
+                  </Text>
+                )}
                 {total.group && (
                   <Text size="xs" c="dimmed">
                     {total.group}

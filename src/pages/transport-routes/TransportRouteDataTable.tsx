@@ -17,6 +17,7 @@ import {
   routeLegCount,
 } from './routeSummary';
 import { appConfig } from '@/config';
+import { useRouteCosting } from './useRouteCosting';
 
 const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
@@ -30,6 +31,8 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
   const { t } = useTranslation();
   const truckTypeLabel = useTruckTypeLabel();
   const containerSizeLabel = useContainerSizeLabel();
+
+  const { costOf } = useRouteCosting();
 
   const columns = useMemo(
     () => [
@@ -123,6 +126,33 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         ),
       },
       {
+        key: 'costPrice',
+        width: '150px',
+        header: t('transportRoutes.costing.costPrice'),
+        render: (r: TransportRouteRow) => {
+          const costing = costOf(r);
+          return (
+            <Text
+              size="sm"
+              ta="right"
+
+              c={costing.missing.length > 0 ? 'orange' : undefined}
+              title={
+                costing.missing.length > 0
+                  ? t(
+                      costing.missing.includes('norm')
+                        ? 'transportRoutes.costing.missingNorm'
+                        : 'transportRoutes.costing.missingPrice',
+                    )
+                  : undefined
+              }
+            >
+              {formatMoney(costing.costPrice)}
+            </Text>
+          );
+        },
+      },
+      {
         key: 'status',
         width: '130px',
         header: t('transportRoutes.columns.status'),
@@ -145,7 +175,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         ),
       },
     ],
-    [t, truckTypeLabel, containerSizeLabel],
+    [t, truckTypeLabel, containerSizeLabel, costOf],
   );
 
   return (

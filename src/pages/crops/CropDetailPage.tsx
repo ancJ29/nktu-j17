@@ -64,6 +64,8 @@ export function CropDetailPage() {
 
   const employees = useEmployeeStore((s) => s.items);
   const templates = useCropDiaryTemplateStore((s) => s.items);
+  const templatesInitialized = useCropDiaryTemplateStore((s) => s.initialized);
+  const loadTemplates = useCropDiaryTemplateStore((s) => s.loadAll);
 
   const location = useLocation();
   const navState = location.state as {
@@ -80,6 +82,10 @@ export function CropDetailPage() {
 
   const [sheetTotals, setSheetTotals] = useState<SheetColumnTotal[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('details');
+
+  useEffect(() => {
+    if (crop?.extra?.diaryTemplateCode && !templatesInitialized) void loadTemplates();
+  }, [crop, templatesInitialized, loadTemplates]);
 
   useEffect(() => {
     if (!id) return;
@@ -319,6 +325,7 @@ export function CropDetailPage() {
             cropCode={crop.code}
             {...(extra.fromDate ? { startDate: extra.fromDate } : {})}
             {...(extra.diaryTemplateCode ? { templateCode: extra.diaryTemplateCode } : {})}
+            {...(diaryTemplate ? { templateId: diaryTemplate.id } : {})}
             {...(typeof extra.numberOfSeeds === 'number'
               ? { fallbackPlantCount: extra.numberOfSeeds }
               : {})}

@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '@/constants/routes';
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useGoodsReceiptStore } from '@/stores/useGoodsReceiptStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
@@ -22,6 +23,7 @@ import { useListScrollRestoration, useLookupLabels, useLookupOptions } from '@/h
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useOpenInboundByProduct } from '@/hooks/useOpenInboundByProduct';
+import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { seedCurrentPeriodForProductInventory } from '@/utils/inventoryPeriod';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { ListPageHeader } from '@/components/ListPageHeader';
@@ -64,6 +66,8 @@ const canBulkImport = perms.productInventory.canBulkImport();
 const canEditInventory = perms.productInventory.canEdit();
 const canCompose = canEditInventory;
 const canViewGoodsReceipts = perms.goodsReceipt.canView();
+
+const canViewCustomers = perms.customer.canView();
 
 type StockFilter = 'noStock' | 'outOfStock' | 'lowStock' | 'negative' | null;
 
@@ -123,6 +127,14 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const goodsReceiptsInitialized = useGoodsReceiptStore((s) => s.initialized);
   const loadGoodsReceipts = useGoodsReceiptStore((s) => s.loadAll);
   const inboundIndex = useOpenInboundByProduct();
+
+  const customers = useCustomerStore((s) => s.items);
+  const customersInitialized = useCustomerStore((s) => s.initialized);
+  const loadCustomers = useCustomerStore((s) => s.loadAll);
+  const resolveCustomerName = useMemo(
+    () => (canViewCustomers ? createCustomerShortNameResolver(customers) : undefined),
+    [customers],
+  );
 
   const {
     state: filterState,
@@ -315,6 +327,11 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     if (!canViewGoodsReceipts) return;
     if (!goodsReceiptsInitialized) loadGoodsReceipts();
   }, [goodsReceiptsInitialized, loadGoodsReceipts]);
+
+  useEffect(() => {
+    if (!canViewCustomers) return;
+    if (!customersInitialized) loadCustomers();
+  }, [customersInitialized, loadCustomers]);
 
   useEffect(() => {
     if (error) {
@@ -790,6 +807,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           isLoading={loadingInitial}
           onRowClick={handleRowClick}
           inboundIndex={inboundIndex}
+          resolveCustomerName={resolveCustomerName}
           viewportRef={scrollViewportRef}
           getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}
         />

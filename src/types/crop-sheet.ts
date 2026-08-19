@@ -1,16 +1,27 @@
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 import type { CropDiaryEntry } from './crop-diary';
 
+export type MaterialLine = {
+  materialCode: string;
+  quantity?: number;
+  unit?: string;
+};
+
 export type SheetColumnKind =
-  | 'material'
-  /** A rate **per plant** (water): the day's real total is rate × the crop's
-   *  plant count, which is why it can't just be a `number`. */
-  | 'perPlant'
-  /** A plain measurement with no rollup — EC today, pH next. Summing it would
-   *  be meaningless, which is the whole reason it isn't `material`. */
-  | 'number'
-  /** Free text — the spray and root-drench recipes, and the day note. Their
-   *  embedded dose/mix basis is deliberately left unparsed (a non-goal). */
+  | 'ratio'
+  /**
+   * A daily activity that **consumes material** — the day-matrix sibling of
+   * {@link PrepActivityKind}'s `'material'`. Mostly empty in a template (a
+   * process cannot plan what condition the crop will be in); during the season
+   * the operator writes what was done into the cell and logs the real material
+   * lines against that day ({@link SheetDay.materials}).
+   */
+  | 'activity'
+  /**
+   * Free text — day notes, and the measurements (`EC`, `pH`): the client's
+   * sheets write ranges (`1.8 – 2.0`) into those columns, which is prose
+   * whatever a kind would claim.
+   */
   | 'text';
 
 export type SheetColumn = {
@@ -20,6 +31,7 @@ export type SheetColumn = {
   label: string;
 
   materialCode?: string;
+
   unit?: string;
 
   group?: string;
@@ -37,13 +49,33 @@ export type SheetDayValues = Record<string, number | string | undefined>;
 export type SheetDay = {
   day: number;
   values: SheetDayValues;
+
+  materials?: Record<string, MaterialLine[]>;
 };
+
+export type PrepActivityKind =
+  | 'work'
+  /**
+   * Consumes material — **which and how much is not knowable in advance.**
+   * The client's rule: how much disinfectant a house needs depends on the state
+   * that house is in on the day, so the process states *that* material is used
+   * and the operator logs *what* they used when they do it. This is why the
+   * plan carries no `materialCode` here, unlike a {@link SheetColumn}.
+   */
+  | 'material';
 
 export type PlanPreparation = {
   dayOffset: number;
 
   label?: string;
   activity: string;
+
+  kind?: PrepActivityKind;
+};
+
+export type PlanMemo = {
+  key: string;
+  value: string;
 };
 
 export type CropProcessPlan = {
@@ -63,7 +95,12 @@ export type CropProcessPlan = {
 
   referenceSeedCount?: number;
 
-  memos?: string[];
+  memos?: PlanMemo[];
+};
+
+export type CropColumnChoice = {
+  materialCode?: string;
+  unit?: string;
 };
 
 export type CropSheetExtra = {
@@ -80,7 +117,9 @@ export type CropSheetExtra = {
   target?: string;
   seedCount?: number;
 
-  memos?: string[];
+  memos?: PlanMemo[];
+
+  columnMaterials?: Record<string, CropColumnChoice>;
   [key: string]: unknown;
 };
 

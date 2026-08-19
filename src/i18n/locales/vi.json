@@ -789,14 +789,67 @@
     "materials": "Vật tư",
     "title": "Cấu hình"
   },
+  "costNorms": {
+    "title": "Định mức chi phí",
+    "subtitle": "Định mức tiêu hao dầu và đơn giá dầu dùng để tính giá vốn cho tuyến",
+    "price": {
+      "currentLabel": "Đơn giá dầu hiện tại",
+      "perLiter": "đ / lít",
+      "effectiveSince": "Áp dụng từ {{date}}",
+      "none": "Chưa có đơn giá dầu — chi phí dầu của mọi tuyến đang tính bằng 0.",
+      "update": "Cập nhật giá dầu",
+      "newPrice": "Giá mới",
+      "effectiveDate": "Ngày hiệu lực",
+      "notes": "Ghi chú"
+    },
+    "norms": {
+      "title": "Định mức tiêu hao dầu theo loại xe",
+      "unit": "L/100km",
+      "unset": "Chưa nhập",
+      "empty": "Chưa có loại xe nào.",
+      "noTruckTypes": "Chưa có loại xe nào. Thêm tại Danh mục → Loại xe — định mức phải gắn với loại xe đội xe đang dùng.",
+      "missingWarning_one": "{{count}} loại xe chưa có định mức. Tuyến dùng loại xe này đang tính giá vốn không có chi phí dầu.",
+      "missingWarning_other": "{{count}} loại xe chưa có định mức. Tuyến dùng các loại xe này đang tính giá vốn không có chi phí dầu.",
+      "orphaned": "Loại xe đã gỡ",
+      "orphanedHint": "Định mức này gắn với loại xe không còn trong danh mục. Vẫn hiển thị để con số không bị ẩn đi."
+    },
+    "history": {
+      "title": "Lịch sử thay đổi giá dầu",
+      "hint": "Mỗi lần cập nhật là một dòng mới — giá cũ không bị xoá.",
+      "empty": "Chưa có lần cập nhật giá nào.",
+      "scheduled": "Sắp áp dụng",
+      "inForce": "Đang áp dụng"
+    },
+    "columns": {
+      "truckType": "Loại xe",
+      "litersPer100km": "Định mức (L/100km)",
+      "updatedAt": "Ngày cập nhật",
+      "updatedBy": "Người cập nhật",
+      "effectiveDate": "Ngày hiệu lực",
+      "price": "Đơn giá",
+      "notes": "Ghi chú"
+    },
+    "validation": {
+      "priceRequired": "Vui lòng nhập giá lớn hơn 0",
+      "effectiveDateRequired": "Vui lòng chọn ngày hiệu lực"
+    },
+    "notifications": {
+      "priceSaved": "Đã cập nhật giá dầu",
+      "priceError": "Không thể lưu giá dầu",
+      "normSaved": "Đã cập nhật định mức",
+      "normError": "Không thể lưu định mức"
+    }
+  },
   "cropDiaries": {
     "addItem": "Thêm mục",
+    "addPrep": "Thêm việc chuẩn bị",
     "columns": {
       "activity": "Hoạt động",
       "crop": "Vụ mùa",
       "entryDate": "Ngày",
       "template": "Mẫu"
     },
+    "completedOn": "Đã xong · {{date}}",
     "deleteConfirm": {
       "message": "Xóa \"{{activity}}\"? Hành động này không thể hoàn tác.",
       "title": "Xóa mục nhật ký?"
@@ -813,10 +866,18 @@
       "cropLabel": "Vụ mùa",
       "cropPlaceholder": "Chọn vụ mùa",
       "entryDateLabel": "Ngày",
+      "isPrepHint": "Trước ngày trồng {{date}} — mục này nằm ở phần Chuẩn bị.",
+      "materialLocked": "Bật \"có dùng vật tư\" để ghi",
       "noCrops": "Không có vụ mùa",
       "notesPlaceholder": "Chi tiết, số lượng, quan sát…",
-      "primarySection": "Mục nhật ký"
+      "primarySection": "Mục nhật ký",
+      "usesMaterialLabel": "Công việc này có dùng vật tư"
     },
+    "logMaterial": "Ghi vật tư",
+    "markDone": "Hoàn thành",
+    "markUndone": "Bỏ hoàn thành",
+    "materialExpectedHint": "Chọn vật tư và số lượng đã dùng thực tế. Nếu không dùng gì thì để trống.",
+    "materialPending": "Chưa ghi vật tư",
     "materialSummaryEmpty": "Chưa ghi nhận vật tư",
     "materialSummaryTitle": "Vật tư đã dùng",
     "materialTable": {
@@ -838,6 +899,7 @@
       "updateError": "Không cập nhật được mục nhật ký",
       "updateSuccess": "Đã cập nhật mục nhật ký"
     },
+    "prepEmpty": "Chưa có việc chuẩn bị nào trước khi trồng.",
     "prepTitle": "Chuẩn bị trước khi trồng",
     "searchPlaceholder": "Tìm nhật ký…",
     "sectionEmpty": "Vụ mùa này chưa có mục nhật ký nào.",
@@ -852,14 +914,11 @@
   "cropDiaryTemplates": {
     "addItem": "Thêm mẫu",
     "columns": {
-      "days": "Số ngày",
-      "steps": "Các bước"
+      "days": "Số ngày"
     },
     "dayCount": "{{count}} ngày",
     "dayCount_one": "{{count}} ngày",
     "dayCount_other": "{{count}} ngày",
-    "dayLabel": "Ngày {{day}}",
-    "daysTitle": "Kế hoạch theo ngày",
     "detail": {
       "infoTitle": "Thông tin",
       "statDays": "Số ngày"
@@ -868,48 +927,24 @@
     "emptyMessage": "Tạo danh sách hoạt động để áp dụng cho vụ mùa.",
     "emptyTitle": "Chưa có mẫu nào",
     "excel": {
-      "colActivity": "Hoạt động",
-      "colDay": "Ngày",
-      "colMaterial": "Nguyên liệu",
-      "colQuantity": "Số lượng",
-      "colUnit": "Đơn vị",
       "import": "Nhập Excel",
       "importError": "Không nhập được tệp Excel",
       "importSuccess": "Đã nhập {{count}} ngày từ Excel",
       "nothingToExport": "Thêm ít nhất một ngày trước khi xuất",
-      "sample": "Tải mẫu",
-      "sampleActivityPlain": "Tưới nước",
-      "sampleActivityWithMaterial": "Gieo hạt",
-      "sampleMaterial": "Tên vật tư",
-      "sampleMemo": "5L mỗi cây",
-      "sheetName": "Kế hoạch",
-      "unknownMaterials": "Nguyên liệu không có trong dữ liệu gốc: {{names}}"
+      "sheetName": "Kế hoạch"
     },
     "form": {
-      "activityLabel": "Hoạt động",
-      "activityPlaceholder": "vd. Tưới nước",
       "addMaterial": "Thêm nguyên liệu",
-      "addStep": "Thêm bước",
       "codePlaceholder": "VD: TPL-001",
       "copyingFrom": "Sao chép từ {{code}}",
       "createButton": "Tạo mẫu",
-      "daysSection": "Kế hoạch theo ngày",
       "descriptionLabel": "Mô tả",
       "descriptionPlaceholder": "Khi nào dùng mẫu này",
       "materialPlaceholder": "Chọn nguyên liệu",
       "materialsLabel": "Nguyên liệu",
-      "memoPlaceholder": "vd. 5L mỗi cây",
       "namePlaceholder": "VD: Tuần 1 cây giống",
       "primarySection": "Thông tin mẫu",
       "quantityPlaceholder": "SL",
-      "removeMaterial": "Xóa nguyên liệu",
-      "removeStep": "Xóa bước",
-      "stepActivityHeader": "Hoạt động",
-      "stepActivityPlaceholder": "VD: Tưới nước",
-      "stepNotesHeader": "Ghi chú mặc định",
-      "stepNotesPlaceholder": "VD: 5L mỗi cây",
-      "totalDatesLabel": "Tổng số ngày",
-      "totalDatesPlaceholder": "vd. 14",
       "unitPlaceholder": "Đơn vị"
     },
     "noItems": "Không tìm thấy mẫu",
@@ -928,12 +963,10 @@
       "addStage": "Thêm giai đoạn",
       "adjustmentRate": "Tỉ lệ điều chỉnh",
       "adjustmentRateHint": "Mức chạy của quy trình, dạng phân số. 0,95 nghĩa là liều bên dưới đã bằng 95% công thức gốc.",
+      "columnGroup": "Nhóm",
       "columnKind": "Loại",
       "columnLabel": "Cột",
       "columnLabelPlaceholder": "VD: CANXI (N)",
-      "columnMaterial": "Vật tư",
-      "columnMaterialPlaceholder": "Chọn vật tư",
-      "columnTank": "Bồn",
       "columnsSection": "Các cột",
       "columnsSectionHint": "Những gì ghi nhận mỗi ngày. Cột liều là vật tư thật, nên được cộng vào tổng vụ và chi phí.",
       "day": "Ngày",
@@ -943,11 +976,11 @@
       "importUnmatched": "Không khớp vật tư: {{names}}. Các cột vẫn được giữ — hãy chọn vật tư để liên kết.",
       "importedColumns": "Đã nhập {{columns}} cột trong {{days}} ngày",
       "kind": {
-        "material": "Liều (vật tư)",
-        "number": "Chỉ số",
-        "perPlant": "Trên mỗi cây",
-        "text": "Văn bản"
+        "activity": "Hoạt động (có vật tư)",
+        "ratio": "Định mức (theo số cây)",
+        "text": "Ghi chú"
       },
+      "memoKeyPlaceholder": "Tên (vd. Giá thể)",
       "memoPlaceholder": "vd. ÁP DỤNG CHO GIÁ THỂ XƠ DỪA",
       "memosSection": "Ghi chú chung",
       "memosSectionHint": "Lưu ý áp dụng cho cả quy trình",
@@ -957,6 +990,9 @@
       "noPreparation": "Chưa có việc chuẩn bị.",
       "noStages": "Chưa có giai đoạn — cả vụ tính là một.",
       "prepActivity": "Nội dung",
+      "prepKind": "Loại",
+      "prepKindMaterial": "Có dùng vật tư",
+      "prepKindWork": "Không dùng vật tư",
       "prepLabel": "Mục",
       "prepOffset": "Lệch ngày",
       "preparationSection": "Trước khi xuống giống",
@@ -978,17 +1014,12 @@
       "totalsTitle": "Tổng cả vụ"
     },
     "searchPlaceholder": "Tìm mẫu…",
-    "stepCount": "{{count}} bước",
-    "stepCount_one": "{{count}} bước",
-    "stepCount_other": "{{count}} bước",
-    "stepsTitle": "Các bước",
     "summary": {
       "total": "{{count}} mẫu"
     },
     "title": "Mẫu nhật ký",
     "validation": {
       "activityRequired": "Thêm ít nhất một ngày có hoạt động",
-      "stepsRequired": "Thêm ít nhất một bước có hoạt động",
       "totalDatesRequired": "Tổng số ngày phải lớn hơn 0"
     }
   },
@@ -1074,11 +1105,12 @@
       "conflictMessage": "Người khác đã lưu quy trình của vụ này trong lúc bạn đang sửa. Thay đổi chưa lưu đã bị bỏ và bảng được tải lại — vui lòng nhập lại.",
       "conflictTitle": "Đã tải lại — quy trình có thay đổi",
       "day": {
-        "amount": "Cần dùng",
+        "activities": "Hoạt động",
+        "activityPlaceholder": "Việc đã làm hôm nay…",
+        "amount": "Theo quy trình",
         "changed": "Khác kế hoạch",
-        "dose": "Định mức",
+        "dose": "Cần dùng",
         "events": "Đã ghi trong ngày",
-        "measures": "Nước & chỉ số",
         "noWork": "Quy trình không có việc cho ngày này. Có làm gì thêm thì cứ nhập vào.",
         "notes": "Ghi chép",
         "open": "Mở ngày {{day}}",
@@ -1089,6 +1121,12 @@
       },
       "empty": "Vụ này chưa có quy trình.",
       "loadError": "Không tải được quy trình của vụ",
+      "materialConfig": "Thiết lập vật tư",
+      "materialsHint": "Chọn vật tư và đơn vị cho từng cột của vụ này. Quy trình chỉ nói cột là gì, vụ mùa nói là loại nào và tính bằng đơn vị nào.",
+      "materialsNoColumns": "Quy trình này không có cột nào cần chọn vật tư hay đơn vị.",
+      "materialsPlaceholder": "Chọn vật tư",
+      "materialsUnit": "Đơn vị",
+      "materialsWord": "vật tư",
       "noTotals": "Chưa tiêu hao gì.",
       "plantCount": "Số cây",
       "saveError": "Không lưu được quy trình",
@@ -1104,7 +1142,8 @@
       "totalsForCrop": "Vụ này",
       "totalsPlanned": "Theo mẫu",
       "unpricedMaterials": "Chưa có giá vốn cho: {{names}}. Chi phí cả vụ bên dưới chưa gồm các mục này.",
-      "unsaved": "Chưa lưu"
+      "unsaved": "Chưa lưu",
+      "viewTemplate": "Mẫu gốc"
     },
     "status": {
       "growing": "Đang trồng",
@@ -3041,6 +3080,7 @@
     "filterKindSingle": "Sản phẩm đơn",
     "filterKindTitle": "Loại",
     "filterStockAll": "Tất cả",
+    "filterStockHiddenFromList": "Ẩn khỏi danh sách tồn kho",
     "filterStockInStock": "Còn hàng",
     "filterStockLowStock": "Dưới mức tối thiểu",
     "filterStockNotManaged": "Không quản lý tồn kho",
@@ -3175,6 +3215,7 @@
       },
       "modules": {
         "asset": "Tài sản",
+        "costNorm": "Định mức chi phí",
         "crop": "Vụ mùa",
         "cropDiary": "Nhật ký vụ mùa",
         "cropDiaryTemplate": "Mẫu nhật ký",
@@ -3881,7 +3922,13 @@
       "serviceSubtotal": "Cộng phí dịch vụ",
       "title": "Thanh toán",
       "vatAmount": "VAT ({{rate}}%)",
-      "vatRate": "Thuế suất VAT"
+      "vatRate": "Thuế suất VAT",
+      "costPrice": "Giá vốn (theo tuyến {{code}})",
+      "quotedPrice": "Giá báo khách hàng (trước VAT)",
+      "margin": "Chênh lệch",
+      "marginPercent": "{{percent}}% so với giá vốn",
+      "marginNoPercent": "chưa có giá vốn để so",
+      "costPriceHint": "Tự tính theo tuyến tham chiếu đã áp dụng và định mức đang hiệu lực. Không lưu vào đơn — đơn giữ nguyên các con số lúc lưu."
     },
     "cancel": {
       "confirmMessage": "Hủy đơn vận chuyển này? Đơn vẫn được lưu với nhãn đã hủy.",
@@ -4136,7 +4183,24 @@
       "notes": "Ghi chú",
       "status": "Trạng thái",
       "statusHint": "Tuyến ngừng áp dụng vẫn được lưu nhưng không hiện trong gợi ý khi tạo đơn.",
-      "noTruckTypes": "Chưa có loại xe nào. Thêm tại Cấu hình → Dữ liệu danh mục → Loại xe — tuyến phải chọn đúng loại xe mà đội xe đang dùng."
+      "noTruckTypes": "Chưa có loại xe nào. Thêm tại Cấu hình → Dữ liệu danh mục → Loại xe — tuyến phải chọn đúng loại xe mà đội xe đang dùng.",
+      "costSection": "Cấu trúc chi phí",
+      "segmentsTitle": "Quãng đường từng đoạn",
+      "addSegment": "Thêm đoạn",
+      "segmentFrom": "Điểm đi",
+      "segmentTo": "Điểm đến",
+      "distanceKm": "Số km",
+      "distanceTotal": "Tổng quãng đường",
+      "costItemsTitle": "Hạng mục chi phí",
+      "addCostItem": "Thêm hạng mục",
+      "costItemName": "Tên chi phí",
+      "costItemUnit": "ĐVT",
+      "costItemQuantity": "Số lượng",
+      "costItemAmount": "Thành tiền",
+      "costItemNote": "Ghi chú",
+      "costItemsHint": "Không nhập lương chuyến ở đây — tuyến đã lưu lương chuyến và bảng giá vốn bên dưới đọc đúng con số đó.",
+      "markupPercent": "% Lợi nhuận",
+      "markupHint": "Tỷ lệ lợi nhuận mặc định, dùng để đề xuất giá báo cho tuyến này."
     },
     "trips": {
       "title": "Danh sách chặng",
@@ -4181,6 +4245,22 @@
       "truckMismatchLeg": "Chặng {{leg}}: xe đã chọn không đúng loại xe của tuyến tham chiếu {{code}}, phí có thể không chính xác.",
       "truckMissing": "Chưa chọn xe — phí và lương chuyến vẫn đang áp dụng theo tuyến {{code}}.",
       "truckMissingLeg": "Chặng {{leg}}: chưa chọn xe — phí và lương chuyến vẫn đang áp dụng theo tuyến {{code}}."
+    },
+    "costing": {
+      "title": "Giá vốn (tự tính)",
+      "distance": "Tổng quãng đường",
+      "km": "km",
+      "liters": "L",
+      "fuelCost": "Chi phí dầu",
+      "fuelFormula": "{{km}} km / 100 × {{norm}} L/100km × {{price}} đ/L",
+      "fuelFormulaShort": "Dầu",
+      "laborTotal": "Lương chuyến",
+      "itemsTotal": "Hạng mục chi phí khác",
+      "costPrice": "Giá vốn",
+      "suggestedPrice": "Giá báo đề xuất (+{{markup}}%)",
+      "missingNorm": "Loại xe này chưa có định mức tiêu hao dầu — chi phí dầu đang tính bằng 0 và giá vốn đang thấp hơn thực tế. Nhập tại Định mức chi phí.",
+      "missingPrice": "Chưa có đơn giá dầu — chi phí dầu đang tính bằng 0 và giá vốn đang thấp hơn thực tế. Nhập tại Định mức chi phí.",
+      "noNorm": "chưa có định mức"
     }
   },
   "vendors": {

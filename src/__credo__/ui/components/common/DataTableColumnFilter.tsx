@@ -15,6 +15,12 @@ import {
 } from '@mantine/core';
 import { IconFilter, IconFilterFilled, IconSearch } from '@tabler/icons-react';
 
+import {
+  columnFilterSelectionState,
+  toggleColumnFilterAll,
+  toggleColumnFilterValue,
+} from './columnFilterSelection';
+
 export type DataTableFilterOption = {
   value: string;
 
@@ -54,8 +60,21 @@ export function DataTableColumnFilter({
   const [opened, setOpened] = useState(false);
   const [query, setQuery] = useState('');
 
+  const [cleared, setCleared] = useState(false);
+
   const active = selected.length > 0;
   const selectedSet = useMemo(() => new Set(selected), [selected]);
+  const state = columnFilterSelectionState({ selected, cleared });
+
+  const changeOpened = (next: boolean) => {
+    setOpened(next);
+    if (!next) setCleared(false);
+  };
+
+  const apply = (result: { selected: string[]; cleared: boolean }) => {
+    setCleared(result.cleared);
+    onChange(result.selected);
+  };
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -63,23 +82,22 @@ export function DataTableColumnFilter({
     return options.filter((option) => option.label.toLowerCase().includes(q));
   }, [options, query]);
 
-  const isChecked = (value: string) => !active || selectedSet.has(value);
+  const isChecked = (value: string) =>
+    state === 'some' ? selectedSet.has(value) : state === 'all';
 
-  const toggle = (value: string) => {
-    const base = active ? [...selected] : options.map((option) => option.value);
-    const next = base.includes(value)
-      ? base.filter((current) => current !== value)
-      : [...base, value];
+  const optionValues = useMemo(() => options.map((option) => option.value), [options]);
 
-    onChange(next.length === options.length ? [] : next);
-  };
+  const toggle = (value: string) =>
+    apply(toggleColumnFilterValue({ selected, cleared }, optionValues, value));
 
-  const clear = () => onChange([]);
+  const toggleAll = () => apply(toggleColumnFilterAll({ selected, cleared }));
+
+  const clear = () => apply({ selected: [], cleared: false });
 
   return (
     <Popover
       opened={opened}
-      onChange={setOpened}
+      onChange={changeOpened}
       position="bottom-end"
       shadow="md"
       withArrow
@@ -93,7 +111,7 @@ export function DataTableColumnFilter({
           aria-label={text.search}
           onClick={(event) => {
             event.stopPropagation();
-            setOpened((current) => !current);
+            changeOpened(!opened);
           }}
         >
           {active ? <IconFilterFilled size={14} /> : <IconFilter size={14} />}
@@ -113,9 +131,9 @@ export function DataTableColumnFilter({
           {options.length > 0 && (
             <Checkbox
               size="xs"
-              checked={!active}
-              indeterminate={active}
-              onChange={clear}
+              checked={state === 'all'}
+              indeterminate={state === 'some'}
+              onChange={toggleAll}
               label={
                 <Text size="xs" fw={600}>
                   {text.selectAll}
@@ -157,7 +175,7 @@ export function DataTableColumnFilter({
             </Stack>
           </ScrollArea.Autosize>
 
-          {active && (
+          {state !== 'all' && (
             <Button size="compact-xs" variant="subtle" color="orange" onClick={clear}>
               {text.clear}
             </Button>

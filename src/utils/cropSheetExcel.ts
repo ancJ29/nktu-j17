@@ -9,6 +9,7 @@ import {
   type SheetCropContext,
 } from './cropSheetModel';
 import { addDays } from './cropSchedule';
+import type { TFunction } from 'i18next';
 import type { CropProcessPlan, CropSheetExtra } from '@/types';
 
 export function workbookToGrid(workbook: XLSX.WorkBook): SheetGrid {
@@ -43,12 +44,30 @@ export type CropSheetExportLabels = {
   sheetName: string;
 };
 
+export function cropSheetExportLabels(t: TFunction): CropSheetExportLabels {
+  return {
+    stage: t('cropDiaryTemplates.plan.stage'),
+    day: t('cropDiaryTemplates.plan.day'),
+    date: 'Ngày thực tế',
+    weekday: 'Thứ',
+    totals: 'TỔNG PHÂN',
+    sheetName: t('cropDiaryTemplates.excel.sheetName'),
+  };
+}
+
 const META = {
   target: 'Giống',
   seeds: 'Hạt',
   plants: 'Số lượng cây',
   memo: 'Ghi chú chung',
+
+  prepMaterial: 'Vật tư',
 } as const;
+
+function sheetDate(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-');
+  return year && month && day ? `${day}/${month}/${year}` : isoDate;
+}
 
 export function buildCropSheetRows(
   plan: CropProcessPlan,
@@ -70,7 +89,8 @@ export function buildCropSheetRows(
   const groups = plan.columns.map((c) => c.group ?? '');
 
   const meta = sheetHeader(plan, opts?.crop);
-  const rows: (string | number)[][] = meta.memos.map((memo) => [META.memo, memo]);
+
+  const rows: (string | number)[][] = meta.memos.map((memo) => [META.memo, memo.key, memo.value]);
   if (meta.target) rows.push([META.target, meta.target]);
   if (meta.seedCount !== undefined) rows.push([META.seeds, meta.seedCount]);
   if (meta.plantCount !== undefined) {
@@ -86,9 +106,11 @@ export function buildCropSheetRows(
       (opts?.startDate ? addDays(opts.startDate, job.dayOffset) : undefined) ?? undefined;
     rows.push([
       job.label ?? '',
-      date ?? job.dayOffset,
+
+      date ? sheetDate(date) : job.dayOffset,
       date ? weekdayLabel(date) : '',
       job.activity,
+      ...(job.kind === 'material' ? [META.prepMaterial] : []),
     ]);
   }
 
@@ -104,8 +126,8 @@ export function buildCropSheetRows(
       const n = numericValue(raw);
       if (n === undefined) return raw === undefined ? '' : String(raw);
 
-      const value = column.kind === 'material' ? n * (columnScale(column, plan, opts) ?? 1) : n;
-      if (column.kind === 'material' || column.kind === 'perPlant') totals[i] += value;
+      const value = column.kind === 'ratio' ? n * (columnScale(column, plan, opts) ?? 1) : n;
+      if (column.kind === 'ratio') totals[i] += value;
       return value;
     });
 
@@ -113,7 +135,7 @@ export function buildCropSheetRows(
     rows.push([
       stageStart.get(day.day) ?? '',
       day.day,
-      date,
+      date ? sheetDate(date) : '',
       date ? weekdayLabel(date) : '',
       ...cells,
     ]);
@@ -125,7 +147,7 @@ export function buildCropSheetRows(
     '',
     '',
     ...plan.columns.map((column, i) =>
-      column.kind === 'material' || column.kind === 'perPlant' ? Number(totals[i].toFixed(3)) : '',
+      column.kind === 'ratio' ? Number(totals[i].toFixed(3)) : '',
     ),
   ]);
   return rows;

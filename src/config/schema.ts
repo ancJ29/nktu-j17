@@ -473,8 +473,6 @@ const FeaturesSchema = z
 
       enablePdfSharing: z.boolean().default(false),
 
-      authViaBff: z.boolean().default(false),
-
       enableStats: z.boolean().default(false),
 
       notifyNewVersion: z.boolean().default(false),
@@ -513,7 +511,6 @@ const FeaturesSchema = z
       darkMode: false,
       languageSwitcher: true,
       enablePdfSharing: false,
-      authViaBff: false,
       enableStats: false,
       notifyNewVersion: false,
       tableDensity: 'comfortable',

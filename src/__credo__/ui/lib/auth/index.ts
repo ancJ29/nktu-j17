@@ -1,7 +1,6 @@
 export { createCredoAuthStore } from './createCredoAuthStore';
 
 export { createAuthStore } from './createAuthStore';
-export { createCredoSSOAuthApi } from './createCredoSSOAuthApi';
 
 export { useAuthSubmit } from './hooks';
 

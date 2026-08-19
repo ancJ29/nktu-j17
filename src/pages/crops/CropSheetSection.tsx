@@ -4,43 +4,52 @@ import {
   IconCalendar,
   IconDeviceFloppy,
   IconDownload,
+  IconExternalLink,
+  IconFlask,
   IconPlus,
   IconSun,
 } from '@tabler/icons-react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SectionCard } from '@/components/SectionCard';
-import { SheetGridCellInput } from '@/components/SheetGridCellInput';
+import { SheetColumnHeadCells, SheetGroupHeadCells } from '@/components/SheetGridColumnHeads';
 import {
   CropSheetConflictError,
   queryCropPartition,
   updateCropSheet,
 } from '@/stores/useCropSheetStore';
 import { seedCropSheetIfMissing } from '@/utils/cropSheetSeed';
-import { exportCropSheet } from '@/utils/cropSheetExcel';
+import { cropSheetExportLabels, exportCropSheet } from '@/utils/cropSheetExcel';
 import { addDays } from '@/utils/cropSchedule';
 import {
+  cleanMaterialLines,
+  columnUnit,
   resetDayToPlan,
   seasonTotals,
   sheetCellValue,
   sheetDayView,
+  sheetHasGroups,
   sheetRows,
+  sheetStageSpans,
   type SheetColumnTotal,
 } from '@/utils/cropSheetModel';
 import { device } from '@credo/base-ui/utils';
+import { CropSheetActivityMaterialsModal } from './CropSheetActivityMaterialsModal';
 import { CropSheetDayList } from './CropSheetDayList';
 import { CropSheetDayModal } from './CropSheetDayModal';
-import { sameSheetRow, type SheetGridRowProps } from './sheetRowEquality';
-import { formatNumber } from '@/utils/number';
-import {
-  SHEET_GRID_W,
-  SHEET_STICKY,
-  SHEET_STICKY_HEAD,
-  sheetTableMinWidth,
-} from '@/utils/sheetGridLayout';
+import { CropSheetMaterialsModal } from './CropSheetMaterialsModal';
+import { SheetGridRow } from './SheetGridRow';
+import { SHEET_GRID_W, SHEET_STICKY_HEAD, sheetTableMinWidth } from '@/utils/sheetGridLayout';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { perms } from '@/utils/permission';
-import type { CropDiaryEvent, CropSheet, CropSheetExtra } from '@/types';
+import { ROUTES } from '@/constants/routes';
+import type {
+  CropColumnChoice,
+  CropDiaryEvent,
+  CropSheet,
+  CropSheetExtra,
+  MaterialLine,
+} from '@/types';
 
 type Props = {
   readonly cropId: string;
@@ -49,6 +58,8 @@ type Props = {
   readonly startDate?: string;
   readonly templateCode?: string;
 
+  readonly templateId?: string;
+
   readonly fallbackPlantCount?: number;
 
   readonly onTotalsChange?: (totals: SheetColumnTotal[]) => void;
@@ -56,6 +67,7 @@ type Props = {
 
 const canEdit = perms.cropDiary.canEdit();
 const canCreate = perms.cropDiary.canCreate();
+const canViewTemplate = perms.cropDiaryTemplate.canView();
 const isMobile = device.isMobile;
 
 export function CropSheetSection({
@@ -63,6 +75,7 @@ export function CropSheetSection({
   cropCode,
   startDate,
   templateCode,
+  templateId,
   fallbackPlantCount,
   onTotalsChange,
 }: Props) {
@@ -76,6 +89,12 @@ export function CropSheetSection({
   const [dirty, setDirty] = useState(false);
 
   const [openDay, setOpenDay] = useState<number | null>(null);
+  const [materialsOpen, setMaterialsOpen] = useState(false);
+
+  const [openMaterialsCell, setOpenMaterialsCell] = useState<{
+    day: number;
+    columnKey: string;
+  } | null>(null);
   const todayRowRef = useRef<HTMLTableRowElement | null>(null);
   const anchoredRef = useRef(false);
 
@@ -121,6 +140,8 @@ export function CropSheetSection({
     onTotalsChange?.(totals);
   }, [totals, onTotalsChange]);
 
+  const stageSpans = useMemo(() => sheetStageSpans(rows), [rows]);
+
   const dayLabel = t('cropDiaryTemplates.plan.day');
   const today = todayInVnDateString();
   const todayDay = useMemo(() => rows.find((r) => r.date === today)?.day, [rows, today]);
@@ -146,6 +167,26 @@ export function CropSheetSection({
       return { ...current, days };
     });
     setDirty(true);
+  }, []);
+
+  const setCellMaterials = useCallback((day: number, key: string, lines: MaterialLine[]) => {
+    setDraft((current) => {
+      if (!current) return current;
+      const days = current.days.map((d) => {
+        if (d.day !== day) return d;
+        const materials = { ...(d.materials ?? {}) };
+        if (lines.length) materials[key] = lines;
+        else delete materials[key];
+        const { materials: _drop, ...rest } = d;
+        return { ...rest, ...(Object.keys(materials).length > 0 && { materials }) };
+      });
+      return { ...current, days };
+    });
+    setDirty(true);
+  }, []);
+
+  const openCellMaterials = useCallback((day: number, columnKey: string) => {
+    setOpenMaterialsCell({ day, columnKey });
   }, []);
 
   const handleSeed = useCallback(async () => {
@@ -175,11 +216,21 @@ export function CropSheetSection({
     if (!sheet || !draft) return;
     setSaving(true);
     try {
+      const days = draft.days.map((d) => {
+        if (!d.materials) return d;
+        const materials: Record<string, MaterialLine[]> = {};
+        for (const key of Object.keys(d.materials)) {
+          const lines = cleanMaterialLines(d.materials[key] ?? []);
+          if (lines.length) materials[key] = lines;
+        }
+        const { materials: _drop, ...rest } = d;
+        return { ...rest, ...(Object.keys(materials).length > 0 && { materials }) };
+      });
       const saved = await updateCropSheet({
         id: sheet.id,
         cropId,
         version: sheet.version,
-        extra: draft,
+        extra: { ...draft, days },
       });
       setSheet(saved);
       setDraft(structuredClone(saved.extra ?? draft));
@@ -206,14 +257,7 @@ export function CropSheetSection({
     if (!draft) return;
     exportCropSheet(
       { ...draft.plan, days: draft.days },
-      {
-        stage: t('cropDiaryTemplates.plan.stage'),
-        day: t('cropDiaryTemplates.plan.day'),
-        date: 'Ngày thực tế',
-        weekday: 'Thứ',
-        totals: 'TỔNG PHÂN',
-        sheetName: t('cropDiaryTemplates.excel.sheetName'),
-      },
+      cropSheetExportLabels(t),
       `crop_diary_${cropCode}.xlsx`,
       {
         crop: draft,
@@ -229,7 +273,7 @@ export function CropSheetSection({
   const dayView = useMemo(() => {
     if (openDay === null || !draft) return null;
     const row = rows[openDay - 1];
-    return row ? sheetDayView(row, draft.plan.totalDays) : null;
+    return row ? sheetDayView(row, draft.plan.totalDays, draft) : null;
   }, [openDay, rows, draft]);
 
   const dayEvents = useMemo(() => {
@@ -239,6 +283,11 @@ export function CropSheetSection({
 
   const handleResetDay = useCallback((day: number) => {
     setDraft((current) => (current ? { ...current, days: resetDayToPlan(current, day) } : current));
+    setDirty(true);
+  }, []);
+
+  const setColumnMaterials = useCallback((columnMaterials: Record<string, CropColumnChoice>) => {
+    setDraft((current) => (current ? { ...current, columnMaterials } : current));
     setDirty(true);
   }, []);
 
@@ -271,6 +320,11 @@ export function CropSheetSection({
   }
 
   const columns = draft.plan.columns;
+  const hasGroups = sheetHasGroups(columns);
+
+  const columnHeaderCells = (
+    <SheetColumnHeadCells columns={columns} unitOf={(column) => columnUnit(column, draft)} />
+  );
 
   return (
     <SectionCard
@@ -278,6 +332,10 @@ export function CropSheetSection({
       title={t('crops.sheet.title')}
       actions={
         <Group gap="xs">
+          {/* The plan this sheet was seeded from, in a new tab: "compare"
+              means both on screen, and same-tab navigation would drop the
+              operator's unsaved grid. Gated on the reader's own template
+              permission — the route would refuse them anyway. */}
           {todayDay !== undefined && (
             <Button
               size="compact-sm"
@@ -291,11 +349,34 @@ export function CropSheetSection({
           <Button
             size="compact-sm"
             variant="default"
+            leftSection={<IconFlask size={14} />}
+            onClick={() => setMaterialsOpen(true)}
+          >
+            {t('crops.sheet.materialConfig')}
+          </Button>
+          <Button
+            size="compact-sm"
+            variant="default"
             leftSection={<IconDownload size={14} />}
             onClick={handleExport}
           >
             {t('__new__.01-common.actions.exportExcel')}
           </Button>
+          {templateId && canViewTemplate && (
+            <Button
+              size="compact-sm"
+              variant="default"
+              onClick={() => {
+                window.open(
+                  ROUTES.CROP_DIARY_TEMPLATES.DETAIL.replace(':id', templateId),
+                  '_blank',
+                );
+              }}
+              leftSection={<IconExternalLink size={14} />}
+            >
+              {t('crops.sheet.viewTemplate')}
+            </Button>
+          )}
           {canEdit ? (
             <Button
               size="compact-sm"
@@ -348,65 +429,54 @@ export function CropSheetSection({
       ) : (
         <Box style={{ overflowX: 'auto' }}>
           <Table
-            striped
+            className="crop-sheet-grid"
             withTableBorder
             verticalSpacing={2}
             horizontalSpacing={4}
-            miw={sheetTableMinWidth(
-              columns.length,
-              SHEET_GRID_W.day + SHEET_GRID_W.date + SHEET_GRID_W.stage,
-            )}
+            miw={sheetTableMinWidth(columns, SHEET_GRID_W.dayDate + SHEET_GRID_W.stage)}
           >
             <Table.Thead>
               <Table.Tr>
+                {/* One identity column: the day number and its date answer the
+                    same question, and two near-empty frozen columns were width
+                    taken from the doses. */}
                 <Table.Th
-                  w={SHEET_GRID_W.day}
+                  w={SHEET_GRID_W.dayDate}
+                  rowSpan={hasGroups ? 2 : 1}
                   bg="var(--mantine-color-body)"
                   style={SHEET_STICKY_HEAD.day}
                 >
                   {t('cropDiaryTemplates.plan.day')}
                 </Table.Th>
                 <Table.Th
-                  w={SHEET_GRID_W.date}
-                  bg="var(--mantine-color-body)"
-                  style={SHEET_STICKY_HEAD.date}
-                >
-                  {t('cropDiaryTemplates.excel.colDay')}
-                </Table.Th>
-                <Table.Th
                   w={SHEET_GRID_W.stage}
+                  rowSpan={hasGroups ? 2 : 1}
                   bg="var(--mantine-color-body)"
                   style={SHEET_STICKY_HEAD.stage}
                 >
                   {t('cropDiaryTemplates.plan.stage')}
                 </Table.Th>
-                {columns.map((column) => (
-                  <Table.Th key={column.key} miw={SHEET_GRID_W.column}>
-                    <Text size="xs" fw={600} lh={1.2}>
-                      {column.label || column.key}
-                    </Text>
-                    {(column.unit || column.group) && (
-                      <Text size="10px" c="dimmed" lh={1.2}>
-                        {[column.group, column.unit].filter(Boolean).join(' · ')}
-                      </Text>
-                    )}
-                  </Table.Th>
-                ))}
+                {hasGroups ? <SheetGroupHeadCells columns={columns} /> : columnHeaderCells}
               </Table.Tr>
+              {hasGroups && <Table.Tr>{columnHeaderCells}</Table.Tr>}
             </Table.Thead>
             {/* Plain `tbody`/`tr`/`td` — see `ProcessGridEditor` and
               `SheetGridCellInput` for why Mantine's table cells are not used at
               this cell count. */}
             <tbody>
-              {rows.map((row) => (
+              {rows.map((row, i) => (
                 <SheetGridRow
                   key={row.day}
                   row={row}
+                  stageSpan={stageSpans[i]!}
                   isToday={row.day === todayDay}
                   rowRef={row.day === todayDay ? todayRowRef : undefined}
                   editable={canEdit}
                   dayLabel={dayLabel}
+                  materialsWord={t('crops.sheet.materialsWord')}
+                  logMaterialsLabel={t('cropDiaries.logMaterial')}
                   onCellChange={setCell}
+                  onOpenMaterials={openCellMaterials}
                   onOpenDay={setOpenDay}
                   openLabel={t('crops.sheet.day.open', { day: row.day })}
                 />
@@ -416,8 +486,18 @@ export function CropSheetSection({
         </Box>
       )}
 
+      <CropSheetMaterialsModal
+        opened={materialsOpen}
+        onClose={() => setMaterialsOpen(false)}
+        columns={columns}
+        value={draft.columnMaterials ?? {}}
+        onChange={setColumnMaterials}
+        editable={canEdit}
+      />
+
       <CropSheetDayModal
         view={dayView}
+        onMaterialsChange={canEdit ? setCellMaterials : undefined}
         events={dayEvents}
         onClose={() => setOpenDay(null)}
         editable={canEdit}
@@ -427,81 +507,31 @@ export function CropSheetSection({
         onReset={handleResetDay}
         onSave={handleSave}
       />
+
+      <CropSheetActivityMaterialsModal
+        cell={
+          openMaterialsCell && {
+            ...openMaterialsCell,
+            columnLabel:
+              columns.find((c) => c.key === openMaterialsCell.columnKey)?.label ??
+              openMaterialsCell.columnKey,
+          }
+        }
+        totalDays={draft.plan.totalDays}
+        lines={
+          (openMaterialsCell &&
+            draft.days.find((d) => d.day === openMaterialsCell.day)?.materials?.[
+              openMaterialsCell.columnKey
+            ]) ||
+          []
+        }
+        onChange={setCellMaterials}
+        onClose={() => setOpenMaterialsCell(null)}
+        editable={canEdit}
+        dirty={dirty}
+        saving={saving}
+        onSave={handleSave}
+      />
     </SectionCard>
   );
 }
-
-const SheetGridRow = memo(function SheetGridRow({
-  row,
-  isToday,
-  rowRef,
-  editable,
-  dayLabel,
-  onCellChange,
-  onOpenDay,
-  openLabel,
-}: SheetGridRowProps) {
-  return (
-    <tr
-      className="sheet-grid-row"
-      ref={rowRef}
-      style={isToday ? { outline: '2px solid var(--mantine-color-primary-5)' } : undefined}
-    >
-      {/* The opener is these two cells, not the row: every cell to the right is
-          a live input, so a row-level handler would fire on the way to a field
-          and pull focus out of it. A real `button` keeps the day reachable by
-          keyboard and gives it a spoken name. */}
-      <td className="sheet-grid-day" style={SHEET_STICKY.day}>
-        <button
-          type="button"
-          className="sheet-grid-open"
-          aria-label={openLabel}
-          onClick={() => onOpenDay(row.day)}
-        >
-          {row.day}
-        </button>
-      </td>
-      <td
-        className="sheet-grid-date"
-        style={SHEET_STICKY.date}
-        data-today={isToday ? 'true' : undefined}
-      >
-        {/* The same action on the wider, more natural target. Named by its own
-            date text, and out of the tab order so a keyboard user gets one stop
-            per row rather than two. */}
-        <button
-          type="button"
-          className="sheet-grid-open"
-          tabIndex={-1}
-          onClick={() => onOpenDay(row.day)}
-        >
-          {row.date ?? ''}
-        </button>
-      </td>
-      <td className="sheet-grid-stage" style={SHEET_STICKY.stage}>
-        {row.stage ?? ''}
-      </td>
-      {row.cells.map((cell) => (
-        <td key={cell.column.key}>
-          {/* Drift from the process is the thing an operator most needs to see
-              at a glance, and it is the only signal the old model could not
-              express at all — a seeded entry and a logged one were identical. */}
-          <SheetGridCellInput
-            dense
-            name={`d${row.day}-${cell.column.key}`}
-            label={`${cell.column.label || cell.column.key} — ${dayLabel} ${row.day}`}
-            readOnly={!editable}
-            changed={cell.changed}
-            value={String(cell.value ?? '')}
-            onChange={(value) => onCellChange(row.day, cell.column.key, value)}
-          />
-          {cell.dayTotal !== undefined && cell.dayTotal !== cell.value && (
-            <Text size="9px" c="dimmed" lh={1}>
-              {formatNumber(Number(cell.dayTotal.toFixed(2)))}
-            </Text>
-          )}
-        </td>
-      ))}
-    </tr>
-  );
-}, sameSheetRow);

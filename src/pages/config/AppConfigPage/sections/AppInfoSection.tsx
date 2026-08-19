@@ -10,14 +10,12 @@ export const AppInfoSection = memo(function AppInfoSection({
   languageSwitcher,
   enablePdfSharing,
   enableStats,
-  authViaBff,
   notifyNewVersion,
   onChange,
   onVersionChange,
   onLanguageSwitcherChange,
   onEnablePdfSharingChange,
   onEnableStatsChange,
-  onAuthViaBffChange,
   onNotifyNewVersionChange,
 }: {
   app: AppInfo;
@@ -25,14 +23,12 @@ export const AppInfoSection = memo(function AppInfoSection({
   languageSwitcher: boolean;
   enablePdfSharing: boolean;
   enableStats: boolean;
-  authViaBff: boolean;
   notifyNewVersion: boolean;
   onChange: (app: AppInfo) => void;
   onVersionChange: (v: string) => void;
   onLanguageSwitcherChange: (v: boolean) => void;
   onEnablePdfSharingChange: (v: boolean) => void;
   onEnableStatsChange: (v: boolean) => void;
-  onAuthViaBffChange: (v: boolean) => void;
   onNotifyNewVersionChange: (v: boolean) => void;
 }) {
   return (
@@ -174,28 +170,6 @@ export const AppInfoSection = memo(function AppInfoSection({
         <Switch
           checked={enablePdfSharing}
           onChange={(e) => onEnablePdfSharingChange(e.currentTarget.checked)}
-          style={{ flexShrink: 0 }}
-        />
-      </Group>
-      <Group
-        justify="space-between"
-        p="xs"
-        style={{ borderRadius: 'var(--mantine-radius-sm)' }}
-        bg={authViaBff ? undefined : 'var(--mantine-color-default-hover)'}
-        wrap="nowrap"
-      >
-        <Box style={{ flex: 1, minWidth: 0 }}>
-          <Text fz="sm" fw={500}>
-            Login via BFF
-          </Text>
-          <Text fz="xs" c="dimmed">
-            Route login, refresh and QR login through the c-mngt BFF instead of calling credo-sso
-            directly. Un-tick to roll back — it takes effect on the next attempt, no deploy needed.
-          </Text>
-        </Box>
-        <Switch
-          checked={authViaBff}
-          onChange={(e) => onAuthViaBffChange(e.currentTarget.checked)}
           style={{ flexShrink: 0 }}
         />
       </Group>

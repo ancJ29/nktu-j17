@@ -22,6 +22,7 @@ import {
   IconCashBanknote,
   IconInfoCircle,
   IconMapPin,
+  IconPercentage,
   IconPlus,
   IconRoute,
   IconTrash,
@@ -47,7 +48,13 @@ import {
 import { useTransportOrderStore } from '@/stores/useTransportOrderStore';
 import { buildNextSequentialCode, isDuplicateUniqueFieldError } from '@/utils/code';
 import { perms } from '@/utils/permission';
-import type { TransportRouteExtra, TransportRouteLeg, TransportRouteRow } from '@/types';
+import type {
+  TransportRouteCostItem,
+  TransportRouteExtra,
+  TransportRouteLeg,
+  TransportRouteRow,
+  TransportRouteSegment,
+} from '@/types';
 import { PLACE_INPUT_STYLES, PLACE_SUGGESTION_LIMIT } from '../transport-orders/placeSuggestions';
 import { usePlaceSuggestions } from '../transport-orders/usePlaceSuggestions';
 import { useContainerSizeOptions } from '../transport-orders/containerSize';
@@ -55,6 +62,9 @@ import { truckTypeCarriesContainer } from '../transport-orders/containerTruckTyp
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useTruckTypeOptions } from './truckType';
 import { buildTransportRouteWrite } from './transportRouteWrite';
+import { computeRouteCosting } from './routeCosting';
+import { useRouteCosting } from './useRouteCosting';
+import { RouteCostingSummary } from './RouteCostingSummary';
 
 const isMobile = device.isMobile;
 
@@ -86,12 +96,23 @@ type FormValues = {
   containerSize: string;
   freightAmount: number;
   laborCost: number;
+  segments: TransportRouteSegment[];
+  costItems: TransportRouteCostItem[];
+  markupPercent: number;
   isActive: boolean;
   notes: string;
 };
 
 function blankLeg(): LegRow {
   return { departure: '', destination: '', laborCost: 0 };
+}
+
+function blankSegment(): TransportRouteSegment {
+  return { from: '', to: '', distanceKm: 0 };
+}
+
+function blankCostItem(): TransportRouteCostItem {
+  return { name: '', unit: '', quantity: 1, amount: 0, note: '' };
 }
 
 function blankValues(): FormValues {
@@ -106,6 +127,10 @@ function blankValues(): FormValues {
     containerSize: '',
     freightAmount: 0,
     laborCost: 0,
+
+    segments: [blankSegment()],
+    costItems: [blankCostItem()],
+    markupPercent: 0,
 
     isActive: true,
     notes: '',
@@ -160,6 +185,8 @@ export function TransportRouteFormPage() {
   const truckTypeOptions = useTruckTypeOptions();
   const containerSizeOptions = useContainerSizeOptions();
 
+  const { norms, fuelPricePerLiter } = useRouteCosting();
+
   const form = useForm<FormValues>({
     initialValues: blankValues(),
     validate: {
@@ -210,6 +237,12 @@ export function TransportRouteFormPage() {
         containerSize: r.containerSize || '',
         freightAmount: r.freightAmount || 0,
         laborCost: r.laborCost || 0,
+
+        segments: r.segments?.length ? r.segments.map((seg) => ({ ...seg })) : [blankSegment()],
+        costItems: r.costItems?.length
+          ? r.costItems.map((item) => ({ note: '', ...item }))
+          : [blankCostItem()],
+        markupPercent: r.markupPercent || 0,
         isActive: r.isActive,
         notes: r.extra?.notes || '',
       };
@@ -241,6 +274,9 @@ export function TransportRouteFormPage() {
             : '',
           freightAmount: values.freightAmount,
           laborCost: values.laborCost,
+          segments: values.segments,
+          costItems: values.costItems,
+          markupPercent: values.markupPercent,
           isActive: values.isActive,
           extra,
         });
@@ -339,6 +375,21 @@ export function TransportRouteFormPage() {
   };
 
   const legLaborTotal = form.values.trips.reduce((sum, leg) => sum + (leg.laborCost || 0), 0);
+
+  const draftNorm = form.values.truckType ? norms.get(form.values.truckType) : undefined;
+
+  const draftCosting = computeRouteCosting(
+    {
+      segments: form.values.segments,
+      costItems: form.values.costItems,
+      markupPercent: form.values.markupPercent,
+      isMultiTrip: form.values.isMultiTrip,
+      trips: form.values.trips,
+      laborCost: form.values.laborCost,
+    },
+    { litersPer100km: draftNorm, fuelPricePerLiter },
+  );
+  const segmentTotalKm = draftCosting.distanceKm;
 
   const withCurrent = (options: { value: string; label: string }[], current: string) =>
     current && !options.some((o) => o.value === current)
@@ -576,6 +627,185 @@ export function TransportRouteFormPage() {
                 />
               )}
             </SimpleGrid>
+          </SectionCard>
+
+          {/* ── CẤU TRÚC CHI PHÍ ───────────────────────────────────────────
+              Sits AFTER the default-price card, not before it: the freight fee
+              is what the order form applies and the operator came here to set;
+              the cost structure is what justifies it. Reading it in that order
+              is also how the giá vốn card below can be the last word. */}
+          <SectionCard
+            icon={<IconRoute size={14} />}
+            title={t('transportRoutes.form.segmentsTitle')}
+            actions={
+              <Button
+                size="compact-sm"
+                variant="light"
+                leftSection={<IconPlus size={14} />}
+                onClick={() => form.insertListItem('segments', blankSegment())}
+              >
+                {t('transportRoutes.form.addSegment')}
+              </Button>
+            }
+          >
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>{t('transportRoutes.form.segmentFrom')}</Table.Th>
+                  <Table.Th>{t('transportRoutes.form.segmentTo')}</Table.Th>
+                  <Table.Th w={140}>{t('transportRoutes.form.distanceKm')}</Table.Th>
+                  <Table.Th w={40} />
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {form.values.segments.map((_, i) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      {/* The same place suggestions the legs use — a segment is
+                          measured between places the client already hauls to, so
+                          typing them fresh would only mint spelling variants. */}
+                      <Autocomplete
+                        data={placeSuggestions}
+                        limit={PLACE_SUGGESTION_LIMIT}
+                        styles={PLACE_INPUT_STYLES}
+                        title={form.values.segments[i]!.from || undefined}
+                        {...form.getInputProps(`segments.${i}.from`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <Autocomplete
+                        data={placeSuggestions}
+                        limit={PLACE_SUGGESTION_LIMIT}
+                        styles={PLACE_INPUT_STYLES}
+                        title={form.values.segments[i]!.to || undefined}
+                        {...form.getInputProps(`segments.${i}.to`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput
+                        min={0}
+                        decimalScale={1}
+                        thousandSeparator=","
+                        {...form.getInputProps(`segments.${i}.distanceKm`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        disabled={form.values.segments.length === 1}
+                        onClick={() => form.removeListItem('segments', i)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+            <Group justify="flex-end" gap="md">
+              <Text fw={600}>{t('transportRoutes.form.distanceTotal')}</Text>
+              <Text fw={700}>
+                {segmentTotalKm.toLocaleString('vi-VN')} {t('transportRoutes.costing.km')}
+              </Text>
+            </Group>
+          </SectionCard>
+
+          <SectionCard
+            icon={<IconCashBanknote size={14} />}
+            title={t('transportRoutes.form.costItemsTitle')}
+            actions={
+              <Button
+                size="compact-sm"
+                variant="light"
+                leftSection={<IconPlus size={14} />}
+                onClick={() => form.insertListItem('costItems', blankCostItem())}
+              >
+                {t('transportRoutes.form.addCostItem')}
+              </Button>
+            }
+          >
+            {/* Says out loud what the type comment says in code: driver pay is
+                already stored, and typing it again here would double-count it
+                into every giá vốn. */}
+            <Alert color="blue" variant="light" icon={<IconInfoCircle size={16} />} mb="sm">
+              {t('transportRoutes.form.costItemsHint')}
+            </Alert>
+            <Table>
+              <Table.Thead>
+                <Table.Tr>
+                  <Table.Th>{t('transportRoutes.form.costItemName')}</Table.Th>
+                  <Table.Th w={110}>{t('transportRoutes.form.costItemUnit')}</Table.Th>
+                  <Table.Th w={110}>{t('transportRoutes.form.costItemQuantity')}</Table.Th>
+                  <Table.Th w={160}>{t('transportRoutes.form.costItemAmount')}</Table.Th>
+                  <Table.Th>{t('transportRoutes.form.costItemNote')}</Table.Th>
+                  <Table.Th w={40} />
+                </Table.Tr>
+              </Table.Thead>
+              <Table.Tbody>
+                {form.values.costItems.map((_, i) => (
+                  <Table.Tr key={i}>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`costItems.${i}.name`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`costItems.${i}.unit`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <NumberInput min={0} {...form.getInputProps(`costItems.${i}.quantity`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      {/* THÀNH TIỀN is authored, not derived from ĐVT × SL — the
+                          client's sheet has no unit-price column, so computing
+                          it would invent a precision the source lacks. */}
+                      <NumberInput
+                        thousandSeparator=","
+                        min={0}
+                        {...form.getInputProps(`costItems.${i}.amount`)}
+                      />
+                    </Table.Td>
+                    <Table.Td>
+                      <TextInput {...form.getInputProps(`costItems.${i}.note`)} />
+                    </Table.Td>
+                    <Table.Td>
+                      <ActionIcon
+                        color="red"
+                        variant="subtle"
+                        disabled={form.values.costItems.length === 1}
+                        onClick={() => form.removeListItem('costItems', i)}
+                      >
+                        <IconTrash size={16} />
+                      </ActionIcon>
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
+              </Table.Tbody>
+            </Table>
+            <Group justify="flex-end" gap="md">
+              <Text fw={600}>{t('transportRoutes.costing.itemsTotal')}</Text>
+              <Text fw={700}>{formatMoney(draftCosting.itemsTotal)}</Text>
+            </Group>
+          </SectionCard>
+
+          <SectionCard
+            icon={<IconPercentage size={14} />}
+            title={t('transportRoutes.costing.title')}
+          >
+            <NumberInput
+              w={220}
+              mb="sm"
+              label={t('transportRoutes.form.markupPercent')}
+              description={t('transportRoutes.form.markupHint')}
+              suffix="%"
+              min={0}
+              max={1000}
+              {...form.getInputProps('markupPercent')}
+            />
+            <RouteCostingSummary
+              costing={draftCosting}
+              litersPer100km={draftNorm}
+              fuelPricePerLiter={fuelPricePerLiter}
+            />
           </SectionCard>
 
           {isEdit && perms.transportRoute.canDelete() && (

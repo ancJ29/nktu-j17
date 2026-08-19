@@ -5,6 +5,7 @@ import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useContainerSizeLabel } from '../transport-orders/containerSize';
 import { routeLaborTotal } from './routeSummary';
+import { useRouteCosting } from './useRouteCosting';
 
 type Props = {
   readonly matches: readonly TransportRouteRow[];
@@ -16,6 +17,8 @@ type Props = {
 export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Props) {
   const { t } = useTranslation();
   const containerSizeLabel = useContainerSizeLabel();
+
+  const { costOf } = useRouteCosting();
 
   if (matches.length === 0) return null;
 
@@ -30,6 +33,9 @@ export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Prop
 
         {matches.map((route) => {
           const applied = appliedCode === route.code;
+          const costing = costOf(route);
+
+          const suggested = costing.markupPercent > 0 ? costing.suggestedPrice : 0;
           return (
             <Group key={route.id} justify="space-between" wrap="nowrap" gap="md">
               <Group gap="xs" wrap="wrap" style={{ minWidth: 0 }}>
@@ -57,6 +63,19 @@ export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Prop
                     {formatMoney(routeLaborTotal(route))}
                   </Text>
                 </Text>
+                {/* GIÁ BÁO ĐỀ XUẤT — shown, never applied. Áp dụng still copies
+                    the route's authored PHÍ VẬN CHUYỂN, because that is the
+                    price somebody decided; the markup-derived figure is advice
+                    about it. A suggestion that overwrote the decided price would
+                    make the price list stop being where a price is set. */}
+                {suggested > 0 && (
+                  <Text size="xs" c="dimmed">
+                    {t('transportRoutes.costing.suggestedPrice', { markup: costing.markupPercent })}{' '}
+                    <Text span size="sm" c="dark" fw={500}>
+                      {formatMoney(suggested)}
+                    </Text>
+                  </Text>
+                )}
                 {route.extra?.notes && (
                   <Text size="xs" c="dimmed" fs="italic" lineClamp={1}>
                     {route.extra.notes}

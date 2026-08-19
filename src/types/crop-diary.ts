@@ -1,12 +1,16 @@
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
-import type { TemplateMaterialLine } from './crop-diary-template';
+import type { MaterialLine, PrepActivityKind } from './crop-sheet';
 
 export type CropDiaryExtra = {
   notes?: string;
 
-  materials?: TemplateMaterialLine[];
+  materials?: MaterialLine[];
 
   templateCode?: string;
+
+  prepKind?: PrepActivityKind;
+
+  completedDate?: string;
   [key: string]: unknown;
 };
 

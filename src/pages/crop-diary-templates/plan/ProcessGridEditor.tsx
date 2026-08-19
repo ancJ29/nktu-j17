@@ -2,7 +2,8 @@ import { Box, Table, Text } from '@mantine/core';
 import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SheetGridCellInput } from '@/components/SheetGridCellInput';
-import { sheetCellValue, stageOf } from '@/utils/cropSheetModel';
+import { SheetColumnHeadCells, SheetGroupHeadCells } from '@/components/SheetGridColumnHeads';
+import { sheetCellValue, sheetHasGroups, stageOf } from '@/utils/cropSheetModel';
 import { SHEET_GRID_W, sheetTableMinWidth } from '@/utils/sheetGridLayout';
 import type { SheetColumn, SheetDay, SheetStage } from '@/types';
 
@@ -53,6 +54,8 @@ export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
     );
   }
 
+  const hasGroups = sheetHasGroups(columns);
+
   return (
     <Box style={{ overflowX: 'auto' }}>
       <Table
@@ -60,27 +63,27 @@ export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
         withTableBorder
         verticalSpacing={2}
         horizontalSpacing={4}
-        miw={sheetTableMinWidth(columns.length, SHEET_GRID_W.day + SHEET_GRID_W.stage)}
+        miw={sheetTableMinWidth(columns, SHEET_GRID_W.day + SHEET_GRID_W.stage)}
       >
         <Table.Thead>
           <Table.Tr>
-            <Table.Th w={SHEET_GRID_W.day} style={STICKY_DAY}>
+            <Table.Th w={SHEET_GRID_W.day} rowSpan={hasGroups ? 2 : 1} style={STICKY_DAY}>
               {t('cropDiaryTemplates.plan.day')}
             </Table.Th>
-            <Table.Th w={SHEET_GRID_W.stage}>{t('cropDiaryTemplates.plan.stage')}</Table.Th>
-            {columns.map((column) => (
-              <Table.Th key={column.key} miw={SHEET_GRID_W.column}>
-                <Text size="xs" fw={600} lh={1.2}>
-                  {column.label || column.key}
-                </Text>
-                {(column.unit || column.group) && (
-                  <Text size="10px" c="dimmed" lh={1.2}>
-                    {[column.group, column.unit].filter(Boolean).join(' · ')}
-                  </Text>
-                )}
-              </Table.Th>
-            ))}
+            <Table.Th w={SHEET_GRID_W.stage} rowSpan={hasGroups ? 2 : 1}>
+              {t('cropDiaryTemplates.plan.stage')}
+            </Table.Th>
+            {hasGroups ? (
+              <SheetGroupHeadCells columns={columns} />
+            ) : (
+              <SheetColumnHeadCells columns={columns} unitOf={(c) => c.unit} />
+            )}
           </Table.Tr>
+          {hasGroups && (
+            <Table.Tr>
+              <SheetColumnHeadCells columns={columns} unitOf={(c) => c.unit} />
+            </Table.Tr>
+          )}
         </Table.Thead>
         {/* Plain `tbody`/`tr`/`td` below, not `Table.*`. Every Mantine table
             cell is a context consumer and `Table` hands its provider a **fresh

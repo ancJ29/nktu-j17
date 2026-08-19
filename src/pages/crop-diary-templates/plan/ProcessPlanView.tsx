@@ -2,7 +2,14 @@ import { Badge, Box, Group, Stack, Table, Text } from '@mantine/core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '@/utils/number';
-import { seasonTotals, stageOf, makeCropSheetExtra } from '@/utils/cropSheetModel';
+import {
+  makeCropSheetExtra,
+  seasonTotals,
+  sheetHasGroups,
+  sheetStageSpans,
+  stageOf,
+} from '@/utils/cropSheetModel';
+import { SheetColumnHeadCells, SheetGroupHeadCells } from '@/components/SheetGridColumnHeads';
 import { SHEET_GRID_W, sheetTableMinWidth } from '@/utils/sheetGridLayout';
 import type { CropProcessPlan } from '@/types';
 
@@ -14,6 +21,12 @@ export function ProcessPlanView({ plan }: Props) {
   const { t } = useTranslation();
 
   const totals = useMemo(() => seasonTotals(makeCropSheetExtra(plan)), [plan]);
+
+  const stageSpans = useMemo(
+    () => sheetStageSpans(plan.days.map((d) => ({ stage: stageOf(d.day, plan.stages)?.name }))),
+    [plan],
+  );
+  const hasGroups = sheetHasGroups(plan.columns);
 
   if (!plan.columns.length) {
     return (
@@ -60,7 +73,12 @@ export function ProcessPlanView({ plan }: Props) {
           <Stack gap={2}>
             {plan.memos.map((memo, i) => (
               <Text key={i} size="xs">
-                {memo}
+                {memo.key ? (
+                  <Text span fw={600}>
+                    {memo.key}:{' '}
+                  </Text>
+                ) : null}
+                {memo.value}
               </Text>
             ))}
           </Stack>
@@ -79,6 +97,14 @@ export function ProcessPlanView({ plan }: Props) {
                   {job.dayOffset > 0 ? `+${job.dayOffset}` : job.dayOffset}
                 </Text>
                 {job.label ? ` · ${job.label}` : ''} — {job.activity}
+                {/* Shown only when it is `'material'`: labour is the ordinary
+                    case, and marking every other line "no material" would be
+                    noise on the majority to caption the minority. */}
+                {job.kind === 'material' && (
+                  <Badge ml={6} size="xs" radius="sm" variant="light" color="primary" tt="none">
+                    {t('cropDiaryTemplates.plan.prepKindMaterial')}
+                  </Badge>
+                )}
               </Text>
             ))}
           </Stack>
@@ -103,57 +129,57 @@ export function ProcessPlanView({ plan }: Props) {
 
       <Box style={{ overflowX: 'auto' }}>
         <Table
-          striped
           withTableBorder
           verticalSpacing={2}
           horizontalSpacing={6}
-          miw={sheetTableMinWidth(plan.columns.length, SHEET_GRID_W.day + SHEET_GRID_W.stage)}
+          miw={sheetTableMinWidth(plan.columns, SHEET_GRID_W.day + SHEET_GRID_W.stage)}
         >
           <Table.Thead>
             <Table.Tr>
-              <Table.Th w={SHEET_GRID_W.day}>{t('cropDiaryTemplates.plan.day')}</Table.Th>
-              <Table.Th w={SHEET_GRID_W.stage}>{t('cropDiaryTemplates.plan.stage')}</Table.Th>
-              {plan.columns.map((column) => (
-                <Table.Th key={column.key} miw={SHEET_GRID_W.column}>
-                  <Text size="xs" fw={600} lh={1.2}>
-                    {column.label || column.key}
-                  </Text>
-                  {(column.unit || column.group) && (
-                    <Text size="10px" c="dimmed" lh={1.2}>
-                      {[column.group, column.unit].filter(Boolean).join(' · ')}
-                    </Text>
-                  )}
-                </Table.Th>
-              ))}
+              <Table.Th w={SHEET_GRID_W.day} rowSpan={hasGroups ? 2 : 1}>
+                {t('cropDiaryTemplates.plan.day')}
+              </Table.Th>
+              <Table.Th w={SHEET_GRID_W.stage} rowSpan={hasGroups ? 2 : 1}>
+                {t('cropDiaryTemplates.plan.stage')}
+              </Table.Th>
+              {hasGroups ? (
+                <SheetGroupHeadCells columns={plan.columns} />
+              ) : (
+                <SheetColumnHeadCells columns={plan.columns} unitOf={(c) => c.unit} />
+              )}
             </Table.Tr>
+            {hasGroups && (
+              <Table.Tr>
+                <SheetColumnHeadCells columns={plan.columns} unitOf={(c) => c.unit} />
+              </Table.Tr>
+            )}
           </Table.Thead>
           <Table.Tbody>
-            {plan.days.map((day) => {
-              const stage = stageOf(day.day, plan.stages);
-              return (
-                <Table.Tr key={day.day}>
-                  <Table.Td>
-                    <Text size="xs" fw={600} ta="center">
-                      {day.day}
+            {plan.days.map((day, i) => (
+              <Table.Tr key={day.day}>
+                <Table.Td>
+                  <Text size="xs" fw={600} ta="center">
+                    {day.day}
+                  </Text>
+                </Table.Td>
+                {/* Merged over the stage's run, exactly as the crop grid does
+                    it — a covered row renders no stage cell at all. */}
+                {stageSpans[i]! > 0 && (
+                  <Table.Td rowSpan={stageSpans[i]!} style={{ verticalAlign: 'top' }}>
+                    <Text size="xs" fw={600} c="primary" lh={1.2}>
+                      {stageOf(day.day, plan.stages)?.name ?? ''}
                     </Text>
                   </Table.Td>
-                  <Table.Td>
-                    {stage && stage.fromDay === day.day ? (
-                      <Text size="xs" fw={600} c="primary" lh={1.2}>
-                        {stage.name}
-                      </Text>
-                    ) : null}
+                )}
+                {plan.columns.map((column) => (
+                  <Table.Td key={column.key}>
+                    <Text size="xs" lh={1.3} style={{ whiteSpace: 'pre-wrap' }}>
+                      {String(day.values[column.key] ?? '')}
+                    </Text>
                   </Table.Td>
-                  {plan.columns.map((column) => (
-                    <Table.Td key={column.key}>
-                      <Text size="xs" lh={1.3}>
-                        {String(day.values[column.key] ?? '')}
-                      </Text>
-                    </Table.Td>
-                  ))}
-                </Table.Tr>
-              );
-            })}
+                ))}
+              </Table.Tr>
+            ))}
           </Table.Tbody>
         </Table>
       </Box>

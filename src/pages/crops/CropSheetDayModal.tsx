@@ -1,10 +1,12 @@
-import { Badge, Box, Button, Group, Stack, Table, Text, TextInput } from '@mantine/core';
+import { Badge, Button, Group, Stack, Table, Text, TextInput, Textarea } from '@mantine/core';
 import { IconRotate2 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { MaterialLinesEditor } from '@/components/MaterialLinesEditor';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { formatDate } from '@/utils/dateFormat';
-import { formatNumber } from '@/utils/number';
+import { cellInputText, cellInputToStored } from '@/utils/cropSheetModel';
 import type { SheetDayLine, SheetDayView } from '@/utils/cropSheetModel';
+import type { MaterialLine } from '@/types';
 import type { CropDiaryEntry } from '@/types';
 
 type Props = {
@@ -16,6 +18,8 @@ type Props = {
   readonly dirty: boolean;
   readonly saving: boolean;
   readonly onCellChange: (day: number, columnKey: string, raw: string) => void;
+
+  readonly onMaterialsChange?: (day: number, columnKey: string, lines: MaterialLine[]) => void;
 
   readonly onReset?: (day: number) => void;
   readonly onSave: () => void;
@@ -29,6 +33,7 @@ export function CropSheetDayModal({
   dirty,
   saving,
   onCellChange,
+  onMaterialsChange,
   onReset,
   onSave,
 }: Props) {
@@ -84,23 +89,52 @@ export function CropSheetDayModal({
             />
           ))}
 
-          {view.measures.length > 0 && (
-            <DayLineTable
-              title={t('crops.sheet.day.measures')}
-              lines={view.measures}
-              day={view.day}
-              editable={editable}
-              onCellChange={onCellChange}
-            />
+          {view.activities.length > 0 && (
+            <Stack gap="sm">
+              <SectionLabel>{t('crops.sheet.day.activities')}</SectionLabel>
+              {view.activities.map((line) => (
+                <Stack key={line.column.key} gap={6}>
+                  {/* A textarea like the grid's own activity cell: work typed
+                      over two lines there must read back whole here. */}
+                  <Textarea
+                    size="xs"
+                    autosize
+                    minRows={2}
+                    label={line.column.label || line.column.key}
+                    placeholder={t('crops.sheet.day.activityPlaceholder')}
+                    readOnly={!editable}
+                    value={String(line.value ?? '')}
+                    onChange={(e) => onCellChange(view.day, line.column.key, e.currentTarget.value)}
+                    styles={
+                      line.changed
+                        ? { input: { fontWeight: 700, color: 'var(--mantine-color-orange-7)' } }
+                        : undefined
+                    }
+                  />
+                  {/* The material half of the activity — logged here because
+                      the day is where consumption happens; the process only
+                      ever said "this column consumes". Locked, not hidden,
+                      without edit rights: what was used is still a fact worth
+                      reading. */}
+                  <MaterialLinesEditor
+                    value={line.materials ?? []}
+                    onChange={(lines) => onMaterialsChange?.(view.day, line.column.key, lines)}
+                    disabled={!editable || !onMaterialsChange}
+                  />
+                </Stack>
+              ))}
+            </Stack>
           )}
 
           {view.notes.length > 0 && (
             <Stack gap="xs">
               <SectionLabel>{t('crops.sheet.day.notes')}</SectionLabel>
               {view.notes.map((line) => (
-                <TextInput
+                <Textarea
                   key={line.column.key}
                   size="xs"
+                  autosize
+                  minRows={1}
                   label={line.column.label || line.column.key}
                   readOnly={!editable}
                   value={String(line.value ?? '')}
@@ -219,8 +253,15 @@ function DayLineTable({
                   ta="center"
                   readOnly={!editable}
                   aria-label={`${line.column.label || line.column.key} — ${t('crops.sheet.day.dose')}`}
-                  value={String(line.value ?? '')}
-                  onChange={(e) => onCellChange(day, line.column.key, e.currentTarget.value)}
+
+                  value={cellInputText(line)}
+                  onChange={(e) =>
+                    onCellChange(
+                      day,
+                      line.column.key,
+                      cellInputToStored(e.currentTarget.value, line),
+                    )
+                  }
                   styles={
                     line.changed
                       ? { input: { fontWeight: 700, color: 'var(--mantine-color-orange-7)' } }
@@ -229,7 +270,7 @@ function DayLineTable({
                 />
               </Table.Td>
               <Table.Td>
-                <Amount line={line} />
+                <PlannedRef line={line} />
               </Table.Td>
             </Table.Tr>
           ))}
@@ -239,24 +280,10 @@ function DayLineTable({
   );
 }
 
-function Amount({ line }: { readonly line: SheetDayLine }) {
-  if (line.amount === undefined) {
-    return (
-      <Text size="sm" c="dimmed" ta="right">
-        —
-      </Text>
-    );
-  }
+function PlannedRef({ line }: { readonly line: SheetDayLine }) {
   return (
-    <Box ta="right">
-      <Text size="lg" fw={800} lh={1.1}>
-        {formatNumber(Number(line.amount.toFixed(2)))}
-      </Text>
-      {line.column.unit && (
-        <Text size="10px" c="dimmed" lh={1.2}>
-          {line.column.unit}
-        </Text>
-      )}
-    </Box>
+    <Text size="sm" c="dimmed" ta="right">
+      {line.planned === undefined ? '—' : String(line.planned)}
+    </Text>
   );
 }

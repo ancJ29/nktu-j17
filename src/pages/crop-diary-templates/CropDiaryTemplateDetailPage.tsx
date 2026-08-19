@@ -37,7 +37,7 @@ import {
 } from '@/stores/useCropDiaryTemplateStore';
 import { formatDateTime } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
-import { exportCropSheet } from '@/utils/cropSheetExcel';
+import { cropSheetExportLabels, exportCropSheet } from '@/utils/cropSheetExcel';
 import { perms } from '@/utils/permission';
 import type { CropDiaryTemplate, CropDiaryTemplateCopyFrom, CropProcessPlan } from '@/types';
 
@@ -123,18 +123,7 @@ export function CropDiaryTemplateDetailPage() {
   };
 
   const handleExport = () => {
-    exportCropSheet(
-      plan,
-      {
-        stage: t('cropDiaryTemplates.plan.stage'),
-        day: t('cropDiaryTemplates.plan.day'),
-        date: 'Ngày thực tế',
-        weekday: 'Thứ',
-        totals: 'TỔNG PHÂN',
-        sheetName: t('cropDiaryTemplates.excel.sheetName'),
-      },
-      `crop_process_${template.code}.xlsx`,
-    );
+    exportCropSheet(plan, cropSheetExportLabels(t), `crop_process_${template.code}.xlsx`);
   };
 
   return (

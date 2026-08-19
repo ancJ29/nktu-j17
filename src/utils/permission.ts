@@ -599,6 +599,8 @@ export const perms = {
   })(),
 
   transportRoute: createModulePerms('transportRoute'),
+
+  costNorm: createModulePerms('costNorm'),
   location: createModulePerms('location'),
   warehouseReceipt: createModulePerms('warehouseReceipt'),
   warehouseDeliveryNote: createModulePerms('warehouseDeliveryNote'),

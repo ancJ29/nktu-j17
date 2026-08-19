@@ -50,7 +50,7 @@ const FEE_NAME_COLUMN: Readonly<Record<string, Type1FeeColumnKey>> = {
   PHI_KHAC: 'other',
   PHI_NEO_XE: 'demurrage',
   PHI_TRAM: 'surcharge',
-  PHI_ĐIEN_KHOAN: 'other',
+  PHI_DIEN_KHOAN: 'other',
 
   PHU_THU_VAN_CHUYEN: 'surcharge',
   BOC_XEP: 'handling',

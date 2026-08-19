@@ -71,40 +71,6 @@ export type UpdateProfileRequest = {
 };
 export type UpdateProfileResponse = BaseResponse;
 
-export type VerifyEmailRequest = {
-  serviceCode: string;
-  token: string;
-};
-export type VerifyEmailResponse = BaseResponse;
-
-export type ResendVerificationRequest = {
-  serviceCode: string;
-  email: string;
-  permissionKey?: string;
-  expiration?: number;
-  sendViaEmail?: boolean;
-};
-export type ResendVerificationResponse = BaseResponse & {
-  token?: string;
-};
-
-export type ForgotPasswordRequest = {
-  serviceCode: string;
-  email: string;
-  sendViaEmail?: boolean;
-  permissionKey?: string;
-};
-export type ForgotPasswordResponse = BaseResponse & {
-  token?: string;
-};
-
-export type ResetPasswordRequest = {
-  serviceCode: string;
-  token: string;
-  password: string;
-};
-export type ResetPasswordResponse = BaseResponse;
-
 export type ChangePasswordRequest = {
   token: string;
   serviceCode: string;
@@ -112,22 +78,6 @@ export type ChangePasswordRequest = {
   password: string;
 };
 export type ChangePasswordResponse = BaseResponse;
-
-export type ChangeEmailRequest = {
-  token: string;
-  newEmail: string;
-  password: string;
-  sendViaEmail?: boolean;
-};
-export type ChangeEmailResponse = BaseResponse & {
-  token?: string;
-};
-
-export type ConfirmEmailChangeRequest = {
-  serviceCode: string;
-  token: string;
-};
-export type ConfirmEmailChangeResponse = BaseResponse;
 
 export type GenerateLoginTokenRequest = {
   serviceCode: string;
@@ -242,75 +192,28 @@ export type AddServiceRequest = {
 };
 export type AddServiceResponse = BaseResponse;
 
-export type EmailAction = 'verification' | 'password-reset' | 'email-change' | 'login-token';
-
-export type EmailConfigInput = {
-  emailFrom?: string;
-  emailSubject?: string;
-  emailHtml?: string;
-  emailText?: string;
-};
-export type UrlConfigInput = {
-  baseUrl?: string;
-};
-export type EmailConfigsInput = Partial<Record<EmailAction, EmailConfigInput>>;
-export type UrlConfigsInput = Partial<Record<EmailAction, UrlConfigInput>>;
-
-export type UpdateEmailConfigRequest = {
-  serviceCode: string;
-  action: EmailAction;
-  config: EmailConfigInput;
-};
-export type UpdateEmailConfigResponse = BaseResponse;
-
-export type GetEmailConfigResponse = BaseResponse & {
-  serviceCode: string;
-  configs: Record<
-    string,
-    | {
-        emailFrom: string;
-        emailSubject: string;
-        emailHtml: string;
-        emailText: string;
-      }
-    | undefined
-  >;
-};
-
 export type AddConfigRecordRequest = {
   serviceCode: string;
-  allowEmailSending?: boolean;
   allowRegister?: boolean;
   allowLogin?: boolean;
   allowMagicLink?: boolean;
   allowForgotPassword?: boolean;
   allowResetPassword?: boolean;
-  emailConfigs: EmailConfigsInput;
-  urlConfigs?: UrlConfigsInput;
 };
 export type AddConfigRecordResponse = BaseResponse;
 
 export type GetConfigRecordResponse = BaseResponse & {
   config: {
     serviceCode: string;
-    allowEmailSending?: boolean;
     allowRegister?: boolean;
     allowLogin?: boolean;
     allowMagicLink?: boolean;
     allowForgotPassword?: boolean;
     allowResetPassword?: boolean;
-    emailConfigs: Record<string, unknown>;
-    urlConfigs?: Record<string, unknown>;
     createdAt: string;
     updatedAt: string;
   };
 };
-
-export type UnverifyEmailRequest = {
-  serviceCode: string;
-  email: string;
-};
-export type UnverifyEmailResponse = BaseResponse;
 
 export type ForceUpdatePasswordRequest = { serviceCode: string; email: string; password: string };
 export type ForceUpdatePasswordResponse = BaseResponse;

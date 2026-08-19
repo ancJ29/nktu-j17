@@ -2,60 +2,41 @@ export const C_SSO_ROUTES = {
   PREFIXES: {
     HEALTH: '',
     SSO: '',
-    CONFIG: '/config',
-    OPERATOR: '/operator',
     ADMIN: '/admin',
 
     V2: '/v2',
   },
   SUB_ROUTES: {
     SSO: {
-      REGISTER: { PATH: '/register', METHOD: 'POST' },
       LOGIN: { PATH: '/login', METHOD: 'POST' },
-      UPDATE_PROFILE: { PATH: '/profile', METHOD: 'PATCH' },
       GET_PROFILE: { PATH: '/me', METHOD: 'GET' },
       REFRESH_TOKEN: { PATH: '/refresh-token', METHOD: 'POST' },
-      VERIFY_EMAIL: { PATH: '/verify-email', METHOD: 'POST' },
-      RESEND_VERIFICATION: { PATH: '/resend-verification', METHOD: 'POST' },
-      FORGOT_PASSWORD: { PATH: '/forgot-password', METHOD: 'POST' },
-      RESET_PASSWORD: { PATH: '/reset-password', METHOD: 'POST' },
-      CHANGE_PASSWORD: { PATH: '/change-password', METHOD: 'POST' },
-      CHANGE_EMAIL: { PATH: '/change-email', METHOD: 'POST' },
-      CONFIRM_EMAIL_CHANGE: { PATH: '/confirm-email-change', METHOD: 'POST' },
-      GENERATE_LOGIN_TOKEN: { PATH: '/generate-login-token', METHOD: 'POST' },
       LOGIN_WITH_TOKEN: { PATH: '/login-with-token', METHOD: 'POST' },
     },
+
     V2: {
       GET_PUBLIC_KEY: { PATH: '/public-key', METHOD: 'GET' },
-    },
-    CONFIG: {
-      GET_ALL_SERVICES: { PATH: '/services', METHOD: 'GET' },
-      ADD_SERVICE: { PATH: '/services', METHOD: 'POST' },
-      UPDATE_EMAIL_CONFIG: { PATH: '/email', METHOD: 'PUT' },
-      GET_EMAIL_CONFIG: { PATH: '/email/:serviceCode', METHOD: 'GET' },
-      ADD_CONFIG_RECORD: { PATH: '', METHOD: 'POST' },
-      GET_CONFIG_RECORD: { PATH: '/:serviceCode', METHOD: 'GET' },
+
+      ADD_SERVICE: { PATH: '/config/services', METHOD: 'POST' },
+      ADD_CONFIG_RECORD: { PATH: '/config', METHOD: 'POST' },
+      DELETE_SERVICE: { PATH: '/admin/delete-service', METHOD: 'POST' },
+      DISABLE_SERVICE: { PATH: '/admin/disable-service', METHOD: 'POST' },
+
+      OPERATOR_ADD_USER: { PATH: '/operator/add-user', METHOD: 'POST' },
+      OPERATOR_GENERATE_LOGIN_TOKEN: {
+        PATH: '/operator/generate-login-token',
+        METHOD: 'POST',
+      },
+      OPERATOR_DELETE_USER: { PATH: '/operator/delete-user', METHOD: 'POST' },
+      OPERATOR_CHANGE_PASSWORD: { PATH: '/operator/change-password', METHOD: 'POST' },
+      OPERATOR_CHANGE_EMAIL: { PATH: '/operator/change-email', METHOD: 'POST' },
+      OPERATOR_UPDATE_PROFILE: { PATH: '/operator/update-profile', METHOD: 'POST' },
     },
     HEALTH: {
       HEALTH_CHECK: { PATH: '/health', METHOD: 'GET' },
     },
-    OPERATOR: {
-      ADD_USER: { PATH: '/add-user', METHOD: 'POST' },
-      GENERATE_LOGIN_TOKEN: { PATH: '/generate-login-token', METHOD: 'POST' },
-      DELETE_USER: { PATH: '/delete-user', METHOD: 'POST' },
-      DELETE_USERS: { PATH: '/delete-users', METHOD: 'POST' },
-      CHANGE_PASSWORD: { PATH: '/change-password', METHOD: 'POST' },
-      CHANGE_EMAIL: { PATH: '/change-email', METHOD: 'POST' },
-      UPDATE_PROFILE: { PATH: '/update-profile', METHOD: 'POST' },
-      GET_USERS: { PATH: '/get-users', METHOD: 'POST' },
-    },
+
     ADMIN: {
-      UNVERIFY_EMAIL: { PATH: '/unverify-email', METHOD: 'POST' },
-      FORCE_UPDATE_PASSWORD: { PATH: '/force-update-password', METHOD: 'POST' },
-      DELETE_USER: { PATH: '/delete-user', METHOD: 'POST' },
-      DELETE_SERVICE: { PATH: '/delete-service', METHOD: 'POST' },
-      DISABLE_SERVICE: { PATH: '/disable-service', METHOD: 'POST' },
-      ENABLE_SERVICE: { PATH: '/enable-service', METHOD: 'POST' },
       ENSURE_KEYPAIRS: { PATH: '/ensure-keypairs', METHOD: 'POST' },
       ENSURE_SERVICE: { PATH: '/ensure-service', METHOD: 'POST' },
     },

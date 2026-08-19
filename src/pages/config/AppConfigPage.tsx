@@ -23,7 +23,6 @@ import {
   DEFAULT_THEME,
   DEFAULT_TRANSLATIONS,
   DEFAULT_VENDOR_FEATURES,
-  DEFAULT_AUTH_VIA_BFF,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
 import type {
@@ -277,7 +276,6 @@ export function ConfigEditor({
   const [enablePdfSharing, setEnablePdfSharing] = useState(
     DEFAULT_CONFIG.features.common.enablePdfSharing,
   );
-  const [authViaBff, setAuthViaBff] = useState(DEFAULT_CONFIG.features.common.authViaBff);
   const [enableStats, setEnableStats] = useState(DEFAULT_CONFIG.features.common.enableStats);
   const [notifyNewVersion, setNotifyNewVersion] = useState(DEFAULT_NOTIFY_NEW_VERSION);
   const [tableDensity, setTableDensity] = useState(DEFAULT_TABLE_DENSITY);
@@ -397,7 +395,6 @@ export function ConfigEditor({
           darkMode: DEFAULT_CONFIG.features.common.darkMode,
           languageSwitcher,
           enablePdfSharing,
-          authViaBff,
           enableStats,
           notifyNewVersion,
           tableDensity,
@@ -442,7 +439,6 @@ export function ConfigEditor({
       navigation,
       languageSwitcher,
       enablePdfSharing,
-      authViaBff,
       enableStats,
       notifyNewVersion,
       tableDensity,
@@ -491,7 +487,6 @@ export function ConfigEditor({
     setEnablePdfSharing(
       cfg.features?.common?.enablePdfSharing ?? DEFAULT_CONFIG.features.common.enablePdfSharing,
     );
-    setAuthViaBff(cfg.features?.common?.authViaBff ?? DEFAULT_CONFIG.features.common.authViaBff);
     setEnableStats(cfg.features?.common?.enableStats ?? DEFAULT_CONFIG.features.common.enableStats);
     setNotifyNewVersion(cfg.features?.common?.notifyNewVersion ?? DEFAULT_NOTIFY_NEW_VERSION);
     setTableDensity(cfg.features?.common?.tableDensity ?? DEFAULT_TABLE_DENSITY);
@@ -741,7 +736,6 @@ export function ConfigEditor({
   const resetAll = useCallback(() => {
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
-    setAuthViaBff(DEFAULT_AUTH_VIA_BFF);
     setEnableStats(DEFAULT_ENABLE_STATS);
     setNotifyNewVersion(DEFAULT_NOTIFY_NEW_VERSION);
     setAuth(DEFAULT_AUTH);
@@ -781,7 +775,6 @@ export function ConfigEditor({
     setAppInfo(DEFAULT_APP_INFO);
     setLanguageSwitcher(DEFAULT_LANGUAGE_SWITCHER);
     setEnablePdfSharing(DEFAULT_ENABLE_PDF_SHARING);
-    setAuthViaBff(DEFAULT_AUTH_VIA_BFF);
     setEnableStats(DEFAULT_ENABLE_STATS);
     setNotifyNewVersion(DEFAULT_NOTIFY_NEW_VERSION);
   }, []);
@@ -877,7 +870,6 @@ export function ConfigEditor({
       eqDefault(appInfo, DEFAULT_APP_INFO) &&
       eqDefault(languageSwitcher, DEFAULT_LANGUAGE_SWITCHER) &&
       eqDefault(enablePdfSharing, DEFAULT_ENABLE_PDF_SHARING) &&
-      eqDefault(authViaBff, DEFAULT_AUTH_VIA_BFF) &&
       eqDefault(enableStats, DEFAULT_ENABLE_STATS) &&
       eqDefault(notifyNewVersion, DEFAULT_NOTIFY_NEW_VERSION),
     displaySettings:
@@ -1012,14 +1004,12 @@ export function ConfigEditor({
               languageSwitcher={languageSwitcher}
               enablePdfSharing={enablePdfSharing}
               enableStats={enableStats}
-              authViaBff={authViaBff}
               notifyNewVersion={notifyNewVersion}
               onChange={setAppInfo}
               onVersionChange={setVersion}
               onLanguageSwitcherChange={setLanguageSwitcher}
               onEnablePdfSharingChange={setEnablePdfSharing}
               onEnableStatsChange={setEnableStats}
-              onAuthViaBffChange={setAuthViaBff}
               onNotifyNewVersionChange={setNotifyNewVersion}
             />
           </CollapsibleSection>

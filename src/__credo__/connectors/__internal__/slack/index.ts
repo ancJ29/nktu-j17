@@ -3,12 +3,16 @@ import { ONE_MINUTE, ONE_SECOND } from '@credo/kits/time';
 
 import type {
   SlackAttachment,
+  SlackConnectionCheck,
   SlackEc2Information,
   SlackNotifyColor,
+  SlackPushResult,
   SlackSimpleNotifyType,
 } from './types';
 
 const SLACK_API_URL = 'https://slack.com/api/chat.postMessage';
+const SLACK_AUTH_TEST_URL = 'https://slack.com/api/auth.test';
+const DEFAULT_VERIFY_TIMEOUT_MS = 5 * ONE_SECOND;
 
 const storage = {
   token: '',
@@ -99,13 +103,83 @@ export const slackConnector = {
       title,
       content,
       color,
-    }).catch(() => {
-      // ignore error
     });
   },
 
+  verifyConnection: async ({
+    channel,
+    send = false,
+    timeoutMs = DEFAULT_VERIFY_TIMEOUT_MS,
+    title = 'Slack connection check',
+    content,
+  }: {
+    channel?: string;
+
+    send?: boolean;
+    timeoutMs?: number;
+    title?: string;
+    content?: Record<string, unknown>;
+  } = {}): Promise<SlackConnectionCheck> => {
+    const token = storage.token;
+    const result: SlackConnectionCheck = {
+      configured: {
+        tokenPresent: Boolean(token),
+        ...(token ? { tokenPreview: fingerprintToken(token) } : {}),
+        defaultChannel: storage.defaultChannel,
+        ...(storage.channels.error ? { errorChannel: storage.channels.error } : {}),
+        ...(storage.channels.warning ? { warningChannel: storage.channels.warning } : {}),
+        instanceName: storage.instanceName,
+      },
+      auth: { ok: false },
+    };
+
+    if (!token) {
+      result.auth = { ok: false, error: 'no-token' };
+      return result;
+    }
+
+    try {
+      const response = await fetch(SLACK_AUTH_TEST_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+          Authorization: `Bearer ${token}`,
+        },
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      const body = (await response.json()) as {
+        ok?: boolean;
+        error?: string;
+        team?: string;
+        bot_id?: string;
+        user?: string;
+      };
+      result.auth = body.ok
+        ? {
+            ok: true,
+            ...(body.team ? { team: body.team } : {}),
+            ...(body.bot_id ? { botId: body.bot_id } : {}),
+            ...(body.user ? { user: body.user } : {}),
+          }
+        : { ok: false, error: body.error ?? `HTTP ${response.status}` };
+    } catch (error) {
+      result.auth = { ok: false, error: error instanceof Error ? error.message : String(error) };
+    }
+
+    if (send) {
+      result.message = await push({
+        ...(channel ? { channel } : {}),
+        title: `[${storage.instanceName || 'unknown'}] ${title}`,
+        content: content ?? { at: new Date().toISOString(), check: 'manual' },
+        color: 'good',
+      });
+    }
+
+    return result;
+  },
+
   instanceStarted: async ({ channel }: { channel?: string } = {}) => {
-    await push({
+    const result = await push({
       channel,
       title: `[${storage.instanceName}] Instance Started`,
       content: {
@@ -116,9 +190,11 @@ export const slackConnector = {
           timeZone: 'Asia/Saigon',
         }),
       },
-    }).catch((error) => {
-      console.error(`Failed to send message to Slack: ${error}`);
     });
+
+    if (!result.ok) {
+      console.error(`Failed to send message to Slack: ${result.reason} ${result.detail ?? ''}`);
+    }
   },
 
   notifyError: async ({
@@ -187,6 +263,11 @@ export const slackConnector = {
   },
 };
 
+function fingerprintToken(token: string): string {
+  if (token.length < 12) return '***';
+  return `${token.slice(0, 9)}…${token.slice(-4)}`;
+}
+
 function buildBlocks({
   title,
   content,
@@ -251,15 +332,15 @@ async function push({
   content?: Record<string, unknown>;
   color?: SlackNotifyColor;
   withFooter?: boolean;
-}) {
+}): Promise<SlackPushResult> {
   const resolvedToken = storage.token;
   if (!resolvedToken) {
-    throw new Error('Token is required');
+    return { ok: false, reason: 'no-token' };
   }
 
   const resolvedChannel = channel ?? storage.defaultChannel;
   if (!resolvedChannel) {
-    return;
+    return { ok: false, reason: 'no-channel' };
   }
 
   const blocks = buildBlocks({
@@ -291,14 +372,42 @@ async function push({
     data['text'] = 'no message';
   }
 
-  await fetch(SLACK_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      Authorization: `Bearer ${resolvedToken}`,
-    },
-    body: JSON.stringify(data),
-  }).catch(() => {
-    // ignore error
-  });
+  try {
+    const response = await fetch(SLACK_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        Authorization: `Bearer ${resolvedToken}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      return {
+        ok: false,
+        reason: 'http',
+        detail: `HTTP ${response.status}`,
+        channel: resolvedChannel,
+      };
+    }
+
+    const body = (await response.json()) as { ok?: boolean; error?: string };
+    if (body.ok !== true) {
+      return {
+        ok: false,
+        reason: 'slack',
+        detail: body.error ?? 'unknown',
+        channel: resolvedChannel,
+      };
+    }
+
+    return { ok: true, channel: resolvedChannel };
+  } catch (error) {
+    return {
+      ok: false,
+      reason: 'network',
+      detail: error instanceof Error ? error.message : String(error),
+      channel: resolvedChannel,
+    };
+  }
 }

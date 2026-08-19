@@ -15,6 +15,7 @@ export * from './delivery-request';
 export * from './goods-receipt';
 export * from './transport-order';
 export * from './transport-route';
+export * from './cost-norm';
 export * from './truck-asset';
 export * from './oil-tank';
 export * from './operation-log';
