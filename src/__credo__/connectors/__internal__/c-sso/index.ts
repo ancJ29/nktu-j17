@@ -48,7 +48,8 @@ const storages = {
 registerStagePrefix(storages.baseUrl, storages.target);
 
 const SSO_ROUTES = C_SSO_ROUTES.SUB_ROUTES.SSO;
-const V2_ROUTES = C_SSO_ROUTES.SUB_ROUTES.V2;
+const OPERATOR_ROUTES = C_SSO_ROUTES.SUB_ROUTES.OPERATOR;
+const ADMIN_ROUTES = C_SSO_ROUTES.SUB_ROUTES.ADMIN;
 
 const getBaseUrl = () => storages.baseUrl;
 
@@ -63,15 +64,15 @@ const ssoApi = createApiGroup({
   getBaseUrl,
 });
 
-const v2Api = createApiGroup({
+const operatorApi = createApiGroup({
   storages,
-  prefix: C_SSO_ROUTES.PREFIXES.V2,
+  prefix: C_SSO_ROUTES.PREFIXES.OPERATOR,
   getBaseUrl,
 });
 
-const v2AdminApi = createApiGroup({
+const adminApi = createApiGroup({
   storages,
-  prefix: C_SSO_ROUTES.PREFIXES.V2,
+  prefix: C_SSO_ROUTES.PREFIXES.ADMIN,
   getBaseUrl,
   defaults: { accessKeyRequired: true },
 });
@@ -96,6 +97,11 @@ export const cSsoConnector = {
     if (accessKey) {
       storages.accessKey = accessKey;
     }
+    return cSsoConnector;
+  },
+
+  removeAccessKey: () => {
+    storages.accessKey = '';
     return cSsoConnector;
   },
   setTrustedServiceKey: (trustedServiceKey: string) => {
@@ -140,10 +146,10 @@ export const cSsoConnector = {
       body: { serviceCode, token },
     }),
 
-  getPublicKey: () => v2Api<GetPublicKeyResponse>(V2_ROUTES.GET_PUBLIC_KEY),
+  getPublicKey: () => ssoApi<GetPublicKeyResponse>(SSO_ROUTES.GET_PUBLIC_KEY),
 
   addService: ({ serviceCode, name, description, operatorAccessKey }: AddServiceRequest) =>
-    v2AdminApi<AddServiceResponse>(V2_ROUTES.ADD_SERVICE, {
+    adminApi<AddServiceResponse>(ADMIN_ROUTES.ADD_SERVICE, {
       body: { serviceCode, name, description, operatorAccessKey },
     }),
 
@@ -155,7 +161,7 @@ export const cSsoConnector = {
     allowForgotPassword,
     allowResetPassword,
   }: AddConfigRecordRequest) =>
-    v2AdminApi<AddConfigRecordResponse>(V2_ROUTES.ADD_CONFIG_RECORD, {
+    adminApi<AddConfigRecordResponse>(ADMIN_ROUTES.ADD_CONFIG_RECORD, {
       body: {
         serviceCode,
         allowRegister,
@@ -170,7 +176,7 @@ export const cSsoConnector = {
     operatorAccessKey: string,
     { email, password, serviceCode }: OperatorAddUserRequest,
   ) =>
-    v2Api<OperatorAddUserResponse>(V2_ROUTES.OPERATOR_ADD_USER, {
+    operatorApi<OperatorAddUserResponse>(OPERATOR_ROUTES.OPERATOR_ADD_USER, {
       body: { email, password, serviceCode },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
@@ -179,7 +185,7 @@ export const cSsoConnector = {
     operatorAccessKey: string,
     { serviceCode, email, expiration }: OperatorGenerateLoginTokenRequest,
   ) =>
-    v2Api<OperatorGenerateLoginTokenResponse>(V2_ROUTES.OPERATOR_GENERATE_LOGIN_TOKEN, {
+    operatorApi<OperatorGenerateLoginTokenResponse>(OPERATOR_ROUTES.OPERATOR_GENERATE_LOGIN_TOKEN, {
       body: { serviceCode, email, expiration },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
@@ -188,7 +194,7 @@ export const cSsoConnector = {
     operatorAccessKey: string,
     { serviceCode, email }: OperatorDeleteUserRequest,
   ) =>
-    v2Api<OperatorDeleteUserResponse>(V2_ROUTES.OPERATOR_DELETE_USER, {
+    operatorApi<OperatorDeleteUserResponse>(OPERATOR_ROUTES.OPERATOR_DELETE_USER, {
       body: { serviceCode, email },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
@@ -197,7 +203,7 @@ export const cSsoConnector = {
     operatorAccessKey: string,
     { serviceCode, email, password }: OperatorChangePasswordRequest,
   ) =>
-    v2Api<OperatorChangePasswordResponse>(V2_ROUTES.OPERATOR_CHANGE_PASSWORD, {
+    operatorApi<OperatorChangePasswordResponse>(OPERATOR_ROUTES.OPERATOR_CHANGE_PASSWORD, {
       body: { serviceCode, email, password },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
@@ -206,7 +212,7 @@ export const cSsoConnector = {
     operatorAccessKey: string,
     { serviceCode, oldEmail, newEmail }: OperatorChangeEmailRequest,
   ) =>
-    v2Api<OperatorChangeEmailResponse>(V2_ROUTES.OPERATOR_CHANGE_EMAIL, {
+    operatorApi<OperatorChangeEmailResponse>(OPERATOR_ROUTES.OPERATOR_CHANGE_EMAIL, {
       body: { serviceCode, oldEmail, newEmail },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
@@ -215,18 +221,18 @@ export const cSsoConnector = {
     operatorAccessKey: string,
     { serviceCode, email, profile }: OperatorUpdateProfileRequest,
   ) =>
-    v2Api<OperatorUpdateProfileResponse>(V2_ROUTES.OPERATOR_UPDATE_PROFILE, {
+    operatorApi<OperatorUpdateProfileResponse>(OPERATOR_ROUTES.OPERATOR_UPDATE_PROFILE, {
       body: { serviceCode, email, profile },
       extraHeaders: { 'x-operator-access-key': operatorAccessKey },
     }),
 
   deleteService: ({ serviceCode }: DeleteServiceRequest) =>
-    v2AdminApi<DeleteServiceResponse>(V2_ROUTES.DELETE_SERVICE, {
+    adminApi<DeleteServiceResponse>(ADMIN_ROUTES.DELETE_SERVICE, {
       body: { serviceCode },
     }),
 
   disableService: ({ serviceCode }: DisableServiceRequest) =>
-    v2AdminApi<DisableServiceResponse>(V2_ROUTES.DISABLE_SERVICE, {
+    adminApi<DisableServiceResponse>(ADMIN_ROUTES.DISABLE_SERVICE, {
       body: { serviceCode },
     }),
 };

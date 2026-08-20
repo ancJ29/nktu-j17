@@ -1,6 +1,5 @@
-import { useMemo, type Ref } from 'react';
-import { Badge, Group, Text } from '@mantine/core';
-import { IconArrowNarrowRight } from '@tabler/icons-react';
+import { useCallback, useMemo, useState, type MouseEvent, type Ref } from 'react';
+import { Badge, Group, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { ListDataTable } from '@/components/ListDataTable';
@@ -10,14 +9,17 @@ import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useContainerSizeLabel } from '../transport-orders/containerSize';
 import { useTruckTypeLabel } from './truckType';
+import { JourneyCell } from '../transport-orders/TransportRouteCell';
 import {
   routeContainerDisplay,
-  routeEndpoints,
+  routeJourneyLegs,
   routeLaborTotal,
   routeLegCount,
 } from './routeSummary';
 import { appConfig } from '@/config';
 import { useRouteCosting } from './useRouteCosting';
+import { isRecentFuelPriceChange } from '../cost-norms/fuelPrice';
+import { routeUsesFuelPricing } from './routeCosting';
 
 const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
@@ -32,13 +34,25 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
   const truckTypeLabel = useTruckTypeLabel();
   const containerSizeLabel = useContainerSizeLabel();
 
-  const { costOf } = useRouteCosting();
+  const { costOf, currentPrice, norms } = useRouteCosting();
+
+  const [now] = useState(() => Date.now());
+  const priceJustChanged = isRecentFuelPriceChange(currentPrice, now);
+
+  const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
+  const toggleExpanded = useCallback((id: string) => {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }, []);
 
   const columns = useMemo(
     () => [
       {
         key: 'code',
-        width: '130px',
+        width: '120px',
         header: t('transportRoutes.columns.code'),
 
         render: (r: TransportRouteRow) => (
@@ -49,7 +63,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'kind',
-        width: '110px',
+        width: '95px',
         header: t('transportRoutes.columns.kind'),
         render: (r: TransportRouteRow) =>
           r.isMultiTrip ? (
@@ -65,24 +79,25 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       {
         key: 'route',
         header: t('transportRoutes.columns.route'),
-        render: (r: TransportRouteRow) => {
-          const { from, to } = routeEndpoints(r);
-          return (
-            <Group gap={6} wrap="nowrap">
-              <Text size="sm" fw={500} lineClamp={1} title={from}>
-                {from || '—'}
-              </Text>
-              <IconArrowNarrowRight size={14} style={{ flexShrink: 0, opacity: 0.5 }} />
-              <Text size="sm" fw={500} lineClamp={1} title={to}>
-                {to || '—'}
-              </Text>
-            </Group>
-          );
+
+        onCellClick: (r: TransportRouteRow, event: MouseEvent) => {
+          if (!r.isMultiTrip) return;
+          event.stopPropagation();
+          toggleExpanded(r.id);
         },
+        render: (r: TransportRouteRow) => (
+          <JourneyCell
+            legs={routeJourneyLegs(r)}
+            expanded={expandedIds.has(r.id)}
+            onToggle={() => toggleExpanded(r.id)}
+
+            lines={2}
+          />
+        ),
       },
       {
         key: 'truckType',
-        width: '140px',
+        width: '120px',
         header: t('transportRoutes.columns.truckType'),
         render: (r: TransportRouteRow) => (
           <Text size="sm">{truckTypeLabel(r.truckType) || '—'}</Text>
@@ -90,7 +105,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'containerSize',
-        width: '120px',
+        width: '105px',
         header: t('transportRoutes.columns.containerSize'),
 
         render: (r: TransportRouteRow) => {
@@ -106,7 +121,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'freightAmount',
-        width: '150px',
+        width: '130px',
         header: t('transportRoutes.columns.freightAmount'),
         render: (r: TransportRouteRow) => (
           <Text size="sm" ta="right">
@@ -116,7 +131,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'laborCost',
-        width: '150px',
+        width: '130px',
         header: t('transportRoutes.columns.laborCost'),
 
         render: (r: TransportRouteRow) => (
@@ -127,34 +142,73 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'costPrice',
-        width: '150px',
+        width: '190px',
         header: t('transportRoutes.costing.costPrice'),
         render: (r: TransportRouteRow) => {
           const costing = costOf(r);
-          return (
-            <Text
-              size="sm"
-              ta="right"
 
-              c={costing.missing.length > 0 ? 'orange' : undefined}
-              title={
-                costing.missing.length > 0
-                  ? t(
-                      costing.missing.includes('norm')
-                        ? 'transportRoutes.costing.missingNorm'
-                        : 'transportRoutes.costing.missingPrice',
-                    )
-                  : undefined
-              }
-            >
-              {formatMoney(costing.costPrice)}
+          const moved =
+            priceJustChanged &&
+            routeUsesFuelPricing(r, r.truckType ? norms.get(r.truckType) : undefined);
+          return (
+            <Group gap={4} justify="flex-end" wrap="nowrap">
+              {moved && (
+                <Tooltip
+                  label={t('transportRoutes.costing.costChangedHint')}
+                  withArrow
+                  multiline
+                  w={240}
+                >
+                  <Badge size="xs" variant="light" color="blue" tt="none" radius="sm">
+                    {t('transportRoutes.costing.costChanged')}
+                  </Badge>
+                </Tooltip>
+              )}
+              <Text
+                size="sm"
+                ta="right"
+
+                c={costing.missing.length > 0 ? 'orange' : undefined}
+                title={
+                  costing.missing.length > 0
+                    ? t(
+                        costing.missing.includes('norm')
+                          ? 'transportRoutes.costing.missingNorm'
+                          : 'transportRoutes.costing.missingPrice',
+                      )
+                    : undefined
+                }
+              >
+                {formatMoney(costing.costPrice)}
+              </Text>
+            </Group>
+          );
+        },
+      },
+      {
+        key: 'suggestedPrice',
+        width: '130px',
+        header: t('transportRoutes.costing.suggestedPriceShort'),
+
+        render: (r: TransportRouteRow) => {
+          const costing = costOf(r);
+          if (costing.markupPercent <= 0) {
+            return (
+              <Text size="sm" ta="right" c="dimmed">
+                —
+              </Text>
+            );
+          }
+          return (
+            <Text size="sm" ta="right" title={`+${costing.markupPercent}%`}>
+              {formatMoney(costing.suggestedPrice)}
             </Text>
           );
         },
       },
       {
         key: 'status',
-        width: '130px',
+        width: '120px',
         header: t('transportRoutes.columns.status'),
         render: (r: TransportRouteRow) => (
           <ActiveBadge
@@ -166,7 +220,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'updatedAt',
-        width: '120px',
+        width: '110px',
         header: t('transportRoutes.columns.updatedAt'),
         render: (r: TransportRouteRow) => (
           <Text size="sm" c="dimmed">
@@ -175,7 +229,16 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         ),
       },
     ],
-    [t, truckTypeLabel, containerSizeLabel, costOf],
+    [
+      t,
+      truckTypeLabel,
+      containerSizeLabel,
+      costOf,
+      expandedIds,
+      toggleExpanded,
+      priceJustChanged,
+      norms,
+    ],
   );
 
   return (

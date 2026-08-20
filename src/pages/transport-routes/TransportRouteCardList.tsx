@@ -100,6 +100,17 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
                   {formatMoney(costing.costPrice)}
                 </Text>
               </Text>
+              {/* Same rule as the table column: omitted rather than repeating
+                  the cost price when no markup is set — "đề xuất = giá vốn" is
+                  not a suggestion. */}
+              {costing.markupPercent > 0 && (
+                <Text size="xs" c="dimmed">
+                  {t('transportRoutes.costing.suggestedPriceShort')}{' '}
+                  <Text span size="sm" c="dark">
+                    {formatMoney(costing.suggestedPrice)}
+                  </Text>
+                </Text>
+              )}
             </Group>
           </Stack>
         );

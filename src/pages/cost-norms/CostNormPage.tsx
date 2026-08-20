@@ -34,6 +34,7 @@ import { DesktopOnlyGuard } from '@/components/DesktopOnlyGuard';
 import { Form } from '@/components/Form';
 import { SectionCard } from '@/components/SectionCard';
 import { getCurrentEmployeeStamp } from '@/hooks';
+import { useAuthStore } from '@/stores/useAuthStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useFuelNormStore } from '@/stores/useFuelNormStore';
 import { useFuelPriceStore } from '@/stores/useFuelPriceStore';
@@ -43,7 +44,10 @@ import { perms } from '@/utils/permission';
 import type { FuelNormRow, FuelPriceRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useTruckTypeOptions } from '../transport-routes/truckType';
+import { useTransportRouteStore } from '@/stores/useTransportRouteStore';
+import { routeUsesFuelPricing } from '../transport-routes/routeCosting';
 import { isScheduledFuelPrice, resolveCurrentFuelPrice, sortFuelPriceHistory } from './fuelPrice';
+import { buildUpdatedByStamp, readUpdatedByName } from './updatedBy';
 
 const canEdit = perms.costNorm.canEdit();
 
@@ -76,10 +80,14 @@ export function CostNormPage() {
   const loadPrices = useFuelPriceStore((s) => s.loadAll);
   const createPrice = useFuelPriceStore((s) => s.createSafely);
 
+  const routesInit = useTransportRouteStore((s) => s.initialized);
+  const loadRoutes = useTransportRouteStore((s) => s.loadAll);
+
   useEffect(() => {
     if (!normsInit) void loadNorms();
     if (!pricesInit) void loadPrices();
-  }, [normsInit, loadNorms, pricesInit, loadPrices]);
+    if (!routesInit) void loadRoutes();
+  }, [normsInit, loadNorms, pricesInit, loadPrices, routesInit, loadRoutes]);
 
   const truckTypeOptions = useTruckTypeOptions();
   const today = todayInVnDateString();
@@ -99,6 +107,20 @@ export function CostNormPage() {
     },
   });
 
+  const affectedRouteCodes = useCallback((): string[] => {
+    const normByType = new Map(
+      useFuelNormStore
+        .getState()
+        .items.filter((n) => !n.extra?.isDeleted)
+        .map((n) => [n.truckType, n.litersPer100km || 0]),
+    );
+    return useTransportRouteStore
+      .getState()
+      .items.filter((r) => !r.extra?.isDeleted && r.isActive)
+      .filter((r) => routeUsesFuelPricing(r, r.truckType ? normByType.get(r.truckType) : undefined))
+      .map((r) => r.code);
+  }, []);
+
   const openPriceModal = useCallback(() => {
     priceForm.setValues({ price: current?.price ?? 0, effectiveDate: today, notes: '' });
     priceForm.resetDirty();
@@ -110,16 +132,28 @@ export function CostNormPage() {
     async (values: PriceFormValues) => {
       setSaving(true);
       try {
-        const stamp = getCurrentEmployeeStamp();
+        const stamp = buildUpdatedByStamp(getCurrentEmployeeStamp(), useAuthStore.getState().user);
         const notes = values.notes.trim();
+        const affected = affectedRouteCodes();
         await createPrice({
           patch: {
             price: values.price,
             effectiveDate: values.effectiveDate,
-            extra: { ...stamp, ...(notes ? { notes } : {}) },
+            extra: {
+              ...stamp,
+              ...(notes ? { notes } : {}),
+
+              affectedRouteCodes: affected,
+            },
           },
         });
-        notifications.show({ color: 'green', message: t('costNorms.notifications.priceSaved') });
+        notifications.show({
+          color: 'green',
+
+          message: affected.length
+            ? t('costNorms.notifications.priceSavedAffecting', { count: affected.length })
+            : t('costNorms.notifications.priceSaved'),
+        });
         priceModalHandlers.close();
       } catch (err) {
         logger.error('Fuel price create failed:', err);
@@ -128,7 +162,7 @@ export function CostNormPage() {
         setSaving(false);
       }
     },
-    [createPrice, t, priceModalHandlers],
+    [createPrice, t, priceModalHandlers, affectedRouteCodes],
   );
 
   const normRows = useMemo<NormRow[]>(() => {
@@ -161,7 +195,7 @@ export function CostNormPage() {
     async (row: NormRow, value: number) => {
       setSaving(true);
       try {
-        const stamp = getCurrentEmployeeStamp();
+        const stamp = buildUpdatedByStamp(getCurrentEmployeeStamp(), useAuthStore.getState().user);
         if (row.norm) {
           await updateNorm({
             id: row.norm.id,
@@ -236,8 +270,8 @@ export function CostNormPage() {
                   {t('costNorms.price.effectiveSince', {
                     date: formatDay(current.effectiveDate),
                   })}
-                  {current.extra?.updatedByName
-                    ? ` · ${t('costNorms.columns.updatedBy')}: ${current.extra.updatedByName}`
+                  {readUpdatedByName(current.extra)
+                    ? ` · ${t('costNorms.columns.updatedBy')}: ${readUpdatedByName(current.extra)}`
                     : ''}
                 </Text>
               ) : (
@@ -325,7 +359,7 @@ export function CostNormPage() {
                     </Table.Td>
                     <Table.Td>
                       <Text size="sm" c="dimmed" lineClamp={1}>
-                        {row.norm?.extra?.updatedByName || '—'}
+                        {readUpdatedByName(row.norm?.extra) || '—'}
                       </Text>
                     </Table.Td>
                     <Table.Td>
@@ -390,6 +424,7 @@ export function CostNormPage() {
                 <Table.Th w={180}>{t('costNorms.columns.price')}</Table.Th>
                 <Table.Th w={150}>{t('costNorms.columns.updatedAt')}</Table.Th>
                 <Table.Th w={200}>{t('costNorms.columns.updatedBy')}</Table.Th>
+                <Table.Th w={190}>{t('costNorms.columns.affectedRoutes')}</Table.Th>
                 <Table.Th>{t('costNorms.columns.notes')}</Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -429,8 +464,35 @@ export function CostNormPage() {
                     </Table.Td>
                     <Table.Td>
                       <Text size="sm" c="dimmed" lineClamp={1}>
-                        {row.extra?.updatedByName || '—'}
+                        {readUpdatedByName(row.extra) || '—'}
                       </Text>
+                    </Table.Td>
+                    <Table.Td>
+                      {/* Absent means "written before this was recorded", which
+                          is not the same as zero — so it reads as an em dash
+                          rather than "0 tuyến". */}
+                      {row.extra?.affectedRouteCodes ? (
+                        <Tooltip
+                          multiline
+                          w={280}
+                          withArrow
+                          disabled={row.extra.affectedRouteCodes.length === 0}
+                          label={row.extra.affectedRouteCodes.join(', ')}
+                        >
+                          <Text
+                            size="sm"
+                            c={row.extra.affectedRouteCodes.length ? undefined : 'dimmed'}
+                          >
+                            {t('costNorms.history.affectedRoutes', {
+                              count: row.extra.affectedRouteCodes.length,
+                            })}
+                          </Text>
+                        </Tooltip>
+                      ) : (
+                        <Text size="sm" c="dimmed">
+                          —
+                        </Text>
+                      )}
                     </Table.Td>
                     <Table.Td>
                       <Text size="sm" c="dimmed" lineClamp={1} title={row.extra?.notes}>
@@ -442,7 +504,7 @@ export function CostNormPage() {
               })}
               {history.length === 0 && (
                 <Table.Tr>
-                  <Table.Td colSpan={5}>
+                  <Table.Td colSpan={6}>
                     <Text size="sm" c="dimmed" ta="center" py="md">
                       {t('costNorms.history.empty')}
                     </Text>

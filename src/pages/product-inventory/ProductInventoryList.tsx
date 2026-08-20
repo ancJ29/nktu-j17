@@ -45,6 +45,8 @@ import { ProductInventoryBeginOfPeriodModal } from './ProductInventoryBeginOfPer
 import { ProductInventoryComposeSetModal } from './ProductInventoryComposeSetModal';
 import { ProductInventoryDataTable } from './ProductInventoryDataTable';
 import { ProductInventoryDecomposeSetModal } from './ProductInventoryDecomposeSetModal';
+import { ProductInventoryOutgoingModal } from './ProductInventoryOutgoingModal';
+import { rollupReservationsBySO } from './productInventoryReservations';
 import { InventoryImportExportActions } from '@/components/inventory/InventoryImportExportActions';
 import { hasHideFromInventoryListForProducts, isLocationsEnabled } from '@/utils/permission';
 import {
@@ -134,6 +136,12 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const resolveCustomerName = useMemo(
     () => (canViewCustomers ? createCustomerShortNameResolver(customers) : undefined),
     [customers],
+  );
+
+  const [outgoingFor, setOutgoingFor] = useState<ProductInventorySummary | null>(null);
+  const outgoingReservations = useMemo(
+    () => (outgoingFor ? rollupReservationsBySO(outgoingFor) : []),
+    [outgoingFor],
   );
 
   const {
@@ -760,6 +768,14 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             rows={allRows}
           />
         )}
+        {variant.showOutgoingDetailModal && (
+          <ProductInventoryOutgoingModal
+            opened={outgoingFor !== null}
+            onClose={() => setOutgoingFor(null)}
+            product={outgoingFor?.product ?? null}
+            reservations={outgoingReservations}
+          />
+        )}
 
         {isMobile && <QuickFilterChips chips={mobileQuickChips} />}
 
@@ -808,6 +824,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           onRowClick={handleRowClick}
           inboundIndex={inboundIndex}
           resolveCustomerName={resolveCustomerName}
+          onOutgoingClick={variant.showOutgoingDetailModal ? setOutgoingFor : undefined}
           viewportRef={scrollViewportRef}
           getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}
         />

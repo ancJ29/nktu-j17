@@ -1,4 +1,5 @@
 import type { TransportRouteRow } from '@/types';
+import type { RouteStop } from '../transport-orders/TransportRouteCell';
 import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
 
 export type RouteEndpoints = { from: string; to: string };
@@ -34,4 +35,16 @@ export function routeContainerDisplay(
 ): 'value' | 'any' | 'none' {
   if (route.containerSize) return 'value';
   return truckTypeCarriesContainer(route.truckType, nonContainerTruckTypes) ? 'any' : 'none';
+}
+
+export function routeJourneyLegs(
+  route: Pick<TransportRouteRow, 'isMultiTrip' | 'route' | 'trips'>,
+): RouteStop[][] {
+  const clean = (places: (string | undefined)[]): RouteStop[] =>
+    places.map((place) => ({ place: place?.trim() ?? '' })).filter((stop) => stop.place.length > 0);
+
+  if (route.isMultiTrip) {
+    return (route.trips ?? []).map((leg) => clean([leg.departure, leg.destination]));
+  }
+  return [clean([route.route?.pickup, route.route?.stuffing, route.route?.dropoff])];
 }

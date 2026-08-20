@@ -65,12 +65,12 @@ type SecretField = keyof typeof STORAGE_KEYS;
 
 const SECRET_FIELDS: SecretField[] = ['cMngtAdminAccessKey', 'ssoAdminAccessKey'];
 
+const GATE_FIELD: SecretField = 'cMngtAdminAccessKey';
+
 const SECRET_LABELS: Record<SecretField, string> = {
   cMngtAdminAccessKey: 'C_MNGT_ADMIN_ACCESS_KEY',
   ssoAdminAccessKey: 'CREDO_SSO_ADMIN_ACCESS_KEY',
 };
-
-type Secrets = Record<SecretField, string>;
 
 function readSecret(field: SecretField): string {
   try {
@@ -84,27 +84,6 @@ function readSecret(field: SecretField): string {
   }
 }
 
-function readAllSecrets(): Secrets {
-  return {
-    cMngtAdminAccessKey: readSecret('cMngtAdminAccessKey'),
-    ssoAdminAccessKey: readSecret('ssoAdminAccessKey'),
-  };
-}
-
-function writeSecrets(secrets: Secrets) {
-  for (const field of SECRET_FIELDS) {
-    const key = STORAGE_KEYS[field];
-    const value = secrets[field].trim();
-    if (value) {
-      sessionStorage.setItem(key, value);
-      if (isInternal) localStorage.setItem(key, value);
-    } else {
-      sessionStorage.removeItem(key);
-      localStorage.removeItem(key);
-    }
-  }
-}
-
 function clearSecrets() {
   for (const field of SECRET_FIELDS) {
     const key = STORAGE_KEYS[field];
@@ -113,8 +92,20 @@ function clearSecrets() {
   }
 }
 
-function hasAllSecrets(): boolean {
-  return SECRET_FIELDS.every((f) => readSecret(f).trim().length > 0);
+function writeSecret(field: SecretField, value: string) {
+  const key = STORAGE_KEYS[field];
+  const trimmed = value.trim();
+  if (trimmed) {
+    sessionStorage.setItem(key, trimmed);
+    if (isInternal) localStorage.setItem(key, trimmed);
+  } else {
+    sessionStorage.removeItem(key);
+    localStorage.removeItem(key);
+  }
+}
+
+function hasGateSecret(): boolean {
+  return readSecret(GATE_FIELD).trim().length > 0;
 }
 
 type ImportedFileKind = 'base-data' | 'app-config' | 'department' | 'unknown';
@@ -137,17 +128,17 @@ function detectFileKind(data: unknown): ImportedFileKind {
 }
 
 export function SystemAdminPage() {
-  const [authed, setAuthed] = useState<boolean>(hasAllSecrets);
+  const [authed, setAuthed] = useState<boolean>(hasGateSecret);
 
   useEffect(() => {
     if (authed) {
-      cMngtConnector.setAccessKey(readSecret('cMngtAdminAccessKey'));
+      cMngtConnector.setAccessKey(readSecret(GATE_FIELD));
     }
   }, [authed]);
 
-  const handleAuthed = useCallback((secrets: Secrets) => {
-    writeSecrets(secrets);
-    cMngtConnector.setAccessKey(secrets.cMngtAdminAccessKey.trim());
+  const handleAuthed = useCallback((cMngtAdminAccessKey: string) => {
+    writeSecret(GATE_FIELD, cMngtAdminAccessKey);
+    cMngtConnector.setAccessKey(cMngtAdminAccessKey.trim());
     setAuthed(true);
   }, []);
 
@@ -312,15 +303,15 @@ function BrandedShell({
   );
 }
 
-function AuthGate({ onAuthed }: { onAuthed: (secrets: Secrets) => void }) {
-  const [secrets, setSecrets] = useState<Secrets>(readAllSecrets);
+function AuthGate({ onAuthed }: { onAuthed: (cMngtAdminAccessKey: string) => void }) {
+  const [value, setValue] = useState<string>(() => readSecret(GATE_FIELD));
   const [validating, setValidating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const canSubmit = !validating && SECRET_FIELDS.every((f) => secrets[f].trim().length > 0);
+  const canSubmit = !validating && value.trim().length > 0;
 
-  const handleChange = (field: SecretField, value: string) => {
-    setSecrets((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (next: string) => {
+    setValue(next);
     if (error) setError(null);
   };
 
@@ -329,12 +320,9 @@ function AuthGate({ onAuthed }: { onAuthed: (secrets: Secrets) => void }) {
     setValidating(true);
     setError(null);
 
-    const trimmed: Secrets = {
-      cMngtAdminAccessKey: secrets.cMngtAdminAccessKey.trim(),
-      ssoAdminAccessKey: secrets.ssoAdminAccessKey.trim(),
-    };
+    const trimmed = value.trim();
 
-    cMngtConnector.setAccessKey(trimmed.cMngtAdminAccessKey);
+    cMngtConnector.setAccessKey(trimmed);
     try {
       const res = await cMngtConnector.listClients();
       if (!res.success) {
@@ -344,13 +332,13 @@ function AuthGate({ onAuthed }: { onAuthed: (secrets: Secrets) => void }) {
       onAuthed(trimmed);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Validation failed. Check the keys and try again.';
+        err instanceof Error ? err.message : 'Validation failed. Check the key and try again.';
       setError(message);
       cMngtConnector.setAccessKey('');
     } finally {
       setValidating(false);
     }
-  }, [canSubmit, secrets, onAuthed]);
+  }, [canSubmit, value, onAuthed]);
 
   return (
     <Stack gap="lg" align="center" mt="xl">
@@ -361,28 +349,25 @@ function AuthGate({ onAuthed }: { onAuthed: (secrets: Secrets) => void }) {
             Admin authentication
           </Title>
           <Text size="sm" c="dimmed">
-            Enter the C-Mngt and SSO admin access keys to continue. Keys are kept in sessionStorage
-            and wiped on tab close.
+            Enter the C-Mngt admin access key to continue. Kept in sessionStorage and wiped on tab
+            close. The SSO admin key is asked for when you provision or delete a client.
           </Text>
         </div>
       </Group>
 
       <Card withBorder padding="lg" w="100%" maw={520}>
         <Stack gap="sm">
-          {SECRET_FIELDS.map((field, idx) => (
-            <PasswordInput
-              key={field}
-              label={SECRET_LABELS[field]}
-              value={secrets[field]}
-              onChange={(e) => handleChange(field, e.currentTarget.value)}
-              autoComplete="off"
-              spellCheck={false}
-              autoFocus={idx === 0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && canSubmit) handleSubmit();
-              }}
-            />
-          ))}
+          <PasswordInput
+            label={SECRET_LABELS[GATE_FIELD]}
+            value={value}
+            onChange={(e) => handleChange(e.currentTarget.value)}
+            autoComplete="off"
+            spellCheck={false}
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && canSubmit) handleSubmit();
+            }}
+          />
 
           {error && (
             <Alert color="red" variant="light" mt="xs">
@@ -403,6 +388,31 @@ function AuthGate({ onAuthed }: { onAuthed: (secrets: Secrets) => void }) {
         </Stack>
       </Card>
     </Stack>
+  );
+}
+
+function SsoAdminKeyField({
+  value,
+  onChange,
+  action,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  action: string;
+}) {
+  return (
+    <PasswordInput
+      label={SECRET_LABELS.ssoAdminAccessKey}
+      description={`Sent to the BFF for this ${action} only. It is not stored on the server.`}
+      value={value}
+      onChange={(e) => {
+        onChange(e.currentTarget.value);
+        writeSecret('ssoAdminAccessKey', e.currentTarget.value);
+      }}
+      autoComplete="off"
+      spellCheck={false}
+      size="sm"
+    />
   );
 }
 
@@ -429,6 +439,8 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
   >([]);
 
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
+
+  const [ssoAdminKey, setSsoAdminKey] = useState<string>(() => readSecret('ssoAdminAccessKey'));
 
   const applyBaseData = useCallback((data: Record<string, unknown>) => {
     if (typeof data.code === 'string') setClientServiceCode(data.code);
@@ -526,7 +538,7 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
         rootEmail: rootEmail.trim(),
         rootPassword: rootPassword.trim() || undefined,
 
-        ssoAdminAccessKey: readSecret('ssoAdminAccessKey'),
+        ssoAdminAccessKey: ssoAdminKey.trim(),
       });
 
       if (!res.success) {
@@ -616,6 +628,7 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
     onProvisioned,
     rootEmail,
     rootPassword,
+    ssoAdminKey,
   ]);
 
   return (
@@ -744,7 +757,10 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
         confirmLabel="Provision"
         confirmColor="teal"
         loading={running}
-      />
+        confirmDisabled={!ssoAdminKey.trim()}
+      >
+        <SsoAdminKeyField value={ssoAdminKey} onChange={setSsoAdminKey} action="provision" />
+      </ConfirmModal>
     </Stack>
   );
 }
@@ -969,6 +985,8 @@ function ClientsPanel({
   const [pendingDelete, setPendingDelete] = useState<ClientConfig | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [ssoAdminKey, setSsoAdminKey] = useState<string>(() => readSecret('ssoAdminAccessKey'));
+
   const load = useCallback(async () => {
     setLoading(true);
     setLoadError(null);
@@ -1000,7 +1018,7 @@ function ClientsPanel({
       const res = await cMngtConnector.removeClient({
         clientServiceCode,
         version,
-        ssoAdminAccessKey: readSecret('ssoAdminAccessKey'),
+        ssoAdminAccessKey: ssoAdminKey.trim(),
       });
       if (!res.success) {
         issues.push(`c-mngt removeClient: ${(res as { message?: string }).message ?? 'failed'}`);
@@ -1028,7 +1046,7 @@ function ClientsPanel({
       });
     }
     onMutate();
-  }, [pendingDelete, onMutate]);
+  }, [pendingDelete, onMutate, ssoAdminKey]);
 
   return (
     <Stack gap="lg">
@@ -1174,7 +1192,10 @@ function ClientsPanel({
         confirmLabel="Delete"
         confirmColor="red"
         loading={deleting}
-      />
+        confirmDisabled={!ssoAdminKey.trim()}
+      >
+        <SsoAdminKeyField value={ssoAdminKey} onChange={setSsoAdminKey} action="deletion" />
+      </ConfirmModal>
     </Stack>
   );
 }

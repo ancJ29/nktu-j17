@@ -83,3 +83,10 @@ export function quoteMargin(
   const amount = (quotedPrice || 0) - (costPrice || 0);
   return { amount, percent: costPrice > 0 ? (amount / costPrice) * 100 : null };
 }
+
+export function routeUsesFuelPricing(
+  route: Pick<TransportRouteRow, 'segments'>,
+  litersPer100km: number | undefined,
+): boolean {
+  return routeDistanceTotal(route) > 0 && (litersPer100km ?? 0) > 0;
+}

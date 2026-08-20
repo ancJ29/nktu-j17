@@ -818,7 +818,9 @@
       "hint": "Every update is appended; nothing is overwritten.",
       "empty": "No price has been registered yet.",
       "scheduled": "Scheduled",
-      "inForce": "In force"
+      "inForce": "In force",
+      "affectedRoutes_one": "{{count}} route",
+      "affectedRoutes_other": "{{count}} routes"
     },
     "columns": {
       "truckType": "Vehicle type",
@@ -827,7 +829,8 @@
       "updatedBy": "Updated by",
       "effectiveDate": "Effective date",
       "price": "Price",
-      "notes": "Note"
+      "notes": "Note",
+      "affectedRoutes": "Routes affected"
     },
     "validation": {
       "priceRequired": "Enter a price greater than 0",
@@ -837,7 +840,9 @@
       "priceSaved": "Diesel price updated",
       "priceError": "Could not save the diesel price",
       "normSaved": "Norm updated",
-      "normError": "Could not save the norm"
+      "normError": "Could not save the norm",
+      "priceSavedAffecting_one": "Diesel price updated — {{count}} route re-costed",
+      "priceSavedAffecting_other": "Diesel price updated — {{count}} routes re-costed"
     }
   },
   "cropDiaries": {
@@ -2938,6 +2943,11 @@
       "stockTakeSuccess": "Stock-take saved"
     },
     "outgoing": {
+      "colCustomer": "Customer",
+      "colOrder": "Sales order",
+      "colQuantity": "Reserved qty",
+      "colStatus": "Status",
+      "modalTitle": "Sales orders holding this stock",
       "fromOrders_one": "Held by {{count}} sales order",
       "fromOrders_other": "Held by {{count}} sales orders",
       "moreOrders_one": "+{{count}} more order",
@@ -4258,9 +4268,12 @@
       "itemsTotal": "Other cost items",
       "costPrice": "Cost price",
       "suggestedPrice": "Suggested quote (+{{markup}}%)",
+      "suggestedPriceShort": "Suggested quote",
       "missingNorm": "No fuel norm registered for this vehicle type — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
       "missingPrice": "No diesel price registered — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
-      "noNorm": "no norm"
+      "noNorm": "no norm",
+      "costChanged": "Cost just updated",
+      "costChangedHint": "This route's cost price moved with the latest diesel price update."
     }
   },
   "vendors": {

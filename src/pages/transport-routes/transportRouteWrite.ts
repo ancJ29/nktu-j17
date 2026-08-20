@@ -6,12 +6,14 @@ import type {
   TransportRouteSegment,
 } from '@/types';
 
+export type TransportRouteWriteLeg = TransportRouteLeg & { distanceKm?: number };
+
 export type TransportRouteWriteInput = {
   isMultiTrip: boolean;
 
   route: { pickup: string; stuffing: string; dropoff: string };
 
-  trips: TransportRouteLeg[];
+  trips: TransportRouteWriteLeg[];
   truckType: string;
   containerSize: string;
   freightAmount: number;
@@ -69,12 +71,22 @@ function isBlankCostItem(item: TransportRouteCostItem): boolean {
   return !item.name && !item.amount && !item.quantity;
 }
 
-function normalizeLeg(leg: TransportRouteLeg): TransportRouteLeg {
+function normalizeLeg(leg: TransportRouteWriteLeg): TransportRouteLeg {
   return {
     departure: leg.departure.trim(),
     destination: leg.destination.trim(),
     laborCost: leg.laborCost || 0,
   };
+}
+
+export function deriveSegmentsFromLegs(
+  trips: readonly TransportRouteWriteLeg[],
+): TransportRouteSegment[] {
+  return trips.map((leg) => ({
+    from: leg.departure.trim(),
+    to: leg.destination.trim(),
+    distanceKm: leg.distanceKm || 0,
+  }));
 }
 
 export function buildTransportRouteWrite(input: TransportRouteWriteInput): TransportRouteWrite {
@@ -88,7 +100,6 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
     containerSize,
     freightAmount: input.freightAmount || 0,
 
-    segments: input.segments.map(normalizeSegment).filter((s) => !isBlankSegment(s)),
     costItems: input.costItems.map(normalizeCostItem).filter((i) => !isBlankCostItem(i)),
     markupPercent: input.markupPercent || 0,
     extra: input.extra,
@@ -103,6 +114,8 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
       isMultiTrip: true,
       trips,
 
+      segments: deriveSegmentsFromLegs(input.trips),
+
       route: {
         pickup: first?.departure ?? '',
         stuffing: '',
@@ -116,6 +129,8 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
   return {
     ...common,
     isMultiTrip: false,
+
+    segments: input.segments.map(normalizeSegment).filter((seg) => !isBlankSegment(seg)),
     route: {
       pickup: input.route.pickup.trim(),
       stuffing: input.route.stuffing.trim(),

@@ -15,7 +15,7 @@ const originStyle = isMobile ? { minWidth: 0 } : { minWidth: ORIGIN_MIN_WIDTH };
 
 const PLACE_LINE_CLAMP = isMobile ? 2 : 1;
 
-type RouteStop = { place: string; at?: DateTimeInput };
+export type RouteStop = { place: string; at?: DateTimeInput };
 
 function stopList(stops: Array<{ place?: string; at?: DateTimeInput }>): RouteStop[] {
   return stops
@@ -28,11 +28,13 @@ function StopCell({
   strong,
   dimmed,
   style,
+  lines,
 }: {
   readonly stop: RouteStop;
   readonly strong?: boolean;
   readonly dimmed?: boolean;
   readonly style?: CSSProperties;
+  readonly lines?: number;
 }) {
   const time = formatTime(stop.at);
 
@@ -46,7 +48,7 @@ function StopCell({
         fz="sm"
         fw={strong ? 500 : undefined}
         c={dimmed ? 'dimmed' : undefined}
-        lineClamp={PLACE_LINE_CLAMP}
+        lineClamp={lines ?? PLACE_LINE_CLAMP}
       >
         {stop.place}
       </Text>
@@ -67,15 +69,23 @@ function Arrow() {
   );
 }
 
-function RouteLine({ stops, suffix }: { stops: RouteStop[]; suffix?: ReactNode }) {
+function RouteLine({
+  stops,
+  suffix,
+  lines,
+}: {
+  stops: RouteStop[];
+  suffix?: ReactNode;
+  lines?: number;
+}) {
   const [origin, ...rest] = stops;
   const destination = rest.pop();
 
-  const wrap = isMobile ? 'wrap' : 'nowrap';
+  const wrap = isMobile || (lines ?? PLACE_LINE_CLAMP) > 1 ? 'wrap' : 'nowrap';
 
   return (
     <Group gap={6} wrap={wrap} align="flex-start" title={stops.map((s) => s.place).join(' › ')}>
-      <StopCell stop={origin ?? { place: '—' }} strong style={originStyle} />
+      <StopCell stop={origin ?? { place: '—' }} strong style={originStyle} lines={lines} />
       {destination && (
         <Group gap={6} wrap={wrap} align="flex-start" style={{ flex: 1, minWidth: 0 }}>
           {/* Intermediate stops stay on the line — dimmed and unweighted, so the
@@ -83,11 +93,11 @@ function RouteLine({ stops, suffix }: { stops: RouteStop[]; suffix?: ReactNode }
           {rest.map((stop, i) => (
             <Fragment key={`${stop.place}-${i}`}>
               <Arrow />
-              <StopCell stop={stop} dimmed style={{ minWidth: 0 }} />
+              <StopCell stop={stop} dimmed style={{ minWidth: 0 }} lines={lines} />
             </Fragment>
           ))}
           <Arrow />
-          <StopCell stop={destination} strong style={{ flex: 1, minWidth: 0 }} />
+          <StopCell stop={destination} strong style={{ flex: 1, minWidth: 0 }} lines={lines} />
           {suffix}
         </Group>
       )}
@@ -95,14 +105,17 @@ function RouteLine({ stops, suffix }: { stops: RouteStop[]; suffix?: ReactNode }
   );
 }
 
-export function TransportRouteCell({
-  order,
+export function JourneyCell({
+  legs,
   expanded = false,
   onToggle,
+  lines,
 }: {
-  readonly order: TransportOrder;
+  readonly legs: readonly RouteStop[][];
   readonly expanded?: boolean;
   readonly onToggle?: () => void;
+
+  readonly lines?: number;
 }) {
   const { t } = useTranslation();
 
@@ -111,26 +124,15 @@ export function TransportRouteCell({
     onToggle?.();
   };
 
-  if (!order.isMultiTrip) {
-    return (
-      <RouteLine
-        stops={stopList([
-          { place: order.route?.pickup, at: order.route?.pickupAt },
-          { place: order.route?.stuffing, at: order.route?.stuffingAt },
-          { place: order.route?.dropoff, at: order.route?.dropoffAt },
-        ])}
-      />
-    );
-  }
+  if (legs.length <= 1) return <RouteLine stops={legs[0] ?? []} lines={lines} />;
 
-  const trips = order.trips ?? [];
-  const firstLeg = trips[0];
-  const lastLeg = trips[trips.length - 1];
+  const firstLeg = legs[0] ?? [];
+  const lastLeg = legs[legs.length - 1] ?? [];
 
   const summaryStops = [
-    ...stopList([{ place: firstLeg?.departure, at: firstLeg?.loadingAt }]),
-    ...(trips.length > 1 ? [{ place: '...' }] : []),
-    ...stopList([{ place: lastLeg?.destination, at: lastLeg?.unloadingAt }]),
+    ...(firstLeg[0] ? [firstLeg[0]] : []),
+    ...(legs.length > 1 ? [{ place: '...' }] : []),
+    ...(lastLeg[lastLeg.length - 1] ? [lastLeg[lastLeg.length - 1]!] : []),
   ];
 
   return (
@@ -146,18 +148,13 @@ export function TransportRouteCell({
       </ActionIcon>
       {expanded ? (
         <Stack gap={2} style={{ flex: 1, minWidth: 0 }}>
-          {trips.map((trip, i) => (
+          {legs.map((leg, i) => (
             <Group key={i} gap={6} wrap="nowrap" align="flex-start">
               <Text fz="sm" fw={700} c="dimmed" w={16} style={{ flexShrink: 0 }}>
                 {i + 1}.
               </Text>
               <Box style={{ flex: 1, minWidth: 0 }}>
-                <RouteLine
-                  stops={stopList([
-                    { place: trip.departure, at: trip.loadingAt },
-                    { place: trip.destination, at: trip.unloadingAt },
-                  ])}
-                />
+                <RouteLine stops={leg} lines={lines} />
               </Box>
             </Group>
           ))}
@@ -166,9 +163,10 @@ export function TransportRouteCell({
         <Box style={{ flex: 1, minWidth: 0 }}>
           <RouteLine
             stops={summaryStops}
+            lines={lines}
             suffix={
               <Text fz="sm" c="dimmed" fs="italic" style={{ flexShrink: 0 }}>
-                {t('transportOrders.route.tripTotal', { count: trips.length })}
+                {t('transportOrders.route.tripTotal', { count: legs.length })}
               </Text>
             }
           />
@@ -176,4 +174,31 @@ export function TransportRouteCell({
       )}
     </Group>
   );
+}
+
+export function TransportRouteCell({
+  order,
+  expanded = false,
+  onToggle,
+}: {
+  readonly order: TransportOrder;
+  readonly expanded?: boolean;
+  readonly onToggle?: () => void;
+}) {
+  const legs = order.isMultiTrip
+    ? (order.trips ?? []).map((trip) =>
+        stopList([
+          { place: trip.departure, at: trip.loadingAt },
+          { place: trip.destination, at: trip.unloadingAt },
+        ]),
+      )
+    : [
+        stopList([
+          { place: order.route?.pickup, at: order.route?.pickupAt },
+          { place: order.route?.stuffing, at: order.route?.stuffingAt },
+          { place: order.route?.dropoff, at: order.route?.dropoffAt },
+        ]),
+      ];
+
+  return <JourneyCell legs={legs} expanded={expanded} onToggle={onToggle} />;
 }

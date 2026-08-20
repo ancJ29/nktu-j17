@@ -4,6 +4,9 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import { initReactI18next } from 'react-i18next';
 
 import { appConfig } from '@/config';
+import { logger } from '@credo/base-ui/utils';
+
+import { pruneShapeChangingOverrides, type TranslationTree } from './mergeTranslations';
 
 import en from './locales/en.json';
 import vi from './locales/vi.json';
@@ -49,7 +52,19 @@ i18n
 
 if (appConfig?.translations) {
   for (const [lang, overrides] of Object.entries(appConfig.translations)) {
-    i18n.addResourceBundle(lang, 'translation', overrides, true, true);
+    const bundled = (resources as Record<string, { translation: TranslationTree }>)[lang]
+      ?.translation;
+
+    const { pruned, dropped } = bundled
+      ? pruneShapeChangingOverrides(bundled, overrides)
+      : { pruned: overrides, dropped: [] as string[] };
+    if (dropped.length > 0) {
+      logger.warn(
+        `[i18n] ignored ${dropped.length} config translation override(s) for "${lang}" that would ` +
+          `have replaced a bundled subtree: ${dropped.join(', ')}. Fix the path in App Config.`,
+      );
+    }
+    i18n.addResourceBundle(lang, 'translation', pruned, true, true);
   }
 }
 

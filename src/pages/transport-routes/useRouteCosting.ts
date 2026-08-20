@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import type { FuelNormRow, TransportRouteRow } from '@/types';
+import type { FuelNormRow, FuelPriceRow, TransportRouteRow } from '@/types';
 import { useFuelNormStore } from '@/stores/useFuelNormStore';
 import { useFuelPriceStore } from '@/stores/useFuelPriceStore';
 import { todayInVnDateString } from '@/utils/dateTimeField';
@@ -18,6 +18,8 @@ export function buildFuelNormMap(rows: readonly FuelNormRow[]): Map<string, numb
 
 export type RouteCostingContext = {
   fuelPricePerLiter: number | undefined;
+
+  currentPrice: FuelPriceRow | undefined;
 
   today: string;
 
@@ -43,10 +45,11 @@ export function useRouteCosting(): RouteCostingContext {
 
   const today = todayInVnDateString();
   const norms = useMemo(() => buildFuelNormMap(normItems), [normItems]);
-  const fuelPricePerLiter = useMemo(
-    () => resolveCurrentFuelPrice(priceItems, today)?.price,
+  const currentPrice = useMemo(
+    () => resolveCurrentFuelPrice(priceItems, today),
     [priceItems, today],
   );
+  const fuelPricePerLiter = currentPrice?.price;
 
   const costOf = useCallback<RouteCostingContext['costOf']>(
     (route) =>
@@ -57,5 +60,5 @@ export function useRouteCosting(): RouteCostingContext {
     [norms, fuelPricePerLiter],
   );
 
-  return { fuelPricePerLiter, today, norms, costOf };
+  return { fuelPricePerLiter, currentPrice, today, norms, costOf };
 }

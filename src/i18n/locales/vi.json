@@ -818,7 +818,9 @@
       "hint": "Mỗi lần cập nhật là một dòng mới — giá cũ không bị xoá.",
       "empty": "Chưa có lần cập nhật giá nào.",
       "scheduled": "Sắp áp dụng",
-      "inForce": "Đang áp dụng"
+      "inForce": "Đang áp dụng",
+      "affectedRoutes_one": "{{count}} tuyến",
+      "affectedRoutes_other": "{{count}} tuyến"
     },
     "columns": {
       "truckType": "Loại xe",
@@ -827,7 +829,8 @@
       "updatedBy": "Người cập nhật",
       "effectiveDate": "Ngày hiệu lực",
       "price": "Đơn giá",
-      "notes": "Ghi chú"
+      "notes": "Ghi chú",
+      "affectedRoutes": "Tuyến bị ảnh hưởng"
     },
     "validation": {
       "priceRequired": "Vui lòng nhập giá lớn hơn 0",
@@ -837,7 +840,9 @@
       "priceSaved": "Đã cập nhật giá dầu",
       "priceError": "Không thể lưu giá dầu",
       "normSaved": "Đã cập nhật định mức",
-      "normError": "Không thể lưu định mức"
+      "normError": "Không thể lưu định mức",
+      "priceSavedAffecting_one": "Đã cập nhật giá dầu — {{count}} tuyến được tính lại giá vốn",
+      "priceSavedAffecting_other": "Đã cập nhật giá dầu — {{count}} tuyến được tính lại giá vốn"
     }
   },
   "cropDiaries": {
@@ -2938,6 +2943,11 @@
       "stockTakeSuccess": "Đã lưu kiểm kho"
     },
     "outgoing": {
+      "colCustomer": "Khách hàng",
+      "colOrder": "Đơn bán",
+      "colQuantity": "Số lượng giữ",
+      "colStatus": "Trạng thái",
+      "modalTitle": "Đơn bán đang giữ hàng",
       "fromOrders_one": "Đang được {{count}} đơn bán giữ",
       "fromOrders_other": "Đang được {{count}} đơn bán giữ",
       "moreOrders_one": "+{{count}} đơn khác",
@@ -4258,9 +4268,12 @@
       "itemsTotal": "Hạng mục chi phí khác",
       "costPrice": "Giá vốn",
       "suggestedPrice": "Giá báo đề xuất (+{{markup}}%)",
+      "suggestedPriceShort": "Giá báo đề xuất",
       "missingNorm": "Loại xe này chưa có định mức tiêu hao dầu — chi phí dầu đang tính bằng 0 và giá vốn đang thấp hơn thực tế. Nhập tại Định mức chi phí.",
       "missingPrice": "Chưa có đơn giá dầu — chi phí dầu đang tính bằng 0 và giá vốn đang thấp hơn thực tế. Nhập tại Định mức chi phí.",
-      "noNorm": "chưa có định mức"
+      "noNorm": "chưa có định mức",
+      "costChanged": "Vừa cập nhật giá vốn",
+      "costChangedHint": "Giá vốn tuyến này vừa thay đổi theo lần cập nhật đơn giá dầu mới nhất."
     }
   },
   "vendors": {
