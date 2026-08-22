@@ -33,9 +33,9 @@ import type { SalesOrderListVariant } from './salesOrderListVariant';
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 const vatRate = getPricingVatRate();
 
-function getDeliveryDateColor(
-  deliveryDate: string | number | Date | null | undefined,
-): string | undefined {
+function getDeliveryDateColor(order: SalesOrder): string | undefined {
+  if (order.isClosed || order.extra?.cancellation != null) return undefined;
+  const deliveryDate = order.extra?.deliveryDate;
   if (!deliveryDate) return undefined;
   const today = new Date();
   today.setHours(0, 0, 0, 0);
@@ -296,7 +296,7 @@ export function SalesOrderDataTable({
                       width: '200px',
                       render: (item: SalesOrder) => {
                         const dd = item.extra?.deliveryDate;
-                        const color = getDeliveryDateColor(dd);
+                        const color = getDeliveryDateColor(item);
                         const readyAt = getSalesOrderReadyDate(item);
                         return (
                           <Stack gap={0}>
@@ -341,7 +341,7 @@ export function SalesOrderDataTable({
                       ),
                       render: (item: SalesOrder) => {
                         const dd = item.extra?.deliveryDate;
-                        const color = getDeliveryDateColor(dd);
+                        const color = getDeliveryDateColor(item);
                         return (
                           <Text size="sm" c={color} fw={color ? 600 : undefined}>
                             {dd ? formatDate(dd) : '-'}

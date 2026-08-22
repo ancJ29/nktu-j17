@@ -10,7 +10,10 @@ import {
   getAutoCompletionTargetValue,
   runTransition as runSoTransition,
 } from '@/pages/sales-orders/transitionEngine';
-import { ensureReconcileStoresLoaded } from '@/pages/sales-orders/reconcileFromDeliveries';
+import {
+  ensureReconcileStoresLoaded,
+  resolveActualDeliveryDate,
+} from '@/pages/sales-orders/reconcileFromDeliveries';
 import {
   buildLinkageSnapshotFromReserveOps,
   executeReservationPlan,
@@ -160,14 +163,14 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
   summary.todayCompletedDrs = todaysCompletedDrs.length;
   if (todaysCompletedDrs.length === 0) return summary;
 
-  const drNumbersBySo = new Map<string, string[]>();
+  const drsBySo = new Map<string, DeliveryRequest[]>();
   for (const d of todaysCompletedDrs) {
     const soId = d.salesOrderId!;
-    const list = drNumbersBySo.get(soId) ?? [];
-    list.push(d.requestNumber);
-    drNumbersBySo.set(soId, list);
+    const list = drsBySo.get(soId) ?? [];
+    list.push(d);
+    drsBySo.set(soId, list);
   }
-  summary.candidateSos = drNumbersBySo.size;
+  summary.candidateSos = drsBySo.size;
 
   const soStore = useSalesOrderStore.getState();
   const stamp = getCurrentEmployeeStamp();
@@ -178,7 +181,8 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
   for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
-  for (const [soId, drNumbers] of drNumbersBySo) {
+  for (const [soId, soDrs] of drsBySo) {
+    const drNumbers = soDrs.map((d) => d.requestNumber);
     const detail: CheatDetail = { salesOrderId: soId, drNumbers, outcome: 'failed' };
     const so = soStore.getById(soId) as SalesOrder | undefined;
     if (!so) {
@@ -232,6 +236,8 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       actor,
       productsByCode,
       inventoryByProduct: prep.inventoryByProduct,
+
+      actualDeliveryDate: resolveActualDeliveryDate(soDrs),
     });
 
     if (!result.ok) {

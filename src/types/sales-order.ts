@@ -186,6 +186,7 @@ export type SalesOrderExtra = {
   deliveryAddress?: string;
 
   googleMapUrl?: string;
+
   deliveryDate?: NullableDateTimeInput;
   deliveryMethod?: string;
 

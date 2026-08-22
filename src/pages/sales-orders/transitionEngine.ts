@@ -71,6 +71,8 @@ export type TransitionInputs = {
   note?: string;
   productsByCode: Map<string, Product>;
   inventoryByProduct: Map<string, ProductInventoryRow[]>;
+
+  actualDeliveryDate?: number;
 };
 
 export async function runTransition(inputs: TransitionInputs): Promise<TransitionResult> {
@@ -231,6 +233,8 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
 
   const enteringReadyFromDraft = fromStatus.stage === 'DRAFT' && toStatus.stage !== 'DRAFT';
 
+  const enteringCompleted = fromStatus.stage !== 'COMPLETED' && toStatus.stage === 'COMPLETED';
+
   const newEntry: SalesOrderActivityEntry = {
     timestamp: transitionAt,
     action: 'status_change',
@@ -246,6 +250,7 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     status: toStatusValue,
     activityLog: [...log, newEntry],
     ...(enteringReadyFromDraft ? { readyAt: transitionAt } : {}),
+    ...(enteringCompleted ? { deliveryDate: inputs.actualDeliveryDate ?? transitionAt } : {}),
     ...(linkage ? { inventoryLinkage: linkage } : {}),
   });
 

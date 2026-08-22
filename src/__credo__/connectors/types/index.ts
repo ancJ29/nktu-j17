@@ -434,9 +434,3 @@ export type {
   UpdateSingleRecordRequest as CMngtUpdateSingleRecordRequest,
   UpdateSingleRecordResponse as CMngtUpdateSingleRecordResponse,
 } from '../__internal__/c-mngt/types';
-
-export type {
-  ClientConfig as CredoSmeClientConfig,
-  ProvisionClientRequest as CredoSmeProvisionClientRequest,
-  ProvisionClientResponse as CredoSmeProvisionClientResponse,
-} from '../__internal__/credo-sme/types';

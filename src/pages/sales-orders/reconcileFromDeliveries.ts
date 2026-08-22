@@ -67,6 +67,21 @@ export function isFullyDelivered(
   });
 }
 
+export function resolveActualDeliveryDate(
+  liveDrsForSo: readonly DeliveryRequest[],
+): number | undefined {
+  let latest: number | undefined;
+  for (const d of liveDrsForSo) {
+    if (d.direction === 'inbound' || !d.isClosed) continue;
+    const ts = (d.extra as DeliveryRequestExtra | undefined)?.deliveryTimestamp;
+    if (ts == null) continue;
+    const ms = new Date(ts as string | number).getTime();
+    if (Number.isNaN(ms)) continue;
+    if (latest === undefined || ms > latest) latest = ms;
+  }
+  return latest;
+}
+
 export async function advanceSoIfFullyDelivered(params: {
   so: SalesOrder;
   actor: Actor;
@@ -120,12 +135,15 @@ export async function advanceSoIfFullyDelivered(params: {
 
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
+  const actualDeliveryDate = resolveActualDeliveryDate(drsForSo);
+
   let result = await runSoTransition({
     order: so,
     toStatusValue: targetStatus,
     actor,
     productsByCode,
     inventoryByProduct,
+    actualDeliveryDate,
   });
 
   if (!result.ok && result.failure.kind === 'patch-conflict') {
@@ -144,6 +162,7 @@ export async function advanceSoIfFullyDelivered(params: {
           actor,
           productsByCode,
           inventoryByProduct: indexInventoryByProduct(useProductInventoryStore.getState().items),
+          actualDeliveryDate,
         });
       }
     }

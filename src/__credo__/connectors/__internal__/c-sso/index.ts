@@ -99,11 +99,6 @@ export const cSsoConnector = {
     }
     return cSsoConnector;
   },
-
-  removeAccessKey: () => {
-    storages.accessKey = '';
-    return cSsoConnector;
-  },
   setTrustedServiceKey: (trustedServiceKey: string) => {
     if (trustedServiceKey) {
       storages.trustedServiceKey = trustedServiceKey;

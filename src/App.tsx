@@ -1,5 +1,3 @@
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
 import { lazy, Suspense, useEffect } from 'react';
 import { RouterProvider } from 'react-router';
 import { useRegisterSW } from 'virtual:pwa-register/react';
@@ -11,6 +9,7 @@ import { buildHash, buildTimestamp } from '@/config/build-version';
 import { isFirstBoot } from '@/config';
 import { isInternal } from '@/config/env';
 import { useCfgReady } from '@/utils/bootState';
+import { isNewVersionNotificationEnabled } from '@/utils/permission';
 import { startOfflineSync } from '@/utils/offlineSync';
 import router from './router';
 import { clearChunkReloadParam, logger, resetReloadGuard } from '@credo/base-ui/utils';
@@ -60,6 +59,9 @@ export default function App() {
   const { checkForUpdates } = usePWA({
     bundledBuild: BUNDLED_BUILD,
     sw: { offlineReady, needRefresh, updateServiceWorker },
+    // Per-client (App Config → App Info), off by default. It gates the *notice*,
+    // not the update — see `isNewVersionNotificationEnabled`.
+    notify: isNewVersionNotificationEnabled(),
     labels: {
       newVersionAvailable: t('pwa.newVersionAvailable'),
       closeCompletelyInstructions: t('pwa.safari.closeCompletelyInstructions'),
@@ -151,8 +153,6 @@ export default function App() {
       <DevClientCodeModal />
       <DebugPanel />
       {isInternal && <InternalBanner />}
-      <SpeedInsights />
-      <Analytics />
     </ErrorBoundary>
   );
 }

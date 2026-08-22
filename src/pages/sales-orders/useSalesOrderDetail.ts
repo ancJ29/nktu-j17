@@ -77,7 +77,7 @@ import {
 } from './transitionEngine';
 import { deriveSoDeliveryIssues, type SoDeliveryIssue } from './deliveryReconciliation';
 import { dispatchSoFollowUp } from './followUps';
-import { advanceSoIfFullyDelivered } from './reconcileFromDeliveries';
+import { advanceSoIfFullyDelivered, resolveActualDeliveryDate } from './reconcileFromDeliveries';
 import { runShipRecovery } from './shipRecovery';
 import { softDeleteLinkedDeliveryRequests } from '@/pages/delivery-requests/deliveryRequestDelete';
 import type { Stage } from './capabilities/types';
@@ -1338,6 +1338,48 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     ) as DeliveryRequest[];
   }, [drs, order]);
 
+  const deliveryDateRecheckRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!order || !drsInit) return;
+    if (!canTransitionStatusPerm) return;
+    const extra = (order.extra ?? {}) as SalesOrderExtra;
+    if (extra.cancellation != null) return;
+    if (resolveStatus(extra.status ?? '').stage !== 'COMPLETED') return;
+    if (deliveryDateRecheckRef.current === order.id) return;
+    deliveryDateRecheckRef.current = order.id;
+    const actual = resolveActualDeliveryDate(linkedDRs);
+    if (actual == null) return;
+    const stored =
+      extra.deliveryDate != null ? new Date(extra.deliveryDate as string | number) : null;
+    const sameLocalDay = (a: Date, b: Date) =>
+      a.getFullYear() === b.getFullYear() &&
+      a.getMonth() === b.getMonth() &&
+      a.getDate() === b.getDate();
+    if (stored && !Number.isNaN(stored.getTime()) && sameLocalDay(stored, new Date(actual))) return;
+    void useSalesOrderStore
+      .getState()
+      .updateSafely({
+        id: order.id,
+        version: order.version,
+        patch: { extra: { ...extra, deliveryDate: actual } },
+      })
+      .then((updated) => {
+        setOrder(updated as SalesOrder);
+
+        logActivity('salesOrder.update', order.id, {
+          orderNumber: order.orderNumber,
+          autoRepair: 'delivery-date',
+          fields: {
+            deliveryDate: {
+              ...(stored && !Number.isNaN(stored.getTime()) && { from: stored.getTime() }),
+              to: actual,
+            },
+          },
+        });
+      })
+      .catch(() => undefined);
+  }, [order, linkedDRs, drsInit, resolveStatus]);
+
   const reconcileIssues: SoDeliveryIssue[] = useMemo(() => {
     if (!order || !drsInit || !inventoryInit || !productsInit) return [];
     const status = (order.extra as SalesOrderExtra | undefined)?.status ?? '';
@@ -1509,6 +1551,8 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             actor,
             productsByCode: productByCode,
             inventoryByProduct,
+
+            actualDeliveryDate: resolveActualDeliveryDate(linkedDRs),
           });
           if (!result.ok) {
             failRed(

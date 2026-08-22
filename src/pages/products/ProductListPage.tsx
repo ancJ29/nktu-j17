@@ -27,13 +27,7 @@ import {
   isProductInventoryEnabled,
   perms,
 } from '@/utils/permission';
-import {
-  isBreakdownSet,
-  isBundleSet,
-  isHiddenFromInventoryListProduct,
-  isNoInventoryProduct,
-  isProductSet,
-} from '@/utils/productSet';
+import { isHiddenFromInventoryListProduct } from '@/utils/productSet';
 import { logActivity } from '@/utils/activityLogger';
 import { exportProductsToExcel } from '@/utils/excelParser';
 import { ProductCardList } from './ProductCardList';
@@ -48,24 +42,22 @@ const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 type FilterStatus = 'all' | 'active' | 'inactive';
 
-type FilterKind = 'set' | 'breakdown' | 'single' | null;
+type FilterInventoryDisplay = 'shown' | 'hidden' | null;
 
 type ProductFilters = {
   status: FilterStatus;
   category: string | null;
-  stock: string | null;
-  kind: FilterKind;
+  inventoryDisplay: FilterInventoryDisplay;
   search: string;
   page: number;
 };
 
-type ProductFilterDimensions = Pick<ProductFilters, 'status' | 'category' | 'stock' | 'kind'>;
+type ProductFilterDimensions = Pick<ProductFilters, 'status' | 'category' | 'inventoryDisplay'>;
 
 const FILTER_DEFAULTS: ProductFilters = {
   status: 'all',
   category: null,
-  stock: null,
-  kind: null,
+  inventoryDisplay: null,
   search: '',
   page: 1,
 };
@@ -96,28 +88,22 @@ export function ProductListPage() {
   const filter = filterState.status;
   const categoryFilter = filterState.category;
 
-  const stockFilter = filterState.stock;
-
-  const kindFilter = filterState.kind;
+  const inventoryDisplayFilter = filterState.inventoryDisplay;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
   const setCategoryFilter = useCallback(
     (v: string | null) => updateState({ category: v }),
     [updateState],
   );
-  const setStockFilter = useCallback(
-    (v: string | null) => updateState({ stock: v }),
-    [updateState],
-  );
-  const setKindFilter = useCallback(
-    (v: string | null) => updateState({ kind: (v as FilterKind) ?? null }),
+  const setInventoryDisplayFilter = useCallback(
+    (v: string | null) => updateState({ inventoryDisplay: (v as FilterInventoryDisplay) ?? null }),
     [updateState],
   );
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
   const filters = useMemo(
-    () => ({ status: filter, category: categoryFilter, stock: stockFilter, kind: kindFilter }),
-    [filter, categoryFilter, stockFilter, kindFilter],
+    () => ({ status: filter, category: categoryFilter, inventoryDisplay: inventoryDisplayFilter }),
+    [filter, categoryFilter, inventoryDisplayFilter],
   );
 
   const onHandByCode = useMemo(() => {
@@ -130,35 +116,18 @@ export function ProductListPage() {
     return m;
   }, [inventoryItems]);
 
-  const filterFn = useCallback(
-    (item: (typeof allProducts)[number], f: ProductFilterDimensions) => {
-      if (item.extra?.isDeleted) return false;
-      if (f.status === 'active' && !item.isActive) return false;
-      if (f.status === 'inactive' && item.isActive) return false;
-      if (f.category && item.extra?.category !== f.category) return false;
-      if (f.kind === 'set' && !isBundleSet(item)) return false;
-      if (f.kind === 'breakdown' && !isBreakdownSet(item)) return false;
-      if (f.kind === 'single' && isProductSet(item)) return false;
+  const filterFn = useCallback((item: (typeof allProducts)[number], f: ProductFilterDimensions) => {
+    if (item.extra?.isDeleted) return false;
+    if (f.status === 'active' && !item.isActive) return false;
+    if (f.status === 'inactive' && item.isActive) return false;
+    if (f.category && item.extra?.category !== f.category) return false;
 
-      if (inventoryEnabled && f.stock) {
-        if (f.stock === 'notManaged') return isNoInventoryProduct(item);
-
-        if (f.stock === 'hiddenFromList')
-          return hideFromInventoryListEnabled && isHiddenFromInventoryListProduct(item);
-        if (isNoInventoryProduct(item)) return false;
-        const onHand = onHandByCode.get(item.code) ?? 0;
-        if (f.stock === 'inStock' && onHand <= 0) return false;
-        if (f.stock === 'outOfStock' && onHand !== 0) return false;
-        if (f.stock === 'lowStock') {
-          const min = item.extra?.minimumInventory?.value;
-          if (typeof min !== 'number' || min <= 0) return false;
-          if (onHand >= min) return false;
-        }
-      }
-      return true;
-    },
-    [onHandByCode],
-  );
+    if (hideFromInventoryListEnabled && f.inventoryDisplay) {
+      const hidden = isHiddenFromInventoryListProduct(item);
+      if (f.inventoryDisplay === 'shown' ? hidden : !hidden) return false;
+    }
+    return true;
+  }, []);
 
   const searchFields = useCallback(
     (item: (typeof allProducts)[number]) => [
@@ -231,34 +200,15 @@ export function ProductListPage() {
     forceRefresh();
   }, [forceRefresh]);
 
-  const stockOptions = useMemo(
-    () => [
-      { value: 'inStock', label: t('products.filterStockInStock') },
-      { value: 'outOfStock', label: t('products.filterStockOutOfStock') },
-      { value: 'lowStock', label: t('products.filterStockLowStock') },
-      { value: 'notManaged', label: t('products.filterStockNotManaged') },
-
-      ...(hideFromInventoryListEnabled
-        ? [{ value: 'hiddenFromList', label: t('products.filterStockHiddenFromList') }]
-        : []),
-    ],
+  const inventoryDisplayOptions = useMemo(
+    () =>
+      hideFromInventoryListEnabled
+        ? [
+            { value: 'shown', label: t('products.filterInventoryDisplayShown') },
+            { value: 'hidden', label: t('products.filterInventoryDisplayHidden') },
+          ]
+        : [],
     [t],
-  );
-
-  const kindOptions = useMemo(
-    () => [
-      { value: 'set', label: t('products.filterKindSet') },
-      ...(allProducts.some((p) => isBreakdownSet(p))
-        ? [{ value: 'breakdown', label: t('products.filterKindBreakdown') }]
-        : []),
-      { value: 'single', label: t('products.filterKindSingle') },
-    ],
-    [allProducts, t],
-  );
-
-  const showKindFilter = useMemo(
-    () => kindFilter !== null || allProducts.some((p) => isProductSet(p)),
-    [allProducts, kindFilter],
   );
 
   const desktopFilters: SelectFilter[] = useMemo(
@@ -275,27 +225,15 @@ export function ProductListPage() {
             },
           ]
         : []),
-      ...(showKindFilter
+      ...(inventoryDisplayOptions.length > 0
         ? [
             {
-              value: kindFilter,
-              onChange: setKindFilter,
-              data: kindOptions,
-              placeholder: t('products.filterKindAll'),
+              value: inventoryDisplayFilter,
+              onChange: setInventoryDisplayFilter,
+              data: inventoryDisplayOptions,
+              placeholder: t('products.filterInventoryDisplayAll'),
               searchable: false,
-              w: 170,
-            },
-          ]
-        : []),
-      ...(inventoryEnabled
-        ? [
-            {
-              value: stockFilter,
-              onChange: setStockFilter,
-              data: stockOptions,
-              placeholder: t('products.filterStockAll'),
-              searchable: false,
-              w: 180,
+              w: 200,
             },
           ]
         : []),
@@ -304,13 +242,9 @@ export function ProductListPage() {
       categoryOptions,
       categoryFilter,
       setCategoryFilter,
-      showKindFilter,
-      kindFilter,
-      setKindFilter,
-      kindOptions,
-      stockFilter,
-      setStockFilter,
-      stockOptions,
+      inventoryDisplayFilter,
+      setInventoryDisplayFilter,
+      inventoryDisplayOptions,
       t,
     ],
   );
@@ -329,25 +263,13 @@ export function ProductListPage() {
             }),
           ]
         : []),
-      ...(showKindFilter
+      ...(inventoryDisplayOptions.length > 0
         ? [
             allOptionFilter({
-              title: t('products.filterKindTitle'),
-              value: kindFilter,
-              options: kindOptions,
-              onChange: setKindFilter,
-              allLabel: t('__new__.01-common.filters.all'),
-              emptyValue: null,
-            }),
-          ]
-        : []),
-      ...(inventoryEnabled
-        ? [
-            allOptionFilter({
-              title: t('products.filterStockTitle'),
-              value: stockFilter,
-              options: stockOptions,
-              onChange: setStockFilter,
+              title: t('products.filterInventoryDisplayTitle'),
+              value: inventoryDisplayFilter,
+              options: inventoryDisplayOptions,
+              onChange: setInventoryDisplayFilter,
               allLabel: t('__new__.01-common.filters.all'),
               emptyValue: null,
             }),
@@ -358,13 +280,9 @@ export function ProductListPage() {
       categoryOptions,
       categoryFilter,
       setCategoryFilter,
-      showKindFilter,
-      kindFilter,
-      setKindFilter,
-      kindOptions,
-      stockFilter,
-      setStockFilter,
-      stockOptions,
+      inventoryDisplayFilter,
+      setInventoryDisplayFilter,
+      inventoryDisplayOptions,
       t,
     ],
   );

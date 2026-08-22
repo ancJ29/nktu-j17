@@ -109,6 +109,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const shouldDisplayHeaderBadges = variant.showStockKpiBadges;
   const shouldDisplaySecondaryHeaderBadges = variant.showSecondaryKpiBadges;
 
+  const secondaryFilterEnabled =
+    variant.showSecondaryFilter || variant.quickChipMode === 'secondary';
+
   const {
     items: allRows,
     loading,
@@ -267,7 +270,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           const min = s.product.extra?.minimumInventory?.value;
           if (typeof min !== 'number' || s.totalOnHand <= 0 || s.totalOnHand > min) return false;
         }
-        if (f.secondary && s.secondaryStatus !== f.secondary) return false;
+        if (secondaryFilterEnabled && f.secondary && s.secondaryStatus !== f.secondary)
+          return false;
 
         if (!columnFilters.predicate(s)) return false;
         return true;
@@ -456,14 +460,18 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             },
           ]
         : []),
-      {
-        value: secondaryFilter,
-        onChange: (v: string | null) => setSecondaryFilter(v as SecondaryFilter),
-        data: secondaryOptions,
-        placeholder: t('common.secondaryStatus.filterPlaceholder'),
-        searchable: false,
-        w: 180,
-      },
+      ...(variant.showSecondaryFilter
+        ? [
+            {
+              value: secondaryFilter,
+              onChange: (v: string | null) => setSecondaryFilter(v as SecondaryFilter),
+              data: secondaryOptions,
+              placeholder: t('common.secondaryStatus.filterPlaceholder'),
+              searchable: false,
+              w: 180,
+            },
+          ]
+        : []),
     ],
     [
       locationFilter,
@@ -479,6 +487,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       setSecondaryFilter,
       secondaryOptions,
       variant.showStockFilter,
+      variant.showSecondaryFilter,
       t,
     ],
   );
@@ -511,9 +520,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           ]
         : []),
 
-      ...(isMobile && variant.quickChipMode === 'secondary'
-        ? []
-        : [
+      ...(variant.showSecondaryFilter && !(isMobile && variant.quickChipMode === 'secondary')
+        ? [
             allOptionFilter<SecondaryFilter>({
               title: t('common.columns.secondaryStatus'),
               value: secondaryFilter,
@@ -522,7 +530,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               allLabel: t('__new__.01-common.filters.all'),
               emptyValue: null,
             }),
-          ]),
+          ]
+        : []),
     ],
     [
       categoryFilter,
@@ -535,6 +544,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       setSecondaryFilter,
       secondaryOptions,
       variant.showStockFilter,
+      variant.showSecondaryFilter,
       variant.quickChipMode,
       t,
     ],
@@ -542,49 +552,51 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const mobileQuickChips: QuickFilterChip[] = useMemo(
     () =>
-      variant.quickChipMode === 'secondary'
-        ? [
-            {
-              key: 'all',
-              label: t('common.secondaryStatus.all'),
-              active: secondaryFilter === null,
-              onClick: () => setSecondaryFilter(null),
-            },
-            {
-              key: 'mustOrder',
-              label: t('common.secondaryStatus.mustOrder'),
-              active: secondaryFilter === 'mustOrder',
-              onClick: () =>
-                setSecondaryFilter(secondaryFilter === 'mustOrder' ? null : 'mustOrder'),
-            },
-            {
-              key: 'outOfStock',
-              label: t('common.secondaryStatus.outOfStock'),
-              active: secondaryFilter === 'outOfStock',
-              onClick: () =>
-                setSecondaryFilter(secondaryFilter === 'outOfStock' ? null : 'outOfStock'),
-            },
-          ]
-        : [
-            {
-              key: 'all',
-              label: t('productInventory.filterStock.all'),
-              active: stockFilter === null,
-              onClick: () => setStockFilter(null),
-            },
-            {
-              key: 'lowStock',
-              label: t('productInventory.filterStock.lowStock'),
-              active: stockFilter === 'lowStock',
-              onClick: () => setStockFilter(stockFilter === 'lowStock' ? null : 'lowStock'),
-            },
-            {
-              key: 'outOfStock',
-              label: t('productInventory.filterStock.outOfStock'),
-              active: stockFilter === 'outOfStock',
-              onClick: () => setStockFilter(stockFilter === 'outOfStock' ? null : 'outOfStock'),
-            },
-          ],
+      variant.quickChipMode === 'none'
+        ? []
+        : variant.quickChipMode === 'secondary'
+          ? [
+              {
+                key: 'all',
+                label: t('common.secondaryStatus.all'),
+                active: secondaryFilter === null,
+                onClick: () => setSecondaryFilter(null),
+              },
+              {
+                key: 'mustOrder',
+                label: t('common.secondaryStatus.mustOrder'),
+                active: secondaryFilter === 'mustOrder',
+                onClick: () =>
+                  setSecondaryFilter(secondaryFilter === 'mustOrder' ? null : 'mustOrder'),
+              },
+              {
+                key: 'outOfStock',
+                label: t('common.secondaryStatus.outOfStock'),
+                active: secondaryFilter === 'outOfStock',
+                onClick: () =>
+                  setSecondaryFilter(secondaryFilter === 'outOfStock' ? null : 'outOfStock'),
+              },
+            ]
+          : [
+              {
+                key: 'all',
+                label: t('productInventory.filterStock.all'),
+                active: stockFilter === null,
+                onClick: () => setStockFilter(null),
+              },
+              {
+                key: 'lowStock',
+                label: t('productInventory.filterStock.lowStock'),
+                active: stockFilter === 'lowStock',
+                onClick: () => setStockFilter(stockFilter === 'lowStock' ? null : 'lowStock'),
+              },
+              {
+                key: 'outOfStock',
+                label: t('productInventory.filterStock.outOfStock'),
+                active: stockFilter === 'outOfStock',
+                onClick: () => setStockFilter(stockFilter === 'outOfStock' ? null : 'outOfStock'),
+              },
+            ],
     [stockFilter, setStockFilter, secondaryFilter, setSecondaryFilter, variant.quickChipMode, t],
   );
 
@@ -610,6 +622,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               )}
               {shouldDisplaySecondaryHeaderBadges ? (
                 <>
+                  {/* Drill-down only while the secondary filter has a visible
+                      control — a badge click must never apply a filter the
+                      operator can't see or clear. Without one the badges are
+                      read-only counts. */}
                   {secondaryMustOrderCount > 0 && (
                     <Badge
                       size="xs"
@@ -617,8 +633,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                       color="orange"
                       radius="sm"
                       tt="lowercase"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => setSecondaryFilter('mustOrder')}
+                      style={secondaryFilterEnabled ? { cursor: 'pointer' } : undefined}
+                      onClick={
+                        secondaryFilterEnabled ? () => setSecondaryFilter('mustOrder') : undefined
+                      }
                     >
                       {t('productInventory.kpis.secondaryMustOrder', {
                         count: secondaryMustOrderCount,
@@ -632,8 +650,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                       color="red"
                       radius="sm"
                       tt="lowercase"
-                      style={{ cursor: 'pointer' }}
-                      onClick={() => setSecondaryFilter('outOfStock')}
+                      style={secondaryFilterEnabled ? { cursor: 'pointer' } : undefined}
+                      onClick={
+                        secondaryFilterEnabled ? () => setSecondaryFilter('outOfStock') : undefined
+                      }
                     >
                       {t('productInventory.kpis.secondaryOutOfStock', {
                         count: secondaryOutOfStockCount,
@@ -777,7 +797,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           />
         )}
 
-        {isMobile && <QuickFilterChips chips={mobileQuickChips} />}
+        {isMobile && mobileQuickChips.length > 0 && <QuickFilterChips chips={mobileQuickChips} />}
 
         {isMobile ? (
           <MobileFilterBar
