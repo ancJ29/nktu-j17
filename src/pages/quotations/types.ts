@@ -71,6 +71,8 @@ export type QuotationExtra = {
   customerName?: string;
 
   assignedStaff?: string;
+
+  companyId?: string;
   note?: string;
   lines: QuotationLine[];
   isDeleted?: boolean;

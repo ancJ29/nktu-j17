@@ -3331,6 +3331,8 @@
       "addLine": "Add product",
       "amountLabel": "Amount",
       "belowSuggestedPriceHint": "Below suggested price ({{price}})",
+      "companyLabel": "Issuing company",
+      "companyPlaceholder": "Select company",
       "customerLabel": "Customer",
       "customerPlaceholder": "Select customer (optional)",
       "headerSection": "Quotation",

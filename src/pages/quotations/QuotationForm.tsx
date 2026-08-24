@@ -42,6 +42,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
+import { getCompanyInfos } from '@/config/companyInfo';
 import { useInitFormFromFetch } from '@/hooks/useInitFormFromFetch';
 import {
   getProductDefaultUnitPrice,
@@ -96,6 +97,8 @@ type FormValues = {
   customerId: string;
   customerName: string;
   assignedStaff: string;
+
+  companyId: string;
   note: string;
   lines: FormLine[];
 };
@@ -168,6 +171,19 @@ export function QuotationForm() {
 
   const showProductPhoto = hasImagesForProducts();
 
+  const companies = useMemo(() => getCompanyInfos(), []);
+  const defaultCompanyId = companies[0]?.id ?? '';
+  const companyOptions = useMemo(
+    () =>
+      companies.map((c, i) => ({
+        value: c.id,
+        label: c.name || c.address || `${t('quotations.form.companyLabel')} ${i + 1}`,
+      })),
+    [companies, t],
+  );
+
+  const showCompanyPicker = companies.length > 1;
+
   const unitLabels = useLookupLabels('unit');
 
   const storeInitialized = useQuotationStore((s) => s.initialized);
@@ -188,6 +204,7 @@ export function QuotationForm() {
       customerId: '',
       customerName: '',
       assignedStaff: '',
+      companyId: '',
       note: QUOTATION_DEFAULT_NOTE,
       lines: [],
     },
@@ -225,6 +242,8 @@ export function QuotationForm() {
         customerId: resolveCustomerId(target.extra.customerCode) ?? '',
         customerName: target.extra.customerName ?? '',
         assignedStaff: target.extra.assignedStaff ?? '',
+
+        companyId: target.extra.companyId ?? '',
         note: target.extra.note ?? '',
         lines: (target.extra.lines ?? []).map(toFormLine),
       };
@@ -246,12 +265,14 @@ export function QuotationForm() {
           customerId: resolveCustomerId(copyFrom.extra.customerCode) ?? '',
           customerName: copyFrom.extra.customerName ?? '',
           assignedStaff: copyFrom.extra.assignedStaff ?? getCurrentEmployeeId() ?? '',
+          companyId: copyFrom.extra.companyId ?? defaultCompanyId,
           note: copyFrom.extra.note ?? '',
           lines: (copyFrom.extra.lines ?? []).map(toFormLine),
         });
       } else {
         const me = getCurrentEmployeeId();
         if (me) form.setFieldValue('assignedStaff', me);
+        if (defaultCompanyId) form.setFieldValue('companyId', defaultCompanyId);
       }
       if (!cancelled) setSeeded(true);
     })();
@@ -359,6 +380,7 @@ export function QuotationForm() {
             ...(customerCode ? { customerCode } : { customerCode: undefined }),
             ...(customerName ? { customerName } : { customerName: undefined }),
             assignedStaff: values.assignedStaff || undefined,
+            companyId: values.companyId || undefined,
             note: values.note.trim() || undefined,
             lines,
           };
@@ -386,6 +408,7 @@ export function QuotationForm() {
               ...(customerCode && { customerCode }),
               ...(customerName && { customerName }),
               ...(values.assignedStaff && { assignedStaff: values.assignedStaff }),
+              ...(values.companyId && { companyId: values.companyId }),
               ...(values.note.trim() && { note: values.note.trim() }),
               lines,
             };
@@ -496,6 +519,16 @@ export function QuotationForm() {
                   comboboxProps={{ withinPortal: true }}
                   onChange={(sel) => form.setFieldValue('assignedStaff', sel?.id ?? '')}
                 />
+                {showCompanyPicker && (
+                  <Select
+                    label={t('quotations.form.companyLabel')}
+                    placeholder={t('quotations.form.companyPlaceholder')}
+                    data={companyOptions}
+                    value={form.values.companyId || null}
+                    comboboxProps={{ withinPortal: true }}
+                    onChange={(v) => form.setFieldValue('companyId', v ?? '')}
+                  />
+                )}
                 {isEdit && editCode && (
                   <TextInput
                     label={t('common.labels.code')}

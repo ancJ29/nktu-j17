@@ -277,6 +277,7 @@ export type CMngtTransportOrderFeatures = {
 };
 
 export type CMngtCompanyInfo = {
+  id?: string;
   name: string;
   address: string;
   taxCode: string;
@@ -341,7 +342,7 @@ export type CMngtAppConfig = AppConfig & {
   layout: CMngtLayoutConfig;
   displaySettings: CMngtDisplaySettings;
 
-  companyInfo?: CMngtCompanyInfo;
+  companyInfo?: CMngtCompanyInfo | CMngtCompanyInfo[];
   translations: Record<string, Record<string, unknown>>;
   permissions?: PartialPermissions;
 };

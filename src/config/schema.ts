@@ -4,6 +4,7 @@ import { CredoAppConfigSchema, type CredoAppConfig } from '@credo/base-ui/types'
 import { IconName } from '@credo/base-ui/components';
 import { z } from 'zod';
 import { defaultNavigation } from './navigation';
+import { CompanyInfoSchema } from './companyInfoSchema';
 
 const CMngtNavigationItemSchema = z.object({
   id: z.string().min(1),
@@ -575,16 +576,7 @@ const LayoutSchema = z
 
 const TranslationsSchema = z.record(z.string(), z.record(z.string(), z.unknown())).optional();
 
-const CompanyInfoSchema = z
-  .object({
-    name: z.string().default(''),
-    address: z.string().default(''),
-    taxCode: z.string().default(''),
-    tel: z.string().default(''),
-    email: z.string().default(''),
-  })
-  .default({ name: '', address: '', taxCode: '', tel: '', email: '' });
-export type CompanyInfoConfig = z.infer<typeof CompanyInfoSchema>;
+export type { CompanyInfoConfig } from './companyInfoSchema';
 
 export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
   schemaVersion: z.number().int().optional(),

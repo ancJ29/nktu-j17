@@ -2,7 +2,7 @@ import { resolveClientCode } from '@/config/client-code';
 import {
   DEFAULT_APP_INFO,
   DEFAULT_AUTH,
-  DEFAULT_COMPANY_INFO,
+  DEFAULT_COMPANY_INFOS,
   DEFAULT_CUSTOMER_FEATURES,
   DEFAULT_DELIVERY_REQUEST_FEATURES,
   DEFAULT_DISPLAY_SETTINGS,
@@ -25,6 +25,7 @@ import {
   DEFAULT_VENDOR_FEATURES,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
+import { normalizeCompanyInfoList } from '@/config/companyInfoSchema';
 import type {
   CompanyInfoConfig,
   GoodsReceiptFeatures,
@@ -351,7 +352,7 @@ export function ConfigEditor({
   );
   const [displaySettings, setDisplaySettings] =
     useState<CMngtDisplaySettings>(DEFAULT_DISPLAY_SETTINGS);
-  const [companyInfo, setCompanyInfo] = useState<CompanyInfoConfig>(DEFAULT_COMPANY_INFO);
+  const [companyInfos, setCompanyInfos] = useState<CompanyInfoConfig[]>(DEFAULT_COMPANY_INFOS);
 
   const departmentMultiSelectData = useMemo(
     () =>
@@ -425,7 +426,7 @@ export function ConfigEditor({
       },
       layout,
       displaySettings,
-      companyInfo,
+      companyInfo: companyInfos,
       permissions: Object.keys(permissions).length > 0 ? permissions : undefined,
       translations,
     }),
@@ -467,7 +468,7 @@ export function ConfigEditor({
       farmFeatures,
       layout,
       displaySettings,
-      companyInfo,
+      companyInfos,
       permissions,
       translations,
     ],
@@ -553,7 +554,7 @@ export function ConfigEditor({
     setPermissions(cfg.permissions ?? {});
     setTranslations(cfg.translations ?? {});
     setDisplaySettings({ ...DEFAULT_DISPLAY_SETTINGS, ...cfg.displaySettings });
-    setCompanyInfo({ ...DEFAULT_COMPANY_INFO, ...cfg.companyInfo });
+    setCompanyInfos(normalizeCompanyInfoList(cfg.companyInfo));
     setHasConfig(true);
   }, []);
 
@@ -768,7 +769,7 @@ export function ConfigEditor({
     setTranslations(DEFAULT_TRANSLATIONS);
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
     setTableDensity(DEFAULT_TABLE_DENSITY);
-    setCompanyInfo(DEFAULT_COMPANY_INFO);
+    setCompanyInfos(DEFAULT_COMPANY_INFOS);
   }, []);
 
   const resetAppInfo = useCallback(() => {
@@ -862,7 +863,7 @@ export function ConfigEditor({
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
     setTableDensity(DEFAULT_TABLE_DENSITY);
   }, []);
-  const resetCompanyInfo = useCallback(() => setCompanyInfo(DEFAULT_COMPANY_INFO), []);
+  const resetCompanyInfo = useCallback(() => setCompanyInfos(DEFAULT_COMPANY_INFOS), []);
 
   const eqDefault = (a: unknown, b: unknown) => Object.keys(deepDiff(a, b)).length === 0;
   const sectionIsDefault: Partial<Record<SectionKey, boolean>> = {
@@ -875,7 +876,7 @@ export function ConfigEditor({
     displaySettings:
       eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS) &&
       eqDefault(tableDensity, DEFAULT_TABLE_DENSITY),
-    companyInfo: eqDefault(companyInfo, DEFAULT_COMPANY_INFO),
+    companyInfo: eqDefault(companyInfos, DEFAULT_COMPANY_INFOS),
     layout: eqDefault(layout, DEFAULT_LAYOUT),
     theme: eqDefault(themeConfig, DEFAULT_THEME),
     languages: eqDefault(languages, DEFAULT_LANGUAGES) && defaultLanguage === DEFAULT_LANGUAGE,
@@ -1037,14 +1038,14 @@ export function ConfigEditor({
           <CollapsibleSection
             icon={IconBuilding}
             title="Company Info"
-            description="Seller identity printed on generated documents (delivery note, quotation)"
+            description="Companies that issue documents (delivery note, quotation) — the first is the default"
             sectionKey="companyInfo"
             isDefault={sectionIsDefault.companyInfo}
             opened={openSections.has('companyInfo')}
             onToggle={toggleSection}
             onReset={resetCompanyInfo}
           >
-            <CompanyInfoSection value={companyInfo} onChange={setCompanyInfo} />
+            <CompanyInfoSection value={companyInfos} onChange={setCompanyInfos} />
           </CollapsibleSection>
           <CollapsibleSection
             icon={IconLayoutSidebar}

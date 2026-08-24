@@ -3331,6 +3331,8 @@
       "addLine": "Thêm sản phẩm",
       "amountLabel": "Thành tiền",
       "belowSuggestedPriceHint": "Thấp hơn giá đề xuất ({{price}})",
+      "companyLabel": "Công ty phát hành",
+      "companyPlaceholder": "Chọn công ty",
       "customerLabel": "Khách hàng",
       "customerPlaceholder": "Chọn khách hàng (tùy chọn)",
       "headerSection": "Báo giá",

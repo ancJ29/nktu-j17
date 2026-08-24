@@ -49,7 +49,7 @@ import { DetailField } from '@/components/DetailField';
 import { NotFoundState } from '@/components/NotFoundState';
 import { ProductLink } from '@/components/ProductLink';
 import { SectionCard } from '@/components/SectionCard';
-import { getCompanyInfo } from '@/config/companyInfo';
+import { getCompanyInfo, hasMultipleCompanies } from '@/config/companyInfo';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
@@ -379,7 +379,7 @@ export function QuotationDetail() {
     const d = new Date(q.createdAt);
     const dateText = `Ngày ${String(d.getDate()).padStart(2, '0')} tháng ${d.getMonth() + 1} năm ${d.getFullYear()}`;
     return {
-      seller: getCompanyInfo(),
+      seller: getCompanyInfo(q.extra.companyId),
       code: q.extra.code,
       dateText,
       note: q.extra.note,
@@ -721,6 +721,14 @@ export function QuotationDetail() {
                 title={t('quotations.form.headerSection')}
               >
                 <Stack gap="md">
+                  {/* Only worth a row when the client issues under more than one
+                      company — otherwise every quotation would repeat the one
+                      seller the operator already knows. */}
+                  {hasMultipleCompanies() && (
+                    <DetailField label={t('quotations.form.companyLabel')}>
+                      <Text size="sm">{getCompanyInfo(quotation.extra.companyId).name}</Text>
+                    </DetailField>
+                  )}
                   {quotation.extra.assignedStaff && (
                     <DetailField label={t('salesOrders.columns.assignedStaff')}>
                       <EmployeeLink id={quotation.extra.assignedStaff} />
