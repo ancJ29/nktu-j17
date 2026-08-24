@@ -1,9 +1,8 @@
 import { useCallback, useMemo, useState, type MouseEvent, type Ref } from 'react';
-import { Badge, Group, Text, Tooltip } from '@mantine/core';
+import { Badge, Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { ListDataTable } from '@/components/ListDataTable';
-import { ActiveBadge } from '@/components/badges';
 import { formatDate } from '@/utils/dateFormat';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
@@ -52,29 +51,32 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
     () => [
       {
         key: 'code',
-        width: '120px',
+        width: '135px',
         header: t('transportRoutes.columns.code'),
-
         render: (r: TransportRouteRow) => (
-          <Text ff="monospace" fz="sm" fw={600}>
-            {r.code}
-          </Text>
-        ),
-      },
-      {
-        key: 'kind',
-        width: '95px',
-        header: t('transportRoutes.columns.kind'),
-        render: (r: TransportRouteRow) =>
-          r.isMultiTrip ? (
-            <Badge size="sm" variant="light" color="grape" tt="none" radius="sm">
-              {t('transportOrders.trips.badge', { n: routeLegCount(r) })}
-            </Badge>
-          ) : (
-            <Text size="sm" c="dimmed">
-              {t('transportRoutes.kind.single')}
+          <Stack gap={4} align="flex-start">
+            {/* Mono, like every other code in this feature (order no.,
+                container, plate): it is matched character-by-character, which
+                is the one job proportional type is bad at. */}
+            <Text ff="monospace" fz="sm" fw={600}>
+              {r.code}
             </Text>
-          ),
+            {r.isMultiTrip ? (
+              <Badge size="xs" variant="light" color="grape" tt="none" radius="sm">
+                {t('transportOrders.trips.badge', { n: routeLegCount(r) })}
+              </Badge>
+            ) : (
+              <Text size="xs" c="dimmed">
+                {t('transportRoutes.kind.single')}
+              </Text>
+            )}
+            {!r.isActive && (
+              <Badge size="xs" variant="light" color="gray" tt="none" radius="sm">
+                {t('transportRoutes.status.inactive')}
+              </Badge>
+            )}
+          </Stack>
+        ),
       },
       {
         key: 'route',
@@ -97,31 +99,30 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'truckType',
-        width: '120px',
+        width: '130px',
         header: t('transportRoutes.columns.truckType'),
-        render: (r: TransportRouteRow) => (
-          <Text size="sm">{truckTypeLabel(r.truckType) || '—'}</Text>
-        ),
-      },
-      {
-        key: 'containerSize',
-        width: '105px',
-        header: t('transportRoutes.columns.containerSize'),
-
         render: (r: TransportRouteRow) => {
           const display = routeContainerDisplay(r, NON_CONTAINER_TRUCK_TYPES);
-          if (display === 'value')
-            return <Text size="sm">{containerSizeLabel(r.containerSize)}</Text>;
           return (
-            <Text size="sm" c="dimmed" fs="italic">
-              {display === 'any' ? t('transportRoutes.form.anyContainerSize') : '—'}
-            </Text>
+            <Stack gap={2}>
+              <Text size="sm">{truckTypeLabel(r.truckType) || '—'}</Text>
+              {display === 'value' && (
+                <Text size="xs" c="dimmed">
+                  {containerSizeLabel(r.containerSize)}
+                </Text>
+              )}
+              {display === 'any' && (
+                <Text size="xs" c="dimmed" fs="italic">
+                  {t('transportRoutes.form.anyContainerSize')}
+                </Text>
+              )}
+            </Stack>
           );
         },
       },
       {
         key: 'freightAmount',
-        width: '130px',
+        width: '125px',
         header: t('transportRoutes.columns.freightAmount'),
         render: (r: TransportRouteRow) => (
           <Text size="sm" ta="right">
@@ -131,7 +132,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'laborCost',
-        width: '130px',
+        width: '120px',
         header: t('transportRoutes.columns.laborCost'),
 
         render: (r: TransportRouteRow) => (
@@ -142,7 +143,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'costPrice',
-        width: '190px',
+        width: '175px',
         header: t('transportRoutes.costing.costPrice'),
         render: (r: TransportRouteRow) => {
           const costing = costOf(r);
@@ -207,20 +208,8 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         },
       },
       {
-        key: 'status',
-        width: '120px',
-        header: t('transportRoutes.columns.status'),
-        render: (r: TransportRouteRow) => (
-          <ActiveBadge
-            isActive={r.isActive}
-            activeLabel={t('transportRoutes.status.active')}
-            inactiveLabel={t('transportRoutes.status.inactive')}
-          />
-        ),
-      },
-      {
         key: 'updatedAt',
-        width: '110px',
+        width: '105px',
         header: t('transportRoutes.columns.updatedAt'),
         render: (r: TransportRouteRow) => (
           <Text size="sm" c="dimmed">
@@ -241,6 +230,8 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
     ],
   );
 
+  const getRowBg = useMemo(() => (r: TransportRouteRow) => (r.isActive ? undefined : 'gray.1'), []);
+
   return (
     <ListDataTable
       data={routes}
@@ -251,6 +242,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       detailRoute={ROUTES.TRANSPORT_ROUTES.EDIT}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
+      getRowBg={getRowBg}
     />
   );
 }

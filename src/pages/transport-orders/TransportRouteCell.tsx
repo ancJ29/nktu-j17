@@ -78,16 +78,38 @@ function RouteLine({
   suffix?: ReactNode;
   lines?: number;
 }) {
+  const oneLine = !isMobile && (lines ?? PLACE_LINE_CLAMP) <= 1;
+
+  if (!oneLine) {
+    const shown = stops.length ? stops : [{ place: '—' }];
+    const last = shown.length - 1;
+    return (
+      <Stack gap={2} title={stops.map((s) => s.place).join(' › ')}>
+        {shown.map((stop, i) => (
+          <Group key={`${stop.place}-${i}`} gap={4} wrap="nowrap" align="flex-start">
+            {i > 0 && <Arrow />}
+            <StopCell
+              stop={stop}
+              strong={i === 0 || i === last}
+              dimmed={i > 0 && i < last}
+              style={{ minWidth: 0 }}
+              lines={lines}
+            />
+            {i === last && suffix}
+          </Group>
+        ))}
+      </Stack>
+    );
+  }
+
   const [origin, ...rest] = stops;
   const destination = rest.pop();
 
-  const wrap = isMobile || (lines ?? PLACE_LINE_CLAMP) > 1 ? 'wrap' : 'nowrap';
-
   return (
-    <Group gap={6} wrap={wrap} align="flex-start" title={stops.map((s) => s.place).join(' › ')}>
+    <Group gap={6} wrap="nowrap" align="flex-start" title={stops.map((s) => s.place).join(' › ')}>
       <StopCell stop={origin ?? { place: '—' }} strong style={originStyle} lines={lines} />
       {destination && (
-        <Group gap={6} wrap={wrap} align="flex-start" style={{ flex: 1, minWidth: 0 }}>
+        <Group gap={6} wrap="nowrap" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
           {/* Intermediate stops stay on the line — dimmed and unweighted, so the
               two endpoints read first without the stuffing point being hidden. */}
           {rest.map((stop, i) => (

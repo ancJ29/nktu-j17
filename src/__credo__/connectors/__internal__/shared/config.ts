@@ -8,13 +8,13 @@ export const configs: Record<string, Record<string, string>> = {
     cStorage: 'https://inst-1786e4.api-bridge.work',
   },
   '49a092': {
-    activityLogger: 'https://inst-49a092.api-bridge.work',
-    credoSso: 'https://inst-49a092.api-bridge.work/$default',
-    cMngt: 'https://inst-49a092.api-bridge.work/$default',
-    cStorage: 'https://inst-49a092.api-bridge.work',
+    activityLogger: 'https://inst-4e8870.api-bridge.work',
+    credoSso: 'https://inst-4e8870.api-bridge.work/$default',
+    cMngt: 'https://inst-4e8870.api-bridge.work/$default',
+    cStorage: 'https://inst-4e8870.api-bridge.work',
   },
-  '4e8870': {
-    activityLogger: 'https://inst-49a092.api-bridge.work',
+  '409e36': {
+    activityLogger: 'https://inst-4e8870.api-bridge.work',
     credoSso: 'https://inst-4e8870.api-bridge.work/$default',
     cMngt: 'https://inst-4e8870.api-bridge.work/$default',
     cStorage: 'https://inst-4e8870.api-bridge.work',
@@ -34,7 +34,7 @@ export const targetConfigs: Record<string, Record<string, string>> = {
     cMngt: 'c-mngt-stg',
     cStorage: 'c-storage-stg',
   },
-  '4e8870': {
+  '409e36': {
     activityLogger: 'activity-logger-ridge',
     credoSso: 'credo-sso-ridge',
     cMngt: 'c-mngt-ridge',
@@ -42,24 +42,15 @@ export const targetConfigs: Record<string, Record<string, string>> = {
   },
 };
 
-export const CREDO_GROUP_STORAGE_KEY = 'a9c56';
+export const CREDO_GROUP_STORAGE_KEY = 'a9c55';
 
 export function setCredoGroup(group: string): void {
-  if (group === '409e36') {
-    return setCredoGroup('4e8870');
-  }
-
   if (!group) return;
 
   const current = getEnvVar(CREDO_GROUP_STORAGE_KEY) || '-';
   if (current === group) return;
 
   setEnvVar(CREDO_GROUP_STORAGE_KEY, group);
-
-  if (isBrowser()) {
-    localStorage.removeItem('a9c55');
-    localStorage.removeItem('19c55230d1');
-  }
 
   if (isBrowser() && group !== credoGroup) {
     setTimeout(() => {
