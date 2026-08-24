@@ -62,6 +62,8 @@ import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useTruckTypeOptions } from './truckType';
 import { buildTransportRouteWrite, deriveSegmentsFromLegs } from './transportRouteWrite';
 import type { TransportRouteWriteLeg } from './transportRouteWrite';
+import { seedSegmentsFromStops, segmentsAreStopEcho } from './segmentSeed';
+import type { RouteStopValues } from './segmentSeed';
 import { computeRouteCosting } from './routeCosting';
 import { useRouteCosting } from './useRouteCosting';
 import { RouteCostingSummary } from './RouteCostingSummary';
@@ -376,6 +378,18 @@ export function TransportRouteFormPage() {
     if (checked && form.values.trips.length === 0) form.setFieldValue('trips', [blankLeg()]);
   };
 
+  const stopValues = {
+    pickup: form.values.pickup,
+    stuffing: form.values.stuffing,
+    dropoff: form.values.dropoff,
+  };
+  const handleStopChange = (field: keyof RouteStopValues) => (value: string) => {
+    form.setFieldValue(field, value);
+    if (segmentsAreStopEcho(form.values.segments, stopValues)) {
+      form.setFieldValue('segments', seedSegmentsFromStops({ ...stopValues, [field]: value }));
+    }
+  };
+
   const legLaborTotal = form.values.trips.reduce((sum, leg) => sum + (leg.laborCost || 0), 0);
 
   const draftNorm = form.values.truckType ? norms.get(form.values.truckType) : undefined;
@@ -599,6 +613,9 @@ export function TransportRouteFormPage() {
           ) : (
             <SectionCard icon={<IconMapPin size={14} />} title={t('transportOrders.route.title')}>
               <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="sm">
+                {/* `onChange` sits AFTER the spread on all three: the stop must
+                    also echo into the segment table below — see
+                    `handleStopChange`. */}
                 <Autocomplete
                   withAsterisk
                   label={t('transportOrders.route.pickup')}
@@ -606,6 +623,7 @@ export function TransportRouteFormPage() {
                   limit={PLACE_SUGGESTION_LIMIT}
                   styles={PLACE_INPUT_STYLES}
                   {...form.getInputProps('pickup')}
+                  onChange={handleStopChange('pickup')}
                 />
                 <Autocomplete
                   label={t('transportOrders.route.stuffing')}
@@ -613,6 +631,7 @@ export function TransportRouteFormPage() {
                   limit={PLACE_SUGGESTION_LIMIT}
                   styles={PLACE_INPUT_STYLES}
                   {...form.getInputProps('stuffing')}
+                  onChange={handleStopChange('stuffing')}
                 />
                 <Autocomplete
                   withAsterisk
@@ -621,6 +640,7 @@ export function TransportRouteFormPage() {
                   limit={PLACE_SUGGESTION_LIMIT}
                   styles={PLACE_INPUT_STYLES}
                   {...form.getInputProps('dropoff')}
+                  onChange={handleStopChange('dropoff')}
                 />
               </SimpleGrid>
             </SectionCard>
@@ -664,7 +684,9 @@ export function TransportRouteFormPage() {
               disagreeing; forgetting produced a zero-fuel giá vốn on a route
               that plainly had legs). A one-leg run has no legs to mirror and
               genuinely has more measured stretches than its three named stops,
-              so it keeps the free-form table. */}
+              so it keeps the free-form table — SEEDED from the stops while it
+              is still their pure echo (`handleStopChange`), owned by the
+              operator from their first authored km/place/row on. */}
           {!form.values.isMultiTrip && (
             <SectionCard
               icon={<IconRoute size={14} />}
