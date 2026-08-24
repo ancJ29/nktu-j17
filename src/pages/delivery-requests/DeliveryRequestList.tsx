@@ -1,4 +1,5 @@
 import { Button, Group, Stack } from '@mantine/core';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { notifications } from '@mantine/notifications';
 import { IconArrowsSort } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -112,10 +113,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
   const salesOrdersInit = useSalesOrderStore((s) => s.initialized);
   const refreshSalesOrders = useSalesOrderStore((s) => s.forceRefresh);
 
-  const currentEmployee = useMemo(() => {
-    const me = getCurrentEmployeeId();
-    return me ? employees.find((e) => e.id === me) : undefined;
-  }, [employees]);
+  const currentEmployee = useMyEmployee();
   const nktuConfig = variant.clientSpecific?.NKTU;
   const salesDeptScoped =
     !!nktuConfig?.salesDeptScopedView &&

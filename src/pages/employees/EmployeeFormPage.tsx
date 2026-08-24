@@ -9,7 +9,7 @@ import { appConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { codeToLoginEmail, AUTO_LOGIN_DOMAIN } from '@/utils/loginEmail';
 import { cMngtConnector } from '@credo/connectors/connector';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { getCurrentIsRoot } from '@/hooks/useCurrentEmployee';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
@@ -258,7 +258,7 @@ export function EmployeeFormPage() {
             ...buildProfileExtra(values),
           };
 
-          const emailLocked = !useAuthStore.getState().user?.isRoot;
+          const emailLocked = !getCurrentIsRoot();
           const { email: _lockedEmail, ...restSansEmail } = rest;
           const patchFields = emailLocked ? restSansEmail : rest;
 

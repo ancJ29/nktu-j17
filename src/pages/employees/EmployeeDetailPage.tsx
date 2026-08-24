@@ -65,7 +65,7 @@ import { EmployeeProfileImageModal } from './EmployeeProfileImageModal';
 import { PermissionsPanel } from '@/pages/profile/PermissionsPanel';
 import { useEmployeeDangerZone } from './useEmployeeDangerZone';
 import { useEmployeeFieldOptions } from './useEmployeeFieldOptions';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
@@ -90,7 +90,7 @@ export function EmployeeDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
+  const isRootUser = useIsRoot();
   const canViewPerms = hasViewPermsRight && (!permMngtRootUserOnly || isRootUser);
   const canModifyPerms = hasModifyPermsRight && (!permMngtRootUserOnly || isRootUser);
   const { resolveDepartment, resolvePosition } = useEmployeeFieldOptions();

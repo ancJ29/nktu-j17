@@ -1,12 +1,16 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Loader, Stack, Text } from '@mantine/core';
 import { IconHistory } from '@tabler/icons-react';
-import { activityLoggerConnector } from '@credo/connectors/connector';
-import type { ActivityLoggerActivityEntity } from '@credo/connectors/types';
+import { activityLoggerConnector, activityLoggerV2Connector } from '@credo/connectors/connector';
 import { device } from '@credo/base-ui/utils';
 import { resolveClientCode } from '@/config/client-code';
+import { appActivityLoggerV1InternalAccessKey } from '@/config/env';
 import { ActivityCard } from '@/components/activity/ActivityCard';
+import {
+  useActivityHistory,
+  type ActivityPageFetcher,
+} from '@/components/activity/useActivityHistory';
 import { SectionCard } from '@/components/SectionCard';
 
 const isMobile = device.isMobile;
@@ -30,57 +34,40 @@ type Props = {
 
 export function ActivityByTargetPanel({ targetId, i18nNamespace }: Props) {
   const { t } = useTranslation();
-  const [activities, setActivities] = useState<ActivityLoggerActivityEntity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(false);
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
 
-  useEffect(() => {
-    let cancelled = false;
+  const fetchers = useMemo<ActivityPageFetcher[]>(
+    () => [
+      (cursor) =>
+        activityLoggerV2Connector.getByTarget({
+          targetId,
+          clientId: resolveClientCode(),
+          limit: PAGE_SIZE,
+          ...(cursor ? { cursor } : {}),
+        }),
 
-    setLoading(true);
-    setError(false);
-    setActivities([]);
-    setNextCursor(undefined);
-    activityLoggerConnector
-      .getByTarget({ targetId, clientId: resolveClientCode(), limit: PAGE_SIZE })
-      .then((res) => {
-        if (cancelled) return;
-        setActivities(res.activities);
-        setNextCursor(res.nextCursor);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [targetId]);
+      ...(appActivityLoggerV1InternalAccessKey
+        ? [
+            ((cursor) =>
+              activityLoggerConnector.getByTarget({
+                targetId,
+                clientId: resolveClientCode(),
+                limit: PAGE_SIZE,
+                ...(cursor ? { cursor } : {}),
+              })) satisfies ActivityPageFetcher,
+          ]
+        : []),
+    ],
+    [targetId],
+  );
 
-  const handleLoadMore = useCallback(() => {
-    if (!nextCursor || loadingMore) return;
-    setLoadingMore(true);
-    activityLoggerConnector
-      .getByTarget({
-        targetId,
-        clientId: resolveClientCode(),
-        limit: PAGE_SIZE,
-        cursor: nextCursor,
-      })
-      .then((res) => {
-        setActivities((prev) => [...prev, ...res.activities]);
-        setNextCursor(res.nextCursor);
-      })
-      .catch(() => {
-        setError(true);
-      })
-      .finally(() => setLoadingMore(false));
-  }, [targetId, nextCursor, loadingMore]);
+  const {
+    entries: activities,
+    loading,
+    loadingMore,
+    error,
+    hasMore,
+    loadMore: handleLoadMore,
+  } = useActivityHistory(fetchers);
 
   return (
     <SectionCard
@@ -105,7 +92,7 @@ export function ActivityByTargetPanel({ targetId, i18nNamespace }: Props) {
           {activities.map((entry) => (
             <ActivityCard key={entry.id} entry={entry} targetLabel={null} showActor />
           ))}
-          {nextCursor && (
+          {hasMore && (
             <Group justify="center" pt="xs">
               <Button variant="default" size="sm" onClick={handleLoadMore} loading={loadingMore}>
                 {t(`${i18nNamespace}.activitiesLoadMore` as const)}

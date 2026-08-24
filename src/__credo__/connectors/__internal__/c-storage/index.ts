@@ -27,6 +27,7 @@ import type {
   PushRecordResponse,
   PushToSeriesRequest,
   PushToSeriesResponse,
+  RecordNoChangeResponse,
   RegisterServiceRequest,
   RegisterServiceResponse,
   RemoveRecordRequest,
@@ -168,21 +169,28 @@ export const cStorageConnector = {
       accessKeyRequired: true,
     }),
 
-  getRecordByKey: <T>({
+  getRecordByKey: (<T>({
     serviceCode,
     key,
     accessKey,
     allowNotFound = true,
-  }: GetRecordByKeyRequest) =>
-    recordApi<GetRecordByKeyResponse<T>>(RECORD_ROUTES.GET_RECORD_BY_KEY, {
+    knownVersion,
+  }: GetRecordByKeyRequest & { knownVersion?: string | undefined }) =>
+    recordApi<GetRecordByKeyResponse<T> | RecordNoChangeResponse>(RECORD_ROUTES.GET_RECORD_BY_KEY, {
       params: { serviceCode, key },
+      queryParams: knownVersion ? { knownVersion } : undefined,
       accessKey,
     }).catch((error) => {
       if (allowNotFound && error instanceof Error && error.message.includes('404')) {
         return null;
       }
       throw error;
-    }),
+    })) as {
+    <T>(
+      req: GetRecordByKeyRequest & { knownVersion: string | undefined },
+    ): Promise<GetRecordByKeyResponse<T> | RecordNoChangeResponse | null>;
+    <T>(req: GetRecordByKeyRequest): Promise<GetRecordByKeyResponse<T> | null>;
+  },
 
   getRecordsByKeys: <T>({ serviceCode, keys, accessKey }: GetRecordsByKeysRequest) =>
     recordApi<GetRecordsByKeysResponse<T>>(RECORD_ROUTES.GET_RECORDS_BY_KEYS, {

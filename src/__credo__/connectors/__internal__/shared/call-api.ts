@@ -12,9 +12,7 @@ import {
   getEncodingMode,
   getStagePrefix,
   getTransportMode,
-  getVrxToken,
   setEncodingMode,
-  setVrxToken,
 } from './transport-state';
 
 const MSGPACK_CONTENT_TYPE = 'application/x-msgpack';
@@ -107,8 +105,6 @@ async function runOnce<T>(
 
   const target = headers['x-target'];
 
-  attachCachedVrxIfAuthed(headers, origin, target);
-
   let mode = selectMode(origin, headers);
   if (mode === 'tunnel') {
     const trustedKey = getCredoConnectorTrustedKey();
@@ -147,12 +143,12 @@ async function runOnce<T>(
     }
 
     recordServerEncoding(response, origin, target);
-    recordVrxToken(response, origin, target);
 
     if (
       response.status === 406 &&
       response.headers.get(ENCODING_HEADER) === 'msgpack' &&
-      mode === 'plain'
+      mode === 'plain' &&
+      IS_BROWSER()
     ) {
       if (headers['x-trusted-service-key']) {
         clearCredoConnectorTrustedKey();
@@ -203,16 +199,6 @@ function selectMode(origin: string, headers: Record<string, string>): Mode {
   }
 
   return 'tunnel';
-}
-
-function attachCachedVrxIfAuthed(
-  headers: Record<string, string>,
-  origin: string,
-  target?: string,
-): void {
-  if (!headers['Authorization']) return;
-  const cached = getVrxToken(origin, target);
-  if (cached) headers['x-vrx'] = cached;
 }
 
 type Built = { url: string; init: RequestInit };
@@ -344,12 +330,6 @@ function recordServerEncoding(response: Response, origin: string, target?: strin
   if (getEncodingMode(origin, target) === serverEncoding) return;
   trace('[callApi] serverEncoding', { serverEncoding, origin, target });
   setEncodingMode(origin, target, serverEncoding);
-}
-
-function recordVrxToken(response: Response, origin: string, target?: string): void {
-  const vrx = response.headers.get('x-vrx');
-
-  if (vrx) setVrxToken(origin, target, vrx);
 }
 
 function configureTrace(

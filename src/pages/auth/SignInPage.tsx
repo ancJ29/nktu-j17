@@ -1,28 +1,25 @@
 import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { takeSessionExpiredNotice, useAuthStore } from '@/stores/useAuthStore';
+import { cacheFlush } from '@/utils/appCache';
 import { resolveLoginIdentifier } from '@/utils/loginEmail';
 import { markPendingLogin } from '@/utils/pendingLoginLog';
 import { markPostLoginReloads } from '@/utils/postLoginReload';
 import { Auth, IconName } from '@credo/base-ui/components';
 import { useAuthSubmit } from '@credo/base-ui/lib';
 import { useForm } from '@mantine/form';
-import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect } from 'react';
+import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { isLocalhost } from '@/config/env';
-import { resolveClientCode } from '@/config/client-code';
 
-const clientCode = resolveClientCode();
-
-type LoginFormValues = {
+type SignInFormValues = {
   identifier: string;
   password: string;
   remember: boolean;
 };
 
-export function LoginPage() {
+export function SignInPage() {
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const login = useAuthStore((state) => state.login);
@@ -53,12 +50,8 @@ export function LoginPage() {
     [i18n],
   );
 
-  const form = useForm<LoginFormValues>({
-    initialValues: {
-      identifier: isLocalhost ? `${clientCode}@internal.cr3do.dev` : '',
-      password: isLocalhost ? 'hH@7lc@WBOFwDJ9!' : '',
-      remember: true,
-    },
+  const form = useForm<SignInFormValues>({
+    initialValues: { identifier: '', password: '', remember: true },
     validate: {
       identifier: (value) =>
         value.length < 1 ? t('auth.login.validation.usernameRequired') : null,
@@ -67,7 +60,7 @@ export function LoginPage() {
   });
 
   const { isLoading, error, handleSubmit } = useAuthSubmit({
-    onSubmit: (values: LoginFormValues) =>
+    onSubmit: (values: SignInFormValues) =>
       login({
         email: resolveLoginIdentifier(values.identifier),
         password: values.password,
@@ -75,9 +68,10 @@ export function LoginPage() {
       }),
     onSuccess: () => {
       markPendingLogin('password');
-
       markPostLoginReloads();
-      navigate('/');
+
+      cacheFlush();
+      window.location.assign(ROUTES.APP.MAIN);
     },
     getErrorMessage: (err) => (err instanceof Error ? err.message : t('auth.login.error.failed')),
   });
@@ -96,11 +90,8 @@ export function LoginPage() {
         passwordLabel: t('auth.login.passwordLabel'),
         passwordPlaceholder: t('auth.login.passwordPlaceholder'),
         rememberMe: t('auth.login.rememberMe'),
-        forgotPasswordLink: t('auth.login.forgotPasswordLink'),
         signInButton: t('auth.login.signInButton'),
         useLoginLinkButton: t('auth.login.useLoginLinkButton'),
-        noAccountPrefix: t('auth.login.noAccountPrefix'),
-        createAccountLink: t('auth.login.createAccountLink'),
       }}
       form={form}
       onSubmit={handleSubmit}
@@ -108,14 +99,8 @@ export function LoginPage() {
       isLoading={isLoading}
       error={error}
       themeConfig={themeConfig.auth}
-      routes={{
-        forgotPassword: ROUTES.AUTH.FORGOT_PASSWORD,
-        register: ROUTES.AUTH.REGISTER,
-        loginViaQRCode: ROUTES.AUTH.LOGIN_VIA_QR_CODE,
-      }}
-      showForgotPassword={appConfig.auth.forgotPassword}
-      showRegister={appConfig.auth.register}
-      showQrLogin={appConfig.auth.loginViaQRCode}
+
+      showQrLogin
       branding={{
         appName: appBrand.name,
         appNameHtml: appBrand.nameHtml,

@@ -8,7 +8,7 @@ import { ROUTES } from '@/constants/routes';
 import { getCurrentEmployeeId, getCurrentIsRoot } from '@/hooks/useCurrentEmployee';
 import { setSalesOrderQueryRange, useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import {
@@ -99,7 +99,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   const { t, i18n } = useTranslation();
   const scrollViewportRef = useListScrollRestoration(ROUTES.SALES_ORDERS.LIST);
 
-  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
+  const isRootUser = useIsRoot();
 
   const [bulkDrOpened, { open: openBulkDr, close: closeBulkDr }] = useDisclosure(false);
 

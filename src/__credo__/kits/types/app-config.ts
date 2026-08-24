@@ -17,9 +17,6 @@ export type AppInfo = {
 };
 
 export type AuthFeatures = {
-  register: boolean;
-  forgotPassword: boolean;
-  resetPassword: boolean;
   loginViaQRCode: boolean;
 };
 

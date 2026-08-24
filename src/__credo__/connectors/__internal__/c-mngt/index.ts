@@ -153,6 +153,8 @@ import type {
   UpdateOperationLogResponse,
   DeleteOperationLogRequest,
   DeleteOperationLogResponse,
+  LogActivitiesRequest,
+  LogActivitiesResponse,
   QueryGenericRecordsRequest,
   QueryGenericRecordsResponse,
   QueryGenericRecordsSyncRequest,
@@ -196,6 +198,7 @@ export * from './routes';
 const storages = {
   target: targets['cMngt'] || '',
   accessKey: '',
+  deviceId: '',
   authToken: '',
   clientCode: '',
   trustedServiceKey: '',
@@ -216,6 +219,7 @@ const LOCATION_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.LOCATION;
 const PRODUCT_INVENTORY_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.PRODUCT_INVENTORY;
 const LOOKUP_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.LOOKUP;
 const OPERATION_LOG_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.OPERATION_LOG;
+const ACTIVITY_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.ACTIVITY;
 const GENERIC_RECORD_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.GENERIC_RECORD;
 const SINGLE_RECORDS_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.SINGLE_RECORDS;
 const PARTITIONED_RECORDS_ROUTES = C_MNGT_ROUTES.SUB_ROUTES.PARTITIONED_RECORDS;
@@ -307,6 +311,12 @@ const lookupApi = createApiGroup({
   getBaseUrl,
 });
 
+const activityApi = createApiGroup({
+  storages,
+  prefix: C_MNGT_ROUTES.PREFIXES.ACTIVITY,
+  getBaseUrl,
+});
+
 const operationLogApi = createApiGroup({
   storages,
   prefix: C_MNGT_ROUTES.PREFIXES.OPERATION_LOG,
@@ -385,6 +395,11 @@ export const cMngtConnector = {
   },
   setClientCode: (clientId: string) => {
     storages.clientCode = clientId;
+    return cMngtConnector;
+  },
+
+  setDeviceId: (deviceId: string) => {
+    storages.deviceId = deviceId;
     return cMngtConnector;
   },
   setTrustedServiceKey: (trustedServiceKey: string) => {
@@ -942,6 +957,12 @@ export const cMngtConnector = {
     request: ImportBatchLookupsRequest<TExtra>,
   ) =>
     lookupApi<ImportBatchLookupsResponse<TExtra>>(LOOKUP_ROUTES.IMPORT_BATCH, {
+      body: request,
+      extraHeaders: { 'x-client-code': storages.clientCode },
+    }),
+
+  logActivities: (request: LogActivitiesRequest) =>
+    activityApi<LogActivitiesResponse>(ACTIVITY_ROUTES.LOG_ACTIVITIES, {
       body: request,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),

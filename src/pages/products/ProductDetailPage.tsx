@@ -60,7 +60,7 @@ import { SectionCard, type SectionCardEditLabels } from '@/components/SectionCar
 import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
 import { ImageZoomModal } from '@/components/ImageZoomModal';
 import { NotFoundState } from '@/components/NotFoundState';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
@@ -541,6 +541,8 @@ export function ProductDetailPage() {
   }, [extra.barcode]);
 
   const barcodeClipboard = useClipboard({ timeout: 1500 });
+
+  const me = useMyEmployee();
 
   if (loading) return null;
   if (!product) {
@@ -1344,7 +1346,6 @@ export function ProductDetailPage() {
     </Stack>
   );
 
-  const authUser = useAuthStore.getState().user;
   const imageEntries: PhotoEntry[] = images.map((img) => ({ url: img.url, timestamp: '' }));
 
   const uploadCard =
@@ -1357,8 +1358,8 @@ export function ProductDetailPage() {
           imageDirectory={buildUploadDirectory({ type: 'product', id: product.id })}
           buildFileName={buildUploadFileName}
           marker={product.name || product.code}
-          currentUserId={authUser?.email}
-          currentUserName={authUser?.name}
+          currentUserId={me?.id}
+          currentUserName={me?.name}
         />
       </Card>
     ) : null;
@@ -1373,8 +1374,8 @@ export function ProductDetailPage() {
           imageDirectory={buildUploadDirectory({ type: 'product', id: product.id })}
           buildFileName={buildUploadFileName}
           marker={product.name || product.code}
-          currentUserId={authUser?.email}
-          currentUserName={authUser?.name}
+          currentUserId={me?.id}
+          currentUserName={me?.name}
         />
       ) : images.length === 0 ? (
         <Stack align="center" gap="sm" py="xl">

@@ -17,9 +17,6 @@ export const ROUTES = {
   AUTH: {
     LOGIN: '/login',
     LOGOUT: '/logout',
-    REGISTER: '/register',
-    FORGOT_PASSWORD: '/forgot-password',
-    RESET_PASSWORD: '/reset-password',
     LOGIN_VIA_QR_CODE: '/login-via-qr-code',
   },
   DELIVERY: {
@@ -155,4 +152,8 @@ export const ROUTES = {
   FORBIDDEN: '/403-forbidden',
   ERROR: '/error',
   SYSTEM_ADMIN: '/8dc52354/system-admin',
+
+  CREDO_SME: {
+    CLIENT_CONFIG: '/5fdb0520ef6/client-config',
+  },
 } as const;

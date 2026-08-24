@@ -507,12 +507,9 @@
       }
     },
     "login": {
-      "createAccountLink": "Create one",
       "error": {
         "failed": "Login failed. Please try again."
       },
-      "forgotPasswordLink": "Forgot password?",
-      "noAccountPrefix": "Don't have an account? ",
       "passwordLabel": "Password",
       "passwordPlaceholder": "Enter your password",
       "rememberMe": "Remember me",

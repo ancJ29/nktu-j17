@@ -11,14 +11,13 @@ import {
 } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DateField } from '@/components/DateField';
 import { EmployeeSelector } from '@/components/selectors';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { useAuthStore } from '@/stores/useAuthStore';
 import {
   getDeliveryRequestDriverDepartments,
   makeEmployeeDepartmentFilter,
@@ -30,7 +29,7 @@ import {
   createDeliveryRequestRecord,
 } from './createDeliveryRequest';
 import { toDateTimeInputOrUndefined } from './deliveryRequestFormShared';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
 
@@ -82,11 +81,7 @@ export function CreateReturnShipmentModal({
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
-  const { user } = useAuthStore();
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
 
   useEffect(() => {
     if (!opened) return;

@@ -1,4 +1,4 @@
-import { activityLoggerConnector } from '@credo/connectors/connector';
+import { credoSmeConnector } from '@credo/connectors/connector';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { resolveClientCode } from '@/config/client-code';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
@@ -60,7 +60,7 @@ async function flush(): Promise<void> {
   const batch = pending.slice(0, MAX_BATCH);
   inFlight = true;
   try {
-    await activityLoggerConnector.logActivities({ activities: batch });
+    await credoSmeConnector.logActivities({ activities: batch });
 
     pending = pending.slice(batch.length);
     attempt = 0;

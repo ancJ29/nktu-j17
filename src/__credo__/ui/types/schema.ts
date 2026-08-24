@@ -28,9 +28,6 @@ export const AppInfoSchema = z.object({
 export type AppInfo = z.infer<typeof AppInfoSchema>;
 
 export const AuthFeaturesSchema = z.object({
-  register: z.boolean(),
-  forgotPassword: z.boolean(),
-  resetPassword: z.boolean(),
   loginViaQRCode: z.boolean(),
 });
 

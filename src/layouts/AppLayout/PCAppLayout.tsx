@@ -1,8 +1,7 @@
 import { appBrand, appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useCurrentEmployee, useLanguageSync, useNavbarSync } from '@/hooks';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { isSignedIn, useAuthStore } from '@/stores/useAuthStore';
 import {
   getDisplayIconWhenCollapsed,
   getHeaderVariant,
@@ -10,7 +9,7 @@ import {
   getNavbarWidth,
   hasAvatarForEmployees,
 } from '@/utils/permission';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import { cacheFlush } from '@/utils/appCache';
 import { EmployeeReadyGate } from './EmployeeReadyGate';
@@ -37,19 +36,16 @@ const logoSrc =
 
 export function PCAppLayout() {
   const { t, i18n } = useTranslation();
-  const { token, user, loadProfile, isProfileLoaded } = useAuthStore();
-  const employees = useEmployeeStore((s) => s.items);
+  const { user, loadProfile, isProfileLoaded } = useAuthStore();
 
-  const { name, profileImage } = useMemo(() => {
-    const employee = findEmployeeByLoginEmail(employees, user?.email);
-    return {
-      name: employee?.name || user?.name || '',
-      profileImage: hasAvatar ? employee?.extra?.profileImage : undefined,
-    };
-  }, [employees, user]);
+  const signedIn = isSignedIn();
+
+  const employee = useMyEmployee();
+  const name = employee?.name || user?.name || '';
+  const profileImage = hasAvatar ? employee?.extra?.profileImage : undefined;
 
   useLanguageSync({ isProfileLoaded });
-  const { isRoot } = useCurrentEmployee({ isProfileLoaded, email: user?.email, token });
+  const { isRoot } = useCurrentEmployee({ isProfileLoaded, email: user?.email });
   const { navbarOpened, toggleNavbar } = useNavbarSync({ isProfileLoaded });
 
   const pcNavigation = useMemo(
@@ -83,10 +79,10 @@ export function PCAppLayout() {
   );
 
   const handleMount = useCallback(() => {
-    if (token && !isProfileLoaded) {
+    if (signedIn && !isProfileLoaded) {
       loadProfile();
     }
-  }, [token, isProfileLoaded, loadProfile]);
+  }, [signedIn, isProfileLoaded, loadProfile]);
 
   const handleRefresh = useCallback(() => {
     cacheFlush();
@@ -141,7 +137,7 @@ export function PCAppLayout() {
       logoutPath={ROUTES.AUTH.LOGOUT}
       profilePath={ROUTES.PROFILE}
       avatar={avatarNode}
-      isAuthenticated={!!token}
+      isAuthenticated={signedIn}
       isProfileLoaded={isProfileLoaded}
       loginPath={ROUTES.AUTH.LOGIN}
       onMount={handleMount}

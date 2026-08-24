@@ -32,8 +32,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
-import { useAuthStore } from '@/stores/useAuthStore';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useGoodsReceiptStore } from '@/stores/useGoodsReceiptStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import { useLocationStore } from '@/stores/useLocationStore';
@@ -69,7 +67,7 @@ import type {
 } from '@/types';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { appConfig } from '@/config';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
 
@@ -173,7 +171,6 @@ export function GoodsReceiptFormPage() {
   } = useProductStore();
   const vendorsInitialized = useVendorStore((s) => s.initialized);
   const loadVendors = useVendorStore((s) => s.loadAll);
-  const employees = useEmployeeStore((s) => s.items);
 
   useEffect(() => {
     if (isMobile) return;
@@ -190,11 +187,7 @@ export function GoodsReceiptFormPage() {
     loadProducts,
   ]);
 
-  const { user } = useAuthStore();
-  const currentEmployeeId = useMemo(() => {
-    if (!user.email) return '';
-    return findEmployeeByLoginEmail(employees, user.email)?.id ?? '';
-  }, [user.email, employees]);
+  const currentEmployeeId = useMyEmployee()?.id ?? '';
 
   const locationSelectData = useMemo(
     () => locations.map((l) => ({ value: l.code, label: `${l.code} — ${l.name}`, name: l.name })),

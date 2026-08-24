@@ -324,3 +324,7 @@ export const QuotationDetailPage = lazy(() =>
 export const QuotationFormPage = lazy(() =>
   import('../pages/quotations').then((m) => ({ default: m.QuotationFormPage })),
 );
+
+export const ClientConfigPage = lazy(() =>
+  import('../pages/credo-sme').then((m) => ({ default: m.ClientConfigPage })),
+);

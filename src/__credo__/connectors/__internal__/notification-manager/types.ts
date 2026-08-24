@@ -1,15 +1,3 @@
-export type DeliveryChannel = 'inbox' | 'slack';
-export type DeliveryStatus = 'sent' | 'failed';
-
-export type DeliveryResult = {
-  notificationId: string;
-  channel: DeliveryChannel;
-
-  target?: string;
-  status: DeliveryStatus;
-  error?: string;
-};
-
 export type NotificationEntity = {
   id: string;
   clientId: string;
@@ -18,8 +6,10 @@ export type NotificationEntity = {
   title: string;
   body: string | null;
   payload: Record<string, unknown>;
-  channels: string[];
+
   createdAt: Date | string;
+
+  readAt: string | null;
 };
 
 export type NotificationInboxItem = NotificationEntity & {
@@ -34,10 +24,6 @@ export type CreateNotificationInput = {
   body?: string;
   payload?: Record<string, unknown>;
 
-  channels?: DeliveryChannel[];
-
-  slackChannel?: string;
-
   timestamp?: string;
 };
 
@@ -46,27 +32,19 @@ export type CreateNotificationsRequest = {
 };
 export type CreateNotificationsResponse = {
   ids: string[];
-  deliveries: DeliveryResult[];
 };
 
 export type GetByRecipientRequest = {
   recipientId: string;
   clientId: string;
+
   cursor?: string;
+
   limit?: number;
-  type?: string;
 };
 export type GetByRecipientResponse = {
   notifications: NotificationInboxItem[];
   nextCursor?: string;
-};
-
-export type GetUnreadCountRequest = {
-  recipientId: string;
-  clientId: string;
-};
-export type GetUnreadCountResponse = {
-  count: number;
 };
 
 export type MarkReadRequest = {
@@ -76,19 +54,4 @@ export type MarkReadRequest = {
 };
 export type MarkReadResponse = {
   marked: number;
-};
-
-export type GetByIdRequest = {
-  id: string;
-  clientId: string;
-};
-export type GetByIdResponse = {
-  notification: NotificationEntity;
-};
-
-export type DeleteByClientRequest = {
-  clientId: string;
-};
-export type DeleteByClientResponse = {
-  deleted: number;
 };

@@ -237,6 +237,7 @@ export function CustomerDetailPage() {
   const handleAddNote = useCallback(
     async (text: string) => {
       if (!customer) return;
+
       const user = useAuthStore.getState().user;
       const newNote: CustomerNote = {
         id: newNoteId(),

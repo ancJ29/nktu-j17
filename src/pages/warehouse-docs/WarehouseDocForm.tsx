@@ -26,13 +26,12 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { useMaterialStore } from '@/stores/useMaterialStore';
 import { useMaterialInventoryStore } from '@/stores/useMaterialInventoryStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { EmployeeSelector } from '@/components/selectors';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { getMaterialUnitCategory } from '@/utils/materialConfig';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import type { Material, MaterialInventoryRow, WarehouseDocRow } from '@/types';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import {
   bundleFor,
   buildDocCode,
@@ -105,10 +104,8 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   const inventoryInitialized = useMaterialInventoryStore((s) => s.initialized);
   const loadInventory = useMaterialInventoryStore((s) => s.loadAll);
 
-  const employees = useEmployeeStore((s) => s.items);
   const employeesInitialized = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
-  const { user } = useAuthStore();
 
   const [loading, setLoading] = useState(false);
   const snapshotRef = useRef<WarehouseDocRow | null>(null);
@@ -149,10 +146,7 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     if (!employeesInitialized) loadEmployees();
   }, [employeesInitialized, loadEmployees]);
 
-  const currentEmployeeId = useMemo(
-    () => (user.email ? (findEmployeeByLoginEmail(employees, user.email)?.id ?? '') : ''),
-    [user.email, employees],
-  );
+  const currentEmployeeId = useMyEmployee()?.id ?? '';
   useEffect(() => {
     if (isEdit || !currentEmployeeId || form.getValues().assignedTo) return;
     form.setFieldValue('assignedTo', currentEmployeeId);

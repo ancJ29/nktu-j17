@@ -36,24 +36,12 @@ import {
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
-
-function decodeJwtPayload(token: string | null | undefined): Record<string, unknown> | null {
-  if (!token) return null;
-  try {
-    const payload = token.split('.')[1];
-    if (!payload) return null;
-    return JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-  } catch {
-    return null;
-  }
-}
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 
 export function DebugPage() {
-  const { user, token, refreshToken } = useAuthStore();
+  const { user } = useAuthStore();
   const { items: employees, initialized: employeesLoaded } = useEmployeeStore();
 
-  const jwtPayload = useMemo(() => decodeJwtPayload(token), [token]);
-  const refreshTokenPayload = useMemo(() => decodeJwtPayload(refreshToken), [refreshToken]);
   const effectivePerms = getEffectivePermissions();
   const config = appConfig as CMngtAppConfig & {
     build?: {
@@ -64,13 +52,18 @@ export function DebugPage() {
     };
   };
 
-  const jwtData = jwtPayload?.data as Record<string, unknown> | undefined;
-  const jwtEmail = (jwtData?.email ?? jwtPayload?.sub ?? jwtPayload?.email) as string | undefined;
-  const resolvedEmail = user?.email || jwtEmail;
-  const matchedEmployee = useMemo(() => {
+  const resolvedEmail = user?.email;
+
+  const matchedEmployee = useMyEmployee() ?? null;
+
+  const emailMatch = useMemo(() => {
     if (!resolvedEmail || !employeesLoaded) return null;
     return findEmployeeByLoginEmail(employees, resolvedEmail) ?? null;
   }, [resolvedEmail, employeesLoaded, employees]);
+  const identityDisagreement =
+    emailMatch?.id !== matchedEmployee?.id
+      ? `server=${matchedEmployee?.id ?? '(none)'} email-match=${emailMatch?.id ?? '(none)'}`
+      : null;
 
   const department = sharedUserStorage.get<string>(SharedStorageKey.DEPARTMENT);
   const employeeExtra = matchedEmployee?.extra as EmployeeExtra | undefined;
@@ -85,11 +78,8 @@ export function DebugPage() {
       {/* Identity */}
       <DebugSection title="Identity">
         <DebugRow label="Profile email" value={user?.email || '(empty)'} />
-        <DebugRow label="JWT email" value={jwtEmail || '(no token)'} />
-        <DebugRow label="Resolved email" value={(resolvedEmail as string) ?? '(none)'} />
+        <DebugRow label="Resolved email" value={resolvedEmail ?? '(none)'} />
         <DebugRow label="Profile name" value={user?.name || '(empty)'} />
-        <DebugRow label="User UUID" value={(jwtData?.userUuid as string) ?? '-'} />
-        <DebugRow label="Service ID" value={(jwtData?.serviceCode as string) ?? '-'} />
       </DebugSection>
 
       {/* Full appConfig */}
@@ -111,6 +101,9 @@ export function DebugPage() {
               : '(no match — root user)'
           }
         />
+        {identityDisagreement && (
+          <DebugRow label="⚠ Identity mismatch" value={identityDisagreement} />
+        )}
         <DebugRow label="Department (employee)" value={matchedEmployee?.department || '(none)'} />
         <DebugRow label="Department (storage)" value={department || '(not set)'} />
         <DebugRow
@@ -152,16 +145,6 @@ export function DebugPage() {
       {/* User Storage */}
       <CollapsibleDebugSection title="User Storage (shared)">
         <DebugJson data={sharedUserStorage.exportSettings()} />
-      </CollapsibleDebugSection>
-
-      {/* JWT Payload */}
-      <CollapsibleDebugSection title="JWT Payload">
-        <DebugJson data={jwtPayload ?? {}} />
-      </CollapsibleDebugSection>
-
-      {/* Refresh Token Payload */}
-      <CollapsibleDebugSection title="Refresh Token Payload">
-        <DebugJson data={refreshTokenPayload ?? {}} />
       </CollapsibleDebugSection>
 
       {/* Product unit integrity */}

@@ -1,15 +1,19 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Loader, Stack, Text } from '@mantine/core';
 import { IconHistory } from '@tabler/icons-react';
-import { activityLoggerConnector } from '@credo/connectors/connector';
-import type { ActivityLoggerActivityEntity } from '@credo/connectors/types';
+import { activityLoggerConnector, activityLoggerV2Connector } from '@credo/connectors/connector';
 import { device } from '@credo/base-ui/utils';
 import { resolveClientCode } from '@/config/client-code';
+import { appActivityLoggerV1InternalAccessKey } from '@/config/env';
 import { ActivityCard } from '@/components/activity/ActivityCard';
+import {
+  useActivityHistory,
+  type ActivityPageFetcher,
+} from '@/components/activity/useActivityHistory';
 import { SectionCard } from '@/components/SectionCard';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 
 const isMobile = device.isMobile;
 const PAGE_SIZE = 50;
@@ -19,58 +23,41 @@ type Props = { readonly employeeId: string };
 export function EmployeeActivityPanel({ employeeId }: Props) {
   const { t } = useTranslation();
   const employees = useEmployeeStore((s) => s.items);
-  const isRoot = useAuthStore((state) => state.user?.isRoot ?? false);
-  const [activities, setActivities] = useState<ActivityLoggerActivityEntity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [loadingMore, setLoadingMore] = useState(false);
-  const [error, setError] = useState(false);
-  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const isRoot = useIsRoot();
 
-  useEffect(() => {
-    let cancelled = false;
+  const fetchers = useMemo<ActivityPageFetcher[]>(
+    () => [
+      (cursor) =>
+        activityLoggerV2Connector.getByActor({
+          actorId: employeeId,
+          clientId: resolveClientCode(),
+          limit: PAGE_SIZE,
+          ...(cursor ? { cursor } : {}),
+        }),
 
-    setLoading(true);
-    setError(false);
-    setActivities([]);
-    setNextCursor(undefined);
-    activityLoggerConnector
-      .getByActor({ actorId: employeeId, clientId: resolveClientCode(), limit: PAGE_SIZE })
-      .then((res) => {
-        if (cancelled) return;
-        setActivities(res.activities);
-        setNextCursor(res.nextCursor);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setError(true);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [employeeId]);
+      ...(appActivityLoggerV1InternalAccessKey
+        ? [
+            ((cursor) =>
+              activityLoggerConnector.getByActor({
+                actorId: employeeId,
+                clientId: resolveClientCode(),
+                limit: PAGE_SIZE,
+                ...(cursor ? { cursor } : {}),
+              })) satisfies ActivityPageFetcher,
+          ]
+        : []),
+    ],
+    [employeeId],
+  );
 
-  const handleLoadMore = useCallback(() => {
-    if (!nextCursor || loadingMore) return;
-    setLoadingMore(true);
-    activityLoggerConnector
-      .getByActor({
-        actorId: employeeId,
-        clientId: resolveClientCode(),
-        limit: PAGE_SIZE,
-        cursor: nextCursor,
-      })
-      .then((res) => {
-        setActivities((prev) => [...prev, ...res.activities]);
-        setNextCursor(res.nextCursor);
-      })
-      .catch(() => {
-        setError(true);
-      })
-      .finally(() => setLoadingMore(false));
-  }, [employeeId, nextCursor, loadingMore]);
+  const {
+    entries: activities,
+    loading,
+    loadingMore,
+    error,
+    hasMore,
+    loadMore: handleLoadMore,
+  } = useActivityHistory(fetchers);
 
   const resolveTargetLabel = (targetId: string | null) => {
     if (!targetId) return null;
@@ -106,7 +93,7 @@ export function EmployeeActivityPanel({ employeeId }: Props) {
               isRoot={isRoot}
             />
           ))}
-          {nextCursor && (
+          {hasMore && (
             <Group justify="center" pt="xs">
               <Button variant="default" size="sm" onClick={handleLoadMore} loading={loadingMore}>
                 {t('employees.detail.activitiesLoadMore')}

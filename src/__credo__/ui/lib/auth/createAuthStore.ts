@@ -54,9 +54,15 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
 
   function getOrCreateDeviceId(): string {
     const existingId = storage.get<string>(storageKeys.DEVICE_ID);
-    if (existingId) return existingId;
 
-    const newId = `${deviceIdPrefix}-${Date.now().toString(36)}`;
+    if (existingId && existingId.length > 20) {
+      return existingId;
+    }
+    const newId = [
+      deviceIdPrefix,
+      Date.now().toString(36),
+      Math.random().toString(36).substring(2, 15),
+    ].join('-');
     storage.set(storageKeys.DEVICE_ID, newId);
     return newId;
   }
@@ -257,6 +263,8 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
               qrCode: response.qrCode || '',
             };
           },
+
+          getDeviceId: () => getOrCreateDeviceId(),
 
           loginWithToken: async ({ token: loginToken }) => {
             if (!api.loginWithToken) {

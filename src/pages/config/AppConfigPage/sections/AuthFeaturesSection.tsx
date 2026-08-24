@@ -1,6 +1,6 @@
 import type { AuthFeatures } from '@credo/kits/types';
 import { Box, Group, SimpleGrid, Switch, Text, ThemeIcon } from '@mantine/core';
-import { IconKey, IconLock, IconQrcode, IconShield, IconUserPlus } from '@tabler/icons-react';
+import { IconQrcode, IconShield } from '@tabler/icons-react';
 import { memo } from 'react';
 
 type AuthFlagDef = {
@@ -8,20 +8,9 @@ type AuthFlagDef = {
   icon: typeof IconShield;
 };
 
-const AUTH_FLAG_DEFS: AuthFlagDef[] = [
-  { key: 'register', icon: IconUserPlus },
-  { key: 'forgotPassword', icon: IconKey },
-  { key: 'resetPassword', icon: IconLock },
-  { key: 'loginViaQRCode', icon: IconQrcode },
-];
+const AUTH_FLAG_DEFS: AuthFlagDef[] = [{ key: 'loginViaQRCode', icon: IconQrcode }];
 
 const AUTH_LABELS: Record<string, string> = {
-  authRegister: 'Register',
-  authRegisterDesc: 'Allow users to register for an account',
-  authForgotPassword: 'Forgot Password',
-  authForgotPasswordDesc: 'Allow users to reset their password',
-  authResetPassword: 'Reset Password',
-  authResetPasswordDesc: 'Allow users to reset their password',
   authLoginViaQRCode: 'Login via QR Code',
   authLoginViaQRCodeDesc: 'Allow users to login via QR Code',
 };

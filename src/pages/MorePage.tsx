@@ -2,6 +2,7 @@ import { appConfig, themeConfig } from '@/config';
 import { stripRootOnlyNavItems } from '@/config/navigation';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 import { Icon, IconName } from '@credo/base-ui/components';
 import type { NavigationItem } from '@/types';
 import { getThemeColor } from '@credo/base-ui/utils';
@@ -45,7 +46,7 @@ export default function MorePage() {
   const theme = useMantineTheme();
   const mainColor = themeConfig.mainColor;
   const user = useAuthStore((s) => s.user);
-  const isRoot = user?.isRoot ?? false;
+  const isRoot = useIsRoot();
 
   const getColor = (color: string) => getThemeColor(theme, color);
   const accentColor = getColor(`${mainColor}.7`);

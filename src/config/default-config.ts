@@ -19,9 +19,6 @@ const CLIENT_NAME = 'Credo Management';
 export const DEFAULT_APP_INFO: CMngtAppConfig['app'] = { name: CLIENT_NAME };
 
 export const DEFAULT_AUTH: AuthFeatures = {
-  register: false,
-  forgotPassword: false,
-  resetPassword: false,
   loginViaQRCode: true,
 };
 

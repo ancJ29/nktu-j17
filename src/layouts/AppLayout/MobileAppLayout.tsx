@@ -1,7 +1,8 @@
 import { appBrand, appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useCurrentEmployee, useLanguageSync } from '@/hooks';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { isSignedIn, useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import { cacheFlush } from '@/utils/appCache';
 import { EmployeeReadyGate } from './EmployeeReadyGate';
@@ -27,10 +28,12 @@ const logoSrc =
 
 export function MobileAppLayout() {
   const { t, i18n } = useTranslation();
-  const { token, user, loadProfile, isProfileLoaded } = useAuthStore();
+  const { user, loadProfile, isProfileLoaded } = useAuthStore();
+
+  const signedIn = isSignedIn();
 
   useLanguageSync({ isProfileLoaded });
-  useCurrentEmployee({ isProfileLoaded, email: user?.email, token });
+  useCurrentEmployee({ isProfileLoaded, email: user?.email });
 
   const handleLanguageChange = useCallback(
     async (languageCode: string) => {
@@ -47,7 +50,7 @@ export function MobileAppLayout() {
     [t],
   );
 
-  const isRoot = user?.isRoot ?? false;
+  const isRoot = useIsRoot();
   const navbarItems = useMemo<NavigationItem[]>(() => {
     return stripRootOnlyNavItems(appConfig.navigation.mobile, isRoot)
       .filter((item) => item.navbar && !item.hidden)
@@ -61,10 +64,10 @@ export function MobileAppLayout() {
   }, [isRoot]);
 
   const handleMount = useCallback(() => {
-    if (token && !isProfileLoaded) {
+    if (signedIn && !isProfileLoaded) {
       loadProfile();
     }
-  }, [token, isProfileLoaded, loadProfile]);
+  }, [signedIn, isProfileLoaded, loadProfile]);
 
   const handleRefresh = useCallback(() => {
     cacheFlush();
@@ -101,7 +104,7 @@ export function MobileAppLayout() {
         menuRefreshConfig: t('menu.refreshConfig'),
         menuClearCache: t('menu.clearCache'),
       }}
-      isAuthenticated={!!token}
+      isAuthenticated={signedIn}
       isProfileLoaded={isProfileLoaded}
       loginPath={ROUTES.AUTH.LOGIN}
       onMount={handleMount}

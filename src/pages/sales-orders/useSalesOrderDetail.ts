@@ -6,7 +6,6 @@ import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
@@ -90,7 +89,7 @@ import {
   isReturnShipmentEnabled,
   perms,
 } from '@/utils/permission';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 
 const isMobile = device.isMobile;
 const additionalDRAllowed = isAdditionalDRAllowed();
@@ -215,7 +214,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   const forceRefresh = useSalesOrderStore((s) => s.forceRefresh);
   const fieldOptions = salesOrderFieldOptions;
   const { resolveStatus } = fieldOptions;
-  const { user } = useAuthStore();
   const { items: employees, loadAll: loadEmployees, initialized: empInit } = useEmployeeStore();
 
   const products = useProductStore((s) => s.items);
@@ -248,10 +246,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   const [cancelOpened, { open: openCancel, close: closeCancel }] = useDisclosure(false);
   const [cancelReason, setCancelReason] = useState('');
 
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
 
   useEffect(() => {
     if (!empInit) loadEmployees();

@@ -507,12 +507,9 @@
       }
     },
     "login": {
-      "createAccountLink": "Tạo tài khoản",
       "error": {
         "failed": "Đăng nhập thất bại. Vui lòng thử lại."
       },
-      "forgotPasswordLink": "Quên mật khẩu?",
-      "noAccountPrefix": "Chưa có tài khoản? ",
       "passwordLabel": "Mật khẩu",
       "passwordPlaceholder": "Nhập mật khẩu",
       "rememberMe": "Ghi nhớ đăng nhập",

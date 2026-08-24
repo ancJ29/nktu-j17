@@ -222,6 +222,7 @@ export function VendorDetailPage() {
   const handleAddNote = useCallback(
     async (text: string) => {
       if (!vendor) return;
+
       const user = useAuthStore.getState().user;
       const newNote: VendorNote = {
         id: newNoteId(),

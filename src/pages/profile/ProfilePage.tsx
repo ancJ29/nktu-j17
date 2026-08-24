@@ -1,7 +1,8 @@
 import { appConfig, featureFlags } from '@/config';
 import { useAuthStore } from '@/stores/useAuthStore';
-import { findEmployeeByLoginEmail, isAutoLoginEmail } from '@/utils/loginEmail';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
+import { isAutoLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import { cacheFlush } from '@/utils/appCache';
 import { FieldLabel, PhoneNumber } from '@credo/base-ui/components';
@@ -23,7 +24,7 @@ import {
 import { EmployeeAvatar } from '@/components/EmployeeAvatar';
 import { useDisclosure } from '@mantine/hooks';
 import { IconCamera, IconLanguage, IconPalette, IconSparkles, IconUser } from '@tabler/icons-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   hasAvatarForEmployees,
@@ -56,21 +57,15 @@ export function ProfilePage() {
   const { t, i18n } = useTranslation();
   const { resolveDepartment, resolvePosition } = useEmployeeFieldOptions();
   const { user } = useAuthStore();
-  const isRootUser = user?.isRoot ?? false;
+  const isRootUser = useIsRoot();
   const canViewPerms = hasViewPermsRight && (!permMngtRootUserOnly || isRootUser);
-  const employees = useEmployeeStore((s) => s.items);
   const [profileImageOpened, { open: openProfileImage, close: closeProfileImage }] =
     useDisclosure(false);
   const [employeeOverride, setEmployeeOverride] = useState<Employee | null>(null);
 
-  const { userEmail, storedEmployee } = useMemo(() => {
-    const userEmail = user.email;
-    const isAutoLogin = isAutoLoginEmail(userEmail || '');
-    return {
-      storedEmployee: findEmployeeByLoginEmail(employees, userEmail),
-      userEmail: isAutoLogin ? undefined : userEmail,
-    };
-  }, [user.email, employees]);
+  const storedEmployee = useMyEmployee();
+
+  const userEmail = isAutoLoginEmail(user.email || '') ? undefined : user.email;
 
   const currentEmployee = employeeOverride ?? storedEmployee;
   const profileImageUrl = hasAvatar ? currentEmployee?.extra?.profileImage : undefined;

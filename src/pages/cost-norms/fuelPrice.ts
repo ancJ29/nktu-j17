@@ -1,4 +1,5 @@
 import type { FuelPriceRow } from '@/types';
+import { isoToVnDateString } from '@/utils/dateTimeField';
 
 function isLive(row: FuelPriceRow): boolean {
   return !row.extra?.isDeleted;
@@ -18,6 +19,14 @@ export function resolveCurrentFuelPrice(
   today: string,
 ): FuelPriceRow | undefined {
   return sortFuelPriceHistory(rows).find((row) => row.effectiveDate <= today);
+}
+
+export function resolveFuelPriceAt(
+  rows: readonly FuelPriceRow[],
+  atMs: number,
+): FuelPriceRow | undefined {
+  const day = isoToVnDateString(atMs);
+  return day ? resolveCurrentFuelPrice(rows, day) : undefined;
 }
 
 export function isScheduledFuelPrice(row: FuelPriceRow, today: string): boolean {

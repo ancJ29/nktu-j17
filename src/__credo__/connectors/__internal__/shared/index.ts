@@ -10,9 +10,7 @@ export type { BuildHeadersOptions, StoragesShape } from './headers';
 export {
   getEncodingMode,
   getStagePrefix,
-  getVrxToken,
   registerStagePrefix,
   setEncodingMode,
-  setVrxToken,
 } from './transport-state';
 export { clearCredoConnectorTrustedKey, getCredoConnectorTrustedKey } from './trusted-key';

@@ -1,11 +1,11 @@
 import { featureFlags } from '@/config';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from './useIsRoot';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { getModulePermissions } from '@/utils/permission';
 import { resolveFirstRunRedirect } from './firstRunRedirect';
 
 export function useRootFirstRunRedirect(): string | null {
-  const isRoot = useAuthStore((s) => s.user?.isRoot ?? false);
+  const isRoot = useIsRoot();
   const initialized = useEmployeeStore((s) => s.initialized);
   const employeeCount = useEmployeeStore((s) => s.items.length);
 

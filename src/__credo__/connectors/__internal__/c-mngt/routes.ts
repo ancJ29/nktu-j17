@@ -15,6 +15,7 @@ export const C_MNGT_ROUTES = {
     PRODUCT_INVENTORY: '/product-inventory',
     LOOKUP: '/lookups',
     OPERATION_LOG: '/operation-logs',
+    ACTIVITY: '/activities',
     GENERIC_RECORD: '/generic-records',
     SINGLE_RECORDS: '/single-records',
     PARTITIONED_RECORDS: '/partitioned-records',
@@ -118,6 +119,10 @@ export const C_MNGT_ROUTES = {
       UPDATE: { PATH: '/:id', METHOD: 'PATCH' },
       DELETE: { PATH: '/:id', METHOD: 'DELETE' },
       IMPORT_BATCH: { PATH: '/import-batch', METHOD: 'POST' },
+    },
+
+    ACTIVITY: {
+      LOG_ACTIVITIES: { PATH: '', METHOD: 'POST' },
     },
     OPERATION_LOG: {
       GET_BY_TARGET: { PATH: '/by-target/:targetId/:period', METHOD: 'GET' },

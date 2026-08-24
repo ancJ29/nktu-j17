@@ -4,8 +4,6 @@ function stateKey(origin: string, target?: string | undefined): string {
 
 const encodingModes = new Map<string, 'json' | 'msgpack'>();
 
-const vrxTokens = new Map<string, string>();
-
 const originStages = new Map<string, string>();
 
 const transportModes = new Map<string, 'plain' | 'body-encode'>();
@@ -23,14 +21,6 @@ export function setEncodingMode(
   mode: 'json' | 'msgpack',
 ): void {
   encodingModes.set(stateKey(origin, target), mode);
-}
-
-export function getVrxToken(origin: string, target?: string | undefined): string | undefined {
-  return vrxTokens.get(stateKey(origin, target));
-}
-
-export function setVrxToken(origin: string, target: string | undefined, token: string): void {
-  vrxTokens.set(stateKey(origin, target), token);
 }
 
 export function getStagePrefix(origin: string, target?: string | undefined): string | undefined {

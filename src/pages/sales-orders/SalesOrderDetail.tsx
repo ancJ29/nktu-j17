@@ -54,7 +54,7 @@ import { notifications } from '@mantine/notifications';
 import { Link } from 'react-router';
 import { ROUTES } from '@/constants/routes';
 import { device } from '@credo/base-ui/utils';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import { isVacuouslyCompletedSalesOrder } from './vacuousCompletionMarker';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
@@ -157,7 +157,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const shouldDisplayShippingFee = variant.showShippingFee;
   const shouldDisplayVatTag = variant.showVatTag;
 
-  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
+  const isRootUser = useIsRoot();
   const {
     order,
     loading,

@@ -1284,3 +1284,20 @@ export type DeletePartitionedRecordResponse = {
   partitionKey?: string;
   listHash?: string;
 };
+
+export type LogActivitiesRequest = {
+  activities: {
+    clientId: string;
+    actorId: string;
+    action: string;
+    targetId?: string;
+    memo?: Record<string, unknown>;
+
+    timestamp?: string;
+  }[];
+};
+export type LogActivitiesResponse = {
+  success: boolean;
+
+  ids: string[];
+};

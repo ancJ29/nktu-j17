@@ -1,17 +1,17 @@
 import { useEffect, useRef } from 'react';
 import { logger } from '@credo/base-ui/utils';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { isSignedIn, useAuthStore } from '@/stores/useAuthStore';
 
 export const PROFILE_LOAD_WATCHDOG_MS = 20000;
 
 export function useProfileLoadWatchdog(timeoutMs = PROFILE_LOAD_WATCHDOG_MS): void {
-  const token = useAuthStore((s) => s.token);
+  const signedIn = isSignedIn();
   const isProfileLoaded = useAuthStore((s) => s.isProfileLoaded);
   const retriedRef = useRef(false);
   const releasedRef = useRef(false);
 
   useEffect(() => {
-    if (!token || isProfileLoaded || releasedRef.current) return;
+    if (!signedIn || isProfileLoaded || releasedRef.current) return;
 
     const retryId = retriedRef.current
       ? undefined
@@ -40,5 +40,5 @@ export function useProfileLoadWatchdog(timeoutMs = PROFILE_LOAD_WATCHDOG_MS): vo
       if (retryId !== undefined) clearTimeout(retryId);
       clearTimeout(releaseId);
     };
-  }, [token, isProfileLoaded, timeoutMs]);
+  }, [signedIn, isProfileLoaded, timeoutMs]);
 }

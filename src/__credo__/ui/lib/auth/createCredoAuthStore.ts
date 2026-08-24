@@ -60,6 +60,8 @@ type CreateCredoAuthStoreOptions<TProfile extends BaseProfile = BaseProfile> = {
   storageKeys?: AuthStorageKeys;
 
   persistStorage?: PersistStorage;
+
+  getProfile?: AuthApi<TProfile>['getProfile'];
 };
 
 export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>(
@@ -77,6 +79,7 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     storage = defaultStorage,
     storageKeys = DEFAULT_STORAGE_KEYS,
     persistStorage,
+    getProfile,
   } = options;
 
   const authApi: AuthApi<TProfile> = {
@@ -109,9 +112,11 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
       };
     },
 
-    getProfile: async ({ token }) => {
-      return cMngtConnector.getMe<TProfile>(token);
-    },
+    getProfile:
+      getProfile ??
+      (async ({ token }) => {
+        return cMngtConnector.getMe<TProfile>(token);
+      }),
 
     register: async ({ username, email }) => {
       console.info('Register attempt:', { username, email });

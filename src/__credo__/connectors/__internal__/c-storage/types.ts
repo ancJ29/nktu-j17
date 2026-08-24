@@ -4,6 +4,8 @@ export type RecordEntity<T = unknown> = {
   key: string;
   description: string;
   isPrivate: boolean;
+
+  version?: string;
   createdAt: Date | string;
   updatedAt: Date | string;
   data: T;
@@ -40,6 +42,12 @@ export type GetRecordByKeyRequest = {
 };
 export type GetRecordByKeyResponse<T = unknown> = {
   record: RecordEntity<T>;
+};
+
+export type RecordNoChangeResponse = {
+  noChange: true;
+
+  version: string;
 };
 
 export type PushRecordRequest = {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { appConfig } from '@/config';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -9,7 +9,10 @@ import { cacheGet, cacheSet, cacheClear, cacheFlush } from '@/utils/appCache';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import { buildEffectivePermissions } from '@/utils/permission';
+
+import { reportPermissionMismatch } from '@/utils/reportPermissionMismatch';
 import { useEmpBootSignal } from '@/hooks/useEmpBootSignal';
+import { useIsRoot } from './useIsRoot';
 import { scheduleReload } from '@/utils/scheduleReload';
 import { tickPostLoginReload, POST_LOGIN_RELOAD_DELAY_MS } from '@/utils/postLoginReload';
 import { logActivity } from '@/utils/activityLogger';
@@ -20,14 +23,19 @@ type UseCurrentEmployeeOptions = {
   isProfileLoaded: boolean;
 
   email: string | undefined | null;
-
-  token: string | undefined | null;
 };
 
 let _currentEmployeeId: string | null = null;
 
 export function getCurrentEmployeeId(): string | null {
   if (_currentEmployeeId) return _currentEmployeeId;
+
+  const mine = useAuthStore.getState().user?.myInformation?.id;
+  if (mine) {
+    _currentEmployeeId = mine;
+    return mine;
+  }
+
   const email = useAuthStore.getState().user?.email;
   if (!email) return null;
 
@@ -52,40 +60,27 @@ export function getCurrentEmployeeStamp(): { userId?: string; userName?: string 
   return match?.name ? { userId: id, userName: match.name } : { userId: id };
 }
 
-function decodeEmailFromToken(token: string): string | null {
-  try {
-    const payload = token.split('.')[1];
-    if (!payload) return null;
-    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-    return decoded.data?.email ?? decoded.email ?? decoded.sub ?? null;
-  } catch {
-    return null;
-  }
-}
-
-export function useCurrentEmployee({ isProfileLoaded, email, token }: UseCurrentEmployeeOptions) {
+export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmployeeOptions) {
   const hasResolved = useRef(false);
   const lockedHandled = useRef(false);
   const { items: employees, initialized } = useEmployeeStore();
-  const isRoot = useAuthStore((state) => state.user?.isRoot ?? false);
+  const isRoot = useIsRoot();
 
   const { setResolvedOk, markMasterDataSettled } = useEmpBootSignal();
 
-  const resolvedEmail = useMemo(
-    () => email || (token ? decodeEmailFromToken(token) : null),
-    [email, token],
-  );
-
   useEffect(() => {
-    if (isProfileLoaded && resolvedEmail && !initialized) {
+    if (isProfileLoaded && email && !initialized) {
       loadAllMasterData().finally(markMasterDataSettled);
     }
-  }, [isProfileLoaded, resolvedEmail, initialized, markMasterDataSettled]);
+  }, [isProfileLoaded, email, initialized, markMasterDataSettled]);
 
   useEffect(() => {
-    if (!isProfileLoaded || !resolvedEmail || !initialized) return;
+    if (!isProfileLoaded || !email || !initialized) return;
 
-    const match = findEmployeeByLoginEmail(employees, resolvedEmail);
+    const myId = useAuthStore.getState().user?.myInformation?.id;
+    const match = myId
+      ? employees.find((e) => e.id === myId)
+      : findEmployeeByLoginEmail(employees, email);
     const extra = match?.extra as EmployeeExtra | undefined;
 
     if (match && !match.isActive) {
@@ -129,13 +124,19 @@ export function useCurrentEmployee({ isProfileLoaded, email, token }: UseCurrent
       const versionChanged = !isFirstResolve && hasVersionChanged(cachedVersions, versions);
       const needsReload = isFirstResolve || versionChanged;
 
-      buildEffectivePermissions(
+      const effective = buildEffectivePermissions(
         clientPerms,
         match.department,
         deptOptions,
         extra?.permissions,
         versions,
       );
+
+      reportPermissionMismatch(effective, {
+        employeeId: match.id,
+        department: match.department,
+        versions,
+      });
 
       cacheSet('emo', { o: extra?.permissions, v: empPermVersion });
 
@@ -161,8 +162,6 @@ export function useCurrentEmployee({ isProfileLoaded, email, token }: UseCurrent
         return;
       }
 
-      syncProfileIfNeeded(match.name, resolvedEmail);
-
       logger.debug('currentEmployee resolved', {
         id: match.id,
         name: match.name,
@@ -174,7 +173,9 @@ export function useCurrentEmployee({ isProfileLoaded, email, token }: UseCurrent
       firePendingLoginLog();
     } else {
       const versions = { cfg: cfgVersion };
-      buildEffectivePermissions(clientPerms, null, deptOptions, null, versions);
+      const effective = buildEffectivePermissions(clientPerms, null, deptOptions, null, versions);
+
+      reportPermissionMismatch(effective, { versions });
 
       cacheClear('emo');
       cacheFlush();
@@ -185,11 +186,11 @@ export function useCurrentEmployee({ isProfileLoaded, email, token }: UseCurrent
         return;
       }
 
-      logger.debug('currentEmployee: no match for', resolvedEmail);
+      logger.debug('currentEmployee: no match for', email);
       setResolvedOk(true);
       firePendingLoginLog();
     }
-  }, [isProfileLoaded, resolvedEmail, initialized, employees, setResolvedOk]);
+  }, [isProfileLoaded, email, initialized, employees, setResolvedOk]);
 
   return { isRoot };
 }
@@ -206,27 +207,4 @@ function hasVersionChanged(
 ): boolean {
   if (cached.emp && current.emp && cached.emp !== current.emp) return true;
   return false;
-}
-
-function syncProfileIfNeeded(employeeName: string, employeeEmail: string) {
-  const state = useAuthStore.getState();
-  const user = state.user;
-  if (!user) return;
-
-  const needsName = !user.name && employeeName;
-  const needsEmail = !user.email && employeeEmail;
-
-  if (!needsName && !needsEmail) return;
-
-  useAuthStore.setState({
-    user: {
-      ...user,
-      name: user.name || employeeName,
-      email: user.email || employeeEmail,
-    },
-  });
-
-  // Deliberately local-only since 2026-08-13: the SSO profile's `name`/`email`
-  // are no longer written back. `currentEmployee.name` already wins wherever
-  // both are shown, so a stale SSO name changes nothing the user sees.
 }

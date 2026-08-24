@@ -18,8 +18,7 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconChevronRight } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { notifications } from '@mantine/notifications';
+import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { device } from '@credo/base-ui/utils';
@@ -41,8 +40,6 @@ import type { Customer, DeliveryRequest, SalesOrder } from '@/types';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
 import { reconcileNktuCompletedDeliveries } from './cheatCompleteSalesOrders';
-import { migrateNktuCheatData } from './migrateCheatData';
-import { useAuthStore } from '@/stores/useAuthStore';
 
 const WINDOW_DAYS = 90;
 const PREVIEW_LIMIT = 50;
@@ -126,31 +123,6 @@ export default function HomePage() {
     (code: string): Customer | undefined => custStore.getByCode(code),
     [custStore],
   );
-
-  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
-  const [migratingCheatData, setMigratingCheatData] = useState(false);
-  const runCheatDataMigration = useCallback(async () => {
-    setMigratingCheatData(true);
-    try {
-      const summary = await migrateNktuCheatData();
-      console.info('[nktu] cheat-data migration', summary);
-      notifications.show({
-        color: summary.failed > 0 ? 'yellow' : 'green',
-        title: 'Cheat-data migration',
-        message: `Scanned ${summary.scanned}, matched ${summary.matched}, notes fixed ${summary.notesFixed}, inventory deducted ${summary.inventoryDeducted}, failed ${summary.failed}. See console for per-order detail; reload to view.`,
-        autoClose: 15000,
-      });
-    } catch (err) {
-      notifications.show({
-        color: 'red',
-        title: 'Cheat-data migration failed',
-        message: err instanceof Error ? err.message : String(err),
-        autoClose: 12000,
-      });
-    } finally {
-      setMigratingCheatData(false);
-    }
-  }, []);
 
   const visibleOrders = useMemo(() => {
     const live = soStore.items.filter((o) => !o.extra?.isDeleted);
@@ -279,18 +251,6 @@ export default function HomePage() {
   return (
     <Box p={{ base: 'xs', md: 'lg' }}>
       <Stack gap="lg" mx="auto">
-        {/* TEMPORARY root-only migration trigger — remove with migrateCheatData.ts */}
-        {isRootUser && (
-          <Button
-            variant="light"
-            color="grape"
-            loading={migratingCheatData}
-            onClick={runCheatDataMigration}
-            style={{ alignSelf: 'flex-start' }}
-          >
-            Migrate cheat data (notes + inventory)
-          </Button>
-        )}
         {canSeeOrders && (
           <DashboardSection
             title={t('home.sections.newOrders')}

@@ -150,6 +150,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
 
           const moved =
             priceJustChanged &&
+            r.isActive &&
             routeUsesFuelPricing(r, r.truckType ? norms.get(r.truckType) : undefined);
           return (
             <Group gap={4} justify="flex-end" wrap="nowrap">

@@ -13,11 +13,17 @@ import { buildHash, buildTimestamp, version } from './build-version';
 import { baseEnvConfig } from '@credo/base-ui/utils';
 import { isLocalhost } from '@/config/env';
 import { reloadPage } from '@credo/base-ui/utils';
-import { activityLoggerConnector, cMngtConnector } from '@credo/connectors/connector';
-import { appActivityLoggerInternalAccessKey, isAdmin } from './env';
+import {
+  activityLoggerConnector,
+  activityLoggerV2Connector,
+  cMngtConnector,
+  credoSmeConnector,
+} from '@credo/connectors/connector';
+import { appActivityLoggerUrl, appActivityLoggerV1InternalAccessKey, isAdmin } from './env';
 import { initAppCache, cacheGet, cacheSet, cacheFlush } from '@/utils/appCache';
 import { markCfgReady, markClientUnconfigured } from '@/utils/bootState';
 import { resolveClientCode } from './client-code';
+import { restoreAuthId } from '@/utils/authId';
 import { ONE_HOUR, ONE_MINUTE } from '@credo/kits/time';
 import { buildNavigation } from './navigation';
 import { bootstrapPermissionCache } from '@/utils/permissionReader';
@@ -211,10 +217,18 @@ export async function forceRefreshConfig(): Promise<void> {
 const clientCode = resolveClientCode();
 if (clientCode) {
   cMngtConnector.setClientCode(clientCode);
+
+  credoSmeConnector.setClientCode(clientCode);
+
+  restoreAuthId();
 }
-const activityLoggerKey = appActivityLoggerInternalAccessKey ?? '';
-if (activityLoggerKey) {
-  activityLoggerConnector.setInternalAccessKey(activityLoggerKey);
+
+if (appActivityLoggerUrl) {
+  activityLoggerV2Connector.setBaseUrl(appActivityLoggerUrl);
+}
+
+if (appActivityLoggerV1InternalAccessKey) {
+  activityLoggerConnector.setInternalAccessKey(appActivityLoggerV1InternalAccessKey);
 }
 
 setDynamicFavicon(appConfig.themeConfig.mainColor, appConfig.app.faviconUrl);

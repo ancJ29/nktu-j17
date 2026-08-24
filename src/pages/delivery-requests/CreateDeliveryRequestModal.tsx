@@ -9,7 +9,6 @@ import { EmployeeSelector } from '@/components/selectors';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { useAuthStore } from '@/stores/useAuthStore';
 import {
   getDeliveryRequestDriverDepartments,
   makeEmployeeDepartmentFilter,
@@ -28,7 +27,7 @@ import {
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
 import { RESOLVED_DELIVERY_REQUEST_VARIANT } from './deliveryRequestVariant';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
 
 const { showListItems, seedScheduledDateFromSalesOrder } = RESOLVED_DELIVERY_REQUEST_VARIANT;
@@ -61,11 +60,7 @@ export function CreateDeliveryRequestModal({
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
-  const { user } = useAuthStore();
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
 
   useEffect(() => {
     if (!opened) return;

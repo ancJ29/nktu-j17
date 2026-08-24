@@ -1,7 +1,7 @@
 import { ROUTES } from '@/constants/routes';
 import { themeConfig } from '@/config';
 import { useCurrentEmployee, useLanguageSync } from '@/hooks';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { isSignedIn, useAuthStore } from '@/stores/useAuthStore';
 import { cacheFlush } from '@/utils/appCache';
 import { reloadPage } from '@credo/base-ui/utils';
 import { EmployeeReadyGate } from './EmployeeReadyGate';
@@ -21,17 +21,19 @@ type RouteHandle = {
 
 export function MobileDetailLayout() {
   const { t } = useTranslation();
-  const { token, user, loadProfile, isProfileLoaded } = useAuthStore();
+  const { user, loadProfile, isProfileLoaded } = useAuthStore();
+
+  const signedIn = isSignedIn();
   const matches = useMatches();
 
   useLanguageSync({ isProfileLoaded });
-  useCurrentEmployee({ isProfileLoaded, email: user?.email, token });
+  useCurrentEmployee({ isProfileLoaded, email: user?.email });
 
   const handleMount = useCallback(() => {
-    if (token && !isProfileLoaded) {
+    if (signedIn && !isProfileLoaded) {
       loadProfile();
     }
-  }, [token, isProfileLoaded, loadProfile]);
+  }, [signedIn, isProfileLoaded, loadProfile]);
 
   const handleRefresh = useCallback(() => {
     cacheFlush();
@@ -51,7 +53,7 @@ export function MobileDetailLayout() {
   return (
     <MobileDetailLayoutUI
       mainColor={themeConfig.mainColor}
-      isAuthenticated={!!token}
+      isAuthenticated={signedIn}
       isProfileLoaded={isProfileLoaded}
       loginPath={ROUTES.AUTH.LOGIN}
       homePath={ROUTES.APP.MAIN}

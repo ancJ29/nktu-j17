@@ -28,7 +28,6 @@ import { DateField } from '@/components/DateField';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { CustomerSelector, EmployeeSelector, VendorSelector } from '@/components/selectors';
 import { SegmentTabs } from '@/components/SegmentTabs';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { useRowSelection } from '@/hooks/useRowSelection';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
@@ -50,7 +49,7 @@ import {
   toDateTimeInputOrUndefined,
 } from './deliveryRequestFormShared';
 import { getInitialStatusValue } from './transitionEngine';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 
 const isMobile = device.isMobile;
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
@@ -124,11 +123,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
-  const { user } = useAuthStore();
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
 
   useEffect(() => {
     if (!soInit) loadSalesOrders();

@@ -2,7 +2,7 @@ import { Box, Group, Image, Stack, Text, UnstyledButton } from '@mantine/core';
 import { IconPhoto } from '@tabler/icons-react';
 import { ImageUploadPanel } from '@/components/ImageUploadPanel';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { buildUploadFileName } from '@/utils/uploadPath';
 import type { OperationLogPhoto } from '@/types';
 import { visiblePhotos, type TFn } from './operationLogConfig';
@@ -17,7 +17,7 @@ type FieldProps = {
 };
 
 export function LogPhotoField({ photos, onChange, directory, label, marker, t }: FieldProps) {
-  const authUser = useAuthStore.getState().user;
+  const me = useMyEmployee();
   const shown = visiblePhotos(photos);
   return (
     <Stack gap={4}>
@@ -34,8 +34,8 @@ export function LogPhotoField({ photos, onChange, directory, label, marker, t }:
         imageDirectory={directory}
         buildFileName={buildUploadFileName}
         marker={marker}
-        currentUserId={authUser?.email}
-        currentUserName={authUser?.name}
+        currentUserId={me?.id}
+        currentUserName={me?.name}
       />
     </Stack>
   );

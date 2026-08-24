@@ -54,7 +54,6 @@ import type {
 } from '@/types';
 import type { DateTimeInput } from '@credo/kits/types';
 import type { CMngtDeliveryRequestDirection } from '@credo/connectors/types';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { getInitialStatusValue } from './transitionEngine';
 import {
@@ -70,7 +69,7 @@ import {
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
 
 const isMobile = device.isMobile;
@@ -106,12 +105,8 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
   const drsInit = useDeliveryRequestStore((s) => s.initialized);
   const loadDRs = useDeliveryRequestStore((s) => s.loadAll);
 
-  const { user } = useAuthStore();
   const employees = useEmployeeStore((s) => s.items);
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
 
   const products = useProductStore((s) => s.items);
 

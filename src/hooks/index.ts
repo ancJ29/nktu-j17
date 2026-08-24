@@ -6,6 +6,8 @@ export {
   getCurrentEmployeeStamp,
 } from './useCurrentEmployee';
 export { useInitFormFromFetch } from './useInitFormFromFetch';
+export { useIsRoot } from './useIsRoot';
+export { useMyEmployee } from './useMyEmployee';
 export { useInventoryAutoRevalidate } from './useInventoryAutoRevalidate';
 export { useInventorySection, type InventorySection } from './useInventorySection';
 export { useLanguageSync } from './useLanguageSync';

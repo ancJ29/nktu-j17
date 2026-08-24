@@ -3,7 +3,6 @@ import { SalesOrderConfigErrorBanner } from '@/components/SalesOrderConfigErrorB
 import { DeliveryRequestConfigErrorBanner } from '@/components/DeliveryRequestConfigErrorBanner';
 import { useInventoryAutoRevalidate } from '@/hooks';
 import { useProfileLoadWatchdog } from '@/hooks/useProfileLoadWatchdog';
-import { useTokenKeepAlive } from '@/hooks/useTokenKeepAlive';
 import { MobileAppLayout } from './MobileAppLayout';
 import { PCAppLayout } from './PCAppLayout';
 
@@ -11,8 +10,6 @@ export function AppLayout() {
   useInventoryAutoRevalidate();
 
   useProfileLoadWatchdog();
-
-  useTokenKeepAlive();
 
   return (
     <>

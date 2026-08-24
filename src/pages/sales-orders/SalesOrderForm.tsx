@@ -46,8 +46,6 @@ import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useProductStore } from '@/stores/useProductStore';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { device, logger } from '@credo/base-ui/utils';
@@ -141,7 +139,7 @@ import {
 } from '@/utils/productPricing';
 import { convertUnit } from '@/utils/unitConversion';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
 
 const locationsEnabled = isLocationsEnabled();
@@ -265,8 +263,6 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
   const customers = useCustomerStore((s) => s.items);
   const products = useProductStore((s) => s.items);
-  const employees = useEmployeeStore((s) => s.items);
-  const { user } = useAuthStore();
 
   const locations = useLocationStore((s) => s.items);
   const allInventoryRows = useProductInventoryStore((s) => s.items);
@@ -393,11 +389,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [customers, variant.customerPicker],
   );
 
-  const currentEmployeeId = useMemo(() => {
-    if (!user.email) return '';
-    const emp = findEmployeeByLoginEmail(employees, user.email);
-    return emp?.id ?? '';
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
+  const currentEmployeeId = currentEmployee?.id ?? '';
 
   const productSelectData = useMemo(
     () =>
@@ -460,11 +453,6 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     () => buildExpiringUploadDirectory({ type: 'sales-order', id: uploadId }),
     [uploadId],
   );
-
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
 
   const splitNotesCfg = variant.clientSpecific?.NKTU?.splitNotes;
   const noteDept = currentEmployee?.department ?? null;

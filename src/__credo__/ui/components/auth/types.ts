@@ -54,41 +54,6 @@ export type LoginFormValues = {
   remember: boolean;
 };
 
-export type RegisterFormValues = {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
-export type ForgotPasswordFormValues = {
-  email: string;
-};
-
-export type ResetPasswordFormValues = {
-  password: string;
-  confirmPassword: string;
-};
-
-export type LoginRoutes = {
-  forgotPassword: string;
-  register: string;
-  loginViaQRCode: string;
-};
-
-export type RegisterRoutes = {
-  login: string;
-};
-
-export type ForgotPasswordRoutes = {
-  login: string;
-};
-
-export type ResetPasswordRoutes = {
-  login: string;
-  forgotPassword: string;
-};
-
 export type LoginViaQRCodeRoutes = {
   login: string;
 };

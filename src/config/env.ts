@@ -33,10 +33,10 @@ export function setAppApiGroup(apiGroup: string) {
   localStorage.setItem(API_GROUP_STORAGE_KEY, apiGroup);
 }
 
-export const appActivityLoggerInternalAccessKey =
-  localStorage.getItem('284901473a') ||
-  (import.meta.env.VITE_APP_ACTIVITY_LOGGER_INTERNAL_ACCESS_KEY as string) ||
-  '';
+export const appActivityLoggerUrl = (import.meta.env.VITE_APP_ACTIVITY_LOGGER_URL as string) ?? '';
+
+export const appActivityLoggerV1InternalAccessKey =
+  (import.meta.env.VITE_APP_ACTIVITY_LOGGER_INTERNAL_ACCESS_KEY as string) ?? '';
 
 export const appCredoStorageHash = (import.meta.env.VITE_APP_CREDO_STORAGE_HASH as string) ?? '';
 

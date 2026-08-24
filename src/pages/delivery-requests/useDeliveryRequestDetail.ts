@@ -25,7 +25,6 @@ import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { asyncDeduplicator } from '@credo/base-ui/utils';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
-import { useAuthStore } from '@/stores/useAuthStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -53,7 +52,7 @@ import {
   type TransitionFailure,
 } from './transitionEngine';
 import { deliveryRequestStatusOptions } from './useDeliveryRequestStatusOptions';
-import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import type {
   DeliveryRequest,
   DeliveryRequestActivityEntry,
@@ -144,7 +143,6 @@ export function useDeliveryRequestDetail(
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const invalidateCache = useDeliveryRequestStore((s) => s.invalidate);
-  const { user } = useAuthStore();
   const employees = useEmployeeStore((s) => s.items);
   const soInit = useSalesOrderStore((s) => s.initialized);
   const loadSOs = useSalesOrderStore((s) => s.loadAll);
@@ -186,10 +184,7 @@ export function useDeliveryRequestDetail(
     if (!inventoryInit) loadInventory();
   }, [inventoryInit, loadInventory]);
 
-  const currentEmployee = useMemo(() => {
-    if (!user.email) return undefined;
-    return findEmployeeByLoginEmail(employees, user.email);
-  }, [user.email, employees]);
+  const currentEmployee = useMyEmployee();
 
   const [deliveredQty, setDeliveredQty] = useState<Map<string, number>>(new Map());
   useEffect(() => {

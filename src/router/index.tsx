@@ -13,15 +13,7 @@ import { isAdmin } from '@/config/env';
 import { ForbiddenState } from '@/components/ForbiddenState';
 import { RouteErrorState } from '@/components/RouteErrorState';
 
-import {
-  ForgotPasswordPage,
-  GuestLayout,
-  LoginPage,
-  LoginViaQRCodePage,
-  LogoutPage,
-  RegisterPage,
-  ResetPasswordPage,
-} from './auth';
+import { AccessViaQRCodePage, GuestLayout, LogoutPage, SignInPage } from './auth';
 
 import {
   HomePage,
@@ -95,6 +87,7 @@ import {
   NotFoundPage,
   ForbiddenPage,
   SystemAdminPage,
+  ClientConfigPage,
 } from './pages';
 import { byClient } from '@/config/client';
 
@@ -1112,18 +1105,9 @@ const router = createBrowserRouter([
       {
         element: <GuestLayout />,
         children: [
-          { path: ROUTES.AUTH.LOGIN, element: <LoginPage /> },
-          ...(appConfig.auth.register
-            ? [{ path: ROUTES.AUTH.REGISTER, element: <RegisterPage /> }]
-            : []),
-          ...(appConfig.auth.forgotPassword
-            ? [{ path: ROUTES.AUTH.FORGOT_PASSWORD, element: <ForgotPasswordPage /> }]
-            : []),
-          ...(appConfig.auth.resetPassword
-            ? [{ path: ROUTES.AUTH.RESET_PASSWORD, element: <ResetPasswordPage /> }]
-            : []),
+          { path: ROUTES.AUTH.LOGIN, element: <SignInPage /> },
           ...(appConfig.auth.loginViaQRCode
-            ? [{ path: ROUTES.AUTH.LOGIN_VIA_QR_CODE, element: <LoginViaQRCodePage /> }]
+            ? [{ path: ROUTES.AUTH.LOGIN_VIA_QR_CODE, element: <AccessViaQRCodePage /> }]
             : []),
         ],
       },
@@ -1131,6 +1115,8 @@ const router = createBrowserRouter([
   },
 
   { path: ROUTES.SYSTEM_ADMIN, element: <SystemAdminPage /> },
+
+  { path: ROUTES.CREDO_SME.CLIENT_CONFIG, element: <ClientConfigPage /> },
 
   { path: ROUTES.ERROR, element: <ErrorPage /> },
   { path: ROUTES.FORBIDDEN, element: <ForbiddenPage /> },

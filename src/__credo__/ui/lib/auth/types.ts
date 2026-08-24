@@ -184,6 +184,8 @@ export type AuthState<TProfile extends BaseProfile = BaseProfile> = {
   loginWithQrCode: () => Promise<{ success: boolean; qrCode: string }>;
 
   loginWithToken: (params: { token: string }) => Promise<{ success: boolean }>;
+
+  getDeviceId: () => string;
 };
 
 export type PersistStorage = {

@@ -3,7 +3,7 @@ import type { FuelNormRow, FuelPriceRow, TransportRouteRow } from '@/types';
 import { useFuelNormStore } from '@/stores/useFuelNormStore';
 import { useFuelPriceStore } from '@/stores/useFuelPriceStore';
 import { todayInVnDateString } from '@/utils/dateTimeField';
-import { resolveCurrentFuelPrice } from '../cost-norms/fuelPrice';
+import { resolveCurrentFuelPrice, resolveFuelPriceAt } from '../cost-norms/fuelPrice';
 import { computeRouteCosting, type RouteCosting } from './routeCosting';
 
 export function buildFuelNormMap(rows: readonly FuelNormRow[]): Map<string, number> {
@@ -26,7 +26,9 @@ export type RouteCostingContext = {
   norms: Map<string, number>;
 
   costOf: (
-    route: Parameters<typeof computeRouteCosting>[0] & Pick<TransportRouteRow, 'truckType'>,
+    route: Parameters<typeof computeRouteCosting>[0] &
+      Pick<TransportRouteRow, 'truckType'> &
+      Partial<Pick<TransportRouteRow, 'isActive' | 'updatedAt'>>,
   ) => RouteCosting;
 };
 
@@ -52,12 +54,17 @@ export function useRouteCosting(): RouteCostingContext {
   const fuelPricePerLiter = currentPrice?.price;
 
   const costOf = useCallback<RouteCostingContext['costOf']>(
-    (route) =>
-      computeRouteCosting(route, {
+    (route) => {
+      const fuelPrice =
+        route.isActive === false && route.updatedAt
+          ? resolveFuelPriceAt(priceItems, route.updatedAt)?.price
+          : fuelPricePerLiter;
+      return computeRouteCosting(route, {
         litersPer100km: route.truckType ? norms.get(route.truckType) : undefined,
-        fuelPricePerLiter,
-      }),
-    [norms, fuelPricePerLiter],
+        fuelPricePerLiter: fuelPrice,
+      });
+    },
+    [norms, fuelPricePerLiter, priceItems],
   );
 
   return { fuelPricePerLiter, currentPrice, today, norms, costOf };

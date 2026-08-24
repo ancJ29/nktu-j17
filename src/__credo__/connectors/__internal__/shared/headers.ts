@@ -12,6 +12,8 @@ export type StoragesShape = {
   internalAccessKey?: string | undefined;
   accessKey?: string | undefined;
   authToken?: string | undefined;
+
+  deviceId?: string | undefined;
   adminKey?: string | undefined;
   superAdminAccessKey?: string | undefined;
   trustedServiceKey?: string | undefined;
@@ -68,6 +70,10 @@ export function buildHeaders({
     }
     headers['x-nonce'] = nonce;
     headers['x-timestamp'] = timestamp;
+  }
+
+  if (storages?.deviceId) {
+    headers['x-device-id'] = storages.deviceId;
   }
 
   if (storages?.authToken) {

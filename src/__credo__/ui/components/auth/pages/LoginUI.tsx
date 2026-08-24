@@ -3,14 +3,12 @@ import type { UseFormReturnType } from '@mantine/form';
 import type { Language } from '../../../types';
 import { Icon } from '../../common/Icon';
 import type { IconName } from '../../types';
-import type { AuthBranding, AuthThemeConfig, LoginFormValues, LoginRoutes } from '../types';
+import type { AuthBranding, AuthThemeConfig, LoginFormValues } from '../types';
 import {
   AuthButton,
   AuthDivider,
   AuthError,
-  AuthFooterLink,
   AuthHeader,
-  AuthLink,
   AuthPageWrapper,
   AuthPasswordInput,
   AuthSubtitle,
@@ -27,20 +25,14 @@ type LoginUIProps = {
     passwordLabel: string;
     passwordPlaceholder: string;
     rememberMe: string;
-    forgotPasswordLink: string;
     signInButton: string;
     useLoginLinkButton: string;
-    noAccountPrefix: string;
-    createAccountLink: string;
   };
   onSubmit: (values: LoginFormValues) => void;
   onQrLogin?: () => void;
   isLoading: boolean;
   error: string | null;
   themeConfig: AuthThemeConfig;
-  routes: LoginRoutes;
-  showForgotPassword?: boolean;
-  showRegister?: boolean;
   showQrLogin?: boolean;
   userIconName: IconName;
   lockIconName: IconName;
@@ -62,9 +54,6 @@ export function LoginUI({
   isLoading,
   error,
   themeConfig,
-  routes,
-  showForgotPassword = true,
-  showRegister = true,
   showQrLogin = true,
   branding,
   userIconName,
@@ -80,11 +69,8 @@ export function LoginUI({
     passwordLabel = 'Password',
     passwordPlaceholder = 'Enter your password',
     rememberMe = 'Remember me',
-    forgotPasswordLink = 'Forgot password?',
     signInButton = 'Sign In',
     useLoginLinkButton = 'Use Login Link',
-    noAccountPrefix = "Don't have an account? ",
-    createAccountLink = 'Create one',
   } = labels ?? {};
 
   return (
@@ -123,11 +109,6 @@ export function LoginUI({
               disabled={isLoading}
               {...form.getInputProps('remember', { type: 'checkbox' })}
             />
-            {showForgotPassword && (
-              <AuthLink href={routes.forgotPassword} c={themeConfig.link.color}>
-                {forgotPasswordLink}
-              </AuthLink>
-            )}
           </Group>
 
           <AuthButton
@@ -155,16 +136,6 @@ export function LoginUI({
             {useLoginLinkButton}
           </Button>
         </Stack>
-      )}
-
-      {showRegister && (
-        <AuthFooterLink
-          href={routes.register}
-          color={themeConfig.link.color}
-          prefix={noAccountPrefix}
-        >
-          {createAccountLink}
-        </AuthFooterLink>
       )}
     </AuthPageWrapper>
   );

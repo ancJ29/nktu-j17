@@ -1,7 +1,10 @@
 export { activityLoggerConnector } from './__internal__/activity-logger';
+export { activityLoggerV2Connector } from './__internal__/activity-logger-v2';
 export { cMngtConnector } from './__internal__/c-mngt';
 export { cSsoConnector } from './__internal__/c-sso';
 export { cStorageConnector } from './__internal__/c-storage';
+
+export { credoSmeConnector } from './__internal__/credo-sme';
 export { dolgaConnector } from './__internal__/dolga';
 export { emailConnector } from './__internal__/email';
 export { notificationManagerConnector } from './__internal__/notification-manager';

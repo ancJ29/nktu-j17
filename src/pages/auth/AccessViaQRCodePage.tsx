@@ -5,34 +5,21 @@ import { cacheFlush } from '@/utils/appCache';
 import { unwrapLoginToken } from '@/utils/loginToken';
 import { markPendingLogin } from '@/utils/pendingLoginLog';
 import { markPostLoginReloads } from '@/utils/postLoginReload';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate, useSearchParams } from 'react-router';
-
+import { Auth } from '@credo/base-ui/components';
 import { Button, Group, Stack, Text, TextInput } from '@mantine/core';
 import { IconCheck, IconForms, IconQrcode } from '@tabler/icons-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useSearchParams } from 'react-router';
 
-import { Auth } from '@credo/base-ui/components';
+const MAGIC_LINK_STORAGE_KEY = 'smeMagicLinkParams';
 
-const MAGIC_LINK_STORAGE_KEY = 'magicLinkParams';
-
-export function LoginViaQRCodePage() {
-  if (!appConfig.auth.loginViaQRCode) {
-    return <Navigate to={ROUTES.NOT_FOUND} replace />;
-  }
-
-  return <LoginViaQRCodeContent />;
-}
-
-function LoginViaQRCodeContent() {
+export function AccessViaQRCodePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const loginWithToken = useAuthStore((state) => state.loginWithToken);
 
-  const authToken = useAuthStore((state) => state.token);
-
-  const [mounted, setMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | undefined>(undefined);
   const [showQrScanner, setShowQrScanner] = useState(false);
@@ -41,25 +28,6 @@ function LoginViaQRCodeContent() {
   const [showOptions, setShowOptions] = useState(false);
   const [verificationSuccess, setVerificationSuccess] = useState(false);
   const verificationInProgress = useRef(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    if (authToken) {
-      navigate(ROUTES.APP.MAIN, { replace: true });
-    }
-  }, [mounted, authToken, navigate]);
-
-  useEffect(() => {
-    if (!mounted) return;
-    const tokenFromUrl = searchParams.get('token');
-    if (tokenFromUrl) {
-      sessionStorage.setItem(MAGIC_LINK_STORAGE_KEY, JSON.stringify({ token: tokenFromUrl }));
-    }
-  }, [mounted, searchParams]);
 
   const verifyToken = useCallback(
     async (rawToken: string) => {
@@ -70,16 +38,8 @@ function LoginViaQRCodeContent() {
       setError(undefined);
 
       const unwrapped = unwrapLoginToken(rawToken);
-      if (!unwrapped) {
-        setError(t('auth.magicLink.invalidQrCode'));
-        setIsLoading(false);
-        verificationInProgress.current = false;
-        sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
-        navigate(ROUTES.AUTH.LOGIN_VIA_QR_CODE, { replace: true });
-        return;
-      }
-      if (unwrapped.expired) {
-        setError(t('auth.magicLink.linkExpired'));
+      if (!unwrapped || unwrapped.expired) {
+        setError(unwrapped ? t('auth.magicLink.linkExpired') : t('auth.magicLink.invalidQrCode'));
         setIsLoading(false);
         verificationInProgress.current = false;
         sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
@@ -91,76 +51,73 @@ function LoginViaQRCodeContent() {
         const result = await loginWithToken({ token: unwrapped.token });
         if (result.success) {
           markPendingLogin('qr');
-
           markPostLoginReloads();
 
           cacheFlush();
+          sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
           setVerificationSuccess(true);
-          setTimeout(() => navigate(ROUTES.APP.MAIN), 1500);
-        } else {
-          setError(t('auth.magicLink.verificationFailed'));
+          setIsLoading(false);
+          setTimeout(() => window.location.assign(ROUTES.APP.MAIN), 1200);
+          return;
         }
+        setError(t('auth.magicLink.verificationFailed'));
       } catch {
         setError(t('auth.magicLink.verificationFailed'));
         setVerificationSuccess(false);
-      } finally {
-        sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
-
-        navigate(ROUTES.AUTH.LOGIN_VIA_QR_CODE, { replace: true });
-        setIsLoading(false);
-        verificationInProgress.current = false;
       }
+
+      sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
+
+      navigate(ROUTES.AUTH.LOGIN_VIA_QR_CODE, { replace: true });
+      setIsLoading(false);
+      verificationInProgress.current = false;
     },
     [loginWithToken, navigate, t],
   );
 
   useEffect(() => {
-    if (!mounted) return;
     if (verificationInProgress.current) return;
 
     const tokenFromUrl = searchParams.get('token');
     if (tokenFromUrl) {
+      sessionStorage.setItem(MAGIC_LINK_STORAGE_KEY, JSON.stringify({ token: tokenFromUrl }));
+
       void verifyToken(tokenFromUrl);
       return;
     }
 
-    const storedParams = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
-    if (storedParams) {
+    const stored = sessionStorage.getItem(MAGIC_LINK_STORAGE_KEY);
+    if (stored) {
       try {
-        const { token } = JSON.parse(storedParams) as { token: string };
+        const { token } = JSON.parse(stored) as { token: string };
         if (token) {
           void verifyToken(token);
           return;
         }
       } catch {
-        // Corrupt entry — fall through to scan/manual UI.
+        // Corrupt entry — fall through to the scan / manual UI.
       }
     }
 
     setShowOptions(true);
     setIsLoading(false);
     setError(undefined);
-  }, [mounted, searchParams, verifyToken]);
+  }, [searchParams, verifyToken]);
 
   const handleQrScan = useCallback(
     (data: string) => {
-      const trimmedData = data.trim();
+      const trimmed = data.trim();
       verificationInProgress.current = false;
       setVerificationSuccess(false);
       setError(undefined);
 
       try {
-        if (trimmedData.includes('?') || trimmedData.startsWith('http')) {
-          const url = new URL(trimmedData);
-          const token = url.searchParams.get('token');
-
-          if (token) {
-            void verifyToken(token);
-          } else {
-            setError(t('auth.magicLink.invalidQrCode'));
-          }
+        if (trimmed.includes('?') || trimmed.startsWith('http')) {
+          const token = new URL(trimmed).searchParams.get('token');
+          if (token) void verifyToken(token);
+          else setError(t('auth.magicLink.invalidQrCode'));
         } else {
-          void verifyToken(trimmedData);
+          void verifyToken(trimmed);
         }
       } catch {
         setError(t('auth.magicLink.invalidQrCode'));
@@ -170,10 +127,9 @@ function LoginViaQRCodeContent() {
   );
 
   const handleManualCodeSubmit = useCallback(() => {
-    const trimmedCode = manualCode.trim();
-    if (!trimmedCode) return;
-
-    handleQrScan(trimmedCode);
+    const trimmed = manualCode.trim();
+    if (!trimmed) return;
+    handleQrScan(trimmed);
   }, [manualCode, handleQrScan]);
 
   const authTheme = themeConfig.auth;
@@ -251,9 +207,7 @@ function LoginViaQRCodeContent() {
                   value={manualCode}
                   onChange={(e) => setManualCode(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && manualCode) {
-                      handleManualCodeSubmit();
-                    }
+                    if (e.key === 'Enter' && manualCode) handleManualCodeSubmit();
                   }}
                 />
 

@@ -46,7 +46,7 @@ import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPan
 import { NotFoundState } from '@/components/NotFoundState';
 import { useMaterialStore, MATERIAL_RECORD_TARGET } from '@/stores/useMaterialStore';
 import { useMaterialInventoryStore } from '@/stores/useMaterialInventoryStore';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { formatDateTime } from '@/utils/dateFormat';
 import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
@@ -233,6 +233,8 @@ export function MaterialDetailPage() {
     [material, t],
   );
 
+  const me = useMyEmployee();
+
   if (loading) return null;
   if (!material) {
     return (
@@ -263,7 +265,6 @@ export function MaterialDetailPage() {
 
   const images = material.extra?.images ?? [];
   const imageEntries: PhotoEntry[] = images.map((img) => ({ url: img.url, timestamp: '' }));
-  const authUser = useAuthStore.getState().user;
   const uploadDir = buildUploadDirectory({ type: 'material', id: material.id });
 
   const imagesContent = (
@@ -277,8 +278,8 @@ export function MaterialDetailPage() {
             imageDirectory={uploadDir}
             buildFileName={buildUploadFileName}
             marker={material.name || material.code}
-            currentUserId={authUser?.email}
-            currentUserName={authUser?.name}
+            currentUserId={me?.id}
+            currentUserName={me?.name}
           />
         </Card>
       )}
@@ -291,8 +292,8 @@ export function MaterialDetailPage() {
             imageDirectory={uploadDir}
             buildFileName={buildUploadFileName}
             marker={material.name || material.code}
-            currentUserId={authUser?.email}
-            currentUserName={authUser?.name}
+            currentUserId={me?.id}
+            currentUserName={me?.name}
           />
         ) : images.length === 0 ? (
           <Stack align="center" gap="sm" py="xl">

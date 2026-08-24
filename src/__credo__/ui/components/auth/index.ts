@@ -15,7 +15,7 @@ export {
   AuthTextInput,
 } from './ui';
 
-export { ForgotPasswordUI, LoginUI, LoginViaQRCodeUI, RegisterUI, ResetPasswordUI } from './pages';
+export { LoginUI, LoginViaQRCodeUI } from './pages';
 
 export type {
   AuthBranding,
@@ -25,15 +25,8 @@ export type {
   AuthLinkTheme,
   AuthSuccessTheme,
   AuthThemeConfig,
-  ForgotPasswordFormValues,
-  ForgotPasswordRoutes,
   IconComponent,
   IconProps,
   LoginFormValues,
-  LoginRoutes,
   LoginViaQRCodeRoutes,
-  RegisterFormValues,
-  RegisterRoutes,
-  ResetPasswordFormValues,
-  ResetPasswordRoutes,
 } from './types';

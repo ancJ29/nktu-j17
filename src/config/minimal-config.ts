@@ -16,9 +16,6 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
     pwaIconMaskableUrl: `${baseUrl}/maskable-512x512.png`,
   },
   auth: {
-    register: false,
-    forgotPassword: false,
-    resetPassword: false,
     loginViaQRCode: true,
   },
   themeConfig: { mainColor: 'steel' },

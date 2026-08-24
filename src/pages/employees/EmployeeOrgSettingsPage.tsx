@@ -11,7 +11,7 @@ import { appConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { ConfigOptionEditor } from '@/pages/config/AppConfigPage/editors/ConfigOptionEditor';
 import { DeptPermissionsSection } from '@/pages/config/AppConfigPage/sections/DeptPermissionsSection';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useIsRoot } from '@/hooks/useIsRoot';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import {
   isPermissionManagementEnabled,
@@ -27,7 +27,7 @@ const isMobile = device.isMobile;
 export function EmployeeOrgSettingsPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isRootUser = useAuthStore((s) => s.user?.isRoot ?? false);
+  const isRootUser = useIsRoot();
 
   const rootLocked = isPermissionManagementRootUserOnly() && !isRootUser;
 

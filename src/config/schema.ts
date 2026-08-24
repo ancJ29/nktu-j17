@@ -609,9 +609,6 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
     logoUrl: getEnvVar('VITE_APP_LOGO_URL'),
   },
   auth: {
-    register: false,
-    forgotPassword: false,
-    resetPassword: false,
     loginViaQRCode: true,
   },
 
