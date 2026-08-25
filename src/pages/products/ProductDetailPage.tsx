@@ -66,7 +66,7 @@ import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { formatDateTime } from '@/utils/dateFormat';
-import { lookupLabelOf, useLookupLabels, useLookupOptions } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels, useLookupV2Options } from '@/hooks';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import {
   hasBarcodeForProducts,
@@ -166,9 +166,9 @@ export function ProductDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const unitLabels = useLookupLabels('unit');
-  const categoryOptions = useLookupOptions('product-category');
-  const tagOptions = useLookupOptions('product-tag');
+  const unitLabels = useLookupV2Labels('unit');
+  const categoryOptions = useLookupV2Options('product-category');
+  const tagOptions = useLookupV2Options('product-tag');
   const editLabels = useMemo<SectionCardEditLabels>(
     () => ({
       edit: t('__new__.01-common.actions.edit'),

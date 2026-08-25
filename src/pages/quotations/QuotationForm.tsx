@@ -50,7 +50,7 @@ import {
   isBelowSuggestedPrice,
 } from '@/utils/productPricing';
 import { formatNumber } from '@/utils/number';
-import { useLookupLabels, lookupLabelOf } from '@/hooks';
+import { useLookupV2Labels, lookupLabelOf } from '@/hooks';
 import {
   getSalesOrderPicDepartments,
   hasImagesForProducts,
@@ -184,7 +184,7 @@ export function QuotationForm() {
 
   const showCompanyPicker = companies.length > 1;
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const storeInitialized = useQuotationStore((s) => s.initialized);
   const loadQuotations = useQuotationStore((s) => s.loadAll);

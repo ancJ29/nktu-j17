@@ -49,7 +49,7 @@ import { SectionCard } from '@/components/SectionCard';
 import { VendorLink } from '@/components/VendorLink';
 import { useProductStore } from '@/stores/useProductStore';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { isActivityLoggingEnabled, isLocationsEnabled } from '@/utils/permission';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import type { GoodsReceipt, GoodsReceiptItem } from '@/types';
@@ -252,7 +252,7 @@ export function GoodsReceiptDetailPage() {
 
   const [activeTab, setActiveTab] = useState<string | null>('receipt');
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const products = useProductStore((s) => s.items);
 

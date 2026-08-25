@@ -2043,7 +2043,6 @@
     },
     "reorderHint": "Drag the handle to reorder entries.",
     "subtitle": "Manage dropdown options and reference values used across the app.",
-    "title": "Common Lookup",
     "validation": {
       "labelRequired": "Label is required",
       "valueDuplicate": "Another active entry already uses this value",
@@ -2362,7 +2361,6 @@
     "assets": "Assets",
     "employeeOrg": "Organization",
     "farm": "Farm",
-    "lookups": "Meta-data",
     "lookupsV2": "Meta-data",
     "materialsCatalog": "Materials Catalog",
     "partners": "Partners",
@@ -3286,6 +3284,7 @@
       "markConfirmed": "Customer confirmed",
       "markReady": "Mark as ready",
       "new": "New quotation",
+      "preview": "Quick view",
       "sharePdf": "Share PDF"
     },
     "cancelConfirm": {
@@ -3374,6 +3373,7 @@
       "updateError": "Failed to update quotation",
       "updateSuccess": "Quotation updated"
     },
+    "previewTitle": "Quotation preview",
     "print": {
       "includeVat": "Include VAT",
       "landscape": "Landscape",

@@ -498,7 +498,6 @@ const FeaturesSchema = z
     locations: LocationFeaturesSchema,
     productInventory: ModuleFeaturesSchema,
     materialInventory: MaterialInventoryFeaturesSchema,
-    lookups: LookupFeaturesSchema,
     lookupV2: LookupFeaturesSchema,
 
     trucks: ModuleFeaturesSchema,
@@ -525,7 +524,6 @@ const FeaturesSchema = z
     locations: LocationFeaturesSchema.parse({}),
     productInventory: ModuleFeaturesSchema.parse({}),
     materialInventory: MaterialInventoryFeaturesSchema.parse({}),
-    lookups: LookupFeaturesSchema.parse({}),
     lookupV2: LookupFeaturesSchema.parse({}),
     trucks: ModuleFeaturesSchema.parse({}),
     oilTanks: ModuleFeaturesSchema.parse({}),

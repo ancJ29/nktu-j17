@@ -13,7 +13,7 @@ import type {
   ProductInventoryExtra,
   ProductInventoryRow,
 } from '@/types';
-import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
@@ -54,7 +54,7 @@ export function ProductInventoryComposeSetModal({
   locations,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const [setCode, setSetCode] = useState<string | null>(null);
 

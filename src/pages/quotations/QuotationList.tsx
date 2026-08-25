@@ -1,6 +1,6 @@
-import { Badge, Card, Group, Stack, Text, ThemeIcon } from '@mantine/core';
+import { ActionIcon, Badge, Card, Group, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { IconFileInvoice } from '@tabler/icons-react';
+import { IconFileInvoice, IconListDetails } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -34,6 +34,7 @@ import {
 import { formatDate } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import { perms } from '@/utils/permission';
+import { QuotationPreviewDrawer } from './QuotationPreviewDrawer';
 import { quotationBundle, useQuotationStore } from './useQuotationStore';
 import {
   quotationBadgeProps,
@@ -73,6 +74,8 @@ export function QuotationList() {
   const employees = useEmployeeStore((s) => s.items);
   const employeesInitialized = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
+
+  const [preview, setPreview] = useState<Quotation | null>(null);
 
   const [dateRange, setDateRange] = useState<DateRangeValue>(() =>
     defaultLastNDaysRange(RANGE_DAYS),
@@ -304,6 +307,27 @@ export function QuotationList() {
         width: '150px',
         render: (row: Quotation) => <QuotationDate row={row} />,
       },
+
+      {
+        key: '__preview',
+        header: '',
+        width: '56px',
+        ta: 'center' as const,
+        render: (row: Quotation) => (
+          <Tooltip label={t('quotations.actions.preview')} withArrow>
+            <ActionIcon
+              variant="subtle"
+              color="gray"
+              onClick={(e) => {
+                e.stopPropagation();
+                setPreview(row);
+              }}
+            >
+              <IconListDetails size={18} />
+            </ActionIcon>
+          </Tooltip>
+        ),
+      },
     ],
     [t, customerName, staffName],
   );
@@ -443,10 +467,24 @@ export function QuotationList() {
                     </Text>
                   </Stack>
                   <Stack gap={4} align="flex-end">
-                    <StatusBadge
-                      status={row.extra.status ?? 'draft'}
-                      label={t(`quotations.status.${row.extra.status ?? 'draft'}`)}
-                    />
+                    <Group gap={4} wrap="nowrap">
+                      <StatusBadge
+                        status={row.extra.status ?? 'draft'}
+                        label={t(`quotations.status.${row.extra.status ?? 'draft'}`)}
+                      />
+                      <Tooltip label={t('quotations.actions.preview')} withArrow>
+                        <ActionIcon
+                          variant="subtle"
+                          color="gray"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPreview(row);
+                          }}
+                        >
+                          <IconListDetails size={18} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </Group>
                     <Text fw={600}>{formatNumber(quotationTotal(row.extra.lines ?? []))}</Text>
                   </Stack>
                 </Group>
@@ -470,6 +508,12 @@ export function QuotationList() {
         pageSize={pageSize}
         onPageChange={setPage}
         onPageSizeChange={setPageSize}
+      />
+
+      <QuotationPreviewDrawer
+        quotation={preview}
+        onClose={() => setPreview(null)}
+        customerName={preview ? customerName(preview) : undefined}
       />
     </Stack>
   );

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Product } from '@/types';
 import { CodeLabel, ColorBadge, DataTable } from '@credo/base-ui/components';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { ProductThumb } from './ProductThumb';
 import {
@@ -47,9 +47,9 @@ export function ProductDataTable({
 }: ProductDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
-  const categoryLabels = useLookupLabels('product-category');
+  const categoryLabels = useLookupV2Labels('product-category');
 
   const columns = useMemo(
     () =>

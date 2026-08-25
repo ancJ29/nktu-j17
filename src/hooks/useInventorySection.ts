@@ -5,7 +5,7 @@ import { useLocationStore } from '@/stores/useLocationStore';
 import type { Location } from '@/types';
 import { isDefaultLocation } from '@/types';
 import { getItemBaseUnit, getItemUnits } from '@/utils/unitConversion';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 
 type InventoryRowBase = {
   readonly id: string;
@@ -47,7 +47,7 @@ export type InventorySection<TRow extends InventoryRowBase> = {
   readonly baseUnit: string;
   readonly baseUnitLabel: string;
   readonly hasMultipleUnits: boolean;
-  readonly unitLabels: ReturnType<typeof useLookupLabels>;
+  readonly unitLabels: ReturnType<typeof useLookupV2Labels>;
   readonly locationByCode: Map<string, Location>;
   readonly forceRefresh: () => unknown;
 
@@ -96,7 +96,7 @@ export function useInventorySection<TEntity extends EntityBase, TRow extends Inv
   const baseUnit = getItemBaseUnit(entity);
   const units = useMemo(() => getItemUnits(entity), [entity]);
   const hasMultipleUnits = units.length > 1;
-  const unitLabels = useLookupLabels(unitLookup);
+  const unitLabels = useLookupV2Labels(unitLookup);
   const baseUnitLabel = baseUnit ? lookupLabelOf(unitLabels, baseUnit) : '';
 
   const [updateOpened, { open: openUpdateRaw, close: closeUpdate }] = useDisclosure(false);

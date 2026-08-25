@@ -18,7 +18,7 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import JsBarcode from 'jsbarcode';
-import { lookupLabelOf, useLookupLabels, useLookupOptions } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels, useLookupV2Options } from '@/hooks';
 import {
   IconAdjustmentsHorizontal,
   IconBarcode,
@@ -199,7 +199,7 @@ function SetCompositionEditor({
   const products = useProductStore((s) => s.items);
   const items = form.values.setItems;
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const componentFilter = useMemo(
     () => (p: (typeof products)[number]) =>
@@ -496,9 +496,9 @@ export function SingleProductForm({
 }: SingleProductFormProps) {
   const { t } = useTranslation();
 
-  const categoryOptions = useLookupOptions('product-category');
-  const unitOptions = useLookupOptions('unit');
-  const tagOptions = useLookupOptions('product-tag');
+  const categoryOptions = useLookupV2Options('product-category');
+  const unitOptions = useLookupV2Options('unit');
+  const tagOptions = useLookupV2Options('product-tag');
   const categoryData = useMemo(
     () => categoryOptions.map((o) => ({ value: o.value, label: o.label })),
     [categoryOptions],

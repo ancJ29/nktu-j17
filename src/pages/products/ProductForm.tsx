@@ -14,7 +14,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { isListVersionConflict, readListHash } from '@/utils/listVersionConflict';
 import { device } from '@credo/base-ui/utils';
 import { Tabs } from '@credo/base-ui/components';
-import { useInitFormFromFetch, useLookupOptions } from '@/hooks';
+import { useInitFormFromFetch, useLookupV2Options } from '@/hooks';
 import { generateInternalBarcode } from '@/utils/barcode';
 import {
   hasBarcodeForProducts,
@@ -67,9 +67,9 @@ export function ProductForm({ variant }: ProductFormProps) {
   const forceRefresh = useProductStore((s) => s.forceRefresh);
   const totalProducts = useProductStore((s) => s.items.length);
 
-  const categoryOptions = useLookupOptions('product-category');
-  const tagOptions = useLookupOptions('product-tag');
-  const unitOptions = useLookupOptions('unit');
+  const categoryOptions = useLookupV2Options('product-category');
+  const tagOptions = useLookupV2Options('product-tag');
+  const unitOptions = useLookupV2Options('unit');
 
   const snapshotRef = useRef<Product | null>(null);
 

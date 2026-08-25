@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { DEFAULT_LOCATION_CODE, isDefaultLocation } from '@/types';
 import type { Location, Product, ProductInventoryExtra, ProductInventoryRow } from '@/types';
-import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { applyDelta, readRowBreakdown } from '@/utils/inventoryMath';
@@ -43,7 +43,7 @@ export function ProductInventoryDecomposeSetModal({
   locations,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const [setCode, setSetCode] = useState<string | null>(null);
 

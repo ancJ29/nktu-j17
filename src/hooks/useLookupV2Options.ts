@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useLookupV2Store } from '@/stores/useLookupV2Store';
-import type { LookupOption } from './useLookupOptions';
+
+export type LookupOption = { value: string; label: string };
 
 export function useLookupV2Options(category: string): LookupOption[] {
   const items = useLookupV2Store((s) => s.items);
@@ -40,4 +41,13 @@ export function useLookupV2Labels(category: string): Map<string, string> {
     }
     return map;
   }, [items, category]);
+}
+
+export function lookupLabelOf(
+  map: Map<string, string>,
+  value: string | undefined,
+  fallback: string = '—',
+): string {
+  if (!value) return fallback;
+  return map.get(value) ?? value;
 }

@@ -26,7 +26,6 @@ export type SectionKey =
   | 'deliveryRequests'
   | 'goodsReceipts'
   | 'transportOrders'
-  | 'lookups'
   | 'lookupV2'
   | 'permissions'
   | 'deptPermissions'
@@ -62,7 +61,6 @@ export const ALL_SECTIONS: SectionKey[] = [
   'deliveryRequests',
   'goodsReceipts',
   'transportOrders',
-  'lookups',
   'lookupV2',
   'permissions',
   'deptPermissions',

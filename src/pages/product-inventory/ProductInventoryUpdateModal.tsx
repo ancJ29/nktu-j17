@@ -39,7 +39,7 @@ import {
   setUnitSnapshot,
   validateRepack,
 } from '@/utils/inventoryMath';
-import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { Form } from '@/components/Form';
 
 export type UpdateMode = 'delta' | 'snapshot' | 'repack';
@@ -83,7 +83,7 @@ export function ProductInventoryUpdateModal({
   const units = useMemo(() => (product ? getItemUnits(product) : []), [product]);
   const hasMultipleUnits = units.length > 1;
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
   const unitOptions = useMemo(
     () => units.map((u) => ({ value: u, label: lookupLabelOf(unitLabels, u) })),
     [units, unitLabels],

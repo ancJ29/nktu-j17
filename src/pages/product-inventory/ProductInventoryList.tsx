@@ -19,7 +19,7 @@ import {
   type ColumnFilterDef,
   type ColumnFilterValues,
 } from '@credo/base-ui/hooks';
-import { useListScrollRestoration, useLookupLabels, useLookupOptions } from '@/hooks';
+import { useListScrollRestoration, useLookupV2Labels, useLookupV2Options } from '@/hooks';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useOpenInboundByProduct } from '@/hooks/useOpenInboundByProduct';
@@ -47,6 +47,7 @@ import { ProductInventoryDataTable } from './ProductInventoryDataTable';
 import { ProductInventoryDecomposeSetModal } from './ProductInventoryDecomposeSetModal';
 import { ProductInventoryOutgoingModal } from './ProductInventoryOutgoingModal';
 import { rollupReservationsBySO } from './productInventoryReservations';
+import { useReservationOrderStatus } from './useReservationOrderStatus';
 import { InventoryImportExportActions } from '@/components/inventory/InventoryImportExportActions';
 import { hasHideFromInventoryListForProducts, isLocationsEnabled } from '@/utils/permission';
 import {
@@ -140,6 +141,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     () => (canViewCustomers ? createCustomerShortNameResolver(customers) : undefined),
     [customers],
   );
+
+  const orderStatus = useReservationOrderStatus();
 
   const [outgoingFor, setOutgoingFor] = useState<ProductInventorySummary | null>(null);
   const outgoingReservations = useMemo(
@@ -395,9 +398,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [locations],
   );
 
-  const categoryLookups = useLookupOptions('product-category');
+  const categoryLookups = useLookupV2Options('product-category');
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],
@@ -794,6 +797,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             onClose={() => setOutgoingFor(null)}
             product={outgoingFor?.product ?? null}
             reservations={outgoingReservations}
+            orderStatus={orderStatus}
           />
         )}
 
@@ -844,6 +848,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           onRowClick={handleRowClick}
           inboundIndex={inboundIndex}
           resolveCustomerName={resolveCustomerName}
+          orderStatus={orderStatus}
           onOutgoingClick={variant.showOutgoingDetailModal ? setOutgoingFor : undefined}
           viewportRef={scrollViewportRef}
           getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}

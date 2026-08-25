@@ -17,7 +17,7 @@ import {
 } from './routeSummary';
 import { appConfig } from '@/config';
 import { useRouteCosting } from './useRouteCosting';
-import { isRecentFuelPriceChange } from '../cost-norms/fuelPrice';
+import { isRecentFuelPriceChange, routePredatesFuelPriceChange } from '../cost-norms/fuelPrice';
 import { routeUsesFuelPricing } from './routeCosting';
 
 const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
@@ -150,7 +150,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
 
           const moved =
             priceJustChanged &&
-            r.isActive &&
+            routePredatesFuelPriceChange(currentPrice, r.createdAt) &&
             routeUsesFuelPricing(r, r.truckType ? norms.get(r.truckType) : undefined);
           return (
             <Group gap={4} justify="flex-end" wrap="nowrap">
@@ -227,6 +227,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       expandedIds,
       toggleExpanded,
       priceJustChanged,
+      currentPrice,
       norms,
     ],
   );

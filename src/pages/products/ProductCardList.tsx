@@ -7,7 +7,7 @@ import { CodeLabel, ColorBadge, InfiniteScrollSentinel } from '@credo/base-ui/co
 import { ActiveBadge } from '@/components/badges';
 import type { Product } from '@/types';
 import { hasImagesForProducts, isProductInventoryEnabled } from '@/utils/permission';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { ProductThumb } from './ProductThumb';
 import { isProductSet, isNoInventoryProduct } from '@/utils/productSet';
 import { ProductSetBadge } from '@/components/ProductSetBadge';
@@ -57,7 +57,7 @@ export function ProductCardList({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  const categoryLabels = useLookupLabels('product-category');
+  const categoryLabels = useLookupV2Labels('product-category');
 
   if (isLoading) {
     return (

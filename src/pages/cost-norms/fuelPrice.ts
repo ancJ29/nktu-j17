@@ -57,3 +57,11 @@ export function isRecentFuelPriceChange(
   const from = fuelPriceBecameCurrentAt(row);
   return from <= nowMs && nowMs - from < windowMs;
 }
+
+export function routePredatesFuelPriceChange(
+  row: Pick<FuelPriceRow, 'createdAt' | 'effectiveDate'> | undefined,
+  routeCreatedAtMs: number,
+): boolean {
+  if (!row) return false;
+  return routeCreatedAtMs < fuelPriceBecameCurrentAt(row);
+}

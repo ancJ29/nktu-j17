@@ -46,9 +46,6 @@ export const featureFlags = {
   materialInventory: {
     enabled: features?.materialInventory?.enabled ?? false,
   },
-  lookups: {
-    enabled: features?.lookups?.enabled ?? false,
-  },
   lookupV2: {
     enabled: features?.lookupV2?.enabled ?? false,
   },

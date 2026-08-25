@@ -6,7 +6,7 @@ import { device } from '@credo/base-ui/utils';
 import { InlineTextareaField, type InlineEditLabels } from '@credo/base-ui/components';
 import type { InventoryLinkageSnapshotEntry, InventoryLinkageState, SalesOrderItem } from '@/types';
 import { DEFAULT_LOCATION_CODE, isDefaultLocation } from '@/types';
-import { lookupLabelOf, useLookupLabels, useOpenInboundByProduct } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels, useOpenInboundByProduct } from '@/hooks';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
@@ -94,7 +94,7 @@ export function OrderItemsTable({
   const inventoryRows = useProductInventoryStore((s) => s.items);
   const inventoryInitialized = useProductInventoryStore((s) => s.initialized);
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const inboundByProduct = useOpenInboundByProduct();
 

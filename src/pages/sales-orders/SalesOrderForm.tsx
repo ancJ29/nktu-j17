@@ -56,7 +56,7 @@ import {
   parseSalesOrderItemsExcelFile,
   parseSalesOrderItemsByNameExcelFile,
 } from '@/utils/excelParser';
-import { lookupLabelOf, useInitFormFromFetch, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useInitFormFromFetch, useLookupV2Labels } from '@/hooks';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import {
   getDeliveryRequestDriverDepartments,
@@ -268,7 +268,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
   const allInventoryRows = useProductInventoryStore((s) => s.items);
   const inventoryInitialized = useProductInventoryStore((s) => s.initialized);
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   useEffect(() => {
     if (!inventoryInitialized) loadInventory();

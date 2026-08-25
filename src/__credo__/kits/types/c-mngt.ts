@@ -329,7 +329,6 @@ export type CMngtAppConfig = AppConfig & {
     transportOrders: CMngtTransportOrderFeatures;
     locations: CMngtLocationFeatures;
     productInventory: CMngtModuleFeatures;
-    lookups: CMngtLookupFeatures;
 
     lookupV2: CMngtLookupFeatures;
 

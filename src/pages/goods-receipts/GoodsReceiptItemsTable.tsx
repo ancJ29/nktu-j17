@@ -3,13 +3,13 @@ import { IconEdit } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { FieldLabel } from '@credo/base-ui/components';
 import { ProductLink } from '@/components/ProductLink';
-import { lookupLabelOf, type useLookupLabels } from '@/hooks';
+import { lookupLabelOf, type useLookupV2Labels } from '@/hooks';
 import type { GoodsReceiptItem } from '@/types';
 import { resolveBaseUnitDisplay, type PackagingAwareEntity } from './goodsReceiptUnitDisplay';
 
 export type GoodsReceiptItemsProps = {
   readonly items: readonly GoodsReceiptItem[];
-  readonly unitLabels: ReturnType<typeof useLookupLabels>;
+  readonly unitLabels: ReturnType<typeof useLookupV2Labels>;
   readonly products: readonly PackagingAwareEntity[];
 
   readonly onItemTap?: (idx: number) => void;

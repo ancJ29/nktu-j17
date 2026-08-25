@@ -33,7 +33,6 @@ import type {
   QuotationFeatures,
 } from '@/config/schema';
 import type { GoodsReceiptStatus } from '@/types';
-import { LOOKUP_CATEGORIES } from '@/pages/lookups/categoryRegistry';
 import { LOOKUP_V2_CATEGORIES } from '@/pages/lookup-v2/categoryRegistry';
 import { useLookupV2Options } from '@/hooks/useLookupV2Options';
 import {
@@ -342,9 +341,6 @@ export function ConfigEditor({
     useState<CMngtTransportOrderFeatures>(DEFAULT_TRANSPORT_ORDER_FEATURES);
 
   const truckTypeOptions = useLookupV2Options('truck-type');
-  const [lookupsFeatures, setLookupsFeatures] = useState<CMngtLookupFeatures>(
-    SCHEMA_DEFAULT_LOOKUP_FEATURES,
-  );
   const [layout, setLayout] = useState<CMngtLayoutConfig>(DEFAULT_CONFIG.layout);
   const [permissions, setPermissions] = useState<PartialPermissions>({});
   const [translations, setTranslations] = useState<Record<string, Record<string, unknown>>>(
@@ -418,7 +414,6 @@ export function ConfigEditor({
         transportOrders: transportOrdersFeatures,
         locations: locationsFeatures,
         productInventory: productInventoryFeatures,
-        lookups: lookupsFeatures,
         lookupV2: lookupV2Features,
         trucks: trucksFeatures,
         oilTanks: oilTanksFeatures,
@@ -462,7 +457,6 @@ export function ConfigEditor({
       locationsFeatures,
       productInventoryFeatures,
       lookupV2Features,
-      lookupsFeatures,
       trucksFeatures,
       oilTanksFeatures,
       farmFeatures,
@@ -549,7 +543,6 @@ export function ConfigEditor({
       ...SCHEMA_DEFAULT_TRANSPORT_ORDER_FEATURES,
       ...cfg.features?.transportOrders,
     });
-    setLookupsFeatures({ ...SCHEMA_DEFAULT_LOOKUP_FEATURES, ...cfg.features?.lookups });
     setLayout({ ...SCHEMA_DEFAULT_LAYOUT, ...cfg.layout });
     setPermissions(cfg.permissions ?? {});
     setTranslations(cfg.translations ?? {});
@@ -754,7 +747,6 @@ export function ConfigEditor({
     setFarmFeatures(SCHEMA_DEFAULT_MODULE_FEATURES);
     setCustomersFeatures(DEFAULT_CUSTOMER_FEATURES);
     setVendorsFeatures(DEFAULT_VENDOR_FEATURES);
-    setLookupsFeatures(SCHEMA_DEFAULT_LOOKUP_FEATURES);
     setSalesOrdersFeatures(DEFAULT_SALES_ORDER_FEATURES);
     setQuotationsFeatures(SCHEMA_DEFAULT_QUOTATION_FEATURES);
     setDeliveryRequestsFeatures(DEFAULT_DELIVERY_REQUEST_FEATURES);
@@ -817,7 +809,6 @@ export function ConfigEditor({
   const resetOilTanks = useCallback(() => setOilTanksFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
   const resetFarm = useCallback(() => setFarmFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
   const resetVendors = useCallback(() => setVendorsFeatures(DEFAULT_VENDOR_FEATURES), []);
-  const resetLookups = useCallback(() => setLookupsFeatures(SCHEMA_DEFAULT_LOOKUP_FEATURES), []);
   const resetCustomers = useCallback(() => setCustomersFeatures(DEFAULT_CUSTOMER_FEATURES), []);
   const resetSalesOrders = useCallback(
     () => setSalesOrdersFeatures(DEFAULT_SALES_ORDER_FEATURES),
@@ -909,7 +900,6 @@ export function ConfigEditor({
       warehouseDeliveryNotesFeatures,
       SCHEMA_DEFAULT_WAREHOUSE_DELIVERY_NOTE_FEATURES,
     ),
-    lookups: eqDefault(lookupsFeatures, SCHEMA_DEFAULT_LOOKUP_FEATURES),
     lookupV2: eqDefault(lookupV2Features, SCHEMA_DEFAULT_LOOKUP_FEATURES),
     customers: eqDefault(customersFeatures, DEFAULT_CUSTOMER_FEATURES),
     salesOrders: eqDefault(salesOrdersFeatures, DEFAULT_SALES_ORDER_FEATURES),
@@ -1664,64 +1654,6 @@ export function ConfigEditor({
                   })
                 }
               />
-            </Stack>
-          </CollapsibleSection>
-          {/* Lookups — toggle + category checkboxes */}
-          <CollapsibleSection
-            icon={IconCategory2}
-            title="Lookups"
-            description="Dropdown options and reference values (product categories, units, tags, etc.)."
-            sectionKey="lookups"
-            isDefault={sectionIsDefault.lookups}
-            opened={openSections.has('lookups')}
-            onToggle={toggleSection}
-            onReset={resetLookups}
-          >
-            <Stack gap="sm">
-              <FeatureToggleRow
-                label="Enable Lookups"
-                description="When enabled, the lookups section is available in navigation for managing dropdown options and reference values."
-                checked={lookupsFeatures.enabled}
-                onChange={(checked) => setLookupsFeatures({ ...lookupsFeatures, enabled: checked })}
-              />
-              {lookupsFeatures.enabled && (
-                <Stack gap="xs" px="xs">
-                  <Text fz="xs" c="dimmed" fw={500}>
-                    Enabled Categories
-                  </Text>
-                  {LOOKUP_CATEGORIES.map((cat) => {
-                    const checked =
-                      lookupsFeatures.enabledCategories.length === 0 ||
-                      lookupsFeatures.enabledCategories.includes(cat.id);
-                    return (
-                      <Checkbox
-                        key={cat.id}
-                        label={LOOKUP_CATEGORY_LABELS[cat.labelKey] ?? cat.labelKey}
-                        checked={checked}
-                        onChange={() => {
-                          const allIds = LOOKUP_CATEGORIES.map((c) => c.id);
-
-                          if (lookupsFeatures.enabledCategories.length === 0) {
-                            setLookupsFeatures({
-                              ...lookupsFeatures,
-                              enabledCategories: allIds.filter((id) => id !== cat.id),
-                            });
-                          } else {
-                            const next = checked
-                              ? lookupsFeatures.enabledCategories.filter((id) => id !== cat.id)
-                              : [...lookupsFeatures.enabledCategories, cat.id];
-
-                            setLookupsFeatures({
-                              ...lookupsFeatures,
-                              enabledCategories: next.length === allIds.length ? [] : next,
-                            });
-                          }
-                        }}
-                      />
-                    );
-                  })}
-                </Stack>
-              )}
             </Stack>
           </CollapsibleSection>
           {/* Lookups v2 — meta-data register on the single-mode-records stack */}

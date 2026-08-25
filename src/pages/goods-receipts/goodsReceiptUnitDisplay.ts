@@ -1,4 +1,4 @@
-import { lookupLabelOf, type useLookupLabels } from '@/hooks';
+import { lookupLabelOf, type useLookupV2Labels } from '@/hooks';
 import type { GoodsReceiptItem } from '@/types';
 import { convertUnit } from '@/utils/unitConversion';
 
@@ -13,7 +13,7 @@ export type PackagingAwareEntity = {
 export function resolveBaseUnitDisplay(
   item: GoodsReceiptItem,
   products: readonly PackagingAwareEntity[],
-  unitLabels: ReturnType<typeof useLookupLabels>,
+  unitLabels: ReturnType<typeof useLookupV2Labels>,
 ): string | null {
   const pool = products;
   const entity = pool.find((e) => e.code === item.itemCode);

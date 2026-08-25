@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Badge,
   Button,
   Card,
@@ -10,7 +9,6 @@ import {
   SegmentedControl,
   Stack,
   Switch,
-  Table,
   Text,
   ThemeIcon,
   Title,
@@ -27,7 +25,6 @@ import {
   IconInfoCircle,
   IconListDetails,
   IconLock,
-  IconPhoto,
   IconPrinter,
   IconSend,
   IconShare,
@@ -47,15 +44,13 @@ import { DangerAction } from '@/components/DangerAction';
 import { DangerZoneCard } from '@/components/DangerZoneCard';
 import { DetailField } from '@/components/DetailField';
 import { NotFoundState } from '@/components/NotFoundState';
-import { ProductLink } from '@/components/ProductLink';
 import { SectionCard } from '@/components/SectionCard';
 import { getCompanyInfo, hasMultipleCompanies } from '@/config/companyInfo';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
-import { useLookupLabels, lookupLabelOf } from '@/hooks';
+import { useLookupV2Labels, lookupLabelOf, useProductPhotoByCode } from '@/hooks';
 import { formatDateTime } from '@/utils/dateFormat';
-import { formatNumber } from '@/utils/number';
 import {
   getPricingVatRate,
   hasImagesForProducts,
@@ -64,7 +59,6 @@ import {
   perms,
 } from '@/utils/permission';
 import { EntityConflictError } from '@/stores/createEntityStore';
-import { useProductStore } from '@/stores/useProductStore';
 import {
   DEFAULT_QUOTATION_PRINT_OPTIONS,
   printQuotation,
@@ -75,6 +69,7 @@ import {
 } from './quotationPrint';
 import { shareQuotationPdf } from './quotationPdf';
 import { readVietnameseMoney } from '@/utils/vietnameseNumberToWords';
+import { QuotationLinesTable } from './QuotationLinesTable';
 import { quotationBundle, useQuotationStore } from './useQuotationStore';
 import {
   canTransitionQuotation,
@@ -95,6 +90,8 @@ const canViewSelf = perms.salesOrder.canViewSelf();
 const canSharePdf = isPdfSharingEnabled();
 
 const showPriceTiers = isQuotationTierPricingEnabled();
+
+const showProductPhoto = hasImagesForProducts();
 
 function canViewQuotation(q: Quotation): boolean {
   if (canViewAll) return true;
@@ -139,29 +136,12 @@ export function QuotationDetail() {
   const customers = useCustomerStore((s) => s.items);
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
   useEffect(() => {
     if (!customersInitialized) loadCustomers();
   }, [customersInitialized, loadCustomers]);
 
-  const products = useProductStore((s) => s.items);
-  const productsInitialized = useProductStore((s) => s.initialized);
-  const loadProducts = useProductStore((s) => s.loadAll);
-  useEffect(() => {
-    if (!productsInitialized) loadProducts();
-  }, [productsInitialized, loadProducts]);
-
-  const showProductPhoto = hasImagesForProducts();
-  const photoByCode = useMemo(() => {
-    const m = new Map<string, string>();
-    if (showProductPhoto) {
-      for (const p of products) {
-        const url = p.extra?.images?.[0]?.url?.trim();
-        if (url) m.set(p.code, url);
-      }
-    }
-    return m;
-  }, [products, showProductPhoto]);
+  const photoByCode = useProductPhotoByCode();
 
   const employeesInitialized = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
@@ -200,7 +180,6 @@ export function QuotationDetail() {
 
   const isIssued = isReady || isConfirmed;
   const lines = useMemo(() => quotation?.extra.lines ?? [], [quotation]);
-  const total = useMemo(() => quotationTotal(lines), [lines]);
 
   const flipStatus = useCallback(
     async (next: QuotationStatus): Promise<Quotation> => {
@@ -398,7 +377,7 @@ export function QuotationDetail() {
       showPhoto: showProductPhoto,
       showVat: includeVat,
     };
-  }, [quotation, customers, photoByCode, showProductPhoto, unitLabels, includeVat]);
+  }, [quotation, customers, photoByCode, unitLabels, includeVat]);
 
   const handlePrint = useCallback(() => {
     const st = quotation?.extra.status ?? 'draft';
@@ -630,87 +609,7 @@ export function QuotationDetail() {
               icon={<IconListDetails size={14} />}
               title={t('quotations.form.linesLabel')}
             >
-              {lines.length === 0 ? (
-                <Text size="sm" c="dimmed" fs="italic">
-                  —
-                </Text>
-              ) : (
-                <Table striped withRowBorders={false}>
-                  <Table.Thead>
-                    <Table.Tr>
-                      <Table.Th>{t('quotations.form.productLabel')}</Table.Th>
-                      <Table.Th style={{ textAlign: 'right' }}>
-                        {t('quotations.form.quantityLabel')}
-                      </Table.Th>
-                      <Table.Th style={{ textAlign: 'right' }}>
-                        {t('quotations.form.priceLabel')}
-                      </Table.Th>
-                      <Table.Th style={{ textAlign: 'right' }}>
-                        {t('quotations.form.amountLabel')}
-                      </Table.Th>
-                    </Table.Tr>
-                  </Table.Thead>
-                  <Table.Tbody>
-                    {lines.map((l, i) => (
-                      <Table.Tr key={`${l.productCode}-${i}`}>
-                        <Table.Td>
-                          <Group gap="sm" wrap="nowrap">
-                            {showProductPhoto && (
-                              <Avatar
-                                src={photoByCode.get(l.productCode) ?? null}
-                                radius="sm"
-                                size={40}
-                                color="gray"
-                              >
-                                <IconPhoto size={18} />
-                              </Avatar>
-                            )}
-                            <div style={{ minWidth: 0 }}>
-                              <ProductLink code={l.productCode} name={l.productName} size="sm" />
-                              <Text size="xs" c="dimmed" ff="monospace">
-                                {l.productCode}
-                              </Text>
-                            </div>
-                          </Group>
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'right' }}>
-                          <Text>{formatNumber(l.quantity)}</Text>
-                          {l.unit && (
-                            <Text size="xs" c="dimmed">
-                              {lookupLabelOf(unitLabels, l.unit)}
-                            </Text>
-                          )}
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'right' }}>
-                          <Text>{formatNumber(l.unitPrice)}</Text>
-                          {showPriceTiers &&
-                            l.priceTiers?.map((tier) => (
-                              <Text key={tier.minQuantity} size="xs" c="dimmed" lh={1.3}>
-                                {t('quotations.form.priceTiers.rung', {
-                                  quantity: formatNumber(tier.minQuantity),
-                                  price: formatNumber(tier.unitPrice),
-                                })}
-                              </Text>
-                            ))}
-                        </Table.Td>
-                        <Table.Td style={{ textAlign: 'right' }}>
-                          <Text fw={600}>{formatNumber(l.quantity * l.unitPrice)}</Text>
-                        </Table.Td>
-                      </Table.Tr>
-                    ))}
-                  </Table.Tbody>
-                  <Table.Tfoot>
-                    <Table.Tr>
-                      <Table.Td colSpan={3} style={{ textAlign: 'right', fontWeight: 600 }}>
-                        {t('quotations.form.totalLabel')}
-                      </Table.Td>
-                      <Table.Td style={{ textAlign: 'right' }}>
-                        <Text fw={700}>{formatNumber(total)}</Text>
-                      </Table.Td>
-                    </Table.Tr>
-                  </Table.Tfoot>
-                </Table>
-              )}
+              <QuotationLinesTable lines={lines} />
             </SectionCard>
           </Grid.Col>
 

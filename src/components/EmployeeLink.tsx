@@ -35,7 +35,11 @@ export function EmployeeLink({
   size = 'sm',
 }: EmployeeLinkProps) {
   const employee = useEmployeeStore((s) =>
-    code ? s.getByCode(code) : id ? s.getById(id) : undefined,
+    code
+      ? s.getByCode(code)
+      : id
+        ? (s.getById(id) ?? s.items.find((e) => e.userUuid === id))
+        : undefined,
   );
 
   const name = employee?.name ?? fallbackLabel ?? '';

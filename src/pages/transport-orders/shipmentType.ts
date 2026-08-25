@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLookupV2Labels, useLookupV2Options } from '@/hooks/useLookupV2Options';
-import type { LookupOption } from '@/hooks/useLookupOptions';
+import type { LookupOption } from '@/hooks/useLookupV2Options';
 import type { TransportOrderShipmentType } from '@/types';
 
 export const SHIPMENT_TYPE_CATEGORY = 'shipment-type';

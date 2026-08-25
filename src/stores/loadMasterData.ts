@@ -10,7 +10,6 @@ import { useProductStore } from './useProductStore';
 import { useCustomerStore } from './useCustomerStore';
 import { useVendorStore } from './useVendorStore';
 import { useLocationStore } from './useLocationStore';
-import { useLookupStore } from './useLookupStore';
 
 let inflightPromise: Promise<void> | null = null;
 
@@ -38,7 +37,6 @@ async function hydrateAllFromCache(): Promise<void> {
     useEmployeeStore.getState().hydrateFromCache(),
     useProductStore.getState().hydrateFromCache(),
     useLocationStore.getState().hydrateFromCache(),
-    useLookupStore.getState().hydrateFromCache(),
   ]);
 }
 
@@ -50,7 +48,6 @@ function buildHashesToSend(cached: CMngtMasterDataHashes): CMngtMasterDataHashes
     out.products = cached.products;
   if (cached.locations && useLocationStore.getState().items.length > 0)
     out.locations = cached.locations;
-  if (cached.lookups && useLookupStore.getState().items.length > 0) out.lookups = cached.lookups;
   return out;
 }
 
@@ -63,7 +60,6 @@ const HASH_KEY_TO_STORE: ReadonlyArray<
   ['employees', useEmployeeStore],
   ['products', useProductStore],
   ['locations', useLocationStore],
-  ['lookups', useLookupStore],
 ];
 
 function applyListHashes(hashes: CMngtMasterDataHashes): void {
@@ -88,7 +84,6 @@ async function doLoad(): Promise<void> {
       ...(toSend.employees && { employeesHash: toSend.employees }),
       ...(toSend.products && { productsHash: toSend.products }),
       ...(toSend.locations && { locationsHash: toSend.locations }),
-      ...(toSend.lookups && { lookupsHash: toSend.lookups }),
     });
 
     if (res.changed) {
@@ -96,7 +91,6 @@ async function doLoad(): Promise<void> {
       if (u.employees) useEmployeeStore.getState().setItems(u.employees as never[]);
       if (u.products) useProductStore.getState().setItems(u.products as never[]);
       if (u.locations) useLocationStore.getState().setItems(u.locations as never[]);
-      if (u.lookups) useLookupStore.getState().setItems(u.lookups as never[]);
     }
 
     applyListHashes(res.hashes);
@@ -126,7 +120,6 @@ function ensureStoresInitialized(): void {
   initIfEmpty(useCustomerStore);
   initIfEmpty(useVendorStore);
   initIfEmpty(useLocationStore);
-  initIfEmpty(useLookupStore);
 }
 
 function initIfEmpty<T extends { id: string }>(store: {

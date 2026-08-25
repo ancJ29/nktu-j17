@@ -38,7 +38,7 @@ import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { device, logger } from '@credo/base-ui/utils';
-import { getCurrentActorId, lookupLabelOf, useInitFormFromFetch, useLookupLabels } from '@/hooks';
+import { getCurrentActorId, lookupLabelOf, useInitFormFromFetch, useLookupV2Labels } from '@/hooks';
 import {
   allowsNoInventoryProductsForGoodsReceipts,
   getGoodsReceiptPicDepartments,
@@ -157,7 +157,7 @@ export function GoodsReceiptFormPage() {
 
   const [loading, setLoading] = useState(false);
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const {
     items: locations,

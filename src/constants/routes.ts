@@ -138,9 +138,6 @@ export const ROUTES = {
     DETAIL: '/vendors/:id',
     EDIT: '/vendors/:id/edit',
   },
-  LOOKUPS: {
-    LIST: '/lookups',
-  },
   LOOKUPS_V2: {
     LIST: '/lookups-v2',
   },

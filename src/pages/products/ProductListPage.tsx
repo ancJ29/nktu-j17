@@ -11,7 +11,7 @@ import { LIST_LAZY_RENDER_CHUNK } from '@/config/listDefaults';
 import { device } from '@credo/base-ui/utils';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
-import { useListScrollRestoration, useLookupOptions } from '@/hooks';
+import { useListScrollRestoration, useLookupV2Options } from '@/hooks';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
@@ -169,14 +169,14 @@ export function ProductListPage() {
     total: totalItems,
   });
 
-  const categoryLookups = useLookupOptions('product-category');
+  const categoryLookups = useLookupV2Options('product-category');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],
   );
 
-  const tagLookups = useLookupOptions('product-tag');
-  const unitLookups = useLookupOptions('unit');
+  const tagLookups = useLookupV2Options('product-tag');
+  const unitLookups = useLookupV2Options('unit');
 
   useEffect(() => {
     if (!initialized && !error) loadAll();

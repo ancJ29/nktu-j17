@@ -33,7 +33,6 @@ export type NavId =
   | 'configuration-vendors'
   | 'configuration-app-config'
   | 'configuration-debug'
-  | 'lookups'
   | 'lookups-v2'
   | 'truck-assets'
   | 'oil-tanks'
@@ -231,13 +230,6 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     adminOnly: true,
   },
 
-  lookups: {
-    path: ROUTES.LOOKUPS.LIST,
-    labelKey: 'nav.lookups',
-    label: 'Meta-data',
-    defaultIcon: IconName.Category2,
-  },
-
   'lookups-v2': {
     path: ROUTES.LOOKUPS_V2.LIST,
     labelKey: 'nav.lookupsV2',
@@ -388,7 +380,6 @@ type FeatureFlags = {
   locations?: { enabled?: boolean };
   productInventory?: { enabled?: boolean };
   materialInventory?: { enabled?: boolean };
-  lookups?: { enabled?: boolean };
   lookupV2?: { enabled?: boolean };
   trucks?: { enabled?: boolean };
   oilTanks?: { enabled?: boolean };
@@ -418,7 +409,6 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'warehouse-material-inventory': (f) => f.materialInventory?.enabled ?? false,
   'warehouse-receipts': (f) => f.warehouseReceipts?.enabled ?? false,
   'warehouse-delivery-notes': (f) => f.warehouseDeliveryNotes?.enabled ?? false,
-  lookups: (f) => f.lookups?.enabled ?? false,
   'lookups-v2': (f) => f.lookupV2?.enabled ?? false,
   'truck-assets': (f) => f.trucks?.enabled ?? false,
   'oil-tanks': (f) => f.oilTanks?.enabled ?? false,
@@ -740,7 +730,6 @@ export const defaultNavigation = buildNavigation({
     productInventory: { enabled: true },
     materialInventory: { enabled: true },
     trucks: { enabled: true },
-    lookups: { enabled: true },
     lookupV2: { enabled: true },
     farm: { enabled: true },
   },

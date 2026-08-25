@@ -12,7 +12,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import type { Location, Product, ProductInventoryExtra, ProductInventoryRow } from '@/types';
 import { DEFAULT_LOCATION_CODE } from '@/types';
 import { convertUnit, getItemBaseUnit, getItemUnits } from '@/utils/unitConversion';
-import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { isLocationsEnabled } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
 import { Form } from '@/components/Form';
@@ -88,7 +88,7 @@ export function ProductInventoryFormModal({
     [selectedProduct],
   );
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
   const unitOptions = useMemo(
     () => units.map((u) => ({ value: u, label: lookupLabelOf(unitLabels, u) })),
     [units, unitLabels],

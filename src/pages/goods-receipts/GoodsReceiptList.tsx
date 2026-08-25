@@ -43,7 +43,7 @@ import {
   perms,
 } from '@/utils/permission';
 
-import { useListScrollRestoration, useLookupLabels } from '@/hooks';
+import { useListScrollRestoration, useLookupV2Labels } from '@/hooks';
 import type { GoodsReceipt } from '@/types';
 import { GoodsReceiptCardList } from './GoodsReceiptCardList';
 import { GoodsReceiptDataTable } from './GoodsReceiptDataTable';
@@ -106,7 +106,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
 
   const products = useProductStore((s) => s.items);
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const [itemsReceipt, setItemsReceipt] = useState<GoodsReceipt | null>(null);
 

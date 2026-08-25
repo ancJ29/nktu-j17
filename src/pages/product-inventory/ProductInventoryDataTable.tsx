@@ -1,5 +1,5 @@
 import { useMemo, type Ref } from 'react';
-import { Badge, Box, Group, HoverCard, Stack, Text, Tooltip } from '@mantine/core';
+import { Badge, Box, Group, HoverCard, Loader, Stack, Text, Tooltip } from '@mantine/core';
 import { IconAlertTriangle, IconMapPin } from '@tabler/icons-react';
 import { ProductSetBadge } from '@/components/ProductSetBadge';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,7 @@ import {
 } from '@credo/base-ui/components';
 import { formatDateTime } from '@/utils/dateFormat';
 import { getItemBaseUnit } from '@/utils/unitConversion';
-import { lookupLabelOf, useLookupLabels, type InboundEntry } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels, type InboundEntry } from '@/hooks';
 import type { Location, Product, ProductInventorySummary } from '@/types';
 import { isDefaultLocation } from '@/types';
 import { isLocationsEnabled, tableDensity } from '@/utils/permission';
@@ -21,6 +21,8 @@ import { InventorySecondaryStatusBadge } from '@/components/inventory/InventoryS
 import { SalesOrderLink } from '@/components/SalesOrderLink';
 import type { CustomerShortNameResolver } from '@/utils/customerDisplay';
 import { rollupReservationsBySO, type ReservationRollup } from './productInventoryReservations';
+import { ReservationStatusBadge } from './ReservationStatusBadge';
+import type { ReservationOrderStatusSource } from './useReservationOrderStatus';
 import { hasImagesForProducts } from '@/utils/permission';
 
 const imagesEnabled = hasImagesForProducts();
@@ -35,6 +37,8 @@ type Props = {
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
 
   readonly resolveCustomerName?: CustomerShortNameResolver;
+
+  readonly orderStatus?: ReservationOrderStatusSource;
 
   readonly onOutgoingClick?: (summary: ProductInventorySummary) => void;
 
@@ -57,7 +61,7 @@ const MAX_REFS_IN_POPOVER = 10;
 
 function formatByUnit(
   byUnit: Record<string, number>,
-  unitLabels: ReturnType<typeof useLookupLabels>,
+  unitLabels: ReturnType<typeof useLookupV2Labels>,
 ): string {
   return Object.entries(byUnit)
     .filter(([, q]) => q !== 0)
@@ -70,7 +74,7 @@ function InboundDropdown({
   unitLabels,
 }: {
   entry: InboundEntry;
-  unitLabels: ReturnType<typeof useLookupLabels>;
+  unitLabels: ReturnType<typeof useLookupV2Labels>;
 }) {
   const { t } = useTranslation();
   const shown = entry.draftRefs.slice(0, MAX_REFS_IN_POPOVER);
@@ -116,7 +120,7 @@ function InboundCell({
 }: {
   entry: InboundEntry | undefined;
   product: Product;
-  unitLabels: ReturnType<typeof useLookupLabels>;
+  unitLabels: ReturnType<typeof useLookupV2Labels>;
 }) {
   if (!entry || (entry.totalBase === 0 && Object.keys(entry.byUnit).length === 0)) {
     return <PlaceholderCell />;
@@ -173,7 +177,7 @@ function ForecastedCell({
 }: {
   summary: ProductInventorySummary;
   entry: InboundEntry | undefined;
-  unitLabels: ReturnType<typeof useLookupLabels>;
+  unitLabels: ReturnType<typeof useLookupV2Labels>;
 }) {
   const { t } = useTranslation();
   const totalBase = entry?.totalBase || 0;
@@ -209,10 +213,12 @@ function OutgoingDropdown({
   reservations,
   unitLabels,
   resolveCustomerName,
+  orderStatus,
 }: {
   reservations: ReservationRollup[];
-  unitLabels: ReturnType<typeof useLookupLabels>;
+  unitLabels: ReturnType<typeof useLookupV2Labels>;
   resolveCustomerName?: CustomerShortNameResolver;
+  orderStatus?: ReservationOrderStatusSource;
 }) {
   const { t } = useTranslation();
   const shown = reservations.slice(0, MAX_REFS_IN_POPOVER);
@@ -228,7 +234,17 @@ function OutgoingDropdown({
           return (
             <Group key={r.id} gap={8} wrap="nowrap" justify="space-between" align="flex-start">
               <Stack gap={0} style={{ minWidth: 0 }}>
-                <SalesOrderLink id={r.id} fallbackLabel={r.orderNumber} size="xs" />
+                <Group gap={6} wrap="nowrap">
+                  <SalesOrderLink id={r.id} fallbackLabel={r.orderNumber} size="xs" />
+                  {orderStatus && (
+                    <ReservationStatusBadge
+                      state={orderStatus.resolve(r.id)}
+                      size="xs"
+
+                      fallback={orderStatus.firstLoad ? <Loader size={10} color="gray" /> : null}
+                    />
+                  )}
+                </Group>
                 {customer && (
                   <Text size="xs" c="dimmed" lineClamp={1}>
                     {customer}
@@ -258,13 +274,14 @@ export function ProductInventoryDataTable({
   onRowClick,
   inboundIndex,
   resolveCustomerName,
+  orderStatus,
   onOutgoingClick,
   maxHeight = 'calc(100vh - 300px)',
   viewportRef,
   getColumnFilter,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const locationByCode = useMemo(() => {
     const m = new Map<string, Location>();
@@ -564,7 +581,15 @@ export function ProductInventoryDataTable({
             if (reservations.length === 0) return cell;
             const drillDown = onOutgoingClick;
             return (
-              <HoverCard width={320} shadow="md" withArrow position="top" openDelay={120}>
+              <HoverCard
+                width={320}
+                shadow="md"
+                withArrow
+                position="top"
+                openDelay={120}
+
+                onOpen={orderStatus?.hydrate}
+              >
                 <HoverCard.Target>
                   <Box
                     style={{ cursor: drillDown ? 'pointer' : 'help' }}
@@ -586,6 +611,7 @@ export function ProductInventoryDataTable({
                     reservations={reservations}
                     unitLabels={unitLabels}
                     resolveCustomerName={resolveCustomerName}
+                    orderStatus={orderStatus}
                   />
                 </HoverCard.Dropdown>
               </HoverCard>
@@ -646,6 +672,7 @@ export function ProductInventoryDataTable({
       unitLabels,
       inboundIndex,
       resolveCustomerName,
+      orderStatus,
       onOutgoingClick,
       getColumnFilter,
     ],

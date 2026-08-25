@@ -2,7 +2,7 @@ import { appConfig } from '@/config';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
-import { useLookupLabels } from '@/hooks';
+import { useLookupV2Labels } from '@/hooks';
 import { findProductUnitIssues, type UnitIntegrityReport } from '@/utils/unitIntegrity';
 import { getEffectivePermissions } from '@/utils/permission';
 import { cacheGet } from '@/utils/appCache';
@@ -162,7 +162,7 @@ export function DebugPage() {
 }
 
 function UnitIntegritySection() {
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
   const [report, setReport] = useState<UnitIntegrityReport | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);

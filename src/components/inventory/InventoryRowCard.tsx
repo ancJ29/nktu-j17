@@ -1,7 +1,7 @@
 import { Badge, Card, Group, Stack, Text } from '@mantine/core';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { lookupLabelOf, type useLookupLabels } from '@/hooks';
+import { lookupLabelOf, type useLookupV2Labels } from '@/hooks';
 import { isDefaultLocation } from '@/types';
 
 // `useTranslation` powers the default-location label only; the negative-state
@@ -12,7 +12,7 @@ type Props = {
   readonly onHand: number;
   readonly baseUnit: string;
   readonly baseUnitLabel: string;
-  readonly unitLabels: ReturnType<typeof useLookupLabels>;
+  readonly unitLabels: ReturnType<typeof useLookupV2Labels>;
   readonly locationsEnabled: boolean;
   /** Resolved location record (or null when the row sits on the default sentinel). */
   readonly locationName?: string;

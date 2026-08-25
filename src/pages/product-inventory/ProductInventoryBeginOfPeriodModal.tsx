@@ -27,7 +27,7 @@ import { getItemBaseUnit } from '@/utils/unitConversion';
 import { applyDelta, readRowBreakdown } from '@/utils/inventoryMath';
 import { getBeginOfPeriodValue, getCurrentPeriodKey } from '@/utils/inventoryPeriod';
 import { type BeginOfPeriodMode, computeBeginOfPeriodChange } from '@/utils/inventoryBeginOfPeriod';
-import { getCurrentActorId, lookupLabelOf, useLookupLabels } from '@/hooks';
+import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { Form } from '@/components/Form';
 
 type Props = {
@@ -52,7 +52,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
   const [mode, setMode] = useState<BeginOfPeriodMode>('snapshot');
   const [picked, setPicked] = useState<ProductSelectorChange | null>(null);
 
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
   const periodKey = getCurrentPeriodKey();
 
   const selectedProduct = picked?.product ?? null;

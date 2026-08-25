@@ -82,7 +82,6 @@ import {
   ProfilePage,
   AppConfigPage,
   DebugPage,
-  LookupsPage,
   ErrorPage,
   NotFoundPage,
   ForbiddenPage,
@@ -135,7 +134,6 @@ const productInventoryGate = gate('productInventory');
 const materialInventoryGate = gate('materialInventory');
 const warehouseReceiptGate = gate('warehouseReceipt');
 const warehouseDeliveryNoteGate = gate('warehouseDeliveryNote');
-const lookupGate = gate('lookup');
 const lookupV2Gate = gate('lookupV2');
 
 const employeeDetailNav = {
@@ -318,7 +316,6 @@ const salesOrdersEnabled = featureFlags.salesOrders.enabled;
 const deliveryRequestsEnabled = featureFlags.deliveryRequests.enabled;
 const goodsReceiptsEnabled = featureFlags.goodsReceipts.enabled;
 const transportOrdersEnabled = featureFlags.transportOrders.enabled;
-const lookupsEnabled = featureFlags.lookups.enabled;
 const lookupV2Enabled = featureFlags.lookupV2.enabled;
 
 const employeeRoutes: RouteObject[] = [
@@ -1022,13 +1019,6 @@ const router = createBrowserRouter([
           ...transportOrderRoutes,
           ...transportRouteRoutes,
           ...costNormRoutes,
-          {
-            path: ROUTES.LOOKUPS.LIST,
-            element: gatedComponent(
-              { enabled: lookupsEnabled, requires: lookupGate.view },
-              LookupsPage,
-            ),
-          },
           {
             path: ROUTES.LOOKUPS_V2.LIST,
             element: gatedComponent(

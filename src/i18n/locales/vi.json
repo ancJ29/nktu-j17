@@ -2043,7 +2043,6 @@
     },
     "reorderHint": "Kéo biểu tượng để sắp xếp lại thứ tự.",
     "subtitle": "Quản lý các giá trị dropdown / danh mục tham chiếu trong ứng dụng.",
-    "title": "Danh mục",
     "validation": {
       "labelRequired": "Cần nhập nhãn",
       "valueDuplicate": "Đã có mục khác đang dùng mã này",
@@ -2362,7 +2361,6 @@
     "assets": "Tài sản",
     "employeeOrg": "Cơ cấu tổ chức",
     "farm": "Nông trại",
-    "lookups": "Danh mục",
     "lookupsV2": "Danh mục",
     "materialsCatalog": "Danh mục vật tư",
     "partners": "Khách hàng / NCC",
@@ -3286,6 +3284,7 @@
       "markConfirmed": "Khách đã chốt",
       "markReady": "Đánh dấu sẵn sàng",
       "new": "Báo giá mới",
+      "preview": "Xem nhanh",
       "sharePdf": "Chia sẻ PDF"
     },
     "cancelConfirm": {
@@ -3374,6 +3373,7 @@
       "updateError": "Cập nhật báo giá thất bại",
       "updateSuccess": "Đã cập nhật báo giá"
     },
+    "previewTitle": "Xem nhanh báo giá",
     "print": {
       "includeVat": "Bao gồm VAT",
       "landscape": "Ngang",

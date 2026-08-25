@@ -77,7 +77,7 @@ import {
   resolveSalesOrderPaymentState,
 } from '@/utils/salesOrderPricing';
 import { useCustomerStore } from '@/stores/useCustomerStore';
-import { useLookupLabels, lookupLabelOf } from '@/hooks';
+import { useLookupV2Labels, lookupLabelOf } from '@/hooks';
 import { getCompanyInfo } from '@/config/companyInfo';
 import type { SalesOrderDetailVariant } from './salesOrderDetailVariant';
 import {
@@ -266,7 +266,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const [sharingPdf, setSharingPdf] = useState(false);
 
   const customers = useCustomerStore((s) => s.items);
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   if (loading || !order || !currentStatus) return null;
 

@@ -1,20 +1,16 @@
 import { useEffect, useMemo } from 'react';
-import { Badge, Group, Loader, Stack, Table, Text } from '@mantine/core';
+import { Group, Loader, Stack, Table, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { SalesOrderLink } from '@/components/SalesOrderLink';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { useCustomerStore } from '@/stores/useCustomerStore';
-import { setSalesOrderQueryRange, useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import type { Product, SalesOrderExtra } from '@/types';
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
-import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
-import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
-import { getCancellationTargetStatusValue } from '@/pages/sales-orders/transitionEngine';
 import type { ReservationRollup } from './productInventoryReservations';
-
-const SO_FETCH_DAYS = 90;
+import { ReservationStatusBadge } from './ReservationStatusBadge';
+import type { ReservationOrderStatusSource } from './useReservationOrderStatus';
 
 type Props = {
   readonly opened: boolean;
@@ -22,46 +18,31 @@ type Props = {
 
   readonly product: Product | null;
   readonly reservations: readonly ReservationRollup[];
+
+  readonly orderStatus: ReservationOrderStatusSource;
 };
 
-export function ProductInventoryOutgoingModal({ opened, onClose, product, reservations }: Props) {
+export function ProductInventoryOutgoingModal({
+  opened,
+  onClose,
+  product,
+  reservations,
+  orderStatus,
+}: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupLabels('unit');
-
-  const salesOrders = useSalesOrderStore((s) => s.items);
-  const salesOrdersInitialized = useSalesOrderStore((s) => s.initialized);
-  const salesOrdersLoading = useSalesOrderStore((s) => s.loading);
-  const loadSalesOrders = useSalesOrderStore((s) => s.loadAll);
-  const refreshSalesOrders = useSalesOrderStore((s) => s.forceRefresh);
+  const unitLabels = useLookupV2Labels('unit');
 
   const customers = useCustomerStore((s) => s.items);
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
 
-  const soFetchRange = useMemo(() => defaultLastNDaysRange(SO_FETCH_DAYS), []);
-
+  const hydrateOrders = orderStatus.hydrate;
   useEffect(() => {
     if (!opened) return;
     if (!customersInitialized) loadCustomers();
-    setSalesOrderQueryRange(soFetchRange.from, soFetchRange.to);
 
-    if (salesOrdersInitialized) refreshSalesOrders();
-    else loadSalesOrders();
-  }, [
-    opened,
-    customersInitialized,
-    salesOrdersInitialized,
-    loadCustomers,
-    loadSalesOrders,
-    refreshSalesOrders,
-    soFetchRange,
-  ]);
-
-  const orderById = useMemo(() => {
-    const m = new Map<string, (typeof salesOrders)[number]>();
-    for (const so of salesOrders) m.set(so.id, so);
-    return m;
-  }, [salesOrders]);
+    hydrateOrders(true);
+  }, [opened, customersInitialized, loadCustomers, hydrateOrders]);
 
   const resolveCustomerName = useMemo(
     () => createCustomerShortNameResolver(customers),
@@ -71,30 +52,24 @@ export function ProductInventoryOutgoingModal({ opened, onClose, product, reserv
   const rows = useMemo(
     () =>
       reservations.map((r) => {
-        const order = orderById.get(r.id);
-        const extra = (order?.extra ?? {}) as SalesOrderExtra;
+        const state = orderStatus.resolve(r.id);
+        const extra = (state.order?.extra ?? {}) as SalesOrderExtra;
 
         const customer =
           resolveCustomerName(
             extra.customerName ?? r.customerName,
             extra.customerCode ?? r.customerCode,
           ) ?? undefined;
-
-        const cancelled = order ? extra.cancellation != null : false;
-        const statusValue = cancelled
-          ? (getCancellationTargetStatusValue() ?? extra.status)
-          : extra.status;
-        const status = statusValue ? salesOrderFieldOptions.resolveStatus(statusValue) : undefined;
         const quantity = Object.entries(r.byUnit)
           .filter(([, q]) => q !== 0)
           .map(([u, q]) => `${q.toLocaleString()} ${lookupLabelOf(unitLabels, u)}`)
           .join(' + ');
-        return { ...r, customer, status, cancelled, quantity };
+        return { ...r, customer, state, quantity };
       }),
-    [reservations, orderById, resolveCustomerName, unitLabels],
+    [reservations, orderStatus, resolveCustomerName, unitLabels],
   );
 
-  const showLoader = salesOrdersLoading && !salesOrdersInitialized;
+  const showLoader = orderStatus.firstLoad;
 
   return (
     <ResponsiveModal
@@ -140,24 +115,15 @@ export function ProductInventoryOutgoingModal({ opened, onClose, product, reserv
                     </Text>
                   </Table.Td>
                   <Table.Td>
-                    {r.status ? (
-                      <Badge
-                        size="sm"
-                        variant={r.cancelled ? 'filled' : 'light'}
-                        color={r.cancelled ? 'red' : r.status.color}
-                        tt="none"
-                      >
-                        {r.status.label || t('salesOrders.cancel.statusBadge')}
-                      </Badge>
-                    ) : r.cancelled ? (
-                      <Badge size="sm" variant="filled" color="red" tt="none">
-                        {t('salesOrders.cancel.statusBadge')}
-                      </Badge>
-                    ) : (
-                      <Text size="sm" c="dimmed">
-                        —
-                      </Text>
-                    )}
+                    <ReservationStatusBadge
+                      state={r.state}
+
+                      fallback={
+                        <Text size="sm" c="dimmed">
+                          —
+                        </Text>
+                      }
+                    />
                   </Table.Td>
                   <Table.Td>
                     <Text size="sm" lineClamp={1}>

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import type { OperationLog, OperationLogExtra, OperationLogPhoto } from '@/types';
-import type { LookupOption } from '@/hooks/useLookupOptions';
+import type { LookupOption } from '@/hooks/useLookupV2Options';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 
 const CURRENT_YEAR = new Date().getFullYear();

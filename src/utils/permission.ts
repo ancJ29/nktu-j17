@@ -630,7 +630,6 @@ export const perms = {
     };
   })(),
   materialInventory: createModulePerms('materialInventory'),
-  lookup: createModulePerms('lookup'),
   lookupV2: createModulePerms('lookupV2'),
 
   report: createModulePerms('report'),

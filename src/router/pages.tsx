@@ -295,9 +295,6 @@ export const AppConfigPage = lazy(() =>
 export const DebugPage = lazy(() =>
   import('../pages/config').then((m) => ({ default: m.DebugPage })),
 );
-export const LookupsPage = lazy(() =>
-  import('../pages/lookups').then((m) => ({ default: m.LookupsPage })),
-);
 export const LookupV2Page = lazy(() =>
   import('../pages/lookup-v2').then((m) => ({ default: m.LookupV2Page })),
 );

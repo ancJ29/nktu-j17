@@ -1,5 +1,5 @@
 import { ColorBadge } from '@credo/base-ui/components';
-import { lookupLabelOf, useLookupLabels } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 
 type TagBadgeProps = {
   readonly tag: string;
@@ -9,7 +9,7 @@ type TagBadgeProps = {
 };
 
 export function TagBadge({ tag, lookup = 'product-tag', color = '#355ea1' }: TagBadgeProps) {
-  const tagLabels = useLookupLabels(lookup);
+  const tagLabels = useLookupV2Labels(lookup);
 
   return <ColorBadge color={color} label={lookupLabelOf(tagLabels, tag)} size="sm" />;
 }

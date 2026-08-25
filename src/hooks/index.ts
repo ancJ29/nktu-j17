@@ -15,12 +15,12 @@ export { useListFilter } from './useListFilter';
 export { useListScrollRestoration } from './useListScrollRestoration';
 export {
   lookupLabelOf,
-  useLookupLabels,
-  useLookupOptions,
+  useLookupV2Labels,
+  useLookupV2Options,
   type LookupOption,
-} from './useLookupOptions';
-export { useLookupV2Options, useLookupV2Labels } from './useLookupV2Options';
+} from './useLookupV2Options';
 export { useNavbarSync } from './useNavbarSync';
+export { useProductPhotoByCode } from './useProductPhotoByCode';
 export { useProfileLoadWatchdog } from './useProfileLoadWatchdog';
 export { useRootFirstRunRedirect } from './useRootFirstRunRedirect';
 export {

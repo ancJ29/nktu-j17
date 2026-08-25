@@ -3,7 +3,7 @@ import { Badge, Card, Group, Skeleton, Stack, Text, ThemeIcon } from '@mantine/c
 import { IconBuildingWarehouse, IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { getItemBaseUnit } from '@/utils/unitConversion';
-import { lookupLabelOf, useLookupLabels, type InboundEntry } from '@/hooks';
+import { lookupLabelOf, useLookupV2Labels, type InboundEntry } from '@/hooks';
 import type { Location, Product, ProductInventorySummary } from '@/types';
 import { isDefaultLocation } from '@/types';
 import { isLocationsEnabled } from '@/utils/permission';
@@ -38,7 +38,7 @@ export function ProductInventoryCardList({
   inboundIndex,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupLabels('unit');
+  const unitLabels = useLookupV2Labels('unit');
 
   const locationByCode = useMemo(() => {
     const m = new Map<string, Location>();
