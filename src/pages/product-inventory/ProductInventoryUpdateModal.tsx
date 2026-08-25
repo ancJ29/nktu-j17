@@ -83,7 +83,7 @@ export function ProductInventoryUpdateModal({
   const units = useMemo(() => (product ? getItemUnits(product) : []), [product]);
   const hasMultipleUnits = units.length > 1;
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   const unitOptions = useMemo(
     () => units.map((u) => ({ value: u, label: lookupLabelOf(unitLabels, u) })),
     [units, unitLabels],

@@ -52,7 +52,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
   const [mode, setMode] = useState<BeginOfPeriodMode>('snapshot');
   const [picked, setPicked] = useState<ProductSelectorChange | null>(null);
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   const periodKey = getCurrentPeriodKey();
 
   const selectedProduct = picked?.product ?? null;

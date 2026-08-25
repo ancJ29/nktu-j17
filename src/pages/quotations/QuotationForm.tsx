@@ -184,7 +184,7 @@ export function QuotationForm() {
 
   const showCompanyPicker = companies.length > 1;
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const storeInitialized = useQuotationStore((s) => s.initialized);
   const loadQuotations = useQuotationStore((s) => s.loadAll);

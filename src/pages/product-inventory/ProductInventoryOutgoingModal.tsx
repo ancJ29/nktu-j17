@@ -30,7 +30,7 @@ export function ProductInventoryOutgoingModal({
   orderStatus,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const customers = useCustomerStore((s) => s.items);
   const customersInitialized = useCustomerStore((s) => s.initialized);

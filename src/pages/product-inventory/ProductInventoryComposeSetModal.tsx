@@ -54,7 +54,7 @@ export function ProductInventoryComposeSetModal({
   locations,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const [setCode, setSetCode] = useState<string | null>(null);
 

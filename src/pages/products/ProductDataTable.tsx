@@ -47,7 +47,7 @@ export function ProductDataTable({
 }: ProductDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const categoryLabels = useLookupV2Labels('product-category');
 

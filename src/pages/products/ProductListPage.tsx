@@ -176,7 +176,7 @@ export function ProductListPage() {
   );
 
   const tagLookups = useLookupV2Options('product-tag');
-  const unitLookups = useLookupV2Options('unit');
+  const unitLookups = useLookupV2Options('product-unit');
 
   useEffect(() => {
     if (!initialized && !error) loadAll();

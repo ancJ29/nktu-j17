@@ -266,7 +266,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const [sharingPdf, setSharingPdf] = useState(false);
 
   const customers = useCustomerStore((s) => s.items);
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   if (loading || !order || !currentStatus) return null;
 

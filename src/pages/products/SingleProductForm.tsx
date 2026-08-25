@@ -199,7 +199,7 @@ function SetCompositionEditor({
   const products = useProductStore((s) => s.items);
   const items = form.values.setItems;
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const componentFilter = useMemo(
     () => (p: (typeof products)[number]) =>
@@ -497,7 +497,7 @@ export function SingleProductForm({
   const { t } = useTranslation();
 
   const categoryOptions = useLookupV2Options('product-category');
-  const unitOptions = useLookupV2Options('unit');
+  const unitOptions = useLookupV2Options('product-unit');
   const tagOptions = useLookupV2Options('product-tag');
   const categoryData = useMemo(
     () => categoryOptions.map((o) => ({ value: o.value, label: o.label })),

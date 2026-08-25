@@ -400,7 +400,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const categoryLookups = useLookupV2Options('product-category');
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],

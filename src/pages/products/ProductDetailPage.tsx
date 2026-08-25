@@ -166,7 +166,7 @@ export function ProductDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   const categoryOptions = useLookupV2Options('product-category');
   const tagOptions = useLookupV2Options('product-tag');
   const editLabels = useMemo<SectionCardEditLabels>(

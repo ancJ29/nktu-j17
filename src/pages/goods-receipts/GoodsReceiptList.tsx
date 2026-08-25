@@ -106,7 +106,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
 
   const products = useProductStore((s) => s.items);
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const [itemsReceipt, setItemsReceipt] = useState<GoodsReceipt | null>(null);
 

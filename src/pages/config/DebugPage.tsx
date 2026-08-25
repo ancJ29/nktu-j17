@@ -162,7 +162,7 @@ export function DebugPage() {
 }
 
 function UnitIntegritySection() {
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   const [report, setReport] = useState<UnitIntegrityReport | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);

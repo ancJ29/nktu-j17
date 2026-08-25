@@ -136,7 +136,7 @@ export function QuotationDetail() {
   const customers = useCustomerStore((s) => s.items);
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   useEffect(() => {
     if (!customersInitialized) loadCustomers();
   }, [customersInitialized, loadCustomers]);

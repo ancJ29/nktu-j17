@@ -252,7 +252,7 @@ export function GoodsReceiptDetailPage() {
 
   const [activeTab, setActiveTab] = useState<string | null>('receipt');
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const products = useProductStore((s) => s.items);
 

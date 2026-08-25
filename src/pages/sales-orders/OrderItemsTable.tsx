@@ -94,7 +94,7 @@ export function OrderItemsTable({
   const inventoryRows = useProductInventoryStore((s) => s.items);
   const inventoryInitialized = useProductInventoryStore((s) => s.initialized);
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const inboundByProduct = useOpenInboundByProduct();
 

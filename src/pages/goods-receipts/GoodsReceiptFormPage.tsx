@@ -157,7 +157,7 @@ export function GoodsReceiptFormPage() {
 
   const [loading, setLoading] = useState(false);
 
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const {
     items: locations,

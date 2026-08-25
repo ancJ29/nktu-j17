@@ -13,7 +13,7 @@ const showPriceTiers = isQuotationTierPricingEnabled();
 
 export function QuotationLinesTable({ lines }: { readonly lines: readonly QuotationLine[] }) {
   const { t } = useTranslation();
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
   const photoByCode = useProductPhotoByCode();
 
   if (lines.length === 0) {

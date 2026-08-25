@@ -268,7 +268,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
   const allInventoryRows = useProductInventoryStore((s) => s.items);
   const inventoryInitialized = useProductInventoryStore((s) => s.initialized);
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   useEffect(() => {
     if (!inventoryInitialized) loadInventory();

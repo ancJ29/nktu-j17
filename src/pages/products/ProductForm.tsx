@@ -69,7 +69,7 @@ export function ProductForm({ variant }: ProductFormProps) {
 
   const categoryOptions = useLookupV2Options('product-category');
   const tagOptions = useLookupV2Options('product-tag');
-  const unitOptions = useLookupV2Options('unit');
+  const unitOptions = useLookupV2Options('product-unit');
 
   const snapshotRef = useRef<Product | null>(null);
 

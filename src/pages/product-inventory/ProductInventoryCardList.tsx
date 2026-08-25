@@ -38,7 +38,7 @@ export function ProductInventoryCardList({
   inboundIndex,
 }: Props) {
   const { t } = useTranslation();
-  const unitLabels = useLookupV2Labels('unit');
+  const unitLabels = useLookupV2Labels('product-unit');
 
   const locationByCode = useMemo(() => {
     const m = new Map<string, Location>();
