@@ -209,11 +209,6 @@ export type GetAllLookupsResponse = {
   hash?: string;
 };
 
-export type GetLookupByIdResponse = {
-  success: boolean;
-  item: LookupRecord;
-};
-
 export type CreateLookupRequest = {
   item: Record<string, unknown>;
 
@@ -239,7 +234,8 @@ export type UpdateLookupResponse = {
 };
 
 export type DeleteLookupRequest = {
-  version?: string;
+  version: string;
+
   expectedListHash?: string;
 };
 export type DeleteLookupResponse = {
@@ -250,10 +246,13 @@ export type DeleteLookupResponse = {
 
 export type ImportBatchLookupsRequest = {
   items: Array<Record<string, unknown>>;
+
+  expectedListHash?: string;
 };
 export type ImportBatchLookupsResponse = {
   success: boolean;
   summary: { total: number; created: number; updated: number; errors: number };
+
   created: LookupRecord[];
   updated: LookupRecord[];
   errors: Array<{ index: number; message: string }>;

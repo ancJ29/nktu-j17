@@ -42,7 +42,6 @@ export const CREDO_SME_ROUTES = {
 
     LOOKUP: {
       GET_ALL: { PATH: '', METHOD: 'GET' },
-      GET_BY_ID: { PATH: '/:id', METHOD: 'GET' },
       CREATE: { PATH: '', METHOD: 'POST' },
       UPDATE: { PATH: '/:id', METHOD: 'PATCH' },
       DELETE: { PATH: '/:id', METHOD: 'DELETE' },

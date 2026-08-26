@@ -1,6 +1,6 @@
 import { Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { useVendorStore } from '@/stores/useVendorStore';
@@ -68,6 +68,8 @@ export function VendorList({ variant }: VendorListProps) {
   const setOrigin = useCallback((v: OriginFilter) => updateState({ origin: v }), [updateState]);
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
+
+  const showAddress = useMemo(() => allVendors.some((v) => !!v.address), [allVendors]);
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
     useListFilter(allVendors, {
@@ -201,6 +203,7 @@ export function VendorList({ variant }: VendorListProps) {
       ) : (
         <VendorDataTable
           vendors={paginated}
+          showAddress={showAddress}
           isLoading={loading && !initialized}
           origin={variant.origin}
           viewportRef={scrollViewportRef}

@@ -62,6 +62,8 @@ export const BASE_PERMISSIONS: Permissions = {
       canTakePhoto: false,
 
       canEditDeliveryPackageSize: false,
+
+      canEditItemWarehouseFields: false,
     },
     query: {
       canViewAll: false,

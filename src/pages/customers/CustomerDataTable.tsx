@@ -6,14 +6,22 @@ import type { Customer } from '@/types';
 import { PhoneNumber } from '@credo/base-ui/components';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ActiveBadge } from '@/components/badges';
+import { AddressWithMapLink } from '@/components/AddressWithMapLink';
 
 type CustomerDataTableProps = {
   readonly customers: Customer[];
   readonly isLoading?: boolean;
+
+  readonly showAddress?: boolean;
   readonly viewportRef?: Ref<HTMLDivElement>;
 };
 
-export function CustomerDataTable({ customers, isLoading, viewportRef }: CustomerDataTableProps) {
+export function CustomerDataTable({
+  customers,
+  isLoading,
+  showAddress = false,
+  viewportRef,
+}: CustomerDataTableProps) {
   const { t } = useTranslation();
 
   const columns = useMemo(
@@ -70,6 +78,21 @@ export function CustomerDataTable({ customers, isLoading, viewportRef }: Custome
             <Text size="sm">-</Text>
           ),
       },
+      ...(showAddress
+        ? [
+            {
+              key: 'address',
+              width: '280px',
+              header: t('common.labels.address'),
+              render: (item: Customer) => (
+                <AddressWithMapLink
+                  address={item.address}
+                  googleMapUrl={item.extra?.addressGoogleMapUrl}
+                />
+              ),
+            },
+          ]
+        : []),
       {
         key: 'status',
         header: t('__new__.01-common.labels.status'),
@@ -83,7 +106,7 @@ export function CustomerDataTable({ customers, isLoading, viewportRef }: Custome
         ),
       },
     ],
-    [t],
+    [t, showAddress],
   );
 
   return (

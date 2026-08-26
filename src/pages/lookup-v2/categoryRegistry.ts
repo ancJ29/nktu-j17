@@ -6,7 +6,6 @@ export type LookupV2CategoryId =
   | 'product-unit'
   | 'material-category'
   | 'product-category'
-  | 'product-tag'
   | 'truck-type'
   | 'truck-maintenance-type'
   | 'container-size'
@@ -31,8 +30,6 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
     defaultSortOrder: 1,
   },
   { id: 'product-category', labelKey: 'lookups.categories.productCategory', defaultSortOrder: 1 },
-
-  { id: 'product-tag', labelKey: 'lookups.categories.productTag', defaultSortOrder: 1 },
 
   { id: 'truck-type', labelKey: 'lookups.categories.truckType', defaultSortOrder: 1 },
 

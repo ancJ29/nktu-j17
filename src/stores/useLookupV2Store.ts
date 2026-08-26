@@ -21,8 +21,6 @@ export const useLookupV2Store = createEntityStore<LookupV2Row, FlatUpdateBody, F
         : null,
     ),
 
-  fetchOne: (id) => credoSmeConnector.getLookupById({ id }).then((r) => r.item as LookupV2Row),
-
   create: (body) => {
     const { expectedListHash, ...item } = body;
     return credoSmeConnector.createLookup({ item, expectedListHash }).then((r) => ({
@@ -44,8 +42,8 @@ export const useLookupV2Store = createEntityStore<LookupV2Row, FlatUpdateBody, F
       .deleteLookup({ id, version, expectedListHash })
       .then((r) => ({ ...(r.listHash !== undefined && { listHash: r.listHash }) })),
 
-  bulkUpsert: (items) =>
-    credoSmeConnector.importBatchLookups({ items }).then((r) => ({
+  bulkUpsert: (items, expectedListHash) =>
+    credoSmeConnector.importBatchLookups({ items, expectedListHash }).then((r) => ({
       created: r.created as LookupV2Row[],
       updated: r.updated as LookupV2Row[],
       errors: r.errors,

@@ -139,6 +139,8 @@ const canManualReleasePerm = perms.salesOrder.canManualRelease();
 const canCreateDRPerm = perms.deliveryRequest.canCreate();
 
 const canEditDeliveryPackageSize = perms.salesOrder.canEditDeliveryPackageSize();
+
+const canEditItemWarehouseFields = perms.salesOrder.canEditItemWarehouseFields();
 const deliveryPackageSizeOptions = getSalesOrderDeliveryPackageSizeOptions();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
@@ -228,6 +230,8 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     handleMobileCameraCapture,
     handleMetaPatch,
     handleItemMemoPatch,
+    handleItemReadyPatch,
+    handleItemWarehouseMemoPatch,
     handleToggleDeliveryMethod,
     isExternalDelivery,
     employees,
@@ -407,6 +411,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
 
   const canEditNotes = (variant.notesAlwaysEditable ? canEdit : canEditMeta) && !isMobile;
   const canEditItemMemo = variant.itemMemoEditable && canEdit && !isMobile;
+
+  const showItemReady = variant.itemReadyCheckbox;
+  const showItemWarehouseMemo = variant.itemWarehouseMemo;
+
+  const canTickItemReady = showItemReady && canEditItemWarehouseFields;
+  const canEditWarehouseMemo = showItemWarehouseMemo && canEditItemWarehouseFields;
 
   const canEditPackageSize =
     canEditDeliveryPackageSize && !order.isClosed && !isCancelled && !isMobile;
@@ -1632,6 +1642,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
                         inventoryLinkageState={linkage?.state}
                         canEditItemMemo={canEditItemMemo}
                         onItemMemoSave={handleItemMemoPatch}
+                        showItemReady={showItemReady}
+                        {...(canTickItemReady && { onItemReadySave: handleItemReadyPatch })}
+                        showItemWarehouseMemo={showItemWarehouseMemo}
+                        {...(canEditWarehouseMemo && {
+                          onItemWarehouseMemoSave: handleItemWarehouseMemoPatch,
+                        })}
                         productPhotoOnHover={variant.itemProductPhotoOnHover}
                         currentOrderNumber={order.orderNumber}
                       />
@@ -1861,6 +1877,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               inventoryLinkageState={linkage?.state}
               canEditItemMemo={canEditItemMemo}
               onItemMemoSave={handleItemMemoPatch}
+              showItemReady={showItemReady}
+              {...(canTickItemReady && { onItemReadySave: handleItemReadyPatch })}
+              showItemWarehouseMemo={showItemWarehouseMemo}
+              {...(canEditWarehouseMemo && {
+                onItemWarehouseMemoSave: handleItemWarehouseMemoPatch,
+              })}
               productPhotoOnHover={variant.itemProductPhotoOnHover}
               currentOrderNumber={order.orderNumber}
             />

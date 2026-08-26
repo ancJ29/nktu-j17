@@ -12,7 +12,6 @@ import {
   Select,
   SimpleGrid,
   Stack,
-  TagsInput,
   Text,
   Textarea,
   TextInput,
@@ -50,7 +49,7 @@ import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { CodeLabel, FieldLabel, Tabs } from '@credo/base-ui/components';
 import { asyncDeduplicator, device } from '@credo/base-ui/utils';
-import { ActiveBadge, CategoryBadge, TagBadge, UnitBadge } from '@/components/badges';
+import { ActiveBadge, CategoryBadge, UnitBadge } from '@/components/badges';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { CopyValueButton } from '@/components/CopyValueButton';
 import { DescriptionText } from '@/components/DescriptionText';
@@ -110,7 +109,6 @@ const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 
 type ClassificationDraft = {
   category: string;
-  tags: string[];
   attributes: Array<{ key: string; value: string }>;
 };
 
@@ -168,7 +166,6 @@ export function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const unitLabels = useLookupV2Labels('product-unit');
   const categoryOptions = useLookupV2Options('product-category');
-  const tagOptions = useLookupV2Options('product-tag');
   const editLabels = useMemo<SectionCardEditLabels>(
     () => ({
       edit: t('__new__.01-common.actions.edit'),
@@ -556,7 +553,6 @@ export function ProductDetailPage() {
     );
   }
 
-  const tags = extra.tags ?? [];
   const minInv = extra.minimumInventory;
   const allUnits =
     extra.units && extra.units.length > 0 ? extra.units : product.unit ? [product.unit] : [];
@@ -622,9 +618,6 @@ export function ProductDetailPage() {
           {t('products.detail.noInventoryBadge')}
         </Badge>
       )}
-      {tags.map((tag) => (
-        <TagBadge key={tag} tag={tag} />
-      ))}
     </Group>
   );
 
@@ -699,9 +692,6 @@ export function ProductDetailPage() {
                 {t('products.detail.noInventoryBadge')}
               </Badge>
             )}
-            {tags.map((tag) => (
-              <TagBadge key={tag} tag={tag} />
-            ))}
           </Group>
         </Stack>
       </Group>
@@ -916,30 +906,6 @@ export function ProductDetailPage() {
     </Stack>
   );
 
-  const tagsSlot = (
-    <Stack gap={6}>
-      <FieldLabel>{t('products.columnsExtra.tags')}</FieldLabel>
-      {classEdit.editing && cDraft ? (
-        <TagsInput
-          data={tagOptions.map((o) => o.label)}
-          value={cDraft.tags}
-          onChange={(next) => classEdit.setDraft({ ...cDraft, tags: next })}
-          placeholder={t('products.form.tagsPlaceholder')}
-        />
-      ) : tags.length > 0 ? (
-        <Group gap={6} wrap="wrap">
-          {tags.map((tag) => (
-            <TagBadge key={tag} tag={tag} />
-          ))}
-        </Group>
-      ) : (
-        <Text size="sm" c="dimmed" fs="italic">
-          {t('products.detail.tagsEmpty')}
-        </Text>
-      )}
-    </Stack>
-  );
-
   const productAttributes = extra.attributes ?? [];
 
   const updateAttrRow = (idx: number, patch: Partial<{ key: string; value: string }>) => {
@@ -1032,7 +998,6 @@ export function ProductDetailPage() {
       onEdit={() =>
         classEdit.begin({
           category: extra.category ?? '',
-          tags: [...tags],
           attributes: productAttributes.map((a) => ({ key: a.key, value: a.value })),
         })
       }
@@ -1045,7 +1010,6 @@ export function ProductDetailPage() {
           return patchExtra(
             {
               category: next.category || undefined,
-              tags: next.tags,
               attributes: cleaned.length > 0 ? cleaned : undefined,
             },
             'product.updateClassification',
@@ -1055,7 +1019,6 @@ export function ProductDetailPage() {
     >
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
         {categorySlot}
-        {tagsSlot}
       </SimpleGrid>
       <Divider />
       {attributesSlot}

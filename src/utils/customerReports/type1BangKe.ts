@@ -116,7 +116,10 @@ const PAYMENT_BLOCKS = [
   },
 ] as const;
 
-function bangKePeriodLabel(orders: ReadonlyArray<TransportOrder>): string {
+export function bangKePeriodLabel(
+  orders: ReadonlyArray<TransportOrder>,
+  monthPrefix = 'THÁNG ',
+): string {
   let earliest = Number.POSITIVE_INFINITY;
   let latest = Number.NEGATIVE_INFINITY;
   for (const o of orders) {
@@ -127,12 +130,12 @@ function bangKePeriodLabel(orders: ReadonlyArray<TransportOrder>): string {
   }
   if (!Number.isFinite(earliest)) {
     const now = new Date();
-    return `THÁNG ${now.getMonth() + 1}/${now.getFullYear()}`;
+    return `${monthPrefix}${now.getMonth() + 1}/${now.getFullYear()}`;
   }
   const from = new Date(earliest);
   const to = new Date(latest);
   if (from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth()) {
-    return `THÁNG ${from.getMonth() + 1}/${from.getFullYear()}`;
+    return `${monthPrefix}${from.getMonth() + 1}/${from.getFullYear()}`;
   }
   return `TỪ ${formatDate(earliest)} ĐẾN ${formatDate(latest)}`;
 }
@@ -169,6 +172,8 @@ export type BangKeLayout = {
     header: string;
     slots: ReadonlyArray<ChiHoSlot>;
   }>;
+
+  periodPrefix?: string;
 };
 
 const TYPE1_LAYOUT: BangKeLayout = {
@@ -176,7 +181,7 @@ const TYPE1_LAYOUT: BangKeLayout = {
   chiHoSlots: ['amount', 'invoiceNo', 'name'],
 };
 
-export const buildBangKeSheet = (
+export const buildBangKeWorksheet = (
   orders: ReadonlyArray<TransportOrder>,
   {
     seller,
@@ -188,7 +193,7 @@ export const buildBangKeSheet = (
     titleSuffix,
   }: CustomerReportInput,
   layout: BangKeLayout,
-): CustomerReportResult => {
+): { ws: XLSX.WorkSheet; rowCount: number } => {
   const rows = orders
     .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
     .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
@@ -305,7 +310,9 @@ export const buildBangKeSheet = (
   banner(seller.address);
   banner(`MST: ${seller.taxCode}`);
   const suffix = titleSuffix?.trim() ? ` ${titleSuffix.trim()}` : '';
-  const rTitle = banner(`BẢNG KÊ VẬN CHUYỂN${suffix} ${bangKePeriodLabel(rows)}`);
+  const rTitle = banner(
+    `BẢNG KÊ VẬN CHUYỂN${suffix} ${bangKePeriodLabel(rows, layout.periodPrefix)}`,
+  );
   const rDear = banner(`Kính gửi: ${customer.name}`);
   banner(`Địa chỉ: ${customer.address ?? ''}`);
   banner(`MST: ${customer.taxCode ?? ''}`);
@@ -578,9 +585,18 @@ export const buildBangKeSheet = (
     setStyle(rSign, c, { font: { bold: true }, alignment: { horizontal: 'center' } });
   }
 
+  return { ws, rowCount: rows.length };
+};
+
+export const buildBangKeSheet = (
+  orders: ReadonlyArray<TransportOrder>,
+  input: CustomerReportInput,
+  layout: BangKeLayout,
+): CustomerReportResult => {
+  const { ws, rowCount } = buildBangKeWorksheet(orders, input, layout);
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
-  return { workbook, rowCount: rows.length };
+  return { workbook, rowCount };
 };
 
 export const buildCustomerReportType1: CustomerReportBuilder = (orders, input) =>

@@ -2,6 +2,7 @@ import { Card, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { PhoneNumber } from '@credo/base-ui/components';
+import { AddressWithMapLink } from '@/components/AddressWithMapLink';
 import { ActiveBadge } from '@/components/badges';
 import { ListCardList } from '@/components/ListCardList';
 import type { Customer } from '@/types';
@@ -67,6 +68,16 @@ export function CustomerCardList({ customers, isLoading }: CustomerCardListProps
                     copiedTooltip={t('common.labels.copied')}
                   />
                 </Group>
+              )}
+              {/* Card-only condition: unlike the desktop column (self-gated
+                  across the whole list) a card shows the row it has, so an
+                  address-less one simply omits the line. */}
+              {item.address && (
+                <AddressWithMapLink
+                  address={item.address}
+                  googleMapUrl={item.extra?.addressGoogleMapUrl}
+                  size="xs"
+                />
               )}
             </Stack>
             <ActiveBadge

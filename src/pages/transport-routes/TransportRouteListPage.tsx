@@ -99,14 +99,13 @@ export function TransportRouteListPage() {
         if (f.status === 'inactive' && item.isActive) return false;
         if (f.truckType && item.truckType !== f.truckType) return false;
 
-        if (f.containerSize && item.containerSize && item.containerSize !== f.containerSize)
-          return false;
+        if (f.containerSize && item.containerSize !== f.containerSize) return false;
         if (f.kind === 'single' && item.isMultiTrip) return false;
         if (f.kind === 'multi' && !item.isMultiTrip) return false;
         return true;
       },
 
-      searchFields: (item) => [item.code, ...routePlaces(item)],
+      searchFields: (item) => [item.code, item.name ?? '', ...routePlaces(item)],
       search: filterState.search,
       onSearchChange,
       page: filterState.page,

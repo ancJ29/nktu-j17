@@ -9,65 +9,7 @@ import { deepMergePermissions } from '@/utils/permission';
 import { Box, Button, Checkbox, Group, Paper, Stack, Text } from '@mantine/core';
 import { useMemo } from 'react';
 import { buildFullOverlay, buildModuleOverlay, cleanAndEmit } from '../helpers';
-
-const PERM_MODULE_LABELS: Record<string, string> = {
-  crop: 'Crop',
-  cropDiary: 'Crop Diary',
-  cropDiaryTemplate: 'Crop Diary Template',
-  costNorm: 'Cost Norm',
-  customer: 'Customer',
-  deliveryRequest: 'Delivery Request',
-  employee: 'Employee',
-  goodsReceipt: 'Goods Receipt',
-  greenhouse: 'Greenhouse',
-  location: 'Location',
-  lookup: 'Lookup',
-  lookupV2: 'Lookup (v2)',
-  material: 'Material',
-  materialInventory: 'Material Inventory',
-  oilTank: 'Oil Tank',
-  permissionManagement: 'Permission Management',
-  product: 'Product',
-  productInventory: 'Product Inventory',
-  report: 'Report',
-  salesOrder: 'Sales Order',
-  transportOrder: 'Transport Order',
-  transportRoute: 'Transport Route',
-  truck: 'Truck',
-  vendor: 'Vendor',
-};
-
-const PERM_LABELS: Record<string, string> = {
-  canCreate: 'Add',
-  canDelete: 'Del',
-  canEdit: 'Edit',
-  canView: 'View',
-  actionsGroup: 'Actions',
-  queryGroup: 'Query',
-  enableAll: 'Enable all',
-  disableAll: 'Disable all',
-};
-
-const PERM_FLAG_LABELS: Record<string, string> = {
-  canCancel: 'Cancel',
-  canConfirmReceived: 'Confirm Received',
-  canExport: 'Export to Excel',
-  canIssueMagicLink: 'Issue Magic Link',
-  canManualRelease: 'Manual Release',
-  canModify: 'Modify Permissions',
-  canSetPassword: 'Set Password',
-  canToggleStatus: 'Toggle Status',
-  canTransitionStatus: 'Change Status',
-  canViewAll: 'View all records',
-  canViewPrice: 'View Prices',
-  canViewSelf: 'View own records',
-  canReorder: 'Re-order deliveries',
-  canManagePhotos: 'Manage Photos',
-  canManageInventory: 'Manage Inventory',
-  canViewActivityLog: 'View Activity Log',
-  canBulkImport: 'Bulk Import',
-  canViewSetComponentInventory: 'View component inventory of sets',
-};
+import { PERM_FLAG_LABELS, PERM_LABELS, PERM_MODULE_LABELS } from './permissionLabels';
 
 function moduleHasAccess(mod: ModulePermissions | undefined): boolean {
   if (!mod) return false;

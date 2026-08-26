@@ -14,6 +14,10 @@ export type SalesOrderItem = BaseSalesOrderItem & {
   memo?: string;
 
   extraQuantity?: number;
+
+  isReady?: boolean;
+
+  warehouseMemo?: string;
 };
 
 export type SalesOrderActivityEntry = {

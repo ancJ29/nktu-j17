@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo } from 'react';
-import type { FuelNormRow, FuelPriceRow, TransportRouteRow } from '@/types';
+import type { FuelNormRow, TransportRouteRow } from '@/types';
 import { useFuelNormStore } from '@/stores/useFuelNormStore';
 import { useFuelPriceStore } from '@/stores/useFuelPriceStore';
 import { todayInVnDateString } from '@/utils/dateTimeField';
-import { resolveCurrentFuelPrice, resolveFuelPriceAt } from '../cost-norms/fuelPrice';
+import { resolveCurrentFuelPrice } from '../cost-norms/fuelPrice';
 import { computeRouteCosting, type RouteCosting } from './routeCosting';
 
 export function buildFuelNormMap(rows: readonly FuelNormRow[]): Map<string, number> {
@@ -19,16 +19,10 @@ export function buildFuelNormMap(rows: readonly FuelNormRow[]): Map<string, numb
 export type RouteCostingContext = {
   fuelPricePerLiter: number | undefined;
 
-  currentPrice: FuelPriceRow | undefined;
-
-  today: string;
-
   norms: Map<string, number>;
 
   costOf: (
-    route: Parameters<typeof computeRouteCosting>[0] &
-      Pick<TransportRouteRow, 'truckType'> &
-      Partial<Pick<TransportRouteRow, 'isActive' | 'updatedAt'>>,
+    route: Parameters<typeof computeRouteCosting>[0] & Pick<TransportRouteRow, 'truckType'>,
   ) => RouteCosting;
 };
 
@@ -54,18 +48,13 @@ export function useRouteCosting(): RouteCostingContext {
   const fuelPricePerLiter = currentPrice?.price;
 
   const costOf = useCallback<RouteCostingContext['costOf']>(
-    (route) => {
-      const fuelPrice =
-        route.isActive === false && route.updatedAt
-          ? resolveFuelPriceAt(priceItems, route.updatedAt)?.price
-          : fuelPricePerLiter;
-      return computeRouteCosting(route, {
+    (route) =>
+      computeRouteCosting(route, {
         litersPer100km: route.truckType ? norms.get(route.truckType) : undefined,
-        fuelPricePerLiter: fuelPrice,
-      });
-    },
-    [norms, fuelPricePerLiter, priceItems],
+        fuelPricePerLiter,
+      }),
+    [norms, fuelPricePerLiter],
   );
 
-  return { fuelPricePerLiter, currentPrice, today, norms, costOf };
+  return { fuelPricePerLiter, norms, costOf };
 }

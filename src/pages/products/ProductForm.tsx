@@ -68,7 +68,6 @@ export function ProductForm({ variant }: ProductFormProps) {
   const totalProducts = useProductStore((s) => s.items.length);
 
   const categoryOptions = useLookupV2Options('product-category');
-  const tagOptions = useLookupV2Options('product-tag');
   const unitOptions = useLookupV2Options('product-unit');
 
   const snapshotRef = useRef<Product | null>(null);
@@ -126,7 +125,6 @@ export function ProductForm({ variant }: ProductFormProps) {
       basePrice: 0,
       suggestedPrice: 0,
       category: '',
-      tags: [],
       attributes: [],
       minInventoryValue: '',
       minInventoryUnit: '',
@@ -229,7 +227,6 @@ export function ProductForm({ variant }: ProductFormProps) {
       basePrice: p.extra?.basePrice ?? 0,
       suggestedPrice: p.extra?.suggestedPrice ?? 0,
       category: p.extra?.category ?? '',
-      tags: p.extra?.tags ?? [],
       attributes: p.extra?.attributes ?? [],
       minInventoryValue: min?.value ?? '',
       minInventoryUnit: min?.unit ?? '',
@@ -315,7 +312,6 @@ export function ProductForm({ variant }: ProductFormProps) {
           ...(values.basePrice > 0 && { basePrice: values.basePrice }),
           ...(values.suggestedPrice > 0 && { suggestedPrice: values.suggestedPrice }),
           ...(values.category.trim() && { category: values.category.trim() }),
-          ...(values.tags.length > 0 && { tags: values.tags }),
 
           ...(() => {
             const cleaned = values.attributes
@@ -506,21 +502,14 @@ export function ProductForm({ variant }: ProductFormProps) {
 
       const catLabelToValue = new Map<string, string>();
       for (const o of categoryOptions) catLabelToValue.set(o.label.trim().toLowerCase(), o.value);
-      const tagLabelToCanonical = new Map<string, string>();
-      for (const o of tagOptions) tagLabelToCanonical.set(o.label.trim().toLowerCase(), o.label);
       const unitLabelToValue = new Map<string, string>();
       for (const o of unitOptions) unitLabelToValue.set(o.label.trim().toLowerCase(), o.value);
 
       const unknownCategories = new Set<string>();
-      const unknownTags = new Set<string>();
       const unknownUnits = new Set<string>();
       for (const p of products) {
         const cat = p.category?.trim();
         if (cat && !catLabelToValue.has(cat.toLowerCase())) unknownCategories.add(cat);
-        for (const raw of p.tags ?? []) {
-          const tag = raw.trim();
-          if (tag && !tagLabelToCanonical.has(tag.toLowerCase())) unknownTags.add(tag);
-        }
 
         for (const raw of [p.unit, p.minInventoryUnit]) {
           const unit = raw?.trim();
@@ -528,19 +517,12 @@ export function ProductForm({ variant }: ProductFormProps) {
         }
       }
 
-      if (unknownCategories.size > 0 || unknownTags.size > 0 || unknownUnits.size > 0) {
+      if (unknownCategories.size > 0 || unknownUnits.size > 0) {
         const lines: string[] = [];
         if (unknownCategories.size > 0) {
           lines.push(
             t('products.bulkImport.unknownCategoryMessage', {
               labels: Array.from(unknownCategories).join(', '),
-            }),
-          );
-        }
-        if (unknownTags.size > 0) {
-          lines.push(
-            t('products.bulkImport.unknownTagMessage', {
-              labels: Array.from(unknownTags).join(', '),
             }),
           );
         }
@@ -581,16 +563,12 @@ export function ProductForm({ variant }: ProductFormProps) {
         const category = p.category?.trim()
           ? catLabelToValue.get(p.category.trim().toLowerCase())
           : undefined;
-        const tags = (p.tags ?? [])
-          .map((raw) => tagLabelToCanonical.get(raw.trim().toLowerCase()))
-          .filter((v): v is string => Boolean(v));
         const extra: ProductExtra = {
           sku: code,
           ...(barcodeEnabled && {
             barcode: p.barcode?.trim() || generateInternalBarcode(),
           }),
           ...(category && { category }),
-          ...(tags.length > 0 && { tags }),
 
           ...(p.noInventory && { noInventory: true }),
           ...(hideFromInventoryListEnabled &&
@@ -684,7 +662,7 @@ export function ProductForm({ variant }: ProductFormProps) {
     } finally {
       setIsBulkLoading(false);
     }
-  }, [t, forceRefresh, navigate, totalProducts, categoryOptions, tagOptions, unitOptions]);
+  }, [t, forceRefresh, navigate, totalProducts, categoryOptions, unitOptions]);
 
   const validateFileType = useCallback((f: File) => {
     const validTypes = [

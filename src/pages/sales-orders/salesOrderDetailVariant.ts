@@ -9,6 +9,10 @@ export type SalesOrderDetailVariant = {
 
   itemMemoEditable: boolean;
 
+  itemReadyCheckbox: boolean;
+
+  itemWarehouseMemo: boolean;
+
   showShortageAlert: boolean;
 
   itemProductPhotoOnHover: boolean;
@@ -41,6 +45,8 @@ export const DEFAULT_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
   showVatTag: true,
   notesAlwaysEditable: false,
   itemMemoEditable: false,
+  itemReadyCheckbox: false,
+  itemWarehouseMemo: false,
   itemProductPhotoOnHover: false,
 };
 
@@ -51,6 +57,8 @@ export const NKTU_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
   showVatTag: false,
   notesAlwaysEditable: true,
   itemMemoEditable: true,
+  itemReadyCheckbox: true,
+  itemWarehouseMemo: true,
   itemProductPhotoOnHover: true,
   clientSpecific: {
     NKTU: {

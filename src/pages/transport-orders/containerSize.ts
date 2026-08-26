@@ -1,5 +1,9 @@
+import { appConfig } from '@/config';
 import { useLookupV2Labels, useLookupV2Options } from '@/hooks/useLookupV2Options';
 import type { LookupOption } from '@/hooks/useLookupV2Options';
+
+export const NON_CONTAINER_TRUCK_TYPES =
+  appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
 export const CONTAINER_SIZE_CATEGORY = 'container-size';
 

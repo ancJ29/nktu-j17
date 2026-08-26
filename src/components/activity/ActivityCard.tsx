@@ -1832,6 +1832,44 @@ function ItemDiffSection({ diff }: { readonly diff: SalesOrderItemDiff }) {
 
 // ── update (inline) ──────────────────────────────────────────────────────
 
+/**
+ * One line's free-text field, before → after, for the inline-edit block.
+ *
+ * The product name is the point: a sales order carries many lines, and "an item
+ * note changed" left the reader to guess which. Values arrive already capped by
+ * `capActivityText` — the clamp here is layout, not a size guard.
+ */
+function ItemTextDiff({
+  label,
+  product,
+  from,
+  to,
+}: {
+  readonly label: string;
+  readonly product: string;
+  readonly from?: string;
+  readonly to?: string;
+}) {
+  return (
+    <Stack gap={0}>
+      <Text size="xs" c="dimmed">
+        {label} · {product}
+      </Text>
+      <Group gap={6} wrap="nowrap" align="baseline">
+        <Text size="xs" c="dimmed" td="line-through" lineClamp={2} style={{ minWidth: 0 }}>
+          {from || '—'}
+        </Text>
+        <Text size="xs" c="dimmed" style={{ flexShrink: 0 }}>
+          →
+        </Text>
+        <Text size="xs" fw={500} lineClamp={2} style={{ minWidth: 0 }}>
+          {to || '—'}
+        </Text>
+      </Group>
+    </Stack>
+  );
+}
+
 function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
   const { t } = useTranslation();
   // New shape: structured per-field diff. Legacy shape carried only
@@ -1859,6 +1897,8 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
     !f.deliveryDate &&
     !f.notes &&
     !f.itemMemo &&
+    !f.itemReady &&
+    !f.itemWarehouseMemo &&
     !f.warehouseNote &&
     !f.driverNote
   )
@@ -1930,10 +1970,31 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
           {t('salesOrders.detail.activityMemo.notesChanged')}
         </Text>
       )}
-      {f.itemMemo?.changed && (
+      {f.itemMemo && (
+        <ItemTextDiff
+          label={t('salesOrders.detail.itemMemo')}
+          product={f.itemMemo.product}
+          from={f.itemMemo.from}
+          to={f.itemMemo.to}
+        />
+      )}
+      {f.itemReady && (
         <Text size="xs" c="dimmed" fs="italic">
-          {t('salesOrders.detail.activityMemo.itemMemoChanged')}
+          {t(
+            f.itemReady.to
+              ? 'salesOrders.detail.activityMemo.itemReadyMarked'
+              : 'salesOrders.detail.activityMemo.itemReadyCleared',
+            { product: f.itemReady.product },
+          )}
         </Text>
+      )}
+      {f.itemWarehouseMemo && (
+        <ItemTextDiff
+          label={t('salesOrders.detail.itemWarehouseMemo')}
+          product={f.itemWarehouseMemo.product}
+          from={f.itemWarehouseMemo.from}
+          to={f.itemWarehouseMemo.to}
+        />
       )}
       {f.warehouseNote?.changed && (
         <Text size="xs" c="dimmed" fs="italic">

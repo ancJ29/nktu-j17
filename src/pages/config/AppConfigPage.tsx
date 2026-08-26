@@ -221,7 +221,6 @@ const MODULE_LABELS: Record<string, string> = {
 
 const LOOKUP_CATEGORY_LABELS: Record<string, string> = {
   'lookups.categories.productCategory': 'Product Category',
-  'lookups.categories.productTag': 'Product Tag',
   'lookups.categories.unit': 'Unit of Measure',
   'lookups.categories.materialCategory': 'Material Category',
   'lookups.categories.materialUnit': 'Material Unit',

@@ -4,6 +4,7 @@ import {
   Divider,
   Group,
   Indicator,
+  MultiSelect,
   ScrollArea,
   Select,
   SimpleGrid,
@@ -21,6 +22,7 @@ import {
   type MoreFilterDef,
   type MoreFilterDateRange,
   type MoreFilterSelect,
+  type MoreFilterMultiSelect,
   type DateRangePreset,
   EMPTY_DATE_RANGE,
 } from '../types/date-range';
@@ -140,12 +142,29 @@ function SelectFilter({ filter }: { filter: MoreFilterSelect }) {
   );
 }
 
+function MultiSelectFilter({ filter }: { filter: MoreFilterMultiSelect }) {
+  return (
+    <MultiSelect
+      label={filter.title}
+      placeholder={filter.value.length > 0 ? undefined : (filter.placeholder ?? filter.title)}
+      data={filter.options}
+      value={filter.value}
+      onChange={filter.onChange}
+      searchable
+      clearable
+      hidePickedOptions
+      size="sm"
+    />
+  );
+}
+
 function countActive(filters: MoreFilterDef[]): number {
   let count = 0;
   for (const f of filters) {
     if (f.type === 'dateRange' && (f.customOnly ? f.value.preset === 'custom' : f.value.preset))
       count++;
     if (f.type === 'select' && f.value !== null) count++;
+    if (f.type === 'multiSelect' && f.value.length > 0) count++;
     if (f.type === 'switch' && f.value) count++;
   }
   return count;
@@ -204,6 +223,8 @@ export function MobileFilterMoreDrawer({
               {filters.map((f) =>
                 f.type === 'select' ? (
                   <SelectFilter key={f.key} filter={f} />
+                ) : f.type === 'multiSelect' ? (
+                  <MultiSelectFilter key={f.key} filter={f} />
                 ) : f.type === 'switch' ? (
                   <Switch
                     key={f.key}

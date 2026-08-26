@@ -38,10 +38,16 @@ function usesDriver(order: TransportOrder, driverId: string): boolean {
 
 export type TransportOrderShipmentFilter = 'all' | TransportOrderShipmentType;
 
+function readCustomerCodes(c: string[] | string | undefined): string[] {
+  if (Array.isArray(c)) return c;
+  return c ? [c] : [];
+}
+
 type TransportOrderUrlState = {
   q?: string;
   s?: string[];
-  c?: string;
+
+  c?: string[];
   tk?: string;
 
   tt?: string;
@@ -61,7 +67,9 @@ function compactState(state: TransportOrderUrlState): TransportOrderUrlState {
   if (state.q) r.q = state.q;
 
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
-  if (state.c) r.c = state.c;
+
+  const customerCodes = readCustomerCodes(state.c);
+  if (customerCodes.length > 0) r.c = customerCodes;
   if (state.tk) r.tk = state.tk;
   if (state.tt) r.tt = state.tt;
   if (state.dv) r.dv = state.dv;
@@ -90,7 +98,8 @@ export function useTransportOrderListFilters(
   const search = state.q ?? '';
 
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
-  const customerFilter = state.c ?? null;
+
+  const customerFilter = useMemo(() => readCustomerCodes(state.c), [state.c]);
   const truckFilter = state.tk ?? null;
   const truckTypeFilter = state.tt ?? null;
   const driverFilter = state.dv ?? null;
@@ -115,7 +124,7 @@ export function useTransportOrderListFilters(
     [updateState],
   );
   const setCustomerFilter = useCallback(
-    (v: string | null) => updateState({ c: v || undefined, pg: undefined }),
+    (v: string[]) => updateState({ c: v.length > 0 ? v : undefined, pg: undefined }),
     [updateState],
   );
   const setTruckFilter = useCallback(
@@ -167,7 +176,9 @@ export function useTransportOrderListFilters(
       if (o.extra?.isDeleted) return false;
       if (hideCancelled && o.extra?.cancellation) return false;
       if (statusFilter.length > 0 && !statusFilter.includes(o.status)) return false;
-      if (customerFilter && o.customerCode !== customerFilter) return false;
+
+      if (customerFilter.length > 0 && !(o.customerCode && customerFilter.includes(o.customerCode)))
+        return false;
       if (truckFilter && !usesTruck(o, truckFilter)) return false;
       if (truckTypeFilter && !usesTruckType(o, truckTypeFilter, truckTypeOf)) return false;
       if (driverFilter && !usesDriver(o, driverFilter)) return false;
@@ -211,7 +222,7 @@ export function useTransportOrderListFilters(
 
   const hasActiveFilters = !!(
     !statusFilterIsDefault ||
-    customerFilter ||
+    customerFilter.length > 0 ||
     truckFilter ||
     truckTypeFilter ||
     driverFilter ||

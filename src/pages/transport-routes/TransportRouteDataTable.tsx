@@ -1,12 +1,16 @@
 import { useCallback, useMemo, useState, type MouseEvent, type Ref } from 'react';
-import { Badge, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { Badge, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { ListDataTable } from '@/components/ListDataTable';
+import { ActiveBadge } from '@/components/badges';
 import { formatDate } from '@/utils/dateFormat';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
-import { useContainerSizeLabel } from '../transport-orders/containerSize';
+import {
+  NON_CONTAINER_TRUCK_TYPES,
+  useContainerSizeLabel,
+} from '../transport-orders/containerSize';
 import { useTruckTypeLabel } from './truckType';
 import { JourneyCell } from '../transport-orders/TransportRouteCell';
 import {
@@ -15,12 +19,7 @@ import {
   routeLaborTotal,
   routeLegCount,
 } from './routeSummary';
-import { appConfig } from '@/config';
 import { useRouteCosting } from './useRouteCosting';
-import { isRecentFuelPriceChange, routePredatesFuelPriceChange } from '../cost-norms/fuelPrice';
-import { routeUsesFuelPricing } from './routeCosting';
-
-const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
 type Props = {
   readonly routes: TransportRouteRow[];
@@ -33,10 +32,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
   const truckTypeLabel = useTruckTypeLabel();
   const containerSizeLabel = useContainerSizeLabel();
 
-  const { costOf, currentPrice, norms } = useRouteCosting();
-
-  const [now] = useState(() => Date.now());
-  const priceJustChanged = isRecentFuelPriceChange(currentPrice, now);
+  const { costOf } = useRouteCosting();
 
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
   const toggleExpanded = useCallback((id: string) => {
@@ -51,32 +47,44 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
     () => [
       {
         key: 'code',
-        width: '135px',
-        header: t('transportRoutes.columns.code'),
+
+        width: '170px',
+        header: (
+          <Stack gap={0}>
+            <Text inherit>{t('transportRoutes.columns.code')}</Text>
+            <Text fz="xs" c="dimmed" fw={400} tt="none">
+              {t('transportRoutes.columns.name')}
+            </Text>
+          </Stack>
+        ),
+
         render: (r: TransportRouteRow) => (
-          <Stack gap={4} align="flex-start">
-            {/* Mono, like every other code in this feature (order no.,
-                container, plate): it is matched character-by-character, which
-                is the one job proportional type is bad at. */}
+          <Stack gap={0}>
             <Text ff="monospace" fz="sm" fw={600}>
               {r.code}
             </Text>
-            {r.isMultiTrip ? (
-              <Badge size="xs" variant="light" color="grape" tt="none" radius="sm">
-                {t('transportOrders.trips.badge', { n: routeLegCount(r) })}
-              </Badge>
-            ) : (
-              <Text size="xs" c="dimmed">
-                {t('transportRoutes.kind.single')}
-              </Text>
-            )}
-            {!r.isActive && (
-              <Badge size="xs" variant="light" color="gray" tt="none" radius="sm">
-                {t('transportRoutes.status.inactive')}
-              </Badge>
-            )}
+            {/* Clamped with a `title`, the desktop recovery this register
+                already uses for a long place name. */}
+            <Text fz="xs" c="dimmed" lineClamp={1} title={r.name || undefined}>
+              {r.name || '—'}
+            </Text>
           </Stack>
         ),
+      },
+      {
+        key: 'kind',
+        width: '95px',
+        header: t('transportRoutes.columns.kind'),
+        render: (r: TransportRouteRow) =>
+          r.isMultiTrip ? (
+            <Badge size="sm" variant="light" color="grape" tt="none" radius="sm">
+              {t('transportOrders.trips.badge', { n: routeLegCount(r) })}
+            </Badge>
+          ) : (
+            <Text size="sm" c="dimmed">
+              {t('transportRoutes.kind.single')}
+            </Text>
+          ),
       },
       {
         key: 'route',
@@ -99,30 +107,37 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'truckType',
-        width: '130px',
+        width: '120px',
         header: t('transportRoutes.columns.truckType'),
+        render: (r: TransportRouteRow) => (
+          <Text size="sm">{truckTypeLabel(r.truckType) || '—'}</Text>
+        ),
+      },
+      {
+        key: 'containerSize',
+        width: '105px',
+        header: t('transportRoutes.columns.containerSize'),
+
         render: (r: TransportRouteRow) => {
           const display = routeContainerDisplay(r, NON_CONTAINER_TRUCK_TYPES);
+          if (display === 'value')
+            return <Text size="sm">{containerSizeLabel(r.containerSize)}</Text>;
+          if (display === 'missing')
+            return (
+              <Text size="sm" c="orange" title={t('transportRoutes.form.containerSizeMissingHint')}>
+                {t('transportRoutes.form.containerSizeMissing')}
+              </Text>
+            );
           return (
-            <Stack gap={2}>
-              <Text size="sm">{truckTypeLabel(r.truckType) || '—'}</Text>
-              {display === 'value' && (
-                <Text size="xs" c="dimmed">
-                  {containerSizeLabel(r.containerSize)}
-                </Text>
-              )}
-              {display === 'any' && (
-                <Text size="xs" c="dimmed" fs="italic">
-                  {t('transportRoutes.form.anyContainerSize')}
-                </Text>
-              )}
-            </Stack>
+            <Text size="sm" c="dimmed" fs="italic">
+              {'—'}
+            </Text>
           );
         },
       },
       {
         key: 'freightAmount',
-        width: '125px',
+        width: '130px',
         header: t('transportRoutes.columns.freightAmount'),
         render: (r: TransportRouteRow) => (
           <Text size="sm" ta="right">
@@ -132,7 +147,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'laborCost',
-        width: '120px',
+        width: '130px',
         header: t('transportRoutes.columns.laborCost'),
 
         render: (r: TransportRouteRow) => (
@@ -143,47 +158,28 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       },
       {
         key: 'costPrice',
-        width: '175px',
+        width: '140px',
         header: t('transportRoutes.costing.costPrice'),
         render: (r: TransportRouteRow) => {
           const costing = costOf(r);
-
-          const moved =
-            priceJustChanged &&
-            routePredatesFuelPriceChange(currentPrice, r.createdAt) &&
-            routeUsesFuelPricing(r, r.truckType ? norms.get(r.truckType) : undefined);
           return (
-            <Group gap={4} justify="flex-end" wrap="nowrap">
-              {moved && (
-                <Tooltip
-                  label={t('transportRoutes.costing.costChangedHint')}
-                  withArrow
-                  multiline
-                  w={240}
-                >
-                  <Badge size="xs" variant="light" color="blue" tt="none" radius="sm">
-                    {t('transportRoutes.costing.costChanged')}
-                  </Badge>
-                </Tooltip>
-              )}
-              <Text
-                size="sm"
-                ta="right"
+            <Text
+              size="sm"
+              ta="right"
 
-                c={costing.missing.length > 0 ? 'orange' : undefined}
-                title={
-                  costing.missing.length > 0
-                    ? t(
-                        costing.missing.includes('norm')
-                          ? 'transportRoutes.costing.missingNorm'
-                          : 'transportRoutes.costing.missingPrice',
-                      )
-                    : undefined
-                }
-              >
-                {formatMoney(costing.costPrice)}
-              </Text>
-            </Group>
+              c={costing.missing.length > 0 ? 'orange' : undefined}
+              title={
+                costing.missing.length > 0
+                  ? t(
+                      costing.missing.includes('norm')
+                        ? 'transportRoutes.costing.missingNorm'
+                        : 'transportRoutes.costing.missingPrice',
+                    )
+                  : undefined
+              }
+            >
+              {formatMoney(costing.costPrice)}
+            </Text>
           );
         },
       },
@@ -209,8 +205,20 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         },
       },
       {
+        key: 'status',
+        width: '120px',
+        header: t('transportRoutes.columns.status'),
+        render: (r: TransportRouteRow) => (
+          <ActiveBadge
+            isActive={r.isActive}
+            activeLabel={t('transportRoutes.status.active')}
+            inactiveLabel={t('transportRoutes.status.inactive')}
+          />
+        ),
+      },
+      {
         key: 'updatedAt',
-        width: '105px',
+        width: '110px',
         header: t('transportRoutes.columns.updatedAt'),
         render: (r: TransportRouteRow) => (
           <Text size="sm" c="dimmed">
@@ -219,20 +227,8 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         ),
       },
     ],
-    [
-      t,
-      truckTypeLabel,
-      containerSizeLabel,
-      costOf,
-      expandedIds,
-      toggleExpanded,
-      priceJustChanged,
-      currentPrice,
-      norms,
-    ],
+    [t, truckTypeLabel, containerSizeLabel, costOf, expandedIds, toggleExpanded],
   );
-
-  const getRowBg = useMemo(() => (r: TransportRouteRow) => (r.isActive ? undefined : 'gray.1'), []);
 
   return (
     <ListDataTable
@@ -244,7 +240,6 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       detailRoute={ROUTES.TRANSPORT_ROUTES.EDIT}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}
-      getRowBg={getRowBg}
     />
   );
 }

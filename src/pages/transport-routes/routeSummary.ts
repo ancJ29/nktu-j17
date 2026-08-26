@@ -4,6 +4,10 @@ import { truckTypeCarriesContainer } from '../transport-orders/containerTruckTyp
 
 export type RouteEndpoints = { from: string; to: string };
 
+export function isRouteLive(route: Pick<TransportRouteRow, 'isActive' | 'extra'>): boolean {
+  return !route.extra?.isDeleted && route.isActive;
+}
+
 export function routeEndpoints(route: Pick<TransportRouteRow, 'route'>): RouteEndpoints {
   return { from: route.route?.pickup ?? '', to: route.route?.dropoff ?? '' };
 }
@@ -32,9 +36,9 @@ export function routePlaces(
 export function routeContainerDisplay(
   route: Pick<TransportRouteRow, 'truckType' | 'containerSize'>,
   nonContainerTruckTypes: readonly string[],
-): 'value' | 'any' | 'none' {
+): 'value' | 'missing' | 'none' {
   if (route.containerSize) return 'value';
-  return truckTypeCarriesContainer(route.truckType, nonContainerTruckTypes) ? 'any' : 'none';
+  return truckTypeCarriesContainer(route.truckType, nonContainerTruckTypes) ? 'missing' : 'none';
 }
 
 export function routeJourneyLegs(

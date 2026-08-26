@@ -52,6 +52,17 @@ export function isListVersionConflict(err: unknown): boolean {
   );
 }
 
+export function validationFieldsOf(err: unknown): Record<string, string> | undefined {
+  if (!(err instanceof CallApiError) || err.status !== 400) return undefined;
+  const fields = (err.payload as { fields?: unknown } | null)?.fields;
+  if (typeof fields !== 'object' || fields === null || Array.isArray(fields)) return undefined;
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(fields)) {
+    if (typeof value === 'string') out[key] = value;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
 export function toEntityConflictError<T>(err: unknown): EntityConflictError<T> | never {
   if (isVersionConflict(err)) {
     const payload = err.payload as VersionConflictPayload<T>;
@@ -161,7 +172,10 @@ type EntityStoreConfig<T, TUpdate, TCreate, TMeta> = {
 
   create?: (patch: TCreate) => Promise<{ item: T; listHash?: string }>;
 
-  bulkUpsert?: (items: TCreate[]) => Promise<{
+  bulkUpsert?: (
+    items: TCreate[],
+    expectedListHash: string | undefined,
+  ) => Promise<{
     created: T[];
     updated: T[];
     errors: ReadonlyArray<{ index: number; message: string }>;
@@ -566,7 +580,20 @@ export function createEntityStore<
             `[entity:${cacheKey}] bulkUpsertSafely called but store was created without bulkUpsert`,
           );
         }
-        const result = await bulkUpsertFn(items as TCreate[]);
+        let result: Awaited<ReturnType<NonNullable<typeof bulkUpsertFn>>>;
+        try {
+          result = await bulkUpsertFn(items as TCreate[], get().hash ?? undefined);
+        } catch (err) {
+          if (isListVersionConflict(err)) {
+            set({ hash: null });
+            await revalidateInBackground();
+            throw new EntityConflictError<T>(
+              undefined,
+              'The list changed while the batch was being prepared',
+            );
+          }
+          throw err;
+        }
         const merged = [...result.created, ...result.updated];
         if (merged.length > 0) {
           const byId = new Map(get().items.map((i) => [i.id, i]));

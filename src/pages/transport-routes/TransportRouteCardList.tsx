@@ -6,9 +6,17 @@ import { ListCardList } from '@/components/ListCardList';
 import { ActiveBadge } from '@/components/badges';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
-import { useContainerSizeLabel } from '../transport-orders/containerSize';
+import {
+  NON_CONTAINER_TRUCK_TYPES,
+  useContainerSizeLabel,
+} from '../transport-orders/containerSize';
 import { useTruckTypeLabel } from './truckType';
-import { routeEndpoints, routeLaborTotal, routeLegCount } from './routeSummary';
+import {
+  routeContainerDisplay,
+  routeEndpoints,
+  routeLaborTotal,
+  routeLegCount,
+} from './routeSummary';
 import { useRouteCosting } from './useRouteCosting';
 
 type Props = {
@@ -34,10 +42,19 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
         const costing = costOf(r);
         return (
           <Stack gap={6}>
-            <Group justify="space-between" wrap="nowrap">
-              <Text ff="monospace" fw={700} fz="sm">
-                {r.code}
-              </Text>
+            <Group justify="space-between" wrap="nowrap" align="flex-start">
+              <Stack gap={0} style={{ minWidth: 0 }}>
+                <Text ff="monospace" fw={700} fz="sm">
+                  {r.code}
+                </Text>
+                {/* Wraps rather than clamping — there is no hover on a phone to
+                    recover a cut name, the same call the chain below makes. */}
+                {r.name && (
+                  <Text fz="xs" c="dimmed">
+                    {r.name}
+                  </Text>
+                )}
+              </Stack>
               <ActiveBadge
                 isActive={r.isActive}
                 activeLabel={t('transportRoutes.status.active')}
@@ -69,10 +86,16 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
                   {truckTypeLabel(r.truckType)}
                 </Badge>
               )}
-              {r.containerSize && (
+              {r.containerSize ? (
                 <Badge size="xs" variant="light" color="cyan" tt="none" radius="sm">
                   {containerSizeLabel(r.containerSize)}
                 </Badge>
+              ) : (
+                routeContainerDisplay(r, NON_CONTAINER_TRUCK_TYPES) === 'missing' && (
+                  <Badge size="xs" variant="light" color="orange" tt="none" radius="sm">
+                    {t('transportRoutes.form.containerSizeMissing')}
+                  </Badge>
+                )
               )}
             </Group>
 

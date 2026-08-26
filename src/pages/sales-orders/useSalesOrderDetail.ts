@@ -60,6 +60,7 @@ import {
 import { emitInventoryActivityForApplied } from '@/utils/inventoryActivityEmit';
 import { formatPlanFailures } from './planFailures';
 import { logActivity } from '@/utils/activityLogger';
+import { capActivityText } from './activityMemo';
 import type { SalesOrderInlineFields, SalesOrderReleasedRow } from './activityMemo';
 import { statusChangeMemo } from './activityMemo';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
@@ -1062,7 +1063,102 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         logActivity('salesOrder.update', id, {
           orderNumber: order.orderNumber,
           inlineEdit: true,
-          fields: { itemMemo: { changed: true } } satisfies SalesOrderInlineFields,
+          fields: {
+            itemMemo: {
+              product: current.productName,
+              ...(capActivityText(current.memo) !== undefined && {
+                from: capActivityText(current.memo),
+              }),
+              ...(capActivityText(memo) !== undefined && { to: capActivityText(memo) }),
+            },
+          } satisfies SalesOrderInlineFields,
+        });
+      } catch (err) {
+        if (err instanceof EntityConflictError) {
+          if (err.latest) setOrder(err.latest as SalesOrder);
+          notifications.show({
+            color: 'yellow',
+            title: t('common.conflict.title'),
+            message: t('common.conflict.message'),
+            autoClose: 8000,
+          });
+        }
+        throw err;
+      }
+    },
+    [id, order, t],
+  );
+
+  const handleItemReadyPatch = useCallback(
+    async (itemIndex: number, isReady: boolean) => {
+      if (!id || !order) return;
+      const current = order.items[itemIndex];
+      if (!current || (current.isReady ?? false) === isReady) return;
+      const nextItems = order.items.map((it, i) => {
+        if (i !== itemIndex) return it;
+        const { isReady: _drop, ...rest } = it;
+        return isReady ? { ...rest, isReady: true } : rest;
+      });
+      try {
+        const updated = await useSalesOrderStore.getState().updateSafely({
+          id,
+          version: order.version,
+          patch: { items: nextItems },
+        });
+        setOrder(updated as SalesOrder);
+        logActivity('salesOrder.update', id, {
+          orderNumber: order.orderNumber,
+          inlineEdit: true,
+          fields: {
+            itemReady: { product: current.productName, to: isReady },
+          } satisfies SalesOrderInlineFields,
+        });
+      } catch (err) {
+        if (err instanceof EntityConflictError) {
+          if (err.latest) setOrder(err.latest as SalesOrder);
+          notifications.show({
+            color: 'yellow',
+            title: t('common.conflict.title'),
+            message: t('common.conflict.message'),
+            autoClose: 8000,
+          });
+        }
+        throw err;
+      }
+    },
+    [id, order, t],
+  );
+
+  const handleItemWarehouseMemoPatch = useCallback(
+    async (itemIndex: number, warehouseMemo: string) => {
+      if (!id || !order) return;
+      const current = order.items[itemIndex];
+      const next = warehouseMemo.trim();
+      if (!current || (current.warehouseMemo ?? '') === next) return;
+      const nextItems = order.items.map((it, i) => {
+        if (i !== itemIndex) return it;
+        const { warehouseMemo: _drop, ...rest } = it;
+        return next ? { ...rest, warehouseMemo: next } : rest;
+      });
+      try {
+        const updated = await useSalesOrderStore.getState().updateSafely({
+          id,
+          version: order.version,
+          patch: { items: nextItems },
+        });
+        setOrder(updated as SalesOrder);
+        logActivity('salesOrder.update', id, {
+          orderNumber: order.orderNumber,
+          inlineEdit: true,
+          fields: {
+            itemWarehouseMemo: {
+              product: current.productName,
+              ...(capActivityText(current.warehouseMemo) !== undefined && {
+                from: capActivityText(current.warehouseMemo),
+              }),
+              ...(capActivityText(next) !== undefined && { to: capActivityText(next) }),
+            },
+          } satisfies SalesOrderInlineFields,
         });
       } catch (err) {
         if (err instanceof EntityConflictError) {
@@ -1840,6 +1936,8 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
     handleMetaPatch,
     handleItemMemoPatch,
+    handleItemReadyPatch,
+    handleItemWarehouseMemoPatch,
     handleToggleDeliveryMethod,
     isExternalDelivery,
     employees,

@@ -45,13 +45,24 @@ export type SalesOrderCustomerDiff = {
   to: SalesOrderCustomerMemo;
 };
 
+export const ACTIVITY_TEXT_CAP = 160;
+
+export function capActivityText(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  return value.length <= ACTIVITY_TEXT_CAP ? value : `${value.slice(0, ACTIVITY_TEXT_CAP)}…`;
+}
+
 export type SalesOrderInlineFields = {
   assignedStaff?: { from?: string; to?: string };
   deliveryMethod?: { from?: string; to?: string };
   deliveryDate?: { from?: number; to?: number };
   notes?: { changed: true };
 
-  itemMemo?: { changed: true };
+  itemMemo?: { product: string; from?: string; to?: string };
+
+  itemReady?: { product: string; to: boolean };
+
+  itemWarehouseMemo?: { product: string; from?: string; to?: string };
 
   warehouseNote?: { changed: true };
   driverNote?: { changed: true };

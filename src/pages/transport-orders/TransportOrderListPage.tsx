@@ -243,11 +243,15 @@ export function TransportOrderListPage() {
   };
 
   const handleExportCustomerReport = () => {
-    const code = filters.customerFilter;
+    const code = filters.customerFilter.length === 1 ? filters.customerFilter[0]! : null;
     if (!code) {
       notifications.show({
         color: 'yellow',
-        message: t('transportOrders.notifications.customerReportNeedCustomer'),
+        message: t(
+          filters.customerFilter.length === 0
+            ? 'transportOrders.notifications.customerReportNeedCustomer'
+            : 'transportOrders.notifications.customerReportOneCustomer',
+        ),
       });
       return;
     }
@@ -298,6 +302,13 @@ export function TransportOrderListPage() {
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.statusFilter, statusData, t]);
+
+  const customerPlaceholder = useMemo(() => {
+    if (filters.customerFilter.length === 0) return t('transportOrders.form.customer');
+    if (filters.customerFilter.length === 1) return customerLabel(filters.customerFilter[0]!);
+    return t('common.filters.customerCount', { count: filters.customerFilter.length });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.customerFilter, customerData, t]);
 
   const presetLabels: Partial<Record<DateRangePreset, string>> = {
     today: t('common.datePreset.today'),
@@ -390,10 +401,11 @@ export function TransportOrderListPage() {
       w: 180,
     },
     {
+      multi: true,
       value: filters.customerFilter,
       onChange: filters.setCustomerFilter,
       data: customerData,
-      placeholder: t('transportOrders.form.customer'),
+      placeholder: customerPlaceholder,
       visible: customerData.length > 0,
       searchable: true,
       w: 200,
@@ -513,7 +525,7 @@ export function TransportOrderListPage() {
   const desktopMoreFilters = moreFilters.filter((f) => f.key !== 'shipmentType');
   const mobileMoreFilters: MoreFilterDef[] = [
     {
-      type: 'select',
+      type: 'multiSelect',
       key: 'customer',
       title: t('transportOrders.form.customer'),
       placeholder: t('transportOrders.form.customer'),
@@ -642,11 +654,18 @@ export function TransportOrderListPage() {
               {t('transportOrders.columns.truck')}: {truckLabel(filters.truckFilter)}
             </FilterPill>
           )}
-          {filters.customerFilter && (
-            <FilterPill onClose={() => filters.setCustomerFilter(null)}>
-              {t('transportOrders.form.customer')}: {customerLabel(filters.customerFilter)}
+          {/* One pill per customer, like the status pills — each drops its own
+              value, which is the whole point of picking several. */}
+          {filters.customerFilter.map((code) => (
+            <FilterPill
+              key={code}
+              onClose={() =>
+                filters.setCustomerFilter(filters.customerFilter.filter((v) => v !== code))
+              }
+            >
+              {t('transportOrders.form.customer')}: {customerLabel(code)}
             </FilterPill>
-          )}
+          ))}
           {filters.truckTypeFilter && (
             <FilterPill onClose={() => filters.setTruckTypeFilter(null)}>
               {t('transportOrders.filters.truckType')}: {truckTypeLabel(filters.truckTypeFilter)}

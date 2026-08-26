@@ -6,6 +6,7 @@ import type { Vendor } from '@/types';
 import { PhoneNumber } from '@credo/base-ui/components';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ActiveBadge } from '@/components/badges';
+import { AddressWithMapLink } from '@/components/AddressWithMapLink';
 import { VendorOriginBadge } from './VendorOriginBadge';
 import type { VendorOriginLabels } from './vendorOriginLabels';
 
@@ -13,11 +14,19 @@ type VendorDataTableProps = {
   readonly vendors: Vendor[];
   readonly isLoading?: boolean;
 
+  readonly showAddress?: boolean;
+
   readonly origin?: VendorOriginLabels;
   readonly viewportRef?: Ref<HTMLDivElement>;
 };
 
-export function VendorDataTable({ vendors, isLoading, origin, viewportRef }: VendorDataTableProps) {
+export function VendorDataTable({
+  vendors,
+  isLoading,
+  showAddress = false,
+  origin,
+  viewportRef,
+}: VendorDataTableProps) {
   const { t } = useTranslation();
 
   const columns = useMemo(
@@ -79,6 +88,21 @@ export function VendorDataTable({ vendors, isLoading, origin, viewportRef }: Ven
             },
           ]
         : []),
+      ...(showAddress
+        ? [
+            {
+              key: 'address',
+              width: '280px',
+              header: t('common.labels.address'),
+              render: (item: Vendor) => (
+                <AddressWithMapLink
+                  address={item.address}
+                  googleMapUrl={item.extra?.addressGoogleMapUrl}
+                />
+              ),
+            },
+          ]
+        : []),
       {
         key: 'status',
         header: t('__new__.01-common.labels.status'),
@@ -92,7 +116,7 @@ export function VendorDataTable({ vendors, isLoading, origin, viewportRef }: Ven
         ),
       },
     ],
-    [t, origin],
+    [t, origin, showAddress],
   );
 
   return (

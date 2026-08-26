@@ -696,6 +696,7 @@
     },
     "filters": {
       "apply": "Apply Filters",
+      "customerCount": "{{count}} customers",
       "more": "More",
       "selectDateRange": "Select date range",
       "statusCount": "{{count}} statuses"
@@ -2009,7 +2010,6 @@
       "materialCategory": "Material Category",
       "materialUnit": "Material Unit",
       "productCategory": "Product Category",
-      "productTag": "Product Tag",
       "productUnit": "Product Unit",
       "shipmentType": "Shipment Type",
       "truckType": "Truck Type",
@@ -2032,6 +2032,7 @@
       "value": "Value (code)",
       "valueHelp": "Short stable identifier — avoid spaces."
     },
+    "noCategories": "No lookup categories are enabled for this client. Turn them on in App Config → Lookups v2 → Enabled Categories.",
     "noItems": "No entries yet.",
     "notifications": {
       "createSuccess": "Entry added",
@@ -2045,7 +2046,8 @@
     "subtitle": "Manage dropdown options and reference values used across the app.",
     "validation": {
       "labelRequired": "Label is required",
-      "valueDuplicate": "Another active entry already uses this value",
+      "valueDuplicate": "Another entry in this category already uses this value",
+      "valueDuplicateHidden": "A removed entry still holds this value and is not shown here — choose a different one",
       "valueRequired": "Value is required"
     }
   },
@@ -2998,7 +3000,6 @@
       "skippedTitle": "Rows skipped as duplicates",
       "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
       "unknownLabelTitle": "Unrecognized category, tag or unit",
-      "unknownTagMessage": "Unrecognized tags: {{labels}}. Add them under Lookups, or fix the file, then re-import.",
       "unknownUnitMessage": "Unrecognized units: {{labels}}. Use the unit names shown under Lookups (not their codes), or add them there, then re-import.",
       "uploadFile": "Upload Product File"
     },
@@ -3006,8 +3007,7 @@
       "minimumInventory": "Min"
     },
     "columnsExtra": {
-      "attributes": "Attributes",
-      "tags": "Tags"
+      "attributes": "Attributes"
     },
     "deleteConfirm": {
       "message": "Are you sure you want to delete this product? This action cannot be undone.",
@@ -3068,7 +3068,6 @@
         "details": "Details",
         "images": "Images"
       },
-      "tagsEmpty": "No tags",
       "techSpecCardTitle": "Technical specs",
       "techSpecsEmpty": "No technical specs",
       "updatedByOn": "Updated by <user/> on {{date}}"
@@ -3192,6 +3191,7 @@
         "canBulkImport": "Bulk Import via Excel",
         "canConfirmReceived": "Confirm Received",
         "canEditDeliveryPackageSize": "Edit Delivery Package Size",
+        "canEditItemWarehouseFields": "Edit Warehouse Line Fields",
         "canExport": "Export Excel",
         "canIssueMagicLink": "Issue Magic Link",
         "canManageInventory": "Manage Inventory",
@@ -3613,7 +3613,8 @@
           "reserve": "Reserved stock",
           "ship": "Shipped (deducted on-hand)"
         },
-        "itemMemoChanged": "Item note changed",
+        "itemReadyCleared": "Cleared the prepared mark on \"{{product}}\"",
+        "itemReadyMarked": "Marked \"{{product}}\" prepared",
         "itemsAdded_one": "{{count}} item added",
         "itemsAdded_other": "{{count}} items added",
         "itemsChanged_one": "{{count}} item changed",
@@ -3669,6 +3670,9 @@
       "extraQuantityHint": "+{{extra}} spare · ships {{physical}}",
       "fromLocation": "From location",
       "itemMemo": "Memo",
+      "itemReady": "Prepared",
+      "itemReadyTooltip": "Tick when this line has been picked and staged",
+      "itemWarehouseMemo": "Warehouse note",
       "itemsTitle": "Order Items",
       "linkedDRsLoading": "Loading deliveries…",
       "noDRsCreatable": "No delivery requests yet. Use \"Create Delivery Request\" once the order is ready.",
@@ -3923,13 +3927,7 @@
       "serviceSubtotal": "Service subtotal",
       "title": "Billing",
       "vatAmount": "VAT ({{rate}}%)",
-      "vatRate": "VAT rate",
-      "costPrice": "Cost price (from route {{code}})",
-      "quotedPrice": "Quoted to customer (pre-VAT)",
-      "margin": "Difference",
-      "marginPercent": "{{percent}}% over cost",
-      "marginNoPercent": "no cost basis",
-      "costPriceHint": "Computed live from the applied route and the current cost norms. Not stored on the order — an order keeps the numbers it was saved with."
+      "vatRate": "VAT rate"
     },
     "cancel": {
       "confirmMessage": "Cancel this transport order? It stays on record with a cancelled badge.",
@@ -4063,6 +4061,7 @@
       "createError": "Failed to create transport order",
       "created": "Transport order created",
       "customerReportNeedCustomer": "Pick a customer in the filter to export their report.",
+      "customerReportOneCustomer": "Pick exactly one customer — the report is addressed to a single customer.",
       "customerReportSuccess_one": "Exported customer report with {{count}} order.",
       "customerReportSuccess_other": "Exported customer report with {{count}} orders.",
       "deleted": "Transport order deleted",
@@ -4125,7 +4124,8 @@
       "driverRequired": "Driver is required",
       "entryDateRequired": "Date is required",
       "plateRequired": "Plate number is required",
-      "truckRequired": "Truck is required"
+      "truckRequired": "Truck is required",
+      "containerSizeRequired": "Container type is required"
     }
   },
   "transportRoutes": {
@@ -4140,6 +4140,7 @@
     },
     "columns": {
       "code": "Route code",
+      "name": "Route name",
       "kind": "Route type",
       "route": "Route",
       "truckType": "Vehicle type",
@@ -4171,16 +4172,17 @@
       "infoSection": "Route details",
       "pricingSection": "Default pricing",
       "code": "Route code",
+      "name": "Route name",
+      "nameHint": "What the operators call this run.",
       "codeAuto": "Generated on save",
       "codeLocked": "Fixed once created",
       "truckType": "Applies to vehicle type",
       "containerSize": "Applies to container type",
-      "anyContainerSize": "Any",
       "multiTrip": "Multi-leg",
       "multiTripHint": "The route runs several legs — each with its own origin, destination and driver pay.",
       "freightAmount": "Default freight fee",
-      "freightAmountHint": "Charged once for the whole route, on both route types.",
-      "laborCost": "Default driver pay",
+      "basePay": "Base pay",
+      "allowance": "Allowance",
       "notes": "Notes",
       "status": "Status",
       "statusHint": "An inactive route stays in the register but is no longer suggested on new orders.",
@@ -4201,7 +4203,9 @@
       "costItemNote": "Note",
       "costItemsHint": "Driver pay is not entered here — the route already stores it and the breakdown below reads that figure.",
       "markupPercent": "Markup (%)",
-      "markupHint": "Default profit margin used to suggest a quote for this route."
+      "markupHint": "Default profit margin used to suggest a quote for this route.",
+      "containerSizeMissing": "Not set",
+      "containerSizeMissingHint": "This route names no container type, so it is offered on no order. Edit it and pick one — a 20ft and a 40ft run are priced separately."
     },
     "trips": {
       "title": "Legs",
@@ -4213,7 +4217,9 @@
       "dropoffRequired": "Drop-off is required",
       "departureRequired": "Origin is required",
       "destinationRequired": "Destination is required",
-      "truckTypeRequired": "Vehicle type is required"
+      "truckTypeRequired": "Vehicle type is required",
+      "nameRequired": "Route name is required",
+      "containerSizeRequired": "Container type is required"
     },
     "notifications": {
       "created": "Route created",
@@ -4232,6 +4238,13 @@
     "dangerZone": {
       "title": "Danger zone",
       "deleteHint": "Deleting removes the route from the register. Consider setting it inactive instead."
+    },
+    "picker": {
+      "label": "Apply a saved route",
+      "hint": "Fills the journey and the pricing from the route price list. Every field stays editable.",
+      "placeholder": "Pick a route",
+      "noMatch": "No route matches that search",
+      "incomplete": "no container type"
     },
     "suggestion": {
       "title": "Matching saved route",
@@ -4254,7 +4267,6 @@
       "liters": "L",
       "fuelCost": "Fuel cost",
       "fuelFormula": "{{km}} km / 100 × {{norm}} L/100km × {{price}} đ/L",
-      "fuelFormulaShort": "Fuel",
       "laborTotal": "Driver pay",
       "itemsTotal": "Other cost items",
       "costPrice": "Cost price",
@@ -4262,9 +4274,7 @@
       "suggestedPriceShort": "Suggested quote",
       "missingNorm": "No fuel norm registered for this vehicle type — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
       "missingPrice": "No diesel price registered — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
-      "noNorm": "no norm",
-      "costChanged": "Cost just updated",
-      "costChangedHint": "This route's cost price moved with the latest diesel price update."
+      "noNorm": "no norm"
     }
   },
   "vendors": {

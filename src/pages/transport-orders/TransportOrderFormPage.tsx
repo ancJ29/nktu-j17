@@ -75,7 +75,7 @@ import {
   formatMoney,
   readFeeLines,
 } from './transportOrderPricing';
-import { useContainerSizeOptions } from './containerSize';
+import { NON_CONTAINER_TRUCK_TYPES, useContainerSizeOptions } from './containerSize';
 import { truckTypeCarriesContainer } from './containerTruckType';
 import {
   FALLBACK_FEE_NAMES,
@@ -106,8 +106,7 @@ import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
 import { useTransportRouteStore } from '@/stores/useTransportRouteStore';
 import { TransportRouteSuggestion } from '../transport-routes/TransportRouteSuggestion';
-import { useRouteCosting } from '../transport-routes/useRouteCosting';
-import { quoteMargin } from '../transport-routes/routeCosting';
+import { TransportRoutePicker } from '../transport-routes/TransportRoutePicker';
 import {
   matchTransportRoutes,
   type TransportRouteDraft,
@@ -129,8 +128,6 @@ const driverEmployeeFilter = (e: Employee) => {
     : isDriverDepartment(e.department);
 };
 const DEFAULT_VAT_PERCENT = 8;
-
-const NON_CONTAINER_TRUCK_TYPES = toFeatures.nonContainerTruckTypes ?? [];
 
 type FeeRow = {
   label: string;
@@ -496,6 +493,20 @@ export function TransportOrderFormPage() {
       entryDate: (v, values) =>
         !values.isMultiTrip && !v ? t('transportOrders.validation.entryDateRequired') : null,
       customerCode: (v) => (!v ? t('transportOrders.validation.customerRequired') : null),
+
+      containerSize: (v, values) => {
+        if (v) return null;
+        const truckId = values.isMultiTrip ? (values.trips[0]?.truckId ?? '') : values.truckId;
+        if (!truckId) return null;
+        const type = useTruckAssetStore
+          .getState()
+          .items.find((tr) => tr.id === truckId)
+          ?.extra?.truckType?.trim();
+        if (!type) return null;
+        return truckTypeCarriesContainer(type, NON_CONTAINER_TRUCK_TYPES)
+          ? t('transportOrders.validation.containerSizeRequired')
+          : null;
+      },
       trips: {
         truckId: (v: string, values: FormValues, path: string) =>
           values.isMultiTrip && !legAt(values, path)?.externalTruck && !v
@@ -813,9 +824,6 @@ export function TransportOrderFormPage() {
   const [appliedRoute, setAppliedRoute] = useState<TransportRouteRow | undefined>();
   const appliedRouteCode = appliedRoute?.code;
 
-  const { costOf } = useRouteCosting();
-  const appliedCosting = appliedRoute ? costOf(appliedRoute) : undefined;
-
   const showContainerSize = truckTypeCarriesContainer(draftTruckType, NON_CONTAINER_TRUCK_TYPES);
 
   useEffect(() => {
@@ -852,7 +860,30 @@ export function TransportOrderFormPage() {
   ]);
 
   const applyRoute = useCallback(
-    (route: TransportRouteRow) => {
+    (route: TransportRouteRow, opts?: { fillJourney?: boolean }) => {
+      if (opts?.fillJourney) {
+        form.setFieldValue('isMultiTrip', !!route.isMultiTrip);
+        if (route.isMultiTrip) {
+          const current = form.getValues().trips;
+          form.setFieldValue(
+            'trips',
+            (route.trips ?? []).map((leg, i) => ({
+              ...(current[i] ?? blankTrip()),
+              departure: leg.departure,
+              destination: leg.destination,
+              laborCost: leg.laborCost || 0,
+            })),
+          );
+        } else {
+          form.setFieldValue('pickup', route.route?.pickup ?? '');
+
+          form.setFieldValue('stuffing', route.route?.stuffing ?? '');
+          form.setFieldValue('dropoff', route.route?.dropoff ?? '');
+        }
+
+        if (route.containerSize) form.setFieldValue('containerSize', route.containerSize);
+      }
+
       const fees = [...form.getValues().fees];
       const idx = fees.findIndex(
         (f) => f.kind !== 'passthrough' && f.label.trim() === freightFeeName,
@@ -965,8 +996,6 @@ export function TransportOrderFormPage() {
     form.values.roundDown,
   );
 
-  const orderMargin = quoteMargin(totals.subtotal, appliedCosting?.costPrice ?? 0);
-
   const totalsRow = (label: string, value: number, dimmed = false) => (
     <Group justify="space-between">
       <Text size="sm" c="dimmed">
@@ -1015,7 +1044,27 @@ export function TransportOrderFormPage() {
               />
             }
           >
-            <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
+            {/* First control on the form, because picking a route reshapes both
+                cards below it — the multi-trip switch beside this header flips,
+                and the Route card gives way to the leg list or back.
+
+                Create only: filling the journey overwrites the places and the
+                legs, which is what a blank form wants and the last thing a
+                booked order does. An existing order still gets the suggestion
+                strip, which touches no place at all. */}
+            {!isEdit && (
+              <TransportRoutePicker
+                routes={savedRoutes}
+                appliedId={appliedRoute?.id}
+                onPick={(route) => applyRoute(route, { fillJourney: true })}
+              />
+            )}
+
+            <SimpleGrid
+              cols={{ base: 1, sm: 2, md: 3 }}
+              spacing="sm"
+              mt={isEdit ? undefined : 'sm'}
+            >
               {/* Derived from leg 1 on a multi-trip job — hidden rather than shown
                   authored-but-overwritten. */}
               {!form.values.isMultiTrip && (
@@ -1683,91 +1732,6 @@ export function TransportOrderFormPage() {
                 </>
               )}
             </Stack>
-
-            {/* ── GIÁ VỐN & CHÊNH LỆCH ──────────────────────────────────────
-                Under the totals rather than beside them, because it is a
-                comparison AGAINST the figure directly above it: the customer's
-                pre-VAT bill is the quote, and the margin is what is left of it.
-                VAT is deliberately not in either side — it is the state's money,
-                not margin.
-                Only rendered when a route was applied; there is no cost without
-                one (see `appliedCosting`). */}
-            {appliedCosting && appliedRoute && (
-              <>
-                <Divider my="sm" />
-                <Stack gap={4}>
-                  {appliedCosting.missing.length > 0 && (
-                    <Alert
-                      color="yellow"
-                      variant="light"
-                      icon={<IconAlertTriangle size={16} />}
-                      mb="xs"
-                    >
-                      {t(
-                        appliedCosting.missing.includes('norm')
-                          ? 'transportRoutes.costing.missingNorm'
-                          : 'transportRoutes.costing.missingPrice',
-                      )}
-                    </Alert>
-                  )}
-
-                  {/* Auto, never hand-edited — the client's ask verbatim. The
-                      breakdown is one hover away rather than expanded inline:
-                      the dispatcher is deciding a price, not auditing a cost. */}
-                  <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
-                    <Stack gap={0} style={{ minWidth: 0 }}>
-                      <Text size="sm" c="dimmed">
-                        {t('transportOrders.billing.costPrice', { code: appliedRoute.code })}
-                      </Text>
-                      <Text size="xs" c="dimmed">
-                        {t('transportRoutes.costing.fuelFormulaShort')}{' '}
-                        {formatMoney(appliedCosting.fuelCost)} ·{' '}
-                        {t('transportRoutes.costing.laborTotal')}{' '}
-                        {formatMoney(appliedCosting.laborTotal)} ·{' '}
-                        {t('transportRoutes.costing.itemsTotal')}{' '}
-                        {formatMoney(appliedCosting.itemsTotal)}
-                      </Text>
-                    </Stack>
-                    <Text size="sm" style={{ whiteSpace: 'nowrap' }}>
-                      {formatMoney(appliedCosting.costPrice)}
-                    </Text>
-                  </Group>
-
-                  {/* The operator's own number — Σ of everything billed pre-VAT,
-                      which they author line by line above. Deliberately NOT a
-                      new field: the quote already exists on this form, and a
-                      second place to type it would be a second answer. */}
-                  {totalsRow(t('transportOrders.billing.quotedPrice'), totals.subtotal)}
-
-                  <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
-                    <Stack gap={0} style={{ minWidth: 0 }}>
-                      <Text fw={600}>{t('transportOrders.billing.margin')}</Text>
-                      <Text size="xs" c="dimmed">
-                        {orderMargin.percent === null
-                          ? t('transportOrders.billing.marginNoPercent')
-                          : t('transportOrders.billing.marginPercent', {
-                              percent: orderMargin.percent.toFixed(1),
-                            })}
-                      </Text>
-                    </Stack>
-                    {/* Red when the job loses money — the one state the whole
-                        feature exists to make visible before the order is
-                        booked, not after. */}
-                    <Text
-                      fw={700}
-                      c={orderMargin.amount < 0 ? 'red' : 'teal'}
-                      style={{ whiteSpace: 'nowrap' }}
-                    >
-                      {formatMoney(orderMargin.amount)}
-                    </Text>
-                  </Group>
-
-                  <Text size="xs" c="dimmed" mt={4}>
-                    {t('transportOrders.billing.costPriceHint')}
-                  </Text>
-                </Stack>
-              </>
-            )}
           </SectionCard>
 
           {/* Meta */}

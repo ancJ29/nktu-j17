@@ -696,6 +696,7 @@
     },
     "filters": {
       "apply": "Áp dụng",
+      "customerCount": "{{count}} khách hàng",
       "more": "Thêm",
       "selectDateRange": "Chọn khoảng thời gian",
       "statusCount": "{{count}} trạng thái"
@@ -2009,7 +2010,6 @@
       "materialCategory": "Danh mục vật tư",
       "materialUnit": "Đơn vị vật tư",
       "productCategory": "Danh mục sản phẩm",
-      "productTag": "Tag sản phẩm",
       "productUnit": "Đơn vị sản phẩm",
       "shipmentType": "Loại hình",
       "truckType": "Loại xe",
@@ -2032,6 +2032,7 @@
       "value": "Mã (value)",
       "valueHelp": "Mã định danh ngắn, không dấu cách."
     },
+    "noCategories": "Chưa có danh mục nào được bật cho khách hàng này. Bật trong App Config → Lookups v2 → Enabled Categories.",
     "noItems": "Chưa có mục nào.",
     "notifications": {
       "createSuccess": "Đã thêm",
@@ -2045,7 +2046,8 @@
     "subtitle": "Quản lý các giá trị dropdown / danh mục tham chiếu trong ứng dụng.",
     "validation": {
       "labelRequired": "Cần nhập nhãn",
-      "valueDuplicate": "Đã có mục khác đang dùng mã này",
+      "valueDuplicate": "Đã có mục khác trong danh mục này dùng mã này",
+      "valueDuplicateHidden": "Một mục đã xoá vẫn đang giữ mã này và không hiển thị ở đây — vui lòng chọn mã khác",
       "valueRequired": "Cần nhập mã"
     }
   },
@@ -2998,7 +3000,6 @@
       "skippedTitle": "Các dòng bị bỏ qua do trùng lặp",
       "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
       "unknownLabelTitle": "Danh mục, thẻ hoặc đơn vị không hợp lệ",
-      "unknownTagMessage": "Thẻ không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
       "unknownUnitMessage": "Đơn vị không hợp lệ: {{labels}}. Vui lòng dùng đúng tên đơn vị hiển thị trong mục Danh mục dữ liệu (không phải mã), hoặc thêm mới tại đó rồi nhập lại.",
       "uploadFile": "Tải lên tệp sản phẩm"
     },
@@ -3006,8 +3007,7 @@
       "minimumInventory": "Tối thiểu"
     },
     "columnsExtra": {
-      "attributes": "Thuộc tính",
-      "tags": "Thẻ"
+      "attributes": "Thuộc tính"
     },
     "deleteConfirm": {
       "message": "Bạn có chắc chắn muốn xóa sản phẩm này? Hành động này không thể hoàn tác.",
@@ -3068,7 +3068,6 @@
         "details": "Chi tiết",
         "images": "Hình ảnh"
       },
-      "tagsEmpty": "Chưa có thẻ",
       "techSpecCardTitle": "Thông số kỹ thuật",
       "techSpecsEmpty": "Chưa có thông số kỹ thuật",
       "updatedByOn": "Cập nhật bởi <user/> vào {{date}}"
@@ -3192,6 +3191,7 @@
         "canBulkImport": "Nhập hàng loạt qua Excel",
         "canConfirmReceived": "Xác nhận nhập kho",
         "canEditDeliveryPackageSize": "Sửa kích thước kiện hàng",
+        "canEditItemWarehouseFields": "Sửa thông tin kho theo dòng hàng",
         "canExport": "Xuất Excel",
         "canIssueMagicLink": "Tạo liên kết đăng nhập",
         "canManageInventory": "Quản lý tồn kho",
@@ -3613,7 +3613,8 @@
           "reserve": "Đã giữ hàng",
           "ship": "Đã xuất kho (trừ tồn)"
         },
-        "itemMemoChanged": "Đã thay đổi ghi chú dòng hàng",
+        "itemReadyCleared": "Bỏ đánh dấu đã soạn \"{{product}}\"",
+        "itemReadyMarked": "Đánh dấu đã soạn \"{{product}}\"",
         "itemsAdded_one": "Thêm {{count}} dòng",
         "itemsAdded_other": "Thêm {{count}} dòng",
         "itemsChanged_one": "Sửa {{count}} dòng",
@@ -3669,6 +3670,9 @@
       "extraQuantityHint": "+{{extra}} dư · giao {{physical}}",
       "fromLocation": "Lấy từ kho",
       "itemMemo": "Ghi chú",
+      "itemReady": "Đã soạn",
+      "itemReadyTooltip": "Tích khi đã soạn xong và tập kết dòng hàng này",
+      "itemWarehouseMemo": "Ghi chú kho",
       "itemsTitle": "Danh sách sản phẩm",
       "linkedDRsLoading": "Đang tải yêu cầu giao hàng…",
       "noDRsCreatable": "Chưa có yêu cầu giao hàng. Sử dụng \"Tạo yêu cầu giao hàng\" khi đơn hàng đã sẵn sàng.",
@@ -3923,13 +3927,7 @@
       "serviceSubtotal": "Cộng phí dịch vụ",
       "title": "Thanh toán",
       "vatAmount": "VAT ({{rate}}%)",
-      "vatRate": "Thuế suất VAT",
-      "costPrice": "Giá vốn (theo tuyến {{code}})",
-      "quotedPrice": "Giá báo khách hàng (trước VAT)",
-      "margin": "Chênh lệch",
-      "marginPercent": "{{percent}}% so với giá vốn",
-      "marginNoPercent": "chưa có giá vốn để so",
-      "costPriceHint": "Tự tính theo tuyến tham chiếu đã áp dụng và định mức đang hiệu lực. Không lưu vào đơn — đơn giữ nguyên các con số lúc lưu."
+      "vatRate": "Thuế suất VAT"
     },
     "cancel": {
       "confirmMessage": "Hủy đơn vận chuyển này? Đơn vẫn được lưu với nhãn đã hủy.",
@@ -4063,6 +4061,7 @@
       "createError": "Tạo đơn vận chuyển thất bại",
       "created": "Đã tạo đơn vận chuyển",
       "customerReportNeedCustomer": "Chọn một khách hàng ở bộ lọc để xuất bảng kê.",
+      "customerReportOneCustomer": "Chọn đúng một khách hàng — bảng kê chỉ gửi cho một khách hàng.",
       "customerReportSuccess_one": "Đã xuất bảng kê ({{count}} đơn).",
       "customerReportSuccess_other": "Đã xuất bảng kê ({{count}} đơn).",
       "deleted": "Đã xóa đơn vận chuyển",
@@ -4125,7 +4124,8 @@
       "driverRequired": "Vui lòng chọn tài xế",
       "entryDateRequired": "Vui lòng chọn ngày",
       "plateRequired": "Vui lòng nhập biển số xe",
-      "truckRequired": "Vui lòng chọn xe"
+      "truckRequired": "Vui lòng chọn xe",
+      "containerSizeRequired": "Vui lòng chọn loại cont"
     }
   },
   "transportRoutes": {
@@ -4140,6 +4140,7 @@
     },
     "columns": {
       "code": "Mã tuyến",
+      "name": "Tên tuyến",
       "kind": "Loại tuyến",
       "route": "Tuyến",
       "truckType": "Loại xe",
@@ -4171,16 +4172,17 @@
       "infoSection": "Thông tin tuyến",
       "pricingSection": "Giá mặc định",
       "code": "Mã tuyến",
+      "name": "Tên tuyến",
+      "nameHint": "Tên gọi quen thuộc của tuyến này.",
       "codeAuto": "Tự sinh khi lưu",
       "codeLocked": "Không sửa được sau khi tạo",
       "truckType": "Loại xe áp dụng",
       "containerSize": "Loại cont áp dụng",
-      "anyContainerSize": "Tất cả",
       "multiTrip": "Nhiều chặng",
       "multiTripHint": "Tuyến gồm nhiều chặng — mỗi chặng có điểm đi, điểm đến và lương chuyến riêng.",
       "freightAmount": "Phí vận chuyển mặc định",
-      "freightAmountHint": "Tính chung cho cả tuyến, áp dụng cho cả hai loại tuyến.",
-      "laborCost": "Lương chuyến mặc định",
+      "basePay": "Lương cơ bản",
+      "allowance": "Phụ cấp",
       "notes": "Ghi chú",
       "status": "Trạng thái",
       "statusHint": "Tuyến ngừng áp dụng vẫn được lưu nhưng không hiện trong gợi ý khi tạo đơn.",
@@ -4201,7 +4203,9 @@
       "costItemNote": "Ghi chú",
       "costItemsHint": "Không nhập lương chuyến ở đây — tuyến đã lưu lương chuyến và bảng giá vốn bên dưới đọc đúng con số đó.",
       "markupPercent": "% Lợi nhuận",
-      "markupHint": "Tỷ lệ lợi nhuận mặc định, dùng để đề xuất giá báo cho tuyến này."
+      "markupHint": "Tỷ lệ lợi nhuận mặc định, dùng để đề xuất giá báo cho tuyến này.",
+      "containerSizeMissing": "Chưa chọn",
+      "containerSizeMissingHint": "Tuyến này chưa chọn loại cont nên không được gợi ý cho đơn nào. Vào sửa và chọn loại cont — giá 20ft và 40ft tính riêng."
     },
     "trips": {
       "title": "Danh sách chặng",
@@ -4213,7 +4217,9 @@
       "dropoffRequired": "Vui lòng nhập nơi hạ",
       "departureRequired": "Vui lòng nhập điểm đi",
       "destinationRequired": "Vui lòng nhập điểm đến",
-      "truckTypeRequired": "Vui lòng chọn loại xe"
+      "truckTypeRequired": "Vui lòng chọn loại xe",
+      "nameRequired": "Vui lòng nhập tên tuyến",
+      "containerSizeRequired": "Vui lòng chọn loại cont"
     },
     "notifications": {
       "created": "Đã tạo tuyến",
@@ -4232,6 +4238,13 @@
     "dangerZone": {
       "title": "Vùng nguy hiểm",
       "deleteHint": "Xoá sẽ gỡ tuyến khỏi danh sách. Cân nhắc chuyển sang Ngừng áp dụng thay vì xoá."
+    },
+    "picker": {
+      "label": "Áp dụng tuyến có sẵn",
+      "hint": "Điền sẵn hành trình và giá theo bảng giá tuyến. Mọi trường vẫn sửa được.",
+      "placeholder": "Chọn tuyến",
+      "noMatch": "Không tìm thấy tuyến phù hợp",
+      "incomplete": "chưa có loại cont"
     },
     "suggestion": {
       "title": "Tuyến tham chiếu",
@@ -4254,7 +4267,6 @@
       "liters": "L",
       "fuelCost": "Chi phí dầu",
       "fuelFormula": "{{km}} km / 100 × {{norm}} L/100km × {{price}} đ/L",
-      "fuelFormulaShort": "Dầu",
       "laborTotal": "Lương chuyến",
       "itemsTotal": "Hạng mục chi phí khác",
       "costPrice": "Giá vốn",
@@ -4262,9 +4274,7 @@
       "suggestedPriceShort": "Giá báo đề xuất",
       "missingNorm": "Loại xe này chưa có định mức tiêu hao dầu — chi phí dầu đang tính bằng 0 và giá vốn đang thấp hơn thực tế. Nhập tại Định mức chi phí.",
       "missingPrice": "Chưa có đơn giá dầu — chi phí dầu đang tính bằng 0 và giá vốn đang thấp hơn thực tế. Nhập tại Định mức chi phí.",
-      "noNorm": "chưa có định mức",
-      "costChanged": "Vừa cập nhật giá vốn",
-      "costChangedHint": "Giá vốn tuyến này vừa thay đổi theo lần cập nhật đơn giá dầu mới nhất."
+      "noNorm": "chưa có định mức"
     }
   },
   "vendors": {

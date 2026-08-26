@@ -9,6 +9,7 @@ import type {
 export type TransportRouteWriteLeg = TransportRouteLeg & { distanceKm?: number };
 
 export type TransportRouteWriteInput = {
+  name: string;
   isMultiTrip: boolean;
 
   route: { pickup: string; stuffing: string; dropoff: string };
@@ -18,7 +19,9 @@ export type TransportRouteWriteInput = {
   containerSize: string;
   freightAmount: number;
 
-  laborCost: number;
+  basePay: number;
+
+  allowance: number;
 
   segments: TransportRouteSegment[];
 
@@ -31,12 +34,15 @@ export type TransportRouteWriteInput = {
 export type TransportRouteWrite = Pick<
   TransportRouteRow,
   | 'isActive'
+  | 'name'
   | 'isMultiTrip'
   | 'route'
   | 'trips'
   | 'truckType'
   | 'containerSize'
   | 'freightAmount'
+  | 'basePay'
+  | 'allowance'
   | 'laborCost'
   | 'segments'
   | 'costItems'
@@ -95,6 +101,8 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
 
   const common = {
     isActive: input.isActive,
+
+    name: input.name.trim(),
     truckType,
 
     containerSize,
@@ -122,6 +130,8 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
         dropoff: last?.destination ?? '',
       },
 
+      basePay: 0,
+      allowance: 0,
       laborCost: 0,
     };
   }
@@ -137,6 +147,9 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
       dropoff: input.route.dropoff.trim(),
     },
     trips: [],
-    laborCost: input.laborCost || 0,
+    basePay: input.basePay || 0,
+    allowance: input.allowance || 0,
+
+    laborCost: (input.basePay || 0) + (input.allowance || 0),
   };
 }

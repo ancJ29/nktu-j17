@@ -1,4 +1,14 @@
-import { Button, Indicator, Popover, Select, SimpleGrid, Stack, Switch, Text } from '@mantine/core';
+import {
+  Button,
+  Indicator,
+  MultiSelect,
+  Popover,
+  Select,
+  SimpleGrid,
+  Stack,
+  Switch,
+  Text,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconAdjustments } from '@tabler/icons-react';
 import { useCallback, useState } from 'react';
@@ -8,6 +18,7 @@ import {
   type MoreFilterDef,
   type MoreFilterDateRange,
   type MoreFilterSelect,
+  type MoreFilterMultiSelect,
   type DateRangePreset,
   type DateRangeValue,
   EMPTY_DATE_RANGE,
@@ -18,6 +29,7 @@ export type {
   MoreFilterDef,
   MoreFilterDateRange,
   MoreFilterSelect,
+  MoreFilterMultiSelect,
   DateRangePreset,
   DateRangeValue,
 };
@@ -138,12 +150,29 @@ function SelectFilterField({ filter }: { filter: MoreFilterSelect }) {
   );
 }
 
+function MultiSelectFilterField({ filter }: { filter: MoreFilterMultiSelect }) {
+  return (
+    <MultiSelect
+      label={filter.title}
+      placeholder={filter.value.length > 0 ? undefined : (filter.placeholder ?? filter.title)}
+      data={filter.options}
+      value={filter.value}
+      onChange={filter.onChange}
+      searchable
+      clearable
+      hidePickedOptions
+      size="sm"
+    />
+  );
+}
+
 function countActive(filters: MoreFilterDef[]): number {
   let count = 0;
   for (const f of filters) {
     if (f.type === 'dateRange' && (f.customOnly ? f.value.preset === 'custom' : f.value.preset))
       count++;
     if (f.type === 'select' && f.value !== null) count++;
+    if (f.type === 'multiSelect' && f.value.length > 0) count++;
     if (f.type === 'switch' && f.value) count++;
   }
   return count;
@@ -185,6 +214,8 @@ export function DesktopFilterMorePopover({ filters, presetLabels }: DesktopFilte
           {filters.map((f) =>
             f.type === 'select' ? (
               <SelectFilterField key={f.key} filter={f} />
+            ) : f.type === 'multiSelect' ? (
+              <MultiSelectFilterField key={f.key} filter={f} />
             ) : f.type === 'switch' ? (
               <Switch
                 key={f.key}

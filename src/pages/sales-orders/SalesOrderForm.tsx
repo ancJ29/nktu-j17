@@ -186,6 +186,10 @@ type ItemFormValues = {
   memo?: string;
 
   extraQuantity?: number;
+
+  isReady?: boolean;
+
+  warehouseMemo?: string;
 };
 
 type SalesOrderFormValues = {
@@ -1227,6 +1231,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           ...(item.sourceSetCode && { sourceSetCode: item.sourceSetCode }),
           ...(item.memo && { memo: item.memo }),
           ...(item.extraQuantity ? { extraQuantity: item.extraQuantity } : {}),
+          ...(item.isReady ? { isReady: true } : {}),
+          ...(item.warehouseMemo ? { warehouseMemo: item.warehouseMemo } : {}),
         })),
       };
     },
@@ -1312,6 +1318,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         ...(!item.role &&
           item.extraQuantity &&
           item.extraQuantity > 0 && { extraQuantity: item.extraQuantity }),
+
+        ...(item.role !== 'set-component' && item.isReady === true && { isReady: true }),
+
+        ...(item.role !== 'set-component' &&
+          item.warehouseMemo?.trim() && { warehouseMemo: item.warehouseMemo.trim() }),
       }));
 
       const selectedCustomer = values.customerId ? customerMap.get(values.customerId) : undefined;

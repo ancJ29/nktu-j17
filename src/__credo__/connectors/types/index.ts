@@ -454,7 +454,6 @@ export type {
   GetAllLookupsRequest as CredoSmeGetAllLookupsRequest,
   GetAllLookupsResponse as CredoSmeGetAllLookupsResponse,
   GetAppConfigAdminResponse as CredoSmeGetAppConfigAdminResponse,
-  GetLookupByIdResponse as CredoSmeGetLookupByIdResponse,
   GetMeNoChangeResponse as CredoSmeGetMeNoChangeResponse,
   GetMeResponse as CredoSmeGetMeResponse,
   ImportBatchLookupsRequest as CredoSmeImportBatchLookupsRequest,

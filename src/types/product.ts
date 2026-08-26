@@ -41,7 +41,6 @@ export type ProductExtra = {
   suggestedPrice?: number;
 
   category?: string;
-  tags?: string[];
 
   attributes?: Array<{ key: string; value: string }>;
 

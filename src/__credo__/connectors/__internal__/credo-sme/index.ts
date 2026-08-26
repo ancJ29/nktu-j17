@@ -14,7 +14,6 @@ import type {
   DeleteLookupResponse,
   GetAllLookupsRequest,
   GetAllLookupsResponse,
-  GetLookupByIdResponse,
   GetMeNoChangeResponse,
   GetMeResponse,
   ImportBatchLookupsRequest,
@@ -174,12 +173,6 @@ export const credoSmeConnector = {
   getAllLookups: (params?: GetAllLookupsRequest) =>
     lookupApi<GetAllLookupsResponse>(LOOKUP_ROUTES.GET_ALL, {
       ...(params?.hash !== undefined ? { queryParams: { hash: params.hash } } : {}),
-      extraHeaders: sessionHeaders(),
-    }),
-
-  getLookupById: ({ id }: { id: string }) =>
-    lookupApi<GetLookupByIdResponse>(LOOKUP_ROUTES.GET_BY_ID, {
-      params: { id },
       extraHeaders: sessionHeaders(),
     }),
 

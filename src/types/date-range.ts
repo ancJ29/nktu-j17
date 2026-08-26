@@ -38,6 +38,16 @@ export type MoreFilterSelect = {
   onChange: (value: string | null) => void;
 };
 
+export type MoreFilterMultiSelect = {
+  type: 'multiSelect';
+  key: string;
+  title: string;
+  placeholder?: string;
+  value: string[];
+  options: { value: string; label: string }[];
+  onChange: (value: string[]) => void;
+};
+
 export type MoreFilterSwitch = {
   type: 'switch';
   key: string;
@@ -47,4 +57,5 @@ export type MoreFilterSwitch = {
   color?: string;
 };
 
-export type MoreFilterDef = MoreFilterDateRange | MoreFilterSelect | MoreFilterSwitch;
+export type MoreFilterDef =
+  MoreFilterDateRange | MoreFilterSelect | MoreFilterMultiSelect | MoreFilterSwitch;

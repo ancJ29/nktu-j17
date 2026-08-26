@@ -18,10 +18,20 @@ export type SingleRecordsStoreConfig = {
   staleTime?: number;
 };
 
+const FOREIGN_WRITER_ENTITIES = new Set(['lookup']);
+
 export function createSingleRecordsStore<T extends SingleRecordRow>(
   config: SingleRecordsStoreConfig,
 ) {
   const { entity, uniqueField, cacheKey, cacheTTL, staleTime } = config;
+
+  if (FOREIGN_WRITER_ENTITIES.has(entity)) {
+    throw new Error(
+      `[single-records] "${entity}" is served by another BFF — routing it through ` +
+        `c-mngt's passthrough would make two writers of one envelope. See ` +
+        `useLookupV2Store's docblock.`,
+    );
+  }
 
   const target: CMngtSingleRecordTarget = {
     entity,

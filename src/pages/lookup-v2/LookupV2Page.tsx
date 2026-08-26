@@ -31,7 +31,7 @@ import { useShallow } from 'zustand/react/shallow';
 import { ActiveBadge } from '@/components/badges';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { DesktopOnlyGuard } from '@/components/DesktopOnlyGuard';
-import { EntityConflictError } from '@/stores/createEntityStore';
+import { EntityConflictError, validationFieldsOf } from '@/stores/createEntityStore';
 import { useLookupV2Store } from '@/stores/useLookupV2Store';
 import { perms } from '@/utils/permission';
 import type { LookupV2Row } from '@/types';
@@ -47,6 +47,32 @@ const canDelete = perms.lookupV2.canDelete();
 type FormValues = { value: string; label: string; sortOrder: number };
 
 export function LookupV2Page() {
+  if (enabledCategories.length === 0) return <NoCategoriesConfigured />;
+  return <LookupV2Manager />;
+}
+
+function NoCategoriesConfigured() {
+  const { t } = useTranslation();
+  return (
+    <DesktopOnlyGuard>
+      <Stack gap="lg">
+        <Stack gap={2}>
+          <Title order={3}>{t('nav.lookupsV2')}</Title>
+          <Text size="xs" c="dimmed">
+            {t('lookups.subtitle')}
+          </Text>
+        </Stack>
+        <Card withBorder padding="xl">
+          <Text size="sm" c="dimmed" ta="center">
+            {t('lookups.noCategories')}
+          </Text>
+        </Card>
+      </Stack>
+    </DesktopOnlyGuard>
+  );
+}
+
+function LookupV2Manager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
@@ -115,8 +141,17 @@ export function LookupV2Page() {
         } else {
           notifications.show({ color: 'green', message: t('lookups.notifications.updateSuccess') });
         }
-      } catch {
-        notifications.show({ color: 'red', message: t('lookups.notifications.writeError') });
+      } catch (err) {
+        if (err instanceof EntityConflictError) {
+          notifications.show({
+            color: 'yellow',
+            title: t('common.conflict.title'),
+            message: t('common.conflict.listMessage'),
+            autoClose: 10000,
+          });
+        } else {
+          notifications.show({ color: 'red', message: t('lookups.notifications.writeError') });
+        }
       } finally {
         setReordering(false);
       }
@@ -222,11 +257,21 @@ export function LookupV2Page() {
     async (values: FormValues) => {
       const nextValue = values.value.trim().toUpperCase();
 
-      const duplicate = categoryItems.find(
-        (l) => l.id !== editing?.id && l.value.trim().toUpperCase() === nextValue,
+      const duplicate = items.find(
+        (l) =>
+          l.category === registered.id &&
+          l.id !== editing?.id &&
+          l.value.trim().toUpperCase() === nextValue,
       );
       if (duplicate) {
-        form.setFieldError('value', t('lookups.validation.valueDuplicate'));
+        form.setFieldError(
+          'value',
+          t(
+            duplicate.extra?.isDeleted
+              ? 'lookups.validation.valueDuplicateHidden'
+              : 'lookups.validation.valueDuplicate',
+          ),
+        );
         return;
       }
 
@@ -253,13 +298,18 @@ export function LookupV2Page() {
         }
         closeForm();
       } catch (err) {
-        if (err instanceof EntityConflictError) onConflict(err.latest as LookupV2Row | undefined);
-        else notifications.show({ color: 'red', message: t('lookups.notifications.writeError') });
+        if (err instanceof EntityConflictError) {
+          onConflict(err.latest as LookupV2Row | undefined);
+        } else if (validationFieldsOf(err)) {
+          form.setFieldError('value', t('lookups.validation.valueDuplicateHidden'));
+        } else {
+          notifications.show({ color: 'red', message: t('lookups.notifications.writeError') });
+        }
       } finally {
         setSubmitting(false);
       }
     },
-    [registered, editing, form, categoryItems, t, closeForm, onConflict],
+    [registered, editing, form, items, t, closeForm, onConflict],
   );
 
   const handleToggleActive = useCallback(

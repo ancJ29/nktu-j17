@@ -234,8 +234,6 @@ export type BulkProduct = {
 
   category?: string;
 
-  tags?: string[];
-
   price?: number;
 
   basePrice?: number;
@@ -333,8 +331,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           barcode: 'barcode',
           description: 'description',
           category: 'category',
-          tags: 'tags',
-          tag: 'tags',
           price: 'price',
           'selling price': 'price',
           'base price': 'basePrice',
@@ -355,7 +351,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'mã vạch': 'barcode',
           'mô tả': 'description',
           'danh mục': 'category',
-          thẻ: 'tags',
           giá: 'price',
           'giá bán': 'price',
           'giá vốn': 'basePrice',
@@ -401,15 +396,6 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
 
             const fieldName = headerMapping[header];
             if (!fieldName) continue;
-
-            if (fieldName === 'tags') {
-              const list = value
-                .split(';')
-                .map((s) => s.trim())
-                .filter(Boolean);
-              if (list.length > 0) product.tags = list;
-              continue;
-            }
 
             if (numericFields.has(fieldName)) {
               if (fieldName === 'minInventoryValue') {
@@ -622,7 +608,6 @@ export const generateProductExcelTemplate = ({
     ...(hasBarcode ? [{ key: 'barcode' as const, header: labels.barcode, width: 16 }] : []),
     { key: 'description', header: labels.description, width: 36 },
     { key: 'category', header: labels.category, width: 18 },
-
     ...(hasPrice
       ? [
           { key: 'price' as const, header: labels.price, width: 12 },
@@ -1008,12 +993,12 @@ export const generateMaterialExcelTemplate = ({
         code: 'Mã vật tư',
         units: 'Đơn vị',
         category: 'Danh mục',
+        tags: 'Thẻ',
         costPrice: 'Giá vốn',
         minimumStock: 'Tồn kho tối thiểu',
         specification: 'Quy cách đóng gói',
         description: 'Mô tả',
         memo: 'Ghi chú',
-        tags: 'Thẻ',
         isActive: 'Đang sử dụng',
       }
     : {
@@ -1021,12 +1006,12 @@ export const generateMaterialExcelTemplate = ({
         code: 'Code',
         units: multiUnit ? 'Units' : 'Unit',
         category: 'Category',
+        tags: 'Tags',
         costPrice: 'Cost price',
         minimumStock: 'Min stock',
         specification: 'Packaging specification',
         description: 'Description',
         memo: 'Memo',
-        tags: 'Tags',
         isActive: 'Active',
       };
 
@@ -1107,8 +1092,6 @@ export type ProductExportOptions = {
 
   categoryLabels?: Record<string, string>;
 
-  tagLabels?: Record<string, string>;
-
   unitLabels?: Record<string, string>;
 
   hasHideFromInventoryList?: boolean;
@@ -1124,7 +1107,6 @@ export const exportProductsToExcel = (
     language,
     hasPrice = true,
     categoryLabels,
-    tagLabels,
     unitLabels,
     hasHideFromInventoryList = false,
     hasInventory = false,
@@ -1141,7 +1123,6 @@ export const exportProductsToExcel = (
     | 'barcode'
     | 'description'
     | 'category'
-    | 'tags'
     | 'alternativeNames'
     | 'attributes'
     | 'onHand'
@@ -1163,7 +1144,6 @@ export const exportProductsToExcel = (
         barcode: 'Mã vạch',
         description: 'Mô tả',
         category: 'Danh mục',
-        tags: 'Thẻ',
         alternativeNames: 'Tên gọi khác',
         attributes: 'Thuộc tính',
         onHand: 'Tồn kho hiện tại',
@@ -1183,7 +1163,6 @@ export const exportProductsToExcel = (
         barcode: 'Barcode',
         description: 'Description',
         category: 'Category',
-        tags: 'Tags',
         alternativeNames: 'Alternative names',
         attributes: 'Attributes',
         onHand: 'On hand',
@@ -1204,7 +1183,6 @@ export const exportProductsToExcel = (
     { key: 'barcode', header: labels.barcode, width: 16 },
     { key: 'description', header: labels.description, width: 36 },
     { key: 'category', header: labels.category, width: 18 },
-    { key: 'tags', header: labels.tags, width: 24 },
     { key: 'alternativeNames', header: labels.alternativeNames, width: 28 },
     { key: 'attributes', header: labels.attributes, width: 36 },
 
@@ -1251,7 +1229,6 @@ export const exportProductsToExcel = (
         barcode: e.barcode ?? '',
         description: p.description ?? '',
         category: resolveLabel(e.category, categoryLabels),
-        tags: (e.tags ?? []).map((tv) => resolveLabel(tv, tagLabels)).join('; '),
         alternativeNames: (e.alternativeNames ?? []).join('; '),
         attributes: (e.attributes ?? [])
           .filter((a) => a.key.trim() && a.value.trim())

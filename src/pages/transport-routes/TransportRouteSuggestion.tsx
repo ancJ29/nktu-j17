@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useContainerSizeLabel } from '../transport-orders/containerSize';
-import { routeLaborTotal } from './routeSummary';
-import { useRouteCosting } from './useRouteCosting';
 
 type Props = {
   readonly matches: readonly TransportRouteRow[];
@@ -17,8 +15,6 @@ type Props = {
 export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Props) {
   const { t } = useTranslation();
   const containerSizeLabel = useContainerSizeLabel();
-
-  const { costOf } = useRouteCosting();
 
   if (matches.length === 0) return null;
 
@@ -33,49 +29,35 @@ export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Prop
 
         {matches.map((route) => {
           const applied = appliedCode === route.code;
-          const costing = costOf(route);
-
-          const suggested = costing.markupPercent > 0 ? costing.suggestedPrice : 0;
           return (
             <Group key={route.id} justify="space-between" wrap="nowrap" gap="md">
               <Group gap="xs" wrap="wrap" style={{ minWidth: 0 }}>
                 <Text ff="monospace" fw={600} fz="sm">
                   {route.code}
                 </Text>
+                {/* Suppressed when it merely repeats the code — a client that
+                    names a route after its own code should not read it twice. */}
+                {route.name && route.name !== route.code && (
+                  <Text fz="sm" fw={500}>
+                    {route.name}
+                  </Text>
+                )}
                 {route.containerSize && (
                   <Badge size="xs" variant="light" color="cyan" tt="none" radius="sm">
                     {containerSizeLabel(route.containerSize)}
                   </Badge>
                 )}
-                {/* Shown unguarded: the strip only ever renders inside the
-                    order FORM, which is already an authoring surface with every
-                    fee amount on it. `canViewPrice` guards the list and detail
-                    page, not this. */}
+                {/* The ONE number, and the only one applying actually copies:
+                    what the customer is charged. Shown unguarded because the
+                    strip renders inside the order FORM, which is already an
+                    authoring surface carrying every fee amount — this is not a
+                    figure the operator is being shown for the first time. */}
                 <Text size="xs" c="dimmed">
                   {t('transportRoutes.suggestion.freight')}{' '}
                   <Text span size="sm" c="dark" fw={500}>
                     {formatMoney(route.freightAmount)}
                   </Text>
                 </Text>
-                <Text size="xs" c="dimmed">
-                  {t('transportRoutes.suggestion.labor')}{' '}
-                  <Text span size="sm" c="dark" fw={500}>
-                    {formatMoney(routeLaborTotal(route))}
-                  </Text>
-                </Text>
-                {/* GIÁ BÁO ĐỀ XUẤT — shown, never applied. Áp dụng still copies
-                    the route's authored PHÍ VẬN CHUYỂN, because that is the
-                    price somebody decided; the markup-derived figure is advice
-                    about it. A suggestion that overwrote the decided price would
-                    make the price list stop being where a price is set. */}
-                {suggested > 0 && (
-                  <Text size="xs" c="dimmed">
-                    {t('transportRoutes.costing.suggestedPrice', { markup: costing.markupPercent })}{' '}
-                    <Text span size="sm" c="dark" fw={500}>
-                      {formatMoney(suggested)}
-                    </Text>
-                  </Text>
-                )}
                 {route.extra?.notes && (
                   <Text size="xs" c="dimmed" fs="italic" lineClamp={1}>
                     {route.extra.notes}

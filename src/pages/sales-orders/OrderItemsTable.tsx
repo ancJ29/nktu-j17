@@ -1,6 +1,17 @@
-import { Badge, Box, Card, Divider, Group, Stack, Table, Text } from '@mantine/core';
+import {
+  Badge,
+  Box,
+  Card,
+  Checkbox,
+  Divider,
+  Group,
+  Stack,
+  Table,
+  Text,
+  Tooltip,
+} from '@mantine/core';
 import { IconBoxMultiple, IconMapPin } from '@tabler/icons-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
 import { InlineTextareaField, type InlineEditLabels } from '@credo/base-ui/components';
@@ -50,6 +61,12 @@ type OrderItemsTableProps = {
   canEditItemMemo?: boolean;
   onItemMemoSave?: (itemIndex: number, memo: string) => Promise<void>;
 
+  showItemReady?: boolean;
+  onItemReadySave?: (itemIndex: number, isReady: boolean) => Promise<void>;
+
+  showItemWarehouseMemo?: boolean;
+  onItemWarehouseMemoSave?: (itemIndex: number, warehouseMemo: string) => Promise<void>;
+
   productPhotoOnHover?: boolean;
 };
 
@@ -61,6 +78,10 @@ export function OrderItemsTable({
   inventoryLinkageState,
   canEditItemMemo = false,
   onItemMemoSave,
+  showItemReady = false,
+  onItemReadySave,
+  showItemWarehouseMemo = false,
+  onItemWarehouseMemoSave,
   productPhotoOnHover = false,
   currentOrderNumber,
 }: OrderItemsTableProps) {
@@ -70,11 +91,56 @@ export function OrderItemsTable({
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
 
   const memoEditable = canEditItemMemo && !!onItemMemoSave;
+
+  const [readySaving, setReadySaving] = useState<number | null>(null);
+  const readyEditable = showItemReady && !!onItemReadySave;
+  const renderReadyBox = (item: SalesOrderItem) => {
+    const idx = items.indexOf(item);
+    return (
+      <Checkbox
+        checked={item.isReady === true}
+        disabled={!readyEditable || readySaving !== null || idx < 0}
+        aria-label={t('salesOrders.detail.itemReady')}
+        onChange={async (e) => {
+          const next = e.currentTarget.checked;
+          setReadySaving(idx);
+          try {
+            await onItemReadySave!(idx, next);
+          } catch {
+            // The handler already surfaced the conflict toast and re-seeded the
+            // order; the box re-renders from that state, so there is nothing to
+            // roll back here.
+          } finally {
+            setReadySaving(null);
+          }
+        }}
+      />
+    );
+  };
   const inlineEditLabels: InlineEditLabels = {
     edit: t('__new__.01-common.actions.edit'),
     save: t('__new__.01-common.actions.save'),
     cancel: t('__new__.01-common.actions.cancel'),
   };
+  const warehouseMemoEditable = showItemWarehouseMemo && !!onItemWarehouseMemoSave;
+  const renderWarehouseMemo = (item: SalesOrderItem) =>
+    warehouseMemoEditable ? (
+      <InlineTextareaField
+        canEdit
+        value={item.warehouseMemo ?? ''}
+        onSave={async (next) => {
+          const idx = items.indexOf(item);
+          if (idx >= 0) await onItemWarehouseMemoSave!(idx, next);
+        }}
+        placeholder={''}
+        emptyPlaceholder={''}
+        labels={inlineEditLabels}
+      />
+    ) : item.warehouseMemo ? (
+      <Text size="sm" c="dimmed" fs="italic" style={{ wordBreak: 'break-word' }}>
+        {item.warehouseMemo}
+      </Text>
+    ) : null;
   const renderMemoEditor = (item: SalesOrderItem) => (
     <InlineTextareaField
       canEdit
@@ -192,6 +258,15 @@ export function OrderItemsTable({
             >
               <Stack gap="sm">
                 <Group justify="space-between" wrap="nowrap" align="flex-start" gap="sm">
+                  {/* Deliberately NOT desktop-only. `mobile-workflow.md` §4 bars
+                      inline-edit *pencils* — a value edited in place in a
+                      read-only slot — and its line is "mobile doesn't AUTHOR a
+                      record". A picking tick is neither: it is a control that
+                      looks like a control, reversible in one tap, and the
+                      warehouse does this on the floor with a phone. Desktop-only
+                      here would be a picking feature that picking staff can't
+                      reach. */}
+                  {showItemReady && !isSetChild && <Box pt={2}>{renderReadyBox(item)}</Box>}
                   <Box style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
                     <Group gap={6} wrap="nowrap">
                       {isSetParent && (
@@ -275,6 +350,12 @@ export function OrderItemsTable({
                   {!isSetChild && item.memo && (
                     <FieldRow label={t('salesOrders.detail.itemMemo')} value={item.memo} />
                   )}
+                  {showItemWarehouseMemo && !isSetChild && (
+                    <FieldRow
+                      label={t('salesOrders.detail.itemWarehouseMemo')}
+                      value={renderWarehouseMemo(item)}
+                    />
+                  )}
                   {showPrice && !isSetChild && !isSetParent && (
                     <FieldRow
                       label={t('common.detail.lineTotal')}
@@ -346,6 +427,17 @@ export function OrderItemsTable({
         <Table.Thead>
           <Table.Tr>
             <Table.Th w={40}>#</Table.Th>
+            {/* Leading, not trailing: the warehouse scans down this column and
+                nothing else, so it must not sit behind the price columns. */}
+            {showItemReady && (
+              <Table.Th w={64} style={{ textAlign: 'center' }}>
+                <Tooltip label={t('salesOrders.detail.itemReadyTooltip')} withArrow>
+                  <Text size="sm" fw={700} span>
+                    {t('salesOrders.detail.itemReady')}
+                  </Text>
+                </Tooltip>
+              </Table.Th>
+            )}
             <Table.Th w={120}>{t('common.labels.sku')}</Table.Th>
             <Table.Th w={200}>{t('common.labels.productName')}</Table.Th>
             <Table.Th style={{ textAlign: 'center' }}>{t('salesOrders.detail.quantity')}</Table.Th>
@@ -368,9 +460,17 @@ export function OrderItemsTable({
                 </Table.Th>
               </>
             )}
-            <Table.Th style={{ textAlign: 'center' }} w={200} pr="md">
+            <Table.Th style={{ textAlign: 'center' }} w={200} pr={showItemWarehouseMemo ? 0 : 'md'}>
               {t('salesOrders.form.itemMemoLabel')}
             </Table.Th>
+            {/* Its own column, beside the sales note rather than merged into it:
+                one says what to do with the line, the other says what happened
+                to it, and reading them in one cell loses who is speaking. */}
+            {showItemWarehouseMemo && (
+              <Table.Th style={{ textAlign: 'center' }} w={200} pr="md">
+                {t('salesOrders.detail.itemWarehouseMemo')}
+              </Table.Th>
+            )}
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>
@@ -398,6 +498,14 @@ export function OrderItemsTable({
                 }
               >
                 <Table.Td c="dimmed">{idx + 1}</Table.Td>
+                {showItemReady && (
+                  <Table.Td style={{ textAlign: 'center' }}>
+                    {/* Set children aren't picked individually — the parent line
+                        is the thing that leaves the warehouse, same rule the
+                        memo column follows. */}
+                    {isSetChild ? null : renderReadyBox(item)}
+                  </Table.Td>
+                )}
                 <Table.Td>
                   <Text size="sm" ff="monospace" c="dimmed">
                     {getSku(item.productCode) || '—'}
@@ -546,7 +654,7 @@ export function OrderItemsTable({
                 )}
                 <Table.Td
                   style={{ textAlign: memoEditable && !isSetChild ? 'left' : 'right' }}
-                  pr="md"
+                  pr={showItemWarehouseMemo ? 0 : 'md'}
                 >
                   {memoEditable && !isSetChild ? (
                     renderMemoEditor(item)
@@ -556,6 +664,14 @@ export function OrderItemsTable({
                     </Text>
                   ) : null}
                 </Table.Td>
+                {showItemWarehouseMemo && (
+                  <Table.Td
+                    style={{ textAlign: warehouseMemoEditable && !isSetChild ? 'left' : 'right' }}
+                    pr="md"
+                  >
+                    {isSetChild ? null : renderWarehouseMemo(item)}
+                  </Table.Td>
+                )}
               </Table.Tr>
             );
           })}

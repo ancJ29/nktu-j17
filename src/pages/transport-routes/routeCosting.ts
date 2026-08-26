@@ -76,14 +76,6 @@ export function computeRouteCosting(
   };
 }
 
-export function quoteMargin(
-  quotedPrice: number,
-  costPrice: number,
-): { amount: number; percent: number | null } {
-  const amount = (quotedPrice || 0) - (costPrice || 0);
-  return { amount, percent: costPrice > 0 ? (amount / costPrice) * 100 : null };
-}
-
 export function routeUsesFuelPricing(
   route: Pick<TransportRouteRow, 'segments'>,
   litersPer100km: number | undefined,

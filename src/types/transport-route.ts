@@ -46,6 +46,8 @@ export type TransportRouteExtra = {
 export type TransportRouteRow = SingleRecordRow & {
   code: string;
 
+  name?: string;
+
   isActive: boolean;
 
   isMultiTrip?: boolean;
@@ -59,6 +61,10 @@ export type TransportRouteRow = SingleRecordRow & {
   containerSize?: string;
 
   freightAmount: number;
+
+  basePay?: number;
+
+  allowance?: number;
 
   laborCost?: number;
 

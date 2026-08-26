@@ -10,7 +10,6 @@ import {
   SimpleGrid,
   Stack,
   Switch,
-  TagsInput,
   Text,
   TextInput,
   Textarea,
@@ -63,7 +62,6 @@ export type ProductFormValues = {
 
   suggestedPrice: number;
   category: string;
-  tags: string[];
   attributes: Array<{ key: string; value: string }>;
   minInventoryValue: number | '';
   minInventoryUnit: string;
@@ -498,7 +496,6 @@ export function SingleProductForm({
 
   const categoryOptions = useLookupV2Options('product-category');
   const unitOptions = useLookupV2Options('product-unit');
-  const tagOptions = useLookupV2Options('product-tag');
   const categoryData = useMemo(
     () => categoryOptions.map((o) => ({ value: o.value, label: o.label })),
     [categoryOptions],
@@ -507,8 +504,6 @@ export function SingleProductForm({
     () => unitOptions.map((o) => ({ value: o.value, label: o.label })),
     [unitOptions],
   );
-
-  const tagData = useMemo(() => tagOptions.map((o) => o.label), [tagOptions]);
 
   const selectedUnitData = useMemo(
     () =>
@@ -625,13 +620,6 @@ export function SingleProductForm({
   const classificationCard = (
     <SectionCard icon={<IconCategory size={14} />} title={t('products.form.classificationSection')}>
       <Stack gap="md">
-        <TagsInput
-          label={t('products.form.tagsLabel')}
-          placeholder={t('products.form.tagsPlaceholder')}
-          clearable
-          data={tagData}
-          {...form.getInputProps('tags')}
-        />
         <AttributesField form={form} />
       </Stack>
     </SectionCard>

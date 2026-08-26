@@ -175,7 +175,6 @@ export function ProductListPage() {
     [categoryLookups],
   );
 
-  const tagLookups = useLookupV2Options('product-tag');
   const unitLookups = useLookupV2Options('product-unit');
 
   useEffect(() => {
@@ -292,13 +291,11 @@ export function ProductListPage() {
     setIsExporting(true);
     try {
       const categoryLabels = Object.fromEntries(categoryLookups.map((o) => [o.value, o.label]));
-      const tagLabels = Object.fromEntries(tagLookups.map((o) => [o.value, o.label]));
       const unitLabels = Object.fromEntries(unitLookups.map((o) => [o.value, o.label]));
       exportProductsToExcel(allProducts, {
         language: i18n.language,
         hasPrice: priceVisible,
         categoryLabels,
-        tagLabels,
         unitLabels,
         hasHideFromInventoryList: hideFromInventoryListEnabled,
         hasInventory: inventoryEnabled,
@@ -313,7 +310,7 @@ export function ProductListPage() {
     } finally {
       setIsExporting(false);
     }
-  }, [allProducts, categoryLookups, tagLookups, unitLookups, onHandByCode, i18n.language, t]);
+  }, [allProducts, categoryLookups, unitLookups, onHandByCode, i18n.language, t]);
 
   return (
     <>
