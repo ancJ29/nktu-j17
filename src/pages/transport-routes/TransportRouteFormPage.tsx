@@ -47,7 +47,6 @@ import type { TransportRouteExtra, TransportRouteRow } from '@/types';
 import { usePlaceSuggestions } from '../transport-orders/usePlaceSuggestions';
 import { useContainerSizeOptions } from '../transport-orders/containerSize';
 import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
-import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { useTruckTypeOptions } from './truckType';
 import { buildTransportRouteWrite, deriveSegmentsFromLegs } from './transportRouteWrite';
 import {
