@@ -3576,7 +3576,8 @@
       "deliveryDate": "Delivery Date",
       "labels": "Labels",
       "orderDate": "Order Date",
-      "orderNumber": "Order Number"
+      "orderNumber": "Order Number",
+      "totalQuantityInline": "Total item"
     },
     "configErrors": {
       "description": "The Sales Orders module has been disabled because its configuration is invalid. Fix these issues in App Config and reload:",
@@ -3703,6 +3704,7 @@
       "tabPhotos": "Photos",
       "tabProductPhotos": "Product Photos",
       "tags": "Tags",
+      "totalQuantity": "Total items",
       "viewItems": "View items",
       "warehouseNote": "Warehouse note"
     },
