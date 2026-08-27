@@ -56,25 +56,25 @@ export function VendorDataTable({
         ),
       },
       {
-        key: 'contactPerson',
-        header: t('common.columns.contactPerson'),
-        accessor: 'contactPerson' as keyof Vendor,
-      },
-      {
         key: 'phone',
+        width: '140px',
         header: t('common.labels.phone'),
-        render: (item: Vendor) =>
-          item.phone ? (
-            <PhoneNumber
-              value={item.phone}
-              size="sm"
-              c="dimmed"
-              copyTooltip={t('__new__.01-common.actions.copy')}
-              copiedTooltip={t('common.labels.copied')}
-            />
-          ) : (
-            <Text size="sm">-</Text>
-          ),
+        render: (item: Vendor) => {
+          return (
+            <>
+              <Text size="sm">{item.contactPerson}</Text>
+              {item.phone ? (
+                <PhoneNumber
+                  value={item.phone}
+                  size="sm"
+                  c="dimmed"
+                  copyTooltip={t('__new__.01-common.actions.copy')}
+                  copiedTooltip={t('common.labels.copied')}
+                />
+              ) : null}
+            </>
+          );
+        },
       },
       ...(origin
         ? [
@@ -105,6 +105,7 @@ export function VendorDataTable({
         : []),
       {
         key: 'status',
+        width: '150px',
         header: t('__new__.01-common.labels.status'),
         render: (item: Vendor) => (
           <ActiveBadge

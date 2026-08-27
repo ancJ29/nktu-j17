@@ -58,31 +58,31 @@ export function CustomerDataTable({
         ),
       },
       {
-        key: 'contactPerson',
-        header: t('common.columns.contactPerson'),
-        accessor: 'contactPerson' as keyof Customer,
-      },
-      {
         key: 'phone',
+        width: '140px',
         header: t('common.labels.phone'),
-        render: (item: Customer) =>
-          item.phone ? (
-            <PhoneNumber
-              value={item.phone}
-              size="sm"
-              c="dimmed"
-              copyTooltip={t('__new__.01-common.actions.copy')}
-              copiedTooltip={t('common.labels.copied')}
-            />
-          ) : (
-            <Text size="sm">-</Text>
-          ),
+        render: (item: Customer) => {
+          return (
+            <>
+              <Text size="sm">{item.contactPerson}</Text>
+              {item.phone ? (
+                <PhoneNumber
+                  value={item.phone}
+                  size="sm"
+                  c="dimmed"
+                  copyTooltip={t('__new__.01-common.actions.copy')}
+                  copiedTooltip={t('common.labels.copied')}
+                />
+              ) : null}
+            </>
+          );
+        },
       },
       ...(showAddress
         ? [
             {
               key: 'address',
-              width: '280px',
+              width: '300px',
               header: t('common.labels.address'),
               render: (item: Customer) => (
                 <AddressWithMapLink
@@ -95,6 +95,7 @@ export function CustomerDataTable({
         : []),
       {
         key: 'status',
+        width: '150px',
         header: t('__new__.01-common.labels.status'),
         render: (item: Customer) => (
           <ActiveBadge

@@ -215,6 +215,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     filterFn: () => true,
     searchFields: (item) => [
       item.orderNumber,
+      item.extra?.customerPONumber ?? '',
       resolveSalesOrderCustomerName(item, getCustomerByCode) ?? '',
     ],
 
