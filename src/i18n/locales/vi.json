@@ -3576,8 +3576,7 @@
       "deliveryDate": "Ngày giao",
       "labels": "Nhãn",
       "orderDate": "Ngày đặt",
-      "orderNumber": "Số đơn hàng",
-      "totalQuantityInline": "Tổng SL"
+      "orderNumber": "Số đơn hàng"
     },
     "configErrors": {
       "description": "Module Đơn hàng đã bị tắt do cấu hình không hợp lệ. Vui lòng sửa các lỗi sau trong Cấu hình ứng dụng rồi tải lại:",
@@ -3704,7 +3703,6 @@
       "tabPhotos": "Ảnh",
       "tabProductPhotos": "Ảnh sản phẩm",
       "tags": "Nhãn",
-      "totalQuantity": "Tổng số lượng",
       "viewItems": "Xem sản phẩm",
       "warehouseNote": "Ghi chú cho kho"
     },
@@ -3790,6 +3788,7 @@
       "tagsLabel": "Nhãn",
       "tagsPlaceholder": "Chọn nhãn",
       "totalAmountLabel": "Tổng tiền",
+      "totalQuantityLabel": "Tổng số lượng",
       "updateButton": "Cập nhật đơn hàng",
       "warehouseNoteLabel": "Ghi chú cho kho",
       "warehouseNotePlaceholder": "Ghi chú cho nhân viên kho"

@@ -20,7 +20,6 @@ import { selectionColumn } from '@/components/selectionColumn';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
-import { getSalesOrderTotalQuantity } from '@/utils/salesOrderItemQuantity';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import {
   computeSalesOrderTotals,
@@ -140,20 +139,13 @@ export function SalesOrderDataTable({
         {
           key: 'orderNumber',
           header: t('salesOrders.columns.orderNumber'),
-
-          width: '260px',
+          width: '200px',
           render: (item: SalesOrder) => (
             <Stack gap={2}>
               <Group gap={6} wrap="nowrap">
                 <Text fz="md" fw={500}>
                   {item.orderNumber}
                 </Text>
-                {item.items.length > 0 && (
-                  <Text fz="sm" c="dimmed" style={{ flexShrink: 0 }}>
-                    ({t('salesOrders.columns.totalQuantityInline')}:{' '}
-                    {getSalesOrderTotalQuantity(item.items).toLocaleString()})
-                  </Text>
-                )}
                 {showCheatMarker && isCheatCompletedSalesOrder(item) && (
                   <Tooltip
                     label={t('salesOrders.cheatMarker.tooltip')}

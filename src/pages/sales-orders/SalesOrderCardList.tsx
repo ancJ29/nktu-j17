@@ -24,7 +24,6 @@ import { FieldRow } from '@/components/FieldRow';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
-import { getSalesOrderTotalQuantity } from '@/utils/salesOrderItemQuantity';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import { getPricingVatRate } from '@/utils/permission';
 import {
@@ -143,12 +142,6 @@ export function SalesOrderCardList({
                   <Text fw={700} size="lg" style={{ minWidth: 0, wordBreak: 'break-word' }}>
                     {order.orderNumber}
                   </Text>
-                  {order.items.length > 0 && (
-                    <Text size="sm" c="dimmed" style={{ flexShrink: 0 }}>
-                      ({t('salesOrders.columns.totalQuantityInline')}:{' '}
-                      {getSalesOrderTotalQuantity(order.items).toLocaleString()})
-                    </Text>
-                  )}
                   {showCheatMarker && isCheatCompletedSalesOrder(order) && (
                     <Tooltip
                       label={t('salesOrders.cheatMarker.tooltip')}

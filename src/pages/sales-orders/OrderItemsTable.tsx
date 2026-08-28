@@ -27,10 +27,7 @@ import {
   isPricingManagementEnabled,
   perms,
 } from '@/utils/permission';
-import {
-  getLinePhysicalQuantity,
-  getSalesOrderTotalQuantity,
-} from '@/utils/salesOrderItemQuantity';
+import { getLinePhysicalQuantity } from '@/utils/salesOrderItemQuantity';
 import {
   getSequentialAvailability,
   getUnitAvailabilityAtLocation,
@@ -89,8 +86,6 @@ export function OrderItemsTable({
   currentOrderNumber,
 }: OrderItemsTableProps) {
   const stockSettled = inventoryLinkageState === 'shipped' || inventoryLinkageState === 'released';
-
-  const totalQuantity = useMemo(() => getSalesOrderTotalQuantity(items), [items]);
   const { t } = useTranslation();
 
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
@@ -412,27 +407,15 @@ export function OrderItemsTable({
             </Card>
           );
         })}
-        {items.length > 0 && (
-          <Stack gap={4} px="md" py="sm" bg="gray.0" style={{ borderRadius: 8 }}>
-            <Group justify="space-between">
-              <Text size="sm" fw={600} c="dimmed">
-                {t('salesOrders.detail.totalQuantity')}
-              </Text>
-              <Text size="md" fw={700} ff="monospace">
-                {totalQuantity.toLocaleString()}
-              </Text>
-            </Group>
-            {showPrice && (
-              <Group justify="space-between">
-                <Text size="sm" fw={600} c="dimmed">
-                  {t('common.columns.totalAmount')}
-                </Text>
-                <Text size="md" fw={700} ff="monospace">
-                  {totalAmount?.toLocaleString() ?? '-'}
-                </Text>
-              </Group>
-            )}
-          </Stack>
+        {showPrice && (
+          <Group justify="space-between" px="md" py="sm" bg="gray.0" style={{ borderRadius: 8 }}>
+            <Text size="sm" fw={600} c="dimmed">
+              {t('common.columns.totalAmount')}
+            </Text>
+            <Text size="md" fw={700} ff="monospace">
+              {totalAmount?.toLocaleString() ?? '-'}
+            </Text>
+          </Group>
         )}
       </Stack>
     );
@@ -694,33 +677,20 @@ export function OrderItemsTable({
           })}
         </Table.Tbody>
       </Table>
-      {items.length > 0 && (
+      {showPrice && (
         <Group
           justify="flex-end"
-          gap="xl"
           px="md"
           py="sm"
           bg="gray.0"
           style={{ borderTop: '2px solid var(--mantine-color-gray-3)' }}
         >
-          <Group gap="xs">
-            <Text size="sm" fw={600} c="dimmed">
-              {t('salesOrders.detail.totalQuantity')}
-            </Text>
-            <Text size="lg" fw={700} ff="monospace">
-              {totalQuantity.toLocaleString()}
-            </Text>
-          </Group>
-          {showPrice && (
-            <Group gap="xs">
-              <Text size="sm" fw={600} c="dimmed">
-                {t('common.columns.totalAmount')}
-              </Text>
-              <Text size="lg" fw={700} ff="monospace">
-                {totalAmount?.toLocaleString() ?? '-'}
-              </Text>
-            </Group>
-          )}
+          <Text size="sm" fw={600} c="dimmed">
+            {t('common.columns.totalAmount')}
+          </Text>
+          <Text size="lg" fw={700} ff="monospace">
+            {totalAmount?.toLocaleString() ?? '-'}
+          </Text>
         </Group>
       )}
     </>

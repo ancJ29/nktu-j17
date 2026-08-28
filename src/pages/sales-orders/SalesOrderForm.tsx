@@ -118,7 +118,10 @@ import {
 import { emitInventoryActivityForApplied } from '@/utils/inventoryActivityEmit';
 import { buildReservedLinkage } from '@/utils/inventoryLinkage';
 import { getShortagePolicy, isExtraDeliveryQuantityAllowed } from '@/utils/permission';
-import { getLinePhysicalQuantity } from '@/utils/salesOrderItemQuantity';
+import {
+  getLinePhysicalQuantity,
+  getSalesOrderTotalQuantity,
+} from '@/utils/salesOrderItemQuantity';
 import { formatPlanFailures } from './planFailures';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { logActivity } from '@/utils/activityLogger';
@@ -1248,6 +1251,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [form.getValues().items],
   );
 
+  const totalQuantity = useMemo(
+    () => getSalesOrderTotalQuantity(form.getValues().items.filter((i) => i.productCode)),
+
+    [form.getValues().items],
+  );
+
   type LineShortage = {
     idx: number;
     productCode: string;
@@ -2197,15 +2206,30 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 onShowPhotos={(code, name) => setPhotoProduct({ code, name })}
               />
 
-              {/* Total amount */}
-              {pricingEnabled && (
-                <Group justify="flex-end" mt="xs">
-                  <Text size="sm" fw={600}>
-                    {t('salesOrders.form.totalAmountLabel')}:
-                  </Text>
-                  <Text size="sm" fw={700}>
-                    {totalAmount.toLocaleString()}
-                  </Text>
+              {/* Totals. The item count is not money, so unlike the amount it
+                  carries no pricing gate. */}
+              {(totalQuantity > 0 || pricingEnabled) && (
+                <Group justify="flex-end" mt="xs" gap="xl">
+                  {totalQuantity > 0 && (
+                    <Group gap="xs">
+                      <Text size="sm" fw={600}>
+                        {t('salesOrders.form.totalQuantityLabel')}:
+                      </Text>
+                      <Text size="sm" fw={700}>
+                        {totalQuantity.toLocaleString()}
+                      </Text>
+                    </Group>
+                  )}
+                  {pricingEnabled && (
+                    <Group gap="xs">
+                      <Text size="sm" fw={600}>
+                        {t('salesOrders.form.totalAmountLabel')}:
+                      </Text>
+                      <Text size="sm" fw={700}>
+                        {totalAmount.toLocaleString()}
+                      </Text>
+                    </Group>
+                  )}
                 </Group>
               )}
 
@@ -2569,6 +2593,8 @@ function UnitField({
   );
 }
 
+const selectableProduct = (p: Product) => p.isActive && !p.extra?.isDeleted;
+
 function DesktopItemTable({
   form,
   productSelectData,
@@ -2687,7 +2713,7 @@ function DesktopItemTable({
                           placeholder={t('common.labels.productName')}
                           code={item.productCode || null}
                           name={item.productName || null}
-                          filter={(p) => p.isActive && !p.extra?.isDeleted}
+                          filter={selectableProduct}
                           onChange={(opt) => onProductSelect(idx, opt)}
                           error={form.errors[`items.${idx}.productCode`]}
                           style={{ flex: 1 }}

@@ -50,17 +50,23 @@ const buildChiHoSummarySheet = (
     customer,
     resolveFeeName,
   }: Pick<CustomerReportInput, 'seller' | 'customer' | 'resolveFeeName'>,
-): { ws: XLSX.WorkSheet; lineCount: number } => {
-  const lines = rows.flatMap((order) =>
-    readFeeLines(order)
-      .filter(
+): { ws: XLSX.WorkSheet; rowCount: number } => {
+  const entries = rows
+    .map((order) => {
+      const fees = readFeeLines(order).filter(
         (f) =>
           f.kind === 'passthrough' &&
           isBillableFee(f) &&
           ((f as TransportOrderFee).amount || 0) !== 0,
-      )
-      .map((fee) => ({ order, fee })),
-  );
+      );
+      return {
+        order,
+        amount: fees.reduce((sum, f) => sum + ((f as TransportOrderFee).amount || 0), 0),
+        labels: fees.map((f) => resolveFeeName(f.label)).join(', '),
+        count: fees.length,
+      };
+    })
+    .filter((e) => e.count > 0);
 
   const D_STT = 0;
   const D_DECL = 1;
@@ -113,16 +119,16 @@ const buildChiHoSummarySheet = (
 
   let total = 0;
   const rFirstData = aoa.length;
-  lines.forEach(({ order, fee }, i) => {
+  entries.forEach(({ order, amount, labels }, i) => {
     const row: CellValue[] = new Array(colCount).fill('');
     row[D_STT] = i + 1;
     row[D_DECL] = order.declarationNumber ?? '';
 
     row[D_QTY] = 1;
-    row[D_PRICE] = (fee as TransportOrderFee).amount || 0;
-    row[D_DESC] = resolveFeeName(fee.label);
+    row[D_PRICE] = amount;
+    row[D_DESC] = labels;
     aoa.push(row);
-    total += (fee as TransportOrderFee).amount || 0;
+    total += amount;
   });
   const rLastData = aoa.length - 1;
 
@@ -200,7 +206,7 @@ const buildChiHoSummarySheet = (
     setFmt(r, D_PRICE, FMT_MONEY_DASH);
   }
 
-  return { ws, lineCount: lines.length };
+  return { ws, rowCount: entries.length };
 };
 
 export const buildCustomerReportType4: CustomerReportBuilder = (
@@ -441,7 +447,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
 
   const chiHo = buildChiHoSummarySheet(rows, { seller, customer, resolveFeeName });
-  if (chiHo.lineCount > 0) {
+  if (chiHo.rowCount > 0) {
     XLSX.utils.book_append_sheet(workbook, chiHo.ws, 'TỔNG HỢP CHI PHÍ CHI HỘ');
   }
 
