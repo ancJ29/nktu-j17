@@ -1,9 +1,5 @@
-import { Anchor, Group, Text, Tooltip, type MantineSize } from '@mantine/core';
+import { Anchor, Group, Text, type MantineSize } from '@mantine/core';
 import { IconMapPin } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
-import { device } from '@credo/base-ui/utils';
-
-const isMobile = device.isMobile;
 
 type AddressWithMapLinkProps = {
   readonly address?: string | null;
@@ -15,6 +11,8 @@ type AddressWithMapLinkProps = {
   readonly size?: MantineSize;
 
   readonly fw?: number;
+
+  readonly maxWidth?: string;
 };
 
 export function AddressWithMapLink({
@@ -23,8 +21,8 @@ export function AddressWithMapLink({
   fallback = '-',
   size = 'sm',
   fw,
+  maxWidth = '100%',
 }: AddressWithMapLinkProps) {
-  const { t } = useTranslation();
   const mapLink = googleMapUrl ? (
     <Anchor
       href={googleMapUrl}
@@ -34,21 +32,22 @@ export function AddressWithMapLink({
       style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
     >
       <IconMapPin size={14} />
-      {t('__new__.01-common.actions.openInMaps')}
     </Anchor>
   ) : null;
   return (
     <Group gap="xs" align="center" wrap="nowrap" justify="flex-start">
-      <Text size={size} fw={fw} style={{ minWidth: 0, textAlign: 'left' }}>
+      <Text
+        size={size}
+        fw={fw}
+        style={{
+          minWidth: 0,
+          textAlign: 'left',
+          maxWidth,
+        }}
+      >
         {address || fallback}
       </Text>
-      {mapLink ? (
-        isMobile ? (
-          mapLink
-        ) : (
-          <Tooltip label={t('__new__.01-common.hints.openInMaps')}>{mapLink}</Tooltip>
-        )
-      ) : null}
+      {mapLink}
     </Group>
   );
 }

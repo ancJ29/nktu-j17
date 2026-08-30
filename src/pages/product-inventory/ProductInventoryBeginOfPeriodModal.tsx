@@ -22,15 +22,13 @@ import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { logActivity } from '@/utils/activityLogger';
 import { DEFAULT_LOCATION_CODE, isDefaultLocation } from '@/types';
-import type { Product, ProductInventoryExtra, ProductInventoryRow } from '@/types';
+import type { ProductInventoryExtra, ProductInventoryRow } from '@/types';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { applyDelta, readRowBreakdown } from '@/utils/inventoryMath';
 import { getBeginOfPeriodValue, getCurrentPeriodKey } from '@/utils/inventoryPeriod';
 import { type BeginOfPeriodMode, computeBeginOfPeriodChange } from '@/utils/inventoryBeginOfPeriod';
 import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { Form } from '@/components/Form';
-
-const selectableProduct = (p: Product) => p.isActive && !p.extra?.isDeleted;
 
 type Props = {
   readonly opened: boolean;
@@ -230,7 +228,6 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
             code={picked?.code ?? null}
             name={picked?.name ?? null}
             onChange={setPicked}
-            filter={selectableProduct}
             withAsterisk
             comboboxProps={{ withinPortal: true }}
           />

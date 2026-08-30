@@ -3,6 +3,7 @@ import {
   ActionIcon,
   Affix,
   Alert,
+  Anchor,
   Badge,
   Box,
   Button,
@@ -27,8 +28,10 @@ import {
   IconEdit,
   IconHistory,
   IconPackage,
+  IconPhone,
   IconPhoto,
   IconTrash,
+  IconUser,
 } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -200,8 +203,16 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
   const contactName = partyIsCustomer
     ? customerDisplayName || ''
     : resolvedVendor?.extra?.shortName?.trim() || resolvedVendor?.name || request.vendorName || '';
-  const contactPhone = (partyIsCustomer ? resolvedCustomer?.phone : resolvedVendor?.phone) ?? '';
-  const contactCopyText = [contactName, drExtra.deliveryAddress, drExtra.googleMapUrl, contactPhone]
+  const resolvedParty = partyIsCustomer ? resolvedCustomer : resolvedVendor;
+  const contactPhone = resolvedParty?.phone?.trim() ?? '';
+  const contactPerson = resolvedParty?.contactPerson?.trim() ?? '';
+  const contactCopyText = [
+    contactName,
+    drExtra.deliveryAddress,
+    drExtra.googleMapUrl,
+    contactPerson,
+    contactPhone,
+  ]
     .map((s) => s?.trim())
     .filter(Boolean)
     .join('\n');
@@ -291,18 +302,11 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     />
   );
 
-  const deliveryAddressMobile = (
+  const deliveryAddress = (
     <AddressWithMapLink
       address={drExtra.deliveryAddress}
       googleMapUrl={drExtra.googleMapUrl}
       size="xs"
-    />
-  );
-  const deliveryAddressDesktop = (
-    <AddressWithMapLink
-      address={drExtra.deliveryAddress}
-      googleMapUrl={drExtra.googleMapUrl}
-      fw={500}
     />
   );
 
@@ -451,32 +455,12 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
         <FieldLabel>{partyLabel}</FieldLabel>
         <Box>{partyContent}</Box>
       </Stack>
-      <Group gap="xs" wrap="nowrap">
-        {directionBadge}
-        {copyContactButton}
-      </Group>
     </Group>
   );
 
   const salesOrderLinkContent = showsSalesOrderLink ? (
     <SalesOrderLink id={request.salesOrderId} fallbackLabel={request.salesOrderNumber} />
   ) : null;
-
-  const metadataFooter = (
-    <Group justify="flex-end" gap="md" wrap="nowrap">
-      <Text size="xs" c="dimmed">
-        {t('common.labels.createdAt')} · {formatDateTime(request.createdAt)}
-      </Text>
-      <Text size="xs" c="dimmed">
-        {t('common.labels.updatedAt')} · {formatDateTime(request.updatedAt)}
-      </Text>
-      {request.closedAt && (
-        <Text size="xs" c="dimmed">
-          {t('deliveryRequests.detail.closedAt')} · {formatDateTime(request.closedAt)}
-        </Text>
-      )}
-    </Group>
-  );
 
   const mobileInfoFields = (
     <Stack gap="sm">
@@ -501,10 +485,29 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
         )}
       </SimpleGrid>
 
-      <DetailField label={addressLabel}>{deliveryAddressMobile}</DetailField>
-      <DetailField label={t('__new__.01-common.labels.note')}>{notesField}</DetailField>
+      <DetailField label={t('common.columns.contactPerson')}>
+        <Group gap="xs" align="center" wrap="nowrap" justify="flex-start">
+          {contactPerson && (
+            <Group gap={4} wrap="nowrap">
+              <IconUser size={14} color="var(--mantine-color-dimmed)" style={{ flexShrink: 0 }} />
+              <Text size="sm" fw={500}>
+                {contactPerson}
+              </Text>
+            </Group>
+          )}
+          {contactPhone && (
+            <Group gap={4} wrap="nowrap">
+              <IconPhone size={14} style={{ flexShrink: 0 }} />
+              <Anchor size="sm" href={`tel:${contactPhone}`}>
+                {contactPhone}
+              </Anchor>
+            </Group>
+          )}
+        </Group>
+      </DetailField>
 
-      {metadataFooter}
+      <DetailField label={addressLabel}>{deliveryAddress}</DetailField>
+      <DetailField label={t('__new__.01-common.labels.note')}>{notesField}</DetailField>
     </Stack>
   );
 
@@ -532,15 +535,41 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       </SimpleGrid>
 
       <Grid gutter="md">
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <DetailField label={addressLabel}>{deliveryAddressDesktop}</DetailField>
+        {contactPerson || contactPhone ? (
+          <Grid.Col span={{ base: 12, md: 3 }}>
+            <DetailField label={t('common.columns.contactPerson')}>
+              <Group mb="xs" gap="xs" align="center" wrap="nowrap" justify="flex-start">
+                {contactPerson && (
+                  <Group gap={4} wrap="nowrap">
+                    <IconUser
+                      size={14}
+                      color="var(--mantine-color-dimmed)"
+                      style={{ flexShrink: 0 }}
+                    />
+                    <Text size="sm" fw={500}>
+                      {contactPerson}
+                    </Text>
+                  </Group>
+                )}
+                {contactPhone && (
+                  <Group gap={4} wrap="nowrap">
+                    <IconPhone size={14} style={{ flexShrink: 0 }} />
+                    <Anchor size="sm" href={`tel:${contactPhone}`}>
+                      {contactPhone}
+                    </Anchor>
+                  </Group>
+                )}
+              </Group>
+            </DetailField>
+          </Grid.Col>
+        ) : null}
+        <Grid.Col span={{ base: 12, md: 4 }}>
+          <DetailField label={addressLabel}>{deliveryAddress}</DetailField>
         </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
+        <Grid.Col span={{ base: 12, md: 4 }}>
           <DetailField label={t('__new__.01-common.labels.note')}>{notesField}</DetailField>
         </Grid.Col>
       </Grid>
-
-      {metadataFooter}
     </Stack>
   );
 

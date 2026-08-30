@@ -2593,8 +2593,6 @@ function UnitField({
   );
 }
 
-const selectableProduct = (p: Product) => p.isActive && !p.extra?.isDeleted;
-
 function DesktopItemTable({
   form,
   productSelectData,
@@ -2713,7 +2711,6 @@ function DesktopItemTable({
                           placeholder={t('common.labels.productName')}
                           code={item.productCode || null}
                           name={item.productName || null}
-                          filter={selectableProduct}
                           onChange={(opt) => onProductSelect(idx, opt)}
                           error={form.errors[`items.${idx}.productCode`]}
                           style={{ flex: 1 }}

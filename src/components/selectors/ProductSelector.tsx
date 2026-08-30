@@ -3,6 +3,12 @@ import { useMemo } from 'react';
 import { useProductStore } from '@/stores/useProductStore';
 import type { Product } from '@/types';
 import { PRODUCT_SELECTOR_PRIMARY_NAMES_ONLY } from '@/config/productDisplayDefaults';
+import {
+  isSelectable,
+  toOptions,
+  withSelectedProduct,
+  type Option,
+} from './productSelectorOptions';
 
 export type ProductSelectorChange = {
   code: string;
@@ -26,50 +32,29 @@ export type ProductSelectorProps = Omit<
   filter?: (p: Product) => boolean;
 };
 
-const defaultFilter = (p: Product) => !p.extra?.isDeleted;
-
-type Option = {
-  value: string;
-  label: string;
-  code: string;
-  name: string;
-  units: string[];
-  sku?: string;
-  product: Product;
-};
-
-const noAlternativeNames = PRODUCT_SELECTOR_PRIMARY_NAMES_ONLY;
+const noExtraFilter = () => true;
 
 export function ProductSelector({
   code,
   name,
   onChange,
-  filter = defaultFilter,
+  filter = noExtraFilter,
   searchable = true,
   ...rest
 }: ProductSelectorProps) {
   const products = useProductStore((s) => s.items);
 
-  const options = useMemo<Option[]>(
+  const selectable = useMemo<Option[]>(
     () =>
-      products.filter(filter).flatMap((p) => {
-        const sku = p.extra?.sku?.trim() ?? '';
-        const units = p.extra?.units?.length ? p.extra.units : p.unit ? [p.unit] : [];
-        const alts = noAlternativeNames
-          ? []
-          : (p.extra?.alternativeNames?.filter((n) => n?.trim()) ?? []);
-        const names = [p.name, ...alts];
-        return names.map((variantName, nameIdx) => ({
-          value: `${p.code}__${nameIdx}`,
-          label: sku ? `${variantName} · ${sku}` : variantName,
-          code: p.code,
-          name: variantName,
-          units,
-          sku: sku || undefined,
-          product: p,
-        }));
-      }),
+      products
+        .filter((p) => isSelectable(p) && filter(p))
+        .flatMap((p) => toOptions(p, PRODUCT_SELECTOR_PRIMARY_NAMES_ONLY)),
     [products, filter],
+  );
+
+  const options = useMemo<Option[]>(
+    () => withSelectedProduct(selectable, products, code, PRODUCT_SELECTOR_PRIMARY_NAMES_ONLY),
+    [selectable, products, code],
   );
 
   const optionMap = useMemo(() => {
