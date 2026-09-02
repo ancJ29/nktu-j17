@@ -59,7 +59,8 @@ const FEE_NAME_COLUMN: Readonly<Record<string, Type1FeeColumnKey>> = {
   PHI_THAO_NHAN: 'other',
   LO_XE: 'other',
   VE_SINH_CONT: 'other',
-  PHU_PHI_DAU: 'other', // Phụ phí đầu
+
+  PHU_PHI_DAU: 'other', // Phụ phí dầu
 };
 
 export const CHI_HO_FEE_NAMES: ReadonlyArray<string> = [

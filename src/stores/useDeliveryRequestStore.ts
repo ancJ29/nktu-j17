@@ -4,15 +4,12 @@ import { cMngtConnector } from '@credo/connectors/connector';
 import { createEntityStore } from './createEntityStore';
 import { createPartitionedSyncFetcher } from './createPartitionedFetcher';
 import { ONE_MINUTE } from '@credo/kits/time';
+import { partitionDayKey as fmt } from '@/utils/partitionReconcile';
 
 type DeliveryRequestPatch = Omit<
   Parameters<typeof cMngtConnector.updateDeliveryRequest<DeliveryRequestExtra>>[0],
   'id'
 >;
-
-function fmt(d: Date) {
-  return d.toISOString().slice(0, 10);
-}
 
 const DEFAULT_RANGE_DAYS = 90;
 

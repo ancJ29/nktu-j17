@@ -5,7 +5,11 @@ import type {
 } from '@credo/connectors/types';
 import { logger } from '@credo/base-ui/utils';
 import { persistPartitions, readPartitions } from '@/utils/partitionCache';
-import { enumerateDates, reconcilePartitionSync } from '@/utils/partitionReconcile';
+import {
+  enumerateDates,
+  partitionDayKey as fmt,
+  reconcilePartitionSync,
+} from '@/utils/partitionReconcile';
 import {
   createEntityStore,
   recordHash,
@@ -34,10 +38,6 @@ export type PartitionedRecordsStoreConfig = {
 
   keysForRange?: (from: string, to: string) => string[];
 };
-
-function fmt(d: Date): string {
-  return d.toISOString().slice(0, 10);
-}
 
 export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
   config: PartitionedRecordsStoreConfig,

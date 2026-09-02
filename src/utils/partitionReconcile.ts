@@ -17,6 +17,13 @@ export type PartitionReconcileResult<T> = {
   missing: string[];
 };
 
+export function partitionDayKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 export function enumerateDates(from: string, to: string): string[] {
   const start = new Date(`${from}T00:00:00`);
   const end = new Date(`${to}T00:00:00`);
