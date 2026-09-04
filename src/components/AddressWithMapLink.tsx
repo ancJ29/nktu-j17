@@ -1,6 +1,5 @@
 import { Anchor, Group, Text, type MantineSize } from '@mantine/core';
 import { IconMapPin } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
 
 type AddressWithMapLinkProps = {
   readonly address?: string | null;
