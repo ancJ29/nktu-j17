@@ -1360,6 +1360,7 @@
       "directionInbound": "Nhận hàng",
       "directionInboundDesc": "Nhận hàng từ nhà cung cấp — chọn từ danh sách NCC hoặc nhập tay tên NCC vãng lai. Không cần đơn hàng.",
       "directionLabel": "Loại phiếu",
+      "directionAdditional": "Giao bổ sung",
       "directionOutbound": "Giao hàng",
       "directionOutboundDesc": "Giao hàng cho khách — có thể liên kết với đơn hàng (tùy chọn).",
       "driverLabel": "Người phụ trách",

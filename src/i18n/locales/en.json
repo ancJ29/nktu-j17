@@ -1360,6 +1360,7 @@
       "directionInbound": "Receive",
       "directionInboundDesc": "Goods coming in from a vendor — pick from the vendor list or type a name for a one-off vendor. No sales order needed.",
       "directionLabel": "Type",
+      "directionAdditional": "Additional",
       "directionOutbound": "Deliver",
       "directionOutboundDesc": "Goods going out to a customer — optionally linked to a sales order.",
       "driverLabel": "Driver",

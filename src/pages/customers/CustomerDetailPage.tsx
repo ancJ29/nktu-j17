@@ -492,6 +492,7 @@ export function CustomerDetailPage() {
               <AddressWithMapLink
                 address={customer.address}
                 googleMapUrl={extra.addressGoogleMapUrl}
+                iconLabel={t('__new__.01-common.actions.openInMaps')}
               />
             </Stack>
           </Card>
@@ -509,7 +510,11 @@ export function CustomerDetailPage() {
               <Badge variant="light" color="indigo" radius="sm" size="sm" w="fit-content">
                 {t('customers.detail.shippingAddress')}
               </Badge>
-              <AddressWithMapLink address={sa.address} googleMapUrl={sa.googleMapUrl} />
+              <AddressWithMapLink
+                address={sa.address}
+                googleMapUrl={sa.googleMapUrl}
+                iconLabel={t('__new__.01-common.actions.openInMaps')}
+              />
               {sa.deliveryHours && (
                 <Text size="xs" c="dimmed">
                   {t('customers.detail.receivingHours')}: {sa.deliveryHours}

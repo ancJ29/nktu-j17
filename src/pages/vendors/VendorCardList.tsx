@@ -80,6 +80,7 @@ export function VendorCardList({ vendors, isLoading, origin }: VendorCardListPro
                 <AddressWithMapLink
                   address={item.address}
                   googleMapUrl={item.extra?.addressGoogleMapUrl}
+                  iconLabel={t('__new__.01-common.actions.openInMaps')}
                   size="xs"
                 />
               )}

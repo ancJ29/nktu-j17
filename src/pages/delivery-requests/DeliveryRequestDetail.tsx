@@ -306,6 +306,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     <AddressWithMapLink
       address={drExtra.deliveryAddress}
       googleMapUrl={drExtra.googleMapUrl}
+      iconLabel={t('__new__.01-common.actions.openInMaps')}
       size="xs"
     />
   );

@@ -1,18 +1,15 @@
 import { Anchor, Group, Text, type MantineSize } from '@mantine/core';
 import { IconMapPin } from '@tabler/icons-react';
+import { useTranslation } from 'react-i18next';
 
 type AddressWithMapLinkProps = {
   readonly address?: string | null;
-
   readonly googleMapUrl?: string | null;
-
   readonly fallback?: string;
-
   readonly size?: MantineSize;
-
   readonly fw?: number;
-
   readonly maxWidth?: string;
+  readonly iconLabel?: string;
 };
 
 export function AddressWithMapLink({
@@ -22,6 +19,7 @@ export function AddressWithMapLink({
   size = 'sm',
   fw,
   maxWidth = '100%',
+  iconLabel,
 }: AddressWithMapLinkProps) {
   const mapLink = googleMapUrl ? (
     <Anchor
@@ -32,6 +30,7 @@ export function AddressWithMapLink({
       style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
     >
       <IconMapPin size={14} />
+      {iconLabel}
     </Anchor>
   ) : null;
   return (
