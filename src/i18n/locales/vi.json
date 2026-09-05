@@ -1391,7 +1391,7 @@
     },
     "kind": {
       "return": "Trả hàng",
-      "sample": "Lấy mẫu"
+      "sample": "Nhận hàng"
     },
     "noItems": "Không có yêu cầu giao hàng nào",
     "notifications": {
@@ -1430,8 +1430,8 @@
       "syncedTitle": "Đã đồng bộ"
     },
     "receiveSource": {
-      "sample": "Lấy mẫu từ khách",
-      "sampleDesc": "Lấy mẫu từ khách hàng.",
+      "sample": "Nhận hàng từ khách",
+      "sampleDesc": "Nhận hàng từ khách.",
       "vendor": "Từ nhà cung cấp",
       "vendorDesc": "Nhận hàng từ nhà cung cấp."
     },
