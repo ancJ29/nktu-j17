@@ -3977,11 +3977,11 @@
         "fees_other": "{{count}} fee lines",
         "fieldAdvanceAmount": "Advance",
         "fieldBillNumber": "B/L no.",
-        "fieldDeclarationNumber": "Customs declaration no.",
         "fieldContainerNumber": "Container no.",
         "fieldContainerSize": "Container size",
         "fieldContractNo": "Contract no.",
         "fieldCustomer": "Customer",
+        "fieldDeclarationNumber": "Customs declaration no.",
         "fieldDisbursementCount": "Disbursements",
         "fieldDriver": "Driver",
         "fieldEntryDate": "Date",
@@ -3992,6 +3992,7 @@
         "fieldTripCount": "Trips",
         "fieldTripLaborTotal": "Total driver pay",
         "fieldTruck": "Truck",
+        "fieldTruckType": "Vehicle type",
         "fieldVatRate": "VAT rate",
         "fromTo": "{{from}} → {{to}}",
         "notesChanged": "Note changed",
@@ -4051,7 +4052,8 @@
       "multiTrip": "Multi-trip",
       "multiTripHint": "The job runs several legs — each with its own route, date, truck, driver and driver pay.",
       "noTrucks": "No trucks found. Add trucks under Assets → Trucks.",
-      "shipmentType": "Type"
+      "shipmentType": "Type",
+      "truckType": "Vehicle type"
     },
     "locked": {
       "notice": "This order has entered a manifest and is locked — it can no longer be edited or deleted."

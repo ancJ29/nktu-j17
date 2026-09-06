@@ -420,6 +420,8 @@ const TransportOrderFeaturesSchema = z
 
     nonContainerTruckTypes: z.array(z.string()).default([]),
 
+    orderTruckTypes: z.array(z.string()).default([]),
+
     statusOptions: z.array(TransportOrderStatusOptionSchema).default([]),
 
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
@@ -436,6 +438,7 @@ const TransportOrderFeaturesSchema = z
     codePadLength: 3,
     routeCodePrefix: 'TUYEN-',
     nonContainerTruckTypes: [],
+    orderTruckTypes: [],
     statusOptions: [],
     statusTransitions: {},
     driverDepartments: [],

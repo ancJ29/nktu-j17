@@ -345,7 +345,6 @@ export function ProductInventoryDataTable({
               {
                 key: 'location',
                 header: t('common.labels.location'),
-                filter: getColumnFilter?.('location'),
                 render: (s: ProductInventorySummary) => {
                   if (s.rows.length === 0) {
                     return (
@@ -647,7 +646,6 @@ export function ProductInventoryDataTable({
             </Tooltip>
           ),
           ta: 'center' as const,
-          filter: getColumnFilter?.('secondaryStatus'),
           render: (s: ProductInventorySummary) => (
             <Box ta="center">
               <InventorySecondaryStatusBadge status={s.secondaryStatus} />

@@ -17,6 +17,8 @@ export type TransportOrderWriteFields = {
   truckPlate: string;
   driverId: string;
   driverName: string;
+
+  truckType: string;
   billNumber: string;
 
   declarationNumber: string;
@@ -75,8 +77,11 @@ export function buildTransportOrderWrite(
   const { subtotal } = computeTransportOrderTotals(fees, fields.vatRate);
 
   const trips = fields.isMultiTrip ? fields.trips : [];
+
+  const { truckType, extra, ...rest } = fields;
   return {
-    ...fields,
+    ...rest,
+    extra: { ...extra, ...(truckType ? { truckType } : {}) },
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
     fees,
     trips,

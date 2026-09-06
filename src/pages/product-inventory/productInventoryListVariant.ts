@@ -35,5 +35,5 @@ export const NKTU_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = 
   quickChipMode: 'none',
   showBeginOfPeriod: true,
   showOutgoingDetailModal: true,
-  showColumnHeaderFilters: false,
+  showColumnHeaderFilters: true,
 };

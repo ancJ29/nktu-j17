@@ -269,6 +269,8 @@ export type CMngtTransportOrderFeatures = {
 
   nonContainerTruckTypes?: string[];
 
+  orderTruckTypes?: string[];
+
   statusOptions: CMngtTransportOrderStatusOption[];
 
   statusTransitions?: Record<string, string[]>;

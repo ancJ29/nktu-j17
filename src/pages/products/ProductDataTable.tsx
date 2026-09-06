@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Product } from '@/types';
 import { CodeLabel, ColorBadge, DataTable } from '@credo/base-ui/components';
+import type { DataTableColumnFilterConfig } from '@credo/base-ui/hooks';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { ProductThumb } from './ProductThumb';
@@ -34,6 +35,8 @@ type ProductDataTableProps = {
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;
+
+  readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
 };
 
 export function ProductDataTable({
@@ -44,6 +47,7 @@ export function ProductDataTable({
   hasMore,
   onLoadMore,
   loadingMoreLabel,
+  getColumnFilter,
 }: ProductDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -58,6 +62,7 @@ export function ProductDataTable({
           key: 'name',
           header: t('common.labels.name'),
           width: '250px',
+          filter: getColumnFilter?.('name'),
           render: (item: Product) => {
             const altNames = item.extra?.alternativeNames ?? [];
             return (
@@ -101,6 +106,7 @@ export function ProductDataTable({
               {
                 key: 'basePrice',
                 ta: 'right' as const,
+                filter: getColumnFilter?.('basePrice'),
                 width: '140px',
                 header: t('__new__.07-entities.products.labels.basePriceLabel'),
                 render: (item: Product) => (
@@ -112,6 +118,7 @@ export function ProductDataTable({
               {
                 key: 'price',
                 ta: 'right' as const,
+                filter: getColumnFilter?.('price'),
                 width: '140px',
                 header: t('common.columns.price'),
                 render: (item: Product) => (
@@ -123,6 +130,7 @@ export function ProductDataTable({
               {
                 key: 'suggestedPrice',
                 ta: 'right' as const,
+                filter: getColumnFilter?.('suggestedPrice'),
                 width: '140px',
                 header: t('products.form.suggestedPriceLabel'),
                 render: (item: Product) => (
@@ -138,6 +146,7 @@ export function ProductDataTable({
               {
                 key: 'onHand',
                 ta: 'right',
+                filter: getColumnFilter?.('onHand'),
                 width: '200px',
                 header: t('common.columns.onHand'),
                 render: (item: Product) => {
@@ -209,8 +218,9 @@ export function ProductDataTable({
         header: string;
         render: (item: Product) => React.ReactNode;
         ta?: 'left' | 'center' | 'right';
+        filter?: DataTableColumnFilterConfig;
       }[],
-    [t, onHandByCode, unitLabels, categoryLabels],
+    [t, onHandByCode, unitLabels, categoryLabels, getColumnFilter],
   );
 
   const handleRowClick = (item: Product) => {

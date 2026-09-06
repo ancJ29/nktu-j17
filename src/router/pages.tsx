@@ -19,9 +19,15 @@ export const EmployeeOrgSettingsPage = lazy(() =>
   import('../pages/employees').then((m) => ({ default: m.EmployeeOrgSettingsPage })),
 );
 
-export const ProductListPage = lazy(() =>
+const ProductListPageDefault = lazy(() =>
   import('../pages/products').then((m) => ({ default: m.ProductListPage })),
 );
+const ProductListPageNKTU = lazy(() =>
+  import('../pages/products/NKTUProductListPage').then((m) => ({
+    default: m.NKTUProductListPage,
+  })),
+);
+export const ProductListPage = byClient({ nktu: ProductListPageNKTU }, ProductListPageDefault);
 export const ProductDetailPage = lazy(() =>
   import('../pages/products').then((m) => ({ default: m.ProductDetailPage })),
 );

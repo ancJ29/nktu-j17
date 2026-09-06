@@ -36,7 +36,7 @@ import {
 import { allOptionFilter } from '@/components/mobileFilterDefs';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { perms } from '@/utils/permission';
-import { isDefaultLocation, type Product, type ProductInventorySummary } from '@/types';
+import type { Product, ProductInventorySummary } from '@/types';
 import { buildProductInventorySummaries } from '@/utils/productInventorySummaries';
 
 import { buildProductInventoryColumnFilterDefs } from './productInventoryColumnFilters';
@@ -111,7 +111,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const shouldDisplaySecondaryHeaderBadges = variant.showSecondaryKpiBadges;
 
   const secondaryFilterEnabled =
-    variant.showSecondaryFilter || variant.quickChipMode === 'secondary';
+    variant.showSecondaryFilter ||
+    variant.quickChipMode === 'secondary' ||
+    variant.showSecondaryKpiBadges;
 
   const {
     items: allRows,
@@ -214,34 +216,13 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     }),
     [t],
   );
-  const locationNameByCode = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const l of locations) map.set(l.code, l.name);
-    return map;
-  }, [locations]);
 
   const columnFilterDefs: ColumnFilterDef<ProductInventorySummary>[] = useMemo(
     () =>
       variant.showColumnHeaderFilters
-        ? buildProductInventoryColumnFilterDefs({
-            locationLabelOf: (code) =>
-              isDefaultLocation(code)
-                ? t('productInventory.defaultLocationBadge')
-                : (locationNameByCode.get(code) ?? code),
-            secondaryStatusLabelOf: (value) => secondaryStatusLabels[value] ?? value,
-            inboundIndex,
-            locationsEnabled,
-            labels: columnFilterLabels,
-          })
+        ? buildProductInventoryColumnFilterDefs({ inboundIndex, labels: columnFilterLabels })
         : [],
-    [
-      variant.showColumnHeaderFilters,
-      t,
-      locationNameByCode,
-      secondaryStatusLabels,
-      inboundIndex,
-      columnFilterLabels,
-    ],
+    [variant.showColumnHeaderFilters, inboundIndex, columnFilterLabels],
   );
 
   const columnFilters = useColumnFilters(summaries, columnFilterDefs, {
@@ -625,20 +606,22 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               )}
               {shouldDisplaySecondaryHeaderBadges ? (
                 <>
-                  {/* Drill-down only while the secondary filter has a visible
-                      control — a badge click must never apply a filter the
-                      operator can't see or clear. Without one the badges are
-                      read-only counts. */}
-                  {secondaryMustOrderCount > 0 && (
+                  {/* Each badge toggles its own bucket and renders `filled`
+                      while it holds — that pressed state is what lets the
+                      badges be the *only* control on this dimension for a
+                      client whose bar has no secondary dropdown. A held bucket
+                      keeps its badge at count 0, or the one control that could
+                      clear it would vanish with the last matching row. */}
+                  {(secondaryMustOrderCount > 0 || secondaryFilter === 'mustOrder') && (
                     <Badge
                       size="xs"
-                      variant="light"
+                      variant={secondaryFilter === 'mustOrder' ? 'filled' : 'light'}
                       color="orange"
                       radius="sm"
                       tt="lowercase"
-                      style={secondaryFilterEnabled ? { cursor: 'pointer' } : undefined}
-                      onClick={
-                        secondaryFilterEnabled ? () => setSecondaryFilter('mustOrder') : undefined
+                      style={{ cursor: 'pointer' }}
+                      onClick={() =>
+                        setSecondaryFilter(secondaryFilter === 'mustOrder' ? null : 'mustOrder')
                       }
                     >
                       {t('productInventory.kpis.secondaryMustOrder', {
@@ -646,16 +629,16 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                       })}
                     </Badge>
                   )}
-                  {secondaryOutOfStockCount > 0 && (
+                  {(secondaryOutOfStockCount > 0 || secondaryFilter === 'outOfStock') && (
                     <Badge
                       size="xs"
-                      variant="light"
+                      variant={secondaryFilter === 'outOfStock' ? 'filled' : 'light'}
                       color="red"
                       radius="sm"
                       tt="lowercase"
-                      style={secondaryFilterEnabled ? { cursor: 'pointer' } : undefined}
-                      onClick={
-                        secondaryFilterEnabled ? () => setSecondaryFilter('outOfStock') : undefined
+                      style={{ cursor: 'pointer' }}
+                      onClick={() =>
+                        setSecondaryFilter(secondaryFilter === 'outOfStock' ? null : 'outOfStock')
                       }
                     >
                       {t('productInventory.kpis.secondaryOutOfStock', {
@@ -812,6 +795,12 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             hideStatus
             filters={mobileFilters}
             onClear={clearFilters}
+
+            hasActiveFilters={
+              !!search ||
+              mobileFilters.some((f) => (f.multi ? f.value.length > 0 : f.value !== 'all')) ||
+              (secondaryFilterEnabled && secondaryFilter !== null)
+            }
             labelChips
           />
         ) : (
@@ -826,7 +815,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             hasActiveFilters={
               !!search ||
               desktopFilters.some((f) => f.value !== null) ||
-              columnFilters.hasActiveFilters
+              columnFilters.hasActiveFilters ||
+              (secondaryFilterEnabled && secondaryFilter !== null)
             }
           />
         )}

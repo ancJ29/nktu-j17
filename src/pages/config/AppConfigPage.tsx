@@ -2262,6 +2262,41 @@ export function ConfigEditor({
                       clearable
                     />
                   </Paper>
+                  {/* Which vehicle types this client BOOKS jobs as — a subset
+                      of the register, since a fleet may hold kinds of truck the
+                      client never sells a job as. One key drives two surfaces
+                      because they are one statement; the order is the tab
+                      order. */}
+                  <Paper p="xs" withBorder>
+                    <Text fz="sm" fw={600} mb={4}>
+                      Job Vehicle Types
+                    </Text>
+                    <Text fz="xs" c="dimmed" mb="xs">
+                      The vehicle types this client books transport orders as. Narrows the order
+                      form&rsquo;s &ldquo;Vehicle type&rdquo; picker and gives the order list one
+                      tab per entry, in the order picked here (plus an &ldquo;All&rdquo; tab). Leave
+                      empty to offer every registered type and show no tabs. The fleet register and
+                      the route price list are unaffected either way.
+                    </Text>
+                    <MultiSelect
+                      data={truckTypeOptions}
+                      value={transportOrdersFeatures.orderTruckTypes ?? []}
+                      onChange={(v) =>
+                        setTransportOrdersFeatures({
+                          ...transportOrdersFeatures,
+                          orderTruckTypes: v,
+                        })
+                      }
+                      placeholder={
+                        truckTypeOptions.length === 0
+                          ? 'No vehicle types configured under Meta-data'
+                          : 'None — offer every type, no tabs'
+                      }
+                      size="sm"
+                      searchable
+                      clearable
+                    />
+                  </Paper>
                   <TransportOrderConfigInvariantAlert
                     features={transportOrdersFeatures}
                     knownDepartments={

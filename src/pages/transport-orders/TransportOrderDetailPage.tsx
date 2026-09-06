@@ -93,6 +93,7 @@ import { useFeeNameLabel } from './feeName';
 import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { useShipmentTypeLabel } from './shipmentType';
+import { useTruckTypeLabel } from '../transport-routes/truckType';
 import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
 import { isExternalTruck } from './externalTruck';
 import { ExternalTruckChip } from './TransportVehicle';
@@ -148,6 +149,7 @@ export function TransportOrderDetailPage() {
 
   const containerSizeLabel = useContainerSizeLabel();
   const shipmentTypeLabel = useShipmentTypeLabel();
+  const truckTypeLabel = useTruckTypeLabel();
 
   const feeNameLabel = useFeeNameLabel();
 
@@ -716,6 +718,13 @@ export function TransportOrderDetailPage() {
                   {infoRow(t('transportOrders.form.driver'), driverField)}
                 </>
               )}
+              {/* LOẠI XE — read-only here, unlike the two rows above it. It is
+              booked, not corrected by phone: which type a job is sold as decides
+              its route price and whether it carries a container at all, and both
+              of those are re-derived only by the form. Shown on both job shapes,
+              and absent on orders written before the field. */}
+              {order.extra?.truckType &&
+                infoRow(t('transportOrders.form.truckType'), truckTypeLabel(order.extra.truckType))}
               {infoRow(t('transportOrders.columns.bill'), billNumberField)}
               {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
               {infoRow(t('transportOrders.columns.container'), containerNumberField)}

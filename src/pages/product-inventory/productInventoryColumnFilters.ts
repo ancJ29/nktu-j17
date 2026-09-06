@@ -4,11 +4,7 @@ import type { InboundEntry } from '@/hooks';
 import type { ProductInventorySummary } from '@/types';
 
 type BuildArgs = {
-  readonly locationLabelOf: (code: string) => string;
-  readonly secondaryStatusLabelOf: (value: string) => string;
-
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
-  readonly locationsEnabled: boolean;
   readonly labels: DataTableColumnFilterLabels;
 };
 
@@ -21,10 +17,7 @@ const formatNumber = (value: string): string => {
 };
 
 export function buildProductInventoryColumnFilterDefs({
-  locationLabelOf,
-  secondaryStatusLabelOf,
   inboundIndex,
-  locationsEnabled,
   labels,
 }: BuildArgs): ColumnFilterDef<ProductInventorySummary>[] {
   const incomingOf = (s: ProductInventorySummary) =>
@@ -37,17 +30,6 @@ export function buildProductInventoryColumnFilterDefs({
       getValue: (s) => s.product.name,
       labels,
     },
-    ...(locationsEnabled
-      ? [
-          {
-            key: 'location',
-
-            getValue: (s: ProductInventorySummary) => s.rows.map((r) => r.locationCode),
-            getLabel: locationLabelOf,
-            labels,
-          },
-        ]
-      : []),
     {
       key: 'minStock',
       getValue: (s) => numeric(s.product.extra?.minimumInventory?.value),
@@ -84,12 +66,6 @@ export function buildProductInventoryColumnFilterDefs({
       key: 'forecasted',
       getValue: (s) => numeric(s.totalAvailable + incomingOf(s)),
       getLabel: formatNumber,
-      labels,
-    },
-    {
-      key: 'secondaryStatus',
-      getValue: (s) => s.secondaryStatus,
-      getLabel: secondaryStatusLabelOf,
       labels,
     },
   ];

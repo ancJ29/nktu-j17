@@ -3977,11 +3977,11 @@
         "fees_other": "{{count}} dòng phí",
         "fieldAdvanceAmount": "Tạm ứng",
         "fieldBillNumber": "Số B/L",
-        "fieldDeclarationNumber": "Số tờ khai",
         "fieldContainerNumber": "Số container",
         "fieldContainerSize": "Loại container",
         "fieldContractNo": "Số hợp đồng",
         "fieldCustomer": "Khách hàng",
+        "fieldDeclarationNumber": "Số tờ khai",
         "fieldDisbursementCount": "Chi hộ",
         "fieldDriver": "Tài xế",
         "fieldEntryDate": "Ngày",
@@ -3992,6 +3992,7 @@
         "fieldTripCount": "Số chặng",
         "fieldTripLaborTotal": "Tổng lương chuyến",
         "fieldTruck": "Xe",
+        "fieldTruckType": "Loại xe",
         "fieldVatRate": "Thuế suất VAT",
         "fromTo": "{{from}} → {{to}}",
         "notesChanged": "Ghi chú đã thay đổi",
@@ -4051,7 +4052,8 @@
       "multiTrip": "Nhiều chặng",
       "multiTripHint": "Đơn chạy nhiều chặng — mỗi chặng có điểm đi/đến, ngày, xe, tài xế và lương riêng.",
       "noTrucks": "Chưa có xe. Thêm thông tin xe tại Tài sản → Xe tải.",
-      "shipmentType": "Loại hình"
+      "shipmentType": "Loại hình",
+      "truckType": "Loại xe"
     },
     "locked": {
       "notice": "Đơn đã lên bảng kê và bị khóa — không thể chỉnh sửa hoặc xóa."

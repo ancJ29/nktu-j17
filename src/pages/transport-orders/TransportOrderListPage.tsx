@@ -1,4 +1,4 @@
-import { Button, Stack } from '@mantine/core';
+import { Box, Button, Group, SegmentedControl, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconDownload, IconFileSpreadsheet } from '@tabler/icons-react';
 import { useEffect, useMemo } from 'react';
@@ -14,6 +14,7 @@ import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
+import { MobileScrollPillTabs } from '@/components/MobileScrollPillTabs';
 import { ListStatsCards, type ListStatCell } from '@/components/ListStatsCards';
 import { QuickFilterChips, type QuickFilterChip } from '@/components/QuickFilterChips';
 import { ListPagination } from '@/components/custom/ListPagination';
@@ -51,7 +52,9 @@ import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize'
 import { useFeeNameLabel, useFeeNameOptions } from './feeName';
 import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
 import { truckOptionLabel, useTruckPlate } from './truckDisplay';
-import { useTruckTypeLabel, useTruckTypeOptions } from '../transport-routes/truckType';
+import { useTruckTypeLabel } from '../transport-routes/truckType';
+import { truckTypeColor } from './orderTruckTypes';
+import { ORDER_TRUCK_TYPES, useOrderTruckTypeOptions } from './useOrderTruckTypes';
 import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
@@ -61,6 +64,8 @@ const canExport = perms.transportOrder.canExport();
 const canViewPrice = perms.transportOrder.canViewPrice();
 
 const RANGE_DAYS = 14;
+
+const ALL_TRUCK_TYPES_TAB = '__all__';
 
 export function TransportOrderListPage() {
   const { t, i18n } = useTranslation();
@@ -200,8 +205,57 @@ export function TransportOrderListPage() {
   const feeNameLabel = useFeeNameLabel();
   const feeNameOptions = useFeeNameOptions();
 
-  const truckTypeData = useTruckTypeOptions();
+  const truckTypeData = useOrderTruckTypeOptions();
   const truckTypeLabel = useTruckTypeLabel();
+
+  const showTruckTypeTabs = ORDER_TRUCK_TYPES.length > 0;
+
+  const truckTypeTabs = useMemo(
+    () => [
+      { value: ALL_TRUCK_TYPES_TAB, label: t('__new__.01-common.filters.all') },
+      ...truckTypeData,
+    ],
+    [truckTypeData, t],
+  );
+  const activeTruckTypeTab = filters.truckTypeFilter ?? ALL_TRUCK_TYPES_TAB;
+  const setTruckTypeTab = (value: string) =>
+    filters.setTruckTypeFilter(value === ALL_TRUCK_TYPES_TAB ? null : value);
+
+  const truckTypeSegments = useMemo(
+    () =>
+      truckTypeTabs.map((tab) => {
+        const color = truckTypeColor(tab.value, ORDER_TRUCK_TYPES);
+        const active = tab.value === activeTruckTypeTab;
+        return {
+          value: tab.value,
+          label: (
+            <Text size="sm" fw={500} c={active ? undefined : color}>
+              {tab.label}
+            </Text>
+          ),
+        };
+      }),
+    [truckTypeTabs, activeTruckTypeTab],
+  );
+
+  const truckTypeMobileTabs = useMemo(
+    () =>
+      truckTypeTabs.map((tab) => ({
+        value: tab.value,
+        label: tab.label,
+        icon: (
+          <Box
+            w={8}
+            h={8}
+            style={{
+              borderRadius: '50%',
+              background: `var(--mantine-color-${truckTypeColor(tab.value, ORDER_TRUCK_TYPES)}-6)`,
+            }}
+          />
+        ),
+      })),
+    [truckTypeTabs],
+  );
 
   const getTruckPlate = useTruckPlate();
 
@@ -451,7 +505,7 @@ export function TransportOrderListPage() {
       onChange: filters.setEntryDateRange,
     },
 
-    ...(truckTypeData.length > 0
+    ...(!showTruckTypeTabs && truckTypeData.length > 0
       ? ([
           {
             type: 'select',
@@ -584,13 +638,37 @@ export function TransportOrderListPage() {
             )
           }
           createCta={{
-            to: ROUTES.TRANSPORT_ORDERS.NEW,
+            to: filters.truckTypeFilter
+              ? `${ROUTES.TRANSPORT_ORDERS.NEW}?truckType=${encodeURIComponent(filters.truckTypeFilter)}`
+              : ROUTES.TRANSPORT_ORDERS.NEW,
             label: t('transportOrders.new'),
             enabled: canCreate,
             // The form is desktop-only (mobile redirects), so hide the CTA rather
             // than dead-end into a bounce.
           }}
         />
+
+        {/* Above the stats, so the KPI cells read as "this tab's numbers" —
+            they sum the filtered set, which the tab narrows. */}
+        {showTruckTypeTabs &&
+          (isMobile ? (
+            <MobileScrollPillTabs
+              tabs={truckTypeMobileTabs}
+              value={activeTruckTypeTab}
+              onChange={setTruckTypeTab}
+            />
+          ) : (
+            <Group>
+              <SegmentedControl
+                size="lg"
+                fw="bold"
+                color={truckTypeColor(activeTruckTypeTab, ORDER_TRUCK_TYPES)}
+                data={truckTypeSegments}
+                value={activeTruckTypeTab}
+                onChange={setTruckTypeTab}
+              />
+            </Group>
+          ))}
 
         <ListStatsCards visible={initialized} cells={statsCells} />
 
@@ -666,7 +744,10 @@ export function TransportOrderListPage() {
               {t('transportOrders.form.customer')}: {customerLabel(code)}
             </FilterPill>
           ))}
-          {filters.truckTypeFilter && (
+          {/* No pill while the rail is up: the active tab already says which
+              type the list is narrowed to, and a pill whose ✕ silently moved
+              the operator to another tab would read as a bug. */}
+          {!showTruckTypeTabs && filters.truckTypeFilter && (
             <FilterPill onClose={() => filters.setTruckTypeFilter(null)}>
               {t('transportOrders.filters.truckType')}: {truckTypeLabel(filters.truckTypeFilter)}
             </FilterPill>

@@ -45,7 +45,10 @@ import { buildNextSequentialCode, isDuplicateUniqueFieldError } from '@/utils/co
 import { perms } from '@/utils/permission';
 import type { TransportRouteExtra, TransportRouteRow } from '@/types';
 import { usePlaceSuggestions } from '../transport-orders/usePlaceSuggestions';
-import { useContainerSizeOptions } from '../transport-orders/containerSize';
+import {
+  NON_CONTAINER_TRUCK_TYPES,
+  useContainerSizeOptions,
+} from '../transport-orders/containerSize';
 import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
 import { useTruckTypeOptions } from './truckType';
 import { buildTransportRouteWrite, deriveSegmentsFromLegs } from './transportRouteWrite';
@@ -65,8 +68,6 @@ import { useRouteCosting } from './useRouteCosting';
 import { RouteCostingSummary } from './RouteCostingSummary';
 
 const isMobile = device.isMobile;
-
-const NON_CONTAINER_TRUCK_TYPES = appConfig.features.transportOrders.nonContainerTruckTypes ?? [];
 
 const MAX_CODE_RETRIES = 20;
 

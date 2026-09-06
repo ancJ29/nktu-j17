@@ -104,6 +104,8 @@ export type TransportOrderExtra = {
   activityLog?: TransportOrderActivityEntry[];
 
   tripLogSync?: TransportOrderTripLogSync;
+
+  truckType?: string;
   [key: string]: unknown;
 };
 

@@ -89,6 +89,7 @@ import {
   useShipmentTypeOptions,
 } from './shipmentType';
 import { truckOptionLabel, useDriverWithPlate, useTruckTypeOf } from './truckDisplay';
+import { ORDER_TRUCK_TYPES, useOrderTruckTypeOptions } from './useOrderTruckTypes';
 import { isExternalTruck } from './externalTruck';
 import {
   getInitialTransportOrderStatus,
@@ -158,6 +159,14 @@ type TripRow = {
 
 type RouteTruckIssue = { leg: number; kind: 'missing' | 'mismatch' };
 
+function typeSourceTruckId(v: {
+  isMultiTrip?: boolean;
+  trips?: readonly { truckId: string }[];
+  truckId: string;
+}): string {
+  return v.isMultiTrip ? (v.trips?.[0]?.truckId ?? '') : v.truckId;
+}
+
 type FormValues = {
   isMultiTrip: boolean;
   trips: TripRow[];
@@ -168,6 +177,8 @@ type FormValues = {
   truckPlate: string;
   driverId: string;
   driverName: string;
+
+  truckType: string;
   billNumber: string;
   declarationNumber: string;
   containerNumber: string;
@@ -287,7 +298,7 @@ function draftScheduleSlots(values: FormValues): ScheduleSlot[] {
     : [];
 }
 
-function blankValues(): FormValues {
+function blankValues(presetTruckType = ''): FormValues {
   return {
     isMultiTrip: false,
     trips: [],
@@ -298,6 +309,8 @@ function blankValues(): FormValues {
     truckPlate: '',
     driverId: '',
     driverName: '',
+
+    truckType: presetTruckType,
     billNumber: '',
     declarationNumber: '',
     containerNumber: '',
@@ -346,6 +359,8 @@ function copiedValues(src: TransportOrder): FormValues {
     truckPlate: src.truckPlate,
     driverId: src.driverId,
     driverName: src.driverName,
+
+    truckType: src.extra?.truckType ?? '',
     billNumber: src.billNumber || '',
     declarationNumber: src.declarationNumber || '',
     containerNumber: src.containerNumber || '',
@@ -373,6 +388,12 @@ function copiedValues(src: TransportOrder): FormValues {
   };
 }
 
+function readPresetTruckType(search: string): string {
+  const value = new URLSearchParams(search).get('truckType')?.trim() ?? '';
+  if (!value) return '';
+  return ORDER_TRUCK_TYPES.includes(value) ? value : '';
+}
+
 function extractCopyFrom(state: unknown): TransportOrder | null {
   if (state === null || typeof state !== 'object') return null;
   const copyFrom = (state as { copyFrom?: unknown }).copyFrom;
@@ -388,6 +409,7 @@ export function TransportOrderFormPage() {
   const isEdit = !!id;
 
   const copyFrom = isEdit ? null : extractCopyFrom(location.state);
+  const presetTruckType = isEdit ? '' : readPresetTruckType(location.search);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -467,6 +489,8 @@ export function TransportOrderFormPage() {
 
   const truckTypeOf = useTruckTypeOf();
 
+  const truckTypeOptions = useOrderTruckTypeOptions();
+
   const placeSuggestions = usePlaceSuggestions();
 
   const shipmentTypeOptions = useShipmentTypeOptions();
@@ -476,7 +500,7 @@ export function TransportOrderFormPage() {
   const shipmentTypeLabel = useShipmentTypeLabel();
 
   const form = useForm<FormValues>({
-    initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(),
+    initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(presetTruckType),
     validate: {
       truckId: (v, values) =>
         !values.isMultiTrip && !values.externalTruck && !v
@@ -496,14 +520,8 @@ export function TransportOrderFormPage() {
 
       containerSize: (v, values) => {
         if (v) return null;
-        const truckId = values.isMultiTrip ? (values.trips[0]?.truckId ?? '') : values.truckId;
-        if (!truckId) return null;
-        const type = useTruckAssetStore
-          .getState()
-          .items.find((tr) => tr.id === truckId)
-          ?.extra?.truckType?.trim();
-        if (!type) return null;
-        return truckTypeCarriesContainer(type, NON_CONTAINER_TRUCK_TYPES)
+        if (!values.truckType) return null;
+        return truckTypeCarriesContainer(values.truckType, NON_CONTAINER_TRUCK_TYPES)
           ? t('transportOrders.validation.containerSizeRequired')
           : null;
       },
@@ -593,6 +611,7 @@ export function TransportOrderFormPage() {
         truckPlate: o.truckPlate,
         driverId: o.driverId,
         driverName: o.driverName,
+        truckType: o.extra?.truckType ?? '',
         billNumber: o.billNumber || '',
         declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
@@ -676,6 +695,7 @@ export function TransportOrderFormPage() {
           truckPlate: values.truckPlate.trim(),
           driverId: values.driverId,
           driverName: values.driverName.trim(),
+          truckType: values.truckType.trim(),
           billNumber: values.billNumber.trim(),
           declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
@@ -791,12 +811,25 @@ export function TransportOrderFormPage() {
     [form.values, savedOrders, id],
   );
 
-  const draftTruckType = useMemo(() => {
-    const truckId = form.values.isMultiTrip
-      ? (form.values.trips[0]?.truckId ?? '')
-      : form.values.truckId;
-    return truckTypeOf(truckId) ?? '';
-  }, [form.values.isMultiTrip, form.values.trips, form.values.truckId, truckTypeOf]);
+  const draftTruckType = form.values.truckType;
+
+  const typeTruckId = typeSourceTruckId(form.values);
+
+  const autoTypedFrom = useRef<string | null>(null);
+  useEffect(() => {
+    if (!typeTruckId || autoTypedFrom.current === typeTruckId) return;
+
+    if (autoTypedFrom.current === null && form.getValues().truckType) {
+      autoTypedFrom.current = typeTruckId;
+      return;
+    }
+
+    const registered = truckTypeOf(typeTruckId);
+    if (!registered) return;
+    autoTypedFrom.current = typeTruckId;
+    form.setFieldValue('truckType', registered);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine mints a new `form` object every render; values are read through `getValues()` and the derived id above.
+  }, [typeTruckId, truckTypeOf]);
 
   const routeMatches = useMemo(() => {
     const draft: TransportRouteDraft = {
@@ -837,22 +870,21 @@ export function TransportOrderFormPage() {
     const wanted = appliedRoute?.truckType;
     if (!wanted) return [];
 
-    const check = (leg: number, truckId: string, external: boolean): RouteTruckIssue[] => {
-      if (external) return [];
-      if (!truckId) return [{ leg, kind: 'missing' }];
-      const type = truckTypeOf(truckId) ?? '';
-      return type && type !== wanted ? [{ leg, kind: 'mismatch' }] : [];
-    };
+    const mismatch: RouteTruckIssue[] =
+      draftTruckType && draftTruckType !== wanted ? [{ leg: WHOLE_ORDER, kind: 'mismatch' }] : [];
 
-    if (form.values.isMultiTrip) {
-      return form.values.trips.flatMap((trip, i) =>
-        check(i + 1, trip.truckId, !!trip.externalTruck),
-      );
-    }
-    return check(WHOLE_ORDER, form.values.truckId, !!form.values.externalTruck);
+    const missing = (leg: number, truckId: string, external: boolean): RouteTruckIssue[] =>
+      !external && !truckId ? [{ leg, kind: 'missing' }] : [];
+
+    return [
+      ...(form.values.isMultiTrip
+        ? form.values.trips.flatMap((trip, i) => missing(i + 1, trip.truckId, !!trip.externalTruck))
+        : missing(WHOLE_ORDER, form.values.truckId, !!form.values.externalTruck)),
+      ...mismatch,
+    ];
   }, [
     appliedRoute,
-    truckTypeOf,
+    draftTruckType,
     form.values.isMultiTrip,
     form.values.trips,
     form.values.truckId,
@@ -979,6 +1011,12 @@ export function TransportOrderFormPage() {
           { value: currentShipmentType, label: shipmentTypeLabel(currentShipmentType) },
         ]
       : shipmentTypeOptions;
+
+  const currentTruckType = form.values.truckType;
+  const truckTypeSelectData =
+    currentTruckType && !truckTypeOptions.some((o) => o.value === currentTruckType)
+      ? [...truckTypeOptions, { value: currentTruckType, label: currentTruckType }]
+      : truckTypeOptions;
 
   const payerSelectData = [
     { value: 'company', label: t('transportOrders.fees.payerCompany') },
@@ -1146,6 +1184,22 @@ export function TransportOrderFormPage() {
                     />
                   )}
                 </>
+              )}
+              {/* LOẠI XE — order-level, so it shows on a multi-trip job too
+                  (the legs own their trucks, the order owns what it was sold
+                  as). Omitted entirely when the client has registered no
+                  vehicle types: that category ships no fallback, so the
+                  alternative is a dead empty picker — the same call the list's
+                  LOẠI XE filter makes. */}
+              {truckTypeOptions.length > 0 && (
+                <Select
+                  label={t('transportOrders.form.truckType')}
+                  data={truckTypeSelectData}
+                  value={form.values.truckType || null}
+                  onChange={(v) => form.setFieldValue('truckType', v ?? '')}
+                  searchable
+                  clearable
+                />
               )}
               <TextInput
                 label={t('transportOrders.columns.bill')}
