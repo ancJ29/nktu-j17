@@ -13,6 +13,8 @@ export type TransportOrderFields = {
   driverId?: TransportOrderFieldDelta;
 
   truckType?: TransportOrderFieldDelta;
+
+  customerOrderNumber?: TransportOrderFieldDelta;
   customerCode?: TransportOrderFieldDelta;
   billNumber?: TransportOrderFieldDelta;
   declarationNumber?: TransportOrderFieldDelta;
@@ -143,6 +145,10 @@ export function diffTransportOrder(
   set('driverId', delta(driverKey(before), driverKey(after)));
 
   set('truckType', delta(before.extra?.truckType, after.extra?.truckType));
+  set(
+    'customerOrderNumber',
+    delta(before.extra?.customerOrderNumber, after.extra?.customerOrderNumber),
+  );
   set('customerCode', delta(before.customerCode, after.customerCode));
   set('billNumber', delta(before.billNumber, after.billNumber));
   set('declarationNumber', delta(before.declarationNumber, after.declarationNumber));

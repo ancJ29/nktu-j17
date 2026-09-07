@@ -179,6 +179,8 @@ type FormValues = {
   driverName: string;
 
   truckType: string;
+
+  customerOrderNumber: string;
   billNumber: string;
   declarationNumber: string;
   containerNumber: string;
@@ -311,6 +313,7 @@ function blankValues(presetTruckType = ''): FormValues {
     driverName: '',
 
     truckType: presetTruckType,
+    customerOrderNumber: '',
     billNumber: '',
     declarationNumber: '',
     containerNumber: '',
@@ -361,6 +364,8 @@ function copiedValues(src: TransportOrder): FormValues {
     driverName: src.driverName,
 
     truckType: src.extra?.truckType ?? '',
+
+    customerOrderNumber: src.extra?.customerOrderNumber ?? '',
     billNumber: src.billNumber || '',
     declarationNumber: src.declarationNumber || '',
     containerNumber: src.containerNumber || '',
@@ -612,6 +617,7 @@ export function TransportOrderFormPage() {
         driverId: o.driverId,
         driverName: o.driverName,
         truckType: o.extra?.truckType ?? '',
+        customerOrderNumber: o.extra?.customerOrderNumber ?? '',
         billNumber: o.billNumber || '',
         declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
@@ -696,6 +702,7 @@ export function TransportOrderFormPage() {
           driverId: values.driverId,
           driverName: values.driverName.trim(),
           truckType: values.truckType.trim(),
+          customerOrderNumber: values.customerOrderNumber.trim(),
           billNumber: values.billNumber.trim(),
           declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
@@ -1103,6 +1110,45 @@ export function TransportOrderFormPage() {
               spacing="sm"
               mt={isEdit ? undefined : 'sm'}
             >
+              <CustomerSelector
+                label={t('transportOrders.form.customer')}
+                withAsterisk
+
+                value={
+                  form.values.customerCode
+                    ? (getCustomerByCode(form.values.customerCode)?.id ?? null)
+                    : null
+                }
+                onChange={(sel) => {
+                  form.setFieldValue('customerCode', sel?.customer.code ?? '');
+                  form.setFieldValue('customerName', sel?.name ?? '');
+                }}
+                error={form.errors.customerCode}
+                clearable
+              />
+
+              {/* LOẠI XE — order-level, so it shows on a multi-trip job too
+                  (the legs own their trucks, the order owns what it was sold
+                  as). Omitted entirely when the client has registered no
+                  vehicle types: that category ships no fallback, so the
+                  alternative is a dead empty picker — the same call the list's
+                  LOẠI XE filter makes. */}
+              {truckTypeOptions.length > 0 && (
+                <Select
+                  label={t('transportOrders.form.truckType')}
+                  data={truckTypeSelectData}
+                  value={form.values.truckType || null}
+                  onChange={(v) => form.setFieldValue('truckType', v ?? '')}
+                  searchable
+                  clearable
+                />
+              )}
+
+              <TextInput
+                label={t('transportOrders.columns.customerOrder')}
+                {...form.getInputProps('customerOrderNumber')}
+              />
+
               {/* Derived from leg 1 on a multi-trip job — hidden rather than shown
                   authored-but-overwritten. */}
               {!form.values.isMultiTrip && (
@@ -1185,22 +1231,16 @@ export function TransportOrderFormPage() {
                   )}
                 </>
               )}
-              {/* LOẠI XE — order-level, so it shows on a multi-trip job too
-                  (the legs own their trucks, the order owns what it was sold
-                  as). Omitted entirely when the client has registered no
-                  vehicle types: that category ships no fallback, so the
-                  alternative is a dead empty picker — the same call the list's
-                  LOẠI XE filter makes. */}
-              {truckTypeOptions.length > 0 && (
-                <Select
-                  label={t('transportOrders.form.truckType')}
-                  data={truckTypeSelectData}
-                  value={form.values.truckType || null}
-                  onChange={(v) => form.setFieldValue('truckType', v ?? '')}
-                  searchable
-                  clearable
-                />
-              )}
+            </SimpleGrid>
+            <SimpleGrid
+              cols={{ base: 1, sm: 2, md: 3 }}
+              spacing="sm"
+              mt={isEdit ? undefined : 'sm'}
+            >
+              <TextInput
+                label={t('transportOrders.columns.container')}
+                {...form.getInputProps('containerNumber')}
+              />
               <TextInput
                 label={t('transportOrders.columns.bill')}
                 {...form.getInputProps('billNumber')}
@@ -1208,10 +1248,6 @@ export function TransportOrderFormPage() {
               <TextInput
                 label={t('transportOrders.columns.declaration')}
                 {...form.getInputProps('declarationNumber')}
-              />
-              <TextInput
-                label={t('transportOrders.columns.container')}
-                {...form.getInputProps('containerNumber')}
               />
               {/* Hidden for a Xe Tải job — that vehicle hauls no container, so
                   the field has nothing to say. `showContainerSize` also drives
@@ -1252,22 +1288,6 @@ export function TransportOrderFormPage() {
                   onChange={(v) => form.setFieldValue('status', v ?? '')}
                 />
               )}
-              <CustomerSelector
-                label={t('transportOrders.form.customer')}
-                withAsterisk
-
-                value={
-                  form.values.customerCode
-                    ? (getCustomerByCode(form.values.customerCode)?.id ?? null)
-                    : null
-                }
-                onChange={(sel) => {
-                  form.setFieldValue('customerCode', sel?.customer.code ?? '');
-                  form.setFieldValue('customerName', sel?.name ?? '');
-                }}
-                error={form.errors.customerCode}
-                clearable
-              />
             </SimpleGrid>
           </SectionCard>
 

@@ -3939,6 +3939,7 @@
       "statusBadge": "Cancelled"
     },
     "columns": {
+      "customerOrder": "Customer order no.",
       "bill": "B/L · Booking",
       "declaration": "Customs declaration",
       "container": "Container",
@@ -3976,6 +3977,7 @@
         "fees_one": "{{count}} fee line",
         "fees_other": "{{count}} fee lines",
         "fieldAdvanceAmount": "Advance",
+        "fieldCustomerOrderNumber": "Customer order no.",
         "fieldBillNumber": "B/L no.",
         "fieldContainerNumber": "Container no.",
         "fieldContainerSize": "Container size",

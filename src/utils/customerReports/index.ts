@@ -4,6 +4,7 @@ import { buildCustomerReportType1 } from './type1BangKe';
 import { buildCustomerReportType2 } from './type2ForGiaAn';
 import { buildCustomerReportType3 } from './type3ForSaphia';
 import { buildCustomerReportType4 } from './type4ForVietHoaPhat';
+import { buildCustomerReportType5 } from './type5ForCatHai';
 import { DEFAULT_CUSTOMER_REPORT_TYPE } from './types';
 import type { CustomerReportInput, CustomerReportType } from './types';
 
@@ -35,6 +36,12 @@ export const CUSTOMER_REPORT_TYPES: Record<number, CustomerReportType> = {
     label: 'Bảng kê vận chuyển (VIỆT HOA PHÁT)',
     fileStem: 'bang_ke',
     build: buildCustomerReportType4,
+  },
+  5: {
+    id: 5,
+    label: 'Bảng kê vận chuyển (CÁT HẢI)',
+    fileStem: 'bang_ke',
+    build: buildCustomerReportType5,
   },
 };
 

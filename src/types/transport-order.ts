@@ -106,6 +106,8 @@ export type TransportOrderExtra = {
   tripLogSync?: TransportOrderTripLogSync;
 
   truckType?: string;
+
+  customerOrderNumber?: string;
   [key: string]: unknown;
 };
 

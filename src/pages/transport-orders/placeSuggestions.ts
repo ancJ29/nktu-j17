@@ -1,4 +1,4 @@
-import type { TransportOrder } from '@/types';
+import type { TransportOrder, TransportRouteRow } from '@/types';
 
 export const PLACE_SUGGESTION_LIMIT = 12;
 
@@ -24,7 +24,19 @@ function placesOf(order: TransportOrder): string[] {
   ].filter((p): p is string => !!p && !!p.trim());
 }
 
-export function collectTransportPlaces(orders: TransportOrder[]): string[] {
+function placesOfRoute(route: TransportRouteRow): string[] {
+  return [
+    route.route?.pickup,
+    route.route?.stuffing,
+    route.route?.dropoff,
+    ...(route.trips ?? []).flatMap((leg) => [leg.departure, leg.destination]),
+  ].filter((p): p is string => !!p && !!p.trim());
+}
+
+export function collectTransportPlaces(
+  orders: TransportOrder[],
+  routes: TransportRouteRow[] = [],
+): string[] {
   const seen = new Map<
     string,
     { label: string; count: number; labelCounts: Map<string, number> }
@@ -45,7 +57,22 @@ export function collectTransportPlaces(orders: TransportOrder[]): string[] {
     }
   }
 
-  return [...seen.values()]
+  const used = [...seen.values()]
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label))
     .map((e) => e.label);
+
+  const fromRoutes: string[] = [];
+  const appended = new Set<string>();
+  for (const route of routes) {
+    if (route.extra?.isDeleted || route.isActive === false) continue;
+    for (const raw of placesOfRoute(route)) {
+      const label = raw.trim();
+      const key = placeKey(label);
+      if (seen.has(key) || appended.has(key)) continue;
+      appended.add(key);
+      fromRoutes.push(label);
+    }
+  }
+
+  return [...used, ...fromRoutes];
 }

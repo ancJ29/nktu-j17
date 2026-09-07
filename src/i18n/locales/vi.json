@@ -3939,6 +3939,7 @@
       "statusBadge": "Đã hủy"
     },
     "columns": {
+      "customerOrder": "Mã lệnh KH",
       "bill": "Số B/L · B/K",
       "declaration": "Số tờ khai",
       "container": "Số cont",
@@ -3976,6 +3977,7 @@
         "fees_one": "{{count}} dòng phí",
         "fees_other": "{{count}} dòng phí",
         "fieldAdvanceAmount": "Tạm ứng",
+        "fieldCustomerOrderNumber": "Mã lệnh KH",
         "fieldBillNumber": "Số B/L",
         "fieldContainerNumber": "Số container",
         "fieldContainerSize": "Loại container",

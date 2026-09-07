@@ -548,6 +548,17 @@ export function TransportOrderDetailPage() {
     />
   );
 
+  const customerOrderNumberField = (
+    <InlineTextField
+      canEdit={canEditMeta}
+      value={order.extra?.customerOrderNumber ?? ''}
+      onSave={async (next) =>
+        handleMetaPatch({ extra: { ...order.extra, customerOrderNumber: next.trim() } })
+      }
+      labels={inlineEditLabels}
+    />
+  );
+
   const declarationNumberField = (
     <InlineTextField
       canEdit={canEditMeta}
@@ -725,6 +736,7 @@ export function TransportOrderDetailPage() {
               and absent on orders written before the field. */}
               {order.extra?.truckType &&
                 infoRow(t('transportOrders.form.truckType'), truckTypeLabel(order.extra.truckType))}
+              {infoRow(t('transportOrders.columns.customerOrder'), customerOrderNumberField)}
               {infoRow(t('transportOrders.columns.bill'), billNumberField)}
               {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
               {infoRow(t('transportOrders.columns.container'), containerNumberField)}

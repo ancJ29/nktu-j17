@@ -72,14 +72,11 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
 
   let lastCombinedHash: string | null = null;
 
-  async function fetchAll(): Promise<FetchAllResult<T>> {
-    const { from, to } = currentRange;
-    const keys = keysForRange(from, to);
-    if (keys.length === 0) {
-      lastCombinedHash = null;
-      return { items: [] };
-    }
-
+  async function syncPartitions(keys: string[]): Promise<{
+    merged: T[];
+    hashes: Record<string, string>;
+    emptyKeys: string[];
+  }> {
     const cached = await readPartitions<T>(cacheKey, keys);
     const cachedHashes: Record<string, string> = {};
     for (const key of keys) {
@@ -102,15 +99,28 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
       logger.warn(`[partitioned:${cacheKey}] unchanged partition with no cache`, key);
     }
 
+    void persistPartitions<T>(cacheKey, writes, clears);
+
+    return { merged, hashes: res.hashes, emptyKeys: res.emptyKeys };
+  }
+
+  async function fetchAll(): Promise<FetchAllResult<T>> {
+    const { from, to } = currentRange;
+    const keys = keysForRange(from, to);
+    if (keys.length === 0) {
+      lastCombinedHash = null;
+      return { items: [] };
+    }
+
+    const { merged, hashes, emptyKeys } = await syncPartitions(keys);
+
     for (const key of keys) {
-      const hash = res.hashes[key];
+      const hash = hashes[key];
       if (hash) partitionHashes.set(key, hash);
       else partitionHashes.delete(key);
     }
 
-    void persistPartitions<T>(cacheKey, writes, clears);
-
-    const combinedHash = recordHash({ from, to, hashes: res.hashes, empty: res.emptyKeys });
+    const combinedHash = recordHash({ from, to, hashes, empty: emptyKeys });
     if (combinedHash === lastCombinedHash) return null;
     lastCombinedHash = combinedHash;
     return { items: merged, hash: combinedHash };
@@ -293,6 +303,13 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
 
     getRange(): Range {
       return currentRange;
+    },
+
+    async queryRange(from: Date, to: Date): Promise<T[]> {
+      const keys = keysForRange(fmt(from), fmt(to));
+      if (keys.length === 0) return [];
+      const { merged } = await syncPartitions(keys);
+      return merged;
     },
 
     async queryPartition(key: string): Promise<T[]> {

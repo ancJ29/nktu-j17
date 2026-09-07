@@ -76,7 +76,7 @@ export type TransportOrderTotals = {
   balanceDue: number;
 };
 
-function roundVat(exact: number, roundDown: boolean): number {
+export function roundVat(exact: number, roundDown: boolean): number {
   return roundDown ? Math.floor(exact) : Math.round(exact);
 }
 

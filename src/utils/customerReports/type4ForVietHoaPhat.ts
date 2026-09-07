@@ -34,6 +34,21 @@ const sizeBucketIndex = (containerSize: string | undefined): number => {
 
 const FREIGHT_FEE_VALUE = 'PHI_VAN_CHUYEN';
 
+const SURCHARGE_FEE_VALUE = 'LO_XE';
+
+type Type4Bucket = 'freight' | 'surcharge' | 'other';
+
+const feeBucketReader = (resolveFeeName: (value: string) => string) => {
+  const freightKey = feeKey(resolveFeeName(FREIGHT_FEE_VALUE));
+  const surchargeKey = feeKey(resolveFeeName(SURCHARGE_FEE_VALUE));
+  return (label: string): Type4Bucket => {
+    const key = feeKey(resolveFeeName(label));
+    if (key === freightKey) return 'freight';
+    if (key === surchargeKey) return 'surcharge';
+    return 'other';
+  };
+};
+
 function batchYear(orders: ReadonlyArray<TransportOrder>): number {
   let latest = Number.NEGATIVE_INFINITY;
   for (const o of orders) {
@@ -50,12 +65,14 @@ const buildChiHoSummarySheet = (
     customer,
     resolveFeeName,
   }: Pick<CustomerReportInput, 'seller' | 'customer' | 'resolveFeeName'>,
+
+  bucketOf: (label: string) => Type4Bucket,
 ): { ws: XLSX.WorkSheet; rowCount: number } => {
   const entries = rows
     .map((order) => {
       const fees = readFeeLines(order).filter(
         (f) =>
-          f.kind === 'passthrough' &&
+          bucketOf(f.label) === 'other' &&
           isBillableFee(f) &&
           ((f as TransportOrderFee).amount || 0) !== 0,
       );
@@ -224,7 +241,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
     .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
 
-  const freightKey = feeKey(resolveFeeName(FREIGHT_FEE_VALUE));
+  const bucketOf = feeBucketReader(resolveFeeName);
 
   const splitMoney = (o: TransportOrder) => {
     let freight = 0;
@@ -232,8 +249,9 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     for (const f of readFeeLines(o)) {
       if (!isBillableFee(f)) continue;
       const amount = (f as TransportOrderFee).amount || 0;
-      if (feeKey(resolveFeeName(f.label)) === freightKey) freight += amount;
-      else surcharge += amount;
+      const bucket = bucketOf(f.label);
+      if (bucket === 'freight') freight += amount;
+      else if (bucket === 'surcharge') surcharge += amount;
     }
     return { freight, surcharge, total: freight + surcharge };
   };
@@ -446,7 +464,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
 
-  const chiHo = buildChiHoSummarySheet(rows, { seller, customer, resolveFeeName });
+  const chiHo = buildChiHoSummarySheet(rows, { seller, customer, resolveFeeName }, bucketOf);
   if (chiHo.rowCount > 0) {
     XLSX.utils.book_append_sheet(workbook, chiHo.ws, 'TỔNG HỢP CHI PHÍ CHI HỘ');
   }

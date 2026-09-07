@@ -19,6 +19,8 @@ export type TransportOrderWriteFields = {
   driverName: string;
 
   truckType: string;
+
+  customerOrderNumber: string;
   billNumber: string;
 
   declarationNumber: string;
@@ -78,10 +80,14 @@ export function buildTransportOrderWrite(
 
   const trips = fields.isMultiTrip ? fields.trips : [];
 
-  const { truckType, extra, ...rest } = fields;
+  const { truckType, customerOrderNumber, extra, ...rest } = fields;
   return {
     ...rest,
-    extra: { ...extra, ...(truckType ? { truckType } : {}) },
+    extra: {
+      ...extra,
+      ...(truckType ? { truckType } : {}),
+      ...(customerOrderNumber ? { customerOrderNumber } : {}),
+    },
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
     fees,
     trips,

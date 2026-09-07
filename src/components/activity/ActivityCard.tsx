@@ -3057,6 +3057,7 @@ const TRANSPORT_ORDER_FIELD_LABEL: Record<string, string> = {
   driverId: 'fieldDriver',
   truckType: 'fieldTruckType',
   customerCode: 'fieldCustomer',
+  customerOrderNumber: 'fieldCustomerOrderNumber',
   billNumber: 'fieldBillNumber',
   declarationNumber: 'fieldDeclarationNumber',
   containerNumber: 'fieldContainerNumber',
