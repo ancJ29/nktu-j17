@@ -214,6 +214,7 @@ type EmployeeVerbKey =
 type ProductVerbKey =
   | SimpleVerbKey
   | 'updateDescription'
+  | 'updateWarehouseMemo'
   | 'updateTechSpecs'
   | 'updateClassification'
   | 'updateImages'
@@ -357,6 +358,13 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     icon: <IconFileText size={16} />,
     color: 'blue',
     i18nKey: 'products.detail.activityVerbs.updateDescription',
+    targetType: 'product',
+    showDiff: true,
+  },
+  'product.updateWarehouseMemo': {
+    icon: <IconFileText size={16} />,
+    color: 'blue',
+    i18nKey: 'products.detail.activityVerbs.updateWarehouseMemo',
     targetType: 'product',
     showDiff: true,
   },

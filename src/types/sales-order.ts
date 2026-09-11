@@ -195,6 +195,8 @@ export type SalesOrderExtra = {
   deliveryMethod?: string;
 
   deliveryPackageSize?: string;
+
+  productWarehouseMemos?: string;
   assignedStaff?: string;
   createdBy?: string;
   isUrgent?: boolean;

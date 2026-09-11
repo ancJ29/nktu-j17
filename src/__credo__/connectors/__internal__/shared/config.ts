@@ -9,16 +9,16 @@ export const configs: Record<string, Record<string, string>> = {
     cStorage: 'https://inst-1786e4.api-bridge.work',
   },
   '49a092': {
-    credoSso: 'https://inst-4e8870.api-bridge.work/$default',
-    cCredoSme: 'https://inst-4e8870.api-bridge.work/$default',
-    cMngt: 'https://inst-4e8870.api-bridge.work/$default',
-    cStorage: 'https://inst-4e8870.api-bridge.work',
+    credoSso: 'https://inst-10618c.api-bridge.work/$default',
+    cCredoSme: 'https://inst-10618c.api-bridge.work/$default',
+    cMngt: 'https://inst-10618c.api-bridge.work/$default',
+    cStorage: 'https://inst-10618c.api-bridge.work',
   },
-  '4e8870': {
-    credoSso: 'https://inst-4e8870.api-bridge.work/$default',
-    cCredoSme: 'https://inst-4e8870.api-bridge.work/$default',
-    cMngt: 'https://inst-4e8870.api-bridge.work/$default',
-    cStorage: 'https://inst-4e8870.api-bridge.work',
+  '10618c': {
+    credoSso: 'https://inst-10618c.api-bridge.work/$default',
+    cCredoSme: 'https://inst-10618c.api-bridge.work/$default',
+    cMngt: 'https://inst-10618c.api-bridge.work/$default',
+    cStorage: 'https://inst-10618c.api-bridge.work',
   },
 };
 
@@ -31,14 +31,12 @@ export const targetConfigs: Record<string, Record<string, string>> = {
     cStorage: 'c-storage',
   },
   '49a092': {
-    activityLogger: 'activity-logger-stg',
     credoSso: 'credo-sso-stg',
     cCredoSme: 'credo-sme-stg',
     cMngt: 'c-mngt-stg',
     cStorage: 'c-storage-stg',
   },
-  '4e8870': {
-    activityLogger: 'activity-logger-ridge',
+  '10618c': {
     credoSso: 'credo-sso-ridge',
     cCredoSme: 'credo-sme-ridge',
     cMngt: 'c-mngt-ridge',
@@ -46,13 +44,9 @@ export const targetConfigs: Record<string, Record<string, string>> = {
   },
 };
 
-export const CREDO_GROUP_STORAGE_KEY = 'a8e45';
+export const CREDO_GROUP_STORAGE_KEY = 'a8e43';
 
 export function setCredoGroup(group: string): void {
-  if (group === '409e36') {
-    return setCredoGroup('4e8870');
-  }
-
   if (!group) return;
 
   const current = getEnvVar(CREDO_GROUP_STORAGE_KEY) || '-';
@@ -61,9 +55,7 @@ export function setCredoGroup(group: string): void {
   setEnvVar(CREDO_GROUP_STORAGE_KEY, group);
 
   if (isBrowser()) {
-    localStorage.removeItem('a9c56');
-    localStorage.removeItem('a9c55');
-    localStorage.removeItem('19c55230d1');
+    localStorage.removeItem('a8e41');
   }
 
   if (isBrowser() && group !== credoGroup) {

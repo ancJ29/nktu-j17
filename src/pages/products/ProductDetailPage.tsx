@@ -189,6 +189,7 @@ export function ProductDetailPage() {
 
   const descEdit = useCardEdit<string>();
   const specsEdit = useCardEdit<Array<{ key: string; value: string }>>();
+  const warehouseMemoEdit = useCardEdit<string>();
   const classEdit = useCardEdit<ClassificationDraft>();
 
   const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
@@ -1130,6 +1131,45 @@ export function ProductDetailPage() {
   const minInvUpdatedByEmp = minInv
     ? findEmployeeByLoginEmail(employees, minInv.updatedBy)
     : undefined;
+
+  const warehouseMemoCard = (
+    <SectionCard
+      icon={<IconBuildingWarehouse size={14} />}
+      title={t('products.detail.warehouseMemoTitle')}
+      padding="xs"
+      editable={canEdit && !isMobile}
+      editing={warehouseMemoEdit.editing}
+      saving={warehouseMemoEdit.saving}
+      labels={editLabels}
+      onEdit={() => warehouseMemoEdit.begin(extra.warehouseMemo ?? '')}
+      onCancel={warehouseMemoEdit.cancel}
+      onSave={() =>
+        warehouseMemoEdit.save((next) =>
+          patchExtra({ warehouseMemo: next.trim() || undefined }, 'product.updateWarehouseMemo'),
+        )
+      }
+    >
+      {warehouseMemoEdit.editing ? (
+        <Textarea
+          value={warehouseMemoEdit.draft ?? ''}
+          onChange={(e) => warehouseMemoEdit.setDraft(e.currentTarget.value)}
+          placeholder={t('products.form.warehouseMemoPlaceholder')}
+          minRows={2}
+          autosize
+          autoFocus
+        />
+      ) : extra.warehouseMemo?.trim() ? (
+        <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
+          {extra.warehouseMemo}
+        </Text>
+      ) : (
+        <Text size="sm" c="dimmed">
+          {t('products.detail.warehouseMemoEmpty')}
+        </Text>
+      )}
+    </SectionCard>
+  );
+
   const minInventoryCard = minInv ? (
     <SectionCard
       icon={<IconPlus size={14} />}
@@ -1284,6 +1324,7 @@ export function ProductDetailPage() {
       </Grid.Col>
       <Grid.Col span={{ base: 12, md: 5 }}>
         <Stack gap="md">
+          {warehouseMemoCard}
           {minInventoryCard}
           {currentInventoryCard}
           {dangerZone}
@@ -1302,6 +1343,7 @@ export function ProductDetailPage() {
   const mobileDetailsContent = (
     <Stack gap="md">
       {descriptionCard}
+      {warehouseMemoCard}
       {setCompositionCard}
       {techSpecsCard}
       {classificationCard}

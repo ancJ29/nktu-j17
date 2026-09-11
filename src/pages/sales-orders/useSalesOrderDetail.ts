@@ -1942,6 +1942,8 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     isExternalDelivery,
     employees,
 
+    productByCode,
+
     cameraOpened,
     openCamera,
     closeCamera,

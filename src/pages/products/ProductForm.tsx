@@ -126,6 +126,7 @@ export function ProductForm({ variant }: ProductFormProps) {
       suggestedPrice: 0,
       category: '',
       attributes: [],
+      warehouseMemo: '',
       minInventoryValue: '',
       minInventoryUnit: '',
       noInventory: false,
@@ -228,6 +229,7 @@ export function ProductForm({ variant }: ProductFormProps) {
       suggestedPrice: p.extra?.suggestedPrice ?? 0,
       category: p.extra?.category ?? '',
       attributes: p.extra?.attributes ?? [],
+      warehouseMemo: p.extra?.warehouseMemo ?? '',
       minInventoryValue: min?.value ?? '',
       minInventoryUnit: min?.unit ?? '',
       noInventory: p.extra?.noInventory ?? false,
@@ -319,6 +321,7 @@ export function ProductForm({ variant }: ProductFormProps) {
               .filter((a) => a.key && a.value);
             return cleaned.length > 0 ? { attributes: cleaned } : {};
           })(),
+          ...(values.warehouseMemo.trim() && { warehouseMemo: values.warehouseMemo.trim() }),
           ...(minimumInventory && { minimumInventory }),
           ...(values.noInventory && { noInventory: true }),
           ...(values.hiddenFromInventoryList && { hiddenFromInventoryList: true }),

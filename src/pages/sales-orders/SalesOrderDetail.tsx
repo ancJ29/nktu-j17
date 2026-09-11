@@ -119,6 +119,7 @@ import { StatusChangeModal } from './StatusChangeModal';
 import { CreateDeliveryRequestModal } from '@/pages/delivery-requests/CreateDeliveryRequestModal';
 import { CreateReturnShipmentModal } from '@/pages/delivery-requests/CreateReturnShipmentModal';
 import { OrderItemsTable } from './OrderItemsTable';
+import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import { LinkedDRPhotosSection } from './LinkedDRPhotosSection';
 import { SalesOrderDeliveryRequestInfo } from './SalesOrderDeliveryRequestInfo';
@@ -235,6 +236,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     handleToggleDeliveryMethod,
     isExternalDelivery,
     employees,
+    productByCode,
     t,
   } = useSalesOrderDetail({
     clientSpecific: variant.clientSpecific?.NKTU?.deliveryMethodDrivesInternalDelivery
@@ -418,8 +420,17 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const canTickItemReady = showItemReady && canEditItemWarehouseFields;
   const canEditWarehouseMemo = showItemWarehouseMemo && canEditItemWarehouseFields;
 
+  const warehouseMobileViewCfg = variant.warehouseMobileView;
+  const isWarehouseMobileView =
+    isMobile &&
+    !!warehouseMobileViewCfg &&
+    currentEmployee?.department === warehouseMobileViewCfg.departmentCode;
+
   const canEditPackageSize =
-    canEditDeliveryPackageSize && !order.isClosed && !isCancelled && !isMobile;
+    canEditDeliveryPackageSize &&
+    !order.isClosed &&
+    !isCancelled &&
+    (!isMobile || isWarehouseMobileView);
   const showPackageSize =
     canEditDeliveryPackageSize ||
     deliveryPackageSizeOptions.length > 0 ||
@@ -637,6 +648,17 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   ) : (
     <DetailField label={t('__new__.01-common.labels.note')}>{notesField}</DetailField>
   );
+
+  const productWarehouseMemos =
+    buildSalesOrderWarehouseMemo(order.items, productByCode) || (extra.productWarehouseMemos ?? '');
+
+  const productWarehouseMemosBlock = productWarehouseMemos.trim() ? (
+    <DetailField label={t('salesOrders.detail.productWarehouseMemos')}>
+      <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
+        {productWarehouseMemos}
+      </Text>
+    </DetailField>
+  ) : null;
 
   const linkedDRIds = Array.from(
     new Set([...(extra.deliveryRequestIds ?? []), ...linkedDRs.map((d) => d.id)]),
@@ -1513,6 +1535,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
 
       <DetailField label={t('common.labels.deliveryAddress')}>{deliveryAddressMobile}</DetailField>
       {notesDetailContent}
+      {productWarehouseMemosBlock}
 
       {billingFields}
 
@@ -1553,11 +1576,84 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         <Grid.Col span={{ base: 12, md: 6 }}>{notesDetailContent}</Grid.Col>
       </Grid>
 
+      {productWarehouseMemosBlock}
+
       {billingFields}
 
       {metadataFooter}
 
       {linkedDRs.length > 0 && <SalesOrderDeliveryRequestInfo requests={linkedDRs} />}
+    </Stack>
+  );
+
+  const mobileOrderHeading = (
+    <Group wrap="wrap" justify="space-between" pr="lg">
+      <Group justify="flex-start" wrap="nowrap" gap="xs">
+        <Text size="lg" fw={600}>
+          {order.orderNumber}
+        </Text>
+        {order.extra.customerPONumber && (
+          <Text size="sm" fw={500} fs="italic" ml="xs">
+            ({order.extra.customerPONumber})
+          </Text>
+        )}
+      </Group>
+
+      {headerStatus.label ? (
+        <Badge color={headerStatus.color} variant="filled" size="xs" style={{ flexShrink: 0 }}>
+          {headerStatus.label}
+        </Badge>
+      ) : isCancelled ? (
+        <Badge color="red" variant="filled" size="xs" style={{ flexShrink: 0 }}>
+          {t('salesOrders.cancel.statusBadge')}
+        </Badge>
+      ) : null}
+      {isUrgent && (
+        <Badge color="red" variant="filled" size="xs" style={{ flexShrink: 0 }}>
+          {t('salesOrders.urgent')}
+        </Badge>
+      )}
+    </Group>
+  );
+
+  const warehouseViewNote = splitNotesCfg
+    ? extra.clientSpecific?.NKTU?.warehouseNote?.trim()
+    : order.notes?.trim();
+
+  const warehouseMobileInfoFields = (
+    <Stack gap="sm">
+      {customerHeaderMobile}
+      <Divider variant="dashed" />
+      {/* Two columns, unlike the full mobile page's single stack: these four are
+          all short values, and one per row pushed the product list — the thing
+          the picker actually came for — below the fold. */}
+      <SimpleGrid cols={2} spacing="xs" verticalSpacing="sm">
+        <DetailField label={t('salesOrders.detail.assignedStaff')}>
+          {assignedStaffField}
+        </DetailField>
+        <DetailField label={t('salesOrders.detail.deliveryDate')}>{deliveryDateField}</DetailField>
+        <DetailField label={t('salesOrders.detail.deliveryMethod')}>
+          {deliveryMethodField}
+        </DetailField>
+        {showPackageSize && (
+          <DetailField label={t('salesOrders.detail.deliveryPackageSize')}>
+            {deliveryPackageSizeField}
+          </DetailField>
+        )}
+      </SimpleGrid>
+      {warehouseViewNote && (
+        <DetailField
+          label={
+            splitNotesCfg
+              ? t('salesOrders.detail.warehouseNote')
+              : t('__new__.01-common.labels.note')
+          }
+        >
+          <Text size="sm" style={{ whiteSpace: 'pre-line' }}>
+            {warehouseViewNote}
+          </Text>
+        </DetailField>
+      )}
     </Stack>
   );
 
@@ -1568,17 +1664,25 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       icon: <IconPackage size={14} />,
     },
     { value: 'photos', label: t('salesOrders.detail.tabPhotos'), icon: <IconPhoto size={14} /> },
-    {
-      value: 'productPhotos',
-      label: t('salesOrders.detail.tabProductPhotos'),
-      icon: <IconPhotoScan size={14} />,
-    },
-    {
-      value: 'chat',
-      label: t('salesOrders.detail.tabChat'),
-      icon: <IconMessageCircle size={14} />,
-    },
-    ...(activityLogTabVisible
+    ...(isWarehouseMobileView
+      ? []
+      : [
+          {
+            value: 'productPhotos',
+            label: t('salesOrders.detail.tabProductPhotos'),
+            icon: <IconPhotoScan size={14} />,
+          },
+        ]),
+    ...(isWarehouseMobileView
+      ? []
+      : [
+          {
+            value: 'chat',
+            label: t('salesOrders.detail.tabChat'),
+            icon: <IconMessageCircle size={14} />,
+          },
+        ]),
+    ...(activityLogTabVisible && !isWarehouseMobileView
       ? [
           {
             value: 'activityLog',
@@ -1596,79 +1700,106 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
           <MobileScrollPillTabs tabs={mobileTabs} value={mobileTab} onChange={setMobileTab} />
 
           <Tabs.Panel value="overview">
-            <Stack gap="sm" p="sm">
-              {stuckReservationBanner}
-              {pendingShipNotice}
-              {reconcileBanner}
-              {/* Info / Items / Activity / Attachments accordions */}
-              <Accordion defaultValue="info" variant="separated">
-                <Accordion.Item value="info">
-                  <Accordion.Control>
-                    <Group gap={4} wrap="wrap">
-                      <Text size="sm" fw={500}>
-                        {order.orderNumber}
-                      </Text>
-                      {headerStatus.label ? (
-                        <Badge
-                          color={headerStatus.color}
-                          variant="filled"
-                          size="xs"
-                          style={{ flexShrink: 0 }}
-                        >
-                          {headerStatus.label}
-                        </Badge>
-                      ) : isCancelled ? (
-                        <Badge color="red" variant="filled" size="xs" style={{ flexShrink: 0 }}>
-                          {t('salesOrders.cancel.statusBadge')}
-                        </Badge>
-                      ) : null}
-                      {isUrgent && (
-                        <Badge color="red" variant="filled" size="xs" style={{ flexShrink: 0 }}>
-                          {t('salesOrders.urgent')}
-                        </Badge>
-                      )}
-                    </Group>
-                  </Accordion.Control>
-                  <Accordion.Panel>{mobileInfoFields}</Accordion.Panel>
-                </Accordion.Item>
-                <Accordion.Item value="items">
-                  <Accordion.Control>{t('salesOrders.detail.itemsTitle')}</Accordion.Control>
-                  <Accordion.Panel>
-                    <Box mx={-16}>
-                      <OrderItemsTable
-                        items={order.items}
-                        totalAmount={order.totalAmount}
-                        ownReservedSnapshot={linkage?.reservedSnapshot}
-                        inventoryLinkageState={linkage?.state}
-                        canEditItemMemo={canEditItemMemo}
-                        onItemMemoSave={handleItemMemoPatch}
-                        showItemReady={showItemReady}
-                        {...(canTickItemReady && { onItemReadySave: handleItemReadyPatch })}
-                        showItemWarehouseMemo={showItemWarehouseMemo}
-                        {...(canEditWarehouseMemo && {
-                          onItemWarehouseMemoSave: handleItemWarehouseMemoPatch,
-                        })}
-                        productPhotoOnHover={variant.itemProductPhotoOnHover}
-                        currentOrderNumber={order.orderNumber}
-                      />
-                    </Box>
-                  </Accordion.Panel>
-                </Accordion.Item>
-                <Accordion.Item value="attachments">
-                  <Accordion.Control>{t('salesOrders.detail.tabAttachments')}</Accordion.Control>
-                  <Accordion.Panel>
-                    <Box mx={-16}>{attachmentsContent}</Box>
-                  </Accordion.Panel>
-                </Accordion.Item>
-                <Accordion.Item value="activity">
-                  <Accordion.Control>{t('salesOrders.detail.tabActivity')}</Accordion.Control>
-                  <Accordion.Panel>
-                    <Box mx={-16}>{activityContent}</Box>
-                  </Accordion.Panel>
-                </Accordion.Item>
-              </Accordion>
-              {actionButtons}
-            </Stack>
+            {isWarehouseMobileView ? (
+              <Stack gap="sm" p="sm">
+                {/* Banners survive the trim: they are alerts, not chrome, and a
+                    picker acting on a stuck or half-shipped order is exactly who
+                    needs to know. Each is already conditional. */}
+                {stuckReservationBanner}
+                {pendingShipNotice}
+                {reconcileBanner}
+                {mobileOrderHeading}
+                {warehouseMobileInfoFields}
+                {/* The one collapsible section here, and it opens by default:
+                    the list is what the picker came for, so it must never cost
+                    a tap to see. Collapsing is for the walk back — folding a
+                    finished twenty-line order away to reach the buttons. The
+                    count rides the control so a closed panel still says how
+                    much order is in there. */}
+                <Accordion defaultValue="items" variant="separated" mx={-16}>
+                  <Accordion.Item value="items">
+                    <Accordion.Control>
+                      <Group gap={6} wrap="nowrap">
+                        <Text size="sm" fw={500}>
+                          {t('salesOrders.detail.itemsTitle')}
+                        </Text>
+                        <Text size="xs" c="dimmed">
+                          ({order.items.length})
+                        </Text>
+                      </Group>
+                    </Accordion.Control>
+                    <Accordion.Panel>
+                      <Box mx={-8}>
+                        <OrderItemsTable
+                          items={order.items}
+                          totalAmount={order.totalAmount}
+                          ownReservedSnapshot={linkage?.reservedSnapshot}
+                          inventoryLinkageState={linkage?.state}
+                          showItemReady={showItemReady}
+                          {...(canTickItemReady && { onItemReadySave: handleItemReadyPatch })}
+                          showItemWarehouseMemo={showItemWarehouseMemo}
+                          {...(canEditWarehouseMemo && {
+                            onItemWarehouseMemoSave: handleItemWarehouseMemoPatch,
+                          })}
+                          currentOrderNumber={order.orderNumber}
+                          pickingView
+                        />
+                      </Box>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                </Accordion>
+                {actionButtons}
+              </Stack>
+            ) : (
+              <Stack gap="sm" p="sm">
+                {stuckReservationBanner}
+                {pendingShipNotice}
+                {reconcileBanner}
+                {/* Info / Items / Activity / Attachments accordions */}
+                <Accordion defaultValue="info" variant="separated">
+                  <Accordion.Item value="info">
+                    <Accordion.Control>{mobileOrderHeading}</Accordion.Control>
+                    <Accordion.Panel>{mobileInfoFields}</Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="items">
+                    <Accordion.Control>{t('salesOrders.detail.itemsTitle')}</Accordion.Control>
+                    <Accordion.Panel>
+                      <Box mx={-16}>
+                        <OrderItemsTable
+                          items={order.items}
+                          totalAmount={order.totalAmount}
+                          ownReservedSnapshot={linkage?.reservedSnapshot}
+                          inventoryLinkageState={linkage?.state}
+                          canEditItemMemo={canEditItemMemo}
+                          onItemMemoSave={handleItemMemoPatch}
+                          showItemReady={showItemReady}
+                          {...(canTickItemReady && { onItemReadySave: handleItemReadyPatch })}
+                          showItemWarehouseMemo={showItemWarehouseMemo}
+                          {...(canEditWarehouseMemo && {
+                            onItemWarehouseMemoSave: handleItemWarehouseMemoPatch,
+                          })}
+                          productPhotoOnHover={variant.itemProductPhotoOnHover}
+                          currentOrderNumber={order.orderNumber}
+                        />
+                      </Box>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="attachments">
+                    <Accordion.Control>{t('salesOrders.detail.tabAttachments')}</Accordion.Control>
+                    <Accordion.Panel>
+                      <Box mx={-16}>{attachmentsContent}</Box>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="activity">
+                    <Accordion.Control>{t('salesOrders.detail.tabActivity')}</Accordion.Control>
+                    <Accordion.Panel>
+                      <Box mx={-16}>{activityContent}</Box>
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                </Accordion>
+                {actionButtons}
+              </Stack>
+            )}
           </Tabs.Panel>
 
           <Tabs.Panel value="photos">{photosContent}</Tabs.Panel>

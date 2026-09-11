@@ -46,6 +46,7 @@ import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useProductStore } from '@/stores/useProductStore';
+import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { device, logger } from '@credo/base-ui/utils';
@@ -1345,7 +1346,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           return qId ? { id: qId, code: qCode } : null;
         })();
 
+      const productWarehouseMemos = buildSalesOrderWarehouseMemo(items, productByCode);
+
       const extra: SalesOrderExtra = {
+        ...(productWarehouseMemos && { productWarehouseMemos }),
         ...(values.isIndividualCustomer
           ? { isIndividualCustomer: true, customerName: values.customerName.trim() }
           : selectedCustomer && { customerCode: selectedCustomer.code }),

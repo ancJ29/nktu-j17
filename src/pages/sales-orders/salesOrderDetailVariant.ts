@@ -17,6 +17,10 @@ export type SalesOrderDetailVariant = {
 
   itemProductPhotoOnHover: boolean;
 
+  warehouseMobileView?: {
+    departmentCode: string;
+  };
+
   clientSpecific?: {
     NKTU?: {
       deliveryMethodDrivesInternalDelivery?: boolean;
@@ -60,6 +64,7 @@ export const NKTU_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
   itemReadyCheckbox: true,
   itemWarehouseMemo: true,
   itemProductPhotoOnHover: true,
+  warehouseMobileView: { departmentCode: 'warehouse' },
   clientSpecific: {
     NKTU: {
       deliveryMethodDrivesInternalDelivery: true,

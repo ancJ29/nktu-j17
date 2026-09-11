@@ -68,6 +68,8 @@ type OrderItemsTableProps = {
   onItemWarehouseMemoSave?: (itemIndex: number, warehouseMemo: string) => Promise<void>;
 
   productPhotoOnHover?: boolean;
+
+  pickingView?: boolean;
 };
 
 export function OrderItemsTable({
@@ -83,6 +85,7 @@ export function OrderItemsTable({
   showItemWarehouseMemo = false,
   onItemWarehouseMemoSave,
   productPhotoOnHover = false,
+  pickingView = false,
   currentOrderNumber,
 }: OrderItemsTableProps) {
   const stockSettled = inventoryLinkageState === 'shipped' || inventoryLinkageState === 'released';
@@ -319,7 +322,21 @@ export function OrderItemsTable({
                       </>
                     }
                   />
-                  {showPrice && !isSetChild && (
+                  {/* The product's standing handling rule, on the card of the
+                      product it describes. Picking view only: it earns a row
+                      here because the picker is holding this item, while the
+                      full page summarises every line's memo once at the top. */}
+                  {pickingView && lineProduct?.extra?.warehouseMemo?.trim() && (
+                    <FieldRow
+                      label={t('salesOrders.detail.productWarehouseMemo')}
+                      value={
+                        <Text size="sm" c="orange.8" fw={500} style={{ wordBreak: 'break-word' }}>
+                          {lineProduct.extra.warehouseMemo.trim()}
+                        </Text>
+                      }
+                    />
+                  )}
+                  {showPrice && !pickingView && !isSetChild && (
                     <FieldRow
                       label={
                         isSetParent
@@ -347,7 +364,7 @@ export function OrderItemsTable({
                       }
                     />
                   )}
-                  {!isSetChild && item.memo && (
+                  {!pickingView && !isSetChild && item.memo && (
                     <FieldRow label={t('salesOrders.detail.itemMemo')} value={item.memo} />
                   )}
                   {showItemWarehouseMemo && !isSetChild && (
@@ -356,7 +373,7 @@ export function OrderItemsTable({
                       value={renderWarehouseMemo(item)}
                     />
                   )}
-                  {showPrice && !isSetChild && !isSetParent && (
+                  {showPrice && !pickingView && !isSetChild && !isSetParent && (
                     <FieldRow
                       label={t('common.detail.lineTotal')}
                       value={
@@ -366,7 +383,7 @@ export function OrderItemsTable({
                       }
                     />
                   )}
-                  {locationsEnabled && !isSetParent && (
+                  {locationsEnabled && !pickingView && !isSetParent && (
                     <FieldRow
                       label={t('salesOrders.detail.fromLocation')}
                       value={
@@ -379,7 +396,7 @@ export function OrderItemsTable({
                       }
                     />
                   )}
-                  {showShortageAlert && available !== null && (
+                  {showShortageAlert && !pickingView && available !== null && (
                     <>
                       <Divider variant="dashed" my="xs" />
                       <Group gap="xs" wrap="nowrap" justify="space-between">
@@ -407,7 +424,7 @@ export function OrderItemsTable({
             </Card>
           );
         })}
-        {showPrice && (
+        {showPrice && !pickingView && (
           <Group justify="space-between" px="md" py="sm" bg="gray.0" style={{ borderRadius: 8 }}>
             <Text size="sm" fw={600} c="dimmed">
               {t('common.columns.totalAmount')}

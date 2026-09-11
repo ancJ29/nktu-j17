@@ -275,14 +275,14 @@ export const DEFAULT_TRANSPORT_ORDER_FEATURES: CMngtTransportOrderFeatures = {
       value: 'in_transit',
       label: { en: 'In transit', vi: 'Đang vận chuyển' },
       color: 'orange',
-      actionLabel: { en: 'Confirm vehicle departure', vi: 'Xác nhận xe khởi hành' },
+      actionLabel: { en: 'Departure', vi: 'Khởi hành' },
       allowedDepartments: [],
     },
     {
       value: 'completed',
       label: { en: 'Completed', vi: 'Hoàn thành' },
       color: 'teal',
-      actionLabel: { en: 'Confirm completion', vi: 'Xác nhận hoàn thành' },
+      actionLabel: { en: 'Complete', vi: 'Hoàn thành' },
       allowedDepartments: [],
     },
     {

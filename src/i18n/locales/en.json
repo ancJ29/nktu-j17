@@ -3036,7 +3036,8 @@
         "updateClassification": "Updated classification for",
         "updateDescription": "Updated description for",
         "updateImages": "Updated images for",
-        "updateTechSpecs": "Updated tech specs for"
+        "updateTechSpecs": "Updated tech specs for",
+        "updateWarehouseMemo": "Updated warehouse memo for"
       },
       "attrCardTitle": "Classification & attributes",
       "attributesEmpty": "No attributes",
@@ -3071,7 +3072,9 @@
       },
       "techSpecCardTitle": "Technical specs",
       "techSpecsEmpty": "No technical specs",
-      "updatedByOn": "Updated by <user/> on {{date}}"
+      "updatedByOn": "Updated by <user/> on {{date}}",
+      "warehouseMemoEmpty": "No warehouse memo",
+      "warehouseMemoTitle": "Warehouse memo"
     },
     "editItem": "Edit Product",
     "emptyMessage": "Try adjusting your filters or add your first product to get started.",
@@ -3128,7 +3131,10 @@
       "unitConversionFrom": "From",
       "unitConversionTo": "To",
       "unitPlaceholder": "e.g. pcs, kg, box",
-      "updateButton": "Update Product"
+      "updateButton": "Update Product",
+      "warehouseMemoDescription": "Standing pick/pack instruction. Shown on every sales order containing this product.",
+      "warehouseMemoPlaceholder": "e.g. Fragile — do not stack",
+      "warehouseMemoTitle": "Warehouse memo"
     },
     "inventoryPrompt": {
       "confirm": "Enter inventory",
@@ -3690,6 +3696,8 @@
       "printPopupBlocked": "The browser blocked the print window. Please allow pop-ups and try again.",
       "productPhotosEmpty": "No products in this order yet.",
       "productPhotosEmptyForProduct": "No photos available",
+      "productWarehouseMemo": "Product note",
+      "productWarehouseMemos": "Product warehouse memos",
       "quantity": "Quantity",
       "recentActivities": "Recent Activities",
       "returnShipmentInfoTitle": "Return Shipment",

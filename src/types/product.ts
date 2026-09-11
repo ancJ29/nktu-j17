@@ -44,6 +44,8 @@ export type ProductExtra = {
 
   attributes?: Array<{ key: string; value: string }>;
 
+  warehouseMemo?: string;
+
   minimumInventory?: ProductMinimumInventory;
 
   noInventory?: boolean;

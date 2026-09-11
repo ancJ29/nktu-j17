@@ -37,7 +37,7 @@
       },
       "empty": {
         "noDescription": "Không có mô tả {{item}}",
-        "noNote": "Chưa có ghi chú"
+        "noNote": "Không có ghi chú"
       },
       "filters": {
         "all": "Tất cả",
@@ -3036,7 +3036,8 @@
         "updateClassification": "Đã cập nhật phân loại cho",
         "updateDescription": "Đã cập nhật mô tả cho",
         "updateImages": "Đã cập nhật hình ảnh cho",
-        "updateTechSpecs": "Đã cập nhật thông số kỹ thuật cho"
+        "updateTechSpecs": "Đã cập nhật thông số kỹ thuật cho",
+        "updateWarehouseMemo": "Đã cập nhật ghi chú kho của"
       },
       "attrCardTitle": "Phân loại & thuộc tính",
       "attributesEmpty": "Chưa có thuộc tính",
@@ -3071,7 +3072,9 @@
       },
       "techSpecCardTitle": "Thông số kỹ thuật",
       "techSpecsEmpty": "Chưa có thông số kỹ thuật",
-      "updatedByOn": "Cập nhật bởi <user/> vào {{date}}"
+      "updatedByOn": "Cập nhật bởi <user/> vào {{date}}",
+      "warehouseMemoEmpty": "Không có ghi chú kho",
+      "warehouseMemoTitle": "Ghi chú kho"
     },
     "editItem": "Cập nhật sản phẩm",
     "emptyMessage": "Thử điều chỉnh bộ lọc hoặc thêm sản phẩm đầu tiên để bắt đầu.",
@@ -3128,7 +3131,10 @@
       "unitConversionFrom": "Từ",
       "unitConversionTo": "Đến",
       "unitPlaceholder": "vd: cái, kg, hộp",
-      "updateButton": "Cập nhật sản phẩm"
+      "updateButton": "Cập nhật sản phẩm",
+      "warehouseMemoDescription": "Hướng dẫn cố định khi soạn/đóng hàng. Hiển thị trên mọi đơn hàng có sản phẩm này.",
+      "warehouseMemoPlaceholder": "VD: Hàng dễ vỡ — không chồng",
+      "warehouseMemoTitle": "Ghi chú kho"
     },
     "inventoryPrompt": {
       "confirm": "Nhập tồn kho",
@@ -3690,6 +3696,8 @@
       "printPopupBlocked": "Trình duyệt đã chặn cửa sổ in. Vui lòng cho phép pop-up và thử lại.",
       "productPhotosEmpty": "Đơn hàng chưa có sản phẩm nào.",
       "productPhotosEmptyForProduct": "Chưa có ảnh",
+      "productWarehouseMemo": "Lưu ý sản phẩm",
+      "productWarehouseMemos": "Ghi chú kho theo sản phẩm",
       "quantity": "Số lượng",
       "recentActivities": "Hoạt động gần đây",
       "returnShipmentInfoTitle": "Phiếu Trả Hàng",

@@ -22,6 +22,7 @@ import {
   IconAdjustmentsHorizontal,
   IconBarcode,
   IconBoxMultiple,
+  IconBuildingWarehouse,
   IconCategory,
   IconCurrencyDong,
   IconFileDescription,
@@ -63,6 +64,8 @@ export type ProductFormValues = {
   suggestedPrice: number;
   category: string;
   attributes: Array<{ key: string; value: string }>;
+
+  warehouseMemo: string;
   minInventoryValue: number | '';
   minInventoryUnit: string;
 
@@ -688,6 +691,23 @@ export function SingleProductForm({
     </SectionCard>
   );
 
+  const warehouseMemoCard = (
+    <SectionCard
+      icon={<IconBuildingWarehouse size={14} />}
+      title={t('products.form.warehouseMemoTitle')}
+      padding="xs"
+    >
+      <Textarea
+        description={t('products.form.warehouseMemoDescription')}
+        placeholder={t('products.form.warehouseMemoPlaceholder')}
+        autosize
+        minRows={2}
+        maxRows={6}
+        {...form.getInputProps('warehouseMemo')}
+      />
+    </SectionCard>
+  );
+
   const statusCard = isEditMode ? (
     <SectionCard
       icon={<IconCategory size={14} />}
@@ -718,6 +738,7 @@ export function SingleProductForm({
               {unitsCard}
               {setCompositionCard}
               {inventoryCard}
+              {warehouseMemoCard}
               {statusCard}
             </Stack>
           </Grid.Col>
