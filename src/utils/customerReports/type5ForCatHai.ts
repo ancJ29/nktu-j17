@@ -24,6 +24,57 @@ const FMT_MONEY_DASH = '#,##0;-#,##0;"-"';
 
 const MANUAL_FILL = { fgColor: { rgb: 'FFFF00' } } as const;
 
+type FooterNote = { text: string; value?: string; red?: boolean } | null;
+
+type FooterAmount = 'service' | 'chiHo' | 'manual' | 'sum';
+type PaymentFooter = {
+  notes: ReadonlyArray<FooterNote>;
+  box: ReadonlyArray<{ label: string; amount: FooterAmount }>;
+
+  boxedAmounts: boolean;
+};
+
+const FREIGHT_TRANSFER_NOTE =
+  'Vui lòng thanh toán cho công ty chúng tôi PHÍ VẬN CHUYỂN  trên bằng chuyển khoản theo thông tin:';
+const VCB_ACCOUNT = '102 796 7777  Tại ngân hàng Vietcombank, Chi nhánh Hồ Chí Minh';
+
+const EXPORT_FOOTER: PaymentFooter = {
+  notes: [{ text: FREIGHT_TRANSFER_NOTE }, { text: `Số tài khoản: ${VCB_ACCOUNT}`, red: true }],
+  box: [
+    { label: 'Số tiền cước dịch vụ:', amount: 'service' },
+    { label: 'Số tiền chi hộ ( Đã xuất cho Cát Hải)', amount: 'chiHo' },
+    { label: 'Tổng thanh toán', amount: 'sum' },
+  ],
+  boxedAmounts: true,
+};
+
+const IMPORT_FOOTER: PaymentFooter = {
+  notes: [
+    { text: FREIGHT_TRANSFER_NOTE },
+    { text: 'Công ty thụ hưởng: CÔNG TY CỔ PHẦN DỊCH VỤ THƯƠNG MẠI VÀ ĐẦU TƯ DŨNG UY', red: true },
+    { text: 'Số tài khoản:', value: VCB_ACCOUNT, red: true },
+    null,
+    null,
+    {
+      text: 'Vui lòng thanh toán PHÍ CHI HỘ cho chúng tôi số tiền nêu trên bằng chuyển khoản theo thông tin:',
+    },
+    { text: 'Người thụ hưởng:', value: 'VÕ VĂN HÀO', red: true },
+    {
+      text: 'Số tài khoản:',
+      value: '19038044220014 Tại Ngân hàng kỹ thương Việt Nam ( Techcombank)',
+      red: true,
+    },
+  ],
+  box: [
+    { label: 'Số tiền cước vận chuyển:', amount: 'service' },
+    { label: 'Số tiền chi hộ: Dũng Uy xuất lại', amount: 'manual' },
+    { label: 'Phí neo', amount: 'manual' },
+    { label: 'Số tiền chi hộ đã xuất cho Cát Hải', amount: 'chiHo' },
+    { label: 'Tổng cộng thanh toán', amount: 'sum' },
+  ],
+  boxedAmounts: false,
+};
+
 const SIZE_BUCKETS = [
   { key: '20', header: "20'" },
   { key: '40', header: "40'" },
@@ -154,19 +205,91 @@ function plateOf(
   order: TransportOrder,
   truckLabel: (name: string, truckId: string | undefined) => string,
 ): string {
-  if (!order.isMultiTrip || (order.trips?.length ?? 0) === 0) {
-    return truckLabel(order.truckPlate, order.truckId);
+  if (order.isMultiTrip) {
+    for (const trip of order.trips ?? []) {
+      const plate = truckLabel(trip.truckPlate, trip.truckId);
+      if (plate) return plate;
+    }
   }
-  const plates: string[] = [];
-  for (const trip of order.trips!) {
-    const plate = truckLabel(trip.truckPlate, trip.truckId);
-    if (plate && !plates.includes(plate)) plates.push(plate);
-  }
-  return plates.join('; ');
+  return truckLabel(order.truckPlate, order.truckId);
 }
 
-export const buildCustomerReportType5: CustomerReportBuilder = (
-  orders,
+type Route = { pickup: string; stuffing: string; dropoff: string };
+
+function routeOf(order: TransportOrder): Route {
+  const stops: string[] = [];
+  if (order.isMultiTrip) {
+    for (const trip of order.trips ?? []) {
+      for (const place of [trip.departure, trip.destination]) {
+        const stop = (place ?? '').trim();
+        if (stop && stops[stops.length - 1] !== stop) stops.push(stop);
+      }
+    }
+  }
+  if (stops.length === 0) {
+    return {
+      pickup: order.route?.pickup ?? '',
+      stuffing: order.route?.stuffing ?? '',
+      dropoff: order.route?.dropoff ?? '',
+    };
+  }
+  const middle: string[] = [];
+  for (const stop of stops.slice(1, -1)) if (!middle.includes(stop)) middle.push(stop);
+  return { pickup: stops[0]!, stuffing: middle.join(', '), dropoff: stops[stops.length - 1]! };
+}
+
+const looseText = (text: string): string =>
+  text.trim().toLocaleLowerCase('vi').replace(/\s+/g, ' ');
+
+const isShipmentType = (order: TransportOrder, value: string): boolean =>
+  (order.shipmentType ?? '').trim().toUpperCase() === value;
+
+const stuffingContains = (order: TransportOrder, warehouse: string): boolean =>
+  looseText(routeOf(order).stuffing).includes(looseText(warehouse));
+
+const SHEETS: ReadonlyArray<{
+  name: string;
+  includes: (order: TransportOrder) => boolean;
+
+  footer: PaymentFooter;
+}> = [
+  { name: 'Hàng xuất', includes: (o) => isShipmentType(o, 'XUAT'), footer: EXPORT_FOOTER },
+  {
+    name: 'Hàng nhập - VS',
+    includes: (o) => isShipmentType(o, 'NHAP') && stuffingContains(o, 'Kho VS (KCN Tân Đô)'),
+    footer: IMPORT_FOOTER,
+  },
+  {
+    name: 'Hàng nhập - OG',
+    includes: (o) => isShipmentType(o, 'NHAP') && stuffingContains(o, 'Kho OG'),
+    footer: IMPORT_FOOTER,
+  },
+];
+
+export const buildCustomerReportType5: CustomerReportBuilder = (orders, input) => {
+  const rows = orders
+    .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
+    .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
+
+  const sheets = SHEETS.map((sheet) => ({ ...sheet, rows: rows.filter(sheet.includes) }));
+  const printed = rows.filter((o) => sheets.some((s) => s.rows.includes(o)));
+
+  const periodLabel = bangKePeriodLabel(printed);
+
+  const workbook = XLSX.utils.book_new();
+  for (const sheet of sheets) {
+    XLSX.utils.book_append_sheet(
+      workbook,
+      buildSheet(sheet.rows, input, periodLabel, sheet.footer),
+      sheet.name,
+    );
+  }
+
+  return { workbook, rowCount: printed.length };
+};
+
+function buildSheet(
+  rows: ReadonlyArray<TransportOrder>,
   {
     seller,
     customer,
@@ -176,11 +299,9 @@ export const buildCustomerReportType5: CustomerReportBuilder = (
     getTruckPlate,
     titleSuffix,
   }: CustomerReportInput,
-) => {
-  const rows = orders
-    .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
-    .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
-
+  periodLabel: string,
+  footer: PaymentFooter,
+): XLSX.WorkSheet {
   const columnOf = feeColumnReader(resolveFeeName);
   const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
 
@@ -236,7 +357,7 @@ export const buildCustomerReportType5: CustomerReportBuilder = (
   banner(seller.address);
   banner(`MST: ${seller.taxCode}`);
   const suffix = titleSuffix?.trim() ? ` ${titleSuffix.trim()}` : '';
-  const rTitle = banner(`BẢNG KÊ VẬN CHUYỂN${suffix} ${bangKePeriodLabel(rows)}`);
+  const rTitle = banner(`BẢNG KÊ VẬN CHUYỂN${suffix} ${periodLabel}`);
   const rDear = banner(`Kính gửi: ${customer.name}`);
   banner(`Địa chỉ: ${customer.address ?? ''}`);
   banner(`MST: ${customer.taxCode ?? ''}`);
@@ -313,9 +434,10 @@ export const buildCustomerReportType5: CustomerReportBuilder = (
         sizeCounts[size] += 1;
       }
       row[C_TYPE] = resolveShipmentType(order.shipmentType);
-      row[C_FROM] = order.route?.pickup ?? '';
-      row[C_STUFFING] = order.route?.stuffing ?? '';
-      row[C_TO] = order.route?.dropoff ?? '';
+      const route = routeOf(order);
+      row[C_FROM] = route.pickup;
+      row[C_STUFFING] = route.stuffing;
+      row[C_TO] = route.dropoff;
 
       if (money.amounts.freight !== 0) row[C_FREIGHT] = money.amounts.freight;
       if (money.amounts.sitc !== 0) row[C_SITC] = money.amounts.sitc;
@@ -359,6 +481,42 @@ export const buildCustomerReportType5: CustomerReportBuilder = (
     });
     for (const c of moneyCols) row[c] = sums.get(c) ?? 0;
     aoa.push(row);
+  }
+
+  blankRow();
+  const rFooter = aoa.length;
+  {
+    const service = sums.get(C_TOTAL) ?? 0;
+    const chiHo = CHI_HO_COLUMNS.reduce((s, _c, i) => s + (sums.get(chiHoMoneyCol(i)) ?? 0), 0);
+
+    const cached: Record<FooterAmount, number> = {
+      service,
+      chiHo,
+      manual: 0,
+      sum: service + chiHo,
+    };
+    const height = Math.max(footer.notes.length, footer.box.length);
+    for (let i = 0; i < height; i++) {
+      const r = aoa.length;
+      const row: CellValue[] = new Array(colCount).fill('');
+      const note = footer.notes[i];
+      if (note && note.value === undefined) {
+        row[C_DATE] = note.text;
+        merges.push({ s: { r, c: C_DATE }, e: { r, c: C_XLHN } });
+      } else if (note) {
+        row[C_DATE] = note.text;
+        row[C_ORDER_NO] = note.value!;
+        merges.push({ s: { r, c: C_DATE }, e: { r, c: C_TRUCK } });
+        merges.push({ s: { r, c: C_ORDER_NO }, e: { r, c: C_XLHN } });
+      }
+      const line = footer.box[i];
+      if (line) {
+        row[C_POWER] = line.label;
+        if (line.amount !== 'manual') row[C_TOTAL] = cached[line.amount];
+        merges.push({ s: { r, c: C_POWER }, e: { r, c: C_VAT } });
+      }
+      aoa.push(row);
+    }
   }
 
   blankRow();
@@ -438,12 +596,38 @@ export const buildCustomerReportType5: CustomerReportBuilder = (
     if (moneyCols.includes(c)) setFmt(rTotalRow, c, FMT_MONEY_DASH);
   }
 
+  {
+    const red = { font: { color: { rgb: 'FF0000' } } };
+    footer.notes.forEach((note, i) => {
+      if (!note?.red) return;
+      setStyle(rFooter + i, C_DATE, red);
+      if (note.value !== undefined) setStyle(rFooter + i, C_ORDER_NO, red);
+    });
+
+    const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
+    const lastBoxCol = footer.boxedAmounts ? C_TOTAL : C_VAT;
+    footer.box.forEach((line, i) => {
+      const r = rFooter + i;
+      for (let c = C_POWER; c <= lastBoxCol; c++) {
+        setStyle(r, c, { font: { bold: true }, border: ALL_BORDERS });
+      }
+      if (line.amount === 'manual') {
+        setStyle(r, C_TOTAL, { fill: MANUAL_FILL });
+        return;
+      }
+      (ws[ref(r, C_TOTAL)] as StyledCell).f =
+        line.amount === 'service'
+          ? ref(rTotalRow, C_TOTAL)
+          : line.amount === 'chiHo'
+            ? CHI_HO_COLUMNS.map((_c, k) => ref(rTotalRow, chiHoMoneyCol(k))).join('+')
+            : `SUM(${ref(rFooter, C_TOTAL)}:${ref(r - 1, C_TOTAL)})`;
+      setFmt(r, C_TOTAL, FMT_MONEY);
+    });
+  }
+
   for (const c of [0, cSignRight]) {
     setStyle(rSign, c, { font: { bold: true }, alignment: { horizontal: 'center' } });
   }
 
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
-
-  return { workbook, rowCount: rows.length };
-};
+  return ws;
+}
