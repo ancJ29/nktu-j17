@@ -95,6 +95,7 @@ import type {
 import { findStatus as findGoodsReceiptStatus } from '@/pages/goods-receipts/goodsReceiptStatuses';
 import type { GoodsReceiptStatus } from '@/types';
 import { isLocationsEnabled } from '@/utils/permission';
+import { readTruckingSize, truckingSizeFallbackLabel } from '@/pages/transport-orders/truckingSize';
 
 const locationsEnabled = isLocationsEnabled();
 const isMobile = device.isMobile;
@@ -3036,6 +3037,8 @@ type TransportOrderMemo = {
   customerCode?: string;
   route?: string;
   containerNumber?: string;
+  truckingSize?: string;
+  /** Pre-2026-09-08 entries. Kept so history renders — never written now. */
   containerSize?: string;
   shipmentType?: string;
   feeCount?: number;
@@ -3069,7 +3072,10 @@ const TRANSPORT_ORDER_FIELD_LABEL: Record<string, string> = {
   billNumber: 'fieldBillNumber',
   declarationNumber: 'fieldDeclarationNumber',
   containerNumber: 'fieldContainerNumber',
-  containerSize: 'fieldContainerSize',
+  truckingSize: 'fieldTruckingSize',
+  // Entries written before the 2026-09-08 rename carry the old field key, and
+  // an unlabelled key renders raw — so both map to the one label.
+  containerSize: 'fieldTruckingSize',
   shipmentType: 'fieldShipmentType',
   route: 'fieldRoute',
   vatRate: 'fieldVatRate',
@@ -3122,7 +3128,9 @@ function TransportOrderCreateBody({ memo }: { readonly memo: TransportOrderMemo 
         {memo.containerNumber && (
           <Text size="xs" c="dimmed">
             {t('transportOrders.detail.activityMemo.container')}: {memo.containerNumber}
-            {memo.containerSize ? ` (${memo.containerSize}ft)` : ''}
+            {readTruckingSize(memo)
+              ? ` (${truckingSizeFallbackLabel(readTruckingSize(memo))})`
+              : ''}
           </Text>
         )}
         {/* Leg count marks the job as multi-trip at a glance — it's only ever

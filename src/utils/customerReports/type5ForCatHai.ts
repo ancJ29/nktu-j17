@@ -10,6 +10,7 @@ import {
 } from '@/pages/transport-orders/transportOrderPricing';
 import { bangKePeriodLabel } from './type1BangKe';
 import type { CustomerReportBuilder, CustomerReportInput } from './types';
+import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
 
 type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
 type CellValue = string | number;
@@ -28,8 +29,8 @@ const SIZE_BUCKETS = [
   { key: '40', header: "40'" },
 ] as const;
 
-const sizeBucketIndex = (containerSize: string | undefined): number => {
-  const digits = (containerSize ?? '').trim().match(/^(\d+)/)?.[1];
+const sizeBucketIndex = (truckingSize: string | undefined): number => {
+  const digits = (truckingSize ?? '').trim().match(/^(\d+)/)?.[1];
   return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
 };
 
@@ -306,7 +307,7 @@ export const buildCustomerReportType5: CustomerReportBuilder = (
       row[C_DATE] = formatDate(orderPlanDate(order));
       row[C_TRUCK] = plateOf(order, truckLabel);
       row[C_CONT] = order.containerNumber ?? '';
-      const size = sizeBucketIndex(order.containerSize);
+      const size = sizeBucketIndex(readTruckingSize(order));
       if (size >= 0) {
         row[C_SIZE0 + size] = 1;
         sizeCounts[size] += 1;

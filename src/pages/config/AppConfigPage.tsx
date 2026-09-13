@@ -226,7 +226,7 @@ const LOOKUP_CATEGORY_LABELS: Record<string, string> = {
   'lookups.categories.materialUnit': 'Material Unit',
   'lookups.categories.productUnit': 'Product Unit',
   'lookups.categories.truckType': 'Truck Type',
-  'lookups.categories.containerSize': 'Container Size',
+  'lookups.categories.truckingSize': 'Container Size',
   'lookups.categories.shipmentType': 'Shipment Type',
   'lookups.categories.feeName': 'Fee Name',
   'lookups.categories.maintenanceType': 'Maintenance Type',
@@ -2226,40 +2226,6 @@ export function ConfigEditor({
                       }
                       size="sm"
                       placeholder="TUYEN-"
-                    />
-                  </Paper>
-                  {/* Which vehicle types haul no container. The app cannot work
-                      this out — `truck-type` is a per-client lookup of free
-                      strings — and it is stated as the EXCLUSION list so that
-                      empty means "unchanged", and adding a new container type
-                      needs no edit here. */}
-                  <Paper p="xs" withBorder>
-                    <Text fz="sm" fw={600} mb={4}>
-                      Vehicle Types Without Containers
-                    </Text>
-                    <Text fz="xs" c="dimmed" mb="xs">
-                      Pick the vehicle types that do not haul containers (e.g. Xe Tải). The
-                      &ldquo;Container type&rdquo; field is hidden — and cleared — on routes and
-                      orders using them. Leave empty if every type carries containers; nothing
-                      changes then.
-                    </Text>
-                    <MultiSelect
-                      data={truckTypeOptions}
-                      value={transportOrdersFeatures.nonContainerTruckTypes ?? []}
-                      onChange={(v) =>
-                        setTransportOrdersFeatures({
-                          ...transportOrdersFeatures,
-                          nonContainerTruckTypes: v,
-                        })
-                      }
-                      placeholder={
-                        truckTypeOptions.length === 0
-                          ? 'No vehicle types configured under Meta-data'
-                          : 'None — every type carries containers'
-                      }
-                      size="sm"
-                      searchable
-                      clearable
                     />
                   </Paper>
                   {/* Which vehicle types this client BOOKS jobs as — a subset

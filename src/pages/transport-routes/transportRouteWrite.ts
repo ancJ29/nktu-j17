@@ -16,7 +16,7 @@ export type TransportRouteWriteInput = {
 
   trips: TransportRouteWriteLeg[];
   truckType: string;
-  containerSize: string;
+  truckingSize: string;
   freightAmount: number;
 
   basePay: number;
@@ -39,7 +39,7 @@ export type TransportRouteWrite = Pick<
   | 'route'
   | 'trips'
   | 'truckType'
-  | 'containerSize'
+  | 'truckingSize'
   | 'freightAmount'
   | 'basePay'
   | 'allowance'
@@ -97,7 +97,7 @@ export function deriveSegmentsFromLegs(
 
 export function buildTransportRouteWrite(input: TransportRouteWriteInput): TransportRouteWrite {
   const truckType = input.truckType.trim();
-  const containerSize = input.containerSize.trim();
+  const truckingSize = input.truckingSize.trim();
 
   const common = {
     isActive: input.isActive,
@@ -105,7 +105,7 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
     name: input.name.trim(),
     truckType,
 
-    containerSize,
+    truckingSize,
     freightAmount: input.freightAmount || 0,
 
     costItems: input.costItems.map(normalizeCostItem).filter((i) => !isBlankCostItem(i)),

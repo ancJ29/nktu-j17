@@ -1,4 +1,5 @@
 import type { TransportOrder, TransportOrderTripLogRef, TripLogExtra } from '@/types';
+import { readTruckingSize } from './truckingSize';
 
 export const WHOLE_ORDER_TRIP_INDEX = -1;
 
@@ -33,7 +34,7 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
 
   const orderFacts = {
     ...(order.customerName?.trim() ? { customerName: order.customerName.trim() } : {}),
-    ...(order.containerSize ? { containerSize: order.containerSize } : {}),
+    ...(readTruckingSize(order) ? { truckingSize: readTruckingSize(order) } : {}),
   };
 
   const base = (
@@ -103,7 +104,7 @@ export function fingerprintTripLogs(plans: PlannedTripLog[]): string {
       p.extra.loadingAt ?? '',
       p.extra.unloadingAt ?? '',
       p.extra.customerName ?? '',
-      p.extra.containerSize ?? '',
+      p.extra.truckingSize ?? '',
     ]),
   );
 }

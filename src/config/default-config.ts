@@ -261,7 +261,6 @@ export const DEFAULT_TRANSPORT_ORDER_FEATURES: CMngtTransportOrderFeatures = {
   codePrefix: 'VC-',
   codePadLength: 3,
   routeCodePrefix: 'TUYEN-',
-  nonContainerTruckTypes: [],
 
   statusOptions: [
     {

@@ -108,6 +108,8 @@ export type TripLogExtra = {
 
   customerName?: string;
 
+  truckingSize?: string;
+
   containerSize?: string;
 
   note?: string;

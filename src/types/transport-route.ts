@@ -58,6 +58,8 @@ export type TransportRouteRow = SingleRecordRow & {
 
   truckType?: string;
 
+  truckingSize?: string;
+
   containerSize?: string;
 
   freightAmount: number;

@@ -1,7 +1,7 @@
 import type { DateTimeInput } from '@credo/kits/types';
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 
-export type TransportOrderContainerSize = string;
+export type TransportOrderTruckingSize = string;
 
 export type TransportOrderShipmentType = string;
 
@@ -133,7 +133,10 @@ export type TransportOrder = PartitionedRecordRow & {
   declarationNumber?: string;
 
   containerNumber: string;
-  containerSize: TransportOrderContainerSize;
+
+  truckingSize?: TransportOrderTruckingSize;
+
+  containerSize?: string;
   shipmentType: TransportOrderShipmentType;
   route: TransportOrderRoute;
 

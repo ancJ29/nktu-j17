@@ -45,9 +45,10 @@ import { exportMaintenanceLogsToExcel, exportRefuelLogsToExcel } from '@/utils/e
 import { syncTankIssue } from '@/pages/oil-tanks/tankIssueSync';
 import { issueExceedsStock } from '@/pages/oil-tanks/oilTankBalance';
 import { LogDriverField } from './LogDriverField';
-import { ContainerSizeCell } from './ContainerSizeCell';
+import { TruckingSizeCell } from './TruckingSizeCell';
 import { FuelSourceCell } from './FuelSourceCell';
 import { WarrantySummaryCell } from './WarrantySummaryCell';
+import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
 
 function textCell(value: string | undefined) {
   return value ? (
@@ -1019,9 +1020,9 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
       render: (log) => textCell(log.extra?.customerName),
     },
     {
-      header: 'operationLogs.trip.columns.containerSize',
+      header: 'operationLogs.trip.columns.truckingSize',
       nowrap: true,
-      render: (log) => <ContainerSizeCell value={log.extra?.containerSize} />,
+      render: (log) => <TruckingSizeCell value={readTruckingSize(log.extra)} />,
     },
     {
       header: 'operationLogs.trip.columns.odometer',

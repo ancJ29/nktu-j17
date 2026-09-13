@@ -88,7 +88,7 @@ import {
 } from './transportOrderStatuses';
 import { formatMoney, isBillableFee, orderTotals, readFeeLines } from './transportOrderPricing';
 import { appendTimelineEntry, diffTransportOrder, isEmptyDiff } from './activityMemo';
-import { useContainerSizeLabel } from './containerSize';
+import { useTruckingSizeLabel } from './useTruckingSize';
 import { useFeeNameLabel } from './feeName';
 import { PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
@@ -100,6 +100,7 @@ import { ExternalTruckChip } from './TransportVehicle';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 import { reconcileTripLogs } from './tripLogSync';
 import { TransportTripsCard } from './TransportTripsCard';
+import { readTruckingSize } from './truckingSize';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -147,7 +148,7 @@ export function TransportOrderDetailPage() {
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
 
-  const containerSizeLabel = useContainerSizeLabel();
+  const truckingSizeLabel = useTruckingSizeLabel();
   const shipmentTypeLabel = useShipmentTypeLabel();
   const truckTypeLabel = useTruckTypeLabel();
 
@@ -741,8 +742,8 @@ export function TransportOrderDetailPage() {
               {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
               {infoRow(t('transportOrders.columns.container'), containerNumberField)}
               {infoRow(
-                t('transportOrders.form.containerSize'),
-                containerSizeLabel(order.containerSize),
+                t('transportOrders.form.truckingSize'),
+                truckingSizeLabel(readTruckingSize(order)),
               )}
               {infoRow(
                 t('transportOrders.form.shipmentType'),

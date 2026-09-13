@@ -16,11 +16,12 @@ import { useListFilter } from '@/hooks/useListFilter';
 import { useListScrollRestoration } from '@/hooks/useListScrollRestoration';
 import { useTransportRouteStore } from '@/stores/useTransportRouteStore';
 import { perms } from '@/utils/permission';
-import { useContainerSizeOptions } from '../transport-orders/containerSize';
+import { useTruckingSizeOptions } from '../transport-orders/useTruckingSize';
 import { useTruckTypeOptions } from './truckType';
 import { routePlaces } from './routeSummary';
 import { TransportRouteCardList } from './TransportRouteCardList';
 import { TransportRouteDataTable } from './TransportRouteDataTable';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportRoute.canCreate();
@@ -32,7 +33,7 @@ type KindFilter = 'single' | 'multi' | null;
 type TransportRouteFilters = {
   status: FilterStatus;
   truckType: string | null;
-  containerSize: string | null;
+  truckingSize: string | null;
   kind: KindFilter;
   search: string;
   page: number;
@@ -41,7 +42,7 @@ type TransportRouteFilters = {
 const FILTER_DEFAULTS: TransportRouteFilters = {
   status: 'all',
   truckType: null,
-  containerSize: null,
+  truckingSize: null,
   kind: null,
   search: '',
   page: 1,
@@ -71,8 +72,8 @@ export function TransportRouteListPage() {
     (v: string | null) => updateState({ truckType: v }),
     [updateState],
   );
-  const setContainerSize = useCallback(
-    (v: string | null) => updateState({ containerSize: v }),
+  const setTruckingSize = useCallback(
+    (v: string | null) => updateState({ truckingSize: v }),
     [updateState],
   );
   const setKind = useCallback(
@@ -83,14 +84,14 @@ export function TransportRouteListPage() {
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
   const truckTypeOptions = useTruckTypeOptions();
-  const containerSizeOptions = useContainerSizeOptions();
+  const truckingSizeOptions = useTruckingSizeOptions();
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
     useListFilter(allRoutes, {
       filters: {
         status: filterState.status,
         truckType: filterState.truckType,
-        containerSize: filterState.containerSize,
+        truckingSize: filterState.truckingSize,
         kind: filterState.kind,
       },
       filterFn: (item, f) => {
@@ -99,7 +100,7 @@ export function TransportRouteListPage() {
         if (f.status === 'inactive' && item.isActive) return false;
         if (f.truckType && item.truckType !== f.truckType) return false;
 
-        if (f.containerSize && item.containerSize !== f.containerSize) return false;
+        if (f.truckingSize && readTruckingSize(item) !== f.truckingSize) return false;
         if (f.kind === 'single' && item.isMultiTrip) return false;
         if (f.kind === 'multi' && !item.isMultiTrip) return false;
         return true;
@@ -162,10 +163,10 @@ export function TransportRouteListPage() {
           ]
         : []),
       {
-        value: filterState.containerSize,
-        onChange: setContainerSize,
-        data: containerSizeOptions,
-        placeholder: t('transportRoutes.filters.anyContainerSize'),
+        value: filterState.truckingSize,
+        onChange: setTruckingSize,
+        data: truckingSizeOptions,
+        placeholder: t('transportRoutes.filters.anyTruckingSize'),
         searchable: true,
         w: 170,
       } as SelectFilter,
@@ -180,13 +181,13 @@ export function TransportRouteListPage() {
     ],
     [
       truckTypeOptions,
-      containerSizeOptions,
+      truckingSizeOptions,
       kindOptions,
       filterState.truckType,
-      filterState.containerSize,
+      filterState.truckingSize,
       filterState.kind,
       setTruckType,
-      setContainerSize,
+      setTruckingSize,
       setKind,
       t,
     ],

@@ -4,7 +4,7 @@ import type {
   TransportOrderFee,
   TransportOrderRoute,
   TransportOrderTrip,
-  TransportOrderContainerSize,
+  TransportOrderTruckingSize,
   TransportOrderShipmentType,
 } from '@/types';
 import { computeTransportOrderTotals, readFeeLines } from './transportOrderPricing';
@@ -25,7 +25,7 @@ export type TransportOrderWriteFields = {
 
   declarationNumber: string;
   containerNumber: string;
-  containerSize: TransportOrderContainerSize;
+  truckingSize: TransportOrderTruckingSize;
   shipmentType: TransportOrderShipmentType;
   route: TransportOrderRoute;
 

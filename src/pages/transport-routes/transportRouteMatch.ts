@@ -1,6 +1,7 @@
 import type { TransportRouteRow } from '@/types';
 import { placeKey } from '../transport-orders/placeSuggestions';
 import { isRouteLive } from './routeSummary';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 export type DraftLeg = { departure: string; destination: string };
 
@@ -8,7 +9,7 @@ export type TransportRouteDraft = {
   isMultiTrip: boolean;
 
   truckType: string;
-  containerSize: string;
+  truckingSize: string;
 
   pickup: string;
 
@@ -52,7 +53,7 @@ export function matchTransportRoutes(
       if (!isRouteLive(route)) return false;
       if (route.truckType !== draft.truckType) return false;
 
-      if ((route.containerSize ?? '') !== draft.containerSize) return false;
+      if (readTruckingSize(route) !== draft.truckingSize) return false;
       return matchesShape(draft, route);
     })
     .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));

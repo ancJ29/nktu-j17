@@ -1,6 +1,7 @@
 import type { TransportOrder, TransportOrderExtra } from '@/types';
 import { orderTotals, orderTripLaborTotal, readFeeLines } from './transportOrderPricing';
 import { isExternalTruck } from './externalTruck';
+import { readTruckingSize } from './truckingSize';
 
 export type TransportOrderFieldDelta = {
   from?: string | number;
@@ -19,7 +20,7 @@ export type TransportOrderFields = {
   billNumber?: TransportOrderFieldDelta;
   declarationNumber?: TransportOrderFieldDelta;
   containerNumber?: TransportOrderFieldDelta;
-  containerSize?: TransportOrderFieldDelta;
+  truckingSize?: TransportOrderFieldDelta;
   shipmentType?: TransportOrderFieldDelta;
   route?: TransportOrderFieldDelta;
   vatRate?: TransportOrderFieldDelta;
@@ -45,7 +46,7 @@ export type TransportOrderCreateMemo = {
   customerCode?: string;
   route: string;
   containerNumber?: string;
-  containerSize: string;
+  truckingSize: string;
   shipmentType: string;
 
   feeCount: number;
@@ -91,7 +92,7 @@ export function createMemo(order: TransportOrder): TransportOrderCreateMemo {
     ...(order.customerCode ? { customerCode: order.customerCode } : {}),
     route: routeMemo(order),
     ...(order.containerNumber ? { containerNumber: order.containerNumber } : {}),
-    containerSize: order.containerSize,
+    truckingSize: readTruckingSize(order),
     shipmentType: order.shipmentType,
     feeCount: readFeeLines(order).length,
     totalAmount: totals.subtotal,
@@ -153,7 +154,7 @@ export function diffTransportOrder(
   set('billNumber', delta(before.billNumber, after.billNumber));
   set('declarationNumber', delta(before.declarationNumber, after.declarationNumber));
   set('containerNumber', delta(before.containerNumber, after.containerNumber));
-  set('containerSize', delta(before.containerSize, after.containerSize));
+  set('truckingSize', delta(before.truckingSize, after.truckingSize));
   set('shipmentType', delta(before.shipmentType, after.shipmentType));
   set('route', delta(routeMemo(before), routeMemo(after)));
   set('vatRate', delta(before.vatRate, after.vatRate));

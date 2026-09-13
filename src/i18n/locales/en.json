@@ -2005,7 +2005,7 @@
   "lookups": {
     "addItem": "Add",
     "categories": {
-      "containerSize": "Container Size",
+      "truckingSize": "Container / vehicle size",
       "feeName": "Fee Name",
       "maintenanceType": "Maintenance Type",
       "materialCategory": "Material Category",
@@ -2680,7 +2680,7 @@
     "trip": {
       "addItem": "Add trip",
       "columns": {
-        "containerSize": "Container type",
+        "truckingSize": "Container / size",
         "customer": "Customer",
         "date": "Date",
         "destination": "Route / Destination",
@@ -3713,6 +3713,7 @@
       "tabProductPhotos": "Product Photos",
       "tags": "Tags",
       "viewItems": "View items",
+      "viewProductPhotos": "View product photos",
       "warehouseNote": "Warehouse note"
     },
     "editItem": "Edit Order",
@@ -3988,7 +3989,7 @@
         "fieldCustomerOrderNumber": "Customer order no.",
         "fieldBillNumber": "B/L no.",
         "fieldContainerNumber": "Container no.",
-        "fieldContainerSize": "Container size",
+        "fieldTruckingSize": "Container / size",
         "fieldContractNo": "Contract no.",
         "fieldCustomer": "Customer",
         "fieldDeclarationNumber": "Customs declaration no.",
@@ -4050,7 +4051,7 @@
       "truckType": "Vehicle type"
     },
     "form": {
-      "containerSize": "Container size",
+      "truckingSize": "Container / size",
       "customer": "Customer",
       "driver": "Driver",
       "externalDriver": "Driver / hauler",
@@ -4139,7 +4140,7 @@
       "entryDateRequired": "Date is required",
       "plateRequired": "Plate number is required",
       "truckRequired": "Truck is required",
-      "containerSizeRequired": "Container type is required"
+      "truckingSizeRequired": "Container / size is required"
     }
   },
   "transportRoutes": {
@@ -4158,7 +4159,7 @@
       "kind": "Route type",
       "route": "Route",
       "truckType": "Vehicle type",
-      "containerSize": "Container type",
+      "truckingSize": "Container / size",
       "freightAmount": "Freight fee",
       "laborCost": "Driver pay",
       "status": "Status",
@@ -4174,11 +4175,11 @@
     },
     "filters": {
       "truckType": "Vehicle type",
-      "containerSize": "Container type",
+      "truckingSize": "Container / size",
       "kind": "Route type",
       "status": "Status",
       "anyTruckType": "All vehicle types",
-      "anyContainerSize": "All container types",
+      "anyTruckingSize": "All container types",
       "anyKind": "All route types",
       "anyStatus": "All statuses"
     },
@@ -4191,7 +4192,7 @@
       "codeAuto": "Generated on save",
       "codeLocked": "Fixed once created",
       "truckType": "Applies to vehicle type",
-      "containerSize": "Applies to container type",
+      "truckingSize": "Applies to container / size",
       "multiTrip": "Multi-leg",
       "multiTripHint": "The route runs several legs — each with its own origin, destination and driver pay.",
       "freightAmount": "Default freight fee",
@@ -4218,8 +4219,8 @@
       "costItemsHint": "Driver pay is not entered here — the route already stores it and the breakdown below reads that figure.",
       "markupPercent": "Markup (%)",
       "markupHint": "Default profit margin used to suggest a quote for this route.",
-      "containerSizeMissing": "Not set",
-      "containerSizeMissingHint": "This route names no container type, so it is offered on no order. Edit it and pick one — a 20ft and a 40ft run are priced separately."
+      "truckingSizeMissing": "Not set",
+      "truckingSizeMissingHint": "This route names no container / size, so it is offered on no order. Edit it and pick one — a 20ft and a 40ft run are priced separately."
     },
     "trips": {
       "title": "Legs",
@@ -4233,7 +4234,7 @@
       "destinationRequired": "Destination is required",
       "truckTypeRequired": "Vehicle type is required",
       "nameRequired": "Route name is required",
-      "containerSizeRequired": "Container type is required"
+      "truckingSizeRequired": "Container / size is required"
     },
     "notifications": {
       "created": "Route created",

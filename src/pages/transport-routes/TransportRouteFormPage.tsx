@@ -45,11 +45,7 @@ import { buildNextSequentialCode, isDuplicateUniqueFieldError } from '@/utils/co
 import { perms } from '@/utils/permission';
 import type { TransportRouteExtra, TransportRouteRow } from '@/types';
 import { usePlaceSuggestions } from '../transport-orders/usePlaceSuggestions';
-import {
-  NON_CONTAINER_TRUCK_TYPES,
-  useContainerSizeOptions,
-} from '../transport-orders/containerSize';
-import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
+import { useTruckingSizeOptions } from '../transport-orders/useTruckingSize';
 import { useTruckTypeOptions } from './truckType';
 import { buildTransportRouteWrite, deriveSegmentsFromLegs } from './transportRouteWrite';
 import {
@@ -66,6 +62,7 @@ import { RoutePlaceInput } from './RouteFormRow';
 import { computeRouteCosting } from './routeCosting';
 import { useRouteCosting } from './useRouteCosting';
 import { RouteCostingSummary } from './RouteCostingSummary';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 const isMobile = device.isMobile;
 
@@ -127,7 +124,7 @@ export function TransportRouteFormPage() {
   }, [routesInit, loadRoutes, ordersInit, loadOrders]);
 
   const truckTypeOptions = useTruckTypeOptions();
-  const containerSizeOptions = useContainerSizeOptions();
+  const truckingSizeOptions = useTruckingSizeOptions();
 
   const { norms, fuelPricePerLiter } = useRouteCosting();
 
@@ -137,11 +134,9 @@ export function TransportRouteFormPage() {
       name: (v) => (v.trim() ? null : t('transportRoutes.validation.nameRequired')),
       truckType: (v) => (v.trim() ? null : t('transportRoutes.validation.truckTypeRequired')),
 
-      containerSize: (v, values) =>
-        values.truckType.trim() &&
-        truckTypeCarriesContainer(values.truckType, NON_CONTAINER_TRUCK_TYPES) &&
-        !v.trim()
-          ? t('transportRoutes.validation.containerSizeRequired')
+      truckingSize: (v, values) =>
+        values.truckType.trim() && !v.trim()
+          ? t('transportRoutes.validation.truckingSizeRequired')
           : null,
 
       pickup: (v, values) =>
@@ -189,7 +184,7 @@ export function TransportRouteFormPage() {
         stuffing: r.route?.stuffing || '',
         dropoff: r.route?.dropoff || '',
         truckType: r.truckType || '',
-        containerSize: r.containerSize || '',
+        truckingSize: readTruckingSize(r),
         freightAmount: r.freightAmount || 0,
 
         basePay: r.basePay ?? r.laborCost ?? 0,
@@ -226,10 +221,7 @@ export function TransportRouteFormPage() {
           route: { pickup: values.pickup, stuffing: values.stuffing, dropoff: values.dropoff },
           trips: values.trips,
           truckType: values.truckType,
-
-          containerSize: truckTypeCarriesContainer(values.truckType, NON_CONTAINER_TRUCK_TYPES)
-            ? values.containerSize
-            : '',
+          truckingSize: values.truckingSize,
           freightAmount: values.freightAmount,
           basePay: values.basePay,
           allowance: values.allowance,
@@ -355,12 +347,7 @@ export function TransportRouteFormPage() {
       ? [...options, { value: current, label: current }]
       : options;
 
-  const showContainerSize = truckTypeCarriesContainer(
-    form.values.truckType,
-    NON_CONTAINER_TRUCK_TYPES,
-  );
-
-  const containerSizeData = withCurrent(containerSizeOptions, form.values.containerSize);
+  const truckingSizeData = withCurrent(truckingSizeOptions, form.values.truckingSize);
 
   return (
     <Stack gap="lg">
@@ -415,30 +402,21 @@ export function TransportRouteFormPage() {
                 label={t('transportRoutes.form.truckType')}
                 data={withCurrent(truckTypeOptions, form.values.truckType)}
                 value={form.values.truckType || null}
-                onChange={(v) => {
-                  const next = v ?? '';
-                  form.setFieldValue('truckType', next);
-
-                  if (!truckTypeCarriesContainer(next, NON_CONTAINER_TRUCK_TYPES)) {
-                    form.setFieldValue('containerSize', '');
-                  }
-                }}
+                onChange={(v) => form.setFieldValue('truckType', v ?? '')}
                 error={form.errors.truckType}
                 searchable
                 clearable
               />
-              {showContainerSize && (
-                <Select
-                  withAsterisk
-                  label={t('transportRoutes.form.containerSize')}
-                  data={containerSizeData}
-                  value={form.values.containerSize || null}
-                  onChange={(v) => form.setFieldValue('containerSize', v ?? '')}
-                  error={form.errors.containerSize}
-                  searchable
-                  allowDeselect={false}
-                />
-              )}
+              <Select
+                withAsterisk
+                label={t('transportRoutes.form.truckingSize')}
+                data={truckingSizeData}
+                value={form.values.truckingSize || null}
+                onChange={(v) => form.setFieldValue('truckingSize', v ?? '')}
+                error={form.errors.truckingSize}
+                searchable
+                allowDeselect={false}
+              />
               <Switch
                 mt="md"
                 label={

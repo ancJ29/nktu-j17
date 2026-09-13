@@ -14,7 +14,7 @@ export type RouteFormValues = {
   stuffing: string;
   dropoff: string;
   truckType: string;
-  containerSize: string;
+  truckingSize: string;
   freightAmount: number;
 
   basePay: number;
@@ -48,7 +48,7 @@ export function blankRouteFormValues(): RouteFormValues {
     stuffing: '',
     dropoff: '',
     truckType: '',
-    containerSize: '',
+    truckingSize: '',
     freightAmount: 0,
     basePay: 0,
     allowance: 0,

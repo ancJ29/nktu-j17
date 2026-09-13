@@ -61,7 +61,7 @@ import { appConfig } from '@/config';
 import type {
   Employee,
   TransportOrder,
-  TransportOrderContainerSize,
+  TransportOrderTruckingSize,
   TransportOrderExtra,
   TransportOrderFee,
   TransportOrderFeeKind,
@@ -75,8 +75,7 @@ import {
   formatMoney,
   readFeeLines,
 } from './transportOrderPricing';
-import { NON_CONTAINER_TRUCK_TYPES, useContainerSizeOptions } from './containerSize';
-import { truckTypeCarriesContainer } from './containerTruckType';
+import { useTruckingSizeOptions } from './useTruckingSize';
 import {
   FALLBACK_FEE_NAMES,
   feeNameSelectData,
@@ -116,6 +115,7 @@ import type { TransportRouteRow } from '@/types';
 import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleConflicts';
 import type { ScheduleSlot } from './scheduleConflicts';
 import { Form } from '@/components/Form';
+import { readTruckingSize } from './truckingSize';
 
 const isMobile = device.isMobile;
 const toFeatures = appConfig.features.transportOrders;
@@ -184,7 +184,7 @@ type FormValues = {
   billNumber: string;
   declarationNumber: string;
   containerNumber: string;
-  containerSize: TransportOrderContainerSize;
+  truckingSize: TransportOrderTruckingSize;
   shipmentType: TransportOrderShipmentType;
   pickup: string;
   stuffing: string;
@@ -318,7 +318,7 @@ function blankValues(presetTruckType = ''): FormValues {
     declarationNumber: '',
     containerNumber: '',
 
-    containerSize: '',
+    truckingSize: '',
     shipmentType: DEFAULT_SHIPMENT_TYPE,
     pickup: '',
     stuffing: '',
@@ -369,7 +369,7 @@ function copiedValues(src: TransportOrder): FormValues {
     billNumber: src.billNumber || '',
     declarationNumber: src.declarationNumber || '',
     containerNumber: src.containerNumber || '',
-    containerSize: src.containerSize,
+    truckingSize: readTruckingSize(src),
     shipmentType: src.shipmentType,
     pickup: src.route?.pickup || '',
     stuffing: src.route?.stuffing || '',
@@ -488,7 +488,7 @@ export function TransportOrderFormPage() {
     [i18n.language],
   );
 
-  const containerSizeOptions = useContainerSizeOptions();
+  const truckingSizeOptions = useTruckingSizeOptions();
 
   const driverWithPlate = useDriverWithPlate();
 
@@ -523,12 +523,11 @@ export function TransportOrderFormPage() {
         !values.isMultiTrip && !v ? t('transportOrders.validation.entryDateRequired') : null,
       customerCode: (v) => (!v ? t('transportOrders.validation.customerRequired') : null),
 
-      containerSize: (v, values) => {
+      truckingSize: (v, values) => {
         if (v) return null;
+
         if (!values.truckType) return null;
-        return truckTypeCarriesContainer(values.truckType, NON_CONTAINER_TRUCK_TYPES)
-          ? t('transportOrders.validation.containerSizeRequired')
-          : null;
+        return t('transportOrders.validation.truckingSizeRequired');
       },
       trips: {
         truckId: (v: string, values: FormValues, path: string) =>
@@ -621,7 +620,7 @@ export function TransportOrderFormPage() {
         billNumber: o.billNumber || '',
         declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
-        containerSize: o.containerSize,
+        truckingSize: readTruckingSize(o),
         shipmentType: o.shipmentType,
         pickup: o.route?.pickup || '',
         stuffing: o.route?.stuffing || '',
@@ -706,7 +705,7 @@ export function TransportOrderFormPage() {
           billNumber: values.billNumber.trim(),
           declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
-          containerSize: values.containerSize,
+          truckingSize: values.truckingSize,
           shipmentType: values.shipmentType,
           route,
           fees,
@@ -842,7 +841,7 @@ export function TransportOrderFormPage() {
     const draft: TransportRouteDraft = {
       isMultiTrip: form.values.isMultiTrip,
       truckType: draftTruckType,
-      containerSize: form.values.containerSize,
+      truckingSize: form.values.truckingSize,
       pickup: form.values.pickup,
       dropoff: form.values.dropoff,
       legs: form.values.trips.map((trip) => ({
@@ -853,7 +852,7 @@ export function TransportOrderFormPage() {
     return matchTransportRoutes(draft, savedRoutes);
   }, [
     form.values.isMultiTrip,
-    form.values.containerSize,
+    form.values.truckingSize,
     form.values.pickup,
     form.values.dropoff,
     form.values.trips,
@@ -863,15 +862,6 @@ export function TransportOrderFormPage() {
 
   const [appliedRoute, setAppliedRoute] = useState<TransportRouteRow | undefined>();
   const appliedRouteCode = appliedRoute?.code;
-
-  const showContainerSize = truckTypeCarriesContainer(draftTruckType, NON_CONTAINER_TRUCK_TYPES);
-
-  useEffect(() => {
-    if (showContainerSize) return;
-    if (!form.getValues().containerSize) return;
-    form.setFieldValue('containerSize', '');
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine mints a new `form` object every render; values are read through `getValues()`.
-  }, [showContainerSize]);
 
   const routeTruckIssues = useMemo(() => {
     const wanted = appliedRoute?.truckType;
@@ -920,7 +910,8 @@ export function TransportOrderFormPage() {
           form.setFieldValue('dropoff', route.route?.dropoff ?? '');
         }
 
-        if (route.containerSize) form.setFieldValue('containerSize', route.containerSize);
+        const routeSize = readTruckingSize(route);
+        if (routeSize) form.setFieldValue('truckingSize', routeSize);
       }
 
       const fees = [...form.getValues().fees];
@@ -1004,11 +995,11 @@ export function TransportOrderFormPage() {
 
   const tripLaborTotal = computeTripLaborTotal(form.values.trips);
 
-  const currentSize = form.values.containerSize;
-  const containerSizeData =
-    currentSize && !containerSizeOptions.some((o) => o.value === currentSize)
-      ? [...containerSizeOptions, { value: currentSize, label: `${currentSize}ft` }]
-      : containerSizeOptions;
+  const currentSize = form.values.truckingSize;
+  const truckingSizeData =
+    currentSize && !truckingSizeOptions.some((o) => o.value === currentSize)
+      ? [...truckingSizeOptions, { value: currentSize, label: `${currentSize}ft` }]
+      : truckingSizeOptions;
 
   const currentShipmentType = form.values.shipmentType;
   const shipmentTypeData =
@@ -1249,22 +1240,17 @@ export function TransportOrderFormPage() {
                 label={t('transportOrders.columns.declaration')}
                 {...form.getInputProps('declarationNumber')}
               />
-              {/* Hidden for a Xe Tải job — that vehicle hauls no container, so
-                  the field has nothing to say. `showContainerSize` also drives
-                  the effect that clears a value stranded by a late truck pick. */}
-              {showContainerSize && (
-                <Select
-                  label={t('transportOrders.form.containerSize')}
-                  data={containerSizeData}
-                  value={form.values.containerSize || null}
+              <Select
+                label={t('transportOrders.form.truckingSize')}
+                data={truckingSizeData}
+                value={form.values.truckingSize || null}
 
-                  onChange={(v) =>
-                    form.setFieldValue('containerSize', (v as TransportOrderContainerSize) ?? '')
-                  }
-                  searchable
-                  clearable
-                />
-              )}
+                onChange={(v) =>
+                  form.setFieldValue('truckingSize', (v as TransportOrderTruckingSize) ?? '')
+                }
+                searchable
+                clearable
+              />
               <Select
                 label={t('transportOrders.form.shipmentType')}
                 data={shipmentTypeData}

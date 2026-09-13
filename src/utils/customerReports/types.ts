@@ -9,7 +9,7 @@ export type CustomerReportInput = {
   customer: { name: string; address?: string; taxCode?: string };
 
   resolveShipmentType: (value: string) => string;
-  resolveContainerSize: (value: string) => string;
+  resolveTruckingSize: (value: string) => string;
 
   resolveFeeName: (value: string) => string;
 

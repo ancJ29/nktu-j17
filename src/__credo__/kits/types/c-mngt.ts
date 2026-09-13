@@ -267,8 +267,6 @@ export type CMngtTransportOrderFeatures = {
 
   routeCodePrefix?: string;
 
-  nonContainerTruckTypes?: string[];
-
   orderTruckTypes?: string[];
 
   statusOptions: CMngtTransportOrderStatusOption[];

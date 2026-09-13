@@ -48,7 +48,7 @@ import { TransportOrderDataTable } from './TransportOrderDataTable';
 import { formatMoney, orderTotals, orderTripLaborTotal } from './transportOrderPricing';
 import { transportOrderStatuses } from './transportOrderStatuses';
 import { useTransportOrderListFilters } from './useTransportOrderListFilters';
-import { useContainerSizeLabel, useContainerSizeOptions } from './containerSize';
+import { useTruckingSizeLabel, useTruckingSizeOptions } from './useTruckingSize';
 import { useFeeNameLabel, useFeeNameOptions } from './feeName';
 import { useShipmentTypeLabel, useShipmentTypeOptions } from './shipmentType';
 import { truckOptionLabel, useTruckPlate } from './truckDisplay';
@@ -199,8 +199,8 @@ export function TransportOrderListPage() {
   const shipmentData = useShipmentTypeOptions();
   const shipmentTypeLabel = useShipmentTypeLabel();
 
-  const containerSizeData = useContainerSizeOptions();
-  const containerSizeLabel = useContainerSizeLabel();
+  const truckingSizeData = useTruckingSizeOptions();
+  const truckingSizeLabel = useTruckingSizeLabel();
 
   const feeNameLabel = useFeeNameLabel();
   const feeNameOptions = useFeeNameOptions();
@@ -274,7 +274,7 @@ export function TransportOrderListPage() {
         companyName: getCompanyInfo().name,
         resolveStatus: statusLabel,
         resolveShipmentType: shipmentTypeLabel,
-        resolveContainerSize: containerSizeLabel,
+        resolveTruckingSize: truckingSizeLabel,
         resolveFeeName: feeNameLabel,
 
         feeNames: feeNameOptions.map((o) => o.label),
@@ -324,7 +324,7 @@ export function TransportOrderListPage() {
           taxCode: customer?.extra?.taxCode,
         },
         resolveShipmentType: shipmentTypeLabel,
-        resolveContainerSize: containerSizeLabel,
+        resolveTruckingSize: truckingSizeLabel,
         resolveFeeName: feeNameLabel,
         getTruckPlate,
         titleSuffix: shipmentSuffix,
@@ -538,12 +538,12 @@ export function TransportOrderListPage() {
     },
     {
       type: 'select',
-      key: 'containerSize',
-      title: t('transportOrders.form.containerSize'),
+      key: 'truckingSize',
+      title: t('transportOrders.form.truckingSize'),
       placeholder: t('__new__.01-common.filters.all'),
-      value: filters.containerSizeFilter,
-      options: containerSizeData,
-      onChange: filters.setContainerSizeFilter,
+      value: filters.truckingSizeFilter,
+      options: truckingSizeData,
+      onChange: filters.setTruckingSizeFilter,
     },
     {
       type: 'switch',
@@ -762,9 +762,9 @@ export function TransportOrderListPage() {
               {shipmentTypeLabel(filters.shipmentFilter)}
             </FilterPill>
           )}
-          {filters.containerSizeFilter && (
-            <FilterPill onClose={() => filters.setContainerSizeFilter(null)}>
-              {containerSizeLabel(filters.containerSizeFilter)}
+          {filters.truckingSizeFilter && (
+            <FilterPill onClose={() => filters.setTruckingSizeFilter(null)}>
+              {truckingSizeLabel(filters.truckingSizeFilter)}
             </FilterPill>
           )}
           {showBarPills && filters.hideCancelled && (

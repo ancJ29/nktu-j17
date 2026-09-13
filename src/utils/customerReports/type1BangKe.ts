@@ -9,6 +9,7 @@ import {
   readFeeLines,
 } from '@/pages/transport-orders/transportOrderPricing';
 import type { CustomerReportBuilder, CustomerReportInput, CustomerReportResult } from './types';
+import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
 
 type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
 type CellValue = string | number;
@@ -26,8 +27,8 @@ const SIZE_BUCKETS = [
   { key: '40', header: '40ft' },
 ] as const;
 
-function sizeBucketIndex(containerSize: string | undefined): number {
-  const digits = (containerSize ?? '').trim().match(/^(\d+)/)?.[1];
+function sizeBucketIndex(truckingSize: string | undefined): number {
+  const digits = (truckingSize ?? '').trim().match(/^(\d+)/)?.[1];
   return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
 }
 
@@ -384,7 +385,7 @@ export const buildBangKeWorksheet = (
     row[C_BL] = o.billNumber ?? '';
     row[C_CONT] = o.containerNumber ?? '';
 
-    const s = sizeBucketIndex(o.containerSize);
+    const s = sizeBucketIndex(readTruckingSize(o));
     if (s >= 0) row[C_SIZE0 + s] = 1;
     row[C_TYPE] = o.shipmentType ? resolveShipmentType(o.shipmentType).toLocaleUpperCase('vi') : '';
     row[C_PICKUP] = o.route?.pickup ?? '';
@@ -429,7 +430,7 @@ export const buildBangKeWorksheet = (
     row[C_STT] = 'TOTAL';
     merges.push({ s: { r: rTotalRow, c: C_STT }, e: { r: rTotalRow, c: C_CONT } });
     SIZE_BUCKETS.forEach((_bucket, s) => {
-      row[C_SIZE0 + s] = rows.filter((o) => sizeBucketIndex(o.containerSize) === s).length;
+      row[C_SIZE0 + s] = rows.filter((o) => sizeBucketIndex(readTruckingSize(o)) === s).length;
     });
     feeCols.forEach((_col, f) => {
       let sum = 0;

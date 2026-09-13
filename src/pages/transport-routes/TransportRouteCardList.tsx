@@ -6,18 +6,16 @@ import { ListCardList } from '@/components/ListCardList';
 import { ActiveBadge } from '@/components/badges';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
-import {
-  NON_CONTAINER_TRUCK_TYPES,
-  useContainerSizeLabel,
-} from '../transport-orders/containerSize';
+import { useTruckingSizeLabel } from '../transport-orders/useTruckingSize';
 import { useTruckTypeLabel } from './truckType';
 import {
-  routeContainerDisplay,
+  routeTruckingSizeMissing,
   routeEndpoints,
   routeLaborTotal,
   routeLegCount,
 } from './routeSummary';
 import { useRouteCosting } from './useRouteCosting';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 type Props = {
   readonly routes: TransportRouteRow[];
@@ -27,7 +25,7 @@ type Props = {
 export function TransportRouteCardList({ routes, isLoading }: Props) {
   const { t } = useTranslation();
   const truckTypeLabel = useTruckTypeLabel();
-  const containerSizeLabel = useContainerSizeLabel();
+  const truckingSizeLabel = useTruckingSizeLabel();
   const { costOf } = useRouteCosting();
 
   return (
@@ -86,14 +84,14 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
                   {truckTypeLabel(r.truckType)}
                 </Badge>
               )}
-              {r.containerSize ? (
+              {readTruckingSize(r) ? (
                 <Badge size="xs" variant="light" color="cyan" tt="none" radius="sm">
-                  {containerSizeLabel(r.containerSize)}
+                  {truckingSizeLabel(readTruckingSize(r))}
                 </Badge>
               ) : (
-                routeContainerDisplay(r, NON_CONTAINER_TRUCK_TYPES) === 'missing' && (
+                routeTruckingSizeMissing(r) && (
                   <Badge size="xs" variant="light" color="orange" tt="none" radius="sm">
-                    {t('transportRoutes.form.containerSizeMissing')}
+                    {t('transportRoutes.form.truckingSizeMissing')}
                   </Badge>
                 )
               )}

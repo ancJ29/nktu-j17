@@ -3,7 +3,8 @@ import { IconRoute } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
-import { useContainerSizeLabel } from '../transport-orders/containerSize';
+import { useTruckingSizeLabel } from '../transport-orders/useTruckingSize';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 type Props = {
   readonly matches: readonly TransportRouteRow[];
@@ -14,7 +15,7 @@ type Props = {
 
 export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Props) {
   const { t } = useTranslation();
-  const containerSizeLabel = useContainerSizeLabel();
+  const truckingSizeLabel = useTruckingSizeLabel();
 
   if (matches.length === 0) return null;
 
@@ -42,9 +43,9 @@ export function TransportRouteSuggestion({ matches, onApply, appliedCode }: Prop
                     {route.name}
                   </Text>
                 )}
-                {route.containerSize && (
+                {readTruckingSize(route) && (
                   <Badge size="xs" variant="light" color="cyan" tt="none" radius="sm">
-                    {containerSizeLabel(route.containerSize)}
+                    {truckingSizeLabel(readTruckingSize(route))}
                   </Badge>
                 )}
                 {/* The ONE number, and the only one applying actually copies:

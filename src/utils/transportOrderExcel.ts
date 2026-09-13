@@ -10,6 +10,7 @@ import {
   readFeeLines,
 } from '@/pages/transport-orders/transportOrderPricing';
 import { truckNameWithPlate } from '@/pages/transport-orders/truckDisplay';
+import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
 
 const THIN = { style: 'thin', color: { rgb: '000000' } } as const;
 const ALL_BORDERS = { top: THIN, bottom: THIN, left: THIN, right: THIN } as const;
@@ -37,7 +38,7 @@ export type TransportOrderExportOptions = {
   resolveStatus: (value: string) => string;
 
   resolveShipmentType: (value: string) => string;
-  resolveContainerSize: (value: string) => string;
+  resolveTruckingSize: (value: string) => string;
 
   resolveFeeName: (value: string) => string;
 
@@ -71,7 +72,7 @@ export const buildTransportOrderWorkbook = (
     companyName,
     resolveStatus,
     resolveShipmentType,
-    resolveContainerSize,
+    resolveTruckingSize,
     resolveFeeName,
     feeNames,
     getTruckPlate,
@@ -86,7 +87,7 @@ export const buildTransportOrderWorkbook = (
     | 'date'
     | 'shipmentType'
     | 'containerNumber'
-    | 'containerSize'
+    | 'truckingSize'
     | 'billNumber'
     | 'route'
     | 'truck'
@@ -117,7 +118,7 @@ export const buildTransportOrderWorkbook = (
         date: 'Ngày',
         shipmentType: 'Loại hình',
         containerNumber: 'Số cont',
-        containerSize: 'Loại cont',
+        truckingSize: 'Loại cont / kích thước',
         billNumber: 'Số B/L',
         route: 'Tuyến',
         truck: 'Xe',
@@ -138,7 +139,7 @@ export const buildTransportOrderWorkbook = (
         date: 'Date',
         shipmentType: 'Shipment Type',
         containerNumber: 'Container No.',
-        containerSize: 'Container Size',
+        truckingSize: 'Container Size',
         billNumber: 'B/L No.',
         route: 'Route',
         truck: 'Truck',
@@ -182,7 +183,7 @@ export const buildTransportOrderWorkbook = (
     { key: 'date', header: labels.date, width: 12 },
     { key: 'shipmentType', header: labels.shipmentType, width: 12 },
     { key: 'containerNumber', header: labels.containerNumber, width: 14 },
-    { key: 'containerSize', header: labels.containerSize, width: 10 },
+    { key: 'truckingSize', header: labels.truckingSize, width: 10 },
     { key: 'billNumber', header: labels.billNumber, width: 14 },
     { key: 'route', header: labels.route, width: 44 },
     { key: 'truck', header: labels.truck, width: 24 },
@@ -233,7 +234,7 @@ export const buildTransportOrderWorkbook = (
       date: formatDate(orderPlanDate(o)),
       shipmentType: o.shipmentType ? resolveShipmentType(o.shipmentType) : '',
       containerNumber: o.containerNumber ?? '',
-      containerSize: o.containerSize ? resolveContainerSize(o.containerSize) : '',
+      truckingSize: resolveTruckingSize(readTruckingSize(o)),
       billNumber: o.billNumber ?? '',
       route,
       truck,

@@ -7,19 +7,17 @@ import { ActiveBadge } from '@/components/badges';
 import { formatDate } from '@/utils/dateFormat';
 import type { TransportRouteRow } from '@/types';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
-import {
-  NON_CONTAINER_TRUCK_TYPES,
-  useContainerSizeLabel,
-} from '../transport-orders/containerSize';
+import { useTruckingSizeLabel } from '../transport-orders/useTruckingSize';
 import { useTruckTypeLabel } from './truckType';
 import { JourneyCell } from '../transport-orders/TransportRouteCell';
 import {
-  routeContainerDisplay,
+  routeTruckingSizeMissing,
   routeJourneyLegs,
   routeLaborTotal,
   routeLegCount,
 } from './routeSummary';
 import { useRouteCosting } from './useRouteCosting';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 type Props = {
   readonly routes: TransportRouteRow[];
@@ -30,7 +28,7 @@ type Props = {
 export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Props) {
   const { t } = useTranslation();
   const truckTypeLabel = useTruckTypeLabel();
-  const containerSizeLabel = useContainerSizeLabel();
+  const truckingSizeLabel = useTruckingSizeLabel();
 
   const { costOf } = useRouteCosting();
 
@@ -114,26 +112,18 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         ),
       },
       {
-        key: 'containerSize',
+        key: 'truckingSize',
         width: '105px',
-        header: t('transportRoutes.columns.containerSize'),
+        header: t('transportRoutes.columns.truckingSize'),
 
-        render: (r: TransportRouteRow) => {
-          const display = routeContainerDisplay(r, NON_CONTAINER_TRUCK_TYPES);
-          if (display === 'value')
-            return <Text size="sm">{containerSizeLabel(r.containerSize)}</Text>;
-          if (display === 'missing')
-            return (
-              <Text size="sm" c="orange" title={t('transportRoutes.form.containerSizeMissingHint')}>
-                {t('transportRoutes.form.containerSizeMissing')}
-              </Text>
-            );
-          return (
-            <Text size="sm" c="dimmed" fs="italic">
-              {'—'}
+        render: (r: TransportRouteRow) =>
+          routeTruckingSizeMissing(r) ? (
+            <Text size="sm" c="orange" title={t('transportRoutes.form.truckingSizeMissingHint')}>
+              {t('transportRoutes.form.truckingSizeMissing')}
             </Text>
-          );
-        },
+          ) : (
+            <Text size="sm">{truckingSizeLabel(readTruckingSize(r))}</Text>
+          ),
       },
       {
         key: 'freightAmount',
@@ -227,7 +217,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         ),
       },
     ],
-    [t, truckTypeLabel, containerSizeLabel, costOf, expandedIds, toggleExpanded],
+    [t, truckTypeLabel, truckingSizeLabel, costOf, expandedIds, toggleExpanded],
   );
 
   return (

@@ -1,6 +1,6 @@
 import type { TransportRouteRow } from '@/types';
 import type { RouteStop } from '../transport-orders/TransportRouteCell';
-import { truckTypeCarriesContainer } from '../transport-orders/containerTruckType';
+import { readTruckingSize } from '../transport-orders/truckingSize';
 
 export type RouteEndpoints = { from: string; to: string };
 
@@ -33,12 +33,8 @@ export function routePlaces(
   return places.filter((p): p is string => !!p && p.trim().length > 0);
 }
 
-export function routeContainerDisplay(
-  route: Pick<TransportRouteRow, 'truckType' | 'containerSize'>,
-  nonContainerTruckTypes: readonly string[],
-): 'value' | 'missing' | 'none' {
-  if (route.containerSize) return 'value';
-  return truckTypeCarriesContainer(route.truckType, nonContainerTruckTypes) ? 'missing' : 'none';
+export function routeTruckingSizeMissing(route: Pick<TransportRouteRow, 'truckingSize'>): boolean {
+  return !readTruckingSize(route);
 }
 
 export function routeJourneyLegs(

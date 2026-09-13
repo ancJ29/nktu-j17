@@ -8,7 +8,7 @@ export type LookupV2CategoryId =
   | 'product-category'
   | 'truck-type'
   | 'truck-maintenance-type'
-  | 'container-size'
+  | 'trucking-size'
   | 'shipment-type'
   | 'fee-name';
 
@@ -39,7 +39,7 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
     defaultSortOrder: 1,
   },
 
-  { id: 'container-size', labelKey: 'lookups.categories.containerSize', defaultSortOrder: 1 },
+  { id: 'trucking-size', labelKey: 'lookups.categories.truckingSize', defaultSortOrder: 1 },
 
   { id: 'shipment-type', labelKey: 'lookups.categories.shipmentType', defaultSortOrder: 1 },
 
@@ -49,7 +49,7 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
 const FLEET_ONLY_CATEGORIES: LookupV2CategoryId[] = ['truck-type', 'truck-maintenance-type'];
 
 const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = [
-  'container-size',
+  'trucking-size',
   'shipment-type',
   'fee-name',
 ];

@@ -20,6 +20,7 @@ import { orderPlanSortKey } from './planDate';
 import { useTruckTypeOf } from './truckDisplay';
 import { usesTruckType } from './truckTypeMatch';
 import type { TransportOrder, TransportOrderShipmentType } from '@/types';
+import { readTruckingSize } from './truckingSize';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
@@ -104,7 +105,7 @@ export function useTransportOrderListFilters(
   const truckTypeFilter = state.tt ?? null;
   const driverFilter = state.dv ?? null;
   const shipmentFilter: TransportOrderShipmentFilter = state.sh ?? 'all';
-  const containerSizeFilter = state.cz ?? null;
+  const truckingSizeFilter = state.cz ?? null;
   const hideCancelled = state.hc ?? false;
   const sortField = state.sr ?? DEFAULT_SORT;
   const page = state.pg ?? DEFAULT_PAGE;
@@ -144,7 +145,7 @@ export function useTransportOrderListFilters(
       updateState({ sh: v === 'all' ? undefined : v, pg: undefined }),
     [updateState],
   );
-  const setContainerSizeFilter = useCallback(
+  const setTruckingSizeFilter = useCallback(
     (v: string | null) => updateState({ cz: v || undefined, pg: undefined }),
     [updateState],
   );
@@ -183,7 +184,7 @@ export function useTransportOrderListFilters(
       if (truckTypeFilter && !usesTruckType(o, truckTypeFilter, truckTypeOf)) return false;
       if (driverFilter && !usesDriver(o, driverFilter)) return false;
       if (shipmentFilter !== 'all' && o.shipmentType !== shipmentFilter) return false;
-      if (containerSizeFilter && o.containerSize !== containerSizeFilter) return false;
+      if (truckingSizeFilter && readTruckingSize(o) !== truckingSizeFilter) return false;
       if (!isInDateRange(o.createdAt, createdDateRange)) return false;
       if (entryDateRange.preset && o.entryDate && !isInDateRange(o.entryDate, entryDateRange))
         return false;
@@ -209,7 +210,7 @@ export function useTransportOrderListFilters(
     truckTypeOf,
     driverFilter,
     shipmentFilter,
-    containerSizeFilter,
+    truckingSizeFilter,
     createdDateRange,
     entryDateRange,
     sortField,
@@ -227,7 +228,7 @@ export function useTransportOrderListFilters(
     truckTypeFilter ||
     driverFilter ||
     shipmentFilter !== 'all' ||
-    containerSizeFilter ||
+    truckingSizeFilter ||
     hideCancelled ||
     entryDateRange.preset ||
     !isDefaultLastNDaysRange(createdDateRange, defaultDateRangeDays)
@@ -250,8 +251,8 @@ export function useTransportOrderListFilters(
     setDriverFilter,
     shipmentFilter,
     setShipmentFilter,
-    containerSizeFilter,
-    setContainerSizeFilter,
+    truckingSizeFilter,
+    setTruckingSizeFilter,
     hideCancelled,
     setHideCancelled,
     sortField,

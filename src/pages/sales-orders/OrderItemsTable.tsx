@@ -9,6 +9,7 @@ import {
   Table,
   Text,
   Tooltip,
+  UnstyledButton,
 } from '@mantine/core';
 import { IconBoxMultiple, IconMapPin } from '@tabler/icons-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -22,6 +23,7 @@ import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import {
+  hasImagesForProducts,
   isExtraDeliveryQuantityAllowed,
   isLocationsEnabled,
   isPricingManagementEnabled,
@@ -34,6 +36,8 @@ import {
   indexInventoryByProduct,
 } from '@/utils/inventoryCommitment';
 import { ProductLink } from '@/components/ProductLink';
+import { ProductThumb } from '../products/ProductThumb';
+import { ProductPhotoModal } from './ProductPhotoModal';
 import { FieldRow } from '@/components/FieldRow';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { getProductSuggestedPrice, isBelowSuggestedPrice } from '@/utils/productPricing';
@@ -42,6 +46,7 @@ import { AVAILABILITY_INCLUDES_INCOMING } from '@/config/inventoryDisplayDefault
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
+const imagesEnabled = hasImagesForProducts();
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 
@@ -90,6 +95,8 @@ export function OrderItemsTable({
 }: OrderItemsTableProps) {
   const stockSettled = inventoryLinkageState === 'shipped' || inventoryLinkageState === 'released';
   const { t } = useTranslation();
+
+  const [photoProduct, setPhotoProduct] = useState<{ code: string; name: string } | null>(null);
 
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
 
@@ -270,6 +277,27 @@ export function OrderItemsTable({
                       here would be a picking feature that picking staff can't
                       reach. */}
                   {showItemReady && !isSetChild && <Box pt={2}>{renderReadyBox(item)}</Box>}
+                  {/* On a phone the photo is how a picker matches a line to a
+                      shelf before reading its name. Tappable only when there is
+                      a photo to enlarge; otherwise the placeholder just holds
+                      the column so names stay aligned down the list. */}
+                  {imagesEnabled &&
+                    lineProduct &&
+                    (lineProduct.extra?.images?.[0]?.url ? (
+                      <UnstyledButton
+                        aria-label={t('salesOrders.detail.viewProductPhotos')}
+                        onClick={() =>
+                          setPhotoProduct({
+                            code: lineProduct.code,
+                            name: item.productName?.trim() || lineProduct.name,
+                          })
+                        }
+                      >
+                        <ProductThumb product={lineProduct} size={48} />
+                      </UnstyledButton>
+                    ) : (
+                      <ProductThumb product={lineProduct} size={48} />
+                    ))}
                   <Box style={{ flex: 1, minWidth: 0, wordBreak: 'break-word' }}>
                     <Group gap={6} wrap="nowrap">
                       {isSetParent && (
@@ -433,6 +461,17 @@ export function OrderItemsTable({
               {totalAmount?.toLocaleString() ?? '-'}
             </Text>
           </Group>
+        )}
+        {/* Keyed by code so switching lines remounts it with a fresh
+            active-photo index — same mount as the SO form's photo button. */}
+        {photoProduct && (
+          <ProductPhotoModal
+            key={photoProduct.code}
+            opened
+            onClose={() => setPhotoProduct(null)}
+            productCode={photoProduct.code}
+            productName={photoProduct.name}
+          />
         )}
       </Stack>
     );

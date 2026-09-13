@@ -2005,7 +2005,7 @@
   "lookups": {
     "addItem": "Thêm",
     "categories": {
-      "containerSize": "Loại cont",
+      "truckingSize": "Loại cont / kích thước",
       "feeName": "Tên phí",
       "maintenanceType": "Loại bảo trì",
       "materialCategory": "Danh mục vật tư",
@@ -2680,7 +2680,7 @@
     "trip": {
       "addItem": "Thêm chuyến",
       "columns": {
-        "containerSize": "Loại cont",
+        "truckingSize": "Loại cont / kích thước",
         "customer": "Khách hàng",
         "date": "Ngày",
         "destination": "Tuyến / Điểm đến",
@@ -3713,6 +3713,7 @@
       "tabProductPhotos": "Ảnh sản phẩm",
       "tags": "Nhãn",
       "viewItems": "Xem sản phẩm",
+      "viewProductPhotos": "Xem ảnh sản phẩm",
       "warehouseNote": "Ghi chú cho kho"
     },
     "editItem": "Điều chỉnh đơn hàng",
@@ -3988,7 +3989,7 @@
         "fieldCustomerOrderNumber": "Mã lệnh KH",
         "fieldBillNumber": "Số B/L",
         "fieldContainerNumber": "Số container",
-        "fieldContainerSize": "Loại container",
+        "fieldTruckingSize": "Loại cont / kích thước",
         "fieldContractNo": "Số hợp đồng",
         "fieldCustomer": "Khách hàng",
         "fieldDeclarationNumber": "Số tờ khai",
@@ -4050,7 +4051,7 @@
       "truckType": "Loại xe"
     },
     "form": {
-      "containerSize": "Loại cont",
+      "truckingSize": "Loại cont / kích thước",
       "customer": "Khách hàng",
       "driver": "Tài xế",
       "externalDriver": "Tài xế / Nhà xe",
@@ -4139,7 +4140,7 @@
       "entryDateRequired": "Vui lòng chọn ngày",
       "plateRequired": "Vui lòng nhập biển số xe",
       "truckRequired": "Vui lòng chọn xe",
-      "containerSizeRequired": "Vui lòng chọn loại cont"
+      "truckingSizeRequired": "Vui lòng chọn loại cont / kích thước"
     }
   },
   "transportRoutes": {
@@ -4158,7 +4159,7 @@
       "kind": "Loại tuyến",
       "route": "Tuyến",
       "truckType": "Loại xe",
-      "containerSize": "Loại cont",
+      "truckingSize": "Loại cont / kích thước",
       "freightAmount": "Phí vận chuyển",
       "laborCost": "Lương chuyến",
       "status": "Trạng thái",
@@ -4174,11 +4175,11 @@
     },
     "filters": {
       "truckType": "Loại xe",
-      "containerSize": "Loại cont",
+      "truckingSize": "Loại cont / kích thước",
       "kind": "Loại tuyến",
       "status": "Trạng thái",
       "anyTruckType": "Tất cả loại xe",
-      "anyContainerSize": "Tất cả loại cont",
+      "anyTruckingSize": "Tất cả loại cont",
       "anyKind": "Tất cả loại tuyến",
       "anyStatus": "Tất cả trạng thái"
     },
@@ -4191,7 +4192,7 @@
       "codeAuto": "Tự sinh khi lưu",
       "codeLocked": "Không sửa được sau khi tạo",
       "truckType": "Loại xe áp dụng",
-      "containerSize": "Loại cont áp dụng",
+      "truckingSize": "Loại cont / kích thước áp dụng",
       "multiTrip": "Nhiều chặng",
       "multiTripHint": "Tuyến gồm nhiều chặng — mỗi chặng có điểm đi, điểm đến và lương chuyến riêng.",
       "freightAmount": "Phí vận chuyển mặc định",
@@ -4218,8 +4219,8 @@
       "costItemsHint": "Không nhập lương chuyến ở đây — tuyến đã lưu lương chuyến và bảng giá vốn bên dưới đọc đúng con số đó.",
       "markupPercent": "% Lợi nhuận",
       "markupHint": "Tỷ lệ lợi nhuận mặc định, dùng để đề xuất giá báo cho tuyến này.",
-      "containerSizeMissing": "Chưa chọn",
-      "containerSizeMissingHint": "Tuyến này chưa chọn loại cont nên không được gợi ý cho đơn nào. Vào sửa và chọn loại cont — giá 20ft và 40ft tính riêng."
+      "truckingSizeMissing": "Chưa chọn",
+      "truckingSizeMissingHint": "Tuyến này chưa chọn loại cont / kích thước nên không được gợi ý cho đơn nào. Vào sửa và chọn — giá 20ft và 40ft tính riêng."
     },
     "trips": {
       "title": "Danh sách chặng",
@@ -4233,7 +4234,7 @@
       "destinationRequired": "Vui lòng nhập điểm đến",
       "truckTypeRequired": "Vui lòng chọn loại xe",
       "nameRequired": "Vui lòng nhập tên tuyến",
-      "containerSizeRequired": "Vui lòng chọn loại cont"
+      "truckingSizeRequired": "Vui lòng chọn loại cont / kích thước"
     },
     "notifications": {
       "created": "Đã tạo tuyến",
