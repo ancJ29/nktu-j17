@@ -181,6 +181,11 @@ type FormValues = {
   truckType: string;
 
   customerOrderNumber: string;
+
+  requestedPickupDate: string | null;
+  dropoffDate: string | null;
+
+  moocStorageDays: number | string;
   billNumber: string;
   declarationNumber: string;
   containerNumber: string;
@@ -314,6 +319,9 @@ function blankValues(presetTruckType = ''): FormValues {
 
     truckType: presetTruckType,
     customerOrderNumber: '',
+    requestedPickupDate: null,
+    dropoffDate: null,
+    moocStorageDays: '',
     billNumber: '',
     declarationNumber: '',
     containerNumber: '',
@@ -366,6 +374,10 @@ function copiedValues(src: TransportOrder): FormValues {
     truckType: src.extra?.truckType ?? '',
 
     customerOrderNumber: src.extra?.customerOrderNumber ?? '',
+
+    requestedPickupDate: null,
+    dropoffDate: null,
+    moocStorageDays: '',
     billNumber: src.billNumber || '',
     declarationNumber: src.declarationNumber || '',
     containerNumber: src.containerNumber || '',
@@ -617,6 +629,11 @@ export function TransportOrderFormPage() {
         driverName: o.driverName,
         truckType: o.extra?.truckType ?? '',
         customerOrderNumber: o.extra?.customerOrderNumber ?? '',
+        requestedPickupDate: o.extra?.requestedPickupDate
+          ? isoToVnDateString(o.extra.requestedPickupDate)
+          : null,
+        dropoffDate: o.extra?.dropoffDate ? isoToVnDateString(o.extra.dropoffDate) : null,
+        moocStorageDays: o.extra?.moocStorageDays ?? '',
         billNumber: o.billNumber || '',
         declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
@@ -702,6 +719,12 @@ export function TransportOrderFormPage() {
           driverName: values.driverName.trim(),
           truckType: values.truckType.trim(),
           customerOrderNumber: values.customerOrderNumber.trim(),
+          requestedPickupDate: values.requestedPickupDate
+            ? vnDateStringToIso(values.requestedPickupDate)
+            : '',
+          dropoffDate: values.dropoffDate ? vnDateStringToIso(values.dropoffDate) : '',
+          moocStorageDays:
+            typeof values.moocStorageDays === 'number' ? values.moocStorageDays : null,
           billNumber: values.billNumber.trim(),
           declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
@@ -1138,6 +1161,21 @@ export function TransportOrderFormPage() {
               <TextInput
                 label={t('transportOrders.columns.customerOrder')}
                 {...form.getInputProps('customerOrderNumber')}
+              />
+
+              <DateField
+                label={t('transportOrders.form.requestedPickupDate')}
+                {...form.getInputProps('requestedPickupDate')}
+              />
+              <DateField
+                label={t('transportOrders.form.dropoffDate')}
+                {...form.getInputProps('dropoffDate')}
+              />
+              <NumberInput
+                label={t('transportOrders.form.moocStorageDays')}
+                min={0}
+                allowDecimal={false}
+                {...form.getInputProps('moocStorageDays')}
               />
 
               {/* Derived from leg 1 on a multi-trip job — hidden rather than shown

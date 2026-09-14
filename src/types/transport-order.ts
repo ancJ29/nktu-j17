@@ -108,6 +108,11 @@ export type TransportOrderExtra = {
   truckType?: string;
 
   customerOrderNumber?: string;
+
+  requestedPickupDate?: string;
+  dropoffDate?: string;
+
+  moocStorageDays?: number;
   [key: string]: unknown;
 };
 

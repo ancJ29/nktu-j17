@@ -21,6 +21,12 @@ export type TransportOrderWriteFields = {
   truckType: string;
 
   customerOrderNumber: string;
+
+  requestedPickupDate: string;
+
+  dropoffDate: string;
+
+  moocStorageDays: number | null;
   billNumber: string;
 
   declarationNumber: string;
@@ -44,6 +50,14 @@ export type TransportOrderWriteFields = {
   notes: string;
   extra: TransportOrderExtra;
 };
+
+const OWNED_EXTRA_KEYS: ReadonlySet<string> = new Set([
+  'truckType',
+  'customerOrderNumber',
+  'requestedPickupDate',
+  'dropoffDate',
+  'moocStorageDays',
+]);
 
 type MirroredTripFields = Pick<
   TransportOrderWriteFields,
@@ -80,13 +94,27 @@ export function buildTransportOrderWrite(
 
   const trips = fields.isMultiTrip ? fields.trips : [];
 
-  const { truckType, customerOrderNumber, extra, ...rest } = fields;
+  const {
+    truckType,
+    customerOrderNumber,
+    requestedPickupDate,
+    dropoffDate,
+    moocStorageDays,
+    extra,
+    ...rest
+  } = fields;
+  const carried = Object.fromEntries(
+    Object.entries(extra).filter(([key]) => !OWNED_EXTRA_KEYS.has(key)),
+  ) as TransportOrderExtra;
   return {
     ...rest,
     extra: {
-      ...extra,
+      ...carried,
       ...(truckType ? { truckType } : {}),
       ...(customerOrderNumber ? { customerOrderNumber } : {}),
+      ...(requestedPickupDate ? { requestedPickupDate } : {}),
+      ...(dropoffDate ? { dropoffDate } : {}),
+      ...(moocStorageDays !== null ? { moocStorageDays } : {}),
     },
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
     fees,

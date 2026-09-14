@@ -26,7 +26,7 @@ const MANUAL_FILL = { fgColor: { rgb: 'FFFF00' } } as const;
 
 type FooterNote = { text: string; value?: string; red?: boolean } | null;
 
-type FooterAmount = 'service' | 'chiHo' | 'manual' | 'sum';
+type FooterAmount = 'service' | 'chiHo' | 'moor' | 'manual' | 'sum';
 type PaymentFooter = {
   notes: ReadonlyArray<FooterNote>;
   box: ReadonlyArray<{ label: string; amount: FooterAmount }>;
@@ -38,7 +38,7 @@ const FREIGHT_TRANSFER_NOTE =
   'Vui lòng thanh toán cho công ty chúng tôi PHÍ VẬN CHUYỂN  trên bằng chuyển khoản theo thông tin:';
 const VCB_ACCOUNT = '102 796 7777  Tại ngân hàng Vietcombank, Chi nhánh Hồ Chí Minh';
 
-const EXPORT_FOOTER: PaymentFooter = {
+const SHORT_FOOTER: PaymentFooter = {
   notes: [{ text: FREIGHT_TRANSFER_NOTE }, { text: `Số tài khoản: ${VCB_ACCOUNT}`, red: true }],
   box: [
     { label: 'Số tiền cước dịch vụ:', amount: 'service' },
@@ -48,7 +48,7 @@ const EXPORT_FOOTER: PaymentFooter = {
   boxedAmounts: true,
 };
 
-const IMPORT_FOOTER: PaymentFooter = {
+const FULL_FOOTER: PaymentFooter = {
   notes: [
     { text: FREIGHT_TRANSFER_NOTE },
     { text: 'Công ty thụ hưởng: CÔNG TY CỔ PHẦN DỊCH VỤ THƯƠNG MẠI VÀ ĐẦU TƯ DŨNG UY', red: true },
@@ -68,7 +68,8 @@ const IMPORT_FOOTER: PaymentFooter = {
   box: [
     { label: 'Số tiền cước vận chuyển:', amount: 'service' },
     { label: 'Số tiền chi hộ: Dũng Uy xuất lại', amount: 'manual' },
-    { label: 'Phí neo', amount: 'manual' },
+
+    { label: 'Phí neo', amount: 'moor' },
     { label: 'Số tiền chi hộ đã xuất cho Cát Hải', amount: 'chiHo' },
     { label: 'Tổng cộng thanh toán', amount: 'sum' },
   ],
@@ -85,36 +86,96 @@ const sizeBucketIndex = (truckingSize: string | undefined): number => {
   return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
 };
 
-type Type5FeeColumn = 'freight' | 'sitc' | 'xlhn' | 'power' | 'lift' | 'drop' | 'emptyReturn';
+type Type5FeeColumn =
+  'freight' | 'sitc' | 'xlhn' | 'power' | 'moor' | 'lift' | 'drop' | 'emptyReturn' | 'earlyDrop';
 
-const FEE_COLUMNS: ReadonlyArray<{ column: Type5FeeColumn; value: string }> = [
-  { column: 'freight', value: 'PHI_VAN_CHUYEN' },
-  { column: 'sitc', value: 'VE_TRAM_PHU_HUU' },
-  { column: 'xlhn', value: 'VE_TRAM_XLHN' },
-  { column: 'power', value: 'PHI_DIEN_KHOAN' },
-  { column: 'lift', value: 'PHI_NANG' },
-  { column: 'drop', value: 'PHI_HA' },
-  { column: 'emptyReturn', value: 'PHU_THU_HA_RONG' },
-];
+const FEE_NAMES: Record<Type5FeeColumn, string> = {
+  freight: 'PHI_VAN_CHUYEN',
+  sitc: 'VE_TRAM_PHU_HUU',
+  xlhn: 'VE_TRAM_XLHN',
+  power: 'PHI_DIEN_KHOAN',
+  moor: 'PHI_LUU_MOC',
+  lift: 'PHI_NANG',
+  drop: 'PHI_HA',
+  emptyReturn: 'PHU_THU_HA_RONG',
+  earlyDrop: 'PHI_HA_SOM',
+};
 
-const SERVICE_COLUMNS: ReadonlySet<Type5FeeColumn> = new Set<Type5FeeColumn>([
-  'freight',
-  'sitc',
-  'xlhn',
-  'power',
-]);
+type FeeHeader = { column: Type5FeeColumn; header: string };
 
-const CHI_HO_COLUMNS: ReadonlyArray<{ column: Type5FeeColumn; header: string }> = [
-  { column: 'lift', header: 'PHÍ NÂNG' },
-  { column: 'drop', header: 'PHÍ HẠ' },
-  { column: 'emptyReturn', header: 'PHỤ THU HẠ RỖNG' },
+type SheetLayout = {
+  moorDates: boolean;
+  orderNoHeader: string;
+
+  service: ReadonlyArray<FeeHeader>;
+
+  moorFee: boolean;
+  chiHoTitle: string;
+
+  chiHo: ReadonlyArray<FeeHeader>;
+
+  chiHoNote?: string;
+
+  trailing: ReadonlyArray<{ header: string; manual: boolean }>;
+};
+
+const IMPORT_LAYOUT: SheetLayout = {
+  moorDates: false,
+  orderNoHeader: 'MÃ LỆNH',
+  service: [
+    { column: 'freight', header: 'PHÍ VẬN CHUYỂN' },
+    { column: 'sitc', header: 'Phí SITC' },
+    { column: 'xlhn', header: 'Phí XLHN' },
+    { column: 'power', header: 'PHÍ ĐIỆN' },
+  ],
+  moorFee: false,
+
+  chiHoTitle: 'DŨNG UY CHI HỘ (HD KHÁCH)',
+  chiHo: [
+    { column: 'lift', header: 'PHÍ NÂNG' },
+    { column: 'drop', header: 'PHÍ HẠ' },
+    { column: 'emptyReturn', header: 'PHỤ THU HẠ RỖNG' },
+  ],
+  trailing: [
+    { header: 'Note điện OG chịu', manual: true },
+    { header: 'TIỀN CƯỢC CONT', manual: true },
+    { header: 'Nguyên nhân phát sinh', manual: true },
+  ],
+};
+
+const EXPORT_LAYOUT: SheetLayout = {
+  moorDates: true,
+  orderNoHeader: 'Mã Lệnh',
+  service: [
+    { column: 'freight', header: 'PHÍ VẬN CHUYỂN' },
+    { column: 'sitc', header: 'PHÍ SITC' },
+    { column: 'xlhn', header: 'Phí XLHN' },
+  ],
+  moorFee: true,
+
+  chiHoTitle: '',
+  chiHo: [
+    { column: 'lift', header: 'PHÍ NÂNG' },
+    { column: 'drop', header: 'PHÍ HẠ' },
+    { column: 'earlyDrop', header: 'PHÍ HẠ SỚM' },
+  ],
+  chiHoNote: 'Note hoá đơn',
+  trailing: [{ header: 'Note', manual: false }],
+};
+
+const layoutColumns = (layout: SheetLayout): Type5FeeColumn[] => [
+  ...layout.service.map((s) => s.column),
+  ...(layout.moorFee ? (['moor'] as const) : []),
+  ...layout.chiHo.map((c) => c.column),
 ];
 
 function feeColumnReader(
   resolveFeeName: (value: string) => string,
+  columns: ReadonlyArray<Type5FeeColumn>,
 ): (label: string) => Type5FeeColumn | undefined {
   const byKey = new Map<string, Type5FeeColumn>();
-  for (const { column, value } of FEE_COLUMNS) {
+  for (const column of columns) {
+    const value = FEE_NAMES[column];
     byKey.set(feeKey(value), column);
     byKey.set(feeKey(resolveFeeName(value)), column);
   }
@@ -131,17 +192,14 @@ type OrderMoney = {
 function readOrderMoney(
   order: TransportOrder,
   columnOf: (label: string) => Type5FeeColumn | undefined,
+  layout: SheetLayout,
 ): OrderMoney {
-  const amounts = {
-    freight: 0,
-    sitc: 0,
-    xlhn: 0,
-    power: 0,
-    lift: 0,
-    drop: 0,
-    emptyReturn: 0,
-  } as Record<Type5FeeColumn, number>;
-  const invoiceNos: Record<string, string[]> = {};
+  const amounts = Object.fromEntries(
+    (Object.keys(FEE_NAMES) as Type5FeeColumn[]).map((column) => [column, 0]),
+  ) as Record<Type5FeeColumn, number>;
+  const service = new Set(layout.service.map((s) => s.column));
+  const chiHo = new Set(layout.chiHo.map((c) => c.column));
+  const invoiceNos: Partial<Record<Type5FeeColumn, string[]>> = {};
   let vatBase = 0;
 
   for (const fee of readFeeLines(order)) {
@@ -150,16 +208,16 @@ function readOrderMoney(
     if (!column) continue;
     const amount = (fee as TransportOrderFee).amount || 0;
     amounts[column] += amount;
-    if (SERVICE_COLUMNS.has(column)) {
+    if (service.has(column)) {
       if (fee.vatable) vatBase += amount;
-    } else if (fee.invoiceNo) {
+    } else if (chiHo.has(column) && fee.invoiceNo) {
       (invoiceNos[column] ??= []).push(fee.invoiceNo);
     }
   }
 
   const vat = roundVat(vatBase * (order.vatRate || 0), !!order.roundDown);
   const invoices = {} as Record<Type5FeeColumn, string>;
-  for (const { column } of FEE_COLUMNS) {
+  for (const column of Object.keys(FEE_NAMES) as Type5FeeColumn[]) {
     invoices[column] = (invoiceNos[column] ?? []).join(', ');
   }
 
@@ -167,7 +225,7 @@ function readOrderMoney(
     amounts,
     invoices,
     vat,
-    total: amounts.freight + amounts.sitc + amounts.xlhn + amounts.power + vat,
+    total: layout.service.reduce((sum, { column }) => sum + amounts[column], 0) + vat,
   };
 }
 
@@ -250,19 +308,27 @@ const stuffingContains = (order: TransportOrder, warehouse: string): boolean =>
 const SHEETS: ReadonlyArray<{
   name: string;
   includes: (order: TransportOrder) => boolean;
+  layout: SheetLayout;
 
   footer: PaymentFooter;
 }> = [
-  { name: 'Hàng xuất', includes: (o) => isShipmentType(o, 'XUAT'), footer: EXPORT_FOOTER },
   {
-    name: 'Hàng nhập - VS',
-    includes: (o) => isShipmentType(o, 'NHAP') && stuffingContains(o, 'Kho VS (KCN Tân Đô)'),
-    footer: IMPORT_FOOTER,
+    name: 'Hàng nhập',
+    includes: (o) => isShipmentType(o, 'NHAP'),
+    layout: IMPORT_LAYOUT,
+    footer: SHORT_FOOTER,
   },
   {
-    name: 'Hàng nhập - OG',
-    includes: (o) => isShipmentType(o, 'NHAP') && stuffingContains(o, 'Kho OG'),
-    footer: IMPORT_FOOTER,
+    name: 'Hàng xuất - VS',
+    includes: (o) => isShipmentType(o, 'XUAT') && stuffingContains(o, 'Kho VS (KCN Tân Đô)'),
+    layout: EXPORT_LAYOUT,
+    footer: FULL_FOOTER,
+  },
+  {
+    name: 'Hàng xuất - OG',
+    includes: (o) => isShipmentType(o, 'XUAT') && stuffingContains(o, 'Kho OG'),
+    layout: EXPORT_LAYOUT,
+    footer: FULL_FOOTER,
   },
 ];
 
@@ -280,7 +346,7 @@ export const buildCustomerReportType5: CustomerReportBuilder = (orders, input) =
   for (const sheet of sheets) {
     XLSX.utils.book_append_sheet(
       workbook,
-      buildSheet(sheet.rows, input, periodLabel, sheet.footer),
+      buildSheet(sheet.rows, input, periodLabel, sheet.layout, sheet.footer),
       sheet.name,
     );
   }
@@ -300,46 +366,60 @@ function buildSheet(
     titleSuffix,
   }: CustomerReportInput,
   periodLabel: string,
+  layout: SheetLayout,
   footer: PaymentFooter,
 ): XLSX.WorkSheet {
-  const columnOf = feeColumnReader(resolveFeeName);
+  const columnOf = feeColumnReader(resolveFeeName, layoutColumns(layout));
   const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
 
-  const C_STT = 0;
-  const C_DATE = 1;
-  const C_TRUCK = 2;
-  const C_ORDER_NO = 3;
-  const C_CONT = 4;
-  const C_SIZE0 = 5;
-  const C_TYPE = C_SIZE0 + SIZE_BUCKETS.length;
-  const C_FROM = C_TYPE + 1;
-  const C_STUFFING = C_FROM + 1;
-  const C_TO = C_STUFFING + 1;
-  const C_FREIGHT = C_TO + 1;
-  const C_SITC = C_FREIGHT + 1;
-  const C_XLHN = C_SITC + 1;
-  const C_POWER = C_XLHN + 1;
-  const C_VAT = C_POWER + 1;
-  const C_TOTAL = C_VAT + 1;
+  let cursor = 0;
+  const take = (width = 1) => {
+    const c = cursor;
+    cursor += width;
+    return c;
+  };
+  const C_STT = take();
+  const C_DATE = take();
+  const C_REQ_DATE = layout.moorDates ? take() : -1;
+  const C_DROP_DATE = layout.moorDates ? take() : -1;
+  const C_MOOR_DAYS = layout.moorDates ? take() : -1;
+  const C_TRUCK = take();
+  const C_ORDER_NO = take();
+  const C_CONT = take();
+  const C_SIZE0 = take(SIZE_BUCKETS.length);
+  const C_TYPE = take();
+  const C_FROM = take();
+  const C_STUFFING = take();
+  const C_TO = take();
+  const C_SERVICE0 = take(layout.service.length);
+  const C_VAT = take();
+  const C_TOTAL = take();
+  const C_MOOR = layout.moorFee ? take() : -1;
 
-  const C_CHI_HO0 = C_TOTAL + 1;
-  const C_NOTE = C_CHI_HO0 + CHI_HO_COLUMNS.length * 2;
-  const C_DEPOSIT = C_NOTE + 1;
-  const C_REASON = C_DEPOSIT + 1;
-  const colCount = C_REASON + 1;
+  const C_CHI_HO0 = take(layout.chiHo.length * 2);
+  const C_CHI_HO_NOTE = layout.chiHoNote ? take() : -1;
+  const C_TRAILING0 = take(layout.trailing.length);
+  const colCount = cursor;
   const lastCol = colCount - 1;
   const chiHoMoneyCol = (i: number) => C_CHI_HO0 + i * 2;
 
-  const MANUAL_COLS = [C_NOTE, C_DEPOSIT, C_REASON];
+  const MANUAL_COLS = layout.trailing.flatMap((col, i) => (col.manual ? [C_TRAILING0 + i] : []));
   const moneyCols = [
-    C_FREIGHT,
-    C_SITC,
-    C_XLHN,
-    C_POWER,
+    ...layout.service.map((_s, i) => C_SERVICE0 + i),
     C_VAT,
     C_TOTAL,
-    ...CHI_HO_COLUMNS.map((_c, i) => chiHoMoneyCol(i)),
+    ...(C_MOOR >= 0 ? [C_MOOR] : []),
+    ...layout.chiHo.map((_c, i) => chiHoMoneyCol(i)),
   ];
+  const centeredCols = [C_STT, C_DATE, C_REQ_DATE, C_DROP_DATE, C_MOOR_DAYS, C_TYPE].filter(
+    (c) => c >= 0,
+  );
+
+  const C_BOX_LABEL0 = layout.moorFee ? C_TOTAL : C_VAT - 1;
+  const C_BOX_LABEL1 = C_BOX_LABEL0 + 1;
+  const C_BOX_AMOUNT = C_BOX_LABEL1 + 1;
+  const C_NOTE_VALUE = C_DATE + 2;
+  const C_NOTE_END = C_BOX_LABEL0 - 1;
 
   const aoa: CellValue[][] = [];
   const merges: XLSX.Range[] = [];
@@ -381,8 +461,13 @@ function buildSheet(
 
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
+  if (layout.moorDates) {
+    leaf(C_REQ_DATE, 'NGÀY YÊU CẦU LẤY');
+    leaf(C_DROP_DATE, 'NGÀY HẠ');
+    leaf(C_MOOR_DAYS, 'SỐ NGÀY LƯU MOOR');
+  }
   leaf(C_TRUCK, 'SỐ XE');
-  leaf(C_ORDER_NO, 'MÃ LỆNH');
+  leaf(C_ORDER_NO, layout.orderNoHeader);
   leaf(C_CONT, 'SỐ CONT');
   group(
     C_SIZE0,
@@ -392,24 +477,22 @@ function buildSheet(
   );
   leaf(C_TYPE, 'LOẠI HÌNH');
   group(C_FROM, C_TO, 'TUYẾN DỊCH VỤ', ['NƠI LẤY', 'NƠI ĐÓNG/RÚT HÀNG', 'NƠI HẠ']);
-  group(C_FREIGHT, C_VAT, 'CƯỚC DỊCH VỤ', [
-    'PHÍ VẬN CHUYỂN',
-    'Phí SITC',
-    'Phí XLHN',
-    'PHÍ ĐIỆN',
+  group(C_SERVICE0, C_VAT, 'CƯỚC DỊCH VỤ', [
+    ...layout.service.map((s) => s.header),
     vatHeader(rows),
   ]);
   leaf(C_TOTAL, 'TỔNG CỘNG');
-
+  if (C_MOOR >= 0) leaf(C_MOOR, 'PHÍ LƯU MOOR');
   group(
     C_CHI_HO0,
-    C_CHI_HO0 + CHI_HO_COLUMNS.length * 2 - 1,
-    'DŨNG UY CHI HỘ (HD KHÁCH)',
-    CHI_HO_COLUMNS.flatMap((c) => [c.header, 'SỐ HĐ']),
+    C_CHI_HO_NOTE >= 0 ? C_CHI_HO_NOTE : C_CHI_HO0 + layout.chiHo.length * 2 - 1,
+    layout.chiHoTitle,
+    [
+      ...layout.chiHo.flatMap((c) => [c.header, 'SỐ HĐ']),
+      ...(layout.chiHoNote ? [layout.chiHoNote] : []),
+    ],
   );
-  leaf(C_NOTE, 'Note điện OG chịu');
-  leaf(C_DEPOSIT, 'TIỀN CƯỢC CONT');
-  leaf(C_REASON, 'Nguyên nhân phát sinh');
+  layout.trailing.forEach((col, i) => leaf(C_TRAILING0 + i, col.header));
   aoa.push(head1, head2);
 
   const sums = new Map<number, number>();
@@ -422,10 +505,21 @@ function buildSheet(
     const rBlockStart = aoa.length;
 
     for (const order of group) {
-      const money = readOrderMoney(order, columnOf);
+      const money = readOrderMoney(order, columnOf, layout);
       const row: CellValue[] = new Array(colCount).fill('');
       row[C_STT] = ++stt;
       row[C_DATE] = formatDate(orderPlanDate(order));
+      if (layout.moorDates) {
+        const { requestedPickupDate, dropoffDate, moocStorageDays } = order.extra ?? {};
+        if (typeof requestedPickupDate === 'string' && requestedPickupDate) {
+          row[C_REQ_DATE] = formatDate(requestedPickupDate);
+        }
+        if (typeof dropoffDate === 'string' && dropoffDate) {
+          row[C_DROP_DATE] = formatDate(dropoffDate);
+        }
+
+        if (typeof moocStorageDays === 'number') row[C_MOOR_DAYS] = moocStorageDays;
+      }
       row[C_TRUCK] = plateOf(order, truckLabel);
       row[C_CONT] = order.containerNumber ?? '';
       const size = sizeBucketIndex(readTruckingSize(order));
@@ -439,24 +533,18 @@ function buildSheet(
       row[C_STUFFING] = route.stuffing;
       row[C_TO] = route.dropoff;
 
-      if (money.amounts.freight !== 0) row[C_FREIGHT] = money.amounts.freight;
-      if (money.amounts.sitc !== 0) row[C_SITC] = money.amounts.sitc;
-      if (money.amounts.xlhn !== 0) row[C_XLHN] = money.amounts.xlhn;
-      if (money.amounts.power !== 0) row[C_POWER] = money.amounts.power;
-      if (money.vat !== 0) row[C_VAT] = money.vat;
-      if (money.total !== 0) row[C_TOTAL] = money.total;
-      addSum(C_FREIGHT, money.amounts.freight);
-      addSum(C_SITC, money.amounts.sitc);
-      addSum(C_XLHN, money.amounts.xlhn);
-      addSum(C_POWER, money.amounts.power);
-      addSum(C_VAT, money.vat);
-      addSum(C_TOTAL, money.total);
-      CHI_HO_COLUMNS.forEach(({ column }, i) => {
-        const amount = money.amounts[column];
-        const c = chiHoMoneyCol(i);
+      const putMoney = (c: number, amount: number) => {
         if (amount !== 0) row[c] = amount;
-        if (money.invoices[column]) row[c + 1] = money.invoices[column];
         addSum(c, amount);
+      };
+      layout.service.forEach(({ column }, i) => putMoney(C_SERVICE0 + i, money.amounts[column]));
+      putMoney(C_VAT, money.vat);
+      putMoney(C_TOTAL, money.total);
+      if (C_MOOR >= 0) putMoney(C_MOOR, money.amounts.moor);
+      layout.chiHo.forEach(({ column }, i) => {
+        const c = chiHoMoneyCol(i);
+        putMoney(c, money.amounts[column]);
+        if (money.invoices[column]) row[c + 1] = money.invoices[column];
       });
 
       aoa.push(row);
@@ -487,13 +575,15 @@ function buildSheet(
   const rFooter = aoa.length;
   {
     const service = sums.get(C_TOTAL) ?? 0;
-    const chiHo = CHI_HO_COLUMNS.reduce((s, _c, i) => s + (sums.get(chiHoMoneyCol(i)) ?? 0), 0);
+    const chiHo = layout.chiHo.reduce((s, _c, i) => s + (sums.get(chiHoMoneyCol(i)) ?? 0), 0);
+    const moor = C_MOOR >= 0 ? (sums.get(C_MOOR) ?? 0) : 0;
 
     const cached: Record<FooterAmount, number> = {
       service,
       chiHo,
+      moor,
       manual: 0,
-      sum: service + chiHo,
+      sum: service + chiHo + moor,
     };
     const height = Math.max(footer.notes.length, footer.box.length);
     for (let i = 0; i < height; i++) {
@@ -502,18 +592,18 @@ function buildSheet(
       const note = footer.notes[i];
       if (note && note.value === undefined) {
         row[C_DATE] = note.text;
-        merges.push({ s: { r, c: C_DATE }, e: { r, c: C_XLHN } });
+        merges.push({ s: { r, c: C_DATE }, e: { r, c: C_NOTE_END } });
       } else if (note) {
         row[C_DATE] = note.text;
-        row[C_ORDER_NO] = note.value!;
-        merges.push({ s: { r, c: C_DATE }, e: { r, c: C_TRUCK } });
-        merges.push({ s: { r, c: C_ORDER_NO }, e: { r, c: C_XLHN } });
+        row[C_NOTE_VALUE] = note.value!;
+        merges.push({ s: { r, c: C_DATE }, e: { r, c: C_NOTE_VALUE - 1 } });
+        merges.push({ s: { r, c: C_NOTE_VALUE }, e: { r, c: C_NOTE_END } });
       }
       const line = footer.box[i];
       if (line) {
-        row[C_POWER] = line.label;
-        if (line.amount !== 'manual') row[C_TOTAL] = cached[line.amount];
-        merges.push({ s: { r, c: C_POWER }, e: { r, c: C_VAT } });
+        row[C_BOX_LABEL0] = line.label;
+        if (line.amount !== 'manual') row[C_BOX_AMOUNT] = cached[line.amount];
+        merges.push({ s: { r, c: C_BOX_LABEL0 }, e: { r, c: C_BOX_LABEL1 } });
       }
       aoa.push(row);
     }
@@ -535,7 +625,8 @@ function buildSheet(
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
     if (c === C_STT) return { wch: 5 };
-    if (c === C_DATE) return { wch: 11 };
+    if (c === C_DATE || c === C_REQ_DATE || c === C_DROP_DATE) return { wch: 11 };
+    if (c === C_MOOR_DAYS) return { wch: 9 };
     if (c === C_TRUCK) return { wch: 13 };
     if (c === C_ORDER_NO) return { wch: 34 };
     if (c === C_CONT) return { wch: 16 };
@@ -543,7 +634,7 @@ function buildSheet(
     if (c === C_TYPE) return { wch: 11 };
     if (c >= C_FROM && c <= C_TO) return { wch: 24 };
     if (c === C_TOTAL) return { wch: 16 };
-    if (c === C_REASON) return { wch: 26 };
+    if (c === lastCol) return { wch: 26 };
     return { wch: 15 };
   });
 
@@ -583,9 +674,7 @@ function buildSheet(
       if (MANUAL_COLS.includes(c)) setStyle(r, c, { fill: MANUAL_FILL });
       if (moneyCols.includes(c)) setFmt(r, c, FMT_MONEY);
     }
-    setStyle(r, C_STT, { alignment: { horizontal: 'center' } });
-    setStyle(r, C_DATE, { alignment: { horizontal: 'center' } });
-    setStyle(r, C_TYPE, { alignment: { horizontal: 'center' } });
+    for (const c of centeredCols) setStyle(r, c, { alignment: { horizontal: 'center' } });
     for (let s = 0; s < SIZE_BUCKETS.length; s++) {
       setStyle(r, C_SIZE0 + s, { alignment: { horizontal: 'center' } });
     }
@@ -601,27 +690,28 @@ function buildSheet(
     footer.notes.forEach((note, i) => {
       if (!note?.red) return;
       setStyle(rFooter + i, C_DATE, red);
-      if (note.value !== undefined) setStyle(rFooter + i, C_ORDER_NO, red);
+      if (note.value !== undefined) setStyle(rFooter + i, C_NOTE_VALUE, red);
     });
 
     const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
-    const lastBoxCol = footer.boxedAmounts ? C_TOTAL : C_VAT;
+    const lastBoxCol = footer.boxedAmounts ? C_BOX_AMOUNT : C_BOX_LABEL1;
     footer.box.forEach((line, i) => {
       const r = rFooter + i;
-      for (let c = C_POWER; c <= lastBoxCol; c++) {
+      for (let c = C_BOX_LABEL0; c <= lastBoxCol; c++) {
         setStyle(r, c, { font: { bold: true }, border: ALL_BORDERS });
       }
       if (line.amount === 'manual') {
-        setStyle(r, C_TOTAL, { fill: MANUAL_FILL });
+        setStyle(r, C_BOX_AMOUNT, { fill: MANUAL_FILL });
         return;
       }
-      (ws[ref(r, C_TOTAL)] as StyledCell).f =
-        line.amount === 'service'
-          ? ref(rTotalRow, C_TOTAL)
-          : line.amount === 'chiHo'
-            ? CHI_HO_COLUMNS.map((_c, k) => ref(rTotalRow, chiHoMoneyCol(k))).join('+')
-            : `SUM(${ref(rFooter, C_TOTAL)}:${ref(r - 1, C_TOTAL)})`;
-      setFmt(r, C_TOTAL, FMT_MONEY);
+      const formula: Record<Exclude<FooterAmount, 'manual'>, string> = {
+        service: ref(rTotalRow, C_TOTAL),
+        chiHo: layout.chiHo.map((_c, k) => ref(rTotalRow, chiHoMoneyCol(k))).join('+'),
+        moor: C_MOOR >= 0 ? ref(rTotalRow, C_MOOR) : '0',
+        sum: `SUM(${ref(rFooter, C_BOX_AMOUNT)}:${ref(r - 1, C_BOX_AMOUNT)})`,
+      };
+      (ws[ref(r, C_BOX_AMOUNT)] as StyledCell).f = formula[line.amount];
+      setFmt(r, C_BOX_AMOUNT, FMT_MONEY);
     });
   }
 

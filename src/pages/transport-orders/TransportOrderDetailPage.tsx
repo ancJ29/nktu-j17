@@ -9,6 +9,7 @@ import {
   Group,
   Loader,
   Modal,
+  NumberInput,
   SimpleGrid,
   Stack,
   Table,
@@ -560,6 +561,72 @@ export function TransportOrderDetailPage() {
     />
   );
 
+  const patchMoorField = (
+    key: 'requestedPickupDate' | 'dropoffDate' | 'moocStorageDays',
+    next: string | number | null,
+  ) => {
+    const rest = Object.fromEntries(Object.entries(order.extra ?? {}).filter(([k]) => k !== key));
+    return handleMetaPatch({
+      extra: (next === null ? rest : { ...rest, [key]: next }) as TransportOrderExtra,
+    });
+  };
+
+  const moorDateField = (key: 'requestedPickupDate' | 'dropoffDate', label: string) => {
+    const iso = order.extra?.[key];
+    return (
+      <InlineEditField<string | null>
+        canEdit={canEditMeta}
+        value={iso ? isoToVnDateString(iso) : null}
+        onSave={async (next) => patchMoorField(key, next ? vnDateStringToIso(next) : null)}
+        labels={inlineEditLabels}
+        renderDisplay={(v) =>
+          v ? (
+            <Text size="sm">{formatDate(iso ?? '')}</Text>
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              —
+            </Text>
+          )
+        }
+        renderEditor={({ value: v, onChange }) => (
+          <DateField
+            value={v}
+            onChange={(next) => onChange(next || null)}
+            placeholder={label}
+            autoFocus
+          />
+        )}
+      />
+    );
+  };
+
+  const moocStorageDaysField = (
+    <InlineEditField<number | null>
+      canEdit={canEditMeta}
+      value={order.extra?.moocStorageDays ?? null}
+      onSave={async (next) => patchMoorField('moocStorageDays', next)}
+      labels={inlineEditLabels}
+      renderDisplay={(v) =>
+        v === null ? (
+          <Text size="sm" c="dimmed" fs="italic">
+            —
+          </Text>
+        ) : (
+          <Text size="sm">{v}</Text>
+        )
+      }
+      renderEditor={({ value: v, onChange }) => (
+        <NumberInput
+          value={v ?? ''}
+          onChange={(next) => onChange(typeof next === 'number' ? next : null)}
+          min={0}
+          allowDecimal={false}
+          autoFocus
+        />
+      )}
+    />
+  );
+
   const declarationNumberField = (
     <InlineTextField
       canEdit={canEditMeta}
@@ -738,6 +805,15 @@ export function TransportOrderDetailPage() {
               {order.extra?.truckType &&
                 infoRow(t('transportOrders.form.truckType'), truckTypeLabel(order.extra.truckType))}
               {infoRow(t('transportOrders.columns.customerOrder'), customerOrderNumberField)}
+              {infoRow(
+                t('transportOrders.form.requestedPickupDate'),
+                moorDateField('requestedPickupDate', t('transportOrders.form.requestedPickupDate')),
+              )}
+              {infoRow(
+                t('transportOrders.form.dropoffDate'),
+                moorDateField('dropoffDate', t('transportOrders.form.dropoffDate')),
+              )}
+              {infoRow(t('transportOrders.form.moocStorageDays'), moocStorageDaysField)}
               {infoRow(t('transportOrders.columns.bill'), billNumberField)}
               {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
               {infoRow(t('transportOrders.columns.container'), containerNumberField)}
