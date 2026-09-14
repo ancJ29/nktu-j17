@@ -1,37 +1,33 @@
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
-import { orderPlanDate, orderPlanSortKey } from '@/pages/transport-orders/planDate';
+import { orderPlanDate } from '@/pages/transport-orders/planDate';
 import {
   feeKey,
   isBillableFee,
   readFeeLines,
 } from '@/pages/transport-orders/transportOrderPricing';
-import { bangKePeriodLabel } from './type1BangKe';
 import type { CustomerReportBuilder, CustomerReportInput } from './types';
 import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
+import {
+  ALL_BORDERS,
+  FMT_MONEY,
+  FMT_MONEY_DASH,
+  HEADER_FILL,
+  MANUAL_FILL,
+  TOTAL_FILL,
+  bangKePeriodLabel,
+  bangKeTitle,
+  createSheetWriter,
+  joinedPlates,
+  makeStyler,
+  sizeBucketIndex,
+  statementRows,
+  truckLabeler,
+  type CellValue,
+} from './sheetKit';
 
-type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
-type CellValue = string | number;
-
-const THIN = { style: 'thin', color: { rgb: '000000' } } as const;
-const ALL_BORDERS = { top: THIN, bottom: THIN, left: THIN, right: THIN } as const;
-const HEADER_FILL = { fgColor: { rgb: 'D9E1F2' } } as const;
-const TOTAL_FILL = { fgColor: { rgb: 'F2F2F2' } } as const;
-const FMT_MONEY = '#,##0';
-const FMT_MONEY_DASH = '#,##0;-#,##0;"-"';
-
-const MANUAL_FILL = { fgColor: { rgb: 'FFFF00' } } as const;
-
-const SIZE_BUCKETS = [
-  { key: '20', header: "20'" },
-  { key: '40', header: "40'" },
-] as const;
-
-const sizeBucketIndex = (truckingSize: string | undefined): number => {
-  const digits = (truckingSize ?? '').trim().match(/^(\d+)/)?.[1];
-  return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
-};
+const SIZE_BUCKETS = ["20'", "40'"] as const;
 
 const FREIGHT_FEE_VALUE = 'PHI_VAN_CHUYEN';
 
@@ -99,17 +95,7 @@ const buildChiHoSummarySheet = (
 
   const MANUAL_COLS = [D_SUPPLIER, D_GOODS, D_DATE];
 
-  const aoa: CellValue[][] = [];
-  const merges: XLSX.Range[] = [];
-  const blankRow = () => aoa.push([]);
-  const banner = (text: string): number => {
-    const r = aoa.length;
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = text;
-    aoa.push(row);
-    merges.push({ s: { r, c: 0 }, e: { r, c: lastCol } });
-    return r;
-  };
+  const { aoa, merges, blankRow, banner } = createSheetWriter(colCount);
 
   const rSeller = banner(seller.name);
   banner(seller.address);
@@ -178,35 +164,13 @@ const buildChiHoSummarySheet = (
     { wch: 10 },
   ];
 
-  const setStyle = (r: number, c: number, style: Record<string, unknown>) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = (ws[ref] ?? (ws[ref] = { t: 's', v: '' })) as StyledCell;
-    cell.s = { ...(cell.s ?? {}), ...style };
-  };
-  const setFmt = (r: number, c: number, z: string) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = ws[ref] as StyledCell | undefined;
-    if (cell && cell.t === 'n') {
-      cell.z = z;
-      cell.s = { ...(cell.s ?? {}), alignment: { horizontal: 'right' } };
-    }
-  };
+  const { setStyle, setFmt, styleLetterhead, styleHeaderBand } = makeStyler(ws);
 
-  setStyle(rSeller, 0, { font: { bold: true, sz: 13 } });
+  styleLetterhead({ rSeller, rTitle, rDear });
   setStyle(rDivider, 0, { alignment: { horizontal: 'center' } });
-  setStyle(rTitle, 0, { font: { bold: true, sz: 15 }, alignment: { horizontal: 'center' } });
   setStyle(rNumber, 0, { alignment: { horizontal: 'center' } });
-  setStyle(rDear, 0, { font: { bold: true } });
 
-  for (let c = 0; c <= lastCol; c++) {
-    setStyle(rHead, c, {
-      font: { bold: true },
-      border: ALL_BORDERS,
-      alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-
-      fill: MANUAL_COLS.includes(c) ? MANUAL_FILL : HEADER_FILL,
-    });
-  }
+  styleHeaderBand([rHead], lastCol, (c) => (MANUAL_COLS.includes(c) ? MANUAL_FILL : HEADER_FILL));
 
   for (let r = rFirstData; r <= rLastData; r++) {
     for (let c = 0; c <= lastCol; c++) {
@@ -238,9 +202,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     titleSuffix,
   },
 ) => {
-  const rows = orders
-    .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
-    .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
+  const rows = statementRows(orders);
 
   const bucketOf = feeBucketReader(resolveFeeName);
 
@@ -272,43 +234,16 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   const colCount = C_TOTAL + 1;
   const lastCol = colCount - 1;
 
-  const aoa: CellValue[][] = [];
-  const merges: XLSX.Range[] = [];
-  const blankRow = () => aoa.push([]);
-  const banner = (text: string): number => {
-    const r = aoa.length;
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = text;
-    aoa.push(row);
-    merges.push({ s: { r, c: 0 }, e: { r, c: lastCol } });
-    return r;
-  };
+  const sheet = createSheetWriter(colCount);
+  const { aoa, merges } = sheet;
 
-  const rSeller = banner(seller.name);
-  banner(seller.address);
-  banner(`MST: ${seller.taxCode}`);
-  const suffix = titleSuffix?.trim() ? ` ${titleSuffix.trim()}` : '';
-  const rTitle = banner(`BẢNG KÊ VẬN CHUYỂN${suffix} ${bangKePeriodLabel(rows)}`);
-  const rDear = banner(`Kính gửi: ${customer.name}`);
-  banner(`Địa chỉ: ${customer.address ?? ''}`);
-  banner(`MST: ${customer.taxCode ?? ''}`);
-  blankRow();
+  const letterheadRows = sheet.letterhead(
+    seller,
+    customer,
+    bangKeTitle(titleSuffix, bangKePeriodLabel(rows)),
+  );
 
-  const rHead1 = aoa.length;
-  const rHead2 = rHead1 + 1;
-  const head1: CellValue[] = new Array(colCount).fill('');
-  const head2: CellValue[] = new Array(colCount).fill('');
-  const leaf = (c: number, label: string) => {
-    head1[c] = label;
-    merges.push({ s: { r: rHead1, c }, e: { r: rHead2, c } });
-  };
-  const group = (c0: number, c1: number, label: string, subs: string[]) => {
-    head1[c0] = label;
-    if (c1 > c0) merges.push({ s: { r: rHead1, c: c0 }, e: { r: rHead1, c: c1 } });
-    subs.forEach((s, i) => {
-      head2[c0 + i] = s;
-    });
-  };
+  const { rHead1, rHead2, leaf, group } = sheet.headerBand();
 
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY');
@@ -318,18 +253,12 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   leaf(C_DROP, 'NƠI HẠ');
   leaf(C_DECL, 'SỐ TỜ KHAI');
   leaf(C_CONT, 'SỐ CONT');
-  group(
-    C_SIZE0,
-    C_SIZE0 + SIZE_BUCKETS.length - 1,
-    'LOẠI',
-    SIZE_BUCKETS.map((b) => b.header),
-  );
+  group(C_SIZE0, C_SIZE0 + SIZE_BUCKETS.length - 1, 'LOẠI', [...SIZE_BUCKETS]);
   leaf(C_FREIGHT, 'CƯỚC CHƯA VAT');
   leaf(C_SURCHARGE, 'PHỤ PHÍ');
   leaf(C_TOTAL, 'TỔNG THÀNH TIỀN');
-  aoa.push(head1, head2);
 
-  const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
+  const truckLabel = truckLabeler(getTruckPlate);
 
   let sumFreight = 0;
   let sumSurcharge = 0;
@@ -339,16 +268,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     const row: CellValue[] = new Array(colCount).fill('');
     row[C_STT] = i + 1;
     row[C_DATE] = formatDate(orderPlanDate(o));
-    if (o.isMultiTrip && (o.trips?.length ?? 0) > 0) {
-      const plates: string[] = [];
-      for (const trip of o.trips!) {
-        const p = truckLabel(trip.truckPlate, trip.truckId);
-        if (p && !plates.includes(p)) plates.push(p);
-      }
-      row[C_TRUCK] = plates.join('; ');
-    } else {
-      row[C_TRUCK] = truckLabel(o.truckPlate, o.truckId);
-    }
+    row[C_TRUCK] = joinedPlates(o, truckLabel);
 
     row[C_FROM] = o.route?.pickup ?? '';
     row[C_TO] = o.route?.stuffing ?? '';
@@ -386,17 +306,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     aoa.push(row);
   }
 
-  blankRow();
-  const rSign = aoa.length;
-  const cSignRight = Math.ceil(colCount / 2);
-  {
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = customer.name;
-    row[cSignRight] = seller.name;
-    aoa.push(row);
-    merges.push({ s: { r: rSign, c: 0 }, e: { r: rSign, c: cSignRight - 1 } });
-    merges.push({ s: { r: rSign, c: cSignRight }, e: { r: rSign, c: colCount - 1 } });
-  }
+  const signature = sheet.signatureRow(customer.name, seller.name);
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
@@ -411,35 +321,12 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     return { wch: 15 };
   });
 
-  const setStyle = (r: number, c: number, style: Record<string, unknown>) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = (ws[ref] ?? (ws[ref] = { t: 's', v: '' })) as StyledCell;
-    cell.s = { ...(cell.s ?? {}), ...style };
-  };
-  const setFmt = (r: number, c: number, z: string) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = ws[ref] as StyledCell | undefined;
-    if (cell && cell.t === 'n') {
-      cell.z = z;
-      cell.s = { ...(cell.s ?? {}), alignment: { horizontal: 'right' } };
-    }
-  };
+  const { setStyle, setFmt, styleLetterhead, styleHeaderBand, styleTotalRow, styleSignature } =
+    makeStyler(ws);
   const isMoneyCol = (c: number) => c >= C_FREIGHT && c <= C_TOTAL;
 
-  setStyle(rSeller, 0, { font: { bold: true, sz: 13 } });
-  setStyle(rTitle, 0, { font: { bold: true, sz: 15 }, alignment: { horizontal: 'center' } });
-  setStyle(rDear, 0, { font: { bold: true } });
-
-  for (const r of [rHead1, rHead2]) {
-    for (let c = 0; c <= lastCol; c++) {
-      setStyle(r, c, {
-        font: { bold: true },
-        fill: HEADER_FILL,
-        border: ALL_BORDERS,
-        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-      });
-    }
-  }
+  styleLetterhead(letterheadRows);
+  styleHeaderBand([rHead1, rHead2], lastCol);
 
   for (let r = rFirstData; r <= rLastData; r++) {
     for (let c = 0; c <= lastCol; c++) {
@@ -453,14 +340,8 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     }
   }
 
-  for (let c = 0; c <= lastCol; c++) {
-    setStyle(rTotalRow, c, { font: { bold: true }, border: ALL_BORDERS, fill: TOTAL_FILL });
-    if (isMoneyCol(c)) setFmt(rTotalRow, c, FMT_MONEY_DASH);
-  }
-
-  for (const c of [0, cSignRight]) {
-    setStyle(rSign, c, { font: { bold: true }, alignment: { horizontal: 'center' } });
-  }
+  styleTotalRow(rTotalRow, lastCol, isMoneyCol);
+  styleSignature(signature);
 
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');

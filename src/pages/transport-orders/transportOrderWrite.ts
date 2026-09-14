@@ -6,6 +6,7 @@ import type {
   TransportOrderTrip,
   TransportOrderTruckingSize,
   TransportOrderShipmentType,
+  TransportOrderType5Specific,
 } from '@/types';
 import { computeTransportOrderTotals, readFeeLines } from './transportOrderPricing';
 
@@ -22,11 +23,11 @@ export type TransportOrderWriteFields = {
 
   customerOrderNumber: string;
 
-  requestedPickupDate: string;
-
-  dropoffDate: string;
-
-  moocStorageDays: number | null;
+  type5Specific: {
+    requestedPickupDate: string;
+    dropoffDate: string;
+    moocStorageDays: number | null;
+  };
   billNumber: string;
 
   declarationNumber: string;
@@ -54,10 +55,21 @@ export type TransportOrderWriteFields = {
 const OWNED_EXTRA_KEYS: ReadonlySet<string> = new Set([
   'truckType',
   'customerOrderNumber',
-  'requestedPickupDate',
-  'dropoffDate',
-  'moocStorageDays',
+  'type5Specific',
 ]);
+
+function compactType5Specific({
+  requestedPickupDate,
+  dropoffDate,
+  moocStorageDays,
+}: TransportOrderWriteFields['type5Specific']): TransportOrderType5Specific | undefined {
+  const group: TransportOrderType5Specific = {
+    ...(requestedPickupDate ? { requestedPickupDate } : {}),
+    ...(dropoffDate ? { dropoffDate } : {}),
+    ...(moocStorageDays !== null ? { moocStorageDays } : {}),
+  };
+  return Object.keys(group).length > 0 ? group : undefined;
+}
 
 type MirroredTripFields = Pick<
   TransportOrderWriteFields,
@@ -94,27 +106,18 @@ export function buildTransportOrderWrite(
 
   const trips = fields.isMultiTrip ? fields.trips : [];
 
-  const {
-    truckType,
-    customerOrderNumber,
-    requestedPickupDate,
-    dropoffDate,
-    moocStorageDays,
-    extra,
-    ...rest
-  } = fields;
+  const { truckType, customerOrderNumber, type5Specific, extra, ...rest } = fields;
   const carried = Object.fromEntries(
     Object.entries(extra).filter(([key]) => !OWNED_EXTRA_KEYS.has(key)),
   ) as TransportOrderExtra;
+  const type5Group = compactType5Specific(type5Specific);
   return {
     ...rest,
     extra: {
       ...carried,
       ...(truckType ? { truckType } : {}),
       ...(customerOrderNumber ? { customerOrderNumber } : {}),
-      ...(requestedPickupDate ? { requestedPickupDate } : {}),
-      ...(dropoffDate ? { dropoffDate } : {}),
-      ...(moocStorageDays !== null ? { moocStorageDays } : {}),
+      ...(type5Group ? { type5Specific: type5Group } : {}),
     },
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
     fees,

@@ -1,28 +1,30 @@
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
-import { orderPlanDate, orderPlanSortKey } from '@/pages/transport-orders/planDate';
+import { orderPlanDate } from '@/pages/transport-orders/planDate';
 import {
   feeKey,
   isBillableFee,
   readFeeLines,
   roundVat,
 } from '@/pages/transport-orders/transportOrderPricing';
-import { bangKePeriodLabel } from './type1BangKe';
 import type { CustomerReportBuilder, CustomerReportInput } from './types';
 import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
-
-type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
-type CellValue = string | number;
-
-const THIN = { style: 'thin', color: { rgb: '000000' } } as const;
-const ALL_BORDERS = { top: THIN, bottom: THIN, left: THIN, right: THIN } as const;
-const HEADER_FILL = { fgColor: { rgb: 'D9E1F2' } } as const;
-const TOTAL_FILL = { fgColor: { rgb: 'F2F2F2' } } as const;
-const FMT_MONEY = '#,##0';
-const FMT_MONEY_DASH = '#,##0;-#,##0;"-"';
-
-const MANUAL_FILL = { fgColor: { rgb: 'FFFF00' } } as const;
+import {
+  ALL_BORDERS,
+  FMT_MONEY,
+  HEADER_FILL,
+  MANUAL_FILL,
+  bangKePeriodLabel,
+  bangKeTitle,
+  createSheetWriter,
+  makeStyler,
+  sizeBucketIndex,
+  statementRows,
+  truckLabeler,
+  type CellValue,
+  type StyledCell,
+} from './sheetKit';
 
 type FooterNote = { text: string; value?: string; red?: boolean } | null;
 
@@ -76,15 +78,7 @@ const FULL_FOOTER: PaymentFooter = {
   boxedAmounts: false,
 };
 
-const SIZE_BUCKETS = [
-  { key: '20', header: "20'" },
-  { key: '40', header: "40'" },
-] as const;
-
-const sizeBucketIndex = (truckingSize: string | undefined): number => {
-  const digits = (truckingSize ?? '').trim().match(/^(\d+)/)?.[1];
-  return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
-};
+const SIZE_BUCKETS = ["20'", "40'"] as const;
 
 type Type5FeeColumn =
   'freight' | 'sitc' | 'xlhn' | 'power' | 'moor' | 'lift' | 'drop' | 'emptyReturn' | 'earlyDrop';
@@ -307,6 +301,7 @@ const stuffingContains = (order: TransportOrder, warehouse: string): boolean =>
 
 const SHEETS: ReadonlyArray<{
   name: string;
+  titleSuffix: string;
   includes: (order: TransportOrder) => boolean;
   layout: SheetLayout;
 
@@ -314,18 +309,21 @@ const SHEETS: ReadonlyArray<{
 }> = [
   {
     name: 'Hàng nhập',
+    titleSuffix: 'HÀNG NHẬP',
     includes: (o) => isShipmentType(o, 'NHAP'),
     layout: IMPORT_LAYOUT,
     footer: SHORT_FOOTER,
   },
   {
     name: 'Hàng xuất - VS',
+    titleSuffix: 'HÀNG XUẤT',
     includes: (o) => isShipmentType(o, 'XUAT') && stuffingContains(o, 'Kho VS (KCN Tân Đô)'),
     layout: EXPORT_LAYOUT,
     footer: FULL_FOOTER,
   },
   {
     name: 'Hàng xuất - OG',
+    titleSuffix: 'HÀNG XUẤT',
     includes: (o) => isShipmentType(o, 'XUAT') && stuffingContains(o, 'Kho OG'),
     layout: EXPORT_LAYOUT,
     footer: FULL_FOOTER,
@@ -333,9 +331,7 @@ const SHEETS: ReadonlyArray<{
 ];
 
 export const buildCustomerReportType5: CustomerReportBuilder = (orders, input) => {
-  const rows = orders
-    .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
-    .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
+  const rows = statementRows(orders);
 
   const sheets = SHEETS.map((sheet) => ({ ...sheet, rows: rows.filter(sheet.includes) }));
   const printed = rows.filter((o) => sheets.some((s) => s.rows.includes(o)));
@@ -346,7 +342,13 @@ export const buildCustomerReportType5: CustomerReportBuilder = (orders, input) =
   for (const sheet of sheets) {
     XLSX.utils.book_append_sheet(
       workbook,
-      buildSheet(sheet.rows, input, periodLabel, sheet.layout, sheet.footer),
+      buildSheet(
+        sheet.rows,
+        { ...input, titleSuffix: sheet.titleSuffix },
+        periodLabel,
+        sheet.layout,
+        sheet.footer,
+      ),
       sheet.name,
     );
   }
@@ -370,7 +372,7 @@ function buildSheet(
   footer: PaymentFooter,
 ): XLSX.WorkSheet {
   const columnOf = feeColumnReader(resolveFeeName, layoutColumns(layout));
-  const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
+  const truckLabel = truckLabeler(getTruckPlate);
 
   let cursor = 0;
   const take = (width = 1) => {
@@ -421,43 +423,12 @@ function buildSheet(
   const C_NOTE_VALUE = C_DATE + 2;
   const C_NOTE_END = C_BOX_LABEL0 - 1;
 
-  const aoa: CellValue[][] = [];
-  const merges: XLSX.Range[] = [];
-  const blankRow = () => aoa.push([]);
-  const banner = (text: string): number => {
-    const r = aoa.length;
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = text;
-    aoa.push(row);
-    merges.push({ s: { r, c: 0 }, e: { r, c: lastCol } });
-    return r;
-  };
+  const sheet = createSheetWriter(colCount);
+  const { aoa, merges, blankRow } = sheet;
 
-  const rSeller = banner(seller.name);
-  banner(seller.address);
-  banner(`MST: ${seller.taxCode}`);
-  const suffix = titleSuffix?.trim() ? ` ${titleSuffix.trim()}` : '';
-  const rTitle = banner(`BẢNG KÊ VẬN CHUYỂN${suffix} ${periodLabel}`);
-  const rDear = banner(`Kính gửi: ${customer.name}`);
-  banner(`Địa chỉ: ${customer.address ?? ''}`);
-  banner(`MST: ${customer.taxCode ?? ''}`);
-  blankRow();
+  const letterheadRows = sheet.letterhead(seller, customer, bangKeTitle(titleSuffix, periodLabel));
 
-  const rHead1 = aoa.length;
-  const rHead2 = rHead1 + 1;
-  const head1: CellValue[] = new Array(colCount).fill('');
-  const head2: CellValue[] = new Array(colCount).fill('');
-  const leaf = (c: number, label: string) => {
-    head1[c] = label;
-    merges.push({ s: { r: rHead1, c }, e: { r: rHead2, c } });
-  };
-  const group = (c0: number, c1: number, label: string, subs: string[]) => {
-    head1[c0] = label;
-    if (c1 > c0) merges.push({ s: { r: rHead1, c: c0 }, e: { r: rHead1, c: c1 } });
-    subs.forEach((s, i) => {
-      head2[c0 + i] = s;
-    });
-  };
+  const { rHead1, rHead2, leaf, group } = sheet.headerBand();
 
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
@@ -469,12 +440,7 @@ function buildSheet(
   leaf(C_TRUCK, 'SỐ XE');
   leaf(C_ORDER_NO, layout.orderNoHeader);
   leaf(C_CONT, 'SỐ CONT');
-  group(
-    C_SIZE0,
-    C_SIZE0 + SIZE_BUCKETS.length - 1,
-    'SẢN LƯỢNG',
-    SIZE_BUCKETS.map((b) => b.header),
-  );
+  group(C_SIZE0, C_SIZE0 + SIZE_BUCKETS.length - 1, 'SẢN LƯỢNG', [...SIZE_BUCKETS]);
   leaf(C_TYPE, 'LOẠI HÌNH');
   group(C_FROM, C_TO, 'TUYẾN DỊCH VỤ', ['NƠI LẤY', 'NƠI ĐÓNG/RÚT HÀNG', 'NƠI HẠ']);
   group(C_SERVICE0, C_VAT, 'CƯỚC DỊCH VỤ', [
@@ -493,7 +459,6 @@ function buildSheet(
     ],
   );
   layout.trailing.forEach((col, i) => leaf(C_TRAILING0 + i, col.header));
-  aoa.push(head1, head2);
 
   const sums = new Map<number, number>();
   const addSum = (col: number, amount: number) => sums.set(col, (sums.get(col) ?? 0) + amount);
@@ -510,7 +475,8 @@ function buildSheet(
       row[C_STT] = ++stt;
       row[C_DATE] = formatDate(orderPlanDate(order));
       if (layout.moorDates) {
-        const { requestedPickupDate, dropoffDate, moocStorageDays } = order.extra ?? {};
+        const { requestedPickupDate, dropoffDate, moocStorageDays } =
+          order.extra?.type5Specific ?? {};
         if (typeof requestedPickupDate === 'string' && requestedPickupDate) {
           row[C_REQ_DATE] = formatDate(requestedPickupDate);
         }
@@ -609,17 +575,7 @@ function buildSheet(
     }
   }
 
-  blankRow();
-  const rSign = aoa.length;
-  const cSignRight = Math.ceil(colCount / 2);
-  {
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = customer.name;
-    row[cSignRight] = seller.name;
-    aoa.push(row);
-    merges.push({ s: { r: rSign, c: 0 }, e: { r: rSign, c: cSignRight - 1 } });
-    merges.push({ s: { r: rSign, c: cSignRight }, e: { r: rSign, c: colCount - 1 } });
-  }
+  const signature = sheet.signatureRow(customer.name, seller.name);
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
@@ -638,35 +594,14 @@ function buildSheet(
     return { wch: 15 };
   });
 
-  const setStyle = (r: number, c: number, style: Record<string, unknown>) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = (ws[ref] ?? (ws[ref] = { t: 's', v: '' })) as StyledCell;
-    cell.s = { ...(cell.s ?? {}), ...style };
-  };
-  const setFmt = (r: number, c: number, z: string) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = ws[ref] as StyledCell | undefined;
-    if (cell && cell.t === 'n') {
-      cell.z = z;
-      cell.s = { ...(cell.s ?? {}), alignment: { horizontal: 'right' } };
-    }
-  };
+  const { setStyle, setFmt, styleLetterhead, styleHeaderBand, styleTotalRow, styleSignature } =
+    makeStyler(ws);
 
-  setStyle(rSeller, 0, { font: { bold: true, sz: 13 } });
-  setStyle(rTitle, 0, { font: { bold: true, sz: 15 }, alignment: { horizontal: 'center' } });
-  setStyle(rDear, 0, { font: { bold: true } });
+  styleLetterhead(letterheadRows);
 
-  for (const r of [rHead1, rHead2]) {
-    for (let c = 0; c <= lastCol; c++) {
-      setStyle(r, c, {
-        font: { bold: true },
-
-        fill: MANUAL_COLS.includes(c) ? MANUAL_FILL : HEADER_FILL,
-        border: ALL_BORDERS,
-        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-      });
-    }
-  }
+  styleHeaderBand([rHead1, rHead2], lastCol, (c) =>
+    MANUAL_COLS.includes(c) ? MANUAL_FILL : HEADER_FILL,
+  );
 
   for (let r = rFirstData; r <= rLastData; r++) {
     for (let c = 0; c <= lastCol; c++) {
@@ -680,10 +615,7 @@ function buildSheet(
     }
   }
 
-  for (let c = 0; c <= lastCol; c++) {
-    setStyle(rTotalRow, c, { font: { bold: true }, border: ALL_BORDERS, fill: TOTAL_FILL });
-    if (moneyCols.includes(c)) setFmt(rTotalRow, c, FMT_MONEY_DASH);
-  }
+  styleTotalRow(rTotalRow, lastCol, (c) => moneyCols.includes(c));
 
   {
     const red = { font: { color: { rgb: 'FF0000' } } };
@@ -715,9 +647,7 @@ function buildSheet(
     });
   }
 
-  for (const c of [0, cSignRight]) {
-    setStyle(rSign, c, { font: { bold: true }, alignment: { horizontal: 'center' } });
-  }
+  styleSignature(signature);
 
   return ws;
 }

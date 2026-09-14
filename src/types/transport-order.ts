@@ -109,11 +109,15 @@ export type TransportOrderExtra = {
 
   customerOrderNumber?: string;
 
+  type5Specific?: TransportOrderType5Specific;
+  [key: string]: unknown;
+};
+
+export type TransportOrderType5Specific = {
   requestedPickupDate?: string;
   dropoffDate?: string;
 
   moocStorageDays?: number;
-  [key: string]: unknown;
 };
 
 export type TransportOrder = PartitionedRecordRow & {

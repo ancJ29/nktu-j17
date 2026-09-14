@@ -63,8 +63,10 @@ import {
   isActivityLoggingEnabled,
   isDriverDepartment,
   perms,
+  resolveCustomerReportType,
   type ResolvedStatusOption,
 } from '@/utils/permission';
+import { CAT_HAI_REPORT_TYPE } from '@/utils/customerReports/types';
 import {
   dateTimeStringToIso,
   isoToDateTimeString,
@@ -78,6 +80,7 @@ import type {
   TransportOrder,
   TransportOrderCancellation,
   TransportOrderExtra,
+  TransportOrderType5Specific,
 } from '@/types';
 import {
   findStatus,
@@ -561,23 +564,33 @@ export function TransportOrderDetailPage() {
     />
   );
 
-  const patchMoorField = (
-    key: 'requestedPickupDate' | 'dropoffDate' | 'moocStorageDays',
+  const type5Group = order.extra?.type5Specific;
+  const showType5Fields =
+    resolveCustomerReportType(order.customerCode ?? '') === CAT_HAI_REPORT_TYPE || !!type5Group;
+
+  const patchType5Field = (
+    key: keyof TransportOrderType5Specific,
     next: string | number | null,
   ) => {
-    const rest = Object.fromEntries(Object.entries(order.extra ?? {}).filter(([k]) => k !== key));
+    const others = Object.fromEntries(Object.entries(type5Group ?? {}).filter(([k]) => k !== key));
+    const group = next === null ? others : { ...others, [key]: next };
+    const rest = Object.fromEntries(
+      Object.entries(order.extra ?? {}).filter(([k]) => k !== 'type5Specific'),
+    );
     return handleMetaPatch({
-      extra: (next === null ? rest : { ...rest, [key]: next }) as TransportOrderExtra,
+      extra: (Object.keys(group).length > 0
+        ? { ...rest, type5Specific: group }
+        : rest) as TransportOrderExtra,
     });
   };
 
   const moorDateField = (key: 'requestedPickupDate' | 'dropoffDate', label: string) => {
-    const iso = order.extra?.[key];
+    const iso = type5Group?.[key];
     return (
       <InlineEditField<string | null>
         canEdit={canEditMeta}
         value={iso ? isoToVnDateString(iso) : null}
-        onSave={async (next) => patchMoorField(key, next ? vnDateStringToIso(next) : null)}
+        onSave={async (next) => patchType5Field(key, next ? vnDateStringToIso(next) : null)}
         labels={inlineEditLabels}
         renderDisplay={(v) =>
           v ? (
@@ -603,8 +616,8 @@ export function TransportOrderDetailPage() {
   const moocStorageDaysField = (
     <InlineEditField<number | null>
       canEdit={canEditMeta}
-      value={order.extra?.moocStorageDays ?? null}
-      onSave={async (next) => patchMoorField('moocStorageDays', next)}
+      value={type5Group?.moocStorageDays ?? null}
+      onSave={async (next) => patchType5Field('moocStorageDays', next)}
       labels={inlineEditLabels}
       renderDisplay={(v) =>
         v === null ? (
@@ -805,15 +818,22 @@ export function TransportOrderDetailPage() {
               {order.extra?.truckType &&
                 infoRow(t('transportOrders.form.truckType'), truckTypeLabel(order.extra.truckType))}
               {infoRow(t('transportOrders.columns.customerOrder'), customerOrderNumberField)}
-              {infoRow(
-                t('transportOrders.form.requestedPickupDate'),
-                moorDateField('requestedPickupDate', t('transportOrders.form.requestedPickupDate')),
+              {showType5Fields && (
+                <>
+                  {infoRow(
+                    t('transportOrders.form.requestedPickupDate'),
+                    moorDateField(
+                      'requestedPickupDate',
+                      t('transportOrders.form.requestedPickupDate'),
+                    ),
+                  )}
+                  {infoRow(
+                    t('transportOrders.form.dropoffDate'),
+                    moorDateField('dropoffDate', t('transportOrders.form.dropoffDate')),
+                  )}
+                  {infoRow(t('transportOrders.form.moocStorageDays'), moocStorageDaysField)}
+                </>
               )}
-              {infoRow(
-                t('transportOrders.form.dropoffDate'),
-                moorDateField('dropoffDate', t('transportOrders.form.dropoffDate')),
-              )}
-              {infoRow(t('transportOrders.form.moocStorageDays'), moocStorageDaysField)}
               {infoRow(t('transportOrders.columns.bill'), billNumberField)}
               {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
               {infoRow(t('transportOrders.columns.container'), containerNumberField)}

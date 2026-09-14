@@ -1,7 +1,7 @@
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
-import { orderPlanDate, orderPlanSortKey } from '@/pages/transport-orders/planDate';
+import { orderPlanDate } from '@/pages/transport-orders/planDate';
 import {
   feeKey,
   isBillableFee,
@@ -10,27 +10,21 @@ import {
 } from '@/pages/transport-orders/transportOrderPricing';
 import type { CustomerReportBuilder, CustomerReportInput, CustomerReportResult } from './types';
 import { readTruckingSize } from '@/pages/transport-orders/truckingSize';
+import {
+  ALL_BORDERS,
+  FMT_MONEY,
+  bangKePeriodLabel,
+  bangKeTitle,
+  createSheetWriter,
+  joinedPlates,
+  makeStyler,
+  sizeBucketIndex,
+  statementRows,
+  truckLabeler,
+  type CellValue,
+} from './sheetKit';
 
-type StyledCell = XLSX.CellObject & { s?: Record<string, unknown> };
-type CellValue = string | number;
-
-const THIN = { style: 'thin', color: { rgb: '000000' } } as const;
-const ALL_BORDERS = { top: THIN, bottom: THIN, left: THIN, right: THIN } as const;
-const HEADER_FILL = { fgColor: { rgb: 'D9E1F2' } } as const;
-const TOTAL_FILL = { fgColor: { rgb: 'F2F2F2' } } as const;
-const FMT_MONEY = '#,##0';
-
-const FMT_MONEY_DASH = '#,##0;-#,##0;"-"';
-
-const SIZE_BUCKETS = [
-  { key: '20', header: '20ft' },
-  { key: '40', header: '40ft' },
-] as const;
-
-function sizeBucketIndex(truckingSize: string | undefined): number {
-  const digits = (truckingSize ?? '').trim().match(/^(\d+)/)?.[1];
-  return digits ? SIZE_BUCKETS.findIndex((b) => b.key === digits) : -1;
-}
+const SIZE_BUCKETS = ['20ft', '40ft'] as const;
 
 type Type1FeeColumnKey = 'freight' | 'surcharge' | 'handling' | 'demurrage' | 'other';
 
@@ -118,30 +112,6 @@ const PAYMENT_BLOCKS = [
   },
 ] as const;
 
-export function bangKePeriodLabel(
-  orders: ReadonlyArray<TransportOrder>,
-  monthPrefix = 'THÁNG ',
-): string {
-  let earliest = Number.POSITIVE_INFINITY;
-  let latest = Number.NEGATIVE_INFINITY;
-  for (const o of orders) {
-    const t = new Date(orderPlanDate(o) as string | number | Date).getTime();
-    if (Number.isNaN(t)) continue;
-    earliest = Math.min(earliest, t);
-    latest = Math.max(latest, t);
-  }
-  if (!Number.isFinite(earliest)) {
-    const now = new Date();
-    return `${monthPrefix}${now.getMonth() + 1}/${now.getFullYear()}`;
-  }
-  const from = new Date(earliest);
-  const to = new Date(latest);
-  if (from.getFullYear() === to.getFullYear() && from.getMonth() === to.getMonth()) {
-    return `${monthPrefix}${from.getMonth() + 1}/${from.getFullYear()}`;
-  }
-  return `TỪ ${formatDate(earliest)} ĐẾN ${formatDate(latest)}`;
-}
-
 function billedLines(
   order: TransportOrder,
   kind: TransportOrderFee['kind'],
@@ -196,9 +166,7 @@ export const buildBangKeWorksheet = (
   }: CustomerReportInput,
   layout: BangKeLayout,
 ): { ws: XLSX.WorkSheet; rowCount: number } => {
-  const rows = orders
-    .filter((o) => !o.extra?.isDeleted && !o.extra?.cancellation)
-    .sort((a, b) => orderPlanSortKey(a) - orderPlanSortKey(b));
+  const rows = statementRows(orders);
 
   const feeCols = layout.serviceColumns;
   const labelKeyed = buildLabelKeyedColumns(resolveFeeName);
@@ -296,57 +264,23 @@ export const buildBangKeWorksheet = (
   const colCount = C_CHIHO0 + chiHoColumns.length;
   const lastCol = colCount - 1;
 
-  const aoa: CellValue[][] = [];
-  const merges: XLSX.Range[] = [];
-  const blankRow = () => aoa.push([]);
-  const banner = (text: string): number => {
-    const r = aoa.length;
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = text;
-    aoa.push(row);
-    merges.push({ s: { r, c: 0 }, e: { r, c: lastCol } });
-    return r;
-  };
+  const sheet = createSheetWriter(colCount);
+  const { aoa, merges, blankRow } = sheet;
 
-  const rSeller = banner(seller.name);
-  banner(seller.address);
-  banner(`MST: ${seller.taxCode}`);
-  const suffix = titleSuffix?.trim() ? ` ${titleSuffix.trim()}` : '';
-  const rTitle = banner(
-    `BẢNG KÊ VẬN CHUYỂN${suffix} ${bangKePeriodLabel(rows, layout.periodPrefix)}`,
+  const letterheadRows = sheet.letterhead(
+    seller,
+    customer,
+    bangKeTitle(titleSuffix, bangKePeriodLabel(rows, layout.periodPrefix)),
   );
-  const rDear = banner(`Kính gửi: ${customer.name}`);
-  banner(`Địa chỉ: ${customer.address ?? ''}`);
-  banner(`MST: ${customer.taxCode ?? ''}`);
-  blankRow();
 
-  const rHead1 = aoa.length;
-  const rHead2 = rHead1 + 1;
-  const head1: CellValue[] = new Array(colCount).fill('');
-  const head2: CellValue[] = new Array(colCount).fill('');
-  const leaf = (c: number, label: string) => {
-    head1[c] = label;
-    merges.push({ s: { r: rHead1, c }, e: { r: rHead2, c } });
-  };
-  const group = (c0: number, c1: number, label: string, subs: string[]) => {
-    head1[c0] = label;
-    if (c1 > c0) merges.push({ s: { r: rHead1, c: c0 }, e: { r: rHead1, c: c1 } });
-    subs.forEach((s, i) => {
-      head2[c0 + i] = s;
-    });
-  };
+  const { rHead1, rHead2, leaf, group } = sheet.headerBand();
 
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
   leaf(C_TRUCK, 'SỐ XE');
   leaf(C_BL, 'SỐ B/L; B/K');
   leaf(C_CONT, 'SỐ CONT');
-  group(
-    C_SIZE0,
-    C_SIZE0 + SIZE_BUCKETS.length - 1,
-    'SẢN LƯỢNG',
-    SIZE_BUCKETS.map((b) => b.header),
-  );
+  group(C_SIZE0, C_SIZE0 + SIZE_BUCKETS.length - 1, 'SẢN LƯỢNG', [...SIZE_BUCKETS]);
   leaf(C_TYPE, 'LOẠI HÌNH');
   group(C_PICKUP, C_DROPOFF, 'TUYẾN DỊCH VỤ', ['NƠI LẤY', 'NƠI ĐÓNG/RÚT HÀNG', 'NƠI HẠ']);
   group(C_FEE0, C_VAT, 'PHÍ DỊCH VỤ', [...feeCols.map((f) => f.header), vatHeader]);
@@ -360,9 +294,8 @@ export const buildBangKeWorksheet = (
       chiHoColumns.map((col) => col.header),
     );
   }
-  aoa.push(head1, head2);
 
-  const truckLabel = (name: string, truckId: string | undefined) => getTruckPlate(truckId) ?? name;
+  const truckLabel = truckLabeler(getTruckPlate);
 
   let sumService = 0;
   let sumVat = 0;
@@ -372,16 +305,7 @@ export const buildBangKeWorksheet = (
     const row: CellValue[] = new Array(colCount).fill('');
     row[C_STT] = i + 1;
     row[C_DATE] = formatDate(orderPlanDate(o));
-    if (o.isMultiTrip && (o.trips?.length ?? 0) > 0) {
-      const plates: string[] = [];
-      for (const trip of o.trips!) {
-        const p = truckLabel(trip.truckPlate, trip.truckId);
-        if (p && !plates.includes(p)) plates.push(p);
-      }
-      row[C_TRUCK] = plates.join('; ');
-    } else {
-      row[C_TRUCK] = truckLabel(o.truckPlate, o.truckId);
-    }
+    row[C_TRUCK] = joinedPlates(o, truckLabel);
     row[C_BL] = o.billNumber ?? '';
     row[C_CONT] = o.containerNumber ?? '';
 
@@ -392,12 +316,12 @@ export const buildBangKeWorksheet = (
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
+    const feeSums = new Map<number, number>();
     for (const fee of billedLines(o, 'service', resolveFeeName)) {
       const c = C_FEE0 + feeColOf(fee);
-      const prev = typeof row[c] === 'number' ? (row[c] as number) : 0;
-      const next = prev + (fee.amount || 0);
-      if (next !== 0) row[c] = next;
+      feeSums.set(c, (feeSums.get(c) ?? 0) + (fee.amount || 0));
     }
+    for (const [c, amount] of feeSums) if (amount !== 0) row[c] = amount;
 
     const totals = orderTotals(o);
     if (totals.vatAmount !== 0) row[C_VAT] = totals.vatAmount;
@@ -489,17 +413,7 @@ export const buildBangKeWorksheet = (
     fullWidthRow(`Số tài khoản: ${block.account}`);
   }
 
-  blankRow();
-  const rSign = aoa.length;
-  const cSignRight = Math.ceil(colCount / 2);
-  {
-    const row: CellValue[] = new Array(colCount).fill('');
-    row[0] = customer.name;
-    row[cSignRight] = seller.name;
-    aoa.push(row);
-    merges.push({ s: { r: rSign, c: 0 }, e: { r: rSign, c: cSignRight - 1 } });
-    merges.push({ s: { r: rSign, c: cSignRight }, e: { r: rSign, c: colCount - 1 } });
-  }
+  const signature = sheet.signatureRow(customer.name, seller.name);
 
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
@@ -521,36 +435,13 @@ export const buildBangKeWorksheet = (
     return { wch: 13 }; // fee / VAT / TỔNG CỘNG / chi hộ SỐ TIỀN
   });
 
-  const setStyle = (r: number, c: number, style: Record<string, unknown>) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = (ws[ref] ?? (ws[ref] = { t: 's', v: '' })) as StyledCell;
-    cell.s = { ...(cell.s ?? {}), ...style };
-  };
-  const setFmt = (r: number, c: number, z: string) => {
-    const ref = XLSX.utils.encode_cell({ r, c });
-    const cell = ws[ref] as StyledCell | undefined;
-    if (cell && cell.t === 'n') {
-      cell.z = z;
-      cell.s = { ...(cell.s ?? {}), alignment: { horizontal: 'right' } };
-    }
-  };
+  const { setStyle, setFmt, styleLetterhead, styleHeaderBand, styleTotalRow, styleSignature } =
+    makeStyler(ws);
   const isMoneyCol = (c: number) =>
     (c >= C_FEE0 && c <= C_TOTAL) || (c >= C_CHIHO0 && chiHoSlotAt(c) === 'amount');
 
-  setStyle(rSeller, 0, { font: { bold: true, sz: 13 } });
-  setStyle(rTitle, 0, { font: { bold: true, sz: 15 }, alignment: { horizontal: 'center' } });
-  setStyle(rDear, 0, { font: { bold: true } });
-
-  for (const r of [rHead1, rHead2]) {
-    for (let c = 0; c <= lastCol; c++) {
-      setStyle(r, c, {
-        font: { bold: true },
-        alignment: { horizontal: 'center', vertical: 'center', wrapText: true },
-        fill: HEADER_FILL,
-        border: ALL_BORDERS,
-      });
-    }
-  }
+  styleLetterhead(letterheadRows);
+  styleHeaderBand([rHead1, rHead2], lastCol);
 
   for (let r = rFirstData; r <= rLastData; r++) {
     for (let c = 0; c <= lastCol; c++) {
@@ -565,10 +456,7 @@ export const buildBangKeWorksheet = (
     }
   }
 
-  for (let c = 0; c <= lastCol; c++) {
-    setStyle(rTotalRow, c, { font: { bold: true }, border: ALL_BORDERS, fill: TOTAL_FILL });
-    if (isMoneyCol(c)) setFmt(rTotalRow, c, FMT_MONEY_DASH);
-  }
+  styleTotalRow(rTotalRow, lastCol, isMoneyCol);
 
   for (let r = rFirstSummary; r >= 0 && r <= rLastSummary; r++) {
     setStyle(r, 0, { font: { bold: true }, alignment: { horizontal: 'right' } });
@@ -583,9 +471,7 @@ export const buildBangKeWorksheet = (
     });
   }
 
-  for (const c of [0, cSignRight]) {
-    setStyle(rSign, c, { font: { bold: true }, alignment: { horizontal: 'center' } });
-  }
+  styleSignature(signature);
 
   return { ws, rowCount: rows.length };
 };

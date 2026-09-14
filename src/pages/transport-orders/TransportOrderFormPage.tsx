@@ -48,7 +48,8 @@ import { transportOrderBundle, useTransportOrderStore } from '@/stores/useTransp
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { getCurrentActorId, getCurrentEmployeeStamp, useInitFormFromFetch } from '@/hooks';
 import { logActivity } from '@/utils/activityLogger';
-import { isDriverDepartment } from '@/utils/permission';
+import { isDriverDepartment, resolveCustomerReportType } from '@/utils/permission';
+import { CAT_HAI_REPORT_TYPE } from '@/utils/customerReports/types';
 import {
   dateTimeStringToIso,
   isoToDateTimeString,
@@ -347,6 +348,15 @@ function blankValues(presetTruckType = ''): FormValues {
   };
 }
 
+function showsType5Fields(values: FormValues): boolean {
+  return (
+    resolveCustomerReportType(values.customerCode) === CAT_HAI_REPORT_TYPE ||
+    !!values.requestedPickupDate ||
+    !!values.dropoffDate ||
+    values.moocStorageDays !== ''
+  );
+}
+
 function copiedValues(src: TransportOrder): FormValues {
   return {
     isMultiTrip: !!src.isMultiTrip,
@@ -629,11 +639,13 @@ export function TransportOrderFormPage() {
         driverName: o.driverName,
         truckType: o.extra?.truckType ?? '',
         customerOrderNumber: o.extra?.customerOrderNumber ?? '',
-        requestedPickupDate: o.extra?.requestedPickupDate
-          ? isoToVnDateString(o.extra.requestedPickupDate)
+        requestedPickupDate: o.extra?.type5Specific?.requestedPickupDate
+          ? isoToVnDateString(o.extra.type5Specific.requestedPickupDate)
           : null,
-        dropoffDate: o.extra?.dropoffDate ? isoToVnDateString(o.extra.dropoffDate) : null,
-        moocStorageDays: o.extra?.moocStorageDays ?? '',
+        dropoffDate: o.extra?.type5Specific?.dropoffDate
+          ? isoToVnDateString(o.extra.type5Specific.dropoffDate)
+          : null,
+        moocStorageDays: o.extra?.type5Specific?.moocStorageDays ?? '',
         billNumber: o.billNumber || '',
         declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
@@ -719,12 +731,14 @@ export function TransportOrderFormPage() {
           driverName: values.driverName.trim(),
           truckType: values.truckType.trim(),
           customerOrderNumber: values.customerOrderNumber.trim(),
-          requestedPickupDate: values.requestedPickupDate
-            ? vnDateStringToIso(values.requestedPickupDate)
-            : '',
-          dropoffDate: values.dropoffDate ? vnDateStringToIso(values.dropoffDate) : '',
-          moocStorageDays:
-            typeof values.moocStorageDays === 'number' ? values.moocStorageDays : null,
+          type5Specific: {
+            requestedPickupDate: values.requestedPickupDate
+              ? vnDateStringToIso(values.requestedPickupDate)
+              : '',
+            dropoffDate: values.dropoffDate ? vnDateStringToIso(values.dropoffDate) : '',
+            moocStorageDays:
+              typeof values.moocStorageDays === 'number' ? values.moocStorageDays : null,
+          },
           billNumber: values.billNumber.trim(),
           declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
@@ -1163,21 +1177,6 @@ export function TransportOrderFormPage() {
                 {...form.getInputProps('customerOrderNumber')}
               />
 
-              <DateField
-                label={t('transportOrders.form.requestedPickupDate')}
-                {...form.getInputProps('requestedPickupDate')}
-              />
-              <DateField
-                label={t('transportOrders.form.dropoffDate')}
-                {...form.getInputProps('dropoffDate')}
-              />
-              <NumberInput
-                label={t('transportOrders.form.moocStorageDays')}
-                min={0}
-                allowDecimal={false}
-                {...form.getInputProps('moocStorageDays')}
-              />
-
               {/* Derived from leg 1 on a multi-trip job — hidden rather than shown
                   authored-but-overwritten. */}
               {!form.values.isMultiTrip && (
@@ -1258,6 +1257,25 @@ export function TransportOrderFormPage() {
                       optionLabel={driverWithPlate}
                     />
                   )}
+                </>
+              )}
+
+              {showsType5Fields(form.values) && (
+                <>
+                  <DateField
+                    label={t('transportOrders.form.requestedPickupDate')}
+                    {...form.getInputProps('requestedPickupDate')}
+                  />
+                  <DateField
+                    label={t('transportOrders.form.dropoffDate')}
+                    {...form.getInputProps('dropoffDate')}
+                  />
+                  <NumberInput
+                    label={t('transportOrders.form.moocStorageDays')}
+                    min={0}
+                    allowDecimal={false}
+                    {...form.getInputProps('moocStorageDays')}
+                  />
                 </>
               )}
             </SimpleGrid>

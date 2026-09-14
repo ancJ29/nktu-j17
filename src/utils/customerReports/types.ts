@@ -3,6 +3,8 @@ import type { TransportOrder } from '@/types';
 
 export const DEFAULT_CUSTOMER_REPORT_TYPE = 1;
 
+export const CAT_HAI_REPORT_TYPE = 5;
+
 export type CustomerReportInput = {
   seller: { name: string; address: string; taxCode: string };
 

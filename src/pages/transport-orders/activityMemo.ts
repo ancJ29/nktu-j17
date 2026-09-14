@@ -154,12 +154,14 @@ export function diffTransportOrder(
     'customerOrderNumber',
     delta(before.extra?.customerOrderNumber, after.extra?.customerOrderNumber),
   );
+  const type5Before = before.extra?.type5Specific;
+  const type5After = after.extra?.type5Specific;
   set(
     'requestedPickupDate',
-    delta(before.extra?.requestedPickupDate, after.extra?.requestedPickupDate),
+    delta(type5Before?.requestedPickupDate, type5After?.requestedPickupDate),
   );
-  set('dropoffDate', delta(before.extra?.dropoffDate, after.extra?.dropoffDate));
-  set('moocStorageDays', delta(before.extra?.moocStorageDays, after.extra?.moocStorageDays));
+  set('dropoffDate', delta(type5Before?.dropoffDate, type5After?.dropoffDate));
+  set('moocStorageDays', delta(type5Before?.moocStorageDays, type5After?.moocStorageDays));
   set('customerCode', delta(before.customerCode, after.customerCode));
   set('billNumber', delta(before.billNumber, after.billNumber));
   set('declarationNumber', delta(before.declarationNumber, after.declarationNumber));
