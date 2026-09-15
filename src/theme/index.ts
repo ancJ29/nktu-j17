@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { themeConfig } from '@/config';
 import { buildMantineTheme } from '@credo/base-ui/utils';
 import {
@@ -6,9 +7,12 @@ import {
   Drawer,
   Input,
   Modal,
+  MultiSelect,
   rem,
   createTheme,
   PasswordInput,
+  Select,
+  TagsInput,
   TextInput,
   Badge,
   Table,
@@ -22,6 +26,15 @@ const inputStyles = {
     padding: '0',
   },
 };
+
+const pickerInputStyles = (props: { leftSection?: ReactNode }) => ({
+  input: {
+    border: 'none',
+    borderBottom: '1px solid var(--mantine-color-primary-6)',
+    borderRadius: 0,
+    ...(props.leftSection === undefined ? { paddingLeft: 0 } : {}),
+  },
+});
 
 const baseTheme = buildMantineTheme(themeConfig, {
   InputWrapper: Input.Wrapper.extend({
@@ -85,6 +98,10 @@ const baseTheme = buildMantineTheme(themeConfig, {
       return styles;
     },
   }),
+
+  Select: Select.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
+  MultiSelect: MultiSelect.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
+  TagsInput: TagsInput.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
   PasswordInput: PasswordInput.extend({
     styles(_theme, props) {
       const base = {

@@ -21,6 +21,8 @@ export const BASE_PERMISSIONS: Permissions = {
     actions: {
       canViewPrice: false,
       canManagePrice: false,
+      canUploadPhoto: false,
+      canManageInventory: false,
     },
   },
   material: {
@@ -64,6 +66,8 @@ export const BASE_PERMISSIONS: Permissions = {
       canEditDeliveryPackageSize: false,
 
       canEditItemWarehouseFields: false,
+
+      canManagePayment: false,
     },
     query: {
       canViewAll: false,
@@ -78,6 +82,9 @@ export const BASE_PERMISSIONS: Permissions = {
     actions: {
       canManagePhotos: false,
       canReorder: false,
+
+      canConfirmDelivered: false,
+      canCancel: false,
     },
     query: {
       canViewAll: false,
@@ -147,12 +154,6 @@ export const BASE_PERMISSIONS: Permissions = {
     actions: {
       canModify: false,
     },
-  },
-  lookup: {
-    canView: false,
-    canCreate: false,
-    canEdit: false,
-    canDelete: false,
   },
   lookupV2: {
     canView: false,

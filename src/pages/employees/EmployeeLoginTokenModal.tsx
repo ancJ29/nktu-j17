@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { ROUTES } from '@/constants/routes';
 import { resolveClientCode } from '@/config/client-code';
-import { cMngtConnector } from '@credo/connectors/connector';
+import { generateEmployeeLoginToken } from '@/stores/useEmployeeStore';
 import { generateQRCodeWithLogo } from '@/utils/qr';
 import { logActivity } from '@/utils/activityLogger';
 import { wrapLoginToken } from '@/utils/loginToken';
@@ -43,11 +43,11 @@ export function EmployeeLoginTokenModal({
     setLoginLink('');
     setQrCodeData('');
     try {
-      const res = await cMngtConnector.generateEmployeeLoginToken({
+      const res = await generateEmployeeLoginToken({
         id: employee.id,
         expiration: LOGIN_TOKEN_EXPIRY_MINUTES * ONE_MINUTE,
       });
-      if (res.success && res.token) {
+      if (res.token) {
         logActivity('employee.generateLoginToken', employee.id);
         const baseUrl = window.location.origin;
 

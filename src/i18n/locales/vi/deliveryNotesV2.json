@@ -1,0 +1,116 @@
+{
+  "actions": {
+    "issue": "Tạo phiếu giao hàng",
+    "reduce": "Trừ tồn kho",
+    "retry": "Hoàn tất ghi sổ"
+  },
+  "cancelModal": {
+    "message": "Phiếu được đóng và gỡ khỏi đơn hàng.",
+    "title": "Huỷ phiếu giao hàng này?"
+  },
+  "columns": {
+    "assignedTo": "Người phụ trách",
+    "customer": "Khách hàng",
+    "deliveryDate": "Ngày giao",
+    "deliveryType": "Bên vận chuyển",
+    "items": "Số dòng",
+    "noteNumber": "Số phiếu",
+    "salesOrder": "Đơn hàng",
+    "status": "Trạng thái",
+    "totalQuantity": "Tổng SL"
+  },
+  "confirm": {
+    "acknowledge": "Tôi đã hiểu",
+    "title": "Vui lòng xác nhận trước khi tiếp tục"
+  },
+  "deductModal": {
+    "message": "Trạng thái này trừ kho: toàn bộ phần còn lại của mỗi dòng sẽ rời kho ngay bây giờ, như nút Trừ kho. Huỷ phiếu sau đó sẽ không hoàn lại.",
+    "title": "Chuyển phiếu và trừ kho?"
+  },
+  "deliverModal": {
+    "message": "Toàn bộ phần còn lại của mỗi dòng sẽ rời kho ngay bây giờ.",
+    "title": "Đánh dấu phiếu này đã giao?"
+  },
+  "deliveryType": {
+    "external": "Đơn vị vận chuyển ngoài",
+    "internal": "Nhân viên công ty"
+  },
+  "detailTitle": "Chi tiết phiếu giao hàng",
+  "editItem": "Sửa phiếu",
+  "fieldsInvalid": {
+    "message": "Các trường tuỳ chỉnh bị ẩn cho đến khi cấu hình được sửa. Dữ liệu đã lưu không thay đổi.",
+    "title": "Cấu hình trường tuỳ chỉnh không hợp lệ"
+  },
+  "filters": {
+    "deliveryDate": "Ngày giao",
+    "mine": "Được giao cho tôi",
+    "period": "Khoảng thời gian"
+  },
+  "flowInvalid": {
+    "message": "Việc chuyển trạng thái bị tắt cho đến khi cấu hình được sửa. Dữ liệu vẫn xem được.",
+    "title": "Cấu hình luồng trạng thái không hợp lệ"
+  },
+  "form": {
+    "assignedTo": "Người phụ trách",
+    "carrier": "Đơn vị vận chuyển",
+    "completesSalesOrder": "Giao phiếu này là hoàn tất đơn hàng",
+    "completesSalesOrderHint": "Tắt khi vẫn còn phiếu khác — phiếu cuối cùng giữ bật.",
+    "deliveryDate": "Ngày giao",
+    "deliveryType": "Bên vận chuyển",
+    "issueButton": "Tạo phiếu",
+    "item": "Mặt hàng",
+    "lines": "Các dòng",
+    "notes": "Ghi chú",
+    "reference": "Tham chiếu",
+    "remaining": "Còn phải giao",
+    "salesOrder": "Đơn hàng",
+    "updateButton": "Lưu thay đổi"
+  },
+  "issueModal": {
+    "message": "Các dòng của đơn hàng được sao chép sang. Sửa lại trên phiếu nếu lần giao này ít hơn.",
+    "title": "Tạo phiếu giao hàng cho {{orderNumber}}?"
+  },
+  "noItems": "Không có phiếu giao hàng trong khoảng này.",
+  "notFound": {
+    "back": "Về danh sách phiếu giao hàng",
+    "message": "Có thể phiếu đã bị xoá, hoặc đường dẫn đã cũ.",
+    "title": "Không tìm thấy phiếu giao hàng"
+  },
+  "notifications": {
+    "deliverPartial": "Đã giao, nhưng còn một số bút toán kho chưa hoàn tất.",
+    "issueSuccess": "Đã tạo phiếu giao hàng.",
+    "reduceSuccess": "Đã trừ tồn kho.",
+    "statusChangeSuccess": "Đã cập nhật trạng thái.",
+    "updateSuccess": "Đã cập nhật phiếu giao hàng.",
+    "uploadError": "Không tải được ảnh lên. Vui lòng thử lại.",
+    "writeError": "Không lưu được phiếu giao hàng. Vui lòng thử lại."
+  },
+  "pending": {
+    "badge": "Chưa ghi sổ",
+    "message": "Một số bút toán kho của phiếu này chưa hoàn tất. Nhấn Hoàn tất ghi sổ để chạy nốt — chạy lại nhiều lần vẫn an toàn.",
+    "title": "Bút toán kho chưa hoàn tất"
+  },
+  "photos": {
+    "capture": "Chụp ảnh & hoàn tất",
+    "required": "Giao nội bộ cần có ảnh trước khi hoàn tất — chụp trên điện thoại bằng “Chụp ảnh & hoàn tất”.",
+    "title": "Ảnh giao hàng"
+  },
+  "reduceModal": {
+    "message": "Nhập số thực tế đã rời kho. Mỗi dòng bị giới hạn ở phần còn lại.",
+    "title": "Trừ tồn kho cho phiếu này?"
+  },
+  "searchPlaceholder": "Tìm theo số phiếu, đơn hàng, khách hàng, mặt hàng…",
+  "status": {
+    "cancelled": "Đã huỷ",
+    "delivered": "Đã giao",
+    "draft": "Nháp"
+  },
+  "table": {
+    "delivered": "Đã giao",
+    "ordered": "Trên phiếu",
+    "remaining": "Còn lại"
+  },
+  "validation": {
+    "quantityPositive": "Số lượng phải lớn hơn không"
+  }
+}

@@ -29,7 +29,7 @@ export function CopyValueButton({
       variant="subtle"
       size={size}
       color={clipboard.copied ? 'teal' : 'gray'}
-      aria-label={ariaLabel ?? t('__new__.01-common.actions.copy')}
+      aria-label={ariaLabel ?? t('common.actions.copy')}
       onClick={(e) => {
         e.stopPropagation();
         e.preventDefault();

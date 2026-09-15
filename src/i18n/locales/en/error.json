@@ -1,0 +1,28 @@
+{
+  "forbidden": {
+    "goToHomeButton": "Go to Home",
+    "inlineTitle": "Restricted access",
+    "message": "You don't have permission to view this page. Contact your administrator if you believe this is a mistake.",
+    "title": "403"
+  },
+  "generic": {
+    "goToHomeLink": "Go to Home",
+    "message": "We're sorry, an unexpected error occurred. Please try again.",
+    "title": "Something went wrong",
+    "tryAgainButton": "Try Again"
+  },
+  "notFound": {
+    "goToHomeButton": "Go to Home",
+    "message": "The page you're looking for doesn't exist or has been moved.",
+    "title": "404"
+  },
+  "reload": "Reload",
+  "staleChunk": {
+    "message": "The app was updated while this page was open. Reload to continue.",
+    "title": "A new version is available"
+  },
+  "unexpected": {
+    "message": "This page couldn't be opened. Reload to try again — if it keeps happening, contact your administrator.",
+    "title": "Something went wrong"
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "addItem": "Thêm mẫu",
+  "columns": {
+    "days": "Số ngày"
+  },
+  "dayCount": "{{count}} ngày",
+  "dayCount_one": "{{count}} ngày",
+  "dayCount_other": "{{count}} ngày",
+  "detail": {
+    "infoTitle": "Thông tin",
+    "statDays": "Số ngày"
+  },
+  "editItem": "Sửa mẫu",
+  "emptyMessage": "Tạo danh sách hoạt động để áp dụng cho vụ mùa.",
+  "emptyTitle": "Chưa có mẫu nào",
+  "excel": {
+    "import": "Nhập Excel",
+    "importError": "Không nhập được tệp Excel",
+    "nothingToExport": "Thêm ít nhất một ngày trước khi xuất",
+    "sheetName": "Kế hoạch"
+  },
+  "form": {
+    "addMaterial": "Thêm nguyên liệu",
+    "codePlaceholder": "VD: TPL-001",
+    "copyingFrom": "Sao chép từ {{code}}",
+    "createButton": "Tạo mẫu",
+    "descriptionLabel": "Mô tả",
+    "descriptionPlaceholder": "Khi nào dùng mẫu này",
+    "materialPlaceholder": "Chọn nguyên liệu",
+    "materialsLabel": "Nguyên liệu",
+    "namePlaceholder": "VD: Tuần 1 cây giống",
+    "primarySection": "Thông tin mẫu",
+    "quantityPlaceholder": "SL",
+    "unitPlaceholder": "Đơn vị"
+  },
+  "noItems": "Không tìm thấy mẫu",
+  "noMaterials": "Không có nguyên liệu",
+  "notifications": {
+    "createError": "Không tạo được mẫu",
+    "createSuccess": "Đã tạo mẫu",
+    "fetchError": "Không tải được mẫu",
+    "updateError": "Không cập nhật được mẫu",
+    "updateSuccess": "Đã cập nhật mẫu"
+  },
+  "plan": {
+    "addColumn": "Thêm cột",
+    "addMemo": "Thêm ghi chú",
+    "addPreparation": "Thêm việc chuẩn bị",
+    "addStage": "Thêm giai đoạn",
+    "adjustmentRate": "Tỉ lệ điều chỉnh",
+    "adjustmentRateHint": "Mức chạy của quy trình, dạng phân số. 0,95 nghĩa là liều bên dưới đã bằng 95% công thức gốc.",
+    "columnGroup": "Nhóm",
+    "columnKind": "Loại",
+    "columnLabel": "Cột",
+    "columnLabelPlaceholder": "VD: CANXI (N)",
+    "columnsSection": "Các cột",
+    "columnsSectionHint": "Những gì ghi nhận mỗi ngày. Cột liều là vật tư thật, nên được cộng vào tổng vụ và chi phí.",
+    "day": "Ngày",
+    "gridNeedsColumns": "Hãy thêm cột trước — bảng chưa có gì để ghi.",
+    "gridSection": "Kế hoạch theo ngày",
+    "gridSectionHint": "Mỗi ngày một dòng. Ô không phải số sẽ được giữ nguyên chữ, để ngày ngưng bón vẫn ghi được.",
+    "importUnmatched": "Không khớp vật tư: {{names}}. Các cột vẫn được giữ — hãy chọn vật tư để liên kết.",
+    "importedColumns": "Đã nhập {{columns}} cột trong {{days}} ngày",
+    "kind": {
+      "activity": "Hoạt động (có vật tư)",
+      "ratio": "Định mức (theo số cây)",
+      "text": "Ghi chú"
+    },
+    "memoKeyPlaceholder": "Tên (vd. Giá thể)",
+    "memoPlaceholder": "vd. ÁP DỤNG CHO GIÁ THỂ XƠ DỪA",
+    "memosSection": "Ghi chú chung",
+    "memosSectionHint": "Lưu ý áp dụng cho cả quy trình",
+    "moveDown": "Xuống",
+    "moveUp": "Lên",
+    "noColumns": "Chưa có cột nào.",
+    "noPreparation": "Chưa có việc chuẩn bị.",
+    "noStages": "Chưa có giai đoạn — cả vụ tính là một.",
+    "prepActivity": "Nội dung",
+    "prepKind": "Loại",
+    "prepKindMaterial": "Có dùng vật tư",
+    "prepKindWork": "Không dùng vật tư",
+    "prepLabel": "Mục",
+    "prepOffset": "Lệch ngày",
+    "preparationSection": "Trước khi xuống giống",
+    "preparationSectionHint": "Việc làm trước ngày 1 — ngâm hạt, thanh growbag, khử trùng vườn. Lưu theo độ lệch (−14 = trước khi trồng hai tuần) để một quy trình dùng cho mọi vụ; mỗi vụ tự quy ra ngày thật.",
+    "referencePlantCount": "Viết cho (số cây)",
+    "referencePlantCountHint": "Số cây mà liều bên dưới được viết cho. Vụ có số cây khác sẽ tự quy đổi.",
+    "seedCount": "Số hạt",
+    "seedCountHint": "Khác số lượng cây — sổ ghi cả hai",
+    "sizingSection": "Quy mô",
+    "stage": "Giai đoạn",
+    "stageFrom": "Từ ngày",
+    "stageName": "Giai đoạn",
+    "stageTo": "Đến ngày",
+    "stagesSection": "Giai đoạn",
+    "stagesSectionHint": "Các khoảng ngày có tên. Lưu theo khoảng, nên hai ngày trong cùng khoảng không thể lệch nhau.",
+    "target": "Giống",
+    "targetHint": "Giống cây trồng, vd. PI 52",
+    "totalDays": "Tổng số ngày",
+    "totalsTitle": "Tổng cả vụ"
+  },
+  "searchPlaceholder": "Tìm mẫu…",
+  "summary": {
+    "total": "{{count}} mẫu"
+  },
+  "title": "Mẫu nhật ký",
+  "validation": {
+    "activityRequired": "Thêm ít nhất một ngày có hoạt động",
+    "totalDatesRequired": "Tổng số ngày phải lớn hơn 0"
+  }
+}

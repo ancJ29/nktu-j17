@@ -1,0 +1,193 @@
+{
+  "addItem": "Thêm đổ dầu",
+  "allMonths": "Tất cả các tháng",
+  "cards": {
+    "toggleDetail": "Xem chi tiết"
+  },
+  "deleteConfirm": {
+    "message": "Xóa nhật ký ngày {{date}}? Không thể hoàn tác.",
+    "title": "Xóa nhật ký đổ dầu?"
+  },
+  "driverTraining": {
+    "addItem": "Thêm buổi đào tạo",
+    "columns": {
+      "course": "Khóa học",
+      "date": "Ngày",
+      "result": "Kết quả",
+      "trainer": "Người huấn luyện"
+    },
+    "editItem": "Sửa buổi đào tạo",
+    "empty": "Chưa có nhật ký đào tạo năm {{year}}.",
+    "form": {
+      "coursePlaceholder": "vd. Lái xe an toàn",
+      "notePlaceholder": "Ghi chú (tùy chọn)",
+      "resultPlaceholder": "vd. Đạt",
+      "trainerPlaceholder": "Người / đơn vị huấn luyện"
+    },
+    "sectionTitle": "Nhật ký đào tạo"
+  },
+  "exportExcel": "Xuất Excel",
+  "form": {
+    "createButton": "Thêm nhật ký",
+    "selectDriver": "Chọn tài xế"
+  },
+  "greenhouseMaintenance": {
+    "addItem": "Thêm bảo trì",
+    "columns": {
+      "activity": "Hạng mục",
+      "cost": "Chi phí",
+      "date": "Ngày",
+      "performedBy": "Người thực hiện"
+    },
+    "editItem": "Sửa bảo trì",
+    "empty": "Chưa có bảo trì nào trong năm {{year}}.",
+    "form": {
+      "activityPlaceholder": "vd. Vệ sinh và khử trùng",
+      "costPlaceholder": "Chi phí (tùy chọn)",
+      "notePlaceholder": "Ghi chú (tùy chọn)",
+      "performedByPlaceholder": "Nhân viên hoặc nhà thầu"
+    },
+    "sectionTitle": "Nhật ký bảo trì",
+    "validation": {
+      "activityRequired": "Nhập hạng mục đã thực hiện"
+    }
+  },
+  "maintenance": {
+    "addItem": "Thêm bảo trì",
+    "columns": {
+      "accountsReceived": "Đã thanh toán",
+      "condition": "Tình trạng",
+      "date": "Ngày",
+      "item": "Hạng mục",
+      "laborCost": "Tiền công",
+      "lineTotal": "Thành tiền",
+      "odometer": "Số km",
+      "outstanding": "Công nợ",
+      "photos": "Hoá đơn",
+      "quantity": "Số lượng",
+      "supplier": "Nhà cung cấp",
+      "total": "Tổng cộng",
+      "totalAmount": "Tổng hạng mục",
+      "type": "Loại",
+      "unitPrice": "Đơn giá",
+      "vat": "VAT",
+      "warranty": "Bảo hành"
+    },
+    "editItem": "Sửa bảo trì",
+    "empty": "Chưa có lịch sử bảo trì năm {{year}}.",
+    "filters": {
+      "all": "Tất cả",
+      "settled": "Đã thanh toán đủ",
+      "unpaid": "Còn nợ"
+    },
+    "form": {
+      "addItemLine": "Thêm hạng mục",
+      "conditionPlaceholder": "vd. Mới / Đã qua sử dụng",
+      "grandTotalHint": "Hạng mục + tiền công + VAT (tự động)",
+      "itemName": "Tên hạng mục",
+      "itemPlaceholder": "vd. Thay nhớt, má phanh",
+      "monthsSuffix": "tháng",
+      "noItemLines": "Chưa có hạng mục nào — bấm thêm.",
+      "notePlaceholder": "Ghi chú (tùy chọn)",
+      "outstandingHint": "Tổng cộng − Đã thanh toán (tự động)",
+      "supplierPlaceholder": "Gara / nhà cung cấp",
+      "totalAmountHint": "Đơn giá × Số lượng (tự động)",
+      "typePlaceholder": "Chọn loại bảo trì",
+      "vatEnabled": "Có VAT",
+      "vatHint": "Tắt — tích để áp dụng",
+      "warrantyPlaceholder": "Không"
+    },
+    "months_one": "{{count}} tháng",
+    "months_other": "{{count}} tháng",
+    "sectionTitle": "Bảo trì",
+    "warrantyUntil": "đến {{date}}"
+  },
+  "notifications": {
+    "afterWriteError": "Đã lưu phiếu nhưng một cập nhật liên quan bị lỗi.",
+    "createError": "Không lưu được",
+    "createSuccess": "Đã lưu",
+    "deleteError": "Không xóa được",
+    "deleteSuccess": "Đã xóa",
+    "fetchError": "Không tải được nhật ký",
+    "updateError": "Không cập nhật được",
+    "updateSuccess": "Đã cập nhật"
+  },
+  "photos": {
+    "add": "Thêm ảnh",
+    "label": "Hình ảnh",
+    "view": "Xem ảnh"
+  },
+  "refuel": {
+    "abnormalTooltip": "Mức tiêu hao cao hơn bình thường",
+    "addItem": "Thêm nhật ký đổ dầu",
+    "columns": {
+      "consumption": "L/100km",
+      "date": "Ngày",
+      "distance": "Quãng đường (km)",
+      "driver": "Lái xe",
+      "litres": "Số lít",
+      "odometerNew": "ODO mới (km)",
+      "odometerOld": "ODO cũ (km)",
+      "photos": "Hoá đơn",
+      "source": "Nguồn",
+      "total": "Thành tiền",
+      "unitPrice": "Đơn giá"
+    },
+    "editItem": "Sửa nhật ký đổ dầu",
+    "empty": "Chưa có nhật ký đổ dầu năm {{year}}.",
+    "form": {
+      "notePlaceholder": "Ghi chú (tùy chọn)",
+      "tankLabel": "Bồn dầu",
+      "tankPlaceholder": "Chọn bồn"
+    },
+    "notifications": {
+      "tankSyncError": "Đã lưu phiếu đổ dầu nhưng chưa cập nhật được sổ của bồn. Lưu lại phiếu, hoặc bấm “Tính lại tồn” trên bồn."
+    },
+    "sectionTitle": "Nhật ký đổ dầu",
+    "source": {
+      "external": "Cây xăng",
+      "tank": "Bồn nhà"
+    },
+    "summary": {
+      "avgConsumption": "Tiêu hao TB",
+      "totalCost": "Tổng chi phí",
+      "totalDistance": "Tổng quãng đường",
+      "totalLitres": "Tổng số lít"
+    },
+    "validation": {
+      "tankRequired": "Chọn bồn đã lấy dầu"
+    }
+  },
+  "sort": {
+    "default": "Mới nhất"
+  },
+  "trip": {
+    "addItem": "Thêm chuyến",
+    "columns": {
+      "customer": "Khách hàng",
+      "date": "Ngày",
+      "destination": "Tuyến / Điểm đến",
+      "driver": "Lái xe",
+      "odometer": "Số km",
+      "schedule": "Giờ đóng / xuống hàng dự kiến",
+      "transportOrder": "Đơn vận chuyển",
+      "truckingSize": "Loại cont / kích thước"
+    },
+    "editItem": "Sửa chuyến",
+    "empty": "Chưa có chuyến đi năm {{year}}.",
+    "form": {
+      "destinationPlaceholder": "vd. HCM — Đà Lạt",
+      "notePlaceholder": "Ghi chú (tùy chọn)"
+    },
+    "sectionTitle": "Chuyến đi",
+    "summary": {
+      "totalDistance": "Tổng km đã chạy",
+      "totalTrips": "Tổng số chuyến"
+    }
+  },
+  "validation": {
+    "dateRequired": "Bắt buộc nhập ngày",
+    "litresInvalid": "Số lít không được âm",
+    "unitPriceInvalid": "Đơn giá không được âm"
+  }
+}

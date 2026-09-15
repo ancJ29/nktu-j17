@@ -173,7 +173,7 @@ export function CropSheetMaterialsModal({
 
         <Group justify="flex-end">
           <Button size="sm" variant="default" onClick={onClose}>
-            {t('__new__.01-common.actions.close')}
+            {t('common.actions.close')}
           </Button>
         </Group>
       </Stack>

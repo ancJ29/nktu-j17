@@ -1,0 +1,18 @@
+{
+  "dropHere": "Drop files to upload",
+  "empty": "No attachments yet",
+  "hint": "PNG, PDF, JPG. Max {{max}}MB each.",
+  "invalidType": "{{name}}: unsupported file type",
+  "screenshot": "Screenshot",
+  "screenshotCropHint": "Drag to crop the area you want, then click Upload",
+  "screenshotHint": "Take a screenshot first (PrtScn or Cmd+Shift+4), then paste here",
+  "screenshotInstruction": "Press Ctrl+V to paste a screenshot",
+  "screenshotPaste": "Paste",
+  "screenshotTitle": "Paste Screenshot",
+  "title": "Attachments",
+  "tooLarge": "{{name}}: exceeds {{max}}MB limit",
+  "upload": "Upload Files",
+  "uploadError": "Failed to upload {{name}}",
+  "uploadSuccess": "{{count}} file(s) uploaded",
+  "uploading": "Uploading..."
+}

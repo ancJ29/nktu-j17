@@ -1,0 +1,97 @@
+{
+  "actions": {
+    "retry": "Hoàn tất ghi kho"
+  },
+  "addItem": "Phiếu nhập mới",
+  "cancelModal": {
+    "messageDraft": "Phiếu nháp sẽ đóng và bỏ phần hàng dự kiến về. Không có tồn kho nào thay đổi.",
+    "messageReceived": "Số lượng của từng dòng sẽ được trừ lại khỏi tồn kho.",
+    "titleDraft": "Hủy phiếu nháp này?",
+    "titleReceived": "Hủy phiếu nhập này?"
+  },
+  "columns": {
+    "items": "Số dòng",
+    "receiptNumber": "Số phiếu",
+    "receivedDate": "Ngày nhận",
+    "status": "Trạng thái",
+    "totalQuantity": "Tổng SL",
+    "vendor": "Nhà cung cấp"
+  },
+  "confirmModal": {
+    "keepOpen": "Giữ trang này mở cho đến khi hoàn tất.",
+    "message": "Số lượng của từng dòng sẽ được cộng vào tồn kho. Hủy phiếu sau đó sẽ trừ lại.",
+    "title": "Xác nhận phiếu nhập này?"
+  },
+  "detailTitle": "Chi tiết phiếu nhập",
+  "editItem": "Sửa phiếu nhập",
+  "fieldsInvalid": {
+    "message": "Các trường tùy chỉnh sẽ bị ẩn cho đến khi cấu hình được sửa. Dữ liệu đã lưu vẫn giữ nguyên.",
+    "title": "Cấu hình trường tùy chỉnh không hợp lệ"
+  },
+  "filters": {
+    "period": "Kỳ",
+    "receivedDate": "Ngày nhận"
+  },
+  "flowInvalid": {
+    "message": "Không thể chuyển trạng thái cho đến khi cấu hình được sửa. Dữ liệu vẫn xem được.",
+    "title": "Cấu hình luồng trạng thái không hợp lệ"
+  },
+  "form": {
+    "copyingFrom": "Sao chép từ phiếu {{receiptNumber}} — điều chỉnh và lưu thành phiếu mới.",
+    "createButton": "Tạo phiếu nhập",
+    "item": "Mặt hàng",
+    "itemSearchEmpty": "Không tìm thấy",
+    "itemSearchPlaceholder": "Tìm hàng theo tên hoặc mã để thêm dòng",
+    "itemUnknown": "Mặt hàng không còn trong danh mục",
+    "lineCount": "Số mặt hàng",
+    "lineNote": "Ghi chú",
+    "lines": "Danh sách hàng",
+    "noLines": "Tìm hàng ở ô trên để thêm dòng đầu tiên.",
+    "notes": "Ghi chú",
+    "quantity": "Số lượng",
+    "receiptSection": "Thông tin phiếu",
+    "receivedDate": "Ngày nhận",
+    "reference": "Tham chiếu",
+    "removeLine": "Xóa dòng",
+    "summarySection": "Tổng phiếu",
+    "updateButton": "Lưu thay đổi",
+    "vendor": "Nhà cung cấp"
+  },
+  "noItems": "Không có phiếu nhập trong kỳ này.",
+  "notFound": {
+    "back": "Quay lại danh sách",
+    "message": "Có thể phiếu đã bị xóa, hoặc liên kết đã cũ.",
+    "title": "Không tìm thấy phiếu nhập"
+  },
+  "notifications": {
+    "cancelSuccess": "Đã hủy phiếu nhập.",
+    "confirmPartial": "Đã xác nhận phiếu, nhưng còn một phần tồn kho chưa ghi.",
+    "confirmSuccess": "Đã xác nhận phiếu và ghi tồn kho.",
+    "createSuccess": "Đã tạo phiếu nhập.",
+    "statusChangeSuccess": "Đã cập nhật trạng thái",
+    "updateSuccess": "Đã cập nhật phiếu nhập.",
+    "writeError": "Không thể lưu phiếu nhập. Vui lòng thử lại."
+  },
+  "pending": {
+    "badge": "Chưa ghi kho",
+    "blocksCancel": "Hãy hoàn tất ghi kho trước khi hủy, để việc trừ lại không bị trùng.",
+    "message": "Một phần tồn kho của phiếu này chưa được ghi. Nhấn Hoàn tất ghi kho để chạy tiếp — chạy lại nhiều lần vẫn an toàn.",
+    "title": "Ghi kho chưa hoàn tất"
+  },
+  "searchPlaceholder": "Tìm theo số phiếu, nhà cung cấp, mặt hàng…",
+  "status": {
+    "cancelled": "Đã hủy",
+    "draft": "Nháp",
+    "received": "Đã nhận"
+  },
+  "validation": {
+    "customFields": "Kiểm tra lại các trường được đánh dấu",
+    "field": {
+      "date": "Ngày không hợp lệ",
+      "number": "Phải là số",
+      "option": "Chọn một giá trị trong danh sách"
+    },
+    "itemsRequired": "Thêm ít nhất một dòng",
+    "quantityPositive": "Số lượng phải lớn hơn 0"
+  }
+}

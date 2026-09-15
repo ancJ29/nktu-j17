@@ -25,7 +25,7 @@ import { markCfgReady, markClientUnconfigured } from '@/utils/bootState';
 import { resolveClientCode } from './client-code';
 import { restoreAuthId } from '@/utils/authId';
 import { ONE_HOUR, ONE_MINUTE } from '@credo/kits/time';
-import { buildNavigation } from './navigation';
+import { buildNavigation, collectNavViewerRules } from './navigation';
 import { bootstrapPermissionCache } from '@/utils/permissionReader';
 import {
   validateSalesOrderConfig,
@@ -42,7 +42,7 @@ import {
 } from '@/pages/transport-orders/validateConfig';
 import type { ConfigInvariantError } from '@/pages/sales-orders/capabilities/types';
 import type { ConfigInvariantError as DrConfigInvariantError } from '@/pages/delivery-requests/capabilities/types';
-import type { NavigationConfig } from '@/types';
+import type { CMngtCompanyInfo, NavigationConfig } from '@/types';
 
 initAppCache();
 
@@ -122,10 +122,15 @@ bootstrapPermissionCache({
 });
 
 const features = validatedConfig.features;
+
+const navV2Pc = (validated.navigationV2?.pc ?? null) as NavigationConfig['pc'] | null;
+const pcItems = navV2Pc ?? validated.navigation.pc;
 const configNav =
-  validated.navigation.pc.length > 0 || validated.navigation.mobile.length > 0
-    ? (validated.navigation as NavigationConfig)
+  pcItems.length > 0 || validated.navigation.mobile.length > 0
+    ? ({ pc: pcItems, mobile: validated.navigation.mobile } as NavigationConfig)
     : null;
+
+export const navViewerRules = collectNavViewerRules(navV2Pc ?? []);
 
 const navigation = buildNavigation({
   configNav,
@@ -134,7 +139,10 @@ const navigation = buildNavigation({
   showRestrictedItems: features?.permissionManagement?.showRestrictedItems ?? false,
 });
 
-export const appConfig: Omit<CMngtAppConfig, 'navigation'> & { navigation: NavigationConfig } = {
+export const appConfig: Omit<CMngtAppConfig, 'companyInfo' | 'navigation'> & {
+  navigation: NavigationConfig;
+  companyInfo?: CMngtCompanyInfo[] | undefined;
+} = {
   ...validated,
   navigation,
   themeConfig: buildThemeConfig(validated.themeConfig.mainColor),

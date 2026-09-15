@@ -1,0 +1,76 @@
+{
+  "actions": {
+    "confirm": "Xác nhận",
+    "copy": "Sao chép"
+  },
+  "addItem": "Tạo phiếu",
+  "columns": {
+    "date": "Ngày",
+    "itemsCount_one": "{{count}} vật tư",
+    "itemsCount_other": "{{count}} vật tư",
+    "lines": "Vật tư"
+  },
+  "confirmModal": {
+    "message_in": "Xác nhận sẽ cộng số lượng vào tồn kho vật tư. Không thể hoàn tác.",
+    "message_out": "Xác nhận sẽ trừ số lượng khỏi tồn kho vật tư (tồn kho có thể âm). Không thể hoàn tác.",
+    "title": "Xác nhận phiếu này?"
+  },
+  "copiedFrom": "Sao chép từ {{code}} — chỉnh sửa và lưu thành phiếu mới.",
+  "dangerZone": {
+    "deleteItem": "Xóa phiếu",
+    "deleteItemDesc": "Xóa vĩnh viễn phiếu này"
+  },
+  "deleteConfirm": {
+    "message": "Bạn có chắc muốn xóa phiếu này? Hành động này không thể hoàn tác.",
+    "title": "Xóa phiếu"
+  },
+  "editItem": "Sửa phiếu",
+  "emptyMessage": "Điều chỉnh khoảng ngày hoặc tạo phiếu đầu tiên.",
+  "emptyTitle": "Chưa có phiếu",
+  "form": {
+    "addLine": "Thêm",
+    "headerSection": "Thông tin phiếu",
+    "linesLabel": "Danh sách vật tư",
+    "materialLabel": "Vật tư",
+    "materialPlaceholder": "Chọn vật tư",
+    "noLines": "Chưa có vật tư. Thêm vật tư và số lượng.",
+    "notePlaceholder": "Ghi chú hoặc tham chiếu (tùy chọn)",
+    "quantityLabel": "Số lượng",
+    "unitLabel": "Đơn vị"
+  },
+  "fromMaterials": {
+    "createDeliveryNote": "Phiếu xuất",
+    "createReceipt": "Phiếu nhập",
+    "enterSelection": "Chọn vật tư",
+    "rowCreateDeliveryNote": "Tạo phiếu xuất cho vật tư này",
+    "rowCreateReceipt": "Tạo phiếu nhập cho vật tư này",
+    "selectAll": "Chọn tất cả trong trang",
+    "selectPrompt": "Chọn vật tư để đưa vào phiếu",
+    "selected_one": "Đã chọn {{count}} vật tư",
+    "selected_other": "Đã chọn {{count}} vật tư"
+  },
+  "lockedNote": "Phiếu đã xác nhận và bị khóa — số lượng đã được cập nhật vào tồn kho.",
+  "notifications": {
+    "confirmError": "Xác nhận phiếu thất bại",
+    "confirmSuccess": "Đã xác nhận phiếu",
+    "createError": "Tạo phiếu thất bại",
+    "createSuccess": "Đã tạo phiếu",
+    "deleteError": "Xóa phiếu thất bại",
+    "deleteSuccess": "Đã xóa phiếu",
+    "duplicateCode": "Mã đã được sử dụng",
+    "duplicateCodeMessage": "Mã phiếu này đã tồn tại. Vui lòng đổi ngày hoặc thử lại.",
+    "fetchError": "Tải danh sách phiếu thất bại",
+    "updateError": "Cập nhật phiếu thất bại",
+    "updateSuccess": "Đã cập nhật phiếu"
+  },
+  "searchPlaceholder": "Tìm theo mã hoặc ghi chú...",
+  "seededFromMaterials_one": "Tạo từ {{count}} vật tư trong danh sách vật tư — nhập số lượng rồi lưu.",
+  "seededFromMaterials_other": "Tạo từ {{count}} vật tư trong danh sách vật tư — nhập số lượng rồi lưu.",
+  "status": {
+    "confirmed": "Đã xác nhận",
+    "draft": "Nháp"
+  },
+  "validation": {
+    "dateRequired": "Vui lòng chọn ngày"
+  }
+}

@@ -1,5 +1,5 @@
 import { appConfig } from '@/config';
-import type { LookupV2CategoryId } from '@/pages/lookup-v2/categoryRegistry';
+import type { LookupV2CategoryId } from '@/pages/v2/lookup/categoryRegistry';
 
 export function getMaterialUnitCategory(): Extract<LookupV2CategoryId, 'unit' | 'material-unit'> {
   return appConfig.features?.materials?.unitCategory ?? 'material-unit';

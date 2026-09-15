@@ -1,0 +1,193 @@
+{
+  "addItem": "Add Refuel",
+  "allMonths": "All months",
+  "cards": {
+    "toggleDetail": "Toggle details"
+  },
+  "deleteConfirm": {
+    "message": "Delete the log dated {{date}}? This cannot be undone.",
+    "title": "Delete refuel log?"
+  },
+  "driverTraining": {
+    "addItem": "Add training",
+    "columns": {
+      "course": "Course",
+      "date": "Date",
+      "result": "Result",
+      "trainer": "Trainer"
+    },
+    "editItem": "Edit training",
+    "empty": "No training logs for {{year}} yet.",
+    "form": {
+      "coursePlaceholder": "e.g. Defensive driving",
+      "notePlaceholder": "Optional note",
+      "resultPlaceholder": "e.g. Pass",
+      "trainerPlaceholder": "Trainer / provider"
+    },
+    "sectionTitle": "Training logs"
+  },
+  "exportExcel": "Export Excel",
+  "form": {
+    "createButton": "Add Log",
+    "selectDriver": "Select driver"
+  },
+  "greenhouseMaintenance": {
+    "addItem": "Add maintenance",
+    "columns": {
+      "activity": "Work done",
+      "cost": "Cost",
+      "date": "Date",
+      "performedBy": "Performed by"
+    },
+    "editItem": "Edit maintenance",
+    "empty": "No maintenance logged for {{year}} yet.",
+    "form": {
+      "activityPlaceholder": "e.g. Cleaned and sterilised",
+      "costPlaceholder": "Optional cost",
+      "notePlaceholder": "Optional note",
+      "performedByPlaceholder": "Staff or contractor"
+    },
+    "sectionTitle": "Maintenance logs",
+    "validation": {
+      "activityRequired": "Describe the work done"
+    }
+  },
+  "maintenance": {
+    "addItem": "Add maintenance",
+    "columns": {
+      "accountsReceived": "Accounts received",
+      "condition": "Condition",
+      "date": "Date",
+      "item": "Item",
+      "laborCost": "Labor cost",
+      "lineTotal": "Line total",
+      "odometer": "Odometer",
+      "outstanding": "Outstanding",
+      "photos": "Invoice",
+      "quantity": "Qty",
+      "supplier": "Supplier",
+      "total": "Total",
+      "totalAmount": "Items total",
+      "type": "Type",
+      "unitPrice": "Unit price",
+      "vat": "VAT",
+      "warranty": "Warranty"
+    },
+    "editItem": "Edit maintenance",
+    "empty": "No maintenance logs for {{year}} yet.",
+    "filters": {
+      "all": "All",
+      "settled": "Settled",
+      "unpaid": "Outstanding"
+    },
+    "form": {
+      "addItemLine": "Add item",
+      "conditionPlaceholder": "e.g. New / Used",
+      "grandTotalHint": "Items + labor + VAT (auto)",
+      "itemName": "Item name",
+      "itemPlaceholder": "e.g. Oil change, brake pads",
+      "monthsSuffix": "mo",
+      "noItemLines": "No items yet — add one.",
+      "notePlaceholder": "Optional note",
+      "outstandingHint": "Total − Paid (auto)",
+      "supplierPlaceholder": "Garage / vendor",
+      "totalAmountHint": "Unit price × Qty (auto)",
+      "typePlaceholder": "Select maintenance type",
+      "vatEnabled": "Has VAT",
+      "vatHint": "Off — tick to apply",
+      "warrantyPlaceholder": "None"
+    },
+    "months_one": "{{count}} month",
+    "months_other": "{{count}} months",
+    "sectionTitle": "Maintenance",
+    "warrantyUntil": "until {{date}}"
+  },
+  "notifications": {
+    "afterWriteError": "The entry was saved, but a follow-up update failed.",
+    "createError": "Failed to save entry",
+    "createSuccess": "Entry saved",
+    "deleteError": "Failed to delete entry",
+    "deleteSuccess": "Entry deleted",
+    "fetchError": "Failed to load logs",
+    "updateError": "Failed to update entry",
+    "updateSuccess": "Entry updated"
+  },
+  "photos": {
+    "add": "Add photo",
+    "label": "Photos",
+    "view": "View photos"
+  },
+  "refuel": {
+    "abnormalTooltip": "Consumption is higher than normal",
+    "addItem": "Add refuel log",
+    "columns": {
+      "consumption": "L/100km",
+      "date": "Date",
+      "distance": "Distance (km)",
+      "driver": "Driver",
+      "litres": "Litres",
+      "odometerNew": "New ODO (km)",
+      "odometerOld": "Old ODO (km)",
+      "photos": "Receipt",
+      "source": "Source",
+      "total": "Amount",
+      "unitPrice": "Unit price"
+    },
+    "editItem": "Edit refuel log",
+    "empty": "No refuel logs for {{year}} yet.",
+    "form": {
+      "notePlaceholder": "Optional note",
+      "tankLabel": "Tank",
+      "tankPlaceholder": "Pick the tank"
+    },
+    "notifications": {
+      "tankSyncError": "The refuel entry was saved, but the tank's ledger could not be updated. Re-save the entry, or press “Recompute stock” on the tank."
+    },
+    "sectionTitle": "Refuel logs",
+    "source": {
+      "external": "Station",
+      "tank": "Own tank"
+    },
+    "summary": {
+      "avgConsumption": "Avg consumption",
+      "totalCost": "Total cost",
+      "totalDistance": "Total distance",
+      "totalLitres": "Total litres"
+    },
+    "validation": {
+      "tankRequired": "Pick which tank the fuel came from"
+    }
+  },
+  "sort": {
+    "default": "Newest first"
+  },
+  "trip": {
+    "addItem": "Add trip",
+    "columns": {
+      "customer": "Customer",
+      "date": "Date",
+      "destination": "Route / Destination",
+      "driver": "Driver",
+      "odometer": "Distance (km)",
+      "schedule": "Planned load / unload",
+      "transportOrder": "Transport order",
+      "truckingSize": "Container / size"
+    },
+    "editItem": "Edit trip",
+    "empty": "No trips for {{year}} yet.",
+    "form": {
+      "destinationPlaceholder": "e.g. HCM — Da Lat",
+      "notePlaceholder": "Optional note"
+    },
+    "sectionTitle": "Trips",
+    "summary": {
+      "totalDistance": "Total distance",
+      "totalTrips": "Total trips"
+    }
+  },
+  "validation": {
+    "dateRequired": "Date is required",
+    "litresInvalid": "Litres cannot be negative",
+    "unitPriceInvalid": "Unit price cannot be negative"
+  }
+}

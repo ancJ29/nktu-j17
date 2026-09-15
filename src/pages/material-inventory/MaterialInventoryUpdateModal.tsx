@@ -344,14 +344,14 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
                 loading={deleting}
                 onClick={handleDelete}
               >
-                {t('__new__.01-common.actions.remove')}
+                {t('common.actions.remove')}
               </Button>
             ) : (
               <span />
             )}
             <Group gap="sm">
               <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" size="sm" loading={submitting} disabled={wouldGoNegative}>
                 {t(
@@ -959,14 +959,14 @@ function PackagingUpdate({
                 loading={deleting}
                 onClick={handleDelete}
               >
-                {t('__new__.01-common.actions.remove')}
+                {t('common.actions.remove')}
               </Button>
             ) : (
               <span />
             )}
             <Group gap="sm">
               <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button
                 type="submit"

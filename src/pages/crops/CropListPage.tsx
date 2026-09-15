@@ -232,7 +232,7 @@ export function CropListPage() {
                       value: filter,
                       options: statusOptions,
                       onChange: setFilter,
-                      allLabel: t('__new__.01-common.filters.all'),
+                      allLabel: t('common.filters.all'),
                       emptyValue: 'all',
                     }),
                   ]

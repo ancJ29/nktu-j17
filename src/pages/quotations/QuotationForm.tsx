@@ -472,7 +472,7 @@ export function QuotationForm() {
               size="compact-sm"
               leftSection={<IconArrowLeft size={16} />}
             >
-              {t('__new__.01-common.actions.back')}
+              {t('common.actions.back')}
             </Button>
           </Group>
         )}
@@ -522,7 +522,6 @@ export function QuotationForm() {
                 {showCompanyPicker && (
                   <Select
                     label={t('quotations.form.companyLabel')}
-                    placeholder={t('quotations.form.companyPlaceholder')}
                     data={companyOptions}
                     value={form.values.companyId || null}
                     comboboxProps={{ withinPortal: true }}
@@ -752,10 +751,10 @@ export function QuotationForm() {
                 disabled={loading}
                 onClick={() => window.history.back()}
               >
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" loading={loading} size="sm">
-                {t('__new__.01-common.actions.save')}
+                {t('common.actions.save')}
               </Button>
             </Group>
           </Stack>
@@ -842,10 +841,10 @@ export function QuotationForm() {
             </Button>
             <Group justify="flex-end" gap="sm">
               <Button variant="default" size="sm" onClick={() => setTierEditor(null)}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button size="sm" onClick={saveTierEditor}>
-                {t('__new__.01-common.actions.save')}
+                {t('common.actions.save')}
               </Button>
             </Group>
           </Stack>

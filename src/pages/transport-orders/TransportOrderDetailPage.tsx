@@ -66,7 +66,7 @@ import {
   resolveCustomerReportType,
   type ResolvedStatusOption,
 } from '@/utils/permission';
-import { CAT_HAI_REPORT_TYPE } from '@/utils/customerReports/types';
+import { MOOC_FIELD_REPORT_TYPES } from '@/utils/customerReports/types';
 import {
   dateTimeStringToIso,
   isoToDateTimeString,
@@ -105,6 +105,8 @@ import { isValidContainerNumber, normalizeContainerNumber } from './containerNum
 import { reconcileTripLogs } from './tripLogSync';
 import { TransportTripsCard } from './TransportTripsCard';
 import { readTruckingSize } from './truckingSize';
+import { stopLabel } from './multiDrop';
+import { transportOrderCopyPath, transportOrderEditPath } from './useMultiDrop';
 
 const isMobile = device.isMobile;
 const canCreate = perms.transportOrder.canCreate();
@@ -358,7 +360,7 @@ export function TransportOrderDetailPage() {
 
   const handleCopy = useCallback(() => {
     if (!order) return;
-    navigate(ROUTES.TRANSPORT_ORDERS.NEW, { state: { copyFrom: order } });
+    navigate(transportOrderCopyPath(order), { state: { copyFrom: order } });
   }, [order, navigate]);
 
   const activityByStatus = useMemo(() => {
@@ -441,9 +443,9 @@ export function TransportOrderDetailPage() {
   const canEditMeta = canEdit && !locked && !isCancelled && !isMobile;
 
   const inlineEditLabels = {
-    edit: t('__new__.01-common.actions.edit'),
-    save: t('__new__.01-common.actions.save'),
-    cancel: t('__new__.01-common.actions.cancel'),
+    edit: t('common.actions.edit'),
+    save: t('common.actions.save'),
+    cancel: t('common.actions.cancel'),
   };
 
   const truckSelectData = trucks
@@ -566,7 +568,8 @@ export function TransportOrderDetailPage() {
 
   const type5Group = order.extra?.type5Specific;
   const showType5Fields =
-    resolveCustomerReportType(order.customerCode ?? '') === CAT_HAI_REPORT_TYPE || !!type5Group;
+    MOOC_FIELD_REPORT_TYPES.has(resolveCustomerReportType(order.customerCode ?? '')) ||
+    !!type5Group;
 
   const patchType5Field = (
     key: keyof TransportOrderType5Specific,
@@ -777,6 +780,7 @@ export function TransportOrderDetailPage() {
     );
 
   const tripsCard = order.isMultiTrip && <TransportTripsCard order={order} />;
+  const multiDrop = order.extra?.multiDrop;
 
   const overviewContent = (
     <Stack gap="lg">
@@ -834,16 +838,21 @@ export function TransportOrderDetailPage() {
                   {infoRow(t('transportOrders.form.moocStorageDays'), moocStorageDaysField)}
                 </>
               )}
-              {infoRow(t('transportOrders.columns.bill'), billNumberField)}
-              {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
-              {infoRow(t('transportOrders.columns.container'), containerNumberField)}
-              {infoRow(
-                t('transportOrders.form.truckingSize'),
-                truckingSizeLabel(readTruckingSize(order)),
-              )}
-              {infoRow(
-                t('transportOrders.form.shipmentType'),
-                shipmentTypeLabel(order.shipmentType),
+              {/* A multi-drop job carries no container, B/L or LOẠI HÌNH. */}
+              {!multiDrop && (
+                <>
+                  {infoRow(t('transportOrders.columns.bill'), billNumberField)}
+                  {infoRow(t('transportOrders.columns.declaration'), declarationNumberField)}
+                  {infoRow(t('transportOrders.columns.container'), containerNumberField)}
+                  {infoRow(
+                    t('transportOrders.form.truckingSize'),
+                    truckingSizeLabel(readTruckingSize(order)),
+                  )}
+                  {infoRow(
+                    t('transportOrders.form.shipmentType'),
+                    shipmentTypeLabel(order.shipmentType),
+                  )}
+                </>
               )}
               {/* Customer stays read-only — it's the billing party, and changing it
               belongs with the fee review on the form (SO does the same). */}
@@ -857,7 +866,46 @@ export function TransportOrderDetailPage() {
             {/* Same rule as above: a multi-trip job's `route` is derived from the legs
             (first departure → last destination), so it isn't editable here — and
             the leg list states it better than a collapsed 3-field triple. */}
-            {!order.isMultiTrip && (
+            {/* A multi-drop job's `route` is derived from its drop points, so it
+                is shown as the points and edited only on its form. */}
+            {multiDrop && (
+              <>
+                <Divider my="sm" />
+                <Text fw={600} mb="sm">
+                  {t('transportOrders.multiDrop.routeTitle')}
+                </Text>
+                <Stack gap={6}>
+                  {infoRow(
+                    t('transportOrders.multiDrop.from'),
+                    <Text size="sm">{multiDrop.from || '—'}</Text>,
+                  )}
+                  {multiDrop.stops.map((stop, i) => (
+                    <Box key={i}>
+                      {infoRow(
+                        t('transportOrders.multiDrop.stop', { n: i + 1 }),
+                        <Text size="sm">
+                          {stopLabel(stop)} ·{' '}
+                          {t('transportOrders.multiDrop.distance', { km: stop.distanceKm })}
+                        </Text>,
+                      )}
+                    </Box>
+                  ))}
+                  {infoRow(
+                    t('transportOrders.multiDrop.totalDays'),
+                    <Text size="sm">
+                      {t('transportOrders.multiDrop.days', { count: multiDrop.totalDays })}
+                    </Text>,
+                  )}
+                  {order.laborCost
+                    ? infoRow(
+                        t('transportOrders.trips.laborCost'),
+                        <Text size="sm">{canViewPrice ? formatMoney(order.laborCost) : '—'}</Text>,
+                      )
+                    : null}
+                </Stack>
+              </>
+            )}
+            {!order.isMultiTrip && !multiDrop && (
               <>
                 <Divider my="sm" />
                 <Text fw={600} mb="sm">
@@ -1074,7 +1122,7 @@ export function TransportOrderDetailPage() {
               size="compact-sm"
               leftSection={<IconArrowLeft size={16} />}
             >
-              {t('__new__.01-common.actions.back')}
+              {t('common.actions.back')}
             </Button>
           )}
           <Title order={3}>{order.orderNumber}</Title>
@@ -1096,16 +1144,16 @@ export function TransportOrderDetailPage() {
           <Group gap="xs">
             {canCreate && (
               <Button variant="subtle" leftSection={<IconCopy size={16} />} onClick={handleCopy}>
-                {t('__new__.01-common.actions.copy')}
+                {t('common.actions.copy')}
               </Button>
             )}
             {!locked && canEdit && (
               <Button
                 variant="light"
                 leftSection={<IconEdit size={16} />}
-                onClick={() => navigate(ROUTES.TRANSPORT_ORDERS.EDIT.replace(':id', order.id))}
+                onClick={() => navigate(transportOrderEditPath(order))}
               >
-                {t('__new__.01-common.actions.edit')}
+                {t('common.actions.edit')}
               </Button>
             )}
             {!locked && canDelete && (
@@ -1115,7 +1163,7 @@ export function TransportOrderDetailPage() {
                 leftSection={<IconTrash size={16} />}
                 onClick={() => setConfirmDelete(true)}
               >
-                {t('__new__.01-common.actions.remove')}
+                {t('common.actions.remove')}
               </Button>
             )}
           </Group>
@@ -1267,7 +1315,7 @@ export function TransportOrderDetailPage() {
         }}
         title={t('transportOrders.confirmDelete.title')}
         message={t('transportOrders.confirmDelete.message')}
-        confirmLabel={t('__new__.01-common.actions.remove')}
+        confirmLabel={t('common.actions.remove')}
         confirmColor="red"
       />
     </Stack>
@@ -1308,7 +1356,7 @@ function CancelTransportOrderModal({
         />
         <Group justify="flex-end" gap="sm">
           <Button variant="default" onClick={onClose}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button color="red" loading={loading} onClick={() => onConfirm(reason)}>
             {t('transportOrders.actions.cancel')}

@@ -1,0 +1,82 @@
+{
+  "addItem": "Thêm nhà cung cấp",
+  "contacts": {
+    "addContact": "Thêm người liên hệ khác",
+    "emptyHint": "Chưa có người liên hệ bổ sung.",
+    "section": "Người liên hệ"
+  },
+  "deleteConfirm": {
+    "message": "Ẩn nhà cung cấp này? Nhà cung cấp sẽ không xuất hiện trong các danh sách. Dữ liệu vẫn được giữ lại để tra cứu.",
+    "title": "Xóa nhà cung cấp"
+  },
+  "detail": {
+    "activitiesError": "Không tải được lịch sử hoạt động.",
+    "activitiesLoadMore": "Tải thêm",
+    "activitiesNoEntries": "Chưa có hoạt động nào cho nhà cung cấp này.",
+    "activityVerbs": {
+      "addNote": "Đã thêm ghi chú cho",
+      "create": "Đã tạo",
+      "delete": "Đã xóa",
+      "removeNote": "Đã xóa ghi chú của",
+      "toggleStatus": "Đổi trạng thái",
+      "update": "Đã cập nhật"
+    },
+    "billingAddress": "Địa chỉ chính",
+    "noPickupAddresses": "Chưa có địa chỉ lấy hàng.",
+    "pickupAddress": "Địa chỉ lấy hàng",
+    "receivingHours": "Giờ lấy hàng",
+    "recentActivities": "Hoạt động gần đây",
+    "tab": {
+      "activity": "Hoạt động",
+      "details": "Thông tin"
+    }
+  },
+  "editItem": "Cập nhật nhà cung cấp",
+  "form": {
+    "addressPlaceholder": "Địa chỉ đầy đủ",
+    "codePlaceholder": "Mã nhà cung cấp",
+    "contactNameLabel": "Họ tên",
+    "contactPersonLabel": "Người liên hệ chính",
+    "contactPersonPlaceholder": "Tên người liên hệ chính",
+    "contactRoleLabel": "Vai trò / Chức vụ",
+    "createButton": "Tạo nhà cung cấp",
+    "deliveryHoursLabel": "Giờ lấy hàng",
+    "deliveryHoursPlaceholder": "VD: 7:30 - 16:30 (T2 - T6)",
+    "googleMapUrlLabel": "Đường dẫn Google Maps",
+    "googleMapUrlPlaceholder": "Dán đường dẫn Google Maps (không bắt buộc)",
+    "isActiveLabel": "Đang hợp tác",
+    "isDomesticDescription": "Tắt nếu là nhà cung cấp nước ngoài",
+    "isDomesticLabel": "NCC trong nước",
+    "namePlaceholder": "Tên nhà cung cấp",
+    "originLabel": "Xuất xứ",
+    "phonePlaceholder": "Số điện thoại",
+    "pickupAddressLabel": "Địa chỉ lấy hàng",
+    "pickupAddressesAdd": "Thêm địa chỉ lấy hàng",
+    "shortNamePlaceholder": "Tên rút gọn",
+    "updateButton": "Cập nhật nhà cung cấp"
+  },
+  "noItems": "Không tìm thấy nhà cung cấp",
+  "notSet": "Chưa cập nhật",
+  "notifications": {
+    "createError": "Không thể tạo nhà cung cấp",
+    "createSuccess": "Tạo nhà cung cấp thành công",
+    "deleteError": "Không thể xóa nhà cung cấp",
+    "deleteSuccess": "Xóa nhà cung cấp thành công",
+    "disableSuccess": "Đã tạm ngưng hợp tác với nhà cung cấp",
+    "enableSuccess": "Đã kích hoạt hợp tác với nhà cung cấp",
+    "fetchError": "Không thể tải danh sách nhà cung cấp",
+    "toggleError": "Không thể đổi trạng thái nhà cung cấp",
+    "updateError": "Không thể cập nhật nhà cung cấp",
+    "updateSuccess": "Cập nhật nhà cung cấp thành công"
+  },
+  "origin": {
+    "china": "Trung Quốc",
+    "domestic": "Trong nước",
+    "overseas": "Nước ngoài",
+    "vietnam": "Việt Nam"
+  },
+  "status": {
+    "cooperating": "Đang hợp tác",
+    "paused": "Tạm ngưng"
+  }
+}

@@ -201,7 +201,7 @@ export function ProductInventorySection({
                 leftSection={<IconPlus size={14} />}
                 onClick={openCreate}
               >
-                {t('__new__.01-common.actions.addEntry')}
+                {t('common.actions.addEntry')}
               </Button>
             )}
           </Group>

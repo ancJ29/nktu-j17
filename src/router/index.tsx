@@ -20,6 +20,9 @@ import {
   ReportPage,
   MorePage,
   EmployeeListPage,
+  EmployeeV2ListPage,
+  EmployeeV2DetailPage,
+  EmployeeV2FormPage,
   EmployeeDetailPage,
   EmployeeFormPage,
   EmployeeOrgSettingsPage,
@@ -64,6 +67,26 @@ import {
   VendorListPage,
   VendorDetailPage,
   VendorFormPage,
+  VendorsV2Page,
+  CustomersV2Page,
+  CustomerV2DetailPage,
+  CustomerV2FormPage,
+  ProductsV2Page,
+  ProductV2DetailPage,
+  ProductV2FormPage,
+  MaterialsV2Page,
+  GoodsReceiptsV2Page,
+  GoodsReceiptV2DetailPage,
+  GoodsReceiptV2FormPage,
+  DeliveryNotesV2Page,
+  DeliveryNoteV2DetailPage,
+  SalesOrdersV2Page,
+  SalesOrderV2DetailPage,
+  SalesOrderV2FormPage,
+  MaterialV2DetailPage,
+  MaterialV2FormPage,
+  VendorV2DetailPage,
+  VendorV2FormPage,
   SalesOrderListPage,
   SalesOrderDetailPage,
   SalesOrderFormPage,
@@ -76,6 +99,7 @@ import {
   TransportOrderListPage,
   TransportOrderDetailPage,
   TransportOrderFormPage,
+  TransportOrderMultiDropFormPage,
   TransportRouteListPage,
   TransportRouteFormPage,
   CostNormPage,
@@ -118,6 +142,8 @@ const productGate = gate('product');
 const customerGate = gate('customer');
 const vendorGate = gate('vendor');
 const salesOrderGate = gate('salesOrder');
+
+const deliveryNoteGate = gate('deliveryRequest');
 const deliveryRequestGate = gate('deliveryRequest');
 const goodsReceiptGate = gate('goodsReceipt');
 const transportOrderGate = gate('transportOrder');
@@ -317,13 +343,25 @@ const deliveryRequestsEnabled = featureFlags.deliveryRequests.enabled;
 const goodsReceiptsEnabled = featureFlags.goodsReceipts.enabled;
 const transportOrdersEnabled = featureFlags.transportOrders.enabled;
 const lookupV2Enabled = featureFlags.lookupV2.enabled;
+const vendorsV2Enabled = featureFlags.vendorsV2.enabled;
+const customersV2Enabled = featureFlags.customersV2.enabled;
+const productsV2Enabled = featureFlags.productsV2.enabled;
+const materialsV2Enabled = featureFlags.materialsV2.enabled;
+const goodsReceiptsV2Enabled = featureFlags.goodsReceiptsV2.enabled;
+const salesOrdersV2Enabled = featureFlags.salesOrdersV2.enabled;
+const deliveryNotesV2Enabled = featureFlags.deliveryNotesV2.enabled;
+
+const employeesV2 = featureFlags.employees.v2;
+const EmployeeListPageForRegister = employeesV2 ? EmployeeV2ListPage : EmployeeListPage;
+const EmployeeDetailPageForRegister = employeesV2 ? EmployeeV2DetailPage : EmployeeDetailPage;
+const EmployeeFormPageForRegister = employeesV2 ? EmployeeV2FormPage : EmployeeFormPage;
 
 const employeeRoutes: RouteObject[] = [
   {
     path: ROUTES.EMPLOYEES.LIST,
     element: gatedComponent(
       { enabled: employeesEnabled, requires: employeeGate.view },
-      EmployeeListPage,
+      EmployeeListPageForRegister,
     ),
   },
   {
@@ -340,7 +378,7 @@ const employeeDetailRoutes: RouteObject[] = [
     path: ROUTES.EMPLOYEES.NEW,
     element: gatedComponent(
       { enabled: employeesEnabled, requires: employeeGate.create },
-      EmployeeFormPage,
+      EmployeeFormPageForRegister,
     ),
     handle: employeeDetailNav,
   },
@@ -348,7 +386,7 @@ const employeeDetailRoutes: RouteObject[] = [
     path: ROUTES.EMPLOYEES.DETAIL,
     element: gatedComponent(
       { enabled: employeesEnabled, requires: employeeGate.view },
-      EmployeeDetailPage,
+      EmployeeDetailPageForRegister,
     ),
     handle: employeeDetailNav,
   },
@@ -356,7 +394,7 @@ const employeeDetailRoutes: RouteObject[] = [
     path: ROUTES.EMPLOYEES.EDIT,
     element: gatedComponent(
       { enabled: employeesEnabled, requires: employeeGate.edit },
-      EmployeeFormPage,
+      EmployeeFormPageForRegister,
     ),
     handle: employeeDetailNav,
   },
@@ -999,6 +1037,22 @@ const transportOrderDetailRoutes: RouteObject[] = [
     ),
     handle: transportOrderDetailNav,
   },
+  {
+    path: ROUTES.TRANSPORT_ORDERS.NEW_MULTI_DROP,
+    element: gatedComponent(
+      { enabled: transportOrdersEnabled, requires: transportOrderGate.create },
+      TransportOrderMultiDropFormPage,
+    ),
+    handle: transportOrderDetailNav,
+  },
+  {
+    path: ROUTES.TRANSPORT_ORDERS.EDIT_MULTI_DROP,
+    element: gatedComponent(
+      { enabled: transportOrdersEnabled, requires: transportOrderGate.edit },
+      TransportOrderMultiDropFormPage,
+    ),
+    handle: transportOrderDetailNav,
+  },
 ];
 
 const router = createBrowserRouter([
@@ -1024,6 +1078,191 @@ const router = createBrowserRouter([
             element: gatedComponent(
               { enabled: lookupV2Enabled, requires: lookupV2Gate.view },
               LookupV2PageRootGuarded,
+            ),
+          },
+          {
+            path: ROUTES.VENDORS_V2.LIST,
+            element: gatedComponent(
+              { enabled: vendorsV2Enabled, requires: vendorGate.view },
+              VendorsV2Page,
+            ),
+          },
+
+          {
+            path: ROUTES.VENDORS_V2.NEW,
+            element: gatedComponent(
+              { enabled: vendorsV2Enabled, requires: vendorGate.create },
+              VendorV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.VENDORS_V2.EDIT,
+            element: gatedComponent(
+              { enabled: vendorsV2Enabled, requires: vendorGate.edit },
+              VendorV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.VENDORS_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: vendorsV2Enabled, requires: vendorGate.view },
+              VendorV2DetailPage,
+            ),
+          },
+
+          {
+            path: ROUTES.CUSTOMERS_V2.LIST,
+            element: gatedComponent(
+              { enabled: customersV2Enabled, requires: customerGate.view },
+              CustomersV2Page,
+            ),
+          },
+          {
+            path: ROUTES.CUSTOMERS_V2.NEW,
+            element: gatedComponent(
+              { enabled: customersV2Enabled, requires: customerGate.create },
+              CustomerV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.CUSTOMERS_V2.EDIT,
+            element: gatedComponent(
+              { enabled: customersV2Enabled, requires: customerGate.edit },
+              CustomerV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.CUSTOMERS_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: customersV2Enabled, requires: customerGate.view },
+              CustomerV2DetailPage,
+            ),
+          },
+          {
+            path: ROUTES.PRODUCTS_V2.LIST,
+            element: gatedComponent(
+              { enabled: productsV2Enabled, requires: productGate.view },
+              ProductsV2Page,
+            ),
+          },
+          {
+            path: ROUTES.PRODUCTS_V2.NEW,
+            element: gatedComponent(
+              { enabled: productsV2Enabled, requires: productGate.create },
+              ProductV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.PRODUCTS_V2.EDIT,
+            element: gatedComponent(
+              { enabled: productsV2Enabled, requires: productGate.edit },
+              ProductV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.PRODUCTS_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: productsV2Enabled, requires: productGate.view },
+              ProductV2DetailPage,
+            ),
+          },
+          {
+            path: ROUTES.MATERIALS_V2.LIST,
+            element: gatedComponent(
+              { enabled: materialsV2Enabled, requires: materialGate.view },
+              MaterialsV2Page,
+            ),
+          },
+          {
+            path: ROUTES.MATERIALS_V2.NEW,
+            element: gatedComponent(
+              { enabled: materialsV2Enabled, requires: materialGate.create },
+              MaterialV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.MATERIALS_V2.EDIT,
+            element: gatedComponent(
+              { enabled: materialsV2Enabled, requires: materialGate.edit },
+              MaterialV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.MATERIALS_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: materialsV2Enabled, requires: materialGate.view },
+              MaterialV2DetailPage,
+            ),
+          },
+          {
+            path: ROUTES.GOODS_RECEIPTS_V2.LIST,
+            element: gatedComponent(
+              { enabled: goodsReceiptsV2Enabled, requires: goodsReceiptGate.view },
+              GoodsReceiptsV2Page,
+            ),
+          },
+          {
+            path: ROUTES.GOODS_RECEIPTS_V2.NEW,
+            element: gatedComponent(
+              { enabled: goodsReceiptsV2Enabled, requires: goodsReceiptGate.create },
+              GoodsReceiptV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.GOODS_RECEIPTS_V2.EDIT,
+            element: gatedComponent(
+              { enabled: goodsReceiptsV2Enabled, requires: goodsReceiptGate.edit },
+              GoodsReceiptV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.GOODS_RECEIPTS_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: goodsReceiptsV2Enabled, requires: goodsReceiptGate.view },
+              GoodsReceiptV2DetailPage,
+            ),
+          },
+          {
+            path: ROUTES.SALES_ORDERS_V2.LIST,
+            element: gatedComponent(
+              { enabled: salesOrdersV2Enabled, requires: salesOrderGate.view },
+              SalesOrdersV2Page,
+            ),
+          },
+          {
+            path: ROUTES.SALES_ORDERS_V2.NEW,
+            element: gatedComponent(
+              { enabled: salesOrdersV2Enabled, requires: salesOrderGate.create },
+              SalesOrderV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.SALES_ORDERS_V2.EDIT,
+            element: gatedComponent(
+              { enabled: salesOrdersV2Enabled, requires: salesOrderGate.edit },
+              SalesOrderV2FormPage,
+            ),
+          },
+          {
+            path: ROUTES.SALES_ORDERS_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: salesOrdersV2Enabled, requires: salesOrderGate.view },
+              SalesOrderV2DetailPage,
+            ),
+          },
+
+          {
+            path: ROUTES.DELIVERY_NOTES_V2.LIST,
+            element: gatedComponent(
+              { enabled: deliveryNotesV2Enabled, requires: deliveryNoteGate.view },
+              DeliveryNotesV2Page,
+            ),
+          },
+          {
+            path: ROUTES.DELIVERY_NOTES_V2.DETAIL,
+            element: gatedComponent(
+              { enabled: deliveryNotesV2Enabled, requires: deliveryNoteGate.view },
+              DeliveryNoteV2DetailPage,
             ),
           },
           ...productRoutes,

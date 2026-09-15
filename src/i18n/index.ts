@@ -8,8 +8,8 @@ import { logger } from '@credo/base-ui/utils';
 
 import { pruneShapeChangingOverrides, type TranslationTree } from './mergeTranslations';
 
-import en from './locales/en.json';
-import vi from './locales/vi.json';
+import en from './locales/en';
+import vi from './locales/vi';
 
 export const defaultNS = 'translation';
 export const resources = {

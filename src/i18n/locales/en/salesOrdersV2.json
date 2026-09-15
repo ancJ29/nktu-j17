@@ -1,0 +1,176 @@
+{
+  "actions": {
+    "lock": "Lock stock",
+    "release": "Release stock",
+    "retry": "Finish Posting"
+  },
+  "addItem": "New Order",
+  "cancelModal": {
+    "messageConfirmed": "The order is closed and any stock it holds is released.",
+    "messageDraft": "The draft is closed. It holds no stock, so nothing is released.",
+    "titleConfirmed": "Cancel this order?",
+    "titleDraft": "Cancel this draft?"
+  },
+  "columns": {
+    "customer": "Customer",
+    "items": "Lines",
+    "orderDate": "Order date",
+    "orderNumber": "Number",
+    "paymentStatus": "Payment",
+    "requestedDate": "Requested",
+    "status": "Status",
+    "totalAmount": "Amount",
+    "totalQuantity": "Total qty"
+  },
+  "completeModal": {
+    "delivered": "Delivered",
+    "message": "The order is closed and whatever it still holds is released back to stock.",
+    "nothingLeft": "Every line has been delivered through notes — nothing is left to take.",
+    "ordered": "Ordered",
+    "reduceHint": "For goods that shipped without a delivery note for everything. What the notes already took is not taken again.",
+    "reduceToggle": "Also take the undelivered remainder out of stock",
+    "remaining": "To deduct",
+    "title": "Complete this order?"
+  },
+  "confirmModal": {
+    "message": "Stock for every line is locked against this order. It is not deducted — the delivery note does that.",
+    "title": "Confirm this order?"
+  },
+  "delivered": "Delivered",
+  "delivery": {
+    "partial": "Partly delivered",
+    "remaining": "Remaining"
+  },
+  "deliveryNotes": {
+    "hint": "An order cannot go back to draft or be cancelled while a note stands against it. Cancel the notes first — or fulfil the order, if they have already shipped.",
+    "title": "Delivery notes"
+  },
+  "detailTitle": "Order Details",
+  "editItem": "Edit Order",
+  "fieldsInvalid": {
+    "message": "Custom fields are hidden until the configuration is fixed. Their stored values are untouched.",
+    "title": "Custom field configuration is invalid"
+  },
+  "filters": {
+    "item": "Item",
+    "orderDate": "Order date",
+    "period": "Period"
+  },
+  "flowInvalid": {
+    "message": "Status changes are disabled until the configuration is fixed. Records stay readable.",
+    "title": "Status flow configuration is invalid"
+  },
+  "form": {
+    "availableShort": "Short {{count}}",
+    "availableUnknown": "Never counted",
+    "copyingFrom": "Copying from {{orderNumber}} — adjust and save as a new order.",
+    "createButton": "Create Order",
+    "customer": "Customer",
+    "customerCreateOption": "+ New customer — “{{name}}”",
+    "customerEmpty": "No customers yet",
+    "customerFromProfile": "from the customer profile",
+    "customerIndividual": "Individual",
+    "customerPlaceholder": "Search by name, code or phone",
+    "customerRegistered": "On file",
+    "deliveryAddress": "Delivery address",
+    "item": "Item",
+    "itemRemaining": "{{count}} {{unit}} left",
+    "itemSearchEmpty": "Nothing matches",
+    "itemSearchPlaceholder": "Search products by name or code to add a line",
+    "itemUnknown": "Item no longer in the catalogue",
+    "lineCount": "Items",
+    "lineNote": "Note",
+    "lineTotal": "Line total",
+    "lines": "Lines",
+    "moreInfo": "More information",
+    "noLines": "Search above to add the first item.",
+    "notes": "Notes",
+    "orderDate": "Order date",
+    "orderSection": "Order details",
+    "quantity": "Quantity",
+    "reference": "Reference",
+    "removeLine": "Remove line",
+    "requestedDate": "Requested date",
+    "summarySection": "Order summary",
+    "unitPrice": "Unit price",
+    "updateButton": "Save Changes"
+  },
+  "inventory": {
+    "available": "Available",
+    "held": "Locked by this order",
+    "lockModal": {
+      "message": "Stock for every line is locked against this order.",
+      "title": "Lock stock for this order?"
+    },
+    "releaseModal": {
+      "message": "The stock this order holds goes back to available. Nothing about the order changes.",
+      "title": "Release this order's stock?"
+    },
+    "title": "Stock"
+  },
+  "noItems": "No orders in this period.",
+  "notFound": {
+    "back": "Back to orders",
+    "message": "It may have been removed, or the link is out of date.",
+    "title": "Order not found"
+  },
+  "notifications": {
+    "confirmPartial": "Order confirmed, but some stock is still to lock.",
+    "createSuccess": "Order created.",
+    "inventorySuccess": "Stock updated.",
+    "statusChangeSuccess": "Status updated.",
+    "updateSuccess": "Order updated.",
+    "writeError": "Could not save the order. Please try again."
+  },
+  "payment": {
+    "amount": "Amount received",
+    "amountNonNegative": "The amount cannot be negative",
+    "amountRequired": "Say how much was received",
+    "credit": "Customer credit",
+    "modalTitle": "Record this order’s payment",
+    "outstanding": "Outstanding",
+    "paid": "Paid",
+    "partial": "Partly paid",
+    "received": "Received",
+    "record": "Record payment",
+    "recordedAt": "Recorded {{when}}",
+    "statusHint": "What you state here is what the order says — a settled order with the rest written off is Paid.",
+    "success": "Payment recorded.",
+    "title": "Payment",
+    "total": "Total",
+    "unpaid": "Unpaid",
+    "unpriced": "Price the order before recording a payment against it.",
+    "warnExceedsTotal": "That is more than the order total. Check it, or the excess is recorded as the customer’s credit.",
+    "warnSettlesOrder": "That covers the whole total — consider marking it Paid.",
+    "warnWriteOff": "Less than the order total. The remainder is recorded as written off."
+  },
+  "pending": {
+    "badge": "Unposted",
+    "message": "Some of this order's stock writes have not finished. Press Finish Posting to complete them — running it twice is safe.",
+    "title": "Inventory writes unfinished"
+  },
+  "remainderReduced": {
+    "none": "Completion asked for a deduction, but every line had shipped through notes, so nothing more was taken.",
+    "title": "Taken out of stock on completion"
+  },
+  "searchPlaceholder": "Search by number, customer, item…",
+  "status": {
+    "cancelled": "Cancelled",
+    "confirmed": "Confirmed",
+    "draft": "Draft",
+    "fulfilled": "Fulfilled"
+  },
+  "validation": {
+    "customFields": "Check the highlighted fields",
+    "customerRequired": "Pick or type a customer name",
+    "field": {
+      "date": "Use a valid date",
+      "number": "Must be a number",
+      "option": "Pick one of the offered values"
+    },
+    "itemsRequired": "Add at least one line",
+    "phoneInvalid": "That is not a valid phone number",
+    "quantityPositive": "Quantity must be greater than zero",
+    "unitPriceNonNegative": "Price cannot be negative"
+  }
+}

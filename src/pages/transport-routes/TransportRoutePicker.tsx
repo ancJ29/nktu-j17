@@ -52,8 +52,6 @@ export function TransportRoutePicker({ routes, onPick, appliedId }: Props) {
   return (
     <Select
       label={t('transportRoutes.picker.label')}
-      description={t('transportRoutes.picker.hint')}
-      placeholder={t('transportRoutes.picker.placeholder')}
       leftSection={<IconRoute size={16} />}
       data={options}
       value={appliedId ?? null}

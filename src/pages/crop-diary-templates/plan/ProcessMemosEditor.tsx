@@ -45,7 +45,7 @@ export const ProcessMemosEditor = memo(function ProcessMemosEditor({ memos, onCh
             size="sm"
             variant="subtle"
             color="red"
-            aria-label={t('__new__.01-common.actions.remove')}
+            aria-label={t('common.actions.remove')}
             onClick={() => remove(index)}
           >
             <IconTrash size={14} />

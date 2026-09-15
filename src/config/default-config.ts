@@ -327,15 +327,6 @@ export const DEFAULT_DISPLAY_SETTINGS: CMngtDisplaySettings = {
   dateTimeFormat: 'HH:mm DD/MM/YYYY',
 };
 
-export const DEFAULT_COMPANY_INFO: CompanyInfoConfig = {
-  id: '',
-  name: '',
-  address: '',
-  taxCode: '',
-  tel: '',
-  email: '',
-};
-
 export const DEFAULT_COMPANY_INFOS: CompanyInfoConfig[] = [];
 
 export const DEFAULT_TRANSLATIONS: Record<string, Record<string, unknown>> = {};

@@ -32,6 +32,8 @@ const defaultShouldPagination = LIST_PAGINATION_DEFAULT;
 
 const lazyRenderLimits = new Map<string, number>();
 
+const UNPAGINATED_PAGE_SIZE = 100000;
+
 export function useListFilter<T, F extends Record<string, unknown> = Record<string, unknown>>(
   items: T[],
   config: UseListFilterConfig<T, F> = {},
@@ -53,7 +55,9 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
 
   const [internalSearch, setInternalSearch] = useState('');
   const [internalPage, setInternalPage] = useState(1);
-  const [pageSize, setPageSize] = useState(shouldPagination ? initialPageSize : 100000);
+
+  const [pageSizeChoice, setPageSize] = useState(initialPageSize);
+  const pageSize = shouldPagination ? pageSizeChoice : UNPAGINATED_PAGE_SIZE;
 
   const lazyEligible = Boolean(lazyKey) && !shouldPagination;
   const [renderLimit, setRenderLimit] = useState(() =>
@@ -81,7 +85,7 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
     setPageRef.current = setPage;
   });
   useEffect(() => {
-    const resetKey = JSON.stringify([debouncedSearch, filterValues, pageSize]);
+    const resetKey = JSON.stringify([debouncedSearch, filterValues, pageSizeChoice]);
     const previous = prevResetKeyRef.current;
     prevResetKeyRef.current = resetKey;
 
@@ -90,7 +94,7 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
     setPageRef.current(1);
 
     setRenderLimit(LIST_LAZY_RENDER_CHUNK);
-  }, [debouncedSearch, filterValues, pageSize]);
+  }, [debouncedSearch, filterValues, pageSizeChoice]);
 
   const filtered = useMemo(() => {
     let result = items;

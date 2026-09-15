@@ -283,7 +283,7 @@ export function VendorForm({ variant }: VendorFormProps) {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
     </Group>
   );
@@ -556,7 +556,7 @@ export function VendorForm({ variant }: VendorFormProps) {
               disabled={loading}
               onClick={() => navigate(ROUTES.VENDORS.LIST)}
             >
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button type="submit" loading={loading} size="sm">
               {isEdit ? t('vendors.form.updateButton') : t('vendors.form.createButton')}

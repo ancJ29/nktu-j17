@@ -1,0 +1,45 @@
+{
+  "addItem": "Thêm khách hàng",
+  "archiveConfirm": {
+    "message": "Ẩn {{name}}? Khách hàng sẽ không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "title": "Ẩn khách hàng"
+  },
+  "dangerZone": {
+    "archive": "Ẩn khách hàng",
+    "archiveDesc": "Không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "disable": "Tạm ngưng khách hàng",
+    "enable": "Mở lại khách hàng",
+    "toggleConfirm": "Đổi trạng thái của {{name}}?",
+    "toggleDesc": "Khách hàng tạm ngưng vẫn còn trên sổ nhưng không được dùng cho đơn hàng mới."
+  },
+  "detailTitle": "Chi tiết khách hàng",
+  "editItem": "Sửa khách hàng",
+  "filters": {
+    "customerTypeAll": "Tất cả nhóm khách hàng"
+  },
+  "form": {
+    "codeAuto": "Để trống để tự sinh mã",
+    "codeHelp": "Mã khách hàng. Để trống sẽ tự sinh, và không đổi được sau khi tạo.",
+    "createButton": "Tạo khách hàng",
+    "customerType": "Nhóm khách hàng",
+    "updateButton": "Lưu thay đổi"
+  },
+  "noItems": "Chưa có khách hàng nào trên sổ này.",
+  "notFound": {
+    "back": "Về danh sách khách hàng",
+    "message": "Có thể đã bị ẩn, hoặc đường dẫn đã cũ.",
+    "title": "Không tìm thấy khách hàng"
+  },
+  "notifications": {
+    "archiveSuccess": "Đã ẩn khách hàng.",
+    "createSuccess": "Đã tạo khách hàng.",
+    "updateSuccess": "Đã cập nhật khách hàng.",
+    "writeError": "Không lưu được khách hàng. Vui lòng thử lại."
+  },
+  "searchPlaceholder": "Tìm theo tên, mã…",
+  "validation": {
+    "codeDuplicate": "Mã này đã được dùng cho khách hàng khác",
+    "codeDuplicateArchived": "Mã này thuộc về một khách hàng đã ẩn",
+    "nameRequired": "Vui lòng nhập tên"
+  }
+}

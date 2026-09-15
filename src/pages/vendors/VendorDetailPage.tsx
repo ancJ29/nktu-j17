@@ -289,7 +289,7 @@ export function VendorDetailPage() {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
       <Group gap="xs">
         {canEdit && (
@@ -313,7 +313,7 @@ export function VendorDetailPage() {
             size="compact-sm"
             leftSection={<IconEdit size={14} />}
           >
-            {t('__new__.01-common.actions.edit')}
+            {t('common.actions.edit')}
           </Button>
         )}
       </Group>
@@ -415,7 +415,7 @@ export function VendorDetailPage() {
                       value={vendor.phone}
                       size="xs"
                       c="dimmed"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   )}
@@ -449,7 +449,7 @@ export function VendorDetailPage() {
                           value={c.phone}
                           size="xs"
                           c="dimmed"
-                          copyTooltip={t('__new__.01-common.actions.copy')}
+                          copyTooltip={t('common.actions.copy')}
                           copiedTooltip={t('common.labels.copied')}
                         />
                       )}
@@ -550,7 +550,7 @@ export function VendorDetailPage() {
           <DangerAction
             title={t('__new__.07-entities.vendors.dangerZone.deleteItem')}
             description={t('__new__.07-entities.vendors.dangerZone.deleteItemDesc')}
-            buttonLabel={t('__new__.01-common.actions.remove')}
+            buttonLabel={t('common.actions.remove')}
             buttonIcon={<IconTrash size={14} />}
             buttonColor="danger"
             onClick={openDeleteModal}

@@ -1,0 +1,208 @@
+{
+  "customers": {
+    "dangerZone": {
+      "deleteItem": "Delete Customer",
+      "deleteItemDesc": "Hide this customer from the system. The record is kept for audit.",
+      "disableButton": "Deactivate",
+      "disableConfirm": "Are you sure you want to deactivate this customer?",
+      "disableItem": "Deactivate Customer",
+      "disableItemDesc": "Mark this customer as inactive — it stays in lists but reads as inactive",
+      "enableConfirm": "Are you sure you want to activate this customer?",
+      "enableItem": "Activate Customer",
+      "enableItemDesc": "Mark this customer as active again"
+    },
+    "list": {
+      "searchPlaceholder": "Search by name, code, email, phone..."
+    },
+    "title": "__keep__"
+  },
+  "deliveryRequests": {
+    "list": {
+      "searchPlaceholder": "Search requests..."
+    },
+    "title": "__keep__"
+  },
+  "employees": {
+    "dangerZone": {
+      "changePassword": "Set Password",
+      "changePasswordButton": "Set Password",
+      "confirmPassword": "Confirm Password",
+      "copyCredentials": "Copy login info",
+      "deleteEmployee": "Delete Employee",
+      "deleteEmployeeDesc": "Permanently remove this employee from the system",
+      "disableButton": "Lock",
+      "disableConfirm": "Are you sure you want to lock this employee account?",
+      "disableEmployee": "Lock Employee Account",
+      "disableEmployeeDesc": "Temporarily disable this employee's access to the system",
+      "disableError": "Failed to update employee status",
+      "disableSsoWarningTitle": "Disabled, but the login may still work",
+      "disableSuccess": "Employee account locked",
+      "enableButton": "Unlock",
+      "enableConfirm": "Are you sure you want to unlock this employee account?",
+      "enableEmployee": "Unlock Employee Account",
+      "enableEmployeeDesc": "Re-enable this employee's access to the system",
+      "enableSsoWarningTitle": "Enabled, but they may not be able to sign in",
+      "enableSuccess": "Employee account unlocked",
+      "generatePassword": "Generate",
+      "loginIdentifier": "Login identifier",
+      "newPassword": "New Password",
+      "passwordChangeError": "Failed to change password",
+      "passwordChangeSuccess": "Password changed successfully",
+      "passwordChangeWarning": "The new password is active and the employee can sign in with it, but it could not be saved on their record. Copy it now — it will not be shown again.",
+      "passwordChangeWarningTitle": "Password changed, but not recorded",
+      "passwordMismatch": "Passwords do not match",
+      "passwordPolicy": "Password must be at least 8 characters with uppercase, lowercase, number, and special character (@$!%*?&)",
+      "passwordRequired": "Password is required"
+    },
+    "filter": {
+      "inactive": "Inactive"
+    },
+    "list": {
+      "searchPlaceholder": "Search by name, code, email..."
+    },
+    "title": "Employees"
+  },
+  "goodsReceipts": {
+    "actions": {
+      "cancel": "Cancel Receipt",
+      "confirmReceived": "Confirm Received"
+    },
+    "list": {
+      "searchPlaceholder": "Search by receipt #, vendor, reference..."
+    },
+    "notifications": {
+      "exportEmpty": "Nothing to export — adjust the filters and try again.",
+      "exportError": "Failed to export goods receipts.",
+      "exportSuccess_one": "Exported {{count}} receipt.",
+      "exportSuccess_other": "Exported {{count}} receipts."
+    },
+    "title": "__keep__"
+  },
+  "inventory": {
+    "materials": {
+      "list": {
+        "searchPlaceholder": "Search by material or location..."
+      },
+      "title": "__keep__"
+    },
+    "products": {
+      "list": {
+        "searchPlaceholder": "Search by product or location..."
+      },
+      "title": "__keep__"
+    }
+  },
+  "locations": {
+    "dangerZone": {
+      "deleteConfirm": "Are you sure you want to delete this location? Inventory rows referencing it will be left orphaned.",
+      "deleteItem": "Delete location",
+      "deleteItemDesc": "Permanently remove this location from the system.",
+      "disableConfirm": "Are you sure you want to deactivate this location?",
+      "disableItem": "Deactivate location",
+      "enableConfirm": "Are you sure you want to activate this location?",
+      "enableItem": "Activate location"
+    },
+    "list": {
+      "searchPlaceholder": "Search by name, code, address..."
+    },
+    "title": "__keep__"
+  },
+  "lookups": {
+    "title": "__keep__"
+  },
+  "materials": {
+    "dangerZone": {
+      "deleteItem": "Delete Material",
+      "deleteItemDesc": "Permanently remove this material from the system",
+      "disableButton": "Deactivate",
+      "disableConfirm": "Are you sure you want to deactivate this material?",
+      "disableItem": "Deactivate Material",
+      "disableItemDesc": "Hide the material from lists without deleting it",
+      "enableConfirm": "Are you sure you want to activate this material?",
+      "enableItem": "Activate Material",
+      "enableItemDesc": "Make this material available again"
+    },
+    "list": {
+      "searchPlaceholder": "Search by name, code, unit, SKU..."
+    },
+    "title": "__keep__"
+  },
+  "productInventory": {
+    "fromOrders": "Held by"
+  },
+  "products": {
+    "actions": {
+      "enterInventory": "Enter inventory"
+    },
+    "dangerZone": {
+      "deleteBlockedHasStock": "Cannot delete — this product still has stock on hand. Adjust inventory to zero first.",
+      "deleteItem": "Delete Product",
+      "deleteItemDesc": "Permanently remove this product from the system",
+      "disableConfirm": "Are you sure you want to deactivate this product?",
+      "disableItem": "Deactivate Product",
+      "disableItemDesc": "Hide this product from listings without deleting it",
+      "enableConfirm": "Are you sure you want to activate this product?",
+      "enableItem": "Activate Product",
+      "enableItemDesc": "Make this product visible in listings again"
+    },
+    "labels": {
+      "basePriceLabel": "Base price"
+    },
+    "list": {
+      "searchPlaceholder": "Search by name, code, unit..."
+    },
+    "title": "__keep__"
+  },
+  "salesOrders": {
+    "actions": {
+      "copy": "Copy Order",
+      "createAdditionalDR": "Create Additional Delivery Request",
+      "createDR": "Create Delivery Request",
+      "createReturnShipment": "Create Return Shipment",
+      "switchToExternalDelivery": "Switch to external delivery",
+      "switchToInternalDelivery": "Switch to internal delivery"
+    },
+    "list": {
+      "filterExternalDelivery": "External delivery",
+      "filterInternalDelivery": "Internal delivery",
+      "searchPlaceholder": "Search orders..."
+    },
+    "notifications": {
+      "exportEmpty": "Nothing to export — adjust the filters and try again.",
+      "exportError": "Failed to export sales orders.",
+      "exportSuccess_one": "Exported {{count}} order.",
+      "exportSuccess_other": "Exported {{count}} orders."
+    },
+    "title": "__keep__"
+  },
+  "trucks": {
+    "dangerZone": {
+      "deleteConfirm": "Are you sure you want to delete this truck? Its operation logs are kept but the truck disappears from the fleet.",
+      "deleteItem": "Delete Truck",
+      "deleteItemDesc": "Hide this truck from the fleet. The record is kept for audit.",
+      "disableConfirm": "Are you sure you want to deactivate this truck?",
+      "disableItem": "Deactivate Truck",
+      "disableItemDesc": "Hide the truck from active lists without deleting it",
+      "enableConfirm": "Are you sure you want to activate this truck?",
+      "enableItem": "Activate Truck",
+      "enableItemDesc": "Put this truck back into service"
+    }
+  },
+  "vendors": {
+    "dangerZone": {
+      "deleteItem": "Delete Vendor",
+      "deleteItemDesc": "Hide this vendor from the system. The record is kept for audit.",
+      "disableButton": "Pause",
+      "disableConfirm": "Are you sure you want to pause cooperation with this vendor?",
+      "disableItem": "Pause Cooperation",
+      "disableItemDesc": "Mark this vendor as paused — it stays in lists but reads as not cooperating",
+      "enableConfirm": "Are you sure you want to resume cooperation with this vendor?",
+      "enableItem": "Resume Cooperation",
+      "enableItemDesc": "Mark this vendor as cooperating again"
+    },
+    "list": {
+      "searchPlaceholder": "Search by name, code, email, phone..."
+    },
+    "title": "__keep__"
+  }
+}

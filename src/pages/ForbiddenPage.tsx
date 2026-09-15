@@ -23,7 +23,7 @@ export function ForbiddenPage() {
         title: t('error.forbidden.title'),
         message: t('error.forbidden.message'),
         goToHomeButton: t('error.forbidden.goToHomeButton'),
-        goBackLink: t('__new__.01-common.actions.back'),
+        goBackLink: t('common.actions.back'),
       }}
       themeConfig={themeConfig.auth}
       onGoHome={handleGoHome}

@@ -1,0 +1,76 @@
+{
+  "actions": {
+    "confirm": "Confirm",
+    "copy": "Copy"
+  },
+  "addItem": "New document",
+  "columns": {
+    "date": "Date",
+    "itemsCount_one": "{{count}} item",
+    "itemsCount_other": "{{count}} items",
+    "lines": "Items"
+  },
+  "confirmModal": {
+    "message_in": "Confirming will add these quantities to material inventory. This can't be undone.",
+    "message_out": "Confirming will deduct these quantities from material inventory (stock may go negative). This can't be undone.",
+    "title": "Confirm this document?"
+  },
+  "copiedFrom": "Copied from {{code}} — adjust and save as a new document.",
+  "dangerZone": {
+    "deleteItem": "Delete document",
+    "deleteItemDesc": "Permanently remove this document"
+  },
+  "deleteConfirm": {
+    "message": "Are you sure you want to delete this document? This action cannot be undone.",
+    "title": "Delete document"
+  },
+  "editItem": "Edit document",
+  "emptyMessage": "Adjust the date range or create your first document.",
+  "emptyTitle": "No documents yet",
+  "form": {
+    "addLine": "Add item",
+    "headerSection": "Document",
+    "linesLabel": "Line items",
+    "materialLabel": "Material",
+    "materialPlaceholder": "Select material",
+    "noLines": "No line items yet. Add materials and quantities.",
+    "notePlaceholder": "Optional note or reference",
+    "quantityLabel": "Quantity",
+    "unitLabel": "Unit"
+  },
+  "fromMaterials": {
+    "createDeliveryNote": "Delivery note",
+    "createReceipt": "Receipt",
+    "enterSelection": "Select materials",
+    "rowCreateDeliveryNote": "New delivery note for this material",
+    "rowCreateReceipt": "New receipt for this material",
+    "selectAll": "Select all on this page",
+    "selectPrompt": "Tick the materials to put on the document",
+    "selected_one": "{{count}} material selected",
+    "selected_other": "{{count}} materials selected"
+  },
+  "lockedNote": "This document is confirmed and locked — its lines have been posted to inventory.",
+  "notifications": {
+    "confirmError": "Failed to confirm document",
+    "confirmSuccess": "Document confirmed",
+    "createError": "Failed to create document",
+    "createSuccess": "Document created",
+    "deleteError": "Failed to delete document",
+    "deleteSuccess": "Document deleted",
+    "duplicateCode": "Code already in use",
+    "duplicateCodeMessage": "This document code is already taken. Please adjust the date or try again.",
+    "fetchError": "Failed to load documents",
+    "updateError": "Failed to update document",
+    "updateSuccess": "Document updated"
+  },
+  "searchPlaceholder": "Search by code or note...",
+  "seededFromMaterials_one": "Started from {{count}} material on the material list — enter the quantity and save.",
+  "seededFromMaterials_other": "Started from {{count}} materials on the material list — enter the quantities and save.",
+  "status": {
+    "confirmed": "Confirmed",
+    "draft": "Draft"
+  },
+  "validation": {
+    "dateRequired": "Date is required"
+  }
+}

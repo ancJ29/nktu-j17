@@ -5,7 +5,7 @@ import { logger } from '@credo/base-ui/utils';
 import type { CMngtMasterDataHashes } from '@credo/connectors/types';
 import { DEFAULT_LOCATION_CODE, type Location, type LocationExtra } from '@/types';
 import type { EntityStore } from './createEntityStore';
-import { useEmployeeStore } from './useEmployeeStore';
+import { employeesOnOwnRegister, useEmployeeStore } from './useEmployeeStore';
 import { useProductStore } from './useProductStore';
 import { useCustomerStore } from './useCustomerStore';
 import { useVendorStore } from './useVendorStore';
@@ -42,7 +42,7 @@ async function hydrateAllFromCache(): Promise<void> {
 
 function buildHashesToSend(cached: CMngtMasterDataHashes): CMngtMasterDataHashes {
   const out: CMngtMasterDataHashes = {};
-  if (cached.employees && useEmployeeStore.getState().items.length > 0)
+  if (!employeesOnOwnRegister && cached.employees && useEmployeeStore.getState().items.length > 0)
     out.employees = cached.employees;
   if (cached.products && useProductStore.getState().items.length > 0)
     out.products = cached.products;
@@ -64,6 +64,7 @@ const HASH_KEY_TO_STORE: ReadonlyArray<
 
 function applyListHashes(hashes: CMngtMasterDataHashes): void {
   for (const [key, store] of HASH_KEY_TO_STORE) {
+    if (key === 'employees' && employeesOnOwnRegister) continue;
     const h = hashes[key];
     if (h) store.getState().setListHash(h);
   }
@@ -72,6 +73,10 @@ function applyListHashes(hashes: CMngtMasterDataHashes): void {
 async function doLoad(): Promise<void> {
   const vendorsReady = useVendorStore.getState().loadAll();
   const customersReady = useCustomerStore.getState().loadAll();
+
+  const employeesReady = employeesOnOwnRegister
+    ? useEmployeeStore.getState().loadAll()
+    : Promise.resolve();
 
   await hydrateAllFromCache();
 
@@ -88,7 +93,9 @@ async function doLoad(): Promise<void> {
 
     if (res.changed) {
       const u = res.updated;
-      if (u.employees) useEmployeeStore.getState().setItems(u.employees as never[]);
+
+      if (u.employees && !employeesOnOwnRegister)
+        useEmployeeStore.getState().setItems(u.employees as never[]);
       if (u.products) useProductStore.getState().setItems(u.products as never[]);
       if (u.locations) useLocationStore.getState().setItems(u.locations as never[]);
     }
@@ -106,6 +113,8 @@ async function doLoad(): Promise<void> {
     // Hydrated-from-cache state remains in place; individual list pages can
     // retry via their own `loadAll` / `forceRefresh`.
   } finally {
+    await employeesReady;
+
     ensureStoresInitialized();
   }
 

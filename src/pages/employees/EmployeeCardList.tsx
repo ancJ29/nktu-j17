@@ -148,7 +148,7 @@ export function EmployeeCardList({
                       value={work}
                       size="xs"
                       c="dimmed"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   </Group>
@@ -165,7 +165,7 @@ export function EmployeeCardList({
                       value={personal}
                       size="xs"
                       c="dimmed"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   </Group>

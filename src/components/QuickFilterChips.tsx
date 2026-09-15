@@ -7,6 +7,8 @@ export type QuickFilterChip = {
 
   readonly active: boolean;
 
+  readonly color?: string;
+
   readonly onClick: () => void;
 };
 
@@ -26,7 +28,14 @@ export function QuickFilterChips({ chips }: QuickFilterChipsProps) {
             onClick={chip.onClick}
             size="sm"
             variant="light"
+            color={chip.color}
             fw={chip.active ? 700 : 500}
+
+            styles={
+              chip.color
+                ? { label: { color: `var(--mantine-color-${chip.color}-light-color)` } }
+                : undefined
+            }
           >
             {chip.label}
           </Chip>

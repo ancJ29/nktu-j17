@@ -1,0 +1,40 @@
+{
+  "actions": {
+    "exportAccounting": "Xuất kế toán"
+  },
+  "dangerZone": {
+    "disableButton": "Ngừng",
+    "enableButton": "Kích hoạt",
+    "title": "Khu vực nguy hiểm"
+  },
+  "empty": {
+    "noDescription": "Không có mô tả {{item}}",
+    "noNote": "Không có ghi chú"
+  },
+  "filters": {
+    "columnFilter": {
+      "clear": "Xóa lọc",
+      "empty": "Không có giá trị",
+      "search": "Tìm giá trị",
+      "selectAll": "Chọn tất cả"
+    }
+  },
+  "labels": {
+    "active": "Hoạt động",
+    "googleMapUrl": "Đường dẫn Google Maps",
+    "inactive": "Ngừng",
+    "note": "Ghi chú",
+    "orderDate": "Ngày đặt hàng",
+    "status": "Trạng thái"
+  },
+  "list": {
+    "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…",
+    "stats": "Thống kê"
+  },
+  "placeholders": {
+    "googleMapUrl": "Dán đường dẫn Google Maps (không bắt buộc)"
+  },
+  "validation": {
+    "invalidDateTime": "Ngày giờ không hợp lệ — ví dụ {{example}}"
+  }
+}

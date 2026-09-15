@@ -1,0 +1,150 @@
+{
+  "columns": {
+    "availableTooltip": "Tồn kho trừ phần đã đặt giữ. Vật tư chưa được giữ chỗ từ đơn bán.",
+    "forecasted": "Dự báo",
+    "forecastedTooltip": "Tồn + nhập − xuất. Sẽ bật khi có module PO.",
+    "incoming": "Nhập kế tiếp",
+    "incomingTooltip": "Các phiếu nhập PO đang chờ. Sẽ bật khi có module PO.",
+    "material": "Nguyên liệu",
+    "outgoing": "Xuất kế tiếp",
+    "outgoingTooltip": "Các cam kết xuất kho đang chờ. Chưa được kết nối.",
+    "overcommittedTooltip": "Đã đặt giữ {{reserved}} vượt tồn {{onHand}}."
+  },
+  "defaultLocationBadge": "mặc định",
+  "emptyMessage": "Thêm dòng — chọn nguyên liệu và vị trí, nhập số tồn kho ban đầu.",
+  "emptyTitle": "Chưa có dòng tồn kho",
+  "exportButton": "Xuất Excel",
+  "filterByLocation": "Lọc theo vị trí",
+  "filterInactive": "Ngừng nhập",
+  "filterStock": {
+    "all": "Tất cả",
+    "negative": "Đặt trước",
+    "noStock": "Chưa có tồn kho",
+    "outOfStock": "Hết hàng",
+    "placeholder": "Tất cả mức tồn",
+    "title": "Tồn kho"
+  },
+  "form": {
+    "backOrderWarning": "Cho phép tồn kho âm — hữu ích cho back-order. Xác nhận ý định.",
+    "currentOnHand": "Tồn kho hiện tại",
+    "deltaLabel": "Chênh lệch",
+    "deltaPlaceholder": "vd: 5 hoặc -3",
+    "locationPlaceholder": "Chọn vị trí",
+    "materialLabel": "Nguyên liệu",
+    "materialPlaceholder": "Chọn nguyên liệu",
+    "multiUnitInitialHint": "Nhập số lượng ban đầu theo đơn vị đã chọn; tồn kho được quy về đơn vị gốc.",
+    "newOnHand": "Tồn kho mới",
+    "newOnHandLabel": "Tồn kho mới",
+    "noteLabel": "Ghi chú (tùy chọn)",
+    "notePlaceholder": "Lý do — nhập hàng, tiêu hao, hư hỏng...",
+    "onHandLabel": "Tồn kho ban đầu",
+    "reasonLabel": "Lý do",
+    "reasonPlaceholder": "Vì sao tồn kho thay đổi?",
+    "submitAdjust": "Điều chỉnh tồn kho",
+    "submitRepack": "Áp dụng đóng gói lại",
+    "submitStockTake": "Lưu kiểm kho",
+    "varianceLabel": "Chênh lệch"
+  },
+  "importButton": "Nhập Excel",
+  "importModal": {
+    "confirm": "Thay thế tồn kho",
+    "existing": "{{count}} dòng hiện tại",
+    "fileSummary": "Tệp: {{filename}} — đã đọc {{parsed}} dòng.",
+    "matched": "Khớp {{count}}",
+    "title": "Thay thế tồn kho nguyên liệu từ tệp",
+    "unmatched": "Không khớp {{count}}",
+    "unmatchedHint": "Không khớp: {{skus}}{{more}}",
+    "warningBody": "{{matched}} dòng khớp sẽ được ghi đè theo cặp (nguyên liệu, vị trí) — tồn kho và đơn vị trên dòng đó sẽ bị ghi đè; các thông tin đặt giữ, ghi chú và dữ liệu phụ khác được giữ lại. {{existing}} dòng hiện có không nằm trong tệp được giữ nguyên.",
+    "warningTitle": "Thao tác có thể mất dữ liệu"
+  },
+  "inbound": {
+    "detailLabel": "Hàng về",
+    "forecastedHelp": "Có sẵn + hàng về từ phiếu nhập nháp.",
+    "fromDrafts": "Từ {{count}} phiếu nháp",
+    "moreDrafts": "+{{count}} phiếu khác",
+    "unmappedWarning": "{{count}} dòng bị bỏ — đơn vị không có trên vật tư"
+  },
+  "kpis": {
+    "negative": "{{count}} âm",
+    "outOfStock": "{{count}} hết hàng",
+    "totalMaterials": "{{count}} vật tư"
+  },
+  "modal": {
+    "createTitle": "Thêm dòng tồn kho",
+    "updateTitle": "Cập nhật tồn kho"
+  },
+  "mode": {
+    "delta": "Điều chỉnh (chênh lệch)",
+    "repack": "Đóng gói lại",
+    "snapshot": "Kiểm kho (cập nhật)"
+  },
+  "notifications": {
+    "adjustError": "Không thể áp dụng",
+    "adjustSuccess": "Đã cập nhật tồn kho",
+    "conversionError": "Không có đường quy đổi giữa các đơn vị này",
+    "createError": "Không thể thêm dòng",
+    "createSuccess": "Đã thêm dòng",
+    "deleteError": "Không thể xóa",
+    "deleteSuccess": "Đã xóa",
+    "duplicatePair": "Đã có dòng cho cặp nguyên liệu + vị trí này",
+    "exportEmpty": "Không có dòng tồn kho để xuất",
+    "exportError": "Không thể xuất tồn kho",
+    "exportSuccess": "Đã xuất {{count}} dòng",
+    "fetchError": "Không thể tải tồn kho",
+    "importError": "Không thể nhập tồn kho",
+    "importMissingColumn": "Thiếu cột bắt buộc: {{columns}}. Hãy dùng tệp xuất gần nhất làm mẫu.",
+    "importMissingColumnTitle": "Tệp thiếu cột bắt buộc",
+    "importNoIdentity": "Tệp phải có cột SKU hoặc Mã nguyên liệu để khớp với dữ liệu chủ.",
+    "importNoMatched": "Không có dòng nào trong {{count}} dòng khớp với nguyên liệu đã có.",
+    "importNoMatchedTitle": "Không khớp nguyên liệu nào",
+    "importNoValid": "Không có dòng hợp lệ trong tệp",
+    "importParseError": "Không đọc được tệp Excel. Hãy lưu lại dưới dạng .xlsx và thử lại.",
+    "importPartial": "Đã nhập {{created}} thêm mới + {{updated}} cập nhật / {{total}} dòng; {{failed}} lỗi.",
+    "importPartialTitle": "Nhập có lỗi",
+    "importSuccess": "Đã nhập: thêm mới {{created}}, cập nhật {{updated}}.",
+    "repackError": "Không thể đóng gói lại",
+    "repackSuccess": "Đã đóng gói lại",
+    "stockTakeError": "Không thể lưu kiểm kho",
+    "stockTakeSuccess": "Đã lưu kiểm kho"
+  },
+  "reason": {
+    "correction": "Điều chỉnh",
+    "damage": "Hư hỏng / hao hụt",
+    "issue": "Xuất (−)",
+    "other": "Khác",
+    "receive": "Nhập (+)"
+  },
+  "repack": {
+    "balanced": "Đóng gói lại cân bằng theo đơn vị gốc.",
+    "fromQtyLabel": "Số lượng nguồn",
+    "fromUnitLabel": "Đơn vị nguồn",
+    "reason": {
+      "breakage": "Vỡ",
+      "damage": "Hư hỏng",
+      "other": "Khác",
+      "spillage": "Rơi vãi"
+    },
+    "toQtyLabel": "Số lượng đích",
+    "toUnitLabel": "Đơn vị đích",
+    "writeOffHint": "Số lượng hao hụt khi đóng gói (theo đơn vị gốc).",
+    "writeOffOptional": "Hao hụt (tùy chọn)",
+    "writeOffQtyLabel": "Hao hụt ({{unit}})",
+    "writeOffReasonLabel": "Lý do"
+  },
+  "stockState": {
+    "negative": "âm"
+  },
+  "title": "Tồn kho nguyên liệu",
+  "validation": {
+    "bad": "Giá trị không hợp lệ",
+    "deltaRequired": "Cần nhập chênh lệch",
+    "insufficientStock": "Không đủ tồn kho của '{{unit}}'",
+    "materialRequired": "Cần chọn nguyên liệu",
+    "noConversionPath": "Chưa có quy đổi giữa đơn vị này và đơn vị gốc. Thêm quy đổi trên vật tư trước.",
+    "onHandRequired": "Cần nhập số tồn kho",
+    "positiveRequired": "Phải lớn hơn 0",
+    "repackInvalid": "Đóng gói lại không hợp lệ",
+    "unknownUnit": "Đơn vị '{{unit}}' không có trên vật tư này",
+    "valueRequired": "Cần nhập giá trị"
+  }
+}

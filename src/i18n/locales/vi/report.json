@@ -1,0 +1,100 @@
+{
+  "back": "Quay lại danh sách báo cáo",
+  "byCustomer": {
+    "col": "Khách hàng",
+    "heading": "Khách hàng mua nhiều nhất"
+  },
+  "byMethod": {
+    "heading": "Phương thức giao hàng"
+  },
+  "byProduct": {
+    "col": "Sản phẩm",
+    "heading": "Sản phẩm bán chạy",
+    "qty": "Sản lượng"
+  },
+  "byStaff": {
+    "col": "Nhân viên",
+    "heading": "Doanh số theo nhân viên kinh doanh",
+    "orders": "Số đơn",
+    "revenue": "Doanh số",
+    "share": "Tỷ trọng"
+  },
+  "comingSoon": "Báo cáo cho khách hàng này sẽ sớm ra mắt.",
+  "customerProduct": {
+    "completed": "Trong đó đã hoàn thành",
+    "customersHeading": "Khách hàng đã đặt",
+    "empty": "Không có đơn hàng trong kỳ.",
+    "pickCustomer": "Tìm khách hàng",
+    "pickHeading": "Chọn khách hàng hoặc mặt hàng",
+    "pickProduct": "Tìm mặt hàng",
+    "pivotCustomer": "Theo khách hàng",
+    "pivotProduct": "Theo mặt hàng",
+    "productsHeading": "Mặt hàng đã đặt"
+  },
+  "entityTab": {
+    "basis": "đơn chưa huỷ, chưa gồm VAT",
+    "failed": "Không tổng hợp được báo cáo.",
+    "generate": "Tổng hợp",
+    "generatedAt": "Cập nhật lúc {{at}}",
+    "loading": "Đang tải báo cáo…",
+    "noSnapshot": "Chưa tổng hợp báo cáo cho {{period}}. Bấm Tổng hợp để tạo.",
+    "recompute": "Cập nhật lại",
+    "title": "Doanh số"
+  },
+  "kpi": {
+    "avgOrder": "Giá trị TB / đơn",
+    "customers": "Khách hàng đã mua",
+    "orders": "Số đơn hàng",
+    "products": "Mặt hàng",
+    "revenue": "Tổng doanh số"
+  },
+  "menu": {
+    "heading": "Chọn loại báo cáo",
+    "subtitle": "Chọn một loại báo cáo để xem chi tiết."
+  },
+  "status": {
+    "heading": "Tình hình đơn hàng"
+  },
+  "title": "Báo cáo",
+  "trend": {
+    "avg": "Trung bình",
+    "heading": "Doanh số theo thời gian",
+    "peak": "Cao nhất",
+    "perDay": "/ngày"
+  },
+  "types": {
+    "customer": {
+      "desc": "Khách hàng đã đặt những mặt hàng nào trong tháng — sản lượng, thành tiền (và ai đã mua một mặt hàng).",
+      "title": "Doanh số theo khách hàng"
+    },
+    "delivery": {
+      "desc": "Tỷ lệ đúng hẹn, đơn trễ, hiệu suất theo tài xế.",
+      "title": "Báo cáo giao hàng"
+    },
+    "inventory": {
+      "desc": "Giá trị tồn, mặt hàng cần nhập, mặt hàng hết hàng.",
+      "title": "Báo cáo tồn kho"
+    },
+    "monthly": {
+      "desc": "Tổng doanh số trong tháng — theo nhân viên, khách hàng và sản phẩm.",
+      "title": "Doanh số theo tháng"
+    },
+    "weekly": {
+      "desc": "Tổng doanh số trong tuần — theo nhân viên, khách hàng và sản phẩm.",
+      "title": "Doanh số theo tuần"
+    }
+  },
+  "units": {
+    "billion": "tỷ ₫",
+    "customersShort": "KH",
+    "million": "triệu ₫",
+    "orders": "đơn",
+    "pieces": "con",
+    "productsShort": "mặt hàng",
+    "vnd": "₫"
+  },
+  "wip": {
+    "desc": "Báo cáo này đang được phát triển và sẽ sớm ra mắt.",
+    "title": "Đang phát triển"
+  }
+}

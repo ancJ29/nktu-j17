@@ -168,9 +168,9 @@ export function ProductDetailPage() {
   const categoryOptions = useLookupV2Options('product-category');
   const editLabels = useMemo<SectionCardEditLabels>(
     () => ({
-      edit: t('__new__.01-common.actions.edit'),
-      save: t('__new__.01-common.actions.save'),
-      cancel: t('__new__.01-common.actions.cancel'),
+      edit: t('common.actions.edit'),
+      save: t('common.actions.save'),
+      cancel: t('common.actions.cancel'),
     }),
     [t],
   );
@@ -577,7 +577,7 @@ export function ProductDetailPage() {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
       <Group gap="xs">
         {canShowEnterInventory && (
@@ -598,7 +598,7 @@ export function ProductDetailPage() {
             size="compact-sm"
             leftSection={<IconEdit size={14} />}
           >
-            {t('__new__.01-common.actions.edit')}
+            {t('common.actions.edit')}
           </Button>
         )}
       </Group>
@@ -1059,7 +1059,7 @@ export function ProductDetailPage() {
       leftSection={barcodeClipboard.copied ? <IconCheck size={14} /> : <IconCopy size={14} />}
       onClick={() => extra.barcode && barcodeClipboard.copy(extra.barcode)}
     >
-      {t('__new__.01-common.actions.copy')}
+      {t('common.actions.copy')}
     </Button>
   );
 
@@ -1292,7 +1292,7 @@ export function ProductDetailPage() {
                 label={
                   isDeleteBlocked
                     ? t('__new__.07-entities.products.dangerZone.deleteBlockedHasStock')
-                    : t('__new__.01-common.actions.remove')
+                    : t('common.actions.remove')
                 }
                 withArrow
               >

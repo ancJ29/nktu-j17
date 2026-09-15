@@ -539,7 +539,7 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
             />
             <Group justify="flex-end" gap="sm">
               <Button variant="default" size="sm" disabled={saving} onClick={formHandlers.close}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" size="sm" loading={saving}>
                 {t('crops.form.createButton')}

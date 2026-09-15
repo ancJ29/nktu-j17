@@ -100,8 +100,18 @@ export function ProcessPlanView({ plan }: Props) {
                 {/* Shown only when it is `'material'`: labour is the ordinary
                     case, and marking every other line "no material" would be
                     noise on the majority to caption the minority. */}
+                {/* `component="span"` because this sits inside a <Text>, which
+                    is a <p> — Badge renders a div by default. */}
                 {job.kind === 'material' && (
-                  <Badge ml={6} size="xs" radius="sm" variant="light" color="primary" tt="none">
+                  <Badge
+                    component="span"
+                    ml={6}
+                    size="xs"
+                    radius="sm"
+                    variant="light"
+                    color="primary"
+                    tt="none"
+                  >
                     {t('cropDiaryTemplates.plan.prepKindMaterial')}
                   </Badge>
                 )}

@@ -373,7 +373,7 @@ export function GoodsReceiptDetailPage() {
       <Group justify="space-between" align="flex-start" wrap="nowrap" gap="sm">
         {titleBlock}
         {showEditCta && (
-          <Tooltip label={t('__new__.01-common.actions.edit')}>
+          <Tooltip label={t('common.actions.edit')}>
             <ActionIcon
               component={Link}
               to={ROUTES.GOODS_RECEIPTS.EDIT.replace(':id', receipt.id)}
@@ -405,7 +405,7 @@ export function GoodsReceiptDetailPage() {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
       <Group gap="xs">
         {showCopyCta && (
@@ -415,7 +415,7 @@ export function GoodsReceiptDetailPage() {
             leftSection={<IconCopy size={14} />}
             onClick={handleCopyReceipt}
           >
-            {t('__new__.01-common.actions.copy')}
+            {t('common.actions.copy')}
           </Button>
         )}
         {showEditCta && (
@@ -426,7 +426,7 @@ export function GoodsReceiptDetailPage() {
             size="compact-sm"
             leftSection={<IconEdit size={14} />}
           >
-            {t('__new__.01-common.actions.edit')}
+            {t('common.actions.edit')}
           </Button>
         )}
         {showCancelCta && (
@@ -913,7 +913,7 @@ export function GoodsReceiptDetailPage() {
           )}
           <Group justify="flex-end">
             <Button variant="default" onClick={closeConfirm} disabled={actionLoading}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               color={confirmAction === 'confirmReceived' ? 'green' : 'red'}
@@ -958,7 +958,7 @@ export function GoodsReceiptDetailPage() {
           </Alert>
           <Group justify="flex-end">
             <Button variant="default" onClick={closeRepost} disabled={reposting}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button color="orange" loading={reposting} onClick={handleRepostInventory}>
               {t('goodsReceipts.detail.repostInventoryAction')}
@@ -1054,7 +1054,7 @@ function QuantityEditForm({
 
       <Group justify="flex-end" gap="sm" mt="xs">
         <Button variant="default" onClick={onCancel} disabled={saving}>
-          {t('__new__.01-common.actions.cancel')}
+          {t('common.actions.cancel')}
         </Button>
         <Button
           color="green"

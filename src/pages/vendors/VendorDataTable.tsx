@@ -68,7 +68,7 @@ export function VendorDataTable({
                   value={item.phone}
                   size="sm"
                   c="dimmed"
-                  copyTooltip={t('__new__.01-common.actions.copy')}
+                  copyTooltip={t('common.actions.copy')}
                   copiedTooltip={t('common.labels.copied')}
                 />
               ) : null}

@@ -371,7 +371,7 @@ export function CostNormPage() {
                               variant="light"
                               loading={saving}
                               onClick={() => void saveNorm(row, draftNorm)}
-                              aria-label={t('__new__.01-common.actions.save')}
+                              aria-label={t('common.actions.save')}
                             >
                               <IconCheck size={16} />
                             </ActionIcon>
@@ -380,7 +380,7 @@ export function CostNormPage() {
                               variant="subtle"
                               disabled={saving}
                               onClick={() => setEditingType(null)}
-                              aria-label={t('__new__.01-common.actions.cancel')}
+                              aria-label={t('common.actions.cancel')}
                             >
                               <IconX size={16} />
                             </ActionIcon>
@@ -392,7 +392,7 @@ export function CostNormPage() {
                             leftSection={<IconPencil size={14} />}
                             onClick={() => startEdit(row)}
                           >
-                            {t('__new__.01-common.actions.edit')}
+                            {t('common.actions.edit')}
                           </Button>
                         ))}
                     </Table.Td>
@@ -551,10 +551,10 @@ export function CostNormPage() {
               />
               <Group justify="flex-end" gap="sm" mt="xs">
                 <Button variant="default" onClick={priceModalHandlers.close} disabled={saving}>
-                  {t('__new__.01-common.actions.cancel')}
+                  {t('common.actions.cancel')}
                 </Button>
                 <Button type="submit" loading={saving}>
-                  {t('__new__.01-common.actions.save')}
+                  {t('common.actions.save')}
                 </Button>
               </Group>
             </Stack>

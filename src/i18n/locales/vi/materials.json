@@ -1,0 +1,123 @@
+{
+  "addItem": "Thêm vật tư",
+  "bulkImport": {
+    "errorCodeInvalid": "Mã chỉ được chứa chữ và số — đã bỏ qua",
+    "errorCodeRequired": "Thiếu mã vật tư — đã bỏ qua",
+    "import": "Nhập vật tư",
+    "missingColumnMessage": "Tệp thiếu cột bắt buộc: {{columns}}. Vui lòng dùng mẫu mới nhất — bấm \"Tải mẫu\" ở trên.",
+    "missingColumnTitle": "Định dạng tệp không hợp lệ",
+    "noValidRows": "Không tìm thấy vật tư hợp lệ trong tệp",
+    "refreshFailedMessage": "Không tải lại được danh sách vật tư nên không thể kiểm tra mã trùng một cách an toàn. Vui lòng kiểm tra kết nối và thử lại.",
+    "refreshFailedTitle": "Không kiểm tra được vật tư hiện có",
+    "sampleDescription": "Tải mẫu có sẵn định dạng để điền thông tin vật tư",
+    "skippedDuplicateCode": "Mã vật tư đã tồn tại — đã bỏ qua",
+    "skippedTitle": "Các dòng bị bỏ qua do trùng lặp",
+    "unknownCategoryMessage": "Danh mục không hợp lệ: {{labels}}. Vui lòng thêm trong mục Danh mục dữ liệu, hoặc sửa tệp rồi nhập lại.",
+    "unknownLabelTitle": "Đơn vị hoặc danh mục không hợp lệ",
+    "unknownUnitMessage": "Đơn vị không hợp lệ: {{labels}}. Vui lòng dùng đúng tên đơn vị hiển thị trong mục Danh mục dữ liệu (không phải mã), hoặc thêm mới tại đó rồi nhập lại.",
+    "uploadFile": "Tải lên tệp vật tư"
+  },
+  "columns": {
+    "minimumStock": "Tối thiểu"
+  },
+  "deleteConfirm": {
+    "message": "Bạn có chắc chắn muốn xóa vật tư này? Hành động này không thể hoàn tác.",
+    "title": "Xóa vật tư"
+  },
+  "detail": {
+    "activitiesError": "Không tải được lịch sử hoạt động.",
+    "activitiesLoadMore": "Tải thêm",
+    "activitiesNoEntries": "Chưa có hoạt động nào cho vật tư này.",
+    "activityVerbs": {
+      "create": "Đã tạo vật tư",
+      "delete": "Đã xóa vật tư",
+      "disable": "Đã ngừng nhập vật tư",
+      "enable": "Đã kích hoạt vật tư",
+      "inventory": {
+        "adjust": "Đã điều chỉnh tồn kho cho",
+        "create": "Đã thêm tồn kho cho",
+        "repack": "Đã đóng gói lại tồn kho cho",
+        "stockTake": "Đã kiểm kê tồn kho cho"
+      },
+      "update": "Đã cập nhật vật tư",
+      "updateImages": "Đã cập nhật hình ảnh cho"
+    },
+    "costPrice": "Giá vốn",
+    "imagesEmpty": "Chưa có ảnh",
+    "imagesEmptyDesc": "Ảnh giúp nhận diện vật tư nhanh trên kệ.",
+    "inventoryTab": {
+      "title": "Tồn kho hiện có"
+    },
+    "noPhotoHint": "Chưa có ảnh",
+    "recentActivities": "Hoạt động gần đây",
+    "statTotalOnHand": "Tồn kho",
+    "tab": {
+      "activity": "Hoạt động",
+      "details": "Thông tin",
+      "images": "Hình ảnh"
+    }
+  },
+  "editItem": "Cập nhật vật tư",
+  "emptyMessage": "Thử điều chỉnh bộ lọc hoặc thêm vật tư đầu tiên để bắt đầu.",
+  "emptyTitle": "Chưa có vật tư nào",
+  "filterActive": "Đang nhập",
+  "filterCategoryAll": "Tất cả danh mục",
+  "filterStockAll": "Tất cả mức tồn",
+  "filterStockInStock": "Còn hàng",
+  "filterStockLowStock": "Dưới tối thiểu",
+  "filterStockOutOfStock": "Hết hàng",
+  "filterStockTitle": "Tồn kho",
+  "form": {
+    "categoryLabel": "Danh mục",
+    "categoryPlaceholder": "Chọn danh mục",
+    "createButton": "Tạo vật tư",
+    "descriptionPlaceholder": "Mô tả vật tư",
+    "isActiveLabel": "Đang nhập",
+    "memoLabel": "Ghi chú nội bộ",
+    "memoPlaceholder": "Ghi chú của nhân viên (không hiển thị cho khách)",
+    "minimumStockHint": "Ngưỡng cảnh báo sắp hết, tính theo đơn vị gốc.",
+    "minimumStockLabel": "Tồn tối thiểu",
+    "minimumStockPlaceholder": "vd: 100",
+    "namePlaceholder": "Tên vật tư",
+    "packagingSpecLabel": "Quy cách đóng gói",
+    "packagingSpecPlaceholder": "vd: 25kg/bao; 40 bao/pallet",
+    "priceLabel": "Giá vốn",
+    "pricePlaceholder": "0",
+    "unitConversionsHint": "\"1 unit = quantity × baseUnit\" (vd: 1 thùng = 12 cái).",
+    "unitConversionsLabel": "Quy đổi đơn vị",
+    "unitLabel": "Đơn vị",
+    "unitPickerPlaceholder": "Chọn đơn vị",
+    "unitsLabel": "Đơn vị (đa đơn vị)",
+    "unitsPrimaryHint": "Đơn vị đầu tiên là đơn vị chính.",
+    "updateButton": "Cập nhật vật tư"
+  },
+  "inventoryPrompt": {
+    "title": "Nhập tồn kho ngay?"
+  },
+  "noItems": "Không tìm thấy vật tư",
+  "notifications": {
+    "createError": "Không thể tạo vật tư",
+    "createSuccess": "Tạo vật tư thành công",
+    "deleteError": "Không thể xóa vật tư",
+    "deleteSuccess": "Xóa vật tư thành công",
+    "disableSuccess": "Đã ngừng nhập vật tư",
+    "enableSuccess": "Đã kích hoạt vật tư",
+    "fetchError": "Không thể tải danh sách vật tư",
+    "toggleError": "Không thể đổi trạng thái vật tư",
+    "updateError": "Không thể cập nhật vật tư",
+    "updateSuccess": "Cập nhật vật tư thành công"
+  },
+  "status": {
+    "active": "Đang nhập"
+  },
+  "summary": {
+    "lowStock": "{{count}} sắp hết",
+    "negative": "{{count}} âm kho",
+    "tracked": "{{count}} theo dõi tồn"
+  },
+  "tab": {
+    "bulk": "Nhập hàng loạt",
+    "single": "Một vật tư"
+  },
+  "title": "Vật tư"
+}

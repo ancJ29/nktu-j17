@@ -1,0 +1,188 @@
+{
+  "actions": {
+    "addEntry": "Add Item",
+    "back": "Go back",
+    "backToTop": "Back to top",
+    "cancel": "Cancel",
+    "clearValue": "Clear",
+    "close": "Close",
+    "copy": "Copy",
+    "disable": "Disable",
+    "edit": "Edit",
+    "enable": "Enable",
+    "exportExcel": "Export Excel",
+    "openInMaps": "Open in Maps",
+    "pickDateTime": "Pick date and time",
+    "remove": "Remove",
+    "save": "Save Changes"
+  },
+  "bulkImport": {
+    "created": "Created",
+    "downloadSample": "Download Sample",
+    "downloadSuccess": "Sample template downloaded",
+    "dragAndDrop": "Drag & drop file here",
+    "errorsTitle": "Rows that could not be imported",
+    "failed": "Failed",
+    "orClickToSelect": "or click to select a file",
+    "partialSuccess": "{{success}}/{{total}} imported",
+    "results": "Import Results",
+    "rowLabel": "Row {{n}}",
+    "sampleTemplate": "Sample Excel Template",
+    "skipped": "Skipped",
+    "success": "Success",
+    "supportedFormats": "Supported formats: .csv, .xlsx, .xls",
+    "total": "Total"
+  },
+  "cache": {
+    "hoursAgo": "{{count}}h ago",
+    "minutesAgo": "{{count}}m ago",
+    "refresh": "Refresh data"
+  },
+  "columns": {
+    "beginOfPeriod": "Begin of period",
+    "beginOfPeriodTooltip": "Opening on-hand at the start of the current month (UTC+7). Seeded once per month on first load; can be overridden via Excel import.",
+    "beginOfPeriodWithPeriod": "Begin of period ({{period}})",
+    "contactPerson": "Contact Person",
+    "createdDate": "Created Date",
+    "lastUpdated": "Last updated",
+    "locationCount": "{{count}} locations",
+    "minStock": "Min stock",
+    "minStockTooltip": "Warehouse-side minimum stock threshold. On-hand at or below this triggers low-stock coloring.",
+    "onHand": "On hand",
+    "price": "Price",
+    "secondaryStatus": "Status",
+    "secondaryStatusTooltip": "Out of stock when Fixed remain ≤ 0, Must order when ≤ Min stock, OK otherwise.",
+    "totalAmount": "Total Amount"
+  },
+  "conflict": {
+    "listMessage": "Another user just changed this list. The data has been refreshed — please review and submit again.",
+    "message": "Another user modified this record while you were editing. The form has been reloaded with the latest data — please re-apply your changes.",
+    "title": "This record was just updated"
+  },
+  "datePreset": {
+    "custom": "Custom",
+    "lastMonth": "Last month",
+    "lastWeek": "Last week",
+    "nextMonth": "Next month",
+    "nextWeek": "Next week",
+    "thisMonth": "This month",
+    "thisWeek": "This week",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday"
+  },
+  "desktopOnly": {
+    "message": "This feature is available on desktop only. Please switch to a computer to continue.",
+    "title": "Desktop Only"
+  },
+  "detail": {
+    "alsoKnownAs": "Also known as",
+    "currentStatus": "Current",
+    "inventoryTab": {
+      "addFirst": "Add inventory",
+      "locationCount": "{{count}} location(s)",
+      "refresh": "Tap to refresh"
+    },
+    "lineTotal": "Line Total",
+    "notes": {
+      "addButton": "Add note",
+      "addError": "Failed to add note",
+      "addPlaceholder": "Type a note for the team...",
+      "addSuccess": "Note added",
+      "byOn": "by {{author}} · {{date}}",
+      "empty": "No notes yet. Add the first one for your team.",
+      "removeAria": "Remove note",
+      "removeError": "Failed to remove note",
+      "removeSuccess": "Note removed",
+      "title": "Internal notes"
+    },
+    "pending": "Pending"
+  },
+  "filters": {
+    "all": "All",
+    "apply": "Apply Filters",
+    "customerCount": "{{count}} customers",
+    "more": "More",
+    "selectDateRange": "Select date range",
+    "statusCount": "{{count}} statuses",
+    "vendorCount": "{{count}} vendors"
+  },
+  "form": {
+    "isActiveLabel": "Active",
+    "phonePlaceholder": "Phone number",
+    "unitPricePlaceholder": "Price"
+  },
+  "labels": {
+    "address": "Address",
+    "addresses": "Addresses",
+    "assignedTo": "Assigned to",
+    "barcode": "Barcode",
+    "basicInfo": "Basic Information",
+    "category": "Category",
+    "code": "Code",
+    "contact": "Contact",
+    "copied": "Copied",
+    "createdAt": "Created",
+    "customer": "Customers",
+    "defaultLocation": "Default location",
+    "deliveryAddress": "Delivery Address",
+    "department": "Department",
+    "description": "Description",
+    "email": "Email",
+    "home": "Home",
+    "inventory": "Inventory",
+    "language": "Language",
+    "linkCopied": "Link copied — share with anyone on the team.",
+    "linkCopyError": "Failed to copy the link.",
+    "location": "Location",
+    "name": "Name",
+    "onHand": "On hand",
+    "phone": "Phone",
+    "position": "Position",
+    "primaryContact": "Primary contact",
+    "product": "Product",
+    "productInventory": "Product Inventory",
+    "productName": "Product Name",
+    "quantity": "Qty",
+    "reference": "Reference",
+    "salesOrder": "Sales Order",
+    "set": "Set",
+    "shortName": "Short Name",
+    "sku": "SKU",
+    "taxCode": "Tax Code",
+    "type": "Type",
+    "unit": "Unit",
+    "unitPrice": "Unit Price",
+    "units": "Units",
+    "updatedAt": "Last updated",
+    "vendor": "Vendor"
+  },
+  "notFound": {
+    "backToList": "Back to list",
+    "message": "The record you're looking for doesn't exist or may have been removed.",
+    "title": "Record not found"
+  },
+  "pickers": {
+    "inactive": "(inactive)"
+  },
+  "secondaryStatus": {
+    "all": "All",
+    "filterPlaceholder": "Filter by status",
+    "mustOrder": "Must order",
+    "ok": "OK",
+    "outOfStock": "Out of stock"
+  },
+  "transitions": {
+    "noPermission": "You do not have permission to change the status from here.",
+    "onlyDepartments": "Only {{departments}} can change the status from here."
+  },
+  "validation": {
+    "codeNoWhitespace": "Code cannot contain whitespace",
+    "codeRequired": "Code is required",
+    "codeSpecialCharacters": "Code can only contain letters and numbers",
+    "formInvalid": "Please fix the highlighted fields before submitting",
+    "nameRequired": "Name is required",
+    "quantityRequired": "Quantity must be greater than 0",
+    "unitRequired": "Unit is required"
+  }
+}

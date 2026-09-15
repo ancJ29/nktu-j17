@@ -360,7 +360,7 @@ export function CropSheetSection({
             leftSection={<IconDownload size={14} />}
             onClick={handleExport}
           >
-            {t('__new__.01-common.actions.exportExcel')}
+            {t('common.actions.exportExcel')}
           </Button>
           {templateId && canViewTemplate && (
             <Button
@@ -385,7 +385,7 @@ export function CropSheetSection({
               leftSection={<IconDeviceFloppy size={14} />}
               onClick={handleSave}
             >
-              {t('__new__.01-common.actions.save')}
+              {t('common.actions.save')}
             </Button>
           ) : null}
         </Group>

@@ -1,0 +1,176 @@
+{
+  "actions": {
+    "lock": "Giữ hàng",
+    "release": "Trả hàng giữ",
+    "retry": "Hoàn tất ghi nhận"
+  },
+  "addItem": "Tạo đơn hàng",
+  "cancelModal": {
+    "messageConfirmed": "Đơn hàng được đóng lại và toàn bộ hàng đang giữ sẽ được trả về.",
+    "messageDraft": "Bản nháp được đóng lại. Đơn chưa giữ hàng nên không có gì được trả về.",
+    "titleConfirmed": "Hủy đơn hàng này?",
+    "titleDraft": "Hủy bản nháp này?"
+  },
+  "columns": {
+    "customer": "Khách hàng",
+    "items": "Số dòng",
+    "orderDate": "Ngày đặt",
+    "orderNumber": "Số đơn",
+    "paymentStatus": "Thanh toán",
+    "requestedDate": "Ngày yêu cầu",
+    "status": "Trạng thái",
+    "totalAmount": "Thành tiền",
+    "totalQuantity": "Tổng SL"
+  },
+  "completeModal": {
+    "delivered": "Đã giao",
+    "message": "Đơn được đóng lại và hàng còn giữ cho đơn sẽ được trả về kho.",
+    "nothingLeft": "Toàn bộ đơn đã được giao qua phiếu — không còn gì để trừ.",
+    "ordered": "Đặt",
+    "reduceHint": "Dùng khi hàng đã giao mà không lập phiếu giao cho toàn bộ. Phần đã giao qua phiếu không bị trừ lại.",
+    "reduceToggle": "Trừ tồn kho phần chưa giao",
+    "remaining": "Sẽ trừ",
+    "title": "Hoàn tất đơn hàng này?"
+  },
+  "confirmModal": {
+    "message": "Hàng của mọi dòng sẽ được giữ cho đơn này. Tồn kho chưa bị trừ — phiếu giao hàng mới trừ.",
+    "title": "Xác nhận đơn hàng này?"
+  },
+  "delivered": "Đã giao",
+  "delivery": {
+    "partial": "Giao một phần",
+    "remaining": "Còn lại"
+  },
+  "deliveryNotes": {
+    "hint": "Đơn hàng không thể quay lại nháp hoặc bị huỷ khi vẫn còn phiếu giao. Hãy huỷ các phiếu trước — hoặc hoàn tất đơn, nếu hàng đã giao.",
+    "title": "Phiếu giao hàng"
+  },
+  "detailTitle": "Chi tiết đơn hàng",
+  "editItem": "Sửa đơn hàng",
+  "fieldsInvalid": {
+    "message": "Các trường tùy chỉnh bị ẩn cho đến khi cấu hình được sửa. Dữ liệu đã lưu không bị ảnh hưởng.",
+    "title": "Cấu hình trường tùy chỉnh không hợp lệ"
+  },
+  "filters": {
+    "item": "Mặt hàng",
+    "orderDate": "Ngày đặt",
+    "period": "Kỳ"
+  },
+  "flowInvalid": {
+    "message": "Không thể đổi trạng thái cho đến khi cấu hình được sửa. Dữ liệu vẫn xem được.",
+    "title": "Cấu hình luồng trạng thái không hợp lệ"
+  },
+  "form": {
+    "availableShort": "Thiếu {{count}}",
+    "availableUnknown": "Chưa kiểm kê",
+    "copyingFrom": "Sao chép từ {{orderNumber}} — chỉnh sửa rồi lưu thành đơn mới.",
+    "createButton": "Tạo đơn hàng",
+    "customer": "Khách hàng",
+    "customerCreateOption": "+ Thêm khách mới — “{{name}}”",
+    "customerEmpty": "Chưa có khách hàng",
+    "customerFromProfile": "theo hồ sơ khách",
+    "customerIndividual": "Khách lẻ",
+    "customerPlaceholder": "Tìm theo tên, mã hoặc số điện thoại",
+    "customerRegistered": "Có hồ sơ",
+    "deliveryAddress": "Địa chỉ giao",
+    "item": "Mặt hàng",
+    "itemRemaining": "Còn {{count}} {{unit}}",
+    "itemSearchEmpty": "Không tìm thấy",
+    "itemSearchPlaceholder": "Tìm hàng theo tên hoặc mã để thêm dòng",
+    "itemUnknown": "Mặt hàng không còn trong danh mục",
+    "lineCount": "Số mặt hàng",
+    "lineNote": "Ghi chú",
+    "lineTotal": "Thành tiền",
+    "lines": "Danh sách hàng",
+    "moreInfo": "Thông tin thêm",
+    "noLines": "Tìm hàng ở ô trên để thêm dòng đầu tiên.",
+    "notes": "Ghi chú",
+    "orderDate": "Ngày đặt",
+    "orderSection": "Thông tin đơn",
+    "quantity": "Số lượng",
+    "reference": "Tham chiếu",
+    "removeLine": "Xóa dòng",
+    "requestedDate": "Ngày yêu cầu",
+    "summarySection": "Tổng đơn",
+    "unitPrice": "Đơn giá",
+    "updateButton": "Lưu thay đổi"
+  },
+  "inventory": {
+    "available": "Có thể bán",
+    "held": "Đang giữ",
+    "lockModal": {
+      "message": "Hàng của mọi dòng sẽ được giữ cho đơn này.",
+      "title": "Giữ hàng cho đơn này?"
+    },
+    "releaseModal": {
+      "message": "Hàng đang giữ sẽ trở lại khả dụng. Đơn hàng không thay đổi gì.",
+      "title": "Trả lại hàng đang giữ?"
+    },
+    "title": "Tồn kho"
+  },
+  "noItems": "Không có đơn hàng trong kỳ này.",
+  "notFound": {
+    "back": "Về danh sách đơn hàng",
+    "message": "Đơn có thể đã bị xóa, hoặc liên kết đã cũ.",
+    "title": "Không tìm thấy đơn hàng"
+  },
+  "notifications": {
+    "confirmPartial": "Đã xác nhận đơn, nhưng còn hàng chưa giữ xong.",
+    "createSuccess": "Đã tạo đơn hàng.",
+    "inventorySuccess": "Đã cập nhật tồn kho.",
+    "statusChangeSuccess": "Đã cập nhật trạng thái.",
+    "updateSuccess": "Đã cập nhật đơn hàng.",
+    "writeError": "Không thể lưu đơn hàng. Vui lòng thử lại."
+  },
+  "payment": {
+    "amount": "Số tiền đã nhận",
+    "amountNonNegative": "Số tiền không được âm",
+    "amountRequired": "Nhập số tiền đã nhận",
+    "credit": "Khách trả trước",
+    "modalTitle": "Ghi nhận thanh toán cho đơn này",
+    "outstanding": "Còn lại",
+    "paid": "Đã thanh toán",
+    "partial": "Thanh toán một phần",
+    "received": "Đã nhận",
+    "record": "Ghi nhận thanh toán",
+    "recordedAt": "Ghi nhận lúc {{when}}",
+    "statusHint": "Trạng thái là do bạn xác nhận — đơn đã chốt và phần còn lại được miễn vẫn là Đã thanh toán.",
+    "success": "Đã ghi nhận thanh toán.",
+    "title": "Thanh toán",
+    "total": "Tổng tiền",
+    "unpaid": "Chưa thanh toán",
+    "unpriced": "Cần nhập giá cho đơn hàng trước khi ghi nhận thanh toán.",
+    "warnExceedsTotal": "Số tiền vượt quá tổng đơn. Vui lòng kiểm tra lại, hoặc phần dư sẽ ghi thành khoản trả trước của khách.",
+    "warnSettlesOrder": "Số tiền đã đủ tổng đơn — cân nhắc chọn “Đã thanh toán”.",
+    "warnWriteOff": "Số tiền nhỏ hơn tổng đơn. Phần còn lại sẽ được ghi là đã miễn."
+  },
+  "pending": {
+    "badge": "Chưa ghi nhận",
+    "message": "Một số thao tác tồn kho của đơn này chưa hoàn tất. Bấm Hoàn tất ghi nhận để chạy tiếp — chạy lại nhiều lần vẫn an toàn.",
+    "title": "Thao tác tồn kho chưa hoàn tất"
+  },
+  "remainderReduced": {
+    "none": "Hoàn tất có yêu cầu trừ kho, nhưng toàn bộ đơn đã giao qua phiếu nên không trừ thêm.",
+    "title": "Đã trừ kho khi hoàn tất"
+  },
+  "searchPlaceholder": "Tìm theo số đơn, khách hàng, mặt hàng…",
+  "status": {
+    "cancelled": "Đã hủy",
+    "confirmed": "Đã xác nhận",
+    "draft": "Nháp",
+    "fulfilled": "Đã hoàn tất"
+  },
+  "validation": {
+    "customFields": "Kiểm tra lại các trường được đánh dấu",
+    "customerRequired": "Chọn hoặc nhập tên khách hàng",
+    "field": {
+      "date": "Ngày không hợp lệ",
+      "number": "Phải là một con số",
+      "option": "Chọn một trong các giá trị có sẵn"
+    },
+    "itemsRequired": "Thêm ít nhất một dòng",
+    "phoneInvalid": "Số điện thoại không hợp lệ",
+    "quantityPositive": "Số lượng phải lớn hơn 0",
+    "unitPriceNonNegative": "Đơn giá không được âm"
+  }
+}

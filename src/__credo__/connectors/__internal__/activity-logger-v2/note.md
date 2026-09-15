@@ -1,7 +1,7 @@
 # activity-logger v2 — connector status
 
 Client for the Go + Lambda + DynamoDB service in
-[`external/activity-logger/`](../../../../../external/activity-logger/).
+[`externals/activity-logger/`](../../../../../externals/activity-logger/).
 
 ## Why this is a separate directory rather than a flag
 

@@ -121,7 +121,7 @@ export function SalesOrderItemsPreviewDrawer({
                   <AddressWithMapLink
                     address={extra.deliveryAddress}
                     googleMapUrl={extra.googleMapUrl}
-                    iconLabel={t('__new__.01-common.actions.openInMaps')}
+                    iconLabel={t('common.actions.openInMaps')}
                   />
                 </DetailField>
                 <DetailField label={t('__new__.01-common.labels.note')}>{order.notes}</DetailField>

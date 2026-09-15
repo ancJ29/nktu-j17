@@ -1,0 +1,30 @@
+{
+  "appAvailableOffline": "App is now available offline!",
+  "clickToUpdate": "Click here to update now.",
+  "install": "Install",
+  "installDescription": "Install this app on your device for a better experience",
+  "installTitle": "Install C-Mngt App",
+  "maybeLater": "Maybe later",
+  "newVersionAvailable": "New Version Available",
+  "offlineReady": "Ready to work offline",
+  "reloadAutomatically": "The app will reload automatically.",
+  "reloadIn3Seconds": "The app will reload in 3 seconds.",
+  "safari": {
+    "closeCompletelyInstructions": "Close Safari completely (swipe up then swipe app away), then reopen from home screen.",
+    "dontShowAgain": "Don't show again",
+    "installDescription": "Add C-Mngt to your home screen for quick access and offline use",
+    "installTitle": "Install C-Mngt App",
+    "ios": {
+      "step1": "Tap the Share button in Safari toolbar",
+      "step2": "Scroll down and tap 'Add to Home Screen'",
+      "step3": "Tap 'Add' to install the app"
+    },
+    "mac": {
+      "step1": "Click File menu in Safari",
+      "step2": "Select 'Add to Dock' from the menu",
+      "step3": "The app will be added to your Dock for easy access"
+    },
+    "remindLater": "Remind me later"
+  },
+  "updating": "Updating..."
+}

@@ -254,10 +254,10 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     );
   }, [filters.partyFilter, partyFilterData]);
 
-  const allLabel = t('__new__.01-common.filters.all');
+  const allLabel = t('common.filters.all');
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
+    if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);

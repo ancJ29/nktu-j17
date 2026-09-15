@@ -1,0 +1,56 @@
+{
+  "addItem": "Thêm mục",
+  "addPrep": "Thêm việc chuẩn bị",
+  "completedOn": "Đã xong · {{date}}",
+  "deleteConfirm": {
+    "message": "Xóa \"{{activity}}\"? Hành động này không thể hoàn tác.",
+    "title": "Xóa mục nhật ký?"
+  },
+  "editItem": "Sửa mục",
+  "emptyMessage": "Ghi lại hoạt động cho vụ mùa, hoặc áp dụng mẫu.",
+  "emptyTitle": "Chưa có mục nhật ký",
+  "eventsTitle": "Sự kiện",
+  "form": {
+    "activityLabel": "Hoạt động",
+    "activityPlaceholder": "VD: Tưới nước",
+    "createButton": "Tạo mục",
+    "entryDateLabel": "Ngày",
+    "isPrepHint": "Trước ngày trồng {{date}} — mục này nằm ở phần Chuẩn bị.",
+    "materialLocked": "Bật \"có dùng vật tư\" để ghi",
+    "notesPlaceholder": "Chi tiết, số lượng, quan sát…",
+    "usesMaterialLabel": "Công việc này có dùng vật tư"
+  },
+  "logMaterial": "Ghi vật tư",
+  "markDone": "Hoàn thành",
+  "markUndone": "Bỏ hoàn thành",
+  "materialExpectedHint": "Chọn vật tư và số lượng đã dùng thực tế. Nếu không dùng gì thì để trống.",
+  "materialPending": "Chưa ghi vật tư",
+  "materialSummaryEmpty": "Chưa ghi nhận vật tư",
+  "materialTable": {
+    "material": "Vật tư",
+    "quantity": "Số lượng",
+    "times": "Số lần",
+    "unit": "ĐVT"
+  },
+  "materialsLabel": "Vật tư",
+  "noItems": "Không tìm thấy mục nhật ký",
+  "notifications": {
+    "applyTemplateError": "Không thể áp dụng mẫu",
+    "createError": "Không tạo được mục nhật ký",
+    "createSuccess": "Đã tạo mục nhật ký",
+    "deleteError": "Không xóa được mục nhật ký",
+    "deleteSuccess": "Đã xóa mục nhật ký",
+    "fetchError": "Không tải được nhật ký",
+    "updateError": "Không cập nhật được mục nhật ký",
+    "updateSuccess": "Đã cập nhật mục nhật ký"
+  },
+  "prepEmpty": "Chưa có việc chuẩn bị nào trước khi trồng.",
+  "prepTitle": "Chuẩn bị trước khi trồng",
+  "searchPlaceholder": "Tìm nhật ký…",
+  "sectionEmpty": "Vụ mùa này chưa có mục nhật ký nào.",
+  "title": "Nhật ký vụ mùa",
+  "validation": {
+    "activityRequired": "Vui lòng nhập hoạt động",
+    "entryDateRequired": "Vui lòng chọn ngày"
+  }
+}

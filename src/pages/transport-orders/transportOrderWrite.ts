@@ -2,6 +2,7 @@ import { isDuplicateUniqueFieldError } from '@/utils/code';
 import type {
   TransportOrderExtra,
   TransportOrderFee,
+  TransportOrderMultiDrop,
   TransportOrderRoute,
   TransportOrderTrip,
   TransportOrderTruckingSize,
@@ -9,6 +10,7 @@ import type {
   TransportOrderType5Specific,
 } from '@/types';
 import { computeTransportOrderTotals, readFeeLines } from './transportOrderPricing';
+import { routeFromMultiDrop } from './multiDrop';
 
 export type TransportOrderWriteFields = {
   isMultiTrip: boolean;
@@ -50,12 +52,15 @@ export type TransportOrderWriteFields = {
   status: string;
   notes: string;
   extra: TransportOrderExtra;
+
+  multiDrop?: TransportOrderMultiDrop | undefined;
 };
 
 const OWNED_EXTRA_KEYS: ReadonlySet<string> = new Set([
   'truckType',
   'customerOrderNumber',
   'type5Specific',
+  'multiDrop',
 ]);
 
 function compactType5Specific({
@@ -106,7 +111,7 @@ export function buildTransportOrderWrite(
 
   const trips = fields.isMultiTrip ? fields.trips : [];
 
-  const { truckType, customerOrderNumber, type5Specific, extra, ...rest } = fields;
+  const { truckType, customerOrderNumber, type5Specific, multiDrop, extra, ...rest } = fields;
   const carried = Object.fromEntries(
     Object.entries(extra).filter(([key]) => !OWNED_EXTRA_KEYS.has(key)),
   ) as TransportOrderExtra;
@@ -118,8 +123,10 @@ export function buildTransportOrderWrite(
       ...(truckType ? { truckType } : {}),
       ...(customerOrderNumber ? { customerOrderNumber } : {}),
       ...(type5Group ? { type5Specific: type5Group } : {}),
+      ...(multiDrop ? { multiDrop } : {}),
     },
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),
+    ...(multiDrop ? { route: routeFromMultiDrop(multiDrop) } : {}),
     fees,
     trips,
 

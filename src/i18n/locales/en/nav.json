@@ -1,0 +1,17 @@
+{
+  "customersV2": "Customers",
+  "deliveryNotesV2": "Delivery Notes",
+  "employeeOrg": "Organization",
+  "farm": "Farm",
+  "goodsReceiptsV2": "Goods Receipts",
+  "lookupsV2": "Meta-data",
+  "materialsCatalog": "Materials Catalog",
+  "materialsV2": "Materials",
+  "partners": "Partners",
+  "productCatalog": "Product Catalog",
+  "productsV2": "Products",
+  "report": "Reports",
+  "salesOrdersV2": "Sales Orders",
+  "vendorsV2": "Vendors",
+  "warehouse": "Warehouse"
+}

@@ -477,7 +477,7 @@ export function TruckAssetFormPage() {
             size="compact-sm"
             leftSection={<IconArrowLeft size={16} />}
           >
-            {t('__new__.01-common.actions.back')}
+            {t('common.actions.back')}
           </Button>
         </Group>
       )}
@@ -852,10 +852,10 @@ export function TruckAssetFormPage() {
 
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" disabled={loading} onClick={navigateToList}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button type="submit" loading={loading} size="sm">
-              {isEdit ? t('__new__.01-common.actions.save') : t('assets.form.createButton')}
+              {isEdit ? t('common.actions.save') : t('assets.form.createButton')}
             </Button>
           </Group>
         </Stack>

@@ -1,6 +1,10 @@
 export type SalesOrderDetailVariant = {
   showDeliveryNotePrint: boolean;
 
+  productLabelPrint?: {
+    defaultHeader: string;
+  };
+
   showShippingFee: boolean;
 
   showVatTag: boolean;
@@ -56,6 +60,7 @@ export const DEFAULT_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
 
 export const NKTU_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
   showDeliveryNotePrint: true,
+  productLabelPrint: { defaultHeader: 'TÂN UYÊN' },
   showShortageAlert: false,
   showShippingFee: false,
   showVatTag: false,

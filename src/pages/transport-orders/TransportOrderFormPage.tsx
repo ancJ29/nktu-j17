@@ -22,13 +22,10 @@ import { notifications } from '@mantine/notifications';
 import {
   IconAlertTriangle,
   IconArrowLeft,
-  IconCashBanknote,
   IconCopy,
   IconMapPin,
   IconNote,
   IconPlus,
-  IconReceipt,
-  IconReceiptTax,
   IconRoute,
   IconTrash,
   IconTruck,
@@ -37,7 +34,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
-import { device, logger } from '@credo/base-ui/utils';
+import { device } from '@credo/base-ui/utils';
 import { DateField } from '@/components/DateField';
 import { DateTimeTextField } from '@/components/DateTimeTextField';
 import { SectionCard } from '@/components/SectionCard';
@@ -45,11 +42,9 @@ import { EmployeeSelector, CustomerSelector } from '@/components/selectors';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { transportOrderBundle, useTransportOrderStore } from '@/stores/useTransportOrderStore';
-import { EntityConflictError } from '@/stores/createEntityStore';
-import { getCurrentActorId, getCurrentEmployeeStamp, useInitFormFromFetch } from '@/hooks';
-import { logActivity } from '@/utils/activityLogger';
-import { isDriverDepartment, resolveCustomerReportType } from '@/utils/permission';
-import { CAT_HAI_REPORT_TYPE } from '@/utils/customerReports/types';
+import { useInitFormFromFetch } from '@/hooks';
+import { resolveCustomerReportType } from '@/utils/permission';
+import { MOOC_FIELD_REPORT_TYPES } from '@/utils/customerReports/types';
 import {
   dateTimeStringToIso,
   isoToDateTimeString,
@@ -57,38 +52,28 @@ import {
   todayInVnDateString,
   vnDateStringToIso,
 } from '@/utils/dateTimeField';
-import { buildDailySequentialCode, bumpSequentialCode, businessDateString } from '@/utils/code';
-import { appConfig } from '@/config';
 import type {
   Employee,
   TransportOrder,
   TransportOrderTruckingSize,
   TransportOrderExtra,
-  TransportOrderFee,
-  TransportOrderFeeKind,
-  TransportOrderFeePayer,
   TransportOrderShipmentType,
   TransportOrderTrip,
 } from '@/types';
-import {
-  computeTransportOrderTotals,
-  computeTripLaborTotal,
-  formatMoney,
-  readFeeLines,
-} from './transportOrderPricing';
+import { computeTripLaborTotal, formatMoney } from './transportOrderPricing';
 import { useTruckingSizeOptions } from './useTruckingSize';
-import {
-  FALLBACK_FEE_NAMES,
-  feeNameSelectData,
-  useFeeNameOptions,
-  useFreightFeeName,
-} from './feeName';
+import { useFreightFeeName } from './feeName';
 import {
   DEFAULT_SHIPMENT_TYPE,
   useShipmentTypeLabel,
   useShipmentTypeOptions,
 } from './shipmentType';
-import { truckOptionLabel, useDriverWithPlate, useTruckTypeOf } from './truckDisplay';
+import {
+  driverEmployeeFilter,
+  truckOptionLabel,
+  useDriverWithPlate,
+  useTruckTypeOf,
+} from './truckDisplay';
 import { ORDER_TRUCK_TYPES, useOrderTruckTypeOptions } from './useOrderTruckTypes';
 import { isExternalTruck } from './externalTruck';
 import {
@@ -96,12 +81,7 @@ import {
   isTransportOrderLocked,
   transportOrderStatuses,
 } from './transportOrderStatuses';
-import {
-  buildTransportOrderWrite,
-  isDuplicateOrderNumberError,
-  MAX_ORDER_NUMBER_RETRIES,
-} from './transportOrderWrite';
-import { appendTimelineEntry, createMemo, diffTransportOrder, isEmptyDiff } from './activityMemo';
+import { buildTransportOrderWrite } from './transportOrderWrite';
 import { PLACE_INPUT_STYLES, PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
@@ -117,29 +97,21 @@ import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleCo
 import type { ScheduleSlot } from './scheduleConflicts';
 import { Form } from '@/components/Form';
 import { readTruckingSize } from './truckingSize';
+import {
+  blankFee,
+  DEFAULT_VAT_PERCENT,
+  feeRowsToFees,
+  initialFees,
+  toFeeRows,
+  type FeeRow,
+} from './feeRows';
+import { TransportFeeCards } from './TransportFeeCards';
+import { useReseedFeeNames } from './useReseedFeeNames';
+import { notifyTransportOrderSaveError, saveTransportOrder } from './saveTransportOrder';
+import { isMultiDropType } from './multiDrop';
+import { MULTI_DROP_TRUCK_TYPES } from './useMultiDrop';
 
 const isMobile = device.isMobile;
-const toFeatures = appConfig.features.transportOrders;
-const codePrefix = toFeatures.codePrefix;
-
-const toDriverDepartments = toFeatures.driverDepartments ?? [];
-const driverEmployeeFilter = (e: Employee) => {
-  if (!e.isActive || e.extra?.isDeleted) return false;
-  return toDriverDepartments.length > 0
-    ? toDriverDepartments.includes(e.department)
-    : isDriverDepartment(e.department);
-};
-const DEFAULT_VAT_PERCENT = 8;
-
-type FeeRow = {
-  label: string;
-  amount: number;
-  vatable: boolean;
-  kind: TransportOrderFeeKind;
-  payer: TransportOrderFeePayer;
-  invoiceNo: string;
-  memo: string;
-};
 
 type TripRow = {
   departure: string;
@@ -213,46 +185,6 @@ type FormValues = {
   status: string;
   notes: string;
 };
-
-function blankFee(over: Partial<FeeRow> = {}): FeeRow {
-  return {
-    label: '',
-    amount: 0,
-    vatable: true,
-    kind: 'service',
-    payer: 'company',
-    invoiceNo: '',
-    memo: '',
-    ...over,
-  };
-}
-
-function initialFees(): FeeRow[] {
-  return FALLBACK_FEE_NAMES.map(({ value }) =>
-    blankFee({ label: value, vatable: value !== 'Phí neo xe' }),
-  );
-}
-
-function isSeedFees(fees: FeeRow[]): boolean {
-  return (
-    fees.length === FALLBACK_FEE_NAMES.length &&
-    fees.every(
-      (f) =>
-        !f.amount &&
-        !f.invoiceNo.trim() &&
-        !f.memo.trim() &&
-        FALLBACK_FEE_NAMES.some((o) => o.value === f.label),
-    )
-  );
-}
-
-function toFeeRows(order: Pick<TransportOrder, 'fees' | 'disbursements'>): FeeRow[] {
-  return readFeeLines(order).map((f) => ({
-    ...f,
-    payer: f.payer ?? 'company',
-    memo: f.memo ?? '',
-  }));
-}
 
 function tripDate(trip: TripRow): string | null {
   const fromLoading = trip.loadingAt
@@ -350,7 +282,7 @@ function blankValues(presetTruckType = ''): FormValues {
 
 function showsType5Fields(values: FormValues): boolean {
   return (
-    resolveCustomerReportType(values.customerCode) === CAT_HAI_REPORT_TYPE ||
+    MOOC_FIELD_REPORT_TYPES.has(resolveCustomerReportType(values.customerCode)) ||
     !!values.requestedPickupDate ||
     !!values.dropoffDate ||
     values.moocStorageDays !== ''
@@ -438,7 +370,19 @@ export function TransportOrderFormPage() {
   const copyFrom = isEdit ? null : extractCopyFrom(location.state);
   const presetTruckType = isEdit ? '' : readPresetTruckType(location.search);
 
+  const belongsToMultiDrop =
+    !isEdit &&
+    (isMultiDropType(presetTruckType, MULTI_DROP_TRUCK_TYPES) ||
+      isMultiDropType(copyFrom?.extra?.truckType, MULTI_DROP_TRUCK_TYPES));
+
   useEffect(() => {
+    if (belongsToMultiDrop && !isMobile) {
+      navigate(`${ROUTES.TRANSPORT_ORDERS.NEW_MULTI_DROP}${location.search}`, {
+        replace: true,
+        state: location.state,
+      });
+      return;
+    }
     if (!isMobile) return;
     notifications.show({
       color: 'yellow',
@@ -516,13 +460,14 @@ export function TransportOrderFormPage() {
 
   const truckTypeOf = useTruckTypeOf();
 
-  const truckTypeOptions = useOrderTruckTypeOptions();
+  const truckTypeOptions = useOrderTruckTypeOptions().filter(
+    (o) => !isMultiDropType(o.value, MULTI_DROP_TRUCK_TYPES),
+  );
 
   const placeSuggestions = usePlaceSuggestions();
 
   const shipmentTypeOptions = useShipmentTypeOptions();
 
-  const feeNameOptions = useFeeNameOptions();
   const freightFeeName = useFreightFeeName();
   const shipmentTypeLabel = useShipmentTypeLabel();
 
@@ -589,15 +534,7 @@ export function TransportOrderFormPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine re-creates `form` every render; the ref makes this a one-shot on the options arriving.
   }, [isEdit, isCopyCreate, shipmentTypeOptions]);
 
-  const seededFeeNamesRef = useRef(false);
-  useEffect(() => {
-    if (isEdit || isCopyCreate || seededFeeNamesRef.current) return;
-    if (feeNameOptions === FALLBACK_FEE_NAMES) return;
-    seededFeeNamesRef.current = true;
-    if (!isSeedFees(form.getValues().fees)) return;
-    form.setFieldValue('fees', [blankFee({ label: freightFeeName })]);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine re-creates `form` every render; the ref makes this a one-shot on the options arriving.
-  }, [isEdit, isCopyCreate, feeNameOptions, freightFeeName]);
+  useReseedFeeNames(form, isEdit || isCopyCreate);
 
   const fetching = useInitFormFromFetch(
     form,
@@ -613,6 +550,11 @@ export function TransportOrderFormPage() {
       if (isTransportOrderLocked(o.status)) {
         notifications.show({ color: 'yellow', message: t('transportOrders.locked.notice') });
         navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', o.id), { replace: true });
+        return null;
+      }
+
+      if (isMultiDropType(o.extra?.truckType, MULTI_DROP_TRUCK_TYPES)) {
+        navigate(ROUTES.TRANSPORT_ORDERS.EDIT_MULTI_DROP.replace(':id', o.id), { replace: true });
         return null;
       }
       return {
@@ -679,22 +621,7 @@ export function TransportOrderFormPage() {
   const handleSubmit = useCallback(
     async (values: FormValues) => {
       setLoading(true);
-      const actor = getCurrentActorId();
-
-      const fees: TransportOrderFee[] = values.fees
-        .filter((f) => f.label.trim() || f.amount || f.invoiceNo.trim() || f.memo.trim())
-        .map((f) => {
-          const base = {
-            label: f.label.trim(),
-            amount: f.amount || 0,
-            invoiceNo: f.invoiceNo.trim(),
-
-            ...(f.memo.trim() ? { memo: f.memo.trim() } : {}),
-          };
-          return f.kind === 'passthrough'
-            ? { ...base, kind: f.kind, vatable: false, payer: f.payer }
-            : { ...base, kind: 'service' as const, vatable: f.vatable };
-        });
+      const fees = feeRowsToFees(values.fees);
       const trips: TransportOrderTrip[] = values.trips.map((trip) => ({
         departure: trip.departure.trim(),
         destination: trip.destination.trim(),
@@ -759,86 +686,34 @@ export function TransportOrderFormPage() {
         });
 
       try {
-        if (isEdit && id) {
-          const snapshot = snapshotRef.current;
-          if (!snapshot) throw new Error('Transport order snapshot missing');
-          const updated = await transportOrderBundle.updateSafely({
-            id,
-            version: snapshot.version,
-            patch: write({
-              ...snapshot.extra,
-              createdBy: snapshot.extra?.createdBy ?? actor,
-            }),
-          });
-
-          const fields = diffTransportOrder(snapshot, updated);
-          if (!isEmptyDiff(fields)) {
-            logActivity('transportOrder.update', id, {
-              orderNumber: updated.orderNumber,
-              fields,
-            });
-          }
-          notifications.show({
-            color: 'green',
-            message: t('transportOrders.notifications.updated'),
-          });
-          navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', id));
-        } else {
-          const today = businessDateString();
-          const todays = await transportOrderBundle.queryPartition(today);
-          const baseNumber = buildDailySequentialCode(
-            codePrefix,
-            todays.map((o) => o.orderNumber),
-          );
-
-          const createdExtra: TransportOrderExtra = { createdBy: actor };
-          createdExtra.activityLog = appendTimelineEntry(createdExtra, {
-            action: 'created',
-            toStatus: values.status,
-            ...getCurrentEmployeeStamp(),
-          });
-
-          let created: TransportOrder | null = null;
-          for (let attempt = 0; attempt <= MAX_ORDER_NUMBER_RETRIES; attempt++) {
-            const orderNumber = bumpSequentialCode(baseNumber, attempt);
-            try {
-              created = await transportOrderBundle.createSafely({
-                item: { orderNumber, ...write(createdExtra) },
-              });
-              break;
-            } catch (err) {
-              if (isDuplicateOrderNumberError(err) && attempt < MAX_ORDER_NUMBER_RETRIES) continue;
-              throw err;
-            }
-          }
-          if (!created) throw new Error('Transport order create exhausted order-number retries');
-
-          invalidateCache();
-          logActivity('transportOrder.create', created.id, createMemo(created));
-          notifications.show({
-            color: 'green',
-            message: t('transportOrders.notifications.created'),
-          });
-          navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', created.id));
-        }
+        const saved = await saveTransportOrder({
+          id: isEdit ? id : undefined,
+          snapshot: snapshotRef.current,
+          status: values.status,
+          write,
+          invalidate: invalidateCache,
+        });
+        notifications.show({
+          color: 'green',
+          message: isEdit
+            ? t('transportOrders.notifications.updated')
+            : t('transportOrders.notifications.created'),
+        });
+        navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', saved.id));
       } catch (err) {
-        logger.error('Transport order submit failed:', err);
-        if (err instanceof EntityConflictError) {
-          if (err.latest) snapshotRef.current = err.latest as TransportOrder;
-          notifications.show({
-            color: 'yellow',
-            title: t('common.conflict.title'),
-            message: t('common.conflict.message'),
-            autoClose: 8000,
-          });
-        } else {
-          notifications.show({
-            color: 'red',
-            message: isEdit
+        notifyTransportOrderSaveError(
+          err,
+          {
+            conflictTitle: t('common.conflict.title'),
+            conflictMessage: t('common.conflict.message'),
+            failed: isEdit
               ? t('transportOrders.notifications.updateError')
               : t('transportOrders.notifications.createError'),
-          });
-        }
+          },
+          (latest) => {
+            snapshotRef.current = latest;
+          },
+        );
       } finally {
         setLoading(false);
       }
@@ -868,7 +743,8 @@ export function TransportOrderFormPage() {
     }
 
     const registered = truckTypeOf(typeTruckId);
-    if (!registered) return;
+
+    if (!registered || isMultiDropType(registered, MULTI_DROP_TRUCK_TYPES)) return;
     autoTypedFrom.current = typeTruckId;
     form.setFieldValue('truckType', registered);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- Mantine mints a new `form` object every render; values are read through `getValues()` and the derived id above.
@@ -979,7 +855,7 @@ export function TransportOrderFormPage() {
     [t, freightFeeName],
   );
 
-  if (fetching) return null;
+  if (fetching || belongsToMultiDrop) return null;
   if (isMobile) return null;
 
   const pageTitle = isEdit ? t('transportOrders.edit') : t('transportOrders.new');
@@ -1053,33 +929,6 @@ export function TransportOrderFormPage() {
       ? [...truckTypeOptions, { value: currentTruckType, label: currentTruckType }]
       : truckTypeOptions;
 
-  const payerSelectData = [
-    { value: 'company', label: t('transportOrders.fees.payerCompany') },
-    { value: 'customer', label: t('transportOrders.fees.payerCustomer') },
-  ];
-
-  const feeRowsIndexed = form.values.fees.map((row, i) => ({ row, i }));
-  const serviceFeeRows = feeRowsIndexed.filter(({ row }) => row.kind !== 'passthrough');
-  const passthroughFeeRows = feeRowsIndexed.filter(({ row }) => row.kind === 'passthrough');
-
-  const totals = computeTransportOrderTotals(
-    form.values.fees,
-    (form.values.vatRatePercent || 0) / 100,
-    form.values.advanceAmount || 0,
-    form.values.roundDown,
-  );
-
-  const totalsRow = (label: string, value: number, dimmed = false) => (
-    <Group justify="space-between">
-      <Text size="sm" c="dimmed">
-        {label}
-      </Text>
-      <Text size="sm" c={dimmed ? 'dimmed' : undefined}>
-        {formatMoney(value)}
-      </Text>
-    </Group>
-  );
-
   return (
     <Stack gap="lg">
       <Group gap="sm">
@@ -1089,7 +938,7 @@ export function TransportOrderFormPage() {
           size="compact-sm"
           leftSection={<IconArrowLeft size={16} />}
         >
-          {t('__new__.01-common.actions.back')}
+          {t('common.actions.back')}
         </Button>
       </Group>
 
@@ -1601,254 +1450,7 @@ export function TransportOrderFormPage() {
             appliedCode={appliedRouteCode}
           />
 
-          {/* Fees — TWO groups, split by `kind`, each its own card + Add button.
-              The `Loại` picker is gone: a row's kind is the card it lives in.
-              Both feed the one `form.values.fees` array (rendered filtered by kind,
-              edited by real index), so the totals and the write path are unchanged.
-              Service = our own charge (VAT-able, no payer); chi hộ = a third party's
-              cost (never VAT-taxed, `payer` decides collection). */}
-          <SectionCard
-            icon={<IconReceipt size={14} />}
-            title={t('transportOrders.fees.kindService')}
-            actions={
-              <Button
-                size="compact-sm"
-                variant="light"
-                leftSection={<IconPlus size={14} />}
-                onClick={() => form.insertListItem('fees', blankFee())}
-              >
-                {t('transportOrders.fees.add')}
-              </Button>
-            }
-          >
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('transportOrders.fees.label')}</Table.Th>
-                  <Table.Th w={150}>{t('transportOrders.fees.amount')}</Table.Th>
-                  <Table.Th w={60} ta="center">
-                    {t('transportOrders.fees.vatable')}
-                  </Table.Th>
-                  <Table.Th w={140}>{t('transportOrders.fees.invoiceNo')}</Table.Th>
-                  <Table.Th>{t('transportOrders.fees.memo')}</Table.Th>
-                  <Table.Th w={40} />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {serviceFeeRows.map(({ i }) => (
-                  <Table.Tr key={i}>
-                    <Table.Td>
-                      {/* Picked from the `fee-name` register, not typed: the
-                          statement's PHÍ DỊCH VỤ columns ARE these strings, so a
-                          spelling variant splits a customer's column in two.
-                          `feeNameSelectData` keeps a stored name selectable even
-                          once it leaves the register — see `feeName.ts`. */}
-                      <Select
-                        data={feeNameSelectData(feeNameOptions, form.values.fees[i]!.label)}
-                        value={form.values.fees[i]!.label || null}
-                        onChange={(v) => form.setFieldValue(`fees.${i}.label`, v ?? '')}
-                        searchable
-                        error={form.getInputProps(`fees.${i}.label`).error}
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <NumberInput
-                        thousandSeparator=","
-                        min={0}
-                        {...form.getInputProps(`fees.${i}.amount`)}
-                      />
-                    </Table.Td>
-                    <Table.Td ta="center">
-                      <Checkbox
-                        checked={form.values.fees[i]!.vatable}
-                        onChange={(e) =>
-                          form.setFieldValue(`fees.${i}.vatable`, e.currentTarget.checked)
-                        }
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput {...form.getInputProps(`fees.${i}.invoiceNo`)} />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput {...form.getInputProps(`fees.${i}.memo`)} />
-                    </Table.Td>
-                    <Table.Td>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => form.removeListItem('fees', i)}
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </SectionCard>
-
-          {/* Chi hộ — a third party's cost. Never VAT-taxed (that VAT is on their
-              invoice); `payer` decides whether we bill it. */}
-          <SectionCard
-            icon={<IconCashBanknote size={14} />}
-            title={t('transportOrders.fees.kindPassthrough')}
-            actions={
-              <Button
-                size="compact-sm"
-                variant="light"
-                leftSection={<IconPlus size={14} />}
-                onClick={() =>
-                  form.insertListItem(
-                    'fees',
-                    blankFee({ kind: 'passthrough', vatable: false, payer: 'company' }),
-                  )
-                }
-              >
-                {t('transportOrders.fees.add')}
-              </Button>
-            }
-          >
-            <Table>
-              <Table.Thead>
-                <Table.Tr>
-                  <Table.Th>{t('transportOrders.fees.label')}</Table.Th>
-                  <Table.Th w={150}>{t('transportOrders.fees.amount')}</Table.Th>
-                  <Table.Th w={150}>{t('transportOrders.fees.payer')}</Table.Th>
-                  <Table.Th w={140}>{t('transportOrders.fees.invoiceNo')}</Table.Th>
-                  <Table.Th>{t('transportOrders.fees.memo')}</Table.Th>
-                  <Table.Th w={40} />
-                </Table.Tr>
-              </Table.Thead>
-              <Table.Tbody>
-                {passthroughFeeRows.map(({ i }) => (
-                  <Table.Tr key={i}>
-                    <Table.Td>
-                      {/* Same register as the service card — one vocabulary for
-                          both kinds (see `useFeeNameOptions`). */}
-                      <Select
-                        data={feeNameSelectData(feeNameOptions, form.values.fees[i]!.label)}
-                        value={form.values.fees[i]!.label || null}
-                        onChange={(v) => form.setFieldValue(`fees.${i}.label`, v ?? '')}
-                        searchable
-                        error={form.getInputProps(`fees.${i}.label`).error}
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <NumberInput
-                        thousandSeparator=","
-                        min={0}
-                        {...form.getInputProps(`fees.${i}.amount`)}
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <Select
-                        data={payerSelectData}
-                        value={form.values.fees[i]!.payer}
-                        onChange={(v) =>
-                          form.setFieldValue(
-                            `fees.${i}.payer`,
-                            (v as TransportOrderFeePayer) ?? 'company',
-                          )
-                        }
-                        allowDeselect={false}
-                      />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput {...form.getInputProps(`fees.${i}.invoiceNo`)} />
-                    </Table.Td>
-                    <Table.Td>
-                      <TextInput {...form.getInputProps(`fees.${i}.memo`)} />
-                    </Table.Td>
-                    <Table.Td>
-                      <ActionIcon
-                        color="red"
-                        variant="subtle"
-                        onClick={() => form.removeListItem('fees', i)}
-                      >
-                        <IconTrash size={16} />
-                      </ActionIcon>
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
-              </Table.Tbody>
-            </Table>
-          </SectionCard>
-
-          {/* Billing summary — VAT rate + advance drive the running total that
-              settles over BOTH groups, so it stands alone rather than under one. */}
-          <SectionCard
-            icon={<IconReceiptTax size={14} />}
-            title={t('transportOrders.billing.title')}
-          >
-            <Group gap="sm" align="flex-end">
-              <NumberInput
-                w={160}
-                label={t('transportOrders.billing.vatRate')}
-                suffix="%"
-                min={0}
-                max={100}
-                {...form.getInputProps('vatRatePercent')}
-              />
-              {/* TẠM ỨNG sits with the totals it settles, not in the job header —
-                  it's only legible next to the "còn lại" it produces. */}
-              <NumberInput
-                w={200}
-                label={t('transportOrders.billing.advance')}
-                thousandSeparator=","
-                min={0}
-                {...form.getInputProps('advanceAmount')}
-              />
-            </Group>
-
-            {/* Sits under the VAT rate it modifies, not with the totals it moves:
-                it's an input the operator sets, and the effect is visible one row
-                down in the VAT line the moment it's ticked. */}
-            <Checkbox
-              mt="sm"
-              label={t('transportOrders.billing.roundDown')}
-              description={t('transportOrders.billing.roundDownDescription')}
-              {...form.getInputProps('roundDown', { type: 'checkbox' })}
-            />
-
-            {/* The running total. The form never showed one before, but an operator
-                typing an advance with no visible balance is working blind — and it's
-                the balance, not the advance, that the field exists to produce. */}
-            <Divider my="sm" />
-            <Stack gap={4}>
-              {/* Subtotalled per Loại — the two are different money (our revenue vs
-                  a third party's cost we're reclaiming), which is how a freight
-                  invoice is read, and what the deferred PDF will group by. */}
-              {totalsRow(t('transportOrders.billing.serviceSubtotal'), totals.serviceSubtotal)}
-              {totals.passthroughSubtotal > 0 &&
-                totalsRow(
-                  t('transportOrders.billing.passthroughSubtotal'),
-                  totals.passthroughSubtotal,
-                )}
-              {totalsRow(
-                t('transportOrders.billing.vatAmount', { rate: form.values.vatRatePercent || 0 }),
-                totals.vatAmount,
-              )}
-              {totals.nonBillableTotal > 0 &&
-                totalsRow(
-                  t('transportOrders.billing.nonBillableTotal'),
-                  totals.nonBillableTotal,
-                  true,
-                )}
-              <Group justify="space-between">
-                <Text fw={600}>{t('transportOrders.billing.grandTotal')}</Text>
-                <Text fw={600}>{formatMoney(totals.grandTotal)}</Text>
-              </Group>
-              {totals.advanceAmount > 0 && (
-                <>
-                  {totalsRow(t('transportOrders.billing.advance'), -totals.advanceAmount)}
-                  <Group justify="space-between">
-                    <Text fw={700}>{t('transportOrders.billing.balanceDue')}</Text>
-                    <Text fw={700}>{formatMoney(totals.balanceDue)}</Text>
-                  </Group>
-                </>
-              )}
-            </Stack>
-          </SectionCard>
+          <TransportFeeCards form={form} />
 
           {/* Meta */}
           <SectionCard icon={<IconNote size={14} />} title={t('transportOrders.form.metaSection')}>
@@ -1868,10 +1470,10 @@ export function TransportOrderFormPage() {
 
           <Group justify="flex-end">
             <Button variant="default" onClick={() => window.history.back()}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button type="submit" loading={loading}>
-              {t('__new__.01-common.actions.save')}
+              {t('common.actions.save')}
             </Button>
           </Group>
         </Stack>

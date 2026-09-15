@@ -33,6 +33,13 @@ export type NavId =
   | 'configuration-vendors'
   | 'configuration-app-config'
   | 'configuration-debug'
+  | 'vendors-v2'
+  | 'customers-v2'
+  | 'products-v2'
+  | 'materials-v2'
+  | 'goods-receipts-v2'
+  | 'sales-orders-v2'
+  | 'delivery-notes-v2'
   | 'lookups-v2'
   | 'truck-assets'
   | 'oil-tanks'
@@ -230,6 +237,50 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     adminOnly: true,
   },
 
+  'vendors-v2': {
+    path: ROUTES.VENDORS_V2.LIST,
+    labelKey: 'nav.vendorsV2',
+    label: 'Vendors (v2)',
+    defaultIcon: IconName.Truck,
+  },
+
+  'customers-v2': {
+    path: ROUTES.CUSTOMERS_V2.LIST,
+    labelKey: 'nav.customersV2',
+    label: 'Customers (v2)',
+    defaultIcon: IconName.ShoppingCart,
+  },
+  'products-v2': {
+    path: ROUTES.PRODUCTS_V2.LIST,
+    labelKey: 'nav.productsV2',
+    label: 'Products (v2)',
+    defaultIcon: IconName.Package,
+  },
+  'materials-v2': {
+    path: ROUTES.MATERIALS_V2.LIST,
+    labelKey: 'nav.materialsV2',
+    label: 'Materials (v2)',
+    defaultIcon: IconName.Box,
+  },
+
+  'goods-receipts-v2': {
+    path: ROUTES.GOODS_RECEIPTS_V2.LIST,
+    labelKey: 'nav.goodsReceiptsV2',
+    label: 'Goods Receipts (v2)',
+    defaultIcon: IconName.PackageImport,
+  },
+  'sales-orders-v2': {
+    path: ROUTES.SALES_ORDERS_V2.LIST,
+    labelKey: 'nav.salesOrdersV2',
+    label: 'Sales Orders (v2)',
+    defaultIcon: IconName.ShoppingCart,
+  },
+  'delivery-notes-v2': {
+    path: ROUTES.DELIVERY_NOTES_V2.LIST,
+    labelKey: 'nav.deliveryNotesV2',
+    label: 'Delivery Notes (v2)',
+    defaultIcon: IconName.Truck,
+  },
   'lookups-v2': {
     path: ROUTES.LOOKUPS_V2.LIST,
     labelKey: 'nav.lookupsV2',
@@ -380,6 +431,13 @@ type FeatureFlags = {
   locations?: { enabled?: boolean };
   productInventory?: { enabled?: boolean };
   materialInventory?: { enabled?: boolean };
+  vendorsV2?: { enabled?: boolean };
+  customersV2?: { enabled?: boolean };
+  productsV2?: { enabled?: boolean };
+  materialsV2?: { enabled?: boolean };
+  goodsReceiptsV2?: { enabled?: boolean };
+  salesOrdersV2?: { enabled?: boolean };
+  deliveryNotesV2?: { enabled?: boolean };
   lookupV2?: { enabled?: boolean };
   trucks?: { enabled?: boolean };
   oilTanks?: { enabled?: boolean };
@@ -409,6 +467,13 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'warehouse-material-inventory': (f) => f.materialInventory?.enabled ?? false,
   'warehouse-receipts': (f) => f.warehouseReceipts?.enabled ?? false,
   'warehouse-delivery-notes': (f) => f.warehouseDeliveryNotes?.enabled ?? false,
+  'vendors-v2': (f) => f.vendorsV2?.enabled ?? false,
+  'customers-v2': (f) => f.customersV2?.enabled ?? false,
+  'products-v2': (f) => f.productsV2?.enabled ?? false,
+  'materials-v2': (f) => f.materialsV2?.enabled ?? false,
+  'goods-receipts-v2': (f) => f.goodsReceiptsV2?.enabled ?? false,
+  'sales-orders-v2': (f) => f.salesOrdersV2?.enabled ?? false,
+  'delivery-notes-v2': (f) => f.deliveryNotesV2?.enabled ?? false,
   'lookups-v2': (f) => f.lookupV2?.enabled ?? false,
   'truck-assets': (f) => f.trucks?.enabled ?? false,
   'oil-tanks': (f) => f.oilTanks?.enabled ?? false,
@@ -417,33 +482,50 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'crop-diary-templates': (f) => f.farm?.enabled ?? false,
 };
 
+export const NAV_PERMISSION_MODULE: Partial<Record<NavId, string>> = {
+  employees: 'employee',
+
+  'employee-org': 'permissionManagement',
+  'sales-orders': 'salesOrder',
+
+  quotations: 'salesOrder',
+  delivery: 'deliveryRequest',
+  'goods-receipts': 'goodsReceipt',
+  'transport-orders': 'transportOrder',
+  'transport-routes': 'transportRoute',
+  'cost-norms': 'costNorm',
+  'configuration-products': 'product',
+  'configuration-materials': 'material',
+  'configuration-customers': 'customer',
+  'configuration-vendors': 'vendor',
+  'warehouse-locations': 'location',
+  'warehouse-product-inventory': 'productInventory',
+  'warehouse-material-inventory': 'materialInventory',
+  'warehouse-receipts': 'warehouseReceipt',
+  'warehouse-delivery-notes': 'warehouseDeliveryNote',
+
+  'vendors-v2': 'vendor',
+
+  'customers-v2': 'customer',
+  'products-v2': 'product',
+  'materials-v2': 'material',
+  'lookups-v2': 'lookupV2',
+  'truck-assets': 'truck',
+  'oil-tanks': 'oilTank',
+  greenhouses: 'greenhouse',
+  crops: 'crop',
+  'crop-diary-templates': 'cropDiaryTemplate',
+
+  report: 'report',
+};
+
 const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
-  employees: () => getModulePermissions('employee').canView ?? false,
-
-  'employee-org': () => getModulePermissions('permissionManagement').canView ?? false,
-  'sales-orders': () => getModulePermissions('salesOrder').canView ?? false,
-
-  quotations: () => getModulePermissions('salesOrder').canView ?? false,
-  delivery: () => getModulePermissions('deliveryRequest').canView ?? false,
-  'goods-receipts': () => getModulePermissions('goodsReceipt').canView ?? false,
-  'transport-orders': () => getModulePermissions('transportOrder').canView ?? false,
-  'transport-routes': () => getModulePermissions('transportRoute').canView ?? false,
-  'cost-norms': () => getModulePermissions('costNorm').canView ?? false,
-  'configuration-products': () => getModulePermissions('product').canView ?? false,
-  'configuration-materials': () => getModulePermissions('material').canView ?? false,
-  'configuration-customers': () => getModulePermissions('customer').canView ?? false,
-  'configuration-vendors': () => getModulePermissions('vendor').canView ?? false,
-  'warehouse-locations': () => getModulePermissions('location').canView ?? false,
-  'warehouse-product-inventory': () => getModulePermissions('productInventory').canView ?? false,
-  'warehouse-material-inventory': () => getModulePermissions('materialInventory').canView ?? false,
-  'warehouse-receipts': () => getModulePermissions('warehouseReceipt').canView ?? false,
-  'warehouse-delivery-notes': () => getModulePermissions('warehouseDeliveryNote').canView ?? false,
-  'lookups-v2': () => getModulePermissions('lookupV2').canView ?? false,
-  'truck-assets': () => getModulePermissions('truck').canView ?? false,
-  'oil-tanks': () => getModulePermissions('oilTank').canView ?? false,
-  greenhouses: () => getModulePermissions('greenhouse').canView ?? false,
-  crops: () => getModulePermissions('crop').canView ?? false,
-  'crop-diary-templates': () => getModulePermissions('cropDiaryTemplate').canView ?? false,
+  ...(Object.fromEntries(
+    Object.entries(NAV_PERMISSION_MODULE).map(([id, module]) => [
+      id,
+      () => getModulePermissions(module).canView ?? false,
+    ]),
+  ) as Partial<Record<NavId, () => boolean>>),
 
   report: () =>
     (getModulePermissions('report').canView ?? false) ||
@@ -558,6 +640,67 @@ export function stripRootOnlyNavItems<T extends { rootOnly?: boolean; subs?: T[]
     if (item.subs && item.subs.length > 0) {
       const subs = stripRootOnlyNavItems(item.subs, isRoot);
 
+      if (subs.length === 0) continue;
+      result.push({ ...item, subs });
+    } else {
+      result.push(item);
+    }
+  }
+  return result;
+}
+
+export type NavViewerRule = {
+  hiddenForDepartments?: string[];
+  visibleForEmployeeIds?: string[];
+};
+
+export type NavViewer = { department?: string; employeeId?: string };
+
+export function collectNavViewerRules(items: NavigationItem[]): Map<string, NavViewerRule> {
+  const rules = new Map<string, NavViewerRule>();
+  const walk = (list: NavigationItem[]) => {
+    for (const item of list) {
+      if (item.hiddenForDepartments?.length || item.visibleForEmployeeIds?.length) {
+        rules.set(item.id, {
+          ...(item.hiddenForDepartments?.length
+            ? { hiddenForDepartments: item.hiddenForDepartments }
+            : {}),
+          ...(item.visibleForEmployeeIds?.length
+            ? { visibleForEmployeeIds: item.visibleForEmployeeIds }
+            : {}),
+        });
+      }
+      if (item.subs?.length) walk(item.subs);
+    }
+  };
+  walk(items);
+  return rules;
+}
+
+export function stripNavItemsForViewer<T extends { id: string; subs?: T[] }>(
+  items: T[],
+  viewer: NavViewer,
+  rules: Map<string, NavViewerRule>,
+): T[] {
+  if (rules.size === 0) return items;
+
+  const allowed = (id: string): boolean => {
+    const rule = rules.get(id);
+    if (!rule) return true;
+    if (rule.visibleForEmployeeIds?.length) {
+      return viewer.employeeId ? rule.visibleForEmployeeIds.includes(viewer.employeeId) : true;
+    }
+    if (rule.hiddenForDepartments?.length && viewer.department) {
+      return !rule.hiddenForDepartments.includes(viewer.department);
+    }
+    return true;
+  };
+
+  const result: T[] = [];
+  for (const item of items) {
+    if (!allowed(item.id)) continue;
+    if (item.subs && item.subs.length > 0) {
+      const subs = stripNavItemsForViewer(item.subs, viewer, rules);
       if (subs.length === 0) continue;
       result.push({ ...item, subs });
     } else {

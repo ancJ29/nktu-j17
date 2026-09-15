@@ -21,15 +21,29 @@ type EntityChipProps = {
   gap?: number;
 
   monospace?: boolean;
+
+  sub?: ReactNode;
 };
 
-export function EntityChip({ size, lead, label, color, gap = 6, monospace }: EntityChipProps) {
+export function EntityChip({ size, lead, label, color, gap = 6, monospace, sub }: EntityChipProps) {
+  const labelText = (
+    <Text size={size} fw={600} ff={monospace ? 'monospace' : undefined}>
+      {label}
+    </Text>
+  );
   return (
     <Group c={color} gap={gap} wrap="nowrap" component="span" style={{ display: 'inline-flex' }}>
       {lead}
-      <Text size={size} fw={600} ff={monospace ? 'monospace' : undefined}>
-        {label}
-      </Text>
+      {sub ? (
+        <span style={{ display: 'inline-flex', flexDirection: 'column' }}>
+          {labelText}
+          <Text size="xs" c="dimmed">
+            {sub}
+          </Text>
+        </span>
+      ) : (
+        labelText
+      )}
     </Group>
   );
 }

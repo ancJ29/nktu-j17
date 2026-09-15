@@ -11,6 +11,9 @@ export type NavigationItem = {
   navbar?: boolean;
 
   rootOnly?: boolean;
+
+  hiddenForDepartments?: string[];
+  visibleForEmployeeIds?: string[];
   subs?: NavigationItem[];
 };
 

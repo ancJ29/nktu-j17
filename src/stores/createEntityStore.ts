@@ -32,7 +32,7 @@ type VersionConflictPayload<T> = {
   latest?: T;
 };
 
-function isVersionConflict(err: unknown): err is CallApiError & {
+export function isVersionConflict(err: unknown): err is CallApiError & {
   payload: VersionConflictPayload<unknown>;
 } {
   if (!(err instanceof CallApiError) || err.status !== 409) return false;

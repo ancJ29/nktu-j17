@@ -229,7 +229,7 @@ function BulkForm({ onClose, salesOrders, getCustomerByCode, resolveStatus, t }:
 
       <Group justify="flex-end" gap="sm">
         <Button variant="default" onClick={onClose} disabled={saving}>
-          {t('__new__.01-common.actions.cancel')}
+          {t('common.actions.cancel')}
         </Button>
         <Button onClick={handleSave} loading={saving} disabled={!driver || selectedIds.size === 0}>
           {t('deliveryRequests.bulkCreate.createButton', { count: selectedIds.size })}

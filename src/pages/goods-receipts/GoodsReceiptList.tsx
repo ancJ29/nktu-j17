@@ -290,7 +290,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
   }, [filtered, t, shouldDisplayStats]);
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
+    if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) {
       const single = findStatus(filters.statusFilter[0] as 'draft' | 'received' | 'cancelled');
       return t(single.labelKey);
@@ -346,7 +346,7 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
       value: filters.statusFilter,
       options: statusFilterData,
       onChange: filters.setStatusFilter,
-      allLabel: t('__new__.01-common.filters.all'),
+      allLabel: t('common.filters.all'),
       visible: statusFilterData.length > 0,
     }),
   ];

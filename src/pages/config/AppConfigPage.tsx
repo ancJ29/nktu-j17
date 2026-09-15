@@ -25,7 +25,7 @@ import {
   DEFAULT_VENDOR_FEATURES,
 } from '@/config/default-config';
 import { defaultNavigation, stripHiddenNavItems } from '@/config/navigation';
-import { normalizeCompanyInfoList } from '@/config/companyInfoSchema';
+import { carryUnmodelledKeys } from './carryUnmodelledKeys';
 import type {
   CompanyInfoConfig,
   GoodsReceiptFeatures,
@@ -33,7 +33,7 @@ import type {
   QuotationFeatures,
 } from '@/config/schema';
 import type { GoodsReceiptStatus } from '@/types';
-import { LOOKUP_V2_CATEGORIES } from '@/pages/lookup-v2/categoryRegistry';
+import { LOOKUP_V2_CATEGORIES } from '@/pages/v2/lookup/categoryRegistry';
 import { useLookupV2Options } from '@/hooks/useLookupV2Options';
 import {
   formatInvariantError,
@@ -262,6 +262,7 @@ export function ConfigEditor({
   const clientCode = useMemo(() => clientServiceCode ?? resolveClientCode(), [clientServiceCode]);
   const isExternalTarget = clientServiceCode !== undefined;
 
+  const [storedConfig, setStoredConfig] = useState<CMngtAppConfig | null>(null);
   const [version, setVersion] = useState(DEFAULT_CONFIG.version);
   const [appInfo, setAppInfo] = useState<AppInfo>(DEFAULT_CONFIG.app);
   const [auth, setAuth] = useState<AuthFeatures>(DEFAULT_CONFIG.auth);
@@ -347,7 +348,7 @@ export function ConfigEditor({
   );
   const [displaySettings, setDisplaySettings] =
     useState<CMngtDisplaySettings>(DEFAULT_DISPLAY_SETTINGS);
-  const [companyInfos, setCompanyInfos] = useState<CompanyInfoConfig[]>(DEFAULT_COMPANY_INFOS);
+  const [companyInfo, setCompanyInfo] = useState<CompanyInfoConfig[]>(DEFAULT_COMPANY_INFOS);
 
   const departmentMultiSelectData = useMemo(
     () =>
@@ -373,58 +374,60 @@ export function ConfigEditor({
   );
 
   const buildConfigPayload = useCallback(
-    (newVersion?: string): CMngtAppConfig => ({
-      version: newVersion ?? version,
-      schemaVersion: DEFAULT_CONFIG.schemaVersion,
-      app: appInfo,
-      auth,
-      themeConfig,
-      languages,
-      defaultLanguage,
+    (newVersion?: string): CMngtAppConfig =>
+      carryUnmodelledKeys(storedConfig, {
+        version: newVersion ?? version,
+        schemaVersion: DEFAULT_CONFIG.schemaVersion,
+        app: appInfo,
+        auth,
+        themeConfig,
+        languages,
+        defaultLanguage,
 
-      navigation: {
-        pc: stripHiddenNavItems(navigation.pc),
-        mobile: stripHiddenNavItems(navigation.mobile),
-      },
-      features: {
-        common: {
-          darkMode: DEFAULT_CONFIG.features.common.darkMode,
-          languageSwitcher,
-          enablePdfSharing,
-          enableStats,
-          notifyNewVersion,
-          tableDensity,
+        navigation: {
+          pc: stripHiddenNavItems(navigation.pc),
+          mobile: stripHiddenNavItems(navigation.mobile),
         },
-        employees: employeeFeatures,
-        permissionManagement: permMngtFeatures,
-        activityLog: activityLogFeatures,
-        pricing: pricingFeatures,
-        products: productsFeatures,
-        customers: customersFeatures,
-        vendors: vendorsFeatures,
-        materials: materialsFeatures,
-        materialInventory: materialInventoryFeatures,
-        warehouseReceipts: warehouseReceiptsFeatures,
-        warehouseDeliveryNotes: warehouseDeliveryNotesFeatures,
-        salesOrders: salesOrdersFeatures,
-        quotations: quotationsFeatures,
-        deliveryRequests: deliveryRequestsFeatures,
-        goodsReceipts: goodsReceiptsFeatures,
-        transportOrders: transportOrdersFeatures,
-        locations: locationsFeatures,
-        productInventory: productInventoryFeatures,
-        lookupV2: lookupV2Features,
-        trucks: trucksFeatures,
-        oilTanks: oilTanksFeatures,
-        farm: farmFeatures,
-      },
-      layout,
-      displaySettings,
-      companyInfo: companyInfos,
-      permissions: Object.keys(permissions).length > 0 ? permissions : undefined,
-      translations,
-    }),
+        features: {
+          common: {
+            darkMode: DEFAULT_CONFIG.features.common.darkMode,
+            languageSwitcher,
+            enablePdfSharing,
+            enableStats,
+            notifyNewVersion,
+            tableDensity,
+          },
+          employees: employeeFeatures,
+          permissionManagement: permMngtFeatures,
+          activityLog: activityLogFeatures,
+          pricing: pricingFeatures,
+          products: productsFeatures,
+          customers: customersFeatures,
+          vendors: vendorsFeatures,
+          materials: materialsFeatures,
+          materialInventory: materialInventoryFeatures,
+          warehouseReceipts: warehouseReceiptsFeatures,
+          warehouseDeliveryNotes: warehouseDeliveryNotesFeatures,
+          salesOrders: salesOrdersFeatures,
+          quotations: quotationsFeatures,
+          deliveryRequests: deliveryRequestsFeatures,
+          goodsReceipts: goodsReceiptsFeatures,
+          transportOrders: transportOrdersFeatures,
+          locations: locationsFeatures,
+          productInventory: productInventoryFeatures,
+          lookupV2: lookupV2Features,
+          trucks: trucksFeatures,
+          oilTanks: oilTanksFeatures,
+          farm: farmFeatures,
+        },
+        layout,
+        displaySettings,
+        companyInfo,
+        permissions: Object.keys(permissions).length > 0 ? permissions : undefined,
+        translations,
+      }),
     [
+      storedConfig,
       version,
       appInfo,
       auth,
@@ -461,13 +464,14 @@ export function ConfigEditor({
       farmFeatures,
       layout,
       displaySettings,
-      companyInfos,
+      companyInfo,
       permissions,
       translations,
     ],
   );
 
   const applyConfig = useCallback((cfg: CMngtAppConfig) => {
+    setStoredConfig(cfg);
     setVersion(cfg.version ?? DEFAULT_CONFIG.version);
     setAppInfo(cfg.app ?? DEFAULT_CONFIG.app);
     setAuth({ ...SCHEMA_DEFAULT_AUTH, ...cfg.auth });
@@ -546,7 +550,14 @@ export function ConfigEditor({
     setPermissions(cfg.permissions ?? {});
     setTranslations(cfg.translations ?? {});
     setDisplaySettings({ ...DEFAULT_DISPLAY_SETTINGS, ...cfg.displaySettings });
-    setCompanyInfos(normalizeCompanyInfoList(cfg.companyInfo));
+    setCompanyInfo(
+      cfg.companyInfo
+        ? cfg.companyInfo.map((el) => ({
+            id: el.id ?? Math.random().toString(36).substring(2, 15),
+            ...el,
+          }))
+        : DEFAULT_COMPANY_INFOS,
+    );
     setHasConfig(true);
   }, []);
 
@@ -760,7 +771,7 @@ export function ConfigEditor({
     setTranslations(DEFAULT_TRANSLATIONS);
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
     setTableDensity(DEFAULT_TABLE_DENSITY);
-    setCompanyInfos(DEFAULT_COMPANY_INFOS);
+    setCompanyInfo(DEFAULT_COMPANY_INFOS);
   }, []);
 
   const resetAppInfo = useCallback(() => {
@@ -853,7 +864,7 @@ export function ConfigEditor({
     setDisplaySettings(DEFAULT_DISPLAY_SETTINGS);
     setTableDensity(DEFAULT_TABLE_DENSITY);
   }, []);
-  const resetCompanyInfo = useCallback(() => setCompanyInfos(DEFAULT_COMPANY_INFOS), []);
+  const resetCompanyInfo = useCallback(() => setCompanyInfo(DEFAULT_COMPANY_INFOS), []);
 
   const eqDefault = (a: unknown, b: unknown) => Object.keys(deepDiff(a, b)).length === 0;
   const sectionIsDefault: Partial<Record<SectionKey, boolean>> = {
@@ -866,7 +877,7 @@ export function ConfigEditor({
     displaySettings:
       eqDefault(displaySettings, DEFAULT_DISPLAY_SETTINGS) &&
       eqDefault(tableDensity, DEFAULT_TABLE_DENSITY),
-    companyInfo: eqDefault(companyInfos, DEFAULT_COMPANY_INFOS),
+    companyInfo: eqDefault(companyInfo, DEFAULT_COMPANY_INFOS),
     layout: eqDefault(layout, DEFAULT_LAYOUT),
     theme: eqDefault(themeConfig, DEFAULT_THEME),
     languages: eqDefault(languages, DEFAULT_LANGUAGES) && defaultLanguage === DEFAULT_LANGUAGE,
@@ -1027,14 +1038,14 @@ export function ConfigEditor({
           <CollapsibleSection
             icon={IconBuilding}
             title="Company Info"
-            description="Companies that issue documents (delivery note, quotation) — the first is the default"
+            description="Seller identity printed on generated documents (delivery note, quotation)"
             sectionKey="companyInfo"
             isDefault={sectionIsDefault.companyInfo}
             opened={openSections.has('companyInfo')}
             onToggle={toggleSection}
             onReset={resetCompanyInfo}
           >
-            <CompanyInfoSection value={companyInfos} onChange={setCompanyInfos} />
+            <CompanyInfoSection value={companyInfo} onChange={setCompanyInfo} />
           </CollapsibleSection>
           <CollapsibleSection
             icon={IconLayoutSidebar}
@@ -2258,6 +2269,32 @@ export function ConfigEditor({
                           ? 'No vehicle types configured under Meta-data'
                           : 'None — offer every type, no tabs'
                       }
+                      size="sm"
+                      searchable
+                      clearable
+                    />
+                  </Paper>
+                  {/* A job never changes type after creation, so the type alone
+                      picks the form — no per-order flag to keep in step. */}
+                  <Paper p="xs" withBorder>
+                    <Text fz="sm" fw={600} mb={4}>
+                      Multi-drop Vehicle Types
+                    </Text>
+                    <Text fz="xs" c="dimmed" mb="xs">
+                      Vehicle types booked on the multi-drop form (one origin, 1&ndash;7 drop points
+                      picked from the locations list, total days) instead of the container form.
+                      Leave empty to book every type on the container form.
+                    </Text>
+                    <MultiSelect
+                      data={truckTypeOptions}
+                      value={transportOrdersFeatures.multiDropTruckTypes ?? []}
+                      onChange={(v) =>
+                        setTransportOrdersFeatures({
+                          ...transportOrdersFeatures,
+                          multiDropTruckTypes: v,
+                        })
+                      }
+                      placeholder="None — every type uses the container form"
                       size="sm"
                       searchable
                       clearable

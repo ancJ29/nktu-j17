@@ -9,6 +9,7 @@ export { useInitFormFromFetch } from './useInitFormFromFetch';
 export { useIsRoot } from './useIsRoot';
 export { useMyEmployee } from './useMyEmployee';
 export { useInventoryAutoRevalidate } from './useInventoryAutoRevalidate';
+export { useV2RegisterSync } from './useV2RegisterSync';
 export { useInventorySection, type InventorySection } from './useInventorySection';
 export { useLanguageSync } from './useLanguageSync';
 export { useListFilter } from './useListFilter';

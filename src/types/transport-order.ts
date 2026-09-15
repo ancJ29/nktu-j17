@@ -110,7 +110,24 @@ export type TransportOrderExtra = {
   customerOrderNumber?: string;
 
   type5Specific?: TransportOrderType5Specific;
+
+  multiDrop?: TransportOrderMultiDrop;
   [key: string]: unknown;
+};
+
+export type TransportOrderDropStop = {
+  province: string;
+  ward: string;
+
+  distanceKm: number;
+};
+
+export type TransportOrderMultiDrop = {
+  from: string;
+
+  stops: TransportOrderDropStop[];
+
+  totalDays: number;
 };
 
 export type TransportOrderType5Specific = {

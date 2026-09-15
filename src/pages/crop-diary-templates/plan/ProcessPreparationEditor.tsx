@@ -101,7 +101,7 @@ export const ProcessPreparationEditor = memo(function ProcessPreparationEditor({
                     size="sm"
                     variant="subtle"
                     color="red"
-                    aria-label={t('__new__.01-common.actions.remove')}
+                    aria-label={t('common.actions.remove')}
                     onClick={() => onChange(preparation.filter((_, i) => i !== index))}
                   >
                     <IconTrash size={14} />

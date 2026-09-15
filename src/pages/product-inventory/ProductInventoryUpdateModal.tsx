@@ -649,7 +649,7 @@ export function ProductInventoryUpdateModal({
 
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               type="submit"

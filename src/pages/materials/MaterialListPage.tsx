@@ -274,7 +274,7 @@ export function MaterialListPage() {
               value: categoryFilter,
               options: categoryOptions,
               onChange: setCategoryFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -286,7 +286,7 @@ export function MaterialListPage() {
               value: stockFilter,
               options: stockOptions,
               onChange: setStockFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -356,7 +356,7 @@ export function MaterialListPage() {
                 onClick={selection.toggleSelectionMode}
               >
                 {selectionMode
-                  ? t('__new__.01-common.actions.cancel')
+                  ? t('common.actions.cancel')
                   : t('warehouseDoc.fromMaterials.enterSelection')}
               </Button>
             ) : undefined
@@ -378,7 +378,7 @@ export function MaterialListPage() {
             onStatusChange={setFilter}
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('materials.filterActive'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -395,7 +395,7 @@ export function MaterialListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('materials.filterActive'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -448,7 +448,7 @@ export function MaterialListPage() {
                 color="gray"
                 onClick={selection.exitSelectionMode}
               >
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
             </Group>
           </Group>

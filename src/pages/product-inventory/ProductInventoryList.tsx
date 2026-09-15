@@ -485,7 +485,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               value: categoryFilter,
               options: categoryOptions,
               onChange: setCategoryFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -498,7 +498,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               value: stockFilter,
               options: stockOptions,
               onChange: setStockFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -511,7 +511,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               value: secondaryFilter,
               options: secondaryOptions,
               onChange: setSecondaryFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]

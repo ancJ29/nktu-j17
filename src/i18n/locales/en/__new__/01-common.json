@@ -1,0 +1,40 @@
+{
+  "actions": {
+    "exportAccounting": "Export (accounting)"
+  },
+  "dangerZone": {
+    "disableButton": "Deactivate",
+    "enableButton": "Activate",
+    "title": "Danger Zone"
+  },
+  "empty": {
+    "noDescription": "No description {{item}}",
+    "noNote": "No description"
+  },
+  "filters": {
+    "columnFilter": {
+      "clear": "Clear filter",
+      "empty": "No values",
+      "search": "Search values",
+      "selectAll": "Select all"
+    }
+  },
+  "labels": {
+    "active": "Active",
+    "googleMapUrl": "Google Maps URL",
+    "inactive": "Inactive",
+    "note": "Note (optional)",
+    "orderDate": "Order Date",
+    "status": "Status"
+  },
+  "list": {
+    "loadingMore": "Loading {{chunk}} more of {{total}}…",
+    "stats": "Stats"
+  },
+  "placeholders": {
+    "googleMapUrl": "Paste a Google Maps link (optional)"
+  },
+  "validation": {
+    "invalidDateTime": "Unrecognised date/time — e.g. {{example}}"
+  }
+}

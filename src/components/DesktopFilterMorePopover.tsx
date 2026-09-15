@@ -171,7 +171,7 @@ function countActive(filters: MoreFilterDef[]): number {
   for (const f of filters) {
     if (f.type === 'dateRange' && (f.customOnly ? f.value.preset === 'custom' : f.value.preset))
       count++;
-    if (f.type === 'select' && f.value !== null) count++;
+    if (f.type === 'select' && f.value !== (f.restingValue ?? null)) count++;
     if (f.type === 'multiSelect' && f.value.length > 0) count++;
     if (f.type === 'switch' && f.value) count++;
   }

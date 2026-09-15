@@ -1,0 +1,123 @@
+{
+  "actions": {
+    "cancelQuotation": "Cancel",
+    "copy": "Copy",
+    "exportPdf": "Export PDF",
+    "generateSalesOrder": "Generate sales order",
+    "markConfirmed": "Customer confirmed",
+    "markReady": "Mark as ready",
+    "new": "New quotation",
+    "sharePdf": "Share PDF"
+  },
+  "cancelConfirm": {
+    "message": "Cancel this quotation? It will be locked and can no longer be edited or marked ready.",
+    "title": "Cancel this quotation?"
+  },
+  "cancelledNote": "This quotation has been cancelled.",
+  "columns": {
+    "date": "Date"
+  },
+  "confirmAgreement": {
+    "message": "Mark this quotation as agreed by the customer. It will be locked and can no longer be edited — you can still export the PDF and generate a sales order. Continue?",
+    "title": "Record the customer’s agreement?"
+  },
+  "confirmedNote": "The customer has agreed to this quotation, so it is locked. Copy it to quote different terms.",
+  "convertedNote": "A sales order has been generated from this quotation.",
+  "copiedFrom": "Copied from {{code}} — adjust and save as a new draft.",
+  "countLabel_one": "{{count}} quotation",
+  "countLabel_other": "{{count}} quotations",
+  "dangerZone": {
+    "deleteItem": "Delete quotation",
+    "deleteItemDesc": "Permanently remove this quotation"
+  },
+  "dateKind": {
+    "confirmed": "Confirmed",
+    "created": "Created",
+    "po": "PO date",
+    "sent": "Sent"
+  },
+  "deleteConfirm": {
+    "message": "Are you sure you want to delete this quotation? This action cannot be undone.",
+    "title": "Delete quotation"
+  },
+  "editTitle": "Edit quotation",
+  "emptyState": "No quotations in this period.",
+  "filter": {
+    "searchPlaceholder": "Search code or customer"
+  },
+  "form": {
+    "addLine": "Add product",
+    "amountLabel": "Amount",
+    "belowSuggestedPriceHint": "Below suggested price ({{price}})",
+    "companyLabel": "Issuing company",
+    "customerLabel": "Customer",
+    "customerPlaceholder": "Select customer (optional)",
+    "headerSection": "Quotation",
+    "linesLabel": "Products",
+    "noLines": "No products yet. Add products, quantities and prices.",
+    "note": "Note",
+    "priceLabel": "Unit price",
+    "priceTiers": {
+      "addTier": "Add tier",
+      "count_one": "{{count}} tier",
+      "count_other": "{{count}} tiers",
+      "editTooltip": "Price by minimum order quantity",
+      "minQuantity": "Min. quantity",
+      "modalHint": "Quote a unit price per minimum order quantity. The line's unit price fills in from the quantity entered, and the ladder is printed under the item on the PDF.",
+      "modalTitle": "Price by minimum order quantity",
+      "rung": "≥ {{quantity}}: {{price}}"
+    },
+    "productLabel": "Product",
+    "productPlaceholder": "Select product",
+    "quantityLabel": "Quantity",
+    "totalLabel": "Total",
+    "unitLabel": "Unit"
+  },
+  "fromQuotation": "From quotation",
+  "newTitle": "New quotation",
+  "notifications": {
+    "cancelError": "Failed to cancel quotation",
+    "cancelSuccess": "Quotation cancelled",
+    "confirmError": "Failed to record the customer agreement",
+    "confirmSuccess": "Customer agreement recorded",
+    "createError": "Failed to create quotation",
+    "createSuccess": "Quotation created",
+    "deleteError": "Failed to delete quotation",
+    "deleteSuccess": "Quotation deleted",
+    "duplicateCode": "Code already in use, please try again",
+    "fetchError": "Failed to load quotations",
+    "sendError": "Failed to mark quotation ready",
+    "sendSuccess": "Quotation marked ready",
+    "updateError": "Failed to update quotation",
+    "updateSuccess": "Quotation updated"
+  },
+  "previewTitle": "Quotation preview",
+  "print": {
+    "includeVat": "Include VAT",
+    "landscape": "Landscape",
+    "optionsTitle": "Export options",
+    "orientation": "Orientation",
+    "paperSize": "Paper size",
+    "popupBlocked": "Pop-up blocked. Allow pop-ups for this site, then try again.",
+    "portrait": "Portrait"
+  },
+  "sendConfirm": {
+    "message": "Mark this quotation as ready to send to the customer. You can still edit it until the customer confirms. Continue?",
+    "title": "Mark this quotation as ready?"
+  },
+  "share": {
+    "downloadedFallback": "Sharing isn't supported on this browser — the PDF was downloaded instead.",
+    "error": "Couldn't generate the PDF. Please try again."
+  },
+  "status": {
+    "cancelled": "Cancelled",
+    "confirmed": "Confirmed",
+    "converted": "Converted",
+    "draft": "Draft",
+    "sent": "Ready"
+  },
+  "title": "Quotations",
+  "validation": {
+    "linesRequired": "Add at least one product."
+  }
+}

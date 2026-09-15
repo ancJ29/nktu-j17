@@ -661,7 +661,7 @@ export function GoodsReceiptFormPage() {
           size="compact-sm"
           leftSection={<IconArrowLeft size={16} />}
         >
-          {t('__new__.01-common.actions.back')}
+          {t('common.actions.back')}
         </Button>
       </Group>
 
@@ -777,7 +777,7 @@ export function GoodsReceiptFormPage() {
                     leftSection={<IconPlus size={14} />}
                     onClick={() => form.insertListItem('items', { ...emptyItem })}
                   >
-                    {t('__new__.01-common.actions.addEntry')}
+                    {t('common.actions.addEntry')}
                   </Button>
                 </Group>
               </Group>
@@ -916,7 +916,7 @@ export function GoodsReceiptFormPage() {
                 disabled={loading}
                 onClick={() => navigate(ROUTES.GOODS_RECEIPTS.LIST)}
               >
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" loading={loading} size="sm">
                 {isEdit

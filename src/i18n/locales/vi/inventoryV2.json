@@ -1,0 +1,43 @@
+{
+  "alertsOff": "Tắt cảnh báo",
+  "columnHeader": "Tồn kho",
+  "currentOnHand": "Hiện tại",
+  "deltaDescription": "Cộng vào số đang lưu. Nhập số âm để xuất kho.",
+  "deltaLabel": "Thay đổi",
+  "deltaPlaceholder": "ví dụ 10 hoặc -5",
+  "forecastTooltip": "Tồn dự kiến = hiện tại + hàng về − đang giữ",
+  "incoming": "Hàng về",
+  "incomingTooltip": "Hàng về từ phiếu nhập đang nháp. Không tính phiếu đã nhận hoặc đã huỷ.",
+  "incomingUnnamed": "Phiếu nhập chưa rõ số",
+  "minStock": "Tồn kho tối thiểu",
+  "modalTitle": "Cập nhật tồn kho",
+  "mode": {
+    "delta": "Điều chỉnh",
+    "snapshot": "Kiểm kê"
+  },
+  "negative": "nợ hàng",
+  "neverCounted": "Chưa kiểm kê — chưa có bản ghi tồn kho.",
+  "newOnHand": "Sau khi lưu",
+  "note": "Ghi chú",
+  "notifications": {
+    "conflict": "Người khác vừa thay đổi tồn kho này — số liệu mới nhất đang hiển thị. Kiểm tra lại và lưu.",
+    "error": "Không thể lưu tồn kho",
+    "saved": "Đã cập nhật tồn kho"
+  },
+  "onHand": "Tồn kho",
+  "onHandDescription": "Tổng số đã kiểm. Số này thay thế số đang lưu, và có thể âm nếu đang nợ hàng.",
+  "outgoing": "Đang giữ",
+  "outgoingTooltip": "Giữ cho đơn bán đang mở. Trừ vào lượng có thể bán, chưa trừ tồn kho.",
+  "outgoingUnnamed": "Đơn hàng chưa rõ số",
+  "save": "Lưu tồn kho",
+  "shortIncoming": "Về",
+  "shortOnHand": "Tồn",
+  "shortOutgoing": "Giữ",
+  "title": "Tồn kho",
+  "updateStock": "Cập nhật tồn kho",
+  "validation": {
+    "deltaRequired": "Thay đổi bằng 0 thì không ghi gì",
+    "valueRequired": "Nhập một số",
+    "willGoNegative": "Tồn kho sẽ xuống dưới 0 — ghi nhận là nợ hàng."
+  }
+}

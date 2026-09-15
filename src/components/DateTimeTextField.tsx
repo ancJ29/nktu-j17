@@ -208,7 +208,7 @@ export function DateTimeTextField({
                 variant="subtle"
                 color="gray"
                 size="xs"
-                aria-label={t('__new__.01-common.actions.clearValue')}
+                aria-label={t('common.actions.clearValue')}
                 onClick={() => {
                   setDraft(null);
                   setInvalid(false);
@@ -232,7 +232,7 @@ export function DateTimeTextField({
                   variant="subtle"
                   color="gray"
                   size="xs"
-                  aria-label={t('__new__.01-common.actions.pickDateTime')}
+                  aria-label={t('common.actions.pickDateTime')}
                   onClick={() => {
                     // Anchor on the value at the moment of opening — not once at
                     // mount, and not on wherever the operator paged to last time.

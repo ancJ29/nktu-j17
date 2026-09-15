@@ -701,7 +701,7 @@ export function ProductForm({ variant }: ProductFormProps) {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
     </Group>
   );

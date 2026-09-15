@@ -69,11 +69,11 @@ export function CacheStatus({ cachedAt, loading, onRefresh, compact }: CacheStat
 
   let ageLabel: string;
   if (seconds < 3600) {
-    ageLabel = t('__new__.01-common.cache.minutesAgo', {
+    ageLabel = t('common.cache.minutesAgo', {
       count: Math.max(1, Math.floor(seconds / 60)),
     });
   } else {
-    ageLabel = t('__new__.01-common.cache.hoursAgo', { count: Math.floor(seconds / 3600) });
+    ageLabel = t('common.cache.hoursAgo', { count: Math.floor(seconds / 3600) });
   }
 
   if (compact) {
@@ -96,7 +96,7 @@ export function CacheStatus({ cachedAt, loading, onRefresh, compact }: CacheStat
       <Text size="xs" c="dimmed">
         {ageLabel}
       </Text>
-      <Tooltip label={t('__new__.01-common.cache.refresh')}>
+      <Tooltip label={t('common.cache.refresh')}>
         <ActionIcon variant="subtle" size="xs" onClick={onRefresh} loading={loading}>
           <IconRefresh size={14} />
         </ActionIcon>

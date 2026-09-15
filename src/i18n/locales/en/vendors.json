@@ -1,0 +1,82 @@
+{
+  "addItem": "Add Vendor",
+  "contacts": {
+    "addContact": "Add contact",
+    "emptyHint": "No additional contacts yet.",
+    "section": "Contacts"
+  },
+  "deleteConfirm": {
+    "message": "Hide this vendor? It will no longer appear in lists. The record stays in the system for audit.",
+    "title": "Delete Vendor"
+  },
+  "detail": {
+    "activitiesError": "Failed to load activities.",
+    "activitiesLoadMore": "Load more",
+    "activitiesNoEntries": "No activities recorded for this vendor yet.",
+    "activityVerbs": {
+      "addNote": "Added a note to",
+      "create": "Created",
+      "delete": "Deleted",
+      "removeNote": "Removed a note from",
+      "toggleStatus": "Changed status of",
+      "update": "Updated"
+    },
+    "billingAddress": "Billing address",
+    "noPickupAddresses": "No pickup addresses on file.",
+    "pickupAddress": "Pickup address",
+    "receivingHours": "Pickup hours",
+    "recentActivities": "Recent Activities",
+    "tab": {
+      "activity": "Activity",
+      "details": "Details"
+    }
+  },
+  "editItem": "Edit Vendor",
+  "form": {
+    "addressPlaceholder": "Full address",
+    "codePlaceholder": "Vendor code",
+    "contactNameLabel": "Name",
+    "contactPersonLabel": "Primary Contact",
+    "contactPersonPlaceholder": "Primary contact name",
+    "contactRoleLabel": "Role / Title",
+    "createButton": "Create Vendor",
+    "deliveryHoursLabel": "Pickup Hours",
+    "deliveryHoursPlaceholder": "e.g. 7:30 - 16:30 (Mon - Fri)",
+    "googleMapUrlLabel": "Google Maps URL",
+    "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
+    "isActiveLabel": "Active",
+    "isDomesticDescription": "Turn off for an overseas vendor",
+    "isDomesticLabel": "Domestic vendor",
+    "namePlaceholder": "Vendor name",
+    "originLabel": "Origin",
+    "phonePlaceholder": "Phone number",
+    "pickupAddressLabel": "Pickup Address",
+    "pickupAddressesAdd": "Add pickup address",
+    "shortNamePlaceholder": "Abbreviated name",
+    "updateButton": "Update Vendor"
+  },
+  "noItems": "No vendors found",
+  "notSet": "Not set",
+  "notifications": {
+    "createError": "Failed to create vendor",
+    "createSuccess": "Vendor created successfully",
+    "deleteError": "Failed to delete vendor",
+    "deleteSuccess": "Vendor deleted successfully",
+    "disableSuccess": "Vendor paused",
+    "enableSuccess": "Vendor activated",
+    "fetchError": "Failed to load vendors",
+    "toggleError": "Failed to change vendor status",
+    "updateError": "Failed to update vendor",
+    "updateSuccess": "Vendor updated successfully"
+  },
+  "origin": {
+    "china": "China",
+    "domestic": "Domestic",
+    "overseas": "Overseas",
+    "vietnam": "Vietnam"
+  },
+  "status": {
+    "cooperating": "Cooperating",
+    "paused": "Paused"
+  }
+}

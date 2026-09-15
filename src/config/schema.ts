@@ -24,6 +24,19 @@ const CMngtNavigationConfigSchema = z.object({
   mobile: z.array(CMngtNavigationItemSchema),
 });
 
+const CMngtNavigationItemV2Schema = CMngtNavigationItemSchema.extend({
+  hiddenForDepartments: z.array(z.string()).optional(),
+
+  visibleForEmployeeIds: z.array(z.string()).optional(),
+  get subs() {
+    return z.array(CMngtNavigationItemV2Schema).optional();
+  },
+});
+
+const CMngtNavigationV2Schema = z.object({
+  pc: z.array(CMngtNavigationItemV2Schema),
+});
+
 const TranslatableSchema = z.record(z.string(), z.string());
 
 const OptionSchema = z.object({
@@ -56,6 +69,8 @@ const EmployeesFeaturesSchema = z
     enabled: z.boolean().default(true),
 
     selfManage: z.boolean().default(false),
+
+    v2: z.boolean().default(false),
     email: z.boolean().default(false),
     position: z.boolean().default(false),
     department: z.boolean().default(false),
@@ -75,6 +90,7 @@ const EmployeesFeaturesSchema = z
   .default({
     enabled: true,
     selfManage: false,
+    v2: false,
     email: false,
     position: false,
     department: false,
@@ -97,11 +113,14 @@ const PermissionManagementFeaturesSchema = z
     enabled: z.boolean().default(false),
     rootUserOnly: z.boolean().default(true),
     showRestrictedItems: z.boolean().default(false),
+
+    useServerPermissions: z.boolean().default(false),
   })
   .default({
     enabled: false,
     rootUserOnly: true,
     showRestrictedItems: false,
+    useServerPermissions: false,
   });
 
 const ActivityLogFeaturesSchema = z
@@ -148,6 +167,184 @@ const VendorFeaturesSchema = z
     enabled: false,
     codePrefix: 'VND-',
     codePadLength: 4,
+  });
+
+const VendorsV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    simpleMode: z.boolean().default(true),
+    codePrefix: z.string().default('VND-'),
+    codePadLength: z.number().int().min(0).max(12).default(4),
+
+    listColumns: z.array(z.string()).default([]),
+
+    hiddenColumns: z.array(z.string()).default([]),
+  })
+  .default({
+    enabled: false,
+    simpleMode: true,
+    codePrefix: 'VND-',
+    codePadLength: 4,
+    listColumns: [],
+    hiddenColumns: [],
+  });
+
+const CustomersV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    simpleMode: z.boolean().default(true),
+    codePrefix: z.string().default('CST-'),
+    codePadLength: z.number().int().min(0).max(12).default(4),
+
+    listColumns: z.array(z.string()).default([]),
+    hiddenColumns: z.array(z.string()).default([]),
+  })
+  .default({
+    enabled: false,
+    simpleMode: true,
+    codePrefix: 'CST-',
+    codePadLength: 4,
+    listColumns: [],
+    hiddenColumns: [],
+  });
+
+const ProductsV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    simpleMode: z.boolean().default(true),
+    codePrefix: z.string().default('PRD-'),
+    codePadLength: z.number().int().min(0).max(12).default(4),
+    priceManagement: z.boolean().default(false),
+    productPhoto: z.boolean().default(false),
+
+    inventory: z.boolean().default(false),
+
+    incomingColumn: z.boolean().default(false),
+    incomingReceipts: z.boolean().default(false),
+
+    outgoingOrders: z.boolean().default(false),
+
+    listColumns: z.array(z.string()).default([]),
+    hiddenColumns: z.array(z.string()).default([]),
+  })
+  .default({
+    enabled: false,
+    simpleMode: true,
+    codePrefix: 'PRD-',
+    codePadLength: 4,
+    priceManagement: false,
+    productPhoto: false,
+    inventory: false,
+    incomingColumn: false,
+    incomingReceipts: false,
+    outgoingOrders: false,
+    listColumns: [],
+    hiddenColumns: [],
+  });
+
+const MaterialsV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    simpleMode: z.boolean().default(true),
+    codePrefix: z.string().default('MAT-'),
+    codePadLength: z.number().int().min(0).max(12).default(4),
+    unitCategory: z.string().default('material-unit'),
+
+    inventory: z.boolean().default(false),
+
+    listColumns: z.array(z.string()).default([]),
+    hiddenColumns: z.array(z.string()).default([]),
+  })
+  .default({
+    enabled: false,
+    simpleMode: true,
+    codePrefix: 'MAT-',
+    codePadLength: 4,
+    unitCategory: 'material-unit',
+    inventory: false,
+    listColumns: [],
+    hiddenColumns: [],
+  });
+
+const GoodsReceiptsV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    defaultRangeDays: z.number().int().min(1).max(92).default(14),
+
+    codePrefix: z.string().default('GR-'),
+    codePadLength: z.number().int().min(0).max(12).default(3),
+
+    statusFlow: z.unknown().optional(),
+
+    customFields: z.unknown().optional(),
+
+    listColumns: z.array(z.string()).default([]),
+
+    hiddenColumns: z.array(z.string()).default([]),
+
+    defaultListStatuses: z.array(z.string()).default([]),
+  })
+  .default({
+    enabled: false,
+    defaultRangeDays: 14,
+    codePrefix: 'GR-',
+    codePadLength: 3,
+    defaultListStatuses: [],
+    listColumns: [],
+    hiddenColumns: [],
+  });
+
+const SalesOrdersV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    defaultRangeDays: z.number().int().min(1).max(92).default(14),
+    codePrefix: z.string().default('SO-'),
+    codePadLength: z.number().int().min(0).max(12).default(3),
+    statusFlow: z.unknown().optional(),
+    customFields: z.unknown().optional(),
+    listColumns: z.array(z.string()).default([]),
+    hiddenColumns: z.array(z.string()).default([]),
+    defaultListStatuses: z.array(z.string()).default([]),
+
+    paymentTracking: z.boolean().default(false),
+
+    autoCompleteOnFullDelivery: z.boolean().default(false),
+  })
+  .default({
+    enabled: false,
+    defaultRangeDays: 14,
+    codePrefix: 'SO-',
+    codePadLength: 3,
+    defaultListStatuses: [],
+    listColumns: [],
+    hiddenColumns: [],
+    paymentTracking: false,
+    autoCompleteOnFullDelivery: false,
+  });
+
+const DeliveryNotesV2FeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    defaultRangeDays: z.number().int().min(1).max(92).default(14),
+    codePrefix: z.string().default('DN-'),
+    codePadLength: z.number().int().min(0).max(12).default(3),
+    statusFlow: z.unknown().optional(),
+    customFields: z.unknown().optional(),
+    listColumns: z.array(z.string()).default([]),
+    hiddenColumns: z.array(z.string()).default([]),
+    defaultListStatuses: z.array(z.string()).default([]),
+
+    deliveryPhotoRequired: z.boolean().default(true),
+  })
+  .default({
+    enabled: false,
+    defaultRangeDays: 14,
+    codePrefix: 'DN-',
+    codePadLength: 3,
+    defaultListStatuses: [],
+    listColumns: [],
+    hiddenColumns: [],
+    deliveryPhotoRequired: true,
   });
 
 const LookupFeaturesSchema = z
@@ -420,6 +617,8 @@ const TransportOrderFeaturesSchema = z
 
     orderTruckTypes: z.array(z.string()).default([]),
 
+    multiDropTruckTypes: z.array(z.string()).default([]),
+
     statusOptions: z.array(TransportOrderStatusOptionSchema).default([]),
 
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
@@ -436,6 +635,7 @@ const TransportOrderFeaturesSchema = z
     codePadLength: 3,
     routeCodePrefix: 'TUYEN-',
     orderTruckTypes: [],
+    multiDropTruckTypes: [],
     statusOptions: [],
     statusTransitions: {},
     driverDepartments: [],
@@ -466,20 +666,41 @@ const DisplaySettingsSchema = z
     dateTimeFormat: 'HH:mm DD/MM/YYYY',
   });
 
+const COMMON_FEATURE_DEFAULTS = {
+  darkMode: false,
+  languageSwitcher: true,
+  enablePdfSharing: false,
+  enableStats: false,
+  notifyNewVersion: false,
+  tableDensity: 'comfortable',
+} as const;
+
 const FeaturesSchema = z
   .object({
-    common: z.object({
-      darkMode: z.boolean().default(false),
-      languageSwitcher: z.boolean().default(true),
+    common: z
+      .object({
+        darkMode: z.boolean().default(false),
+        languageSwitcher: z.boolean().default(true),
 
-      enablePdfSharing: z.boolean().default(false),
+        enablePdfSharing: z.boolean().default(false),
 
-      enableStats: z.boolean().default(false),
+        enableStats: z.boolean().default(false),
 
-      notifyNewVersion: z.boolean().default(false),
+        notifyNewVersion: z.boolean().default(false),
 
-      tableDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
-    }),
+        tableDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
+      })
+      /**
+       * **Its own default, like every sibling block has.** The object-level
+       * `.default()` at the bottom of this schema only fires when `features` is
+       * absent entirely — a config that names ONE module and leaves the rest to
+       * the schema went through the field defaults instead, and this was the
+       * only field without one. A partial `features` therefore failed to parse,
+       * and `loadConfig` drops an invalid config on the floor: the client boots
+       * on bundled defaults with every per-client flag silently wrong. Pinned
+       * by `seedConfig.test.ts`.
+       */
+      .default(COMMON_FEATURE_DEFAULTS),
     employees: EmployeesFeaturesSchema,
     permissionManagement: PermissionManagementFeaturesSchema,
     activityLog: ActivityLogFeaturesSchema,
@@ -488,6 +709,13 @@ const FeaturesSchema = z
     materials: MaterialFeaturesSchema,
     customers: CustomerFeaturesSchema,
     vendors: VendorFeaturesSchema,
+    vendorsV2: VendorsV2FeaturesSchema,
+    customersV2: CustomersV2FeaturesSchema,
+    productsV2: ProductsV2FeaturesSchema,
+    materialsV2: MaterialsV2FeaturesSchema,
+    goodsReceiptsV2: GoodsReceiptsV2FeaturesSchema,
+    salesOrdersV2: SalesOrdersV2FeaturesSchema,
+    deliveryNotesV2: DeliveryNotesV2FeaturesSchema,
     salesOrders: SalesOrderFeaturesSchema,
     quotations: QuotationFeaturesSchema,
     deliveryRequests: DeliveryRequestFeaturesSchema,
@@ -507,14 +735,7 @@ const FeaturesSchema = z
     farm: ModuleFeaturesSchema,
   })
   .default({
-    common: {
-      darkMode: false,
-      languageSwitcher: true,
-      enablePdfSharing: false,
-      enableStats: false,
-      notifyNewVersion: false,
-      tableDensity: 'comfortable',
-    },
+    common: COMMON_FEATURE_DEFAULTS,
     employees: EmployeesFeaturesSchema.parse({}),
     permissionManagement: PermissionManagementFeaturesSchema.parse({}),
     activityLog: ActivityLogFeaturesSchema.parse({}),
@@ -530,6 +751,13 @@ const FeaturesSchema = z
     farm: ModuleFeaturesSchema.parse({}),
     customers: CustomerFeaturesSchema.parse({}),
     vendors: VendorFeaturesSchema.parse({}),
+    vendorsV2: VendorsV2FeaturesSchema.parse({}),
+    customersV2: CustomersV2FeaturesSchema.parse({}),
+    productsV2: ProductsV2FeaturesSchema.parse({}),
+    materialsV2: MaterialsV2FeaturesSchema.parse({}),
+    goodsReceiptsV2: GoodsReceiptsV2FeaturesSchema.parse({}),
+    salesOrdersV2: SalesOrdersV2FeaturesSchema.parse({}),
+    deliveryNotesV2: DeliveryNotesV2FeaturesSchema.parse({}),
     salesOrders: SalesOrderFeaturesSchema.parse({}),
     quotations: QuotationFeaturesSchema.parse({}),
     deliveryRequests: DeliveryRequestFeaturesSchema.parse({}),
@@ -588,6 +816,7 @@ export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
   permissions: PartialPermissionsSchema,
 
   navigation: CMngtNavigationConfigSchema,
+  navigationV2: CMngtNavigationV2Schema.optional(),
 });
 
 export const defaultAppConfig = CMngtAppConfigSchema.parse({
@@ -612,6 +841,6 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
   defaultLanguage: 'vi',
 
   navigation: defaultNavigation,
-}) satisfies Omit<AppConfig, 'env' | 'navigation' | 'translations'>;
+}) satisfies Omit<AppConfig, 'env' | 'companyInfo' | 'navigation' | 'translations'>;
 
 export type CMngtAppConfig = z.infer<typeof CMngtAppConfigSchema> & CredoAppConfig;

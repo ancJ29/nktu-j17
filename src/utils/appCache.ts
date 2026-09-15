@@ -24,6 +24,8 @@ export type AppCacheData = {
   };
 
   mdh?: { c: string; h: CMngtMasterDataHashes };
+
+  v2s?: { c: string; r: string[] };
   // `vmg` / `cmg` (vendors-/customers-migrated flags) lived here 2026-07-14 only
   // — both one-time migration runtimes were retired with their dedicated
   // backends. Stale entries in deployed browsers are inert (nothing reads them).

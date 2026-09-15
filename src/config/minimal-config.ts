@@ -92,4 +92,4 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
       enabled: true,
     },
   },
-}) satisfies Omit<AppConfig, 'env' | 'navigation' | 'translations'>;
+}) satisfies Omit<AppConfig, 'env' | 'companyInfo' | 'navigation' | 'translations'>;

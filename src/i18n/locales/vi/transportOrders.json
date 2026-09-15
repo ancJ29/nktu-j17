@@ -1,0 +1,248 @@
+{
+  "actions": {
+    "cancel": "Hủy đơn"
+  },
+  "billing": {
+    "advance": "Tạm ứng",
+    "balanceDue": "Còn lại",
+    "contractNo": "Số HĐ vận chuyển",
+    "grandTotal": "Tổng cộng",
+    "nonBillableTotal": "Khách tự thanh toán",
+    "passthroughSubtotal": "Cộng chi hộ",
+    "roundDown": "Làm tròn xuống VAT",
+    "roundDownDescription": "Bỏ phần lẻ dưới 1 đồng thay vì làm tròn — khách hàng trả số nhỏ hơn.",
+    "serviceSubtotal": "Cộng phí dịch vụ",
+    "title": "Thanh toán",
+    "vatAmount": "VAT ({{rate}}%)",
+    "vatRate": "Thuế suất VAT"
+  },
+  "cancel": {
+    "confirmMessage": "Hủy đơn vận chuyển này? Đơn vẫn được lưu với nhãn đã hủy.",
+    "confirmTitle": "Hủy đơn vận chuyển",
+    "reasonLabel": "Lý do (không bắt buộc)",
+    "reasonPlaceholder": "Vì sao hủy đơn vận chuyển này?",
+    "statusBadge": "Đã hủy"
+  },
+  "columns": {
+    "bill": "Số B/L · B/K",
+    "container": "Số cont",
+    "containerBill": "Số cont · B/L",
+    "customerOrder": "Mã lệnh KH",
+    "date": "Ngày",
+    "declaration": "Số tờ khai",
+    "driver": "Tài xế · Xe",
+    "route": "Tuyến",
+    "truck": "Xe"
+  },
+  "confirmDelete": {
+    "message": "Đơn vận chuyển sẽ bị xóa khỏi danh sách. Không thể hoàn tác.",
+    "title": "Xóa đơn vận chuyển"
+  },
+  "conflicts": {
+    "hint": "Cảnh báo này không chặn lưu đơn — kiểm tra lại rồi tự quyết định.",
+    "leg": "Chặng {{n}}",
+    "overlapsWith": "trùng khung giờ với",
+    "title": "Trùng lịch xe / tài xế",
+    "wholeOrder": "Đơn này"
+  },
+  "copiedFrom": "Sao chép từ {{code}} — điều chỉnh và lưu thành đơn mới.",
+  "customerReport": {
+    "export": "Xuất bảng kê khách hàng"
+  },
+  "detail": {
+    "activitiesError": "Không tải được hoạt động.",
+    "activitiesLoadMore": "Tải thêm",
+    "activitiesNoEntries": "Chưa có hoạt động nào cho đơn vận chuyển này.",
+    "activityMemo": {
+      "cancelledFrom": "Hủy từ trạng thái",
+      "container": "Container",
+      "deletedFrom": "Xóa từ trạng thái",
+      "disbursements_one": "{{count}} khoản chi hộ",
+      "disbursements_other": "{{count}} khoản chi hộ",
+      "fees_one": "{{count}} dòng phí",
+      "fees_other": "{{count}} dòng phí",
+      "fieldAdvanceAmount": "Tạm ứng",
+      "fieldBillNumber": "Số B/L",
+      "fieldContainerNumber": "Số container",
+      "fieldContractNo": "Số hợp đồng",
+      "fieldCustomer": "Khách hàng",
+      "fieldDeclarationNumber": "Số tờ khai",
+      "fieldDisbursementCount": "Chi hộ",
+      "fieldDriver": "Tài xế",
+      "fieldDropoffDate": "Ngày hạ",
+      "fieldEntryDate": "Ngày",
+      "fieldFeeCount": "Dòng phí",
+      "fieldMoocStorageDays": "Số ngày lưu moor",
+      "fieldRequestedPickupDate": "Ngày yêu cầu lấy",
+      "fieldRoute": "Tuyến",
+      "fieldShipmentType": "Loại hình",
+      "fieldTotalAmount": "Tạm tính",
+      "fieldTripCount": "Số chặng",
+      "fieldTripLaborTotal": "Tổng lương chuyến",
+      "fieldTruck": "Xe",
+      "fieldTruckingSize": "Loại cont / kích thước",
+      "fieldVatRate": "Thuế suất VAT",
+      "fromTo": "{{from}} → {{to}}",
+      "notesChanged": "Ghi chú đã thay đổi",
+      "reason": "Lý do",
+      "route": "Tuyến",
+      "scheduleChanged": "Đã đổi thời gian dự kiến",
+      "total": "Tổng",
+      "trips_one": "{{count}} chặng",
+      "trips_other": "{{count}} chặng"
+    },
+    "activityVerbs": {
+      "cancel": "Đã hủy đơn vận chuyển",
+      "create": "Đã tạo đơn vận chuyển",
+      "delete": "Đã xóa đơn vận chuyển",
+      "statusChange": "Đã đổi trạng thái",
+      "update": "Đã sửa đơn vận chuyển",
+      "updateInline": "Đã cập nhật thông tin"
+    },
+    "createdBy": "Người tạo",
+    "info": "Thông tin",
+    "recentActivities": "Hoạt động gần đây",
+    "tabActivity": "Lịch sử đơn",
+    "tabActivityLog": "Hoạt động"
+  },
+  "edit": "Sửa đơn vận chuyển",
+  "fees": {
+    "add": "Thêm phí",
+    "amount": "Số tiền",
+    "invoiceNo": "Số hoá đơn",
+    "kindPassthrough": "Chi hộ",
+    "kindService": "Phí dịch vụ",
+    "label": "Tên phí",
+    "memo": "Ghi chú",
+    "notBilled": "không thu",
+    "payer": "Người thanh toán",
+    "payerCompany": "Công ty",
+    "payerCustomer": "Khách hàng",
+    "title": "Phí dịch vụ",
+    "vatable": "VAT"
+  },
+  "filters": {
+    "createdDate": "Ngày tạo",
+    "hideCancelled": "Ẩn đơn đã hủy",
+    "truckType": "Loại xe"
+  },
+  "form": {
+    "customer": "Khách hàng",
+    "driver": "Tài xế",
+    "dropoffDate": "Ngày hạ",
+    "externalDriver": "Tài xế / Nhà xe",
+    "externalPlate": "Biển số xe",
+    "externalTruck": "Xe ngoài",
+    "externalTruckHint": "Xe thuê ngoài — không có trong danh sách xe quản lý",
+    "jobSection": "Thông tin chuyến",
+    "metaSection": "Thông tin khác",
+    "moocStorageDays": "Số ngày lưu moor",
+    "multiTrip": "Nhiều chặng",
+    "multiTripHint": "Đơn chạy nhiều chặng — mỗi chặng có điểm đi/đến, ngày, xe, tài xế và lương riêng.",
+    "noTrucks": "Chưa có xe. Thêm thông tin xe tại Tài sản → Xe tải.",
+    "requestedPickupDate": "Ngày yêu cầu lấy",
+    "shipmentType": "Loại hình",
+    "truckType": "Loại xe",
+    "truckingSize": "Loại cont / kích thước"
+  },
+  "locked": {
+    "notice": "Đơn đã lên bảng kê và bị khóa — không thể chỉnh sửa hoặc xóa."
+  },
+  "multiDrop": {
+    "addStop": "Thêm điểm giao",
+    "chooseType": "Chọn loại xe cho đơn mới",
+    "days_one": "{{count}} ngày",
+    "days_other": "{{count}} ngày",
+    "distance": "{{km}} km",
+    "editTitle": "Sửa đơn {{type}}",
+    "from": "Điểm đi",
+    "locationsFailed": "Không tải được danh sách địa điểm. Tải lại trang để thử lại.",
+    "newTitle": "Tạo đơn {{type}}",
+    "noTrucksOfType": "Chưa có xe loại {{type}}. Thêm xe tại Tài sản → Xe tải.",
+    "routeTitle": "Lộ trình",
+    "stop": "Điểm giao {{n}}",
+    "provincePlaceholder": "Chọn tỉnh / thành phố",
+    "stopPlaceholder": "Chọn phường / xã",
+    "ward": "Phường / Xã",
+    "totalDays": "Tổng số ngày",
+    "totalDistance": "Tổng quãng đường (từ TP.HCM)",
+    "validation": {
+      "fromRequired": "Nhập điểm đi",
+      "provinceRequired": "Chọn tỉnh / thành phố",
+      "stopRequired": "Chọn phường / xã"
+    }
+  },
+  "new": "Tạo đơn vận chuyển",
+  "noResults": "Không tìm thấy đơn vận chuyển",
+  "notifications": {
+    "cancelled": "Đã hủy đơn vận chuyển",
+    "createError": "Tạo đơn vận chuyển thất bại",
+    "created": "Đã tạo đơn vận chuyển",
+    "customerReportNeedCustomer": "Chọn một khách hàng ở bộ lọc để xuất bảng kê.",
+    "customerReportOneCustomer": "Chỉ chọn được một khách hàng ở bộ lọc để xuất bảng kê.",
+    "customerReportSuccess_one": "Đã xuất bảng kê ({{count}} đơn).",
+    "customerReportSuccess_other": "Đã xuất bảng kê ({{count}} đơn).",
+    "deleted": "Đã xóa đơn vận chuyển",
+    "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
+    "exportError": "Xuất đơn vận chuyển thất bại.",
+    "exportSuccess_one": "Đã xuất {{count}} đơn vận chuyển.",
+    "exportSuccess_other": "Đã xuất {{count}} đơn vận chuyển.",
+    "loadError": "Không tải được đơn vận chuyển",
+    "mobileFormBlocked": "Chỉnh sửa đơn vận chuyển chỉ khả dụng trên máy tính.",
+    "saveError": "Lưu thay đổi thất bại",
+    "tripLogSyncError": "Chưa cập nhật được nhật ký chuyến của xe. Hệ thống sẽ thử lại khi mở đơn này lần sau.",
+    "updateError": "Cập nhật đơn vận chuyển thất bại",
+    "updated": "Đã cập nhật đơn vận chuyển"
+  },
+  "route": {
+    "collapse": "Thu gọn",
+    "dropoff": "Nơi hạ",
+    "dropoffAt": "Giờ hạ dự kiến",
+    "expand": "Xem các chặng",
+    "pickup": "Nơi lấy",
+    "pickupAt": "Giờ lấy dự kiến",
+    "stuffing": "Nơi đóng/rút hàng",
+    "stuffingAt": "Giờ đóng/rút hàng dự kiến",
+    "title": "Tuyến dịch vụ",
+    "tripTotal": "(tổng {{count}} chặng)"
+  },
+  "search": "Tìm số đơn / số xe / tài xế / B/L / cont…",
+  "shipmentType": {
+    "domestic": "Nội địa",
+    "export": "Xuất",
+    "import": "Nhập"
+  },
+  "stats": {
+    "balanceDue": "Còn phải thu",
+    "driverPay": "Lương chuyến",
+    "revenue": "Doanh thu",
+    "total": "Tổng"
+  },
+  "statusChange": {
+    "confirmMessage": "Chuyển trạng thái đơn từ \"{{from}}\" sang \"{{to}}\"?",
+    "confirmTitle": "Thay đổi trạng thái",
+    "lockWarning": "Đơn sẽ bị khóa: không thể sửa, xóa hoặc chuyển trạng thái khác.",
+    "notePlaceholder": "Thêm ghi chú cho thay đổi này"
+  },
+  "title": "Đơn vận chuyển",
+  "trips": {
+    "add": "Thêm chặng",
+    "badge": "{{n}} chặng",
+    "departure": "Điểm đi",
+    "destination": "Điểm đến",
+    "laborCost": "Lương chuyến",
+    "laborTotal": "Tổng lương chuyến",
+    "loadingAt": "Đóng hàng dự kiến",
+    "title": "Danh sách chặng",
+    "unloadingAt": "Xuống hàng dự kiến"
+  },
+  "validation": {
+    "containerNumberPattern": "Số cont phải đúng định dạng, ví dụ RFCU9876543 (3 chữ cái, U/J/Z, rồi 7 chữ số)",
+    "customerRequired": "Vui lòng chọn khách hàng",
+    "driverRequired": "Vui lòng chọn tài xế",
+    "entryDateRequired": "Vui lòng chọn ngày",
+    "plateRequired": "Vui lòng nhập biển số xe",
+    "truckRequired": "Vui lòng chọn xe",
+    "truckingSizeRequired": "Vui lòng chọn loại cont / kích thước"
+  }
+}

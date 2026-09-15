@@ -481,7 +481,7 @@ export function QuotationDetail() {
               size="compact-sm"
               leftSection={<IconArrowLeft size={16} />}
             >
-              {t('__new__.01-common.actions.back')}
+              {t('common.actions.back')}
             </Button>
             <Group gap="sm">
               {(isIssued || isConverted) && (
@@ -559,7 +559,7 @@ export function QuotationDetail() {
                   size="compact-sm"
                   leftSection={<IconEdit size={14} />}
                 >
-                  {t('__new__.01-common.actions.edit')}
+                  {t('common.actions.edit')}
                 </Button>
               )}
             </Group>
@@ -756,7 +756,7 @@ export function QuotationDetail() {
                   <DangerAction
                     title={t('quotations.dangerZone.deleteItem')}
                     description={t('quotations.dangerZone.deleteItemDesc')}
-                    buttonLabel={t('__new__.01-common.actions.remove')}
+                    buttonLabel={t('common.actions.remove')}
                     buttonIcon={<IconTrash size={14} />}
                     onClick={openDeleteModal}
                     buttonColor="red"
@@ -849,7 +849,7 @@ export function QuotationDetail() {
           />
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" onClick={closePrintModal} disabled={sharing}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               size="sm"

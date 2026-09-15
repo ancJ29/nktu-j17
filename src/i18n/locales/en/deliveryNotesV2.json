@@ -1,0 +1,116 @@
+{
+  "actions": {
+    "issue": "Issue delivery note",
+    "reduce": "Reduce stock",
+    "retry": "Finish Posting"
+  },
+  "cancelModal": {
+    "message": "The note is closed and drops off its order.",
+    "title": "Cancel this delivery note?"
+  },
+  "columns": {
+    "assignedTo": "Assigned to",
+    "customer": "Customer",
+    "deliveryDate": "Delivery date",
+    "deliveryType": "Carried by",
+    "items": "Lines",
+    "noteNumber": "Number",
+    "salesOrder": "Sales order",
+    "status": "Status",
+    "totalQuantity": "Total qty"
+  },
+  "confirm": {
+    "acknowledge": "I understand",
+    "title": "Please confirm before continuing"
+  },
+  "deductModal": {
+    "message": "This status deducts stock: whatever is left of every line leaves stock now, the same as Reduce. Cancelling later will not put it back.",
+    "title": "Move this note and take the goods out of stock?"
+  },
+  "deliverModal": {
+    "message": "Whatever is left of every line leaves stock now.",
+    "title": "Mark this note delivered?"
+  },
+  "deliveryType": {
+    "external": "External carrier",
+    "internal": "Our own staff"
+  },
+  "detailTitle": "Delivery Note Details",
+  "editItem": "Edit Note",
+  "fieldsInvalid": {
+    "message": "Custom fields are hidden until the configuration is fixed. Their stored values are untouched.",
+    "title": "Custom field configuration is invalid"
+  },
+  "filters": {
+    "deliveryDate": "Delivery date",
+    "mine": "Assigned to me",
+    "period": "Period"
+  },
+  "flowInvalid": {
+    "message": "Status changes are disabled until the configuration is fixed. Records stay readable.",
+    "title": "Status flow configuration is invalid"
+  },
+  "form": {
+    "assignedTo": "Assigned to",
+    "carrier": "Carrier",
+    "completesSalesOrder": "Delivering this note fulfils the order",
+    "completesSalesOrderHint": "Turn this off when more notes are still to come — the last one keeps it on.",
+    "deliveryDate": "Delivery date",
+    "deliveryType": "Carried by",
+    "issueButton": "Issue note",
+    "item": "Item",
+    "lines": "Lines",
+    "notes": "Notes",
+    "reference": "Reference",
+    "remaining": "Left to deliver",
+    "salesOrder": "Sales order",
+    "updateButton": "Save Changes"
+  },
+  "issueModal": {
+    "message": "The order's lines are copied in. Trim them on the note afterwards if this delivery carries less.",
+    "title": "Issue a delivery note for {{orderNumber}}?"
+  },
+  "noItems": "No delivery notes in this period.",
+  "notFound": {
+    "back": "Back to delivery notes",
+    "message": "It may have been removed, or the link is out of date.",
+    "title": "Delivery note not found"
+  },
+  "notifications": {
+    "deliverPartial": "Delivered, but some stock writes are still to finish.",
+    "issueSuccess": "Delivery note issued.",
+    "reduceSuccess": "Stock reduced.",
+    "statusChangeSuccess": "Status updated.",
+    "updateSuccess": "Delivery note updated.",
+    "uploadError": "Could not upload the photo. Please try again.",
+    "writeError": "Could not save the delivery note. Please try again."
+  },
+  "pending": {
+    "badge": "Unposted",
+    "message": "Some of this note's stock writes have not finished. Press Finish Posting to complete them — running it twice is safe.",
+    "title": "Inventory writes unfinished"
+  },
+  "photos": {
+    "capture": "Take photo & complete",
+    "required": "An internal delivery needs a photo before it can be completed — take it on a phone with “Take photo & complete”.",
+    "title": "Delivery photos"
+  },
+  "reduceModal": {
+    "message": "Type what actually left. Each line is capped at what it has left.",
+    "title": "Reduce stock for this note?"
+  },
+  "searchPlaceholder": "Search by number, order, customer, item…",
+  "status": {
+    "cancelled": "Cancelled",
+    "delivered": "Delivered",
+    "draft": "Draft"
+  },
+  "table": {
+    "delivered": "Delivered",
+    "ordered": "On this note",
+    "remaining": "Left"
+  },
+  "validation": {
+    "quantityPositive": "Quantity must be greater than zero"
+  }
+}

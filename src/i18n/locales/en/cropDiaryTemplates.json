@@ -1,0 +1,111 @@
+{
+  "addItem": "Add Template",
+  "columns": {
+    "days": "Days"
+  },
+  "dayCount": "{{count}} days",
+  "dayCount_one": "{{count}} day",
+  "dayCount_other": "{{count}} days",
+  "detail": {
+    "infoTitle": "Information",
+    "statDays": "Days"
+  },
+  "editItem": "Edit Template",
+  "emptyMessage": "Create a checklist of activities to apply to a crop.",
+  "emptyTitle": "No templates yet",
+  "excel": {
+    "import": "Import Excel",
+    "importError": "Could not import the Excel file",
+    "nothingToExport": "Add at least one day before exporting",
+    "sheetName": "Plan"
+  },
+  "form": {
+    "addMaterial": "Add material",
+    "codePlaceholder": "e.g. TPL-001",
+    "copyingFrom": "Copying from {{code}}",
+    "createButton": "Create Template",
+    "descriptionLabel": "Description",
+    "descriptionPlaceholder": "When to use this template",
+    "materialPlaceholder": "Select material",
+    "materialsLabel": "Materials",
+    "namePlaceholder": "e.g. Seedling week 1",
+    "primarySection": "Template details",
+    "quantityPlaceholder": "Qty",
+    "unitPlaceholder": "Unit"
+  },
+  "noItems": "No templates found",
+  "noMaterials": "No materials",
+  "notifications": {
+    "createError": "Failed to create template",
+    "createSuccess": "Template created",
+    "fetchError": "Failed to load templates",
+    "updateError": "Failed to update template",
+    "updateSuccess": "Template updated"
+  },
+  "plan": {
+    "addColumn": "Add column",
+    "addMemo": "Add note",
+    "addPreparation": "Add preparation job",
+    "addStage": "Add stage",
+    "adjustmentRate": "Adjustment rate",
+    "adjustmentRateHint": "How hard this process runs, as a fraction. 0.95 means the doses below are already 95% of the underlying recipe.",
+    "columnGroup": "Group",
+    "columnKind": "Type",
+    "columnLabel": "Column",
+    "columnLabelPlaceholder": "e.g. CANXI (N)",
+    "columnsSection": "Columns",
+    "columnsSectionHint": "What the grid records each day. A dose column is a real material, so it reaches the season total and the cost.",
+    "day": "Day",
+    "gridNeedsColumns": "Add a column first — the grid has nothing to record yet.",
+    "gridSection": "Day plan",
+    "gridSectionHint": "One row per day. A cell that is not a number is kept as written, so a day that skips feeding can say so.",
+    "importUnmatched": "No material matched: {{names}}. The columns were kept — link them by picking a material.",
+    "importedColumns": "Imported {{columns}} columns over {{days}} days",
+    "kind": {
+      "activity": "Activity (uses material)",
+      "ratio": "Amount (by plant count)",
+      "text": "Note"
+    },
+    "memoKeyPlaceholder": "Name (e.g. Substrate)",
+    "memoPlaceholder": "e.g. ÁP DỤNG CHO GIÁ THỂ XƠ DỪA",
+    "memosSection": "General notes",
+    "memosSectionHint": "Caveats that apply to the whole process",
+    "moveDown": "Move down",
+    "moveUp": "Move up",
+    "noColumns": "No columns yet.",
+    "noPreparation": "No preparation jobs.",
+    "noStages": "No stages yet — the whole cycle reads as one.",
+    "prepActivity": "What is done",
+    "prepKind": "Kind",
+    "prepKindMaterial": "Uses material",
+    "prepKindWork": "No material",
+    "prepLabel": "Section",
+    "prepOffset": "Day offset",
+    "preparationSection": "Before planting",
+    "preparationSectionHint": "Work that happens before day 1 — soaking seed, preparing growbags, sterilising the house. Stored as an offset (−14 = a fortnight before planting), so one process serves every crop; each crop turns it into real dates.",
+    "referencePlantCount": "Written for (plants)",
+    "referencePlantCountHint": "The house size the doses below were written for. A crop with a different plant count rescales them automatically.",
+    "seedCount": "Seeds sown",
+    "seedCountHint": "Not the plant count — the sheets state both",
+    "sizingSection": "Sizing",
+    "stage": "Stage",
+    "stageFrom": "From day",
+    "stageName": "Stage",
+    "stageTo": "To day",
+    "stagesSection": "Stages",
+    "stagesSectionHint": "Named spans of the cycle. Stored as day ranges, so two days in one span can never disagree.",
+    "target": "Variety / target",
+    "targetHint": "What is being grown, e.g. PI 52",
+    "totalDays": "Total days",
+    "totalsTitle": "Season totals"
+  },
+  "searchPlaceholder": "Search templates…",
+  "summary": {
+    "total": "{{count}} templates"
+  },
+  "title": "Diary Templates",
+  "validation": {
+    "activityRequired": "Add at least one day with an activity",
+    "totalDatesRequired": "Total days must be at least 1"
+  }
+}

@@ -38,7 +38,7 @@ export function ConfirmModal({
         {children}
         <Group justify="flex-end" gap="sm">
           <Button variant="default" onClick={onClose} size="sm">
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button
             color={confirmColor}
@@ -47,7 +47,7 @@ export function ConfirmModal({
             disabled={confirmDisabled}
             size="sm"
           >
-            {confirmLabel ?? t('__new__.01-common.actions.remove')}
+            {confirmLabel ?? t('common.actions.remove')}
           </Button>
         </Group>
       </Stack>

@@ -57,7 +57,7 @@ export function StatusChangeModal({
       />
       <Group justify="flex-end" gap="sm">
         <Button variant="default" size="sm" onClick={onClose} disabled={loading}>
-          {t('__new__.01-common.actions.cancel')}
+          {t('common.actions.cancel')}
         </Button>
         <Button size="sm" color={confirmColor} loading={loading} onClick={onConfirm}>
           {confirmLabel}

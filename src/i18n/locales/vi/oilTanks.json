@@ -1,0 +1,134 @@
+{
+  "addItem": "Thêm bồn",
+  "columns": {
+    "fuelType": "Nhiên liệu",
+    "level": "Tồn",
+    "location": "Vị trí"
+  },
+  "dangerZone": {
+    "deleteConfirm": "Xóa bồn này? Lịch sử nhập/xuất dầu sẽ không còn truy cập được.",
+    "deleteItem": "Xóa bồn",
+    "deleteItemDesc": "Xóa bồn khỏi ứng dụng. Lịch sử xuất nhập vẫn được giữ nhưng không truy cập được nữa.",
+    "disableConfirm": "Tắt bồn này?",
+    "disableItem": "Tắt bồn",
+    "disableItemDesc": "Ẩn bồn khỏi danh sách và ô chọn. Lịch sử xuất nhập vẫn được giữ.",
+    "enableConfirm": "Bật bồn này?",
+    "enableItem": "Bật bồn",
+    "enableItemDesc": "Cho phép chọn lại bồn này."
+  },
+  "detail": {
+    "activityVerbs": {
+      "create": "Đã tạo",
+      "delete": "Đã xóa",
+      "disable": "Đã tắt",
+      "enable": "Đã bật",
+      "update": "Đã cập nhật"
+    },
+    "infoTitle": "Thông tin",
+    "recompute": "Tính lại tồn",
+    "statCapacity": "Dung tích",
+    "statLevel": "Tồn",
+    "tabs": {
+      "issue": "Xuất dầu",
+      "overview": "Chi tiết",
+      "refill": "Nhập dầu"
+    }
+  },
+  "editItem": "Sửa bồn",
+  "emptyMessage": "Thêm bồn dầu đầu tiên để bắt đầu theo dõi tồn.",
+  "emptyTitle": "Chưa có bồn nào",
+  "form": {
+    "capacityHint": "Chỉ để tham khảo — nhập dầu vượt mức vẫn được ghi nhận",
+    "capacityLabel": "Dung tích",
+    "capacityPlaceholder": "Dung tích danh nghĩa",
+    "codeAuto": "Tự động sinh",
+    "createButton": "Tạo bồn",
+    "fuelTypeLabel": "Loại nhiên liệu",
+    "fuelTypePlaceholder": "VD: Dầu DO 0,05S",
+    "locationLabel": "Vị trí",
+    "locationPlaceholder": "VD: Kho A",
+    "namePlaceholder": "VD: Bồn kho A",
+    "notePlaceholder": "Ghi chú về bồn này",
+    "openingDateLabel": "Ngày chốt tồn đầu",
+    "openingHint": "Lượng dầu có sẵn khi bắt đầu quản lý trên hệ thống. Chỉ nhập một lần — các thay đổi sau được ghi bằng phiếu nhập và phiếu xuất.",
+    "openingLevelLabel": "Tồn đầu kỳ",
+    "openingLevelPlaceholder": "Số lít hiện có",
+    "openingSection": "Tồn đầu kỳ",
+    "primarySection": "Thông tin bồn"
+  },
+  "logs": {
+    "issue": {
+      "addItem": "Thêm phiếu xuất",
+      "columns": {
+        "date": "Ngày",
+        "driver": "Lái xe",
+        "litres": "Số lít",
+        "total": "Thành tiền",
+        "truck": "Số xe",
+        "unitPrice": "Đơn giá"
+      },
+      "editItem": "Sửa phiếu xuất",
+      "empty": "Chưa có phiếu xuất nào trong năm {{year}}",
+      "form": {
+        "driverPlaceholder": "Tên lái xe",
+        "notePlaceholder": "Ghi chú về lần xuất này",
+        "truckPlaceholder": "Chọn xe"
+      },
+      "sectionTitle": "Xuất dầu",
+      "summary": {
+        "litres": "Tổng xuất"
+      }
+    },
+    "refill": {
+      "addItem": "Thêm phiếu nhập",
+      "columns": {
+        "date": "Ngày",
+        "litres": "Số lít",
+        "supplier": "Nhà cung cấp",
+        "total": "Thành tiền",
+        "unitPrice": "Đơn giá"
+      },
+      "editItem": "Sửa phiếu nhập",
+      "empty": "Chưa có phiếu nhập nào trong năm {{year}}",
+      "form": {
+        "notePlaceholder": "Ghi chú về lần nhập này",
+        "supplierPlaceholder": "Đơn vị giao dầu"
+      },
+      "photosLabel": "Phiếu giao hàng",
+      "sectionTitle": "Nhập dầu",
+      "summary": {
+        "cost": "Tổng tiền",
+        "litres": "Tổng nhập"
+      }
+    },
+    "validation": {
+      "exceedsStock": "Số lít xuất vượt quá tồn kho hiện có, chỉ còn {{available}} L",
+      "litresRequired": "Nhập số lít"
+    }
+  },
+  "noItems": "Không tìm thấy bồn nào",
+  "notifications": {
+    "createError": "Không tạo được bồn",
+    "createSuccess": "Đã tạo bồn",
+    "deleteError": "Không xóa được bồn",
+    "deleteSuccess": "Đã xóa bồn",
+    "disableSuccess": "Đã tắt bồn",
+    "enableSuccess": "Đã bật bồn",
+    "fetchError": "Không tải được danh sách bồn",
+    "levelSyncError": "Đã lưu phiếu nhưng chưa cập nhật được tồn của bồn. Dùng “Tính lại tồn” trên bồn để dựng lại.",
+    "recomputeClean": "Đã tính lại tồn từ {{count}} phiếu — số liệu vốn đã khớp.",
+    "recomputeDrift": "Đã tính lại tồn từ sổ. Lệch {{drift}} L — có phiếu chưa được cộng/trừ vào tồn.",
+    "recomputeError": "Không tính lại được tồn từ sổ",
+    "toggleError": "Không đổi được trạng thái bồn",
+    "truckLogSyncError": "Đã lưu phiếu xuất nhưng chưa cập nhật được nhật ký đổ dầu của xe. Lưu lại phiếu để đồng bộ.",
+    "updateError": "Không cập nhật được bồn",
+    "updateSuccess": "Đã cập nhật bồn"
+  },
+  "searchPlaceholder": "Tìm theo tên, mã, loại nhiên liệu hoặc vị trí",
+  "title": "Bồn dầu",
+  "unitLitre": "L",
+  "validation": {
+    "capacityInvalid": "Dung tích phải từ 0 trở lên",
+    "levelInvalid": "Tồn phải từ 0 trở lên"
+  }
+}

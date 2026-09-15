@@ -587,7 +587,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
           disabled={loading}
           onClick={onClose}
         >
-          {t('__new__.01-common.actions.cancel')}
+          {t('common.actions.cancel')}
         </Button>
         <Button
           size={isMobile ? 'md' : 'sm'}

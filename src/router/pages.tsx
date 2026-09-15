@@ -9,6 +9,18 @@ export const MorePage = lazy(() => import('../pages/MorePage'));
 export const EmployeeListPage = lazy(() =>
   import('../pages/employees').then((m) => ({ default: m.EmployeeListPage })),
 );
+
+export const EmployeeV2ListPage = lazy(() =>
+  import('../pages/v2/employees').then((m) => ({ default: m.EmployeeV2ListPage })),
+);
+
+export const EmployeeV2DetailPage = lazy(() =>
+  import('../pages/v2/employees').then((m) => ({ default: m.EmployeeV2DetailPage })),
+);
+
+export const EmployeeV2FormPage = lazy(() =>
+  import('../pages/v2/employees').then((m) => ({ default: m.EmployeeV2FormPage })),
+);
 export const EmployeeDetailPage = lazy(() =>
   import('../pages/employees').then((m) => ({ default: m.EmployeeDetailPage })),
 );
@@ -278,6 +290,11 @@ export const TransportOrderListPage = lazy(() =>
 export const TransportOrderDetailPage = lazy(() =>
   import('../pages/transport-orders').then((m) => ({ default: m.TransportOrderDetailPage })),
 );
+export const TransportOrderMultiDropFormPage = lazy(() =>
+  import('../pages/transport-orders').then((m) => ({
+    default: m.TransportOrderMultiDropFormPage,
+  })),
+);
 export const TransportOrderFormPage = lazy(() =>
   import('../pages/transport-orders').then((m) => ({ default: m.TransportOrderFormPage })),
 );
@@ -301,8 +318,69 @@ export const AppConfigPage = lazy(() =>
 export const DebugPage = lazy(() =>
   import('../pages/config').then((m) => ({ default: m.DebugPage })),
 );
+export const VendorsV2Page = lazy(() =>
+  import('../pages/v2/vendors').then((m) => ({ default: m.VendorsV2Page })),
+);
+export const VendorV2DetailPage = lazy(() =>
+  import('../pages/v2/vendors').then((m) => ({ default: m.VendorV2DetailPage })),
+);
+export const VendorV2FormPage = lazy(() =>
+  import('../pages/v2/vendors').then((m) => ({ default: m.VendorV2FormPage })),
+);
+export const CustomersV2Page = lazy(() =>
+  import('../pages/v2/customers').then((m) => ({ default: m.CustomersV2Page })),
+);
+export const CustomerV2DetailPage = lazy(() =>
+  import('../pages/v2/customers').then((m) => ({ default: m.CustomerV2DetailPage })),
+);
+export const CustomerV2FormPage = lazy(() =>
+  import('../pages/v2/customers').then((m) => ({ default: m.CustomerV2FormPage })),
+);
+export const ProductsV2Page = lazy(() =>
+  import('../pages/v2/products').then((m) => ({ default: m.ProductsV2Page })),
+);
+export const ProductV2DetailPage = lazy(() =>
+  import('../pages/v2/products').then((m) => ({ default: m.ProductV2DetailPage })),
+);
+export const ProductV2FormPage = lazy(() =>
+  import('../pages/v2/products').then((m) => ({ default: m.ProductV2FormPage })),
+);
+export const MaterialsV2Page = lazy(() =>
+  import('../pages/v2/materials').then((m) => ({ default: m.MaterialsV2Page })),
+);
+export const MaterialV2DetailPage = lazy(() =>
+  import('../pages/v2/materials').then((m) => ({ default: m.MaterialV2DetailPage })),
+);
+export const MaterialV2FormPage = lazy(() =>
+  import('../pages/v2/materials').then((m) => ({ default: m.MaterialV2FormPage })),
+);
+
+export const GoodsReceiptsV2Page = lazy(() =>
+  import('../pages/v2/goods-receipts').then((m) => ({ default: m.GoodsReceiptsV2Page })),
+);
+export const GoodsReceiptV2DetailPage = lazy(() =>
+  import('../pages/v2/goods-receipts').then((m) => ({ default: m.GoodsReceiptV2DetailPage })),
+);
+export const GoodsReceiptV2FormPage = lazy(() =>
+  import('../pages/v2/goods-receipts').then((m) => ({ default: m.GoodsReceiptV2FormPage })),
+);
+export const DeliveryNotesV2Page = lazy(() =>
+  import('../pages/v2/delivery-notes').then((m) => ({ default: m.DeliveryNotesV2Page })),
+);
+export const DeliveryNoteV2DetailPage = lazy(() =>
+  import('../pages/v2/delivery-notes').then((m) => ({ default: m.DeliveryNoteV2DetailPage })),
+);
+export const SalesOrdersV2Page = lazy(() =>
+  import('../pages/v2/sales-orders').then((m) => ({ default: m.SalesOrdersV2Page })),
+);
+export const SalesOrderV2DetailPage = lazy(() =>
+  import('../pages/v2/sales-orders').then((m) => ({ default: m.SalesOrderV2DetailPage })),
+);
+export const SalesOrderV2FormPage = lazy(() =>
+  import('../pages/v2/sales-orders').then((m) => ({ default: m.SalesOrderV2FormPage })),
+);
 export const LookupV2Page = lazy(() =>
-  import('../pages/lookup-v2').then((m) => ({ default: m.LookupV2Page })),
+  import('../pages/v2/lookup').then((m) => ({ default: m.LookupV2Page })),
 );
 
 export const ErrorPage = lazy(() =>

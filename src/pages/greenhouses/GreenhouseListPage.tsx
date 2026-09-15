@@ -174,7 +174,7 @@ export function GreenhouseListPage() {
               value: occupancyFilter,
               options: occupancyOptions,
               onChange: setOccupancyFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
 
               emptyValue: 'all',
             }),
@@ -242,7 +242,7 @@ export function GreenhouseListPage() {
             onStatusChange={setFilter}
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -259,7 +259,7 @@ export function GreenhouseListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}

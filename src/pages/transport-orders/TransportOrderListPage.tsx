@@ -1,7 +1,8 @@
-import { Box, Button, Group, SegmentedControl, Stack, Text } from '@mantine/core';
+import { Box, Button, Group, Modal, SegmentedControl, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconDownload, IconFileSpreadsheet } from '@tabler/icons-react';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -55,6 +56,7 @@ import { truckOptionLabel, useTruckPlate } from './truckDisplay';
 import { useTruckTypeLabel } from '../transport-routes/truckType';
 import { truckTypeColor } from './orderTruckTypes';
 import { ORDER_TRUCK_TYPES, useOrderTruckTypeOptions } from './useOrderTruckTypes';
+import { transportOrderNewPath } from './useMultiDrop';
 import type { TransportOrderShipmentType } from '@/types';
 
 const isMobile = device.isMobile;
@@ -211,15 +213,15 @@ export function TransportOrderListPage() {
   const showTruckTypeTabs = ORDER_TRUCK_TYPES.length > 0;
 
   const truckTypeTabs = useMemo(
-    () => [
-      { value: ALL_TRUCK_TYPES_TAB, label: t('__new__.01-common.filters.all') },
-      ...truckTypeData,
-    ],
+    () => [{ value: ALL_TRUCK_TYPES_TAB, label: t('common.filters.all') }, ...truckTypeData],
     [truckTypeData, t],
   );
   const activeTruckTypeTab = filters.truckTypeFilter ?? ALL_TRUCK_TYPES_TAB;
   const setTruckTypeTab = (value: string) =>
     filters.setTruckTypeFilter(value === ALL_TRUCK_TYPES_TAB ? null : value);
+
+  const [chooseTypeOpen, setChooseTypeOpen] = useState(false);
+  const navigate = useNavigate();
 
   const truckTypeSegments = useMemo(
     () =>
@@ -466,7 +468,7 @@ export function TransportOrderListPage() {
     },
   ];
 
-  const allLabel = t('__new__.01-common.filters.all');
+  const allLabel = t('common.filters.all');
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     multiOptionFilter({
@@ -511,7 +513,7 @@ export function TransportOrderListPage() {
             type: 'select',
             key: 'truckType',
             title: t('transportOrders.filters.truckType'),
-            placeholder: t('__new__.01-common.filters.all'),
+            placeholder: t('common.filters.all'),
             value: filters.truckTypeFilter,
             options: truckTypeData,
             onChange: filters.setTruckTypeFilter,
@@ -531,7 +533,7 @@ export function TransportOrderListPage() {
       type: 'select',
       key: 'shipmentType',
       title: t('transportOrders.form.shipmentType'),
-      placeholder: t('__new__.01-common.filters.all'),
+      placeholder: t('common.filters.all'),
       value: filters.shipmentFilter === 'all' ? null : filters.shipmentFilter,
       options: shipmentData,
       onChange: (v) => filters.setShipmentFilter((v as TransportOrderShipmentType | null) ?? 'all'),
@@ -540,7 +542,7 @@ export function TransportOrderListPage() {
       type: 'select',
       key: 'truckingSize',
       title: t('transportOrders.form.truckingSize'),
-      placeholder: t('__new__.01-common.filters.all'),
+      placeholder: t('common.filters.all'),
       value: filters.truckingSizeFilter,
       options: truckingSizeData,
       onChange: filters.setTruckingSizeFilter,
@@ -619,7 +621,7 @@ export function TransportOrderListPage() {
                   onClick={handleExport}
                   disabled={filtered.length === 0}
                 >
-                  {t('__new__.01-common.actions.exportExcel')}
+                  {t('common.actions.exportExcel')}
                 </Button>
                 {/* The customer report is a billing artifact — money is its
                     whole point, so it needs the price gate on top of canExport. */}
@@ -637,15 +639,20 @@ export function TransportOrderListPage() {
               </>
             )
           }
-          createCta={{
-            to: filters.truckTypeFilter
-              ? `${ROUTES.TRANSPORT_ORDERS.NEW}?truckType=${encodeURIComponent(filters.truckTypeFilter)}`
-              : ROUTES.TRANSPORT_ORDERS.NEW,
-            label: t('transportOrders.new'),
-            enabled: canCreate,
-            // The form is desktop-only (mobile redirects), so hide the CTA rather
-            // than dead-end into a bounce.
-          }}
+          createCta={
+            showTruckTypeTabs && !filters.truckTypeFilter
+              ? {
+                  onClick: () => setChooseTypeOpen(true),
+                  mobileVariant: 'hidden' as const,
+                  label: t('transportOrders.new'),
+                  enabled: canCreate,
+                }
+              : {
+                  to: transportOrderNewPath(filters.truckTypeFilter),
+                  label: t('transportOrders.new'),
+                  enabled: canCreate,
+                }
+          }
         />
 
         {/* Above the stats, so the KPI cells read as "this tab's numbers" —
@@ -669,6 +676,27 @@ export function TransportOrderListPage() {
               />
             </Group>
           ))}
+
+        <Modal
+          opened={chooseTypeOpen}
+          onClose={() => setChooseTypeOpen(false)}
+          title={t('transportOrders.multiDrop.chooseType')}
+          centered
+        >
+          <Stack gap="sm">
+            {truckTypeData.map((type) => (
+              <Button
+                key={type.value}
+                variant="light"
+                fullWidth
+                color={truckTypeColor(type.value, ORDER_TRUCK_TYPES) || undefined}
+                onClick={() => navigate(transportOrderNewPath(type.value))}
+              >
+                {type.label}
+              </Button>
+            ))}
+          </Stack>
+        </Modal>
 
         <ListStatsCards visible={initialized} cells={statsCells} />
 

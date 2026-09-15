@@ -303,7 +303,7 @@ export function ProductInventoryFormModal({
           />
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               type="submit"
@@ -311,7 +311,7 @@ export function ProductInventoryFormModal({
               loading={submitting}
               disabled={hasMultipleUnits && selectedUnit !== baseUnit && !conversionValid}
             >
-              {t('__new__.01-common.actions.addEntry')}
+              {t('common.actions.addEntry')}
             </Button>
           </Group>
         </Stack>

@@ -30,6 +30,10 @@ export function isPermissionManagementRootUserOnly() {
   return featureFlags?.permissionManagement?.rootUserOnly ?? true;
 }
 
+export function usesServerPermissions() {
+  return featureFlags?.permissionManagement?.useServerPermissions ?? false;
+}
+
 export function isActivityLoggingEnabled() {
   return featureFlags?.activityLog?.enabled ?? false;
 }
@@ -536,6 +540,8 @@ export const perms = {
       ...createModulePerms('product'),
       canViewPrice: () => resolve().actions?.canViewPrice ?? false,
       canManagePrice: () => resolve().actions?.canManagePrice ?? false,
+      canUploadPhoto: () => resolve().actions?.canUploadPhoto ?? false,
+      canManageInventory: () => resolve().actions?.canManageInventory ?? false,
     };
   })(),
   material: (() => {
@@ -562,6 +568,7 @@ export const perms = {
       canTakePhoto: () => resolve().actions?.canTakePhoto ?? false,
       canEditDeliveryPackageSize: () => resolve().actions?.canEditDeliveryPackageSize ?? false,
       canEditItemWarehouseFields: () => resolve().actions?.canEditItemWarehouseFields ?? false,
+      canManagePayment: () => resolve().actions?.canManagePayment ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
@@ -573,6 +580,9 @@ export const perms = {
       ...createModulePerms('deliveryRequest'),
       canManagePhotos: () => resolve().actions?.canManagePhotos ?? false,
       canReorder: () => resolve().actions?.canReorder ?? false,
+
+      canConfirmDelivered: () => resolve().actions?.canConfirmDelivered ?? false,
+      canCancel: () => resolve().actions?.canCancel ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };

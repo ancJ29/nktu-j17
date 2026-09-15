@@ -1,0 +1,150 @@
+{
+  "columns": {
+    "availableTooltip": "On hand minus reserved. Materials are not yet reservable from sales orders.",
+    "forecasted": "Forecasted",
+    "forecastedTooltip": "On hand + incoming − outgoing. Wired when PO module lands.",
+    "incoming": "Incoming",
+    "incomingTooltip": "Pending purchase-order receipts. Wired when PO module lands.",
+    "material": "Material",
+    "outgoing": "Outgoing",
+    "outgoingTooltip": "Pending outgoing commitments. Not wired yet.",
+    "overcommittedTooltip": "Reserved {{reserved}} exceeds on-hand {{onHand}}."
+  },
+  "defaultLocationBadge": "default",
+  "emptyMessage": "Add an entry — pick a material and location, set the starting on-hand.",
+  "emptyTitle": "No inventory rows yet",
+  "exportButton": "Export",
+  "filterByLocation": "Filter by location",
+  "filterInactive": "Archived",
+  "filterStock": {
+    "all": "All",
+    "negative": "Back-ordered",
+    "noStock": "No stock",
+    "outOfStock": "Out of stock",
+    "placeholder": "All stock levels",
+    "title": "Stock"
+  },
+  "form": {
+    "backOrderWarning": "Negative on-hand allowed — useful for back-orders. Verify intent.",
+    "currentOnHand": "Current on hand",
+    "deltaLabel": "Delta",
+    "deltaPlaceholder": "e.g. 5 or -3",
+    "locationPlaceholder": "Pick a location",
+    "materialLabel": "Material",
+    "materialPlaceholder": "Pick a material",
+    "multiUnitInitialHint": "Enter the opening quantity in the selected unit; on-hand is derived in the base unit.",
+    "newOnHand": "New on hand",
+    "newOnHandLabel": "New on hand",
+    "noteLabel": "Note (optional)",
+    "notePlaceholder": "Reason — receipt, consumption, damage...",
+    "onHandLabel": "Initial on hand",
+    "reasonLabel": "Reason",
+    "reasonPlaceholder": "Why is stock changing?",
+    "submitAdjust": "Apply adjustment",
+    "submitRepack": "Apply repack",
+    "submitStockTake": "Save count",
+    "varianceLabel": "Variance"
+  },
+  "importButton": "Import",
+  "importModal": {
+    "confirm": "Replace inventory",
+    "existing": "{{count}} existing",
+    "fileSummary": "File: {{filename}} — {{parsed}} row(s) parsed.",
+    "matched": "{{count}} matched",
+    "title": "Replace material inventory from file",
+    "unmatched": "{{count}} unmatched",
+    "unmatchedHint": "Unmatched: {{skus}}{{more}}",
+    "warningBody": "The {{matched}} matching row(s) will be upserted by (material, location) — on-hand and unit on those rows get overwritten; reservations, notes, and other extra fields are preserved. {{existing}} existing row(s) not in the file are left unchanged.",
+    "warningTitle": "Destructive action"
+  },
+  "inbound": {
+    "detailLabel": "Inbound",
+    "forecastedHelp": "Available + inbound from open draft receipts.",
+    "fromDrafts": "From {{count}} draft receipt",
+    "moreDrafts": "+{{count}} more receipt",
+    "unmappedWarning": "{{count}} line skipped — unit not on material"
+  },
+  "kpis": {
+    "negative": "{{count}} back-ordered",
+    "outOfStock": "{{count}} out of stock",
+    "totalMaterials": "{{count}} materials"
+  },
+  "modal": {
+    "createTitle": "Add inventory entry",
+    "updateTitle": "Update inventory"
+  },
+  "mode": {
+    "delta": "Adjust (delta)",
+    "repack": "Repack",
+    "snapshot": "Stock-take (absolute)"
+  },
+  "notifications": {
+    "adjustError": "Failed to apply adjustment",
+    "adjustSuccess": "On-hand updated",
+    "conversionError": "No conversion path between these units",
+    "createError": "Failed to add entry",
+    "createSuccess": "Entry added",
+    "deleteError": "Failed to delete row",
+    "deleteSuccess": "Row deleted",
+    "duplicatePair": "An entry already exists for this material + location",
+    "exportEmpty": "No inventory rows to export",
+    "exportError": "Failed to export inventory",
+    "exportSuccess": "Exported {{count}} row(s)",
+    "fetchError": "Failed to load inventory",
+    "importError": "Failed to import inventory",
+    "importMissingColumn": "Missing required column(s): {{columns}}. Use the latest exported file as a template.",
+    "importMissingColumnTitle": "File is missing a required column",
+    "importNoIdentity": "The file must include either an SKU column or a Material Code column so rows can be matched against master data.",
+    "importNoMatched": "None of the {{count}} parsed row(s) matched a known material.",
+    "importNoMatchedTitle": "No matching materials in master data",
+    "importNoValid": "No valid rows found in the file",
+    "importParseError": "Failed to read the Excel file. Try saving it again as .xlsx.",
+    "importPartial": "Imported {{created}} added + {{updated}} updated of {{total}} row(s); {{failed}} failed.",
+    "importPartialTitle": "Imported with errors",
+    "importSuccess": "Imported: {{created}} added, {{updated}} updated.",
+    "repackError": "Failed to apply repack",
+    "repackSuccess": "Repack applied",
+    "stockTakeError": "Failed to save count",
+    "stockTakeSuccess": "Stock-take saved"
+  },
+  "reason": {
+    "correction": "Correction",
+    "damage": "Damage / loss",
+    "issue": "Issue (−)",
+    "other": "Other",
+    "receive": "Receive (+)"
+  },
+  "repack": {
+    "balanced": "Repack balances in base-unit terms.",
+    "fromQtyLabel": "From quantity",
+    "fromUnitLabel": "From unit",
+    "reason": {
+      "breakage": "Breakage",
+      "damage": "Damage",
+      "other": "Other",
+      "spillage": "Spillage"
+    },
+    "toQtyLabel": "To quantity",
+    "toUnitLabel": "To unit",
+    "writeOffHint": "Quantity lost during repack (in base unit).",
+    "writeOffOptional": "Write-off (optional)",
+    "writeOffQtyLabel": "Write-off ({{unit}})",
+    "writeOffReasonLabel": "Reason"
+  },
+  "stockState": {
+    "negative": "back-ordered"
+  },
+  "title": "Material Inventory",
+  "validation": {
+    "bad": "Invalid input",
+    "deltaRequired": "Delta is required",
+    "insufficientStock": "Not enough stock of '{{unit}}'",
+    "materialRequired": "Material is required",
+    "noConversionPath": "No conversion defined between this unit and the base unit. Add a conversion rule on the material first.",
+    "onHandRequired": "On-hand value is required",
+    "positiveRequired": "Must be greater than zero",
+    "repackInvalid": "Repack is invalid",
+    "unknownUnit": "Unit '{{unit}}' is not on this material",
+    "valueRequired": "Value is required"
+  }
+}

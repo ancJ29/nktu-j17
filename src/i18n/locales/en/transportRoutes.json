@@ -1,0 +1,138 @@
+{
+  "columns": {
+    "code": "Route code",
+    "freightAmount": "Freight fee",
+    "kind": "Route type",
+    "laborCost": "Driver pay",
+    "name": "Route name",
+    "route": "Route",
+    "status": "Status",
+    "truckType": "Vehicle type",
+    "truckingSize": "Container / size",
+    "updatedAt": "Last updated"
+  },
+  "confirmDelete": {
+    "message": "Delete route {{code}}? Orders already priced from it are unaffected.",
+    "title": "Delete route"
+  },
+  "costing": {
+    "costPrice": "Cost price",
+    "distance": "Total distance",
+    "fuelCost": "Fuel cost",
+    "fuelFormula": "{{km}} km / 100 × {{norm}} L/100km × {{price}} đ/L",
+    "itemsTotal": "Other cost items",
+    "km": "km",
+    "laborTotal": "Driver pay",
+    "missingNorm": "No fuel norm registered for this vehicle type — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
+    "missingPrice": "No diesel price registered — the fuel cost below is 0 and the cost price is understated. Set it under Cost Norms.",
+    "noNorm": "no norm",
+    "suggestedPrice": "Suggested quote (+{{markup}}%)",
+    "suggestedPriceShort": "Suggested quote",
+    "title": "Cost price (auto)"
+  },
+  "dangerZone": {
+    "deleteHint": "Deleting removes the route from the register. Consider setting it inactive instead.",
+    "title": "Danger zone"
+  },
+  "edit": "Edit route",
+  "filters": {
+    "anyKind": "All route types",
+    "anyTruckType": "All vehicle types",
+    "anyTruckingSize": "All types",
+    "truckType": "Vehicle type"
+  },
+  "form": {
+    "addCostItem": "Add item",
+    "addSegment": "Add leg",
+    "allowance": "Allowance",
+    "basePay": "Base pay",
+    "code": "Route code",
+    "codeAuto": "Generated on save",
+    "codeLocked": "Fixed once created",
+    "costItemAmount": "Amount",
+    "costItemName": "Cost name",
+    "costItemNote": "Note",
+    "costItemQuantity": "Qty",
+    "costItemUnit": "Unit",
+    "costItemsHint": "Driver pay is not entered here — the route already stores it and the breakdown below reads that figure.",
+    "costItemsTitle": "Cost items",
+    "distanceKm": "Distance (km)",
+    "distanceTotal": "Total distance",
+    "freightAmount": "Default freight fee",
+    "infoSection": "Route details",
+    "markupHint": "Default profit margin used to suggest a quote for this route.",
+    "markupPercent": "Markup (%)",
+    "multiTrip": "Multi-leg",
+    "multiTripHint": "The route runs several legs — each with its own origin, destination and driver pay.",
+    "name": "Route name",
+    "noTruckTypes": "No vehicle types are registered yet. Add them under Configuration → Meta-data → Vehicle type — a route has to name a type its trucks actually carry.",
+    "notes": "Notes",
+    "pricingSection": "Default pricing",
+    "segmentFrom": "From",
+    "segmentTo": "To",
+    "segmentsTitle": "Distance by leg",
+    "statusHint": "An inactive route stays in the register but is no longer suggested on new orders.",
+    "truckType": "Applies to vehicle type",
+    "truckingSize": "Applies to container / size",
+    "truckingSizeMissing": "Not set",
+    "truckingSizeMissingHint": "This route names no container / size, so it is offered on no order. Edit it and pick one — a 20ft and a 40ft run are priced separately."
+  },
+  "kind": {
+    "multi": "Multi-leg",
+    "single": "Single leg"
+  },
+  "new": "Add route",
+  "noResults": "No routes found",
+  "notifications": {
+    "createError": "Could not create the route",
+    "created": "Route created",
+    "deleteError": "Could not delete the route",
+    "deleted": "Route deleted",
+    "loadError": "Could not load the route",
+    "mobileFormBlocked": "Routes are created and edited on a desktop",
+    "updateError": "Could not update the route",
+    "updated": "Route updated"
+  },
+  "picker": {
+    "incomplete": "Incomplete",
+    "label": "Select a route",
+    "noMatch": "No matching route found"
+  },
+  "search": {
+    "placeholder": "Search origin / destination"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "suggestion": {
+    "anyContainerSize": "any container",
+    "anyTruckType": "any vehicle",
+    "applied": "Pricing applied from {{code}}",
+    "apply": "Apply",
+    "freight": "Freight",
+    "labor": "Driver pay",
+    "title": "Matching saved route",
+    "title_other": "{{count}} matching saved routes",
+    "truckMismatch": "The selected vehicle is not the type route {{code}} is priced for — the fee and driver pay may not apply.",
+    "truckMismatchLeg": "Leg {{leg}}: the selected vehicle is not the type route {{code}} is priced for — the fee and driver pay may not apply.",
+    "truckMissing": "No vehicle selected — the fee and driver pay are still applied from route {{code}}.",
+    "truckMissingLeg": "Leg {{leg}}: no vehicle selected — the fee and driver pay are still applied from route {{code}}."
+  },
+  "title": "Transport Routes",
+  "trips": {
+    "add": "Add leg",
+    "laborTotal": "Total driver pay",
+    "title": "Legs"
+  },
+  "validation": {
+    "containerSizeRequired": "Container size is required",
+    "departureRequired": "Origin is required",
+    "destinationRequired": "Destination is required",
+    "dropoffRequired": "Drop-off is required",
+    "nameRequired": "Route name is required",
+    "pickupRequired": "Pickup is required",
+    "truckTypeRequired": "Vehicle type is required",
+    "truckingSizeRequired": "Container / size is required"
+  }
+}

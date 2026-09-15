@@ -42,6 +42,9 @@ export const ROUTES = {
     NEW: '/transport-orders/new',
     DETAIL: '/transport-orders/:id',
     EDIT: '/transport-orders/:id/edit',
+
+    NEW_MULTI_DROP: '/transport-orders/new-multi-drop',
+    EDIT_MULTI_DROP: '/transport-orders/:id/edit-multi-drop',
   },
 
   TRANSPORT_ROUTES: {
@@ -137,6 +140,47 @@ export const ROUTES = {
     NEW: '/vendors/new',
     DETAIL: '/vendors/:id',
     EDIT: '/vendors/:id/edit',
+  },
+  VENDORS_V2: {
+    LIST: '/vendors-v2',
+    NEW: '/vendors-v2/new',
+    DETAIL: '/vendors-v2/:id',
+    EDIT: '/vendors-v2/:id/edit',
+  },
+  CUSTOMERS_V2: {
+    LIST: '/customers-v2',
+    NEW: '/customers-v2/new',
+    DETAIL: '/customers-v2/:id',
+    EDIT: '/customers-v2/:id/edit',
+  },
+  PRODUCTS_V2: {
+    LIST: '/products-v2',
+    NEW: '/products-v2/new',
+    DETAIL: '/products-v2/:id',
+    EDIT: '/products-v2/:id/edit',
+  },
+  MATERIALS_V2: {
+    LIST: '/materials-v2',
+    NEW: '/materials-v2/new',
+    DETAIL: '/materials-v2/:id',
+    EDIT: '/materials-v2/:id/edit',
+  },
+  GOODS_RECEIPTS_V2: {
+    LIST: '/goods-receipts-v2',
+    NEW: '/goods-receipts-v2/new',
+    DETAIL: '/goods-receipts-v2/:id',
+    EDIT: '/goods-receipts-v2/:id/edit',
+  },
+  SALES_ORDERS_V2: {
+    LIST: '/sales-orders-v2',
+    NEW: '/sales-orders-v2/new',
+    DETAIL: '/sales-orders-v2/:id',
+    EDIT: '/sales-orders-v2/:id/edit',
+  },
+
+  DELIVERY_NOTES_V2: {
+    LIST: '/delivery-notes-v2',
+    DETAIL: '/delivery-notes-v2/:id',
   },
   LOOKUPS_V2: {
     LIST: '/lookups-v2',

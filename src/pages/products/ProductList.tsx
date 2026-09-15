@@ -328,7 +328,7 @@ export function ProductList({ variant }: ProductListProps) {
               value: categoryFilter,
               options: categoryOptions,
               onChange: setCategoryFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -340,7 +340,7 @@ export function ProductList({ variant }: ProductListProps) {
               value: inventoryDisplayFilter,
               options: inventoryDisplayOptions,
               onChange: setInventoryDisplayFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -401,7 +401,7 @@ export function ProductList({ variant }: ProductListProps) {
                 loading={isExporting}
                 disabled={allProducts.length === 0}
               >
-                {t('__new__.01-common.actions.exportExcel')}
+                {t('common.actions.exportExcel')}
               </Button>
             }
             createCta={{
@@ -421,7 +421,7 @@ export function ProductList({ variant }: ProductListProps) {
               onStatusChange={setFilter}
               statusTitle={t('__new__.01-common.labels.status')}
               statusLabels={{
-                all: t('__new__.01-common.filters.all'),
+                all: t('common.filters.all'),
                 active: t('products.filterActive'),
                 inactive: t('products.filterInactive'),
               }}
@@ -438,7 +438,7 @@ export function ProductList({ variant }: ProductListProps) {
               status={filter}
               onStatusChange={setFilter}
               statusLabels={{
-                all: t('__new__.01-common.filters.all'),
+                all: t('common.filters.all'),
                 active: t('products.filterActive'),
                 inactive: t('products.filterInactive'),
               }}

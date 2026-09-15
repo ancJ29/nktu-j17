@@ -432,7 +432,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   }, [filtered, t]);
 
   const statusPlaceholder = useMemo(() => {
-    if (filters.statusFilter.length === 0) return t('__new__.01-common.filters.all');
+    if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);
@@ -487,7 +487,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       value: filters.statusFilter,
       options: statusFilterData,
       onChange: filters.setStatusFilter,
-      allLabel: t('__new__.01-common.filters.all'),
+      allLabel: t('common.filters.all'),
       visible: statusFilterData.length > 0,
     }),
   ];
@@ -595,7 +595,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
                   selectionMode ? (
                     <>
                       <Button variant="default" size="sm" onClick={exitSelectionMode}>
-                        {t('__new__.01-common.actions.cancel')}
+                        {t('common.actions.cancel')}
                       </Button>
                       <Button
                         size="sm"
@@ -636,7 +636,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
                   onClick={handleExport}
                   disabled={filtered.length === 0}
                 >
-                  {t('__new__.01-common.actions.exportExcel')}
+                  {t('common.actions.exportExcel')}
                 </Button>
               )}
               {canAccountingExport && (

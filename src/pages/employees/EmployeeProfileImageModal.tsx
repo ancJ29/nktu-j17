@@ -338,7 +338,7 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
                 <span />
               )}
               <Button variant="default" size="sm" onClick={handleClose} disabled={busy}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
             </Group>
           </>
@@ -413,7 +413,7 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
               </Button>
               <Group gap="sm">
                 <Button variant="default" size="sm" onClick={handleClose} disabled={busy}>
-                  {t('__new__.01-common.actions.cancel')}
+                  {t('common.actions.cancel')}
                 </Button>
                 <Button
                   size="sm"

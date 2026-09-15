@@ -124,7 +124,7 @@ export function OilTankListPage() {
             onStatusChange={setFilter}
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -140,7 +140,7 @@ export function OilTankListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}

@@ -1,0 +1,52 @@
+{
+  "addItem": "Add",
+  "categories": {
+    "customerType": "Customer Type",
+    "feeName": "Fee Name",
+    "maintenanceType": "Maintenance Type",
+    "materialCategory": "Material Category",
+    "materialUnit": "Material Unit",
+    "productCategory": "Product Category",
+    "productUnit": "Product Unit",
+    "shipmentType": "Shipment Type",
+    "truckType": "Truck Type",
+    "truckingSize": "Container / vehicle size",
+    "unit": "Unit of Measure",
+    "vendorType": "Vendor Type"
+  },
+  "columns": {
+    "label": "Label",
+    "sortOrder": "Order",
+    "value": "Value"
+  },
+  "deleteConfirm": {
+    "message": "This soft-deletes \"{{label}}\". Historical records keep using this label; you can restore later by re-enabling.",
+    "title": "Remove entry?"
+  },
+  "form": {
+    "label": "Label",
+    "labelHelp": "Display text shown in menus.",
+    "sortOrder": "Sort order",
+    "sortOrderHelp": "Lower numbers appear first.",
+    "value": "Value (code)",
+    "valueHelp": "Short stable identifier — avoid spaces."
+  },
+  "noCategories": "No lookup categories are enabled for this client. Turn them on in App Config → Lookups v2 → Enabled Categories.",
+  "noItems": "No entries yet.",
+  "notifications": {
+    "createSuccess": "Entry added",
+    "deleteSuccess": "Entry removed",
+    "disableSuccess": "Entry disabled",
+    "enableSuccess": "Entry enabled",
+    "updateSuccess": "Entry updated",
+    "writeError": "Save failed"
+  },
+  "reorderHint": "Drag the handle to reorder entries.",
+  "subtitle": "Manage dropdown options and reference values used across the app.",
+  "validation": {
+    "labelRequired": "Label is required",
+    "valueDuplicate": "Another entry in this category already uses this value",
+    "valueDuplicateHidden": "A removed entry still holds this value and is not shown here — choose a different one",
+    "valueRequired": "Value is required"
+  }
+}

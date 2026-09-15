@@ -1,0 +1,45 @@
+{
+  "addItem": "Thêm nhà cung cấp",
+  "archiveConfirm": {
+    "message": "Ẩn {{name}}? Nhà cung cấp sẽ không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "title": "Ẩn nhà cung cấp"
+  },
+  "dangerZone": {
+    "archive": "Ẩn nhà cung cấp",
+    "archiveDesc": "Không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "disable": "Tạm ngưng nhà cung cấp",
+    "enable": "Mở lại nhà cung cấp",
+    "toggleConfirm": "Đổi trạng thái của {{name}}?",
+    "toggleDesc": "Nhà cung cấp tạm ngưng vẫn còn trên sổ nhưng không được dùng cho công việc mới."
+  },
+  "detailTitle": "Chi tiết nhà cung cấp",
+  "editItem": "Sửa nhà cung cấp",
+  "filters": {
+    "vendorTypeAll": "Tất cả nhóm nhà cung cấp"
+  },
+  "form": {
+    "codeAuto": "Để trống để tự sinh mã",
+    "codeHelp": "Mã nhà cung cấp. Để trống sẽ tự sinh, và không đổi được sau khi tạo.",
+    "createButton": "Tạo nhà cung cấp",
+    "updateButton": "Lưu thay đổi",
+    "vendorType": "Nhóm nhà cung cấp"
+  },
+  "noItems": "Chưa có nhà cung cấp nào trên sổ này.",
+  "notFound": {
+    "back": "Về danh sách nhà cung cấp",
+    "message": "Có thể đã bị ẩn, hoặc đường dẫn đã cũ.",
+    "title": "Không tìm thấy nhà cung cấp"
+  },
+  "notifications": {
+    "archiveSuccess": "Đã ẩn nhà cung cấp.",
+    "createSuccess": "Đã tạo nhà cung cấp.",
+    "updateSuccess": "Đã cập nhật nhà cung cấp.",
+    "writeError": "Không lưu được nhà cung cấp. Vui lòng thử lại."
+  },
+  "searchPlaceholder": "Tìm theo tên, mã…",
+  "validation": {
+    "codeDuplicate": "Mã này đã được dùng cho nhà cung cấp khác",
+    "codeDuplicateArchived": "Mã này thuộc về một nhà cung cấp đã ẩn",
+    "nameRequired": "Vui lòng nhập tên"
+  }
+}

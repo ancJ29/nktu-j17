@@ -660,7 +660,7 @@ function ScreenshotCropModal({
         {/* Action buttons */}
         <Group justify="flex-end" gap="sm">
           <Button variant="default" onClick={handleCancel} disabled={isProcessing || uploading}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button
             onClick={handleApply}

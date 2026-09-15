@@ -514,7 +514,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
           size="compact-sm"
           leftSection={<IconArrowLeft size={16} />}
         >
-          {t('__new__.01-common.actions.back')}
+          {t('common.actions.back')}
         </Button>
       </Group>
 
@@ -732,7 +732,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
                 disabled={loading}
                 onClick={() => navigate(ROUTES.DELIVERY.LIST)}
               >
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" loading={loading} size="sm">
                 {isEdit

@@ -2,6 +2,7 @@ import { Group, Stack, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDatePresetLabels } from '@/hooks/useDatePresetLabels';
 import { device } from '@credo/base-ui/utils';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
@@ -14,12 +15,7 @@ import { MobileFilterMoreDrawer } from '@/components/MobileFilterMoreDrawer';
 import { FilterPill } from '@/components/FilterPill';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useListFilter } from '@/hooks/useListFilter';
-import {
-  EMPTY_DATE_RANGE,
-  type DateRangePreset,
-  type DateRangeValue,
-  type MoreFilterDef,
-} from '@/types/date-range';
+import { EMPTY_DATE_RANGE, type DateRangeValue, type MoreFilterDef } from '@/types/date-range';
 import {
   defaultLastNDaysRange,
   formatDateRangeLabel,
@@ -112,15 +108,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     { value: 'confirmed', label: t('warehouseDoc.status.confirmed') },
   ];
 
-  const presetLabels: Partial<Record<DateRangePreset, string>> = {
-    today: t('common.datePreset.today'),
-    yesterday: t('common.datePreset.yesterday'),
-    thisWeek: t('common.datePreset.thisWeek'),
-    lastWeek: t('common.datePreset.lastWeek'),
-    thisMonth: t('common.datePreset.thisMonth'),
-    lastMonth: t('common.datePreset.lastMonth'),
-    custom: t('common.datePreset.custom'),
-  };
+  const presetLabels = useDatePresetLabels();
 
   const dateIsDefault = isDefaultLastNDaysRange(dateRange, RANGE_DAYS);
 
@@ -147,7 +135,7 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     },
   ];
 
-  const allLabel = t('__new__.01-common.filters.all');
+  const allLabel = t('common.filters.all');
 
   const mobileFilters: MobileFilterDef[] = [
     ...(postEnabled

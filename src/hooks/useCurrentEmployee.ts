@@ -8,7 +8,8 @@ import type { CMngtAppConfig } from '@credo/kits/types';
 import { cacheGet, cacheSet, cacheClear, cacheFlush } from '@/utils/appCache';
 import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
-import { buildEffectivePermissions } from '@/utils/permission';
+import { buildEffectivePermissions, usesServerPermissions } from '@/utils/permission';
+import { readFreshServerPermissions } from '@/stores/useAuthStore';
 
 import { reportPermissionMismatch } from '@/utils/reportPermissionMismatch';
 import { useEmpBootSignal } from '@/hooks/useEmpBootSignal';
@@ -18,6 +19,19 @@ import { tickPostLoginReload, POST_LOGIN_RELOAD_DELAY_MS } from '@/utils/postLog
 import { logActivity } from '@/utils/activityLogger';
 import { consumePendingLogin } from '@/utils/pendingLoginLog';
 import { logger } from '@credo/base-ui/utils';
+
+function adoptServerPermissionsIfAsked(context: 'employee' | 'root'): void {
+  if (!usesServerPermissions()) return;
+  const server = readFreshServerPermissions();
+  if (!server) {
+    logger.warn("[permissions] server build asked for but absent — keeping this app's", {
+      context,
+    });
+    return;
+  }
+  cacheSet('prm', server);
+  logger.debug('[permissions] gating on the server build', { context });
+}
 
 type UseCurrentEmployeeOptions = {
   isProfileLoaded: boolean;
@@ -137,6 +151,7 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
         department: match.department,
         versions,
       });
+      adoptServerPermissionsIfAsked('employee');
 
       cacheSet('emo', { o: extra?.permissions, v: empPermVersion });
 
@@ -176,6 +191,7 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
       const effective = buildEffectivePermissions(clientPerms, null, deptOptions, null, versions);
 
       reportPermissionMismatch(effective, { versions });
+      adoptServerPermissionsIfAsked('root');
 
       cacheClear('emo');
       cacheFlush();

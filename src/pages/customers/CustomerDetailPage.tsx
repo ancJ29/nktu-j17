@@ -306,7 +306,7 @@ export function CustomerDetailPage() {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
       <Group gap="xs">
         {canEdit && (
@@ -330,7 +330,7 @@ export function CustomerDetailPage() {
             size="compact-sm"
             leftSection={<IconEdit size={14} />}
           >
-            {t('__new__.01-common.actions.edit')}
+            {t('common.actions.edit')}
           </Button>
         )}
       </Group>
@@ -426,7 +426,7 @@ export function CustomerDetailPage() {
                       value={customer.phone}
                       size="xs"
                       c="dimmed"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   )}
@@ -460,7 +460,7 @@ export function CustomerDetailPage() {
                           value={c.phone}
                           size="xs"
                           c="dimmed"
-                          copyTooltip={t('__new__.01-common.actions.copy')}
+                          copyTooltip={t('common.actions.copy')}
                           copiedTooltip={t('common.labels.copied')}
                         />
                       )}
@@ -492,7 +492,7 @@ export function CustomerDetailPage() {
               <AddressWithMapLink
                 address={customer.address}
                 googleMapUrl={extra.addressGoogleMapUrl}
-                iconLabel={t('__new__.01-common.actions.openInMaps')}
+                iconLabel={t('common.actions.openInMaps')}
               />
             </Stack>
           </Card>
@@ -513,7 +513,7 @@ export function CustomerDetailPage() {
               <AddressWithMapLink
                 address={sa.address}
                 googleMapUrl={sa.googleMapUrl}
-                iconLabel={t('__new__.01-common.actions.openInMaps')}
+                iconLabel={t('common.actions.openInMaps')}
               />
               {sa.deliveryHours && (
                 <Text size="xs" c="dimmed">
@@ -566,7 +566,7 @@ export function CustomerDetailPage() {
           <DangerAction
             title={t('__new__.07-entities.customers.dangerZone.deleteItem')}
             description={t('__new__.07-entities.customers.dangerZone.deleteItemDesc')}
-            buttonLabel={t('__new__.01-common.actions.remove')}
+            buttonLabel={t('common.actions.remove')}
             buttonIcon={<IconTrash size={14} />}
             buttonColor="danger"
             onClick={openDeleteModal}

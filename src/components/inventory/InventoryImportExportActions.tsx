@@ -270,7 +270,7 @@ export function InventoryImportExportActions({
             onClick={handleExport}
             disabled={rows.length === 0 && items.length === 0}
           >
-            {t('__new__.01-common.actions.exportExcel')}
+            {t('common.actions.exportExcel')}
           </Button>
         )}
         {canImport && (
@@ -339,7 +339,7 @@ export function InventoryImportExportActions({
             )}
             <Group justify="flex-end" gap="sm">
               <Button variant="default" size="sm" onClick={closeModal} disabled={isImporting}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button color="orange" size="sm" loading={isImporting} onClick={handleConfirmImport}>
                 {t(`${ns}.importModal.confirm`)}

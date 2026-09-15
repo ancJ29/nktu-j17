@@ -1,9 +1,8 @@
 import { useState, type ReactNode } from 'react';
-import { ActionIcon, Group, MultiSelect, Select, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, MultiSelect, Select } from '@mantine/core';
 import { SearchInput } from './SearchInput';
 import type { ComboboxData } from '@mantine/core';
 import { IconFilterOff, IconLink, IconSearch, IconX } from '@tabler/icons-react';
-import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 import { URL_KEY } from '@/hooks/useUrlFilterState';
 import { useCopyLink } from '@/hooks/useCopyLink';
@@ -15,6 +14,8 @@ export type SelectFilter = {
   onChange: (value: string | null) => void;
   data: ComboboxData;
   placeholder: string;
+
+  title?: string;
 
   visible?: boolean;
 
@@ -69,7 +70,6 @@ export function DesktopFilterBar({
   onClear,
   hasActiveFilters: hasActiveFiltersProp,
 }: DesktopFilterBarProps) {
-  const { t } = useTranslation();
   const [params] = useSearchParams();
   const canCopyLink = params.has(URL_KEY);
 
@@ -160,17 +160,15 @@ export function DesktopFilterBar({
         );
       })}
       {moreSection}
-      <Tooltip label={t('__new__.01-common.actions.copyLink')} withArrow>
-        <ActionIcon
-          disabled={!canCopyLink}
-          variant="subtle"
-          color="blue"
-          size="lg"
-          onClick={handleCopyLink}
-        >
-          <IconLink size={16} />
-        </ActionIcon>
-      </Tooltip>
+      <ActionIcon
+        disabled={!canCopyLink}
+        variant="subtle"
+        color="blue"
+        size="lg"
+        onClick={handleCopyLink}
+      >
+        <IconLink size={16} />
+      </ActionIcon>
       {/* Rendered only while there is something to clear — a greyed-out control
           restates a state the empty filters already show. Kept in sync with the
           mobile bar, which does the same.

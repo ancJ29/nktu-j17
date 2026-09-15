@@ -1,0 +1,21 @@
+{
+  "columns": {
+    "assignedDriver": "Người Phụ Trách",
+    "assignedStaff": "Nhân viên phụ trách",
+    "customer": "Khách Hàng",
+    "orderDate": "Ngày Đặt Hàng",
+    "orderNumber": "Mã Đơn Hàng",
+    "poNumber": "Số PO",
+    "requestNumber": "Mã Yêu Cầu",
+    "status": "Trạng Thái"
+  },
+  "empty": "Không có dữ liệu",
+  "error": "Không tải được dữ liệu",
+  "expand": "Mở rộng",
+  "sections": {
+    "newOrders": "Đơn Hàng Mới / Đang Xử Lý",
+    "readyToDeliver": "Hàng chờ giao",
+    "todaySchedule": "Lịch Trình Hôm Nay"
+  },
+  "viewAll": "Xem tất cả"
+}

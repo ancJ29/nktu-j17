@@ -5,6 +5,11 @@ import { buildCustomerReportType2 } from './type2ForGiaAn';
 import { buildCustomerReportType3 } from './type3ForSaphia';
 import { buildCustomerReportType4 } from './type4ForVietHoaPhat';
 import { buildCustomerReportType5 } from './type5ForCatHai';
+import { buildCustomerReportType6 } from './type6ForPhucHuy';
+import { buildCustomerReportType7 } from './type7ForThuySanQuocTe';
+import { buildCustomerReportType8 } from './type8ForAtb';
+import { buildCustomerReportType9 } from './type9ForHaCatA';
+import { buildCustomerReportType10 } from './type10ForVs';
 import { DEFAULT_CUSTOMER_REPORT_TYPE } from './types';
 import type { CustomerReportInput, CustomerReportType } from './types';
 
@@ -42,6 +47,36 @@ export const CUSTOMER_REPORT_TYPES: Record<number, CustomerReportType> = {
     label: 'Bảng kê vận chuyển (CÁT HẢI)',
     fileStem: 'bang_ke',
     build: buildCustomerReportType5,
+  },
+  6: {
+    id: 6,
+    label: 'Bảng kê vận chuyển (PHÚC HUY)',
+    fileStem: 'bang_ke',
+    build: buildCustomerReportType6,
+  },
+  7: {
+    id: 7,
+    label: 'Bảng kê vận chuyển (THỦY SẢN QUỐC TẾ)',
+    fileStem: 'bang_ke',
+    build: buildCustomerReportType7,
+  },
+  8: {
+    id: 8,
+    label: 'Bảng kê vận chuyển (ATB)',
+    fileStem: 'bang_ke',
+    build: buildCustomerReportType8,
+  },
+  9: {
+    id: 9,
+    label: 'Bảng kê vận chuyển (HÀ CÁT Á)',
+    fileStem: 'bang_ke',
+    build: buildCustomerReportType9,
+  },
+  10: {
+    id: 10,
+    label: 'Bảng kê vận chuyển (VS)',
+    fileStem: 'bang_ke',
+    build: buildCustomerReportType10,
   },
 };
 

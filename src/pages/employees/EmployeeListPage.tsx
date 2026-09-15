@@ -181,7 +181,7 @@ export function EmployeeListPage() {
               value: departmentFilter,
               options: departmentOptions,
               onChange: setDepartmentFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -193,7 +193,7 @@ export function EmployeeListPage() {
               value: positionFilter,
               options: positionOptions,
               onChange: setPositionFilter,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -239,7 +239,7 @@ export function EmployeeListPage() {
               onStatusChange={setFilter}
               statusTitle={t('__new__.01-common.labels.status')}
               statusLabels={{
-                all: t('__new__.01-common.filters.all'),
+                all: t('common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
                 inactive: t('__new__.07-entities.employees.filter.inactive'),
               }}
@@ -256,7 +256,7 @@ export function EmployeeListPage() {
               status={filter}
               onStatusChange={setFilter}
               statusLabels={{
-                all: t('__new__.01-common.filters.all'),
+                all: t('common.filters.all'),
                 active: t('__new__.01-common.labels.active'),
                 inactive: t('__new__.07-entities.employees.filter.inactive'),
               }}

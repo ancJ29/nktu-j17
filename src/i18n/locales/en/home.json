@@ -1,0 +1,21 @@
+{
+  "columns": {
+    "assignedDriver": "Assigned To",
+    "assignedStaff": "Assigned Staff",
+    "customer": "Customer",
+    "orderDate": "Order Date",
+    "orderNumber": "Order No.",
+    "poNumber": "PO No.",
+    "requestNumber": "Request No.",
+    "status": "Status"
+  },
+  "empty": "No data",
+  "error": "Failed to load data",
+  "expand": "Expand",
+  "sections": {
+    "newOrders": "New / Processing Orders",
+    "readyToDeliver": "Ready to Deliver",
+    "todaySchedule": "Today's Schedule"
+  },
+  "viewAll": "View all"
+}

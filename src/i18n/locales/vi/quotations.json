@@ -1,0 +1,123 @@
+{
+  "actions": {
+    "cancelQuotation": "Hủy",
+    "copy": "Sao chép",
+    "exportPdf": "Xuất PDF",
+    "generateSalesOrder": "Tạo đơn hàng",
+    "markConfirmed": "Khách đã chốt",
+    "markReady": "Đánh dấu sẵn sàng",
+    "new": "Báo giá mới",
+    "sharePdf": "Chia sẻ PDF"
+  },
+  "cancelConfirm": {
+    "message": "Hủy báo giá này? Báo giá sẽ bị khóa, không thể chỉnh sửa hay đánh dấu sẵn sàng.",
+    "title": "Hủy báo giá này?"
+  },
+  "cancelledNote": "Báo giá này đã bị hủy.",
+  "columns": {
+    "date": "Ngày"
+  },
+  "confirmAgreement": {
+    "message": "Đánh dấu khách hàng đã đồng ý báo giá này. Báo giá sẽ bị khóa và không thể chỉnh sửa — vẫn xuất được PDF và tạo đơn hàng. Tiếp tục?",
+    "title": "Ghi nhận khách đã chốt?"
+  },
+  "confirmedNote": "Khách hàng đã chốt báo giá này nên báo giá bị khóa. Sao chép để báo giá với điều kiện khác.",
+  "convertedNote": "Đã tạo đơn hàng từ báo giá này.",
+  "copiedFrom": "Sao chép từ {{code}} — chỉnh sửa và lưu thành bản nháp mới.",
+  "countLabel_one": "{{count}} báo giá",
+  "countLabel_other": "{{count}} báo giá",
+  "dangerZone": {
+    "deleteItem": "Xóa báo giá",
+    "deleteItemDesc": "Xóa vĩnh viễn báo giá này"
+  },
+  "dateKind": {
+    "confirmed": "Ngày chốt",
+    "created": "Ngày tạo",
+    "po": "Ngày đặt hàng",
+    "sent": "Ngày gửi"
+  },
+  "deleteConfirm": {
+    "message": "Bạn có chắc muốn xóa báo giá này? Hành động này không thể hoàn tác.",
+    "title": "Xóa báo giá"
+  },
+  "editTitle": "Sửa báo giá",
+  "emptyState": "Chưa có báo giá trong khoảng thời gian này.",
+  "filter": {
+    "searchPlaceholder": "Tìm theo mã hoặc khách hàng"
+  },
+  "form": {
+    "addLine": "Thêm sản phẩm",
+    "amountLabel": "Thành tiền",
+    "belowSuggestedPriceHint": "Thấp hơn giá đề xuất ({{price}})",
+    "companyLabel": "Công ty phát hành",
+    "customerLabel": "Khách hàng",
+    "customerPlaceholder": "Chọn khách hàng (tùy chọn)",
+    "headerSection": "Báo giá",
+    "linesLabel": "Sản phẩm",
+    "noLines": "Chưa có sản phẩm. Thêm sản phẩm, số lượng và đơn giá.",
+    "note": "Diễn giải",
+    "priceLabel": "Đơn giá",
+    "priceTiers": {
+      "addTier": "Thêm bậc giá",
+      "count_one": "{{count}} bậc giá",
+      "count_other": "{{count}} bậc giá",
+      "editTooltip": "Giá theo số lượng đặt tối thiểu",
+      "minQuantity": "SL tối thiểu",
+      "modalHint": "Nhập đơn giá theo từng mức số lượng đặt tối thiểu. Đơn giá của dòng sẽ tự điền theo số lượng nhập, và bảng bậc giá được in dưới sản phẩm trên file PDF.",
+      "modalTitle": "Giá theo số lượng đặt tối thiểu",
+      "rung": "Từ {{quantity}}: {{price}}"
+    },
+    "productLabel": "Sản phẩm",
+    "productPlaceholder": "Chọn sản phẩm",
+    "quantityLabel": "Số lượng",
+    "totalLabel": "Tổng cộng",
+    "unitLabel": "Đơn vị"
+  },
+  "fromQuotation": "Từ báo giá",
+  "newTitle": "Báo giá mới",
+  "notifications": {
+    "cancelError": "Hủy báo giá thất bại",
+    "cancelSuccess": "Đã hủy báo giá",
+    "confirmError": "Ghi nhận khách chốt thất bại",
+    "confirmSuccess": "Đã ghi nhận khách chốt báo giá",
+    "createError": "Tạo báo giá thất bại",
+    "createSuccess": "Đã tạo báo giá",
+    "deleteError": "Xóa báo giá thất bại",
+    "deleteSuccess": "Đã xóa báo giá",
+    "duplicateCode": "Mã đã tồn tại, vui lòng thử lại",
+    "fetchError": "Tải báo giá thất bại",
+    "sendError": "Đánh dấu sẵn sàng thất bại",
+    "sendSuccess": "Đã đánh dấu báo giá sẵn sàng",
+    "updateError": "Cập nhật báo giá thất bại",
+    "updateSuccess": "Đã cập nhật báo giá"
+  },
+  "previewTitle": "Xem báo giá",
+  "print": {
+    "includeVat": "Bao gồm VAT",
+    "landscape": "Ngang",
+    "optionsTitle": "Tùy chọn xuất",
+    "orientation": "Hướng giấy",
+    "paperSize": "Khổ giấy",
+    "popupBlocked": "Cửa sổ bật lên bị chặn. Cho phép pop-up cho trang này rồi thử lại.",
+    "portrait": "Dọc"
+  },
+  "sendConfirm": {
+    "message": "Đánh dấu báo giá sẵn sàng gửi khách. Vẫn có thể chỉnh sửa cho đến khi khách chốt. Tiếp tục?",
+    "title": "Đánh dấu báo giá này sẵn sàng?"
+  },
+  "share": {
+    "downloadedFallback": "Trình duyệt này không hỗ trợ chia sẻ — đã tải PDF về máy.",
+    "error": "Không thể tạo PDF. Vui lòng thử lại."
+  },
+  "status": {
+    "cancelled": "Đã hủy",
+    "confirmed": "Đã chốt",
+    "converted": "Đã tạo đơn",
+    "draft": "Nháp",
+    "sent": "Sẵn sàng"
+  },
+  "title": "Báo giá",
+  "validation": {
+    "linesRequired": "Thêm ít nhất một sản phẩm."
+  }
+}

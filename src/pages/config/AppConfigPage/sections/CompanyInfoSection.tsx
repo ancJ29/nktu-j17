@@ -13,7 +13,7 @@ import {
 } from '@mantine/core';
 import { IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react';
 import { memo } from 'react';
-import { DEFAULT_COMPANY_INFO } from '@/config/default-config';
+import { DEFAULT_COMPANY_INFOS } from '@/config/default-config';
 import type { CompanyInfoConfig } from '@/config/schema';
 
 export const CompanyInfoSection = memo(function CompanyInfoSection({
@@ -28,7 +28,7 @@ export const CompanyInfoSection = memo(function CompanyInfoSection({
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange(value.map((c, i) => (i === index ? { ...c, [key]: e.currentTarget.value } : c)));
 
-  const add = () => onChange([...value, { ...DEFAULT_COMPANY_INFO, id: newCompanyId() }]);
+  const add = () => onChange([...value, ...DEFAULT_COMPANY_INFOS]);
   const remove = (index: number) => onChange(value.filter((_, i) => i !== index));
   const makeDefault = (index: number) =>
     onChange([value[index]!, ...value.filter((_, i) => i !== index)]);
@@ -114,10 +114,3 @@ export const CompanyInfoSection = memo(function CompanyInfoSection({
     </Stack>
   );
 });
-
-function newCompanyId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  return `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
-}

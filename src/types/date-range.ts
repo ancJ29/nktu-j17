@@ -36,6 +36,8 @@ export type MoreFilterSelect = {
   value: string | null;
   options: { value: string; label: string }[];
   onChange: (value: string | null) => void;
+
+  restingValue?: string | null;
 };
 
 export type MoreFilterMultiSelect = {

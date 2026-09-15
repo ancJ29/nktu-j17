@@ -61,7 +61,7 @@ export function ScrollToTopButton() {
             size={48}
             radius="xl"
             variant="filled"
-            aria-label={t('__new__.01-common.actions.backToTop')}
+            aria-label={t('common.actions.backToTop')}
             onClick={() => window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' })}
           >
             <IconArrowUp size={22} />

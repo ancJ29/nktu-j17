@@ -5,9 +5,12 @@ import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '@/constants/routes';
-import { cMngtConnector } from '@credo/connectors/connector';
 import { PASSWORD_REGEX } from '@credo/kits/string';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import {
+  archiveEmployee,
+  updateEmployeeLoginPassword,
+  useEmployeeStore,
+} from '@/stores/useEmployeeStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import type { Employee } from '@/types';
 import { logActivity } from '@/utils/activityLogger';
@@ -40,14 +43,7 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
     if (!id || !employee) return;
     setDeleting(true);
     try {
-      const { item: updated, meta } = await useEmployeeStore.getState().updateSafelyWithMeta({
-        id,
-        version: employee.version,
-        patch: {
-          isActive: false,
-          extra: { ...employee.extra, isDeleted: true },
-        },
-      });
+      const { item: updated, meta } = await archiveEmployee(employee);
       logActivity('employee.delete', id);
 
       if (meta?.ssoWarning) {
@@ -108,12 +104,13 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
 
   const handlePasswordChange = useCallback(
     async (values: { newPassword: string; confirmPassword: string }) => {
-      if (!id) return;
+      if (!id || !employee) return;
       setChangingPassword(true);
       try {
-        const res = await cMngtConnector.updateEmployeeLoginPassword({
+        const res = await updateEmployeeLoginPassword({
           id,
           password: values.newPassword,
+          version: employee.version,
         });
         logActivity('employee.passwordChange', id);
 
@@ -141,7 +138,8 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
         setChangingPassword(false);
       }
     },
-    [id, t],
+
+    [id, employee, t],
   );
 
   const closePasswordModalAndReset = useCallback(() => {

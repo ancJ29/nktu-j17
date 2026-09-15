@@ -402,9 +402,7 @@ export function CropDiaryTemplateFormPage() {
   if (fetching) return null;
 
   const pageTitle = isEdit ? t('cropDiaryTemplates.editItem') : t('cropDiaryTemplates.addItem');
-  const saveLabel = isEdit
-    ? t('__new__.01-common.actions.save')
-    : t('cropDiaryTemplates.form.createButton');
+  const saveLabel = isEdit ? t('common.actions.save') : t('cropDiaryTemplates.form.createButton');
   const values = form.getValues();
 
   return (
@@ -419,11 +417,11 @@ export function CropDiaryTemplateFormPage() {
             size="compact-sm"
             leftSection={<IconArrowLeft size={16} />}
           >
-            {t('__new__.01-common.actions.back')}
+            {t('common.actions.back')}
           </Button>
           <Group gap="xs">
             <Button variant="default" size="compact-sm" disabled={loading} onClick={navigateToList}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               type="submit"
@@ -628,7 +626,7 @@ export function CropDiaryTemplateFormPage() {
                   leftSection={<IconDownload size={14} />}
                   onClick={handleExport}
                 >
-                  {t('__new__.01-common.actions.exportExcel')}
+                  {t('common.actions.exportExcel')}
                 </Button>
               </Group>
             </Group>

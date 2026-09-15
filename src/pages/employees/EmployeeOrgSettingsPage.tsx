@@ -132,7 +132,7 @@ export function EmployeeOrgSettingsPage() {
         </Stack>
         {canModify && (
           <Button onClick={handleSave} loading={saving}>
-            {t('__new__.01-common.actions.save')}
+            {t('common.actions.save')}
           </Button>
         )}
       </Group>

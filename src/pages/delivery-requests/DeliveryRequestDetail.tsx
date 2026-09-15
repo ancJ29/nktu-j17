@@ -234,9 +234,9 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     : t('common.labels.deliveryAddress');
 
   const inlineEditLabels: InlineEditLabels = {
-    edit: t('__new__.01-common.actions.edit'),
-    save: t('__new__.01-common.actions.save'),
-    cancel: t('__new__.01-common.actions.cancel'),
+    edit: t('common.actions.edit'),
+    save: t('common.actions.save'),
+    cancel: t('common.actions.cancel'),
   };
 
   const driverField = (
@@ -306,7 +306,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
     <AddressWithMapLink
       address={drExtra.deliveryAddress}
       googleMapUrl={drExtra.googleMapUrl}
-      iconLabel={t('__new__.01-common.actions.openInMaps')}
+      iconLabel={t('common.actions.openInMaps')}
       size="xs"
     />
   );
@@ -829,7 +829,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
           size="compact-sm"
           leftSection={<IconArrowLeft size={16} />}
         >
-          {t('__new__.01-common.actions.back')}
+          {t('common.actions.back')}
         </Button>
         <Group gap="xs">
           {canEdit &&
@@ -841,7 +841,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
                 size="compact-sm"
                 leftSection={<IconEdit size={14} />}
               >
-                {t('__new__.01-common.actions.edit')}
+                {t('common.actions.edit')}
               </Button>
             ) : (
               <Button
@@ -851,7 +851,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
                 size="compact-sm"
                 leftSection={<IconEdit size={14} />}
               >
-                {t('__new__.01-common.actions.edit')}
+                {t('common.actions.edit')}
               </Button>
             ))}
         </Group>

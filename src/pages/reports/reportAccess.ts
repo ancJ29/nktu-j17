@@ -3,7 +3,7 @@ import { byClient } from '@/config/client';
 import { useIsRoot } from '@/hooks/useIsRoot';
 import { perms } from '@/utils/permission';
 
-export const REPORTS_AVAILABLE = byClient({ nktu: true }, false);
+export const REPORTS_AVAILABLE = byClient({ nktu: true, acme: true }, false);
 
 const LEGACY_MANAGER_DEPARTMENT_CODE = 'manager';
 

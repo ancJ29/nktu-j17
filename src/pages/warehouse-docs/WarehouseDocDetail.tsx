@@ -198,7 +198,7 @@ export function WarehouseDocDetail({ kind }: { kind: WarehouseDocKind }) {
               size="compact-sm"
               leftSection={<IconArrowLeft size={16} />}
             >
-              {t('__new__.01-common.actions.back')}
+              {t('common.actions.back')}
             </Button>
             <Group gap="sm">
               {canConfirm && (
@@ -233,7 +233,7 @@ export function WarehouseDocDetail({ kind }: { kind: WarehouseDocKind }) {
                   size="compact-sm"
                   leftSection={<IconEdit size={14} />}
                 >
-                  {t('__new__.01-common.actions.edit')}
+                  {t('common.actions.edit')}
                 </Button>
               )}
             </Group>
@@ -388,7 +388,7 @@ export function WarehouseDocDetail({ kind }: { kind: WarehouseDocKind }) {
                   <DangerAction
                     title={t('warehouseDoc.dangerZone.deleteItem')}
                     description={t('warehouseDoc.dangerZone.deleteItemDesc')}
-                    buttonLabel={t('__new__.01-common.actions.remove')}
+                    buttonLabel={t('common.actions.remove')}
                     buttonIcon={<IconTrash size={14} />}
                     onClick={openDeleteModal}
                     buttonColor="red"

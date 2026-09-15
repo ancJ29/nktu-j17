@@ -1,0 +1,10 @@
+{
+  "clearCache": "Xóa dữ liệu",
+  "clearCacheConfirm": "Thao tác này sẽ xóa toàn bộ dữ liệu lưu tạm trên máy (cài đặt, dữ liệu ngoại tuyến, cookie) và đăng xuất bạn. Chỉ dùng khi ứng dụng bị kẹt ở dữ liệu cũ.",
+  "installApp": "Cài đặt ứng dụng",
+  "logout": "Đăng xuất",
+  "profile": "Hồ sơ",
+  "refreshConfig": "Tải lại cấu hình",
+  "reloadPage": "Tải lại trang",
+  "settings": "Cài đặt"
+}

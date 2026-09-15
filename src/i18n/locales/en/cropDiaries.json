@@ -1,0 +1,56 @@
+{
+  "addItem": "Add Entry",
+  "addPrep": "Add preparation job",
+  "completedOn": "Done · {{date}}",
+  "deleteConfirm": {
+    "message": "Delete \"{{activity}}\"? This cannot be undone.",
+    "title": "Delete diary entry?"
+  },
+  "editItem": "Edit Entry",
+  "emptyMessage": "Log an activity for a crop, or apply a template.",
+  "emptyTitle": "No diary entries yet",
+  "eventsTitle": "Events",
+  "form": {
+    "activityLabel": "Activity",
+    "activityPlaceholder": "e.g. Irrigation",
+    "createButton": "Create Entry",
+    "entryDateLabel": "Date",
+    "isPrepHint": "Before planting on {{date}} — this entry sits under Preparation.",
+    "materialLocked": "Turn on \"uses material\" to record",
+    "notesPlaceholder": "Details, quantities, observations…",
+    "usesMaterialLabel": "This job uses material"
+  },
+  "logMaterial": "Log material",
+  "markDone": "Mark done",
+  "markUndone": "Undo",
+  "materialExpectedHint": "Record what was actually used, and how much. Leave it empty if nothing was needed.",
+  "materialPending": "Material not logged",
+  "materialSummaryEmpty": "No materials logged yet",
+  "materialTable": {
+    "material": "Material",
+    "quantity": "Quantity",
+    "times": "Times",
+    "unit": "Unit"
+  },
+  "materialsLabel": "Materials",
+  "noItems": "No diary entries found",
+  "notifications": {
+    "applyTemplateError": "Could not apply template",
+    "createError": "Failed to create diary entry",
+    "createSuccess": "Diary entry created",
+    "deleteError": "Failed to delete diary entry",
+    "deleteSuccess": "Diary entry deleted",
+    "fetchError": "Failed to load diary entries",
+    "updateError": "Failed to update diary entry",
+    "updateSuccess": "Diary entry updated"
+  },
+  "prepEmpty": "No before-planting jobs yet.",
+  "prepTitle": "Before planting",
+  "searchPlaceholder": "Search diary…",
+  "sectionEmpty": "No diary entries for this crop yet.",
+  "title": "Crop Diary",
+  "validation": {
+    "activityRequired": "Activity is required",
+    "entryDateRequired": "Date is required"
+  }
+}

@@ -728,12 +728,10 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             )}
             <Group justify="flex-end" gap="sm">
               <Button variant="default" size="sm" disabled={saving} onClick={formHandlers.close}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" size="sm" loading={saving}>
-                {editing
-                  ? tr('__new__.01-common.actions.save')
-                  : tr('operationLogs.form.createButton')}
+                {editing ? tr('common.actions.save') : tr('operationLogs.form.createButton')}
               </Button>
             </Group>
           </Stack>

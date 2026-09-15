@@ -1,0 +1,52 @@
+{
+  "addItem": "Thêm",
+  "categories": {
+    "customerType": "Nhóm khách hàng",
+    "feeName": "Tên phí",
+    "maintenanceType": "Loại bảo trì",
+    "materialCategory": "Danh mục vật tư",
+    "materialUnit": "Đơn vị vật tư",
+    "productCategory": "Danh mục sản phẩm",
+    "productUnit": "Đơn vị sản phẩm",
+    "shipmentType": "Loại hình",
+    "truckType": "Loại xe",
+    "truckingSize": "Loại cont / kích thước",
+    "unit": "Đơn vị tính",
+    "vendorType": "Nhóm nhà cung cấp"
+  },
+  "columns": {
+    "label": "Nhãn",
+    "sortOrder": "Thứ tự",
+    "value": "Mã"
+  },
+  "deleteConfirm": {
+    "message": "Sẽ ẩn \"{{label}}\" (soft-delete). Dữ liệu cũ vẫn dùng nhãn này. Có thể bật lại sau.",
+    "title": "Xóa mục này?"
+  },
+  "form": {
+    "label": "Nhãn hiển thị",
+    "labelHelp": "Hiển thị trong dropdown.",
+    "sortOrder": "Thứ tự sắp xếp",
+    "sortOrderHelp": "Số nhỏ hơn xuất hiện trước.",
+    "value": "Mã (value)",
+    "valueHelp": "Mã định danh ngắn, không dấu cách."
+  },
+  "noCategories": "Chưa có danh mục nào được bật cho khách hàng này. Bật trong App Config → Lookups v2 → Enabled Categories.",
+  "noItems": "Chưa có mục nào.",
+  "notifications": {
+    "createSuccess": "Đã thêm",
+    "deleteSuccess": "Đã xóa",
+    "disableSuccess": "Đã tắt",
+    "enableSuccess": "Đã bật",
+    "updateSuccess": "Đã cập nhật",
+    "writeError": "Lưu thất bại"
+  },
+  "reorderHint": "Kéo biểu tượng để sắp xếp lại thứ tự.",
+  "subtitle": "Quản lý các giá trị dropdown / danh mục tham chiếu trong ứng dụng.",
+  "validation": {
+    "labelRequired": "Cần nhập nhãn",
+    "valueDuplicate": "Đã có mục khác trong danh mục này dùng mã này",
+    "valueDuplicateHidden": "Một mục đã xoá vẫn đang giữ mã này và không hiển thị ở đây — vui lòng chọn mã khác",
+    "valueRequired": "Cần nhập mã"
+  }
+}

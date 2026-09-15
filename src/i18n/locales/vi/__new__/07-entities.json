@@ -1,0 +1,208 @@
+{
+  "customers": {
+    "dangerZone": {
+      "deleteItem": "Xóa khách hàng",
+      "deleteItemDesc": "Ẩn khách hàng khỏi hệ thống. Dữ liệu vẫn được giữ lại để tra cứu.",
+      "disableButton": "Ngừng kích hoạt",
+      "disableConfirm": "Bạn có chắc muốn ngừng kích hoạt khách hàng này?",
+      "disableItem": "Ngừng kích hoạt khách hàng",
+      "disableItemDesc": "Đánh dấu khách hàng này là không hoạt động — vẫn hiển thị trong danh sách nhưng ở trạng thái ngừng",
+      "enableConfirm": "Bạn có chắc muốn kích hoạt lại khách hàng này?",
+      "enableItem": "Kích hoạt khách hàng",
+      "enableItemDesc": "Đánh dấu khách hàng này hoạt động trở lại"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo tên, mã, SĐT..."
+    },
+    "title": "__keep__"
+  },
+  "deliveryRequests": {
+    "list": {
+      "searchPlaceholder": "Tìm kiếm yêu cầu..."
+    },
+    "title": "__keep__"
+  },
+  "employees": {
+    "dangerZone": {
+      "changePassword": "Đặt Mật Khẩu",
+      "changePasswordButton": "Đặt Mật Khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "copyCredentials": "Sao chép thông tin đăng nhập",
+      "deleteEmployee": "Xóa Nhân Viên",
+      "deleteEmployeeDesc": "Xóa vĩnh viễn nhân viên khỏi hệ thống",
+      "disableButton": "Khoá",
+      "disableConfirm": "Bạn có chắc chắn muốn khoá tài khoản nhân viên này?",
+      "disableEmployee": "Khoá Tài Khoản Nhân Viên",
+      "disableEmployeeDesc": "Tạm thời vô hiệu hóa quyền truy cập của nhân viên vào hệ thống",
+      "disableError": "Không thể cập nhật trạng thái nhân viên",
+      "disableSsoWarningTitle": "Đã vô hiệu hoá, nhưng tài khoản đăng nhập có thể vẫn dùng được",
+      "disableSuccess": "Đã khoá tài khoản nhân viên",
+      "enableButton": "Mở Khoá",
+      "enableConfirm": "Bạn có chắc chắn muốn mở khoá tài khoản nhân viên này?",
+      "enableEmployee": "Mở Khoá Tài Khoản Nhân Viên",
+      "enableEmployeeDesc": "Kích hoạt lại quyền truy cập của nhân viên vào hệ thống",
+      "enableSsoWarningTitle": "Đã kích hoạt, nhưng nhân viên có thể chưa đăng nhập được",
+      "enableSuccess": "Đã mở khoá tài khoản nhân viên",
+      "generatePassword": "Tạo ngẫu nhiên",
+      "loginIdentifier": "Tên đăng nhập",
+      "newPassword": "Mật khẩu mới",
+      "passwordChangeError": "Không thể đổi mật khẩu",
+      "passwordChangeSuccess": "Đổi mật khẩu thành công",
+      "passwordChangeWarning": "Mật khẩu mới đã có hiệu lực và nhân viên có thể đăng nhập, nhưng chưa lưu được vào hồ sơ. Hãy sao chép ngay — mật khẩu sẽ không hiển thị lại.",
+      "passwordChangeWarningTitle": "Đã đổi mật khẩu, nhưng chưa lưu vào hồ sơ",
+      "passwordMismatch": "Mật khẩu không khớp",
+      "passwordPolicy": "Mật khẩu phải có ít nhất 8 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@$!%*?&)",
+      "passwordRequired": "Vui lòng nhập mật khẩu"
+    },
+    "filter": {
+      "inactive": "Ngừng hoạt động"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo tên, mã..."
+    },
+    "title": "Nhân viên"
+  },
+  "goodsReceipts": {
+    "actions": {
+      "cancel": "Hủy phiếu",
+      "confirmReceived": "Xác nhận nhập kho"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo mã phiếu, NCC, tham chiếu..."
+    },
+    "notifications": {
+      "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
+      "exportError": "Xuất phiếu nhập kho thất bại.",
+      "exportSuccess_one": "Đã xuất {{count}} phiếu nhập kho.",
+      "exportSuccess_other": "Đã xuất {{count}} phiếu nhập kho."
+    },
+    "title": "__keep__"
+  },
+  "inventory": {
+    "materials": {
+      "list": {
+        "searchPlaceholder": "Tìm theo nguyên liệu hoặc vị trí..."
+      },
+      "title": "__keep__"
+    },
+    "products": {
+      "list": {
+        "searchPlaceholder": "Tìm theo sản phẩm hoặc vị trí..."
+      },
+      "title": "__keep__"
+    }
+  },
+  "locations": {
+    "dangerZone": {
+      "deleteConfirm": "Bạn có chắc chắn muốn xóa vị trí này? Các dòng tồn kho tham chiếu sẽ bị mồ côi.",
+      "deleteItem": "Xóa vị trí",
+      "deleteItemDesc": "Xóa vĩnh viễn vị trí khỏi hệ thống.",
+      "disableConfirm": "Bạn có chắc chắn muốn ngừng vị trí này?",
+      "disableItem": "Ngừng vị trí",
+      "enableConfirm": "Bạn có chắc chắn muốn kích hoạt vị trí này?",
+      "enableItem": "Kích hoạt vị trí"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo tên, mã, địa chỉ..."
+    },
+    "title": "__keep__"
+  },
+  "lookups": {
+    "title": "__keep__"
+  },
+  "materials": {
+    "dangerZone": {
+      "deleteItem": "Xóa vật tư",
+      "deleteItemDesc": "Xóa vĩnh viễn vật tư khỏi hệ thống",
+      "disableButton": "Ngừng nhập",
+      "disableConfirm": "Bạn có chắc muốn ngừng nhập vật tư này?",
+      "disableItem": "Ngừng nhập vật tư",
+      "disableItemDesc": "Ẩn vật tư khỏi danh sách nhưng không xóa",
+      "enableConfirm": "Bạn có chắc muốn kích hoạt vật tư này?",
+      "enableItem": "Kích hoạt vật tư",
+      "enableItemDesc": "Cho phép nhập lại vật tư này"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo tên, mã..."
+    },
+    "title": "__keep__"
+  },
+  "productInventory": {
+    "fromOrders": "Đang giữ"
+  },
+  "products": {
+    "actions": {
+      "enterInventory": "Nhập tồn kho"
+    },
+    "dangerZone": {
+      "deleteBlockedHasStock": "Không thể xóa — sản phẩm vẫn còn tồn kho. Hãy điều chỉnh tồn kho về 0 trước.",
+      "deleteItem": "Xóa sản phẩm",
+      "deleteItemDesc": "Xóa vĩnh viễn sản phẩm khỏi hệ thống",
+      "disableConfirm": "Bạn có chắc chắn muốn ngừng sản phẩm này?",
+      "disableItem": "Ngừng bán sản phẩm",
+      "disableItemDesc": "Ẩn sản phẩm khỏi danh sách nhưng không xóa",
+      "enableConfirm": "Bạn có chắc chắn muốn kích hoạt sản phẩm này?",
+      "enableItem": "Kích hoạt sản phẩm",
+      "enableItemDesc": "Hiển thị lại sản phẩm trong danh sách"
+    },
+    "labels": {
+      "basePriceLabel": "Giá gốc"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo tên, mã ..."
+    },
+    "title": "__keep__"
+  },
+  "salesOrders": {
+    "actions": {
+      "copy": "Sao chép đơn",
+      "createAdditionalDR": "Tạo yêu cầu giao nhận bổ sung",
+      "createDR": "Tạo yêu cầu giao nhận",
+      "createReturnShipment": "Tạo phiếu trả hàng",
+      "switchToExternalDelivery": "Giao ngoài",
+      "switchToInternalDelivery": "Giao nội bộ"
+    },
+    "list": {
+      "filterExternalDelivery": "Giao ngoài",
+      "filterInternalDelivery": "Giao nội bộ",
+      "searchPlaceholder": "Tìm kiếm đơn hàng..."
+    },
+    "notifications": {
+      "exportEmpty": "Không có dữ liệu để xuất — điều chỉnh bộ lọc và thử lại.",
+      "exportError": "Xuất đơn hàng thất bại.",
+      "exportSuccess_one": "Đã xuất {{count}} đơn hàng.",
+      "exportSuccess_other": "Đã xuất {{count}} đơn hàng."
+    },
+    "title": "__keep__"
+  },
+  "trucks": {
+    "dangerZone": {
+      "deleteConfirm": "Bạn có chắc muốn xóa xe này? Nhật ký vận hành vẫn được giữ lại, nhưng xe sẽ không còn trong đội xe.",
+      "deleteItem": "Xóa xe",
+      "deleteItemDesc": "Ẩn xe khỏi đội xe. Dữ liệu vẫn được giữ lại để tra cứu.",
+      "disableConfirm": "Bạn có chắc muốn ngừng hoạt động xe này?",
+      "disableItem": "Ngừng hoạt động xe",
+      "disableItemDesc": "Ẩn xe khỏi danh sách đang hoạt động nhưng không xóa",
+      "enableConfirm": "Bạn có chắc muốn kích hoạt lại xe này?",
+      "enableItem": "Kích hoạt xe",
+      "enableItemDesc": "Đưa xe trở lại hoạt động"
+    }
+  },
+  "vendors": {
+    "dangerZone": {
+      "deleteItem": "Xóa nhà cung cấp",
+      "deleteItemDesc": "Ẩn nhà cung cấp khỏi hệ thống. Dữ liệu vẫn được giữ lại để tra cứu.",
+      "disableButton": "Tạm ngưng",
+      "disableConfirm": "Bạn có chắc muốn tạm ngưng hợp tác với nhà cung cấp này?",
+      "disableItem": "Tạm ngưng hợp tác",
+      "disableItemDesc": "Đánh dấu tạm ngưng — nhà cung cấp vẫn hiển thị trong danh sách",
+      "enableConfirm": "Bạn có chắc muốn kích hoạt lại hợp tác với nhà cung cấp này?",
+      "enableItem": "Kích hoạt hợp tác",
+      "enableItemDesc": "Đánh dấu nhà cung cấp hợp tác trở lại"
+    },
+    "list": {
+      "searchPlaceholder": "Tìm theo tên, mã, SĐT..."
+    },
+    "title": "__keep__"
+  }
+}

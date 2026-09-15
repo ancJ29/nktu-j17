@@ -1,0 +1,188 @@
+{
+  "actions": {
+    "addEntry": "Thêm dòng",
+    "back": "Quay lại",
+    "backToTop": "Lên đầu trang",
+    "cancel": "Hủy",
+    "clearValue": "Xóa",
+    "close": "Đóng",
+    "copy": "Sao chép",
+    "disable": "Tắt",
+    "edit": "Sửa",
+    "enable": "Bật",
+    "exportExcel": "Xuất Excel",
+    "openInMaps": "Mở Maps",
+    "pickDateTime": "Chọn ngày giờ",
+    "remove": "Xóa",
+    "save": "Lưu thay đổi"
+  },
+  "bulkImport": {
+    "created": "Đã tạo",
+    "downloadSample": "Tải mẫu",
+    "downloadSuccess": "Đã tải mẫu thành công",
+    "dragAndDrop": "Kéo & thả tệp vào đây",
+    "errorsTitle": "Các dòng không thể nhập",
+    "failed": "Thất bại",
+    "orClickToSelect": "hoặc nhấp để chọn tệp",
+    "partialSuccess": "{{success}}/{{total}} đã nhập",
+    "results": "Kết quả nhập",
+    "rowLabel": "Dòng {{n}}",
+    "sampleTemplate": "Mẫu Excel",
+    "skipped": "Đã bỏ qua",
+    "success": "Thành công",
+    "supportedFormats": "Định dạng hỗ trợ: .csv, .xlsx, .xls",
+    "total": "Tổng"
+  },
+  "cache": {
+    "hoursAgo": "{{count}} giờ trước",
+    "minutesAgo": "{{count}} phút trước",
+    "refresh": "Làm mới dữ liệu"
+  },
+  "columns": {
+    "beginOfPeriod": "Tồn đầu kỳ",
+    "beginOfPeriodTooltip": "Tồn kho đầu tháng hiện tại (UTC+7). Tự động ghi nhận lần đầu trong tháng; có thể chỉnh sửa qua Excel import.",
+    "beginOfPeriodWithPeriod": "Tồn đầu kỳ",
+    "contactPerson": "Người liên hệ",
+    "createdDate": "Ngày tạo",
+    "lastUpdated": "Cập nhật lần cuối",
+    "locationCount": "{{count}} vị trí",
+    "minStock": "Tồn kho tối thiểu",
+    "minStockTooltip": "Ngưỡng tồn kho tối thiểu trong kho. Tồn kho bằng hoặc dưới ngưỡng này sẽ kích hoạt cảnh báo tồn thấp.",
+    "onHand": "Tồn kho",
+    "price": "Giá",
+    "secondaryStatus": "Trạng thái",
+    "secondaryStatusTooltip": "Hết hàng khi Tồn còn lại ≤ 0; Cần nhập khi ≤ Tồn tối thiểu; còn lại là OK.",
+    "totalAmount": "Tổng tiền"
+  },
+  "conflict": {
+    "listMessage": "Một người khác vừa thay đổi danh sách. Dữ liệu đã được tải lại — vui lòng kiểm tra và gửi lại.",
+    "message": "Một người khác vừa chỉnh sửa bản ghi này. Dữ liệu đã được tải lại — vui lòng áp dụng lại thay đổi của bạn nếu cần.",
+    "title": "Bản ghi vừa được cập nhật"
+  },
+  "datePreset": {
+    "custom": "Tùy chỉnh",
+    "lastMonth": "Tháng trước",
+    "lastWeek": "Tuần trước",
+    "nextMonth": "Tháng sau",
+    "nextWeek": "Tuần sau",
+    "thisMonth": "Tháng này",
+    "thisWeek": "Tuần này",
+    "today": "Hôm nay",
+    "tomorrow": "Ngày mai",
+    "yesterday": "Hôm qua"
+  },
+  "desktopOnly": {
+    "message": "Tính năng này chỉ hỗ trợ trên máy tính. Vui lòng chuyển sang máy tính để tiếp tục.",
+    "title": "Chỉ dùng trên máy tính"
+  },
+  "detail": {
+    "alsoKnownAs": "Còn gọi là",
+    "currentStatus": "Hiện tại",
+    "inventoryTab": {
+      "addFirst": "Thêm tồn kho",
+      "locationCount": "{{count}} vị trí",
+      "refresh": "Bấm vào thông tin tồn kho để cập nhật"
+    },
+    "lineTotal": "Thành tiền",
+    "notes": {
+      "addButton": "Thêm ghi chú",
+      "addError": "Không thêm được ghi chú",
+      "addPlaceholder": "Nhập ghi chú cho cả nhóm...",
+      "addSuccess": "Đã thêm ghi chú",
+      "byOn": "bởi {{author}} · {{date}}",
+      "empty": "Chưa có ghi chú nào. Hãy thêm ghi chú đầu tiên cho nhóm.",
+      "removeAria": "Xoá ghi chú",
+      "removeError": "Không xoá được ghi chú",
+      "removeSuccess": "Đã xoá ghi chú",
+      "title": "Ghi chú nội bộ"
+    },
+    "pending": "Đang chờ"
+  },
+  "filters": {
+    "all": "Tất cả",
+    "apply": "Áp dụng",
+    "customerCount": "{{count}} khách hàng",
+    "more": "Thêm",
+    "selectDateRange": "Chọn khoảng thời gian",
+    "statusCount": "{{count}} trạng thái",
+    "vendorCount": "{{count}} nhà cung cấp"
+  },
+  "form": {
+    "isActiveLabel": "Hoạt động",
+    "phonePlaceholder": "Số điện thoại",
+    "unitPricePlaceholder": "Giá"
+  },
+  "labels": {
+    "address": "Địa chỉ",
+    "addresses": "Địa chỉ",
+    "assignedTo": "Người phụ trách",
+    "barcode": "Mã vạch",
+    "basicInfo": "Thông tin cơ bản",
+    "category": "Danh mục",
+    "code": "Mã",
+    "contact": "Liên lạc",
+    "copied": "Đã sao chép",
+    "createdAt": "Ngày tạo",
+    "customer": "Khách hàng",
+    "defaultLocation": "Vị trí mặc định",
+    "deliveryAddress": "Địa chỉ giao hàng",
+    "department": "Phòng ban",
+    "description": "Mô tả",
+    "email": "Email",
+    "home": "Trang chủ",
+    "inventory": "Tồn kho",
+    "language": "Ngôn ngữ",
+    "linkCopied": "Đã sao chép link — gửi cho team để cùng xem.",
+    "linkCopyError": "Sao chép link thất bại.",
+    "location": "Vị trí",
+    "name": "Tên",
+    "onHand": "Tồn kho",
+    "phone": "Điện thoại",
+    "position": "Chức vụ",
+    "primaryContact": "Liên hệ chính",
+    "product": "Sản phẩm",
+    "productInventory": "Tồn kho sản phẩm",
+    "productName": "Tên SP",
+    "quantity": "SL",
+    "reference": "Tham chiếu",
+    "salesOrder": "Đơn hàng",
+    "set": "Bộ",
+    "shortName": "Tên viết tắt",
+    "sku": "SKU",
+    "taxCode": "Mã số thuế",
+    "type": "Nhóm",
+    "unit": "ĐVT",
+    "unitPrice": "Đơn giá",
+    "units": "Đơn vị",
+    "updatedAt": "Cập nhật lần cuối",
+    "vendor": "Nhà cung cấp"
+  },
+  "notFound": {
+    "backToList": "Quay lại danh sách",
+    "message": "Không tìm thấy dữ liệu bạn đang tìm kiếm. Có thể đã bị xóa hoặc không tồn tại.",
+    "title": "Không tìm thấy dữ liệu"
+  },
+  "pickers": {
+    "inactive": "(ngừng hoạt động)"
+  },
+  "secondaryStatus": {
+    "all": "Tất cả",
+    "filterPlaceholder": "Lọc theo trạng thái",
+    "mustOrder": "Cần nhập",
+    "ok": "OK",
+    "outOfStock": "Hết hàng"
+  },
+  "transitions": {
+    "noPermission": "Bạn không có quyền chuyển trạng thái ở bước này.",
+    "onlyDepartments": "Chỉ {{departments}} mới chuyển được trạng thái ở bước này."
+  },
+  "validation": {
+    "codeNoWhitespace": "Mã không được chứa khoảng trắng",
+    "codeRequired": "Vui lòng nhập mã",
+    "codeSpecialCharacters": "Mã chỉ được chứa chữ cái và số",
+    "formInvalid": "Vui lòng sửa các trường được đánh dấu trước khi gửi",
+    "nameRequired": "Vui lòng nhập tên",
+    "quantityRequired": "Số lượng phải lớn hơn 0",
+    "unitRequired": "Vui lòng nhập đơn vị"
+  }
+}

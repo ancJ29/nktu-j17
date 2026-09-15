@@ -1,0 +1,18 @@
+{
+  "dropHere": "Thả tệp vào đây để tải lên",
+  "empty": "Chưa có tệp đính kèm",
+  "hint": "PNG, PDF, JPG. Tối đa {{max}}MB mỗi tệp.",
+  "invalidType": "{{name}}: định dạng không hỗ trợ",
+  "screenshot": "Chụp màn hình",
+  "screenshotCropHint": "Kéo để chọn vùng cần cắt, sau đó nhấn Tải lên",
+  "screenshotHint": "Chụp màn hình trước (PrtScn hoặc Cmd+Shift+4), sau đó dán tại đây",
+  "screenshotInstruction": "Nhấn Ctrl+V để dán ảnh chụp màn hình",
+  "screenshotPaste": "Dán",
+  "screenshotTitle": "Dán ảnh chụp màn hình",
+  "title": "Tệp đính kèm",
+  "tooLarge": "{{name}}: vượt quá giới hạn {{max}}MB",
+  "upload": "Tải tệp lên",
+  "uploadError": "Tải lên thất bại {{name}}",
+  "uploadSuccess": "Đã tải lên {{count}} tệp",
+  "uploading": "Đang tải..."
+}

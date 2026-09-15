@@ -1,6 +1,6 @@
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useTruckAssetStore, TRUCK_ASSET_RECORD_TARGET } from '@/stores/useTruckAssetStore';
-import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { fetchEmployeeById, useEmployeeStore } from '@/stores/useEmployeeStore';
 import type { EmployeeExtra, TruckAssetExtra, TruckAssetRow } from '@/types';
 
 export type DriverLinkSnapshot = {
@@ -33,8 +33,8 @@ async function assignTruckToDriver(
   truckId: string,
   truckCode: string,
 ): Promise<string | undefined> {
-  const { employee } = await cMngtConnector.getEmployeeById<EmployeeExtra>({ id: driverId });
-  const e = employee.extra ?? {};
+  const employee = await fetchEmployeeById(driverId);
+  const e = (employee.extra ?? {}) as EmployeeExtra;
   const prior = e.truckAssetId;
 
   if (prior !== truckId || e.truckAssetCode !== truckCode) {
@@ -48,8 +48,8 @@ async function assignTruckToDriver(
 }
 
 async function clearDriverTruck(driverId: string, truckId: string): Promise<void> {
-  const { employee } = await cMngtConnector.getEmployeeById<EmployeeExtra>({ id: driverId });
-  const e = employee.extra ?? {};
+  const employee = await fetchEmployeeById(driverId);
+  const e = (employee.extra ?? {}) as EmployeeExtra;
   if (e.truckAssetId !== truckId) return;
   await writeEmployeeExtra(driverId, employee.version, {
     ...e,

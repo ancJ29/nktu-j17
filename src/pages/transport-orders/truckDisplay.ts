@@ -1,6 +1,8 @@
 import { useMemo } from 'react';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import type { Employee, TruckAssetRow } from '@/types';
+import { appConfig } from '@/config';
+import { isDriverDepartment } from '@/utils/permission';
 
 export function truckNameWithPlate(name: string, plate: string | undefined | null): string {
   const trimmed = plate?.trim();
@@ -39,4 +41,13 @@ export function useTruckTypeOf(): (truckId: string | undefined | null) => string
 export function useDriverWithPlate(): (employee: Pick<Employee, 'name' | 'extra'>) => string {
   const plateOf = useTruckPlate();
   return (employee) => truckNameWithPlate(employee.name, plateOf(employee.extra?.truckAssetId));
+}
+
+const DRIVER_DEPARTMENTS = appConfig.features.transportOrders.driverDepartments ?? [];
+
+export function driverEmployeeFilter(e: Employee): boolean {
+  if (!e.isActive || e.extra?.isDeleted) return false;
+  return DRIVER_DEPARTMENTS.length > 0
+    ? DRIVER_DEPARTMENTS.includes(e.department)
+    : isDriverDepartment(e.department);
 }

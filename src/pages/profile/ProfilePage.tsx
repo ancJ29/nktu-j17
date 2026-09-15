@@ -184,7 +184,7 @@ export function ProfilePage() {
                     <PhoneNumber
                       value={currentEmployee.phone}
                       size="sm"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   </Group>

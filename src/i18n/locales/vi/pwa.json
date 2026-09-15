@@ -1,0 +1,30 @@
+{
+  "appAvailableOffline": "Ứng dụng đã sẵn sàng hoạt động ngoại tuyến!",
+  "clickToUpdate": "Nhấn vào đây để cập nhật ngay.",
+  "install": "Cài đặt",
+  "installDescription": "Cài đặt ứng dụng này trên thiết bị để có trải nghiệm tốt hơn",
+  "installTitle": "Cài đặt ứng dụng C-Mngt",
+  "maybeLater": "Để sau",
+  "newVersionAvailable": "Có phiên bản mới",
+  "offlineReady": "Sẵn sàng hoạt động ngoại tuyến",
+  "reloadAutomatically": "Ứng dụng sẽ tự động tải lại.",
+  "reloadIn3Seconds": "Ứng dụng sẽ tải lại sau 3 giây.",
+  "safari": {
+    "closeCompletelyInstructions": "Đóng hoàn toàn Safari (vuốt lên rồi vuốt ứng dụng đi), sau đó mở lại từ màn hình chính.",
+    "dontShowAgain": "Không hiển thị lại",
+    "installDescription": "Thêm C-Mngt vào màn hình chính để truy cập nhanh và sử dụng ngoại tuyến",
+    "installTitle": "Cài đặt ứng dụng C-Mngt",
+    "ios": {
+      "step1": "Nhấn nút Chia sẻ trên thanh công cụ Safari",
+      "step2": "Cuộn xuống và nhấn 'Thêm vào màn hình chính'",
+      "step3": "Nhấn 'Thêm' để cài đặt ứng dụng"
+    },
+    "mac": {
+      "step1": "Nhấn menu Tập tin trong Safari",
+      "step2": "Chọn 'Thêm vào Dock'",
+      "step3": "Ứng dụng sẽ được thêm vào Dock để truy cập nhanh"
+    },
+    "remindLater": "Nhắc lại sau"
+  },
+  "updating": "Đang cập nhật..."
+}

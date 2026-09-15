@@ -147,7 +147,7 @@ export function TruckDetailShell({ headerStats, children }: TruckDetailShellProp
             size="compact-sm"
             leftSection={<IconArrowLeft size={16} />}
           >
-            {t('__new__.01-common.actions.back')}
+            {t('common.actions.back')}
           </Button>
           <Group gap="xs">
             {canCreate && (
@@ -157,7 +157,7 @@ export function TruckDetailShell({ headerStats, children }: TruckDetailShellProp
                 size="compact-sm"
                 leftSection={<IconCopy size={14} />}
               >
-                {t('__new__.01-common.actions.copy')}
+                {t('common.actions.copy')}
               </Button>
             )}
             {canEdit && (
@@ -168,7 +168,7 @@ export function TruckDetailShell({ headerStats, children }: TruckDetailShellProp
                 size="compact-sm"
                 leftSection={<IconEdit size={14} />}
               >
-                {t('__new__.01-common.actions.edit')}
+                {t('common.actions.edit')}
               </Button>
             )}
           </Group>

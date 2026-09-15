@@ -1,0 +1,70 @@
+{
+  "addItem": "Thêm khách hàng",
+  "contacts": {
+    "addContact": "Thêm người liên hệ",
+    "emptyHint": "Chưa có người liên hệ bổ sung.",
+    "section": "Người liên hệ"
+  },
+  "deleteConfirm": {
+    "message": "Ẩn khách hàng này? Khách hàng sẽ không xuất hiện trong các danh sách. Dữ liệu vẫn được giữ lại để tra cứu.",
+    "title": "Xóa khách hàng"
+  },
+  "detail": {
+    "activitiesError": "Không thể tải hoạt động.",
+    "activitiesLoadMore": "Tải thêm",
+    "activitiesNoEntries": "Chưa có hoạt động nào cho khách hàng này.",
+    "activityVerbs": {
+      "addNote": "Đã thêm ghi chú cho",
+      "create": "Đã tạo",
+      "delete": "Đã xóa",
+      "removeNote": "Đã xóa ghi chú khỏi",
+      "toggleStatus": "Đã thay đổi trạng thái của",
+      "update": "Đã cập nhật"
+    },
+    "billingAddress": "Địa chỉ chính",
+    "noShippingAddresses": "Chưa có địa chỉ giao hàng.",
+    "receivingHours": "Nhận hàng",
+    "recentActivities": "Hoạt động gần đây",
+    "shippingAddress": "Địa chỉ giao hàng",
+    "tab": {
+      "activity": "Hoạt động",
+      "details": "Thông tin"
+    }
+  },
+  "editItem": "Cập nhật khách hàng",
+  "form": {
+    "addressPlaceholder": "Địa chỉ chính đầy đủ",
+    "contactNameLabel": "Họ tên",
+    "contactPersonLabel": "Người liên hệ chính",
+    "contactPersonPlaceholder": "Tên người liên hệ chính",
+    "contactRoleLabel": "Vai trò / Chức danh",
+    "createButton": "Tạo khách hàng",
+    "deliveryHoursLabel": "Giờ nhận hàng",
+    "deliveryHoursPlaceholder": "VD: 7:30 - 16:30 (T2 - T6)",
+    "googleMapUrlLabel": "Link Google Maps",
+    "googleMapUrlPlaceholder": "Dán link Google Maps (không bắt buộc)",
+    "namePlaceholder": "Tên khách hàng",
+    "shippingAddressLabel": "Địa chỉ giao hàng",
+    "shippingAddressesAdd": "Thêm địa chỉ giao hàng",
+    "shortNamePlaceholder": "Tên rút gọn",
+    "taxCodePlaceholder": "Mã số thuế",
+    "updateButton": "Cập nhật khách hàng"
+  },
+  "noItems": "Không tìm thấy khách hàng",
+  "notSet": "Chưa cập nhật",
+  "notifications": {
+    "createError": "Không thể tạo khách hàng",
+    "createSuccess": "Tạo khách hàng thành công",
+    "deleteError": "Không thể xóa khách hàng",
+    "deleteSuccess": "Xóa khách hàng thành công",
+    "disableSuccess": "Đã ngừng kích hoạt khách hàng.",
+    "enableSuccess": "Đã kích hoạt khách hàng.",
+    "fetchError": "Không thể tải danh sách khách hàng",
+    "toggleError": "Không thể thay đổi trạng thái khách hàng.",
+    "updateError": "Không thể cập nhật khách hàng",
+    "updateSuccess": "Cập nhật khách hàng thành công"
+  },
+  "validation": {
+    "codeDuplicate": "Mã này đã được dùng cho khách hàng khác"
+  }
+}

@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { lookupLabelOf, type useLookupV2Labels } from '@/hooks';
 import { isDefaultLocation } from '@/types';
+import { formatNumber } from '@/utils/number';
 
 // `useTranslation` powers the default-location label only; the negative-state
 // label is passed in so each section can supply its own existing i18n key.
@@ -117,7 +118,7 @@ export function InventoryRowCard({
           </Stack>
           <Group gap={6} wrap="nowrap" align="baseline">
             <Text size="lg" fw={700} c={resolvedColor}>
-              {onHand.toLocaleString()}
+              {formatNumber(onHand)}
             </Text>
             <Text size="xs" c="dimmed">
               {baseUnitLabel}
@@ -141,7 +142,7 @@ export function InventoryRowCard({
                 radius="sm"
                 tt="none"
               >
-                {q.toLocaleString()} {lookupLabelOf(unitLabels, u)}
+                {formatNumber(q)} {lookupLabelOf(unitLabels, u)}
               </Badge>
             ))}
           </Group>

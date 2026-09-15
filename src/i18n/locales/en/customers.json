@@ -1,0 +1,70 @@
+{
+  "addItem": "Add Customer",
+  "contacts": {
+    "addContact": "Add contact",
+    "emptyHint": "No additional contacts yet.",
+    "section": "Contacts"
+  },
+  "deleteConfirm": {
+    "message": "Hide this customer? It will no longer appear in lists. The record stays in the system for audit.",
+    "title": "Delete Customer"
+  },
+  "detail": {
+    "activitiesError": "Failed to load activities.",
+    "activitiesLoadMore": "Load more",
+    "activitiesNoEntries": "No activities recorded for this customer yet.",
+    "activityVerbs": {
+      "addNote": "Added a note to",
+      "create": "Created",
+      "delete": "Deleted",
+      "removeNote": "Removed a note from",
+      "toggleStatus": "Changed status of",
+      "update": "Updated"
+    },
+    "billingAddress": "Billing address",
+    "noShippingAddresses": "No shipping addresses on file.",
+    "receivingHours": "Receiving",
+    "recentActivities": "Recent Activities",
+    "shippingAddress": "Shipping address",
+    "tab": {
+      "activity": "Activity",
+      "details": "Details"
+    }
+  },
+  "editItem": "Edit Customer",
+  "form": {
+    "addressPlaceholder": "Full billing address",
+    "contactNameLabel": "Name",
+    "contactPersonLabel": "Primary Contact",
+    "contactPersonPlaceholder": "Primary contact name",
+    "contactRoleLabel": "Role / Title",
+    "createButton": "Create Customer",
+    "deliveryHoursLabel": "Receiving Hours",
+    "deliveryHoursPlaceholder": "e.g. 7:30 - 16:30 (Mon - Fri)",
+    "googleMapUrlLabel": "Google Maps URL",
+    "googleMapUrlPlaceholder": "Paste a Google Maps link (optional)",
+    "namePlaceholder": "Customer name",
+    "shippingAddressLabel": "Shipping Address",
+    "shippingAddressesAdd": "Add shipping address",
+    "shortNamePlaceholder": "Abbreviated name",
+    "taxCodePlaceholder": "Tax identification number",
+    "updateButton": "Update Customer"
+  },
+  "noItems": "No customers found",
+  "notSet": "Not set",
+  "notifications": {
+    "createError": "Failed to create customer",
+    "createSuccess": "Customer created successfully",
+    "deleteError": "Failed to delete customer",
+    "deleteSuccess": "Customer deleted successfully",
+    "disableSuccess": "Customer deactivated.",
+    "enableSuccess": "Customer activated.",
+    "fetchError": "Failed to load customers",
+    "toggleError": "Failed to change customer status.",
+    "updateError": "Failed to update customer",
+    "updateSuccess": "Customer updated successfully"
+  },
+  "validation": {
+    "codeDuplicate": "Another customer already uses this code"
+  }
+}

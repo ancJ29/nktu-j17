@@ -147,10 +147,10 @@ export function MaterialInventoryFormModal({ opened, onClose, available, fixedMa
           )}
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button type="submit" size="sm" loading={submitting}>
-              {t('__new__.01-common.actions.save')}
+              {t('common.actions.save')}
             </Button>
           </Group>
         </Stack>

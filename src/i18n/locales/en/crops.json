@@ -1,0 +1,140 @@
+{
+  "actions": {
+    "harvest": "Harvest",
+    "plant": "Plant"
+  },
+  "addItem": "Add Crop",
+  "backToGreenhouse": "Back to greenhouse",
+  "columns": {
+    "greenhouse": "Greenhouse",
+    "harvestedAt": "Harvested",
+    "plantedAt": "Planted",
+    "window": "Planned window"
+  },
+  "detail": {
+    "cultivationTitle": "Cultivation",
+    "infoTitle": "Information",
+    "lifecycleTitle": "Lifecycle",
+    "statSeeds": "Seeds",
+    "tab": {
+      "details": "Details",
+      "diary": "Diary",
+      "materials": "Materials used"
+    }
+  },
+  "editItem": "Edit Crop",
+  "emptyMessage": "Plan a crop and assign it to a greenhouse.",
+  "emptyTitle": "No crops yet",
+  "filterStatusPlaceholder": "Status",
+  "form": {
+    "codeAutoLabel": "Code",
+    "createButton": "Create Crop",
+    "diaryTemplateLabel": "Diary template",
+    "diaryTemplatePlaceholder": "Select a template",
+    "fromDateLabel": "Start date",
+    "greenhouseLabel": "Greenhouse",
+    "greenhousePlaceholder": "Select a greenhouse",
+    "growingMediumLabel": "Growing medium",
+    "growingMediumPlaceholder": "Coco peat, rockwool, ...",
+    "namePlaceholder": "e.g. Tomato — Batch A",
+    "noGreenhouses": "No greenhouses available",
+    "notesPlaceholder": "Seed batch, expected yield, etc.",
+    "numberOfSeedsLabel": "Number of seeds",
+    "numberOfSeedsPlaceholder": "e.g. 200",
+    "picLabel": "PIC",
+    "picPlaceholder": "Select an employee",
+    "plantTypeLabel": "Plant type",
+    "plantTypePlaceholder": "PI 52 / Nagami / Mật ...",
+    "primarySection": "Crop details",
+    "secondarySection": "Cultivation details",
+    "statusLabel": "Initial status",
+    "toDateLabel": "End date",
+    "totalDatesLabel": "Total days",
+    "totalDatesPlaceholder": "e.g. 30"
+  },
+  "growingSummary": "{{count}} growing",
+  "history": {
+    "fromMonth": "From month",
+    "toMonth": "To month"
+  },
+  "noItems": "No crops found",
+  "notifications": {
+    "createError": "Failed to create crop",
+    "createSuccess": "Crop created",
+    "fetchError": "Failed to load crops",
+    "harvestError": "Could not harvest crop",
+    "harvestSuccess": "Crop harvested — greenhouse is now free",
+    "occupied": "Greenhouse already has a growing crop ({{code}})",
+    "plantError": "Could not plant crop",
+    "plantSuccess": "Crop planted — greenhouse is now occupied",
+    "updateError": "Failed to update crop",
+    "updateSuccess": "Crop updated"
+  },
+  "searchPlaceholder": "Search crops…",
+  "sectionEmptyActive": "No active crops in this greenhouse yet.",
+  "sectionEmptyHarvested": "No harvested crops in the selected range.",
+  "sectionTitle": "Crops",
+  "sheet": {
+    "adjustmentRate": "Rate",
+    "conflictMessage": "Someone else saved this crop's plan while you were editing. Your unsaved changes were dropped and the grid reloaded — re-enter them.",
+    "conflictTitle": "Reloaded — the plan changed",
+    "day": {
+      "activities": "Activities",
+      "activityPlaceholder": "What was done today…",
+      "amount": "Per process",
+      "changed": "Differs from plan",
+      "dose": "Use",
+      "events": "Recorded this day",
+      "noWork": "The process plans no work for this day. Fill anything in that was actually done.",
+      "notes": "Notes",
+      "open": "Open day {{day}}",
+      "otherDoses": "Other materials",
+      "reset": "Back to plan",
+      "title": "Day {{day}} / {{total}}",
+      "today": "Today"
+    },
+    "empty": "This crop has no plan yet.",
+    "loadError": "Could not load the crop's plan",
+    "materialConfig": "Material config",
+    "materialsHint": "Pick the material and unit for each column of this crop. The process says what a column is; the crop says which material and in what unit.",
+    "materialsNoColumns": "This process has no column needing a material or a unit.",
+    "materialsPlaceholder": "Pick a material",
+    "materialsUnit": "Unit",
+    "materialsWord": "materials",
+    "noTotals": "Nothing consumed yet.",
+    "plantCount": "Plants",
+    "saveError": "Could not save the plan",
+    "saveSuccess": "Plan saved",
+    "seed": "Create from template",
+    "seedError": "Could not create the plan",
+    "seedNoPlan": "That template has no process yet — author its columns first.",
+    "seedSuccess": "Plan created",
+    "title": "Plan & diary",
+    "totalsCost": "Cost",
+    "totalsCostAll": "Season cost",
+    "totalsDays": "Days",
+    "totalsForCrop": "This crop",
+    "totalsPlanned": "Per template",
+    "unpricedMaterials": "No cost price set for: {{names}}. The season cost below excludes them.",
+    "unsaved": "Unsaved",
+    "viewTemplate": "Origin template"
+  },
+  "status": {
+    "growing": "Growing",
+    "harvested": "Harvested",
+    "planned": "Planned"
+  },
+  "tab": {
+    "active": "Active",
+    "harvested": "Harvested"
+  },
+  "title": "Crops",
+  "validation": {
+    "diaryTemplateRequired": "Diary template is required",
+    "fromRequired": "Start date is required",
+    "greenhouseRequired": "Greenhouse is required",
+    "numberOfSeedsRequired": "Number of seeds is required",
+    "overlap": "Overlaps crop \"{{code}}\" already scheduled in this greenhouse",
+    "totalDatesRequired": "Total days must be at least 1"
+  }
+}

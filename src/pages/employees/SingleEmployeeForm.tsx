@@ -350,7 +350,7 @@ export function SingleEmployeeForm({
 
         <Group justify="flex-end" gap="sm">
           <Button variant="default" size="sm" disabled={isLoading} onClick={onCancel}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button type="submit" loading={isLoading} size="sm">
             {isEditMode ? t('employees.form.updateButton') : t('employees.form.createButton')}

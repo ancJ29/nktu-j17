@@ -138,7 +138,7 @@ export function TruckDangerZone({ truck, onUpdated }: TruckDangerZoneProps) {
           <DangerAction
             title={t('__new__.07-entities.trucks.dangerZone.deleteItem')}
             description={t('__new__.07-entities.trucks.dangerZone.deleteItemDesc')}
-            buttonLabel={t('__new__.01-common.actions.remove')}
+            buttonLabel={t('common.actions.remove')}
             buttonIcon={<IconTrash size={14} />}
             buttonColor="danger"
             onClick={openDelete}

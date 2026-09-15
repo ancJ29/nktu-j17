@@ -1,0 +1,123 @@
+{
+  "addItem": "Add Material",
+  "bulkImport": {
+    "errorCodeInvalid": "Code must contain letters and digits only — skipped",
+    "errorCodeRequired": "Missing code — skipped",
+    "import": "Import Materials",
+    "missingColumnMessage": "The file is missing required column(s): {{columns}}. Please use the latest template — click \"Download Sample\" above.",
+    "missingColumnTitle": "File format not supported",
+    "noValidRows": "No valid materials found in the file",
+    "refreshFailedMessage": "The material list could not be refreshed, so duplicate codes cannot be detected safely. Check your connection and try again.",
+    "refreshFailedTitle": "Could not check existing materials",
+    "sampleDescription": "Download a pre-formatted template to fill in material data",
+    "skippedDuplicateCode": "Material code already exists — skipped",
+    "skippedTitle": "Rows skipped as duplicates",
+    "unknownCategoryMessage": "Unrecognized categories: {{labels}}. Add them under Meta-data, or fix the file, then re-import.",
+    "unknownLabelTitle": "Unrecognized unit or category",
+    "unknownUnitMessage": "Unrecognized units: {{labels}}. Use the unit names shown under Meta-data (not their codes), or add them there, then re-import.",
+    "uploadFile": "Upload Material File"
+  },
+  "columns": {
+    "minimumStock": "Min"
+  },
+  "deleteConfirm": {
+    "message": "Are you sure you want to delete this material? This action cannot be undone.",
+    "title": "Delete Material"
+  },
+  "detail": {
+    "activitiesError": "Failed to load activities.",
+    "activitiesLoadMore": "Load more",
+    "activitiesNoEntries": "No activities recorded for this material yet.",
+    "activityVerbs": {
+      "create": "Created material",
+      "delete": "Deleted material",
+      "disable": "Deactivated material",
+      "enable": "Activated material",
+      "inventory": {
+        "adjust": "Adjusted stock for",
+        "create": "Added stock entry for",
+        "repack": "Repacked stock for",
+        "stockTake": "Recorded stock-take for"
+      },
+      "update": "Updated material",
+      "updateImages": "Updated images for"
+    },
+    "costPrice": "Cost price",
+    "imagesEmpty": "No images yet",
+    "imagesEmptyDesc": "Images help operators spot materials quickly on the shelf.",
+    "inventoryTab": {
+      "title": "Stock on Hand"
+    },
+    "noPhotoHint": "No photo",
+    "recentActivities": "Recent Activities",
+    "statTotalOnHand": "On hand",
+    "tab": {
+      "activity": "Activity",
+      "details": "Details",
+      "images": "Images"
+    }
+  },
+  "editItem": "Edit Material",
+  "emptyMessage": "Try adjusting your filters or add your first material to get started.",
+  "emptyTitle": "No materials yet",
+  "filterActive": "Active",
+  "filterCategoryAll": "All categories",
+  "filterStockAll": "All stock levels",
+  "filterStockInStock": "In stock",
+  "filterStockLowStock": "Below minimum",
+  "filterStockOutOfStock": "Out of stock",
+  "filterStockTitle": "Stock",
+  "form": {
+    "categoryLabel": "Category",
+    "categoryPlaceholder": "Pick a category",
+    "createButton": "Create Material",
+    "descriptionPlaceholder": "Material description",
+    "isActiveLabel": "Active",
+    "memoLabel": "Internal note",
+    "memoPlaceholder": "Operator remarks (not customer-facing)",
+    "minimumStockHint": "Low-stock alert threshold, in the base unit.",
+    "minimumStockLabel": "Minimum stock",
+    "minimumStockPlaceholder": "e.g. 100",
+    "namePlaceholder": "Material name",
+    "packagingSpecLabel": "Packaging specification",
+    "packagingSpecPlaceholder": "e.g. 25kg/bag; 40 bags/pallet",
+    "priceLabel": "Cost price",
+    "pricePlaceholder": "0",
+    "unitConversionsHint": "\"1 unit = quantity × baseUnit\" (e.g. 1 box = 12 pcs).",
+    "unitConversionsLabel": "Unit conversions",
+    "unitLabel": "Unit",
+    "unitPickerPlaceholder": "Pick a unit",
+    "unitsLabel": "Units (multi-unit)",
+    "unitsPrimaryHint": "The first unit is the primary/base unit.",
+    "updateButton": "Update Material"
+  },
+  "inventoryPrompt": {
+    "title": "Enter inventory now?"
+  },
+  "noItems": "No materials found",
+  "notifications": {
+    "createError": "Failed to create material",
+    "createSuccess": "Material created successfully",
+    "deleteError": "Failed to delete material",
+    "deleteSuccess": "Material deleted successfully",
+    "disableSuccess": "Material deactivated",
+    "enableSuccess": "Material activated",
+    "fetchError": "Failed to load materials",
+    "toggleError": "Failed to change material status",
+    "updateError": "Failed to update material",
+    "updateSuccess": "Material updated successfully"
+  },
+  "status": {
+    "active": "Active"
+  },
+  "summary": {
+    "lowStock": "{{count}} low stock",
+    "negative": "{{count}} back-ordered",
+    "tracked": "{{count}} tracked"
+  },
+  "tab": {
+    "bulk": "Bulk import",
+    "single": "Single material"
+  },
+  "title": "Materials"
+}

@@ -1,0 +1,46 @@
+{
+  "addItem": "Thêm vị trí",
+  "columns": {
+    "kind": "Nhóm"
+  },
+  "deleteConfirm": {
+    "title": "Xóa vị trí"
+  },
+  "editItem": "Cập nhật vị trí",
+  "emptyMessage": "Thêm vị trí đầu tiên — kho, kệ, hoặc điểm nhận hàng.",
+  "emptyTitle": "Chưa có vị trí",
+  "form": {
+    "addressPlaceholder": "Đường, thành phố, quốc gia",
+    "codePlaceholder": "Mã vị trí",
+    "contactNameLabel": "Người liên hệ",
+    "contactPhoneLabel": "SĐT liên hệ",
+    "contactSection": "Liên hệ",
+    "createButton": "Tạo vị trí",
+    "descriptionPlaceholder": "Mô tả ngắn (tùy chọn)",
+    "kindLabel": "Nhóm",
+    "kindPlaceholder": "vd: kho, kệ, cửa hàng",
+    "namePlaceholder": "Tên vị trí",
+    "notesPlaceholder": "Giờ hoạt động, hướng dẫn ra vào...",
+    "operationsSection": "Vận hành",
+    "primarySection": "Thông tin chính",
+    "updateButton": "Cập nhật vị trí"
+  },
+  "noItems": "Không tìm thấy vị trí",
+  "notifications": {
+    "createError": "Không thể tạo vị trí",
+    "createSuccess": "Tạo vị trí thành công",
+    "deleteError": "Không thể xóa vị trí",
+    "deleteSuccess": "Xóa vị trí thành công",
+    "disableSuccess": "Đã ngừng vị trí",
+    "enableSuccess": "Đã kích hoạt vị trí",
+    "fetchError": "Không thể tải danh sách vị trí",
+    "listConflictMessage": "Một người khác vừa thay đổi danh sách vị trí. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
+    "toggleError": "Không thể cập nhật trạng thái vị trí",
+    "updateError": "Không thể cập nhật vị trí",
+    "updateSuccess": "Cập nhật vị trí thành công"
+  },
+  "summary": {
+    "total": "{{count}} vị trí"
+  },
+  "title": "Vị trí"
+}

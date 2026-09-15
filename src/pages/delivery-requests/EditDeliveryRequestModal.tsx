@@ -345,7 +345,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
 
         <Group justify="flex-end" gap="sm" mt="md">
           <Button variant="default" size="sm" disabled={loading} onClick={onClose}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button type="submit" size="sm" loading={loading}>
             {t('deliveryRequests.form.updateButton')}

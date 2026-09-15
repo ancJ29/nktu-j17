@@ -7,7 +7,7 @@
   `CreateNotificationInput`, plus Request/Response pairs for those three.
 - [`index.ts`](./index.ts) — `notificationManagerConnector` client SDK + re-export of routes.
 
-The service is [`external/notification-manager/`](../../../../../external/notification-manager/) —
+The service is [`externals/notification-manager/`](../../../../../externals/notification-manager/) —
 Go on Lambda over DynamoDB, **not** `workspace/services/notification-manager`, which was
 deleted 2026-08-18 having never been deployed and never had a caller.
 
@@ -59,6 +59,6 @@ Both server-side. `03-deploy.sh` prints them.
 > `recipientId` must come from the credo-sso session, never from a query parameter the
 > browser controls. A BFF controller that forwards `req.query.clientId` silently
 > reproduces the cross-tenant read activity-logger is still carrying — see
-> [`no-browser-path.md`](../../../../../external/notification-manager/docs/memo/no-browser-path.md).
+> [`no-browser-path.md`](../../../../../externals/notification-manager/docs/memo/no-browser-path.md).
 
 Re-exported from [`connector.ts`](../../connector.ts) as `notificationManagerConnector`.

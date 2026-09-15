@@ -1,0 +1,43 @@
+{
+  "alertsOff": "Alerts off",
+  "columnHeader": "On hand",
+  "currentOnHand": "Current",
+  "deltaDescription": "Added to what is stored. Negative to take stock out.",
+  "deltaLabel": "Change by",
+  "deltaPlaceholder": "e.g. 10 or -5",
+  "forecastTooltip": "Projected = on hand + incoming − reserved",
+  "incoming": "Incoming",
+  "incomingTooltip": "Inbound stock from open (draft) goods receipts. Excludes received and cancelled.",
+  "incomingUnnamed": "Receipt without a number",
+  "minStock": "Minimum stock",
+  "modalTitle": "Update stock",
+  "mode": {
+    "delta": "Adjust",
+    "snapshot": "Stock-take"
+  },
+  "negative": "back-ordered",
+  "neverCounted": "Never counted — no stock record yet.",
+  "newOnHand": "New",
+  "note": "Note",
+  "notifications": {
+    "conflict": "Someone else changed this stock — the latest count is shown. Check it and save again.",
+    "error": "Could not save the stock",
+    "saved": "Stock updated"
+  },
+  "onHand": "On hand",
+  "onHandDescription": "The counted total. It replaces what is stored, and may be negative for a back-order.",
+  "outgoing": "Reserved",
+  "outgoingTooltip": "Held by open sales orders. Counts against what can be promised, not yet against stock.",
+  "outgoingUnnamed": "Order without a number",
+  "save": "Save stock",
+  "shortIncoming": "In",
+  "shortOnHand": "Stock",
+  "shortOutgoing": "Held",
+  "title": "Stock",
+  "updateStock": "Update stock",
+  "validation": {
+    "deltaRequired": "A change of zero writes nothing",
+    "valueRequired": "Enter a number",
+    "willGoNegative": "This leaves stock below zero — recorded as a back-order."
+  }
+}

@@ -124,6 +124,7 @@ import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import { LinkedDRPhotosSection } from './LinkedDRPhotosSection';
 import { SalesOrderDeliveryRequestInfo } from './SalesOrderDeliveryRequestInfo';
 import { OrderProductPhotosSection } from './OrderProductPhotosSection';
+import { ProductLabelPrintModal } from './ProductLabelPrintModal';
 const isMobile = device.isMobile;
 const pricingEnabled = isPricingManagementEnabled();
 
@@ -270,6 +271,9 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const [copyingImage, setCopyingImage] = useState(false);
 
   const [sharingPdf, setSharingPdf] = useState(false);
+  const [labelPrintOpened, setLabelPrintOpened] = useState(false);
+
+  const [labelPrintSession, setLabelPrintSession] = useState(0);
 
   const customers = useCustomerStore((s) => s.items);
   const unitLabels = useLookupV2Labels('product-unit');
@@ -437,9 +441,9 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     Boolean(extra.deliveryPackageSize);
 
   const inlineEditLabels: InlineEditLabels = {
-    edit: t('__new__.01-common.actions.edit'),
-    save: t('__new__.01-common.actions.save'),
-    cancel: t('__new__.01-common.actions.cancel'),
+    edit: t('common.actions.edit'),
+    save: t('common.actions.save'),
+    cancel: t('common.actions.cancel'),
   };
 
   const pickableEmployees = employees.filter(picEmployeeFilter);
@@ -1143,7 +1147,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         />
         <Group justify="flex-end" gap="sm">
           <Button variant="default" size="sm" onClick={closeCancel} disabled={actionLoading}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button
             size="sm"
@@ -1195,7 +1199,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         )}
         <Group justify="flex-end" gap="sm">
           <Button variant="default" size="sm" onClick={closeManualRelease} disabled={actionLoading}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button
             size="sm"
@@ -1275,7 +1279,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             leftSection={<IconFileSpreadsheet size={14} />}
             onClick={handleExportDeliveryNoteExcel}
           >
-            {t('__new__.01-common.actions.exportExcel')}
+            {t('common.actions.exportExcel')}
           </Button>
           <Button
             variant="subtle"
@@ -1295,7 +1299,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             size="sm"
             onClick={() => setPrintOptionsOpened(false)}
           >
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button
             size="sm"
@@ -1876,9 +1880,32 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
           size="compact-sm"
           leftSection={<IconArrowLeft size={16} />}
         >
-          {t('__new__.01-common.actions.back')}
+          {t('common.actions.back')}
         </Button>
         <Group gap="xs">
+          {variant.productLabelPrint && (
+            <>
+              <Button
+                variant="subtle"
+                size="compact-sm"
+                leftSection={<IconPrinter size={14} />}
+                onClick={() => {
+                  setLabelPrintSession((n) => n + 1);
+                  setLabelPrintOpened(true);
+                }}
+              >
+                {t('salesOrders.detail.printLabel')}
+              </Button>
+              <ProductLabelPrintModal
+                key={labelPrintSession}
+                opened={labelPrintOpened}
+                onClose={() => setLabelPrintOpened(false)}
+                items={order.items}
+                customerPONumber={extra.customerPONumber}
+                defaultHeader={variant.productLabelPrint.defaultHeader}
+              />
+            </>
+          )}
           {showDeliveryNotePrint && (
             <Button
               variant="subtle"
@@ -1918,7 +1945,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               size="compact-sm"
               leftSection={<IconEdit size={14} />}
             >
-              {t('__new__.01-common.actions.edit')}
+              {t('common.actions.edit')}
             </Button>
           )}
         </Group>

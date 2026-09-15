@@ -1,8 +1,9 @@
-import { ActionIcon, Badge, Card, Group, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Card, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconFileInvoice, IconListDetails } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDatePresetLabels } from '@/hooks/useDatePresetLabels';
 import { useNavigate } from 'react-router';
 import { device } from '@credo/base-ui/utils';
 import { ListDataTable } from '@/components/ListDataTable';
@@ -20,12 +21,7 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
 import { useListFilter } from '@/hooks/useListFilter';
-import {
-  EMPTY_DATE_RANGE,
-  type DateRangePreset,
-  type DateRangeValue,
-  type MoreFilterDef,
-} from '@/types/date-range';
+import { EMPTY_DATE_RANGE, type DateRangeValue, type MoreFilterDef } from '@/types/date-range';
 import {
   defaultLastNDaysRange,
   formatDateRangeLabel,
@@ -173,15 +169,7 @@ export function QuotationList() {
     [employees],
   );
 
-  const presetLabels: Partial<Record<DateRangePreset, string>> = {
-    today: t('common.datePreset.today'),
-    yesterday: t('common.datePreset.yesterday'),
-    thisWeek: t('common.datePreset.thisWeek'),
-    lastWeek: t('common.datePreset.lastWeek'),
-    thisMonth: t('common.datePreset.thisMonth'),
-    lastMonth: t('common.datePreset.lastMonth'),
-    custom: t('common.datePreset.custom'),
-  };
+  const presetLabels = useDatePresetLabels();
   const dateIsDefault = isDefaultLastNDaysRange(dateRange, RANGE_DAYS);
 
   const desktopFilters: SelectFilter[] = [
@@ -212,7 +200,7 @@ export function QuotationList() {
     },
   ];
 
-  const allLabel = t('__new__.01-common.filters.all');
+  const allLabel = t('common.filters.all');
 
   const mobileFilters: MobileFilterDef[] = [
     allOptionFilter<'' | QuotationStatus>({
@@ -314,18 +302,16 @@ export function QuotationList() {
         width: '56px',
         ta: 'center' as const,
         render: (row: Quotation) => (
-          <Tooltip label={t('quotations.actions.preview')} withArrow>
-            <ActionIcon
-              variant="subtle"
-              color="gray"
-              onClick={(e) => {
-                e.stopPropagation();
-                setPreview(row);
-              }}
-            >
-              <IconListDetails size={18} />
-            </ActionIcon>
-          </Tooltip>
+          <ActionIcon
+            variant="subtle"
+            color="gray"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPreview(row);
+            }}
+          >
+            <IconListDetails size={18} />
+          </ActionIcon>
         ),
       },
     ],
@@ -472,18 +458,16 @@ export function QuotationList() {
                         status={row.extra.status ?? 'draft'}
                         label={t(`quotations.status.${row.extra.status ?? 'draft'}`)}
                       />
-                      <Tooltip label={t('quotations.actions.preview')} withArrow>
-                        <ActionIcon
-                          variant="subtle"
-                          color="gray"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPreview(row);
-                          }}
-                        >
-                          <IconListDetails size={18} />
-                        </ActionIcon>
-                      </Tooltip>
+                      <ActionIcon
+                        variant="subtle"
+                        color="gray"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPreview(row);
+                        }}
+                      >
+                        <IconListDetails size={18} />
+                      </ActionIcon>
                     </Group>
                     <Text fw={600}>{formatNumber(quotationTotal(row.extra.lines ?? []))}</Text>
                   </Stack>

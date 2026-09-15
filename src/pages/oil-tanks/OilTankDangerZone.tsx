@@ -138,7 +138,7 @@ export function OilTankDangerZone({ tank, onUpdated }: Props) {
           <DangerAction
             title={t('oilTanks.dangerZone.deleteItem')}
             description={t('oilTanks.dangerZone.deleteItemDesc')}
-            buttonLabel={t('__new__.01-common.actions.remove')}
+            buttonLabel={t('common.actions.remove')}
             buttonIcon={<IconTrash size={14} />}
             buttonColor="danger"
             onClick={openDelete}

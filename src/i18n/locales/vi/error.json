@@ -1,0 +1,28 @@
+{
+  "forbidden": {
+    "goToHomeButton": "Về trang chủ",
+    "inlineTitle": "Truy cập bị hạn chế",
+    "message": "Bạn không có quyền truy cập trang này. Vui lòng liên hệ quản trị viên nếu bạn nghĩ đây là sai sót.",
+    "title": "403"
+  },
+  "generic": {
+    "goToHomeLink": "Về trang chủ",
+    "message": "Rất tiếc, đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
+    "title": "Đã xảy ra lỗi",
+    "tryAgainButton": "Thử lại"
+  },
+  "notFound": {
+    "goToHomeButton": "Về trang chủ",
+    "message": "Trang bạn đang tìm không tồn tại hoặc đã được di chuyển.",
+    "title": "404"
+  },
+  "reload": "Tải lại",
+  "staleChunk": {
+    "message": "Ứng dụng đã được cập nhật trong lúc trang này đang mở. Vui lòng tải lại để tiếp tục.",
+    "title": "Đã có phiên bản mới"
+  },
+  "unexpected": {
+    "message": "Không mở được trang này. Vui lòng tải lại; nếu vẫn lỗi, hãy liên hệ quản trị viên.",
+    "title": "Đã xảy ra lỗi"
+  }
+}

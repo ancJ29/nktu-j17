@@ -358,7 +358,7 @@ export function TransportRouteFormPage() {
           size="compact-sm"
           leftSection={<IconArrowLeft size={16} />}
         >
-          {t('__new__.01-common.actions.back')}
+          {t('common.actions.back')}
         </Button>
       </Group>
 
@@ -394,7 +394,6 @@ export function TransportRouteFormPage() {
               <TextInput
                 withAsterisk
                 label={t('transportRoutes.form.name')}
-                description={t('transportRoutes.form.nameHint')}
                 {...form.getInputProps('name')}
               />
               <Select
@@ -552,7 +551,7 @@ export function TransportRouteFormPage() {
               <DangerAction
                 title={t('transportRoutes.confirmDelete.title')}
                 description={t('transportRoutes.dangerZone.deleteHint')}
-                buttonLabel={t('__new__.01-common.actions.remove')}
+                buttonLabel={t('common.actions.remove')}
                 buttonColor="red"
                 buttonIcon={<IconTrash size={14} />}
                 onClick={() => setConfirmDelete(true)}
@@ -567,10 +566,10 @@ export function TransportRouteFormPage() {
               disabled={loading}
               onClick={() => navigate(ROUTES.TRANSPORT_ROUTES.LIST)}
             >
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button type="submit" loading={loading} size="sm">
-              {t('__new__.01-common.actions.save')}
+              {t('common.actions.save')}
             </Button>
           </Group>
         </Stack>

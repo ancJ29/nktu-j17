@@ -1,0 +1,100 @@
+{
+  "back": "Back to reports",
+  "byCustomer": {
+    "col": "Customer",
+    "heading": "Top customers"
+  },
+  "byMethod": {
+    "heading": "Delivery method"
+  },
+  "byProduct": {
+    "col": "Product",
+    "heading": "Best-selling products",
+    "qty": "Quantity"
+  },
+  "byStaff": {
+    "col": "Salesperson",
+    "heading": "Revenue by salesperson",
+    "orders": "Orders",
+    "revenue": "Revenue",
+    "share": "Share"
+  },
+  "comingSoon": "Reports for this client are coming soon.",
+  "customerProduct": {
+    "completed": "Of which completed",
+    "customersHeading": "Customers that ordered it",
+    "empty": "No orders in this period.",
+    "pickCustomer": "Search a customer",
+    "pickHeading": "Pick a customer or a product",
+    "pickProduct": "Search a product",
+    "pivotCustomer": "By customer",
+    "pivotProduct": "By product",
+    "productsHeading": "Products ordered"
+  },
+  "entityTab": {
+    "basis": "non-cancelled orders, VAT excluded",
+    "failed": "Couldn't build the report.",
+    "generate": "Generate",
+    "generatedAt": "Generated at {{at}}",
+    "loading": "Loading the report…",
+    "noSnapshot": "No report has been built for {{period}} yet. Press Generate to build it.",
+    "recompute": "Recompute",
+    "title": "Sales"
+  },
+  "kpi": {
+    "avgOrder": "Avg. per order",
+    "customers": "Customers served",
+    "orders": "Orders",
+    "products": "Products",
+    "revenue": "Total revenue"
+  },
+  "menu": {
+    "heading": "Choose a report",
+    "subtitle": "Pick a report type to view the details."
+  },
+  "status": {
+    "heading": "Order fulfillment"
+  },
+  "title": "Reports",
+  "trend": {
+    "avg": "Average",
+    "heading": "Revenue over time",
+    "peak": "Peak",
+    "perDay": "/day"
+  },
+  "types": {
+    "customer": {
+      "desc": "What each customer ordered in a month — products, quantity and money (and who bought a product).",
+      "title": "Sales by customer"
+    },
+    "delivery": {
+      "desc": "On-time rate, delays, and performance by driver.",
+      "title": "Delivery report"
+    },
+    "inventory": {
+      "desc": "Stock value, items to reorder, and out-of-stock items.",
+      "title": "Inventory report"
+    },
+    "monthly": {
+      "desc": "Total sales for a month — by salesperson, customer and product.",
+      "title": "Monthly sales"
+    },
+    "weekly": {
+      "desc": "Total sales for a week — by salesperson, customer and product.",
+      "title": "Weekly sales"
+    }
+  },
+  "units": {
+    "billion": "bn ₫",
+    "customersShort": "cust.",
+    "million": "M ₫",
+    "orders": "orders",
+    "pieces": "pcs",
+    "productsShort": "items",
+    "vnd": "₫"
+  },
+  "wip": {
+    "desc": "This report is under development and will be available soon.",
+    "title": "Under development"
+  }
+}

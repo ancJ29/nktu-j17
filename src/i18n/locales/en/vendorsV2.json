@@ -1,0 +1,45 @@
+{
+  "addItem": "Add Vendor",
+  "archiveConfirm": {
+    "message": "Hide {{name}}? It will no longer appear in lists. The record stays in the system for audit.",
+    "title": "Hide Vendor"
+  },
+  "dangerZone": {
+    "archive": "Hide This Vendor",
+    "archiveDesc": "Removes it from the lists. The record stays in the system for audit.",
+    "disable": "Pause This Vendor",
+    "enable": "Resume This Vendor",
+    "toggleConfirm": "Change the status of {{name}}?",
+    "toggleDesc": "A paused vendor stays on the register but is no longer offered for new work."
+  },
+  "detailTitle": "Vendor Details",
+  "editItem": "Edit Vendor",
+  "filters": {
+    "vendorTypeAll": "All vendor types"
+  },
+  "form": {
+    "codeAuto": "Leave blank to generate",
+    "codeHelp": "The vendor's unique code. Generated when left blank, and fixed once created.",
+    "createButton": "Create Vendor",
+    "updateButton": "Save Changes",
+    "vendorType": "Vendor Type"
+  },
+  "noItems": "No vendors on this register yet.",
+  "notFound": {
+    "back": "Back to vendors",
+    "message": "It may have been hidden, or the link is out of date.",
+    "title": "Vendor not found"
+  },
+  "notifications": {
+    "archiveSuccess": "Vendor hidden.",
+    "createSuccess": "Vendor created.",
+    "updateSuccess": "Vendor updated.",
+    "writeError": "Could not save the vendor. Please try again."
+  },
+  "searchPlaceholder": "Search by name, code…",
+  "validation": {
+    "codeDuplicate": "A vendor with this code already exists",
+    "codeDuplicateArchived": "This code is taken by a hidden vendor",
+    "nameRequired": "Name is required"
+  }
+}

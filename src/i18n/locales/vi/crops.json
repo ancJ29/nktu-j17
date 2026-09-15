@@ -1,0 +1,140 @@
+{
+  "actions": {
+    "harvest": "Thu hoạch",
+    "plant": "Trồng"
+  },
+  "addItem": "Thêm vụ mùa",
+  "backToGreenhouse": "Quay lại nhà màng",
+  "columns": {
+    "greenhouse": "Nhà màng",
+    "harvestedAt": "Ngày thu hoạch",
+    "plantedAt": "Ngày trồng",
+    "window": "Lịch dự kiến"
+  },
+  "detail": {
+    "cultivationTitle": "Canh tác",
+    "infoTitle": "Thông tin",
+    "lifecycleTitle": "Vòng đời",
+    "statSeeds": "Hạt giống",
+    "tab": {
+      "details": "Chi tiết",
+      "diary": "Nhật ký",
+      "materials": "Vật tư đã dùng"
+    }
+  },
+  "editItem": "Sửa vụ mùa",
+  "emptyMessage": "Lên kế hoạch vụ mùa và gán vào một nhà màng.",
+  "emptyTitle": "Chưa có vụ mùa",
+  "filterStatusPlaceholder": "Trạng thái",
+  "form": {
+    "codeAutoLabel": "Mã",
+    "createButton": "Tạo vụ mùa",
+    "diaryTemplateLabel": "Mẫu nhật ký",
+    "diaryTemplatePlaceholder": "Chọn mẫu",
+    "fromDateLabel": "Ngày bắt đầu",
+    "greenhouseLabel": "Nhà màng",
+    "greenhousePlaceholder": "Chọn nhà màng",
+    "growingMediumLabel": "Giá thể",
+    "growingMediumPlaceholder": "Xơ dừa, bông khoáng, ...",
+    "namePlaceholder": "vd. Cà chua — Lứa A",
+    "noGreenhouses": "Không có nhà màng",
+    "notesPlaceholder": "Lứa giống, sản lượng dự kiến, v.v.",
+    "numberOfSeedsLabel": "Số lượng giống",
+    "numberOfSeedsPlaceholder": "vd. 200",
+    "picLabel": "Người phụ trách",
+    "picPlaceholder": "Chọn nhân viên",
+    "plantTypeLabel": "Loại cây",
+    "plantTypePlaceholder": "PI 52 / Nagami / Mật ...",
+    "primarySection": "Thông tin vụ mùa",
+    "secondarySection": "Thông tin canh tác",
+    "statusLabel": "Trạng thái ban đầu",
+    "toDateLabel": "Ngày kết thúc",
+    "totalDatesLabel": "Tổng số ngày",
+    "totalDatesPlaceholder": "vd. 30"
+  },
+  "growingSummary": "{{count}} đang trồng",
+  "history": {
+    "fromMonth": "Từ tháng",
+    "toMonth": "Đến tháng"
+  },
+  "noItems": "Không tìm thấy vụ mùa",
+  "notifications": {
+    "createError": "Không tạo được vụ mùa",
+    "createSuccess": "Đã tạo vụ mùa",
+    "fetchError": "Không tải được vụ mùa",
+    "harvestError": "Không thể thu hoạch vụ mùa",
+    "harvestSuccess": "Đã thu hoạch — nhà màng đã trống",
+    "occupied": "Nhà màng đã có vụ mùa đang trồng ({{code}})",
+    "plantError": "Không thể trồng vụ mùa",
+    "plantSuccess": "Đã trồng — nhà màng hiện đang được sử dụng",
+    "updateError": "Không cập nhật được vụ mùa",
+    "updateSuccess": "Đã cập nhật vụ mùa"
+  },
+  "searchPlaceholder": "Tìm vụ mùa…",
+  "sectionEmptyActive": "Chưa có vụ mùa đang canh tác trong nhà màng này.",
+  "sectionEmptyHarvested": "Không có vụ mùa đã thu hoạch trong khoảng thời gian đã chọn.",
+  "sectionTitle": "Vụ mùa",
+  "sheet": {
+    "adjustmentRate": "Tỉ lệ",
+    "conflictMessage": "Người khác đã lưu quy trình của vụ này trong lúc bạn đang sửa. Thay đổi chưa lưu đã bị bỏ và bảng được tải lại — vui lòng nhập lại.",
+    "conflictTitle": "Đã tải lại — quy trình có thay đổi",
+    "day": {
+      "activities": "Hoạt động",
+      "activityPlaceholder": "Việc đã làm hôm nay…",
+      "amount": "Theo quy trình",
+      "changed": "Khác kế hoạch",
+      "dose": "Cần dùng",
+      "events": "Đã ghi trong ngày",
+      "noWork": "Quy trình không có việc cho ngày này. Có làm gì thêm thì cứ nhập vào.",
+      "notes": "Ghi chép",
+      "open": "Mở ngày {{day}}",
+      "otherDoses": "Vật tư khác",
+      "reset": "Về đúng kế hoạch",
+      "title": "Ngày {{day}} / {{total}}",
+      "today": "Hôm nay"
+    },
+    "empty": "Vụ này chưa có quy trình.",
+    "loadError": "Không tải được quy trình của vụ",
+    "materialConfig": "Thiết lập vật tư",
+    "materialsHint": "Chọn vật tư và đơn vị cho từng cột của vụ này. Quy trình chỉ nói cột là gì, vụ mùa nói là loại nào và tính bằng đơn vị nào.",
+    "materialsNoColumns": "Quy trình này không có cột nào cần chọn vật tư hay đơn vị.",
+    "materialsPlaceholder": "Chọn vật tư",
+    "materialsUnit": "Đơn vị",
+    "materialsWord": "vật tư",
+    "noTotals": "Chưa tiêu hao gì.",
+    "plantCount": "Số cây",
+    "saveError": "Không lưu được quy trình",
+    "saveSuccess": "Đã lưu quy trình",
+    "seed": "Tạo từ mẫu",
+    "seedError": "Không tạo được quy trình",
+    "seedNoPlan": "Mẫu này chưa có quy trình — hãy khai báo các cột trước.",
+    "seedSuccess": "Đã tạo quy trình",
+    "title": "Quy trình & nhật ký",
+    "totalsCost": "Chi phí",
+    "totalsCostAll": "Chi phí cả vụ",
+    "totalsDays": "Số ngày",
+    "totalsForCrop": "Vụ này",
+    "totalsPlanned": "Theo mẫu",
+    "unpricedMaterials": "Chưa có giá vốn cho: {{names}}. Chi phí cả vụ bên dưới chưa gồm các mục này.",
+    "unsaved": "Chưa lưu",
+    "viewTemplate": "Mẫu gốc"
+  },
+  "status": {
+    "growing": "Đang trồng",
+    "harvested": "Đã thu hoạch",
+    "planned": "Đã lên kế hoạch"
+  },
+  "tab": {
+    "active": "Đang canh tác",
+    "harvested": "Đã thu hoạch"
+  },
+  "title": "Vụ mùa",
+  "validation": {
+    "diaryTemplateRequired": "Vui lòng chọn mẫu nhật ký",
+    "fromRequired": "Vui lòng chọn ngày bắt đầu",
+    "greenhouseRequired": "Vui lòng chọn nhà màng",
+    "numberOfSeedsRequired": "Vui lòng nhập số lượng giống",
+    "overlap": "Trùng lịch với vụ mùa \"{{code}}\" đã có trong nhà màng này",
+    "totalDatesRequired": "Tổng số ngày phải từ 1 trở lên"
+  }
+}

@@ -56,11 +56,11 @@ export function CropSheetActivityMaterialsModal({
           />
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" onClick={onClose} disabled={saving}>
-              {t('__new__.01-common.actions.close')}
+              {t('common.actions.close')}
             </Button>
             {editable && (
               <Button size="sm" loading={saving} disabled={!dirty} onClick={onSave}>
-                {t('__new__.01-common.actions.save')}
+                {t('common.actions.save')}
               </Button>
             )}
           </Group>

@@ -218,7 +218,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
             onStatusChange={setFilter}
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -226,7 +226,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
               {
                 title: tk(`${i18nKey}.filters.truckType`),
                 value: truckType,
-                options: [{ value: '', label: t('__new__.01-common.filters.all') }, ...typeOptions],
+                options: [{ value: '', label: t('common.filters.all') }, ...typeOptions],
                 onChange: setTruckType,
               },
             ]}
@@ -242,7 +242,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}

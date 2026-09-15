@@ -333,7 +333,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
 
           <Group justify="flex-end" gap="sm">
             <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               type="submit"
@@ -341,7 +341,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
               loading={submitting}
               disabled={!selectedProduct || beginInvalid}
             >
-              {t('__new__.01-common.actions.save')}
+              {t('common.actions.save')}
             </Button>
           </Group>
         </Stack>

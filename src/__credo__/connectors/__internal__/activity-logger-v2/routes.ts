@@ -33,7 +33,7 @@ export const ACTIVITY_LOGGER_V2_ROUTES = {
       // `action` is a FilterExpression that returns short pages the caller has
       // to loop over, and the delete was a tenant-wide wipe reachable with a
       // key that shipped in the browser bundle — now a job whose credential no
-      // Lambda role holds. See external/activity-logger/docs/memo/.
+      // Lambda role holds. See externals/activity-logger/docs/memo/.
     },
   },
 } as const;

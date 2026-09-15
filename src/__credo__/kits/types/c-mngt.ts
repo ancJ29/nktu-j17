@@ -65,6 +65,8 @@ export type CMngtPermissionManagementFeatures = {
   enabled: boolean;
   rootUserOnly: boolean;
   showRestrictedItems: boolean;
+
+  useServerPermissions?: boolean;
 };
 
 export type CMngtActivityLogFeatures = {
@@ -269,6 +271,8 @@ export type CMngtTransportOrderFeatures = {
 
   orderTruckTypes?: string[];
 
+  multiDropTruckTypes?: string[];
+
   statusOptions: CMngtTransportOrderStatusOption[];
 
   statusTransitions?: Record<string, string[]>;
@@ -341,7 +345,7 @@ export type CMngtAppConfig = AppConfig & {
   layout: CMngtLayoutConfig;
   displaySettings: CMngtDisplaySettings;
 
-  companyInfo?: CMngtCompanyInfo | CMngtCompanyInfo[];
+  companyInfo?: CMngtCompanyInfo[];
   translations: Record<string, Record<string, unknown>>;
   permissions?: PartialPermissions;
 };

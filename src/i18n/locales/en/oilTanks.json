@@ -1,0 +1,134 @@
+{
+  "addItem": "Add Tank",
+  "columns": {
+    "fuelType": "Fuel",
+    "level": "Stock",
+    "location": "Location"
+  },
+  "dangerZone": {
+    "deleteConfirm": "Remove this tank? Its refill and issue history will no longer be reachable.",
+    "deleteItem": "Remove tank",
+    "deleteItemDesc": "Remove the tank from the app. Its movement history is kept and can no longer be reached.",
+    "disableConfirm": "Disable this tank?",
+    "disableItem": "Disable tank",
+    "disableItemDesc": "Hide the tank from pickers and lists. Its movement history is kept.",
+    "enableConfirm": "Enable this tank?",
+    "enableItem": "Enable tank",
+    "enableItemDesc": "Make the tank selectable again."
+  },
+  "detail": {
+    "activityVerbs": {
+      "create": "Created",
+      "delete": "Deleted",
+      "disable": "Disabled",
+      "enable": "Enabled",
+      "update": "Updated"
+    },
+    "infoTitle": "Information",
+    "recompute": "Recompute stock",
+    "statCapacity": "Capacity",
+    "statLevel": "Stock",
+    "tabs": {
+      "issue": "Issues",
+      "overview": "Details",
+      "refill": "Refills"
+    }
+  },
+  "editItem": "Edit Tank",
+  "emptyMessage": "Add your first fuel tank to start tracking stock.",
+  "emptyTitle": "No tanks yet",
+  "form": {
+    "capacityHint": "Reference only — a refill above it is not rejected",
+    "capacityLabel": "Capacity",
+    "capacityPlaceholder": "Nominal capacity",
+    "codeAuto": "Generated automatically",
+    "createButton": "Create Tank",
+    "fuelTypeLabel": "Fuel type",
+    "fuelTypePlaceholder": "e.g. Diesel DO 0.05S",
+    "locationLabel": "Location",
+    "locationPlaceholder": "e.g. Warehouse A",
+    "namePlaceholder": "e.g. Warehouse A tank",
+    "notePlaceholder": "Anything worth recording about this tank",
+    "openingDateLabel": "Opening date",
+    "openingHint": "Stock on hand when the tank joins the app. Set once — later movements are recorded as refills and issues.",
+    "openingLevelLabel": "Opening stock",
+    "openingLevelPlaceholder": "Litres on hand",
+    "openingSection": "Opening balance",
+    "primarySection": "Tank details"
+  },
+  "logs": {
+    "issue": {
+      "addItem": "Add issue",
+      "columns": {
+        "date": "Date",
+        "driver": "Driver",
+        "litres": "Litres",
+        "total": "Amount",
+        "truck": "Vehicle",
+        "unitPrice": "Unit price"
+      },
+      "editItem": "Edit issue",
+      "empty": "No issues recorded for {{year}}",
+      "form": {
+        "driverPlaceholder": "Driver name",
+        "notePlaceholder": "Anything worth recording about this issue",
+        "truckPlaceholder": "Select a truck"
+      },
+      "sectionTitle": "Issues",
+      "summary": {
+        "litres": "Litres out"
+      }
+    },
+    "refill": {
+      "addItem": "Add refill",
+      "columns": {
+        "date": "Date",
+        "litres": "Litres",
+        "supplier": "Supplier",
+        "total": "Amount",
+        "unitPrice": "Unit price"
+      },
+      "editItem": "Edit refill",
+      "empty": "No refills recorded for {{year}}",
+      "form": {
+        "notePlaceholder": "Anything worth recording about this delivery",
+        "supplierPlaceholder": "Who delivered it"
+      },
+      "photosLabel": "Delivery note",
+      "sectionTitle": "Refills",
+      "summary": {
+        "cost": "Total cost",
+        "litres": "Litres in"
+      }
+    },
+    "validation": {
+      "exceedsStock": "Exceeds the tank stock — only {{available}} L available",
+      "litresRequired": "Enter the number of litres"
+    }
+  },
+  "noItems": "No tanks found",
+  "notifications": {
+    "createError": "Failed to create tank",
+    "createSuccess": "Tank created",
+    "deleteError": "Failed to remove tank",
+    "deleteSuccess": "Tank removed",
+    "disableSuccess": "Tank disabled",
+    "enableSuccess": "Tank enabled",
+    "fetchError": "Failed to load tanks",
+    "levelSyncError": "The entry was saved, but the tank's stock could not be updated. Use “Recompute stock” on the tank to rebuild it.",
+    "recomputeClean": "Stock rebuilt from {{count}} movements — it already matched.",
+    "recomputeDrift": "Stock rebuilt from the ledger. It was off by {{drift}} L — a movement had not been applied.",
+    "recomputeError": "Failed to rebuild stock from the ledger",
+    "toggleError": "Failed to change tank status",
+    "truckLogSyncError": "The withdrawal was saved, but the truck's refuel log could not be updated. Re-save the entry to sync it.",
+    "updateError": "Failed to update tank",
+    "updateSuccess": "Tank updated"
+  },
+  "searchPlaceholder": "Search by name, code, fuel or location",
+  "title": "Oil Tanks",
+  "unitLitre": "L",
+  "validation": {
+    "capacityInvalid": "Capacity must be 0 or more",
+    "levelInvalid": "Stock must be 0 or more"
+  }
+}

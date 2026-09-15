@@ -3,7 +3,7 @@ import type { TransportOrder } from '@/types';
 
 export const DEFAULT_CUSTOMER_REPORT_TYPE = 1;
 
-export const CAT_HAI_REPORT_TYPE = 5;
+export const MOOC_FIELD_REPORT_TYPES: ReadonlySet<number> = new Set([5, 10]);
 
 export type CustomerReportInput = {
   seller: { name: string; address: string; taxCode: string };

@@ -233,7 +233,7 @@ export function LocationDetailPage() {
         size="compact-sm"
         leftSection={<IconArrowLeft size={16} />}
       >
-        {t('__new__.01-common.actions.back')}
+        {t('common.actions.back')}
       </Button>
       <Group gap="xs">
         {canEdit && (
@@ -257,7 +257,7 @@ export function LocationDetailPage() {
             size="compact-sm"
             leftSection={<IconEdit size={14} />}
           >
-            {t('__new__.01-common.actions.edit')}
+            {t('common.actions.edit')}
           </Button>
         )}
       </Group>
@@ -346,7 +346,7 @@ export function LocationDetailPage() {
               <DangerAction
                 title={t('__new__.07-entities.locations.dangerZone.deleteItem')}
                 description={t('__new__.07-entities.locations.dangerZone.deleteItemDesc')}
-                buttonLabel={t('__new__.01-common.actions.remove')}
+                buttonLabel={t('common.actions.remove')}
                 buttonIcon={<IconTrash size={14} />}
                 onClick={openDeleteModal}
                 buttonColor="red"

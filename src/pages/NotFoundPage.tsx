@@ -23,7 +23,7 @@ export function NotFoundPage() {
         title: t('error.notFound.title'),
         message: t('error.notFound.message'),
         goToHomeButton: t('error.notFound.goToHomeButton'),
-        goBackLink: t('__new__.01-common.actions.back'),
+        goBackLink: t('common.actions.back'),
       }}
       themeConfig={themeConfig.auth}
       onGoHome={handleGoHome}

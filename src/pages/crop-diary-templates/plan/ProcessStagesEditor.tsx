@@ -95,7 +95,7 @@ export const ProcessStagesEditor = memo(function ProcessStagesEditor({
                     size="sm"
                     variant="subtle"
                     color="red"
-                    aria-label={t('__new__.01-common.actions.remove')}
+                    aria-label={t('common.actions.remove')}
                     onClick={() => onChange(stages.filter((_, i) => i !== index))}
                   >
                     <IconTrash size={14} />

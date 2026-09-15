@@ -323,7 +323,7 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
             loading={saving}
             disabled={!isDirty}
           >
-            {t('__new__.01-common.actions.save')}
+            {t('common.actions.save')}
           </Button>
         </Group>
       )}

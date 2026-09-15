@@ -1,0 +1,71 @@
+{
+  "addItem": "Thêm sản phẩm",
+  "archiveConfirm": {
+    "message": "Ẩn {{name}}? Sản phẩm sẽ không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "title": "Ẩn sản phẩm"
+  },
+  "columns": {
+    "minStock": "Tồn tối thiểu"
+  },
+  "dangerZone": {
+    "archive": "Ẩn sản phẩm",
+    "archiveDesc": "Không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "disable": "Tạm ngưng sản phẩm",
+    "enable": "Mở lại sản phẩm",
+    "toggleConfirm": "Đổi trạng thái của {{name}}?",
+    "toggleDesc": "Sản phẩm tạm ngưng vẫn còn trong danh mục nhưng không được dùng cho đơn hàng mới."
+  },
+  "detailTitle": "Chi tiết sản phẩm",
+  "editItem": "Sửa sản phẩm",
+  "filters": {
+    "categoryAll": "Tất cả danh mục",
+    "inventoryStatus": "Trạng thái kho",
+    "inventoryStatusAll": "Tất cả trạng thái kho"
+  },
+  "form": {
+    "attributeAdd": "Thêm thuộc tính",
+    "attributeKey": "Tên",
+    "attributeValue": "Giá trị",
+    "attributes": "Thuộc tính",
+    "attributesHelp": "Thông tin tự đặt: chất liệu, xuất xứ, bảo hành… Tên là phần định danh dòng; dòng chưa có tên sẽ bị bỏ khi lưu.",
+    "category": "Danh mục",
+    "codeAuto": "Để trống để tự sinh mã",
+    "codeHelp": "Mã sản phẩm. Để trống sẽ tự sinh, và không đổi được sau khi tạo.",
+    "createButton": "Tạo sản phẩm",
+    "ignoreStockAlert": "Bỏ qua mức tồn kho",
+    "ignoreStockAlertHelp": "Vẫn theo dõi số lượng tồn, nhưng sản phẩm này không bao giờ bị cảnh báo hết hàng hay cần đặt thêm.",
+    "minStock": "Tồn kho tối thiểu",
+    "minStockHelp": "Đánh dấu \"Cần nhập\" khi tồn kho dự kiến (hiện có + hàng về − đã giữ) xuống tới mức này. Để trống nếu không đặt ngưỡng.",
+    "price": "Giá bán",
+    "pricePlaceholder": "0",
+    "stock": "Tồn kho",
+    "unit": "Đơn vị tính",
+    "updateButton": "Lưu thay đổi"
+  },
+  "noItems": "Chưa có sản phẩm nào trên sổ này.",
+  "notFound": {
+    "back": "Về danh sách sản phẩm",
+    "message": "Có thể đã bị ẩn, hoặc đường dẫn đã cũ.",
+    "title": "Không tìm thấy sản phẩm"
+  },
+  "notifications": {
+    "archiveSuccess": "Đã ẩn sản phẩm.",
+    "createSuccess": "Đã tạo sản phẩm.",
+    "updateSuccess": "Đã cập nhật sản phẩm.",
+    "writeError": "Không lưu được sản phẩm. Vui lòng thử lại."
+  },
+  "photos": {
+    "title": "Hình ảnh"
+  },
+  "searchPlaceholder": "Tìm theo tên, mã…",
+  "status": {
+    "active": "Đang bán",
+    "inactive": "Ngừng bán"
+  },
+  "titleWithInventory": "Sản phẩm & Tồn kho",
+  "validation": {
+    "codeDuplicate": "Mã này đã được dùng cho sản phẩm khác",
+    "codeDuplicateArchived": "Mã này thuộc về một sản phẩm đã ẩn",
+    "nameRequired": "Vui lòng nhập tên"
+  }
+}

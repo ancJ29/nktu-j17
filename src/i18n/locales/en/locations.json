@@ -1,0 +1,46 @@
+{
+  "addItem": "Add Location",
+  "columns": {
+    "kind": "Kind"
+  },
+  "deleteConfirm": {
+    "title": "Delete location"
+  },
+  "editItem": "Edit Location",
+  "emptyMessage": "Add your first location — warehouses, shelves, or pickup points.",
+  "emptyTitle": "No locations yet",
+  "form": {
+    "addressPlaceholder": "Street, city, country",
+    "codePlaceholder": "Location code",
+    "contactNameLabel": "Contact name",
+    "contactPhoneLabel": "Contact phone",
+    "contactSection": "Contact",
+    "createButton": "Create Location",
+    "descriptionPlaceholder": "Short description (optional)",
+    "kindLabel": "Kind",
+    "kindPlaceholder": "e.g. warehouse, shelf, store-front",
+    "namePlaceholder": "Location name",
+    "notesPlaceholder": "Operating hours, access instructions...",
+    "operationsSection": "Operations",
+    "primarySection": "Primary details",
+    "updateButton": "Update Location"
+  },
+  "noItems": "No locations found",
+  "notifications": {
+    "createError": "Failed to create location",
+    "createSuccess": "Location created successfully",
+    "deleteError": "Failed to delete location",
+    "deleteSuccess": "Location deleted successfully",
+    "disableSuccess": "Location deactivated",
+    "enableSuccess": "Location activated",
+    "fetchError": "Failed to load locations",
+    "listConflictMessage": "Another user just changed the location list. Code updated to {{code}}. Please review and submit again.",
+    "toggleError": "Failed to update location status",
+    "updateError": "Failed to update location",
+    "updateSuccess": "Location updated successfully"
+  },
+  "summary": {
+    "total": "{{count}} locations"
+  },
+  "title": "Locations"
+}

@@ -64,7 +64,7 @@ export function CustomerCardList({ customers, isLoading }: CustomerCardListProps
                     value={item.phone}
                     size="xs"
                     c="dimmed"
-                    copyTooltip={t('__new__.01-common.actions.copy')}
+                    copyTooltip={t('common.actions.copy')}
                     copiedTooltip={t('common.labels.copied')}
                   />
                 </Group>
@@ -76,7 +76,7 @@ export function CustomerCardList({ customers, isLoading }: CustomerCardListProps
                 <AddressWithMapLink
                   address={item.address}
                   googleMapUrl={item.extra?.addressGoogleMapUrl}
-                  iconLabel={t('__new__.01-common.actions.openInMaps')}
+                  iconLabel={t('common.actions.openInMaps')}
                   size="xs"
                 />
               )}

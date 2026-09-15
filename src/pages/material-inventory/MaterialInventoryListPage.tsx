@@ -158,7 +158,7 @@ export function MaterialInventoryListPage() {
         value: stockFilter,
         options: stockOptions,
         onChange: setStockFilter,
-        allLabel: t('__new__.01-common.filters.all'),
+        allLabel: t('common.filters.all'),
         emptyValue: null,
       }),
     ],

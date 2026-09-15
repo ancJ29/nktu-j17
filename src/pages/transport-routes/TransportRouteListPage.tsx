@@ -202,7 +202,7 @@ export function TransportRouteListPage() {
               value: filterState.truckType,
               options: truckTypeOptions,
               onChange: setTruckType,
-              allLabel: t('__new__.01-common.filters.all'),
+              allLabel: t('common.filters.all'),
               emptyValue: null,
             }),
           ]
@@ -254,7 +254,7 @@ export function TransportRouteListPage() {
             onStatusChange={setStatus}
             statusTitle={t('transportRoutes.columns.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('transportRoutes.status.active'),
               inactive: t('transportRoutes.status.inactive'),
             }}
@@ -270,7 +270,7 @@ export function TransportRouteListPage() {
             status={filterState.status}
             onStatusChange={setStatus}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('transportRoutes.status.active'),
               inactive: t('transportRoutes.status.inactive'),
             }}

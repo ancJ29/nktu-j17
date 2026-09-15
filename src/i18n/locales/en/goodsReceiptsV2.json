@@ -1,0 +1,97 @@
+{
+  "actions": {
+    "retry": "Finish Posting"
+  },
+  "addItem": "New Receipt",
+  "cancelModal": {
+    "messageDraft": "The draft is closed and its expected inbound is dropped. No stock moves.",
+    "messageReceived": "Every line's stock is subtracted from inventory again.",
+    "titleDraft": "Cancel this draft?",
+    "titleReceived": "Cancel this receipt?"
+  },
+  "columns": {
+    "items": "Lines",
+    "receiptNumber": "Number",
+    "receivedDate": "Received",
+    "status": "Status",
+    "totalQuantity": "Total qty",
+    "vendor": "Vendor"
+  },
+  "confirmModal": {
+    "keepOpen": "Keep this page open until it finishes.",
+    "message": "Stock for every line is added to inventory. Cancelling the receipt afterwards reverses it.",
+    "title": "Confirm this receipt?"
+  },
+  "detailTitle": "Receipt Details",
+  "editItem": "Edit Receipt",
+  "fieldsInvalid": {
+    "message": "Custom fields are hidden until the configuration is fixed. Their stored values are untouched.",
+    "title": "Custom field configuration is invalid"
+  },
+  "filters": {
+    "period": "Period",
+    "receivedDate": "Received date"
+  },
+  "flowInvalid": {
+    "message": "Status changes are disabled until the configuration is fixed. Records stay readable.",
+    "title": "Status flow configuration is invalid"
+  },
+  "form": {
+    "copyingFrom": "Copying from {{receiptNumber}} — adjust and save as a new receipt.",
+    "createButton": "Create Receipt",
+    "item": "Item",
+    "itemSearchEmpty": "Nothing found",
+    "itemSearchPlaceholder": "Search items by name or code to add a line",
+    "itemUnknown": "Item is no longer in the catalogue",
+    "lineCount": "Items",
+    "lineNote": "Note",
+    "lines": "Lines",
+    "noLines": "Search above to add the first line.",
+    "notes": "Notes",
+    "quantity": "Quantity",
+    "receiptSection": "Receipt",
+    "receivedDate": "Received date",
+    "reference": "Reference",
+    "removeLine": "Remove line",
+    "summarySection": "Totals",
+    "updateButton": "Save Changes",
+    "vendor": "Vendor"
+  },
+  "noItems": "No receipts in this period.",
+  "notFound": {
+    "back": "Back to receipts",
+    "message": "It may have been removed, or the link is out of date.",
+    "title": "Receipt not found"
+  },
+  "notifications": {
+    "cancelSuccess": "Receipt cancelled.",
+    "confirmPartial": "Receipt confirmed, but some stock is still to post.",
+    "confirmSuccess": "Receipt confirmed and stock posted.",
+    "createSuccess": "Receipt created.",
+    "statusChangeSuccess": "Status updated",
+    "updateSuccess": "Receipt updated.",
+    "writeError": "Could not save the receipt. Please try again."
+  },
+  "pending": {
+    "badge": "Unposted",
+    "blocksCancel": "Finish posting before cancelling, so the reversal cannot double-count.",
+    "message": "Some of this receipt's stock has not been posted yet. Press Finish Posting to complete it — running it twice is safe.",
+    "title": "Inventory writes unfinished"
+  },
+  "searchPlaceholder": "Search by number, vendor, item…",
+  "status": {
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "received": "Received"
+  },
+  "validation": {
+    "customFields": "Check the highlighted fields",
+    "field": {
+      "date": "Use a valid date",
+      "number": "Must be a number",
+      "option": "Pick one of the offered values"
+    },
+    "itemsRequired": "Add at least one line",
+    "quantityPositive": "Quantity must be greater than zero"
+  }
+}

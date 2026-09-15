@@ -85,3 +85,7 @@ export function generatePassword(length: number = 16): string {
 
   return required.join('');
 }
+
+export function stringOr(value: unknown, fallback: string): string {
+  return typeof value === 'string' ? value : fallback;
+}

@@ -29,6 +29,11 @@ type EmployeeDataTableProps = {
   readonly isLoading?: boolean;
   readonly resolveDepartment?: (value: string | undefined | null) => string;
   readonly resolvePosition?: (value: string | undefined | null) => string;
+
+  readonly viewportRef?: React.Ref<HTMLDivElement>;
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 export function EmployeeDataTable({
@@ -36,6 +41,10 @@ export function EmployeeDataTable({
   isLoading,
   resolveDepartment,
   resolvePosition,
+  viewportRef,
+  hasMore,
+  onLoadMore,
+  loadingMoreLabel,
 }: EmployeeDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -125,7 +134,7 @@ export function EmployeeDataTable({
                       value={work}
                       size="sm"
                       c="dimmed"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   </Group>
@@ -141,7 +150,7 @@ export function EmployeeDataTable({
                       value={personal}
                       size="sm"
                       c="dimmed"
-                      copyTooltip={t('__new__.01-common.actions.copy')}
+                      copyTooltip={t('common.actions.copy')}
                       copiedTooltip={t('common.labels.copied')}
                     />
                   </Group>
@@ -190,6 +199,10 @@ export function EmployeeDataTable({
       isLoading={isLoading}
       emptyMessage={t('employees.noEmployees')}
       onRowClick={handleRowClick}
+      viewportRef={viewportRef}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      loadingMoreLabel={loadingMoreLabel}
     />
   );
 }

@@ -392,7 +392,7 @@ export function CropDetailPage() {
             size="compact-sm"
             leftSection={<IconArrowLeft size={16} />}
           >
-            {t('__new__.01-common.actions.back')}
+            {t('common.actions.back')}
           </Button>
           <Group gap="xs">
             {lifecycleActions}
@@ -404,7 +404,7 @@ export function CropDetailPage() {
                 size="compact-sm"
                 leftSection={<IconEdit size={14} />}
               >
-                {t('__new__.01-common.actions.edit')}
+                {t('common.actions.edit')}
               </Button>
             )}
           </Group>
@@ -472,7 +472,7 @@ export function CropDetailPage() {
               leftSection={<IconEdit size={16} />}
               fullWidth
             >
-              {t('__new__.01-common.actions.edit')}
+              {t('common.actions.edit')}
             </Button>
           )}
         </Stack>

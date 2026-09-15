@@ -41,6 +41,7 @@ export const PERM_LABELS: Record<string, string> = {
 
 export const PERM_FLAG_LABELS: Record<string, string> = {
   canCancel: 'Cancel',
+  canConfirmDelivered: 'Confirm Delivered',
   canConfirmReceived: 'Confirm Received',
   canExport: 'Export to Excel',
   canIssueMagicLink: 'Issue Magic Link',
@@ -60,6 +61,8 @@ export const PERM_FLAG_LABELS: Record<string, string> = {
   canViewSetComponentInventory: 'View component inventory of sets',
   canManagePrice: 'Manage Prices',
   canTakePhoto: 'Take Photos',
+  canUploadPhoto: 'Upload Photos',
   canEditDeliveryPackageSize: 'Edit Delivery Package Size',
   canEditItemWarehouseFields: 'Edit Warehouse Line Fields',
+  canManagePayment: 'Record Payments',
 };

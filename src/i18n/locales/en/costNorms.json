@@ -1,0 +1,56 @@
+{
+  "columns": {
+    "affectedRoutes": "Routes affected",
+    "effectiveDate": "Effective date",
+    "litersPer100km": "Norm (L/100km)",
+    "notes": "Note",
+    "price": "Price",
+    "truckType": "Vehicle type",
+    "updatedAt": "Updated",
+    "updatedBy": "Updated by"
+  },
+  "history": {
+    "affectedRoutes_one": "{{count}} route",
+    "affectedRoutes_other": "{{count}} routes",
+    "empty": "No price has been registered yet.",
+    "hint": "Every update is appended; nothing is overwritten.",
+    "inForce": "In force",
+    "scheduled": "Scheduled",
+    "title": "Diesel price history"
+  },
+  "norms": {
+    "empty": "No vehicle types yet.",
+    "missingWarning_one": "{{count}} vehicle type has no norm yet. Routes using it are costed with no fuel expense.",
+    "missingWarning_other": "{{count}} vehicle types have no norm yet. Routes using them are costed with no fuel expense.",
+    "noTruckTypes": "No vehicle types registered. Add them under Meta-data → Vehicle type — a norm applies to a vehicle class the fleet actually uses.",
+    "orphaned": "Retired type",
+    "orphanedHint": "This norm points at a vehicle type the client no longer offers. It is kept so the figure stays visible.",
+    "title": "Fuel consumption norm by vehicle type",
+    "unit": "L/100km",
+    "unset": "Not set"
+  },
+  "notifications": {
+    "normError": "Could not save the norm",
+    "normSaved": "Norm updated",
+    "priceError": "Could not save the diesel price",
+    "priceSaved": "Diesel price updated",
+    "priceSavedAffecting_one": "Diesel price updated — {{count}} route re-costed",
+    "priceSavedAffecting_other": "Diesel price updated — {{count}} routes re-costed"
+  },
+  "price": {
+    "currentLabel": "Current diesel price",
+    "effectiveDate": "Effective date",
+    "effectiveSince": "Effective from {{date}}",
+    "newPrice": "New price",
+    "none": "No diesel price registered yet — route fuel costs read as 0.",
+    "notes": "Note",
+    "perLiter": "đ / litre",
+    "update": "Update diesel price"
+  },
+  "subtitle": "Fuel norms and the diesel price every route's cost is computed from",
+  "title": "Cost Norms",
+  "validation": {
+    "effectiveDateRequired": "Pick an effective date",
+    "priceRequired": "Enter a price greater than 0"
+  }
+}

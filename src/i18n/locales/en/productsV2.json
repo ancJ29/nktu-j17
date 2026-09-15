@@ -1,0 +1,71 @@
+{
+  "addItem": "Add Product",
+  "archiveConfirm": {
+    "message": "Hide {{name}}? It will no longer appear in lists. The record stays in the system for audit.",
+    "title": "Hide Product"
+  },
+  "columns": {
+    "minStock": "Min stock"
+  },
+  "dangerZone": {
+    "archive": "Hide This Product",
+    "archiveDesc": "Removes it from the lists. The record stays in the system for audit.",
+    "disable": "Pause This Product",
+    "enable": "Resume This Product",
+    "toggleConfirm": "Change the status of {{name}}?",
+    "toggleDesc": "A paused product stays in the catalogue but is no longer offered for new orders."
+  },
+  "detailTitle": "Product Details",
+  "editItem": "Edit Product",
+  "filters": {
+    "categoryAll": "All categories",
+    "inventoryStatus": "Stock status",
+    "inventoryStatusAll": "All stock statuses"
+  },
+  "form": {
+    "attributeAdd": "Add attribute",
+    "attributeKey": "Name",
+    "attributeValue": "Value",
+    "attributes": "Attributes",
+    "attributesHelp": "Free-form details of your own — material, origin, warranty. The name is what identifies a row; rows left unnamed are dropped on save.",
+    "category": "Category",
+    "codeAuto": "Leave blank to generate",
+    "codeHelp": "The product's unique code. Generated when left blank, and fixed once created.",
+    "createButton": "Create Product",
+    "ignoreStockAlert": "Ignore stock level",
+    "ignoreStockAlertHelp": "Stock is still counted, but this product is never flagged as out of stock or must-order.",
+    "minStock": "Minimum stock",
+    "minStockHelp": "Flags the product as \"Must order\" once forecast stock (on hand + incoming − reserved) falls to this. Leave blank for no threshold.",
+    "price": "Price",
+    "pricePlaceholder": "0",
+    "stock": "Stock",
+    "unit": "Unit",
+    "updateButton": "Save Changes"
+  },
+  "noItems": "No products on this register yet.",
+  "notFound": {
+    "back": "Back to products",
+    "message": "It may have been hidden, or the link is out of date.",
+    "title": "Product not found"
+  },
+  "notifications": {
+    "archiveSuccess": "Product hidden.",
+    "createSuccess": "Product created.",
+    "updateSuccess": "Product updated.",
+    "writeError": "Could not save the product. Please try again."
+  },
+  "photos": {
+    "title": "Photos"
+  },
+  "searchPlaceholder": "Search by name, code…",
+  "status": {
+    "active": "Selling",
+    "inactive": "Stopped selling"
+  },
+  "titleWithInventory": "Products & Inventory",
+  "validation": {
+    "codeDuplicate": "A product with this code already exists",
+    "codeDuplicateArchived": "This code is taken by a hidden product",
+    "nameRequired": "Name is required"
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "addItem": "Thêm vật tư",
+  "archiveConfirm": {
+    "message": "Ẩn {{name}}? Vật tư sẽ không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "title": "Ẩn vật tư"
+  },
+  "dangerZone": {
+    "archive": "Ẩn vật tư",
+    "archiveDesc": "Không còn hiện trong danh sách. Dữ liệu vẫn được lưu để đối chiếu.",
+    "disable": "Tạm ngưng vật tư",
+    "enable": "Mở lại vật tư",
+    "toggleConfirm": "Đổi trạng thái của {{name}}?",
+    "toggleDesc": "Vật tư tạm ngưng vẫn còn trên sổ nhưng không được dùng cho công việc mới."
+  },
+  "detailTitle": "Chi tiết vật tư",
+  "editItem": "Sửa vật tư",
+  "filters": {
+    "categoryAll": "Tất cả danh mục"
+  },
+  "form": {
+    "category": "Danh mục",
+    "codeAuto": "Để trống để tự sinh mã",
+    "codeHelp": "Mã vật tư. Để trống sẽ tự sinh, và không đổi được sau khi tạo.",
+    "createButton": "Tạo vật tư",
+    "unit": "Đơn vị tính",
+    "updateButton": "Lưu thay đổi"
+  },
+  "noItems": "Chưa có vật tư nào trên sổ này.",
+  "notFound": {
+    "back": "Về danh sách vật tư",
+    "message": "Có thể đã bị ẩn, hoặc đường dẫn đã cũ.",
+    "title": "Không tìm thấy vật tư"
+  },
+  "notifications": {
+    "archiveSuccess": "Đã ẩn vật tư.",
+    "createSuccess": "Đã tạo vật tư.",
+    "updateSuccess": "Đã cập nhật vật tư.",
+    "writeError": "Không lưu được vật tư. Vui lòng thử lại."
+  },
+  "searchPlaceholder": "Tìm theo tên, mã…",
+  "validation": {
+    "codeDuplicate": "Mã này đã được dùng cho vật tư khác",
+    "codeDuplicateArchived": "Mã này thuộc về một vật tư đã ẩn",
+    "nameRequired": "Vui lòng nhập tên"
+  }
+}

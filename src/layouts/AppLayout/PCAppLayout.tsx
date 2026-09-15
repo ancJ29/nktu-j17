@@ -1,4 +1,11 @@
-import { appBrand, appConfig, featureFlags, forceRefreshConfig, themeConfig } from '@/config';
+import {
+  appBrand,
+  appConfig,
+  featureFlags,
+  forceRefreshConfig,
+  navViewerRules,
+  themeConfig,
+} from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useCurrentEmployee, useLanguageSync, useNavbarSync } from '@/hooks';
 import { isSignedIn, useAuthStore } from '@/stores/useAuthStore';
@@ -16,7 +23,7 @@ import { EmployeeReadyGate } from './EmployeeReadyGate';
 import { LoadingFallback, PCAppLayout as PCAppLayoutUI } from '@credo/base-ui/components';
 import type { CredoNavigationItem } from '@credo/base-ui/types';
 import type { NavigationItem } from '@/types';
-import { stripRootOnlyNavItems } from '@/config/navigation';
+import { stripNavItemsForViewer, stripRootOnlyNavItems } from '@/config/navigation';
 import { Container, Indicator } from '@mantine/core';
 import { Suspense, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,8 +56,13 @@ export function PCAppLayout() {
   const { navbarOpened, toggleNavbar } = useNavbarSync({ isProfileLoaded });
 
   const pcNavigation = useMemo(
-    () => stripRootOnlyNavItems(appConfig.navigation.pc, isRoot),
-    [isRoot],
+    () =>
+      stripNavItemsForViewer(
+        stripRootOnlyNavItems(appConfig.navigation.pc, isRoot),
+        { department: employee?.department, employeeId: employee?.id },
+        navViewerRules,
+      ),
+    [isRoot, employee?.department, employee?.id],
   );
 
   const avatarNode = useMemo(() => {

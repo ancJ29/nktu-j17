@@ -5,7 +5,7 @@ Client for the **Express + SQLite** service in
 which is **still running** and being wound down over one retention window.
 
 Its replacement is [`../activity-logger-v2/`](../activity-logger-v2/), the client
-for the Go + Lambda + DynamoDB service in `external/activity-logger/`.
+for the Go + Lambda + DynamoDB service in `externals/activity-logger/`.
 
 ## Rolled back on 2026-08-18, and why
 

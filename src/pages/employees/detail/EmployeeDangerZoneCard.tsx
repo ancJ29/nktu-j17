@@ -140,7 +140,7 @@ export function EmployeeDangerZoneCard({
                 {t('__new__.07-entities.employees.dangerZone.deleteEmployeeDesc')}
               </Text>
             </Stack>
-            <Tooltip label={t('__new__.01-common.actions.remove')} withArrow>
+            <Tooltip label={t('common.actions.remove')} withArrow>
               <ActionIcon variant="default" size="lg" onClick={onDelete}>
                 <IconTrash size={16} />
               </ActionIcon>

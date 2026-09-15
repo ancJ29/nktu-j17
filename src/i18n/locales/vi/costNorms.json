@@ -1,0 +1,56 @@
+{
+  "columns": {
+    "affectedRoutes": "Tuyến bị ảnh hưởng",
+    "effectiveDate": "Ngày hiệu lực",
+    "litersPer100km": "Định mức (L/100km)",
+    "notes": "Ghi chú",
+    "price": "Đơn giá",
+    "truckType": "Loại xe",
+    "updatedAt": "Ngày cập nhật",
+    "updatedBy": "Người cập nhật"
+  },
+  "history": {
+    "affectedRoutes_one": "{{count}} tuyến",
+    "affectedRoutes_other": "{{count}} tuyến",
+    "empty": "Chưa có lần cập nhật giá nào.",
+    "hint": "Mỗi lần cập nhật là một dòng mới — giá cũ không bị xoá.",
+    "inForce": "Đang áp dụng",
+    "scheduled": "Sắp áp dụng",
+    "title": "Lịch sử thay đổi giá dầu"
+  },
+  "norms": {
+    "empty": "Chưa có loại xe nào.",
+    "missingWarning_one": "{{count}} loại xe chưa có định mức. Tuyến dùng loại xe này đang tính giá vốn không có chi phí dầu.",
+    "missingWarning_other": "{{count}} loại xe chưa có định mức. Tuyến dùng các loại xe này đang tính giá vốn không có chi phí dầu.",
+    "noTruckTypes": "Chưa có loại xe nào. Thêm tại Danh mục → Loại xe — định mức phải gắn với loại xe đội xe đang dùng.",
+    "orphaned": "Loại xe đã gỡ",
+    "orphanedHint": "Định mức này gắn với loại xe không còn trong danh mục. Vẫn hiển thị để con số không bị ẩn đi.",
+    "title": "Định mức tiêu hao dầu theo loại xe",
+    "unit": "L/100km",
+    "unset": "Chưa nhập"
+  },
+  "notifications": {
+    "normError": "Không thể lưu định mức",
+    "normSaved": "Đã cập nhật định mức",
+    "priceError": "Không thể lưu giá dầu",
+    "priceSaved": "Đã cập nhật giá dầu",
+    "priceSavedAffecting_one": "Đã cập nhật giá dầu — {{count}} tuyến được tính lại giá vốn",
+    "priceSavedAffecting_other": "Đã cập nhật giá dầu — {{count}} tuyến được tính lại giá vốn"
+  },
+  "price": {
+    "currentLabel": "Đơn giá dầu hiện tại",
+    "effectiveDate": "Ngày hiệu lực",
+    "effectiveSince": "Áp dụng từ {{date}}",
+    "newPrice": "Giá mới",
+    "none": "Chưa có đơn giá dầu — chi phí dầu của mọi tuyến đang tính bằng 0.",
+    "notes": "Ghi chú",
+    "perLiter": "đ / lít",
+    "update": "Cập nhật giá dầu"
+  },
+  "subtitle": "Định mức tiêu hao dầu và đơn giá dầu dùng để tính giá vốn cho tuyến",
+  "title": "Định mức chi phí",
+  "validation": {
+    "effectiveDateRequired": "Vui lòng chọn ngày hiệu lực",
+    "priceRequired": "Vui lòng nhập giá lớn hơn 0"
+  }
+}

@@ -138,7 +138,7 @@ export function VendorList({ variant }: VendorListProps) {
             onStatusChange={setFilter}
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -153,7 +153,7 @@ export function VendorList({ variant }: VendorListProps) {
                         { value: 'overseas', label: t(variant.origin.overseas) },
                       ],
                       onChange: setOrigin,
-                      allLabel: t('__new__.01-common.filters.all'),
+                      allLabel: t('common.filters.all'),
                       emptyValue: 'all',
                     }),
                   ]
@@ -170,7 +170,7 @@ export function VendorList({ variant }: VendorListProps) {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}

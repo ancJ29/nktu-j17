@@ -1,0 +1,46 @@
+{
+  "addItem": "Add Material",
+  "archiveConfirm": {
+    "message": "Hide {{name}}? It will no longer appear in lists. The record stays in the system for audit.",
+    "title": "Hide Material"
+  },
+  "dangerZone": {
+    "archive": "Hide This Material",
+    "archiveDesc": "Removes it from the lists. The record stays in the system for audit.",
+    "disable": "Pause This Material",
+    "enable": "Resume This Material",
+    "toggleConfirm": "Change the status of {{name}}?",
+    "toggleDesc": "A paused material stays on the register but is no longer offered for new work."
+  },
+  "detailTitle": "Material Details",
+  "editItem": "Edit Material",
+  "filters": {
+    "categoryAll": "All categories"
+  },
+  "form": {
+    "category": "Category",
+    "codeAuto": "Leave blank to generate",
+    "codeHelp": "The material's unique code. Generated when left blank, and fixed once created.",
+    "createButton": "Create Material",
+    "unit": "Unit",
+    "updateButton": "Save Changes"
+  },
+  "noItems": "No materials on this register yet.",
+  "notFound": {
+    "back": "Back to materials",
+    "message": "It may have been hidden, or the link is out of date.",
+    "title": "Material not found"
+  },
+  "notifications": {
+    "archiveSuccess": "Material hidden.",
+    "createSuccess": "Material created.",
+    "updateSuccess": "Material updated.",
+    "writeError": "Could not save the material. Please try again."
+  },
+  "searchPlaceholder": "Search by name, code…",
+  "validation": {
+    "codeDuplicate": "A material with this code already exists",
+    "codeDuplicateArchived": "This code is taken by a hidden material",
+    "nameRequired": "Name is required"
+  }
+}

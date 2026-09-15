@@ -405,7 +405,7 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
             size="compact-sm"
             leftSection={<IconArrowLeft size={16} />}
           >
-            {t('__new__.01-common.actions.back')}
+            {t('common.actions.back')}
           </Button>
         </Group>
       )}
@@ -599,10 +599,10 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
               disabled={loading}
               onClick={() => navigate(kind.routes.LIST)}
             >
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button type="submit" loading={loading} size="sm">
-              {isEdit ? t('__new__.01-common.actions.save') : t('__new__.01-common.actions.save')}
+              {isEdit ? t('common.actions.save') : t('common.actions.save')}
             </Button>
           </Group>
         </Stack>

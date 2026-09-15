@@ -178,7 +178,7 @@ export function MaterialBulkImportForm({
                 </Badge>
               </Group>
               <Button variant="subtle" color="red" size="xs" onClick={onFileRemove}>
-                {t('__new__.01-common.actions.remove')}
+                {t('common.actions.remove')}
               </Button>
             </Group>
           ) : null}
@@ -246,7 +246,7 @@ export function MaterialBulkImportForm({
 
           <Group justify="flex-end">
             <Button variant="default" size="sm" disabled={isLoading} onClick={onCancel}>
-              {t('__new__.01-common.actions.cancel')}
+              {t('common.actions.cancel')}
             </Button>
             <Button
               size="sm"

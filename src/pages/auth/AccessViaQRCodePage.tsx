@@ -222,7 +222,7 @@ export function AccessViaQRCodePage() {
                       setError(undefined);
                     }}
                   >
-                    {t('__new__.01-common.actions.cancel')}
+                    {t('common.actions.cancel')}
                   </Button>
 
                   <Auth.AuthButton
@@ -260,7 +260,7 @@ export function AccessViaQRCodePage() {
           processing: t('auth.magicLink.processing'),
           orEnterCode: t('auth.magicLink.orEnterCode'),
           codePlaceholder: t('auth.magicLink.codePlaceholder'),
-          cancel: t('__new__.01-common.actions.cancel'),
+          cancel: t('common.actions.cancel'),
           verify: t('auth.magicLink.verifyCode'),
           cameraPermissionDenied: t('auth.magicLink.cameraPermissionDenied'),
           noQrCodeFound: t('auth.magicLink.noQrCodeFound'),

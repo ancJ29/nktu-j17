@@ -119,7 +119,7 @@ export function CustomerListPage() {
             onStatusChange={setFilter}
             statusTitle={t('__new__.01-common.labels.status')}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}
@@ -134,7 +134,7 @@ export function CustomerListPage() {
             status={filter}
             onStatusChange={setFilter}
             statusLabels={{
-              all: t('__new__.01-common.filters.all'),
+              all: t('common.filters.all'),
               active: t('__new__.01-common.labels.active'),
               inactive: t('__new__.01-common.labels.inactive'),
             }}

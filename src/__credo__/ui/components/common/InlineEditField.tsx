@@ -158,15 +158,34 @@ export function InlineEditField<T>({
 
 // ── Specialized wrappers ────────────────────────────────────────────────────
 
-const dimmedDash = (
-  <Text size="sm" c="dimmed" fs="italic">
-    —
-  </Text>
-);
+/**
+ * What an empty value looks like, in one place.
+ *
+ * **`emptyPlaceholder` is a `string`, not a `ReactNode`, and the type is the
+ * fix.** It used to be a node whose default was itself a `<Text>`, while the
+ * textarea wrapper — alone among the four — wrapped it in another one. Mantine's
+ * `Text` renders a `<p>`, so the default placeholder produced `<p>` inside
+ * `<p>`: invalid HTML, and React logs it on every render of a note field with no
+ * note. Narrowing the type is what stops the next caller re-creating it, since
+ * the only way back in was passing an element.
+ */
+const EMPTY_DASH = '—';
+
+function EmptyValue({ text }: { readonly text: string }) {
+  // Nothing at all for a deliberately blank placeholder — an empty <p> is a
+  // stray line box in a table cell, which is where `''` is passed from.
+  if (!text) return null;
+  return (
+    <Text size="sm" c="dimmed" fs="italic">
+      {text}
+    </Text>
+  );
+}
 
 type CommonInlineProps = {
   readonly canEdit?: boolean;
-  readonly emptyPlaceholder?: ReactNode;
+  /** Shown when the value is empty. Plain text — the component styles it. */
+  readonly emptyPlaceholder?: string;
   readonly labels?: InlineEditLabels;
 };
 
@@ -175,7 +194,7 @@ export function InlineTextField({
   value,
   onSave,
   canEdit,
-  emptyPlaceholder = dimmedDash,
+  emptyPlaceholder = EMPTY_DASH,
   labels,
   ...inputProps
 }: CommonInlineProps & {
@@ -195,7 +214,7 @@ export function InlineTextField({
             {v}
           </Text>
         ) : (
-          emptyPlaceholder
+          <EmptyValue text={emptyPlaceholder} />
         )
       }
       renderEditor={({ value: v, onChange }) => (
@@ -216,7 +235,7 @@ export function InlineTextareaField({
   value,
   onSave,
   canEdit,
-  emptyPlaceholder = dimmedDash,
+  emptyPlaceholder = EMPTY_DASH,
   labels,
   minRows = 3,
   ...textareaProps
@@ -236,9 +255,7 @@ export function InlineTextareaField({
             {v}
           </Text>
         ) : (
-          <Text size="sm" c="dimmed" fs="italic">
-            {emptyPlaceholder}
-          </Text>
+          <EmptyValue text={emptyPlaceholder} />
         )
       }
       renderEditor={({ value: v, onChange }) => (
@@ -263,7 +280,7 @@ export function InlineSelectField({
   canEdit,
   data,
   renderValueDisplay,
-  emptyPlaceholder = dimmedDash,
+  emptyPlaceholder = EMPTY_DASH,
   labels,
   ...selectProps
 }: CommonInlineProps & {
@@ -282,7 +299,7 @@ export function InlineSelectField({
       labels={labels}
       submitOnEnter
       renderDisplay={(v) => {
-        if (!v) return emptyPlaceholder;
+        if (!v) return <EmptyValue text={emptyPlaceholder} />;
         const label = lookup(v);
         return renderValueDisplay ? renderValueDisplay(v, label) : <Text size="sm">{label}</Text>;
       }}
@@ -309,7 +326,7 @@ export function InlineTagsField({
   canEdit,
   data,
   renderTag,
-  emptyPlaceholder = dimmedDash,
+  emptyPlaceholder = EMPTY_DASH,
   labels,
   ...tagsProps
 }: CommonInlineProps & {
@@ -326,7 +343,7 @@ export function InlineTagsField({
       canEdit={canEdit}
       labels={labels}
       renderDisplay={(arr) => {
-        if (arr.length === 0) return emptyPlaceholder;
+        if (arr.length === 0) return <EmptyValue text={emptyPlaceholder} />;
         return (
           <Group gap={6} wrap="wrap">
             {arr.map((tag) => (

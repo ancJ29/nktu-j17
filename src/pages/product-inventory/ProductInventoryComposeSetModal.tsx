@@ -717,7 +717,7 @@ export function ProductInventoryComposeSetModal({
 
         <Group justify="flex-end" gap="xs">
           <Button variant="default" onClick={handleClose} disabled={submitting}>
-            {t('__new__.01-common.actions.cancel')}
+            {t('common.actions.cancel')}
           </Button>
           <Button
             leftSection={<IconCheck size={14} />}

@@ -1,0 +1,45 @@
+{
+  "addItem": "Add Customer",
+  "archiveConfirm": {
+    "message": "Hide {{name}}? It will no longer appear in lists. The record stays in the system for audit.",
+    "title": "Hide Customer"
+  },
+  "dangerZone": {
+    "archive": "Hide This Customer",
+    "archiveDesc": "Removes it from the lists. The record stays in the system for audit.",
+    "disable": "Pause This Customer",
+    "enable": "Resume This Customer",
+    "toggleConfirm": "Change the status of {{name}}?",
+    "toggleDesc": "A paused customer stays on the register but is no longer offered for new orders."
+  },
+  "detailTitle": "Customer Details",
+  "editItem": "Edit Customer",
+  "filters": {
+    "customerTypeAll": "All customer types"
+  },
+  "form": {
+    "codeAuto": "Leave blank to generate",
+    "codeHelp": "The customer's unique code. Generated when left blank, and fixed once created.",
+    "createButton": "Create Customer",
+    "customerType": "Customer Type",
+    "updateButton": "Save Changes"
+  },
+  "noItems": "No customers on this register yet.",
+  "notFound": {
+    "back": "Back to customers",
+    "message": "It may have been hidden, or the link is out of date.",
+    "title": "Customer not found"
+  },
+  "notifications": {
+    "archiveSuccess": "Customer hidden.",
+    "createSuccess": "Customer created.",
+    "updateSuccess": "Customer updated.",
+    "writeError": "Could not save the customer. Please try again."
+  },
+  "searchPlaceholder": "Search by name, code…",
+  "validation": {
+    "codeDuplicate": "A customer with this code already exists",
+    "codeDuplicateArchived": "This code is taken by a hidden customer",
+    "nameRequired": "Name is required"
+  }
+}

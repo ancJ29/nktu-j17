@@ -488,10 +488,10 @@ export function CropDiarySection({
             />
             <Group justify="flex-end" gap="sm">
               <Button variant="default" size="sm" disabled={saving} onClick={formHandlers.close}>
-                {t('__new__.01-common.actions.cancel')}
+                {t('common.actions.cancel')}
               </Button>
               <Button type="submit" size="sm" loading={saving}>
-                {editing ? t('__new__.01-common.actions.save') : t('cropDiaries.form.createButton')}
+                {editing ? t('common.actions.save') : t('cropDiaries.form.createButton')}
               </Button>
             </Group>
           </Stack>

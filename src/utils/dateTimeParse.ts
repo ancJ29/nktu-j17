@@ -101,6 +101,16 @@ function dateOf(value: string | null | undefined): Ymd | null {
   return { year: Number(m[1]), month: Number(m[2]), day: Number(m[3]) };
 }
 
+export function parseDateInput(
+  input: string,
+  { order = 'DMY', now = new Date() }: Omit<ParseDateTimeOptions, 'fallbackDate'> = {},
+): string | null {
+  const tokens = input.trim().split(/\s+/).filter(Boolean);
+  if (tokens.length !== 1) return null;
+  const date = parseDateToken(tokens[0]!, order, now);
+  return date ? `${date.year}-${pad(date.month)}-${pad(date.day)}` : null;
+}
+
 export function parseDateTimeInput(
   input: string,
   { order = 'DMY', now = new Date(), fallbackDate }: ParseDateTimeOptions = {},

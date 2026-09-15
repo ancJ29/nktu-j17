@@ -8,7 +8,6 @@ import {
   Stack,
   Table,
   Text,
-  Tooltip,
   UnstyledButton,
 } from '@mantine/core';
 import { IconBoxMultiple, IconMapPin } from '@tabler/icons-react';
@@ -128,9 +127,9 @@ export function OrderItemsTable({
     );
   };
   const inlineEditLabels: InlineEditLabels = {
-    edit: t('__new__.01-common.actions.edit'),
-    save: t('__new__.01-common.actions.save'),
-    cancel: t('__new__.01-common.actions.cancel'),
+    edit: t('common.actions.edit'),
+    save: t('common.actions.save'),
+    cancel: t('common.actions.cancel'),
   };
   const warehouseMemoEditable = showItemWarehouseMemo && !!onItemWarehouseMemoSave;
   const renderWarehouseMemo = (item: SalesOrderItem) =>
@@ -487,11 +486,9 @@ export function OrderItemsTable({
                 nothing else, so it must not sit behind the price columns. */}
             {showItemReady && (
               <Table.Th w={64} style={{ textAlign: 'center' }}>
-                <Tooltip label={t('salesOrders.detail.itemReadyTooltip')} withArrow>
-                  <Text size="sm" fw={700} span>
-                    {t('salesOrders.detail.itemReady')}
-                  </Text>
-                </Tooltip>
+                <Text size="sm" fw={700} span>
+                  {t('salesOrders.detail.itemReady')}
+                </Text>
               </Table.Th>
             )}
             <Table.Th w={120}>{t('common.labels.sku')}</Table.Th>
