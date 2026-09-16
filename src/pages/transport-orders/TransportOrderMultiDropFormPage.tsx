@@ -10,7 +10,6 @@ import {
   Select,
   SimpleGrid,
   Stack,
-  Text,
   TextInput,
   Textarea,
   Title,
@@ -32,6 +31,7 @@ import { useLocation, useNavigate, useParams } from 'react-router';
 import { device } from '@credo/base-ui/utils';
 import { ROUTES } from '@/constants/routes';
 import { DateField } from '@/components/DateField';
+import { DateTimeTextField } from '@/components/DateTimeTextField';
 import { Form } from '@/components/Form';
 import { SectionCard } from '@/components/SectionCard';
 import { CustomerSelector, EmployeeSelector } from '@/components/selectors';
@@ -39,7 +39,13 @@ import { useInitFormFromFetch } from '@/hooks';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useTruckAssetStore } from '@/stores/useTruckAssetStore';
 import { transportOrderBundle } from '@/stores/useTransportOrderStore';
-import { isoToVnDateString, todayInVnDateString, vnDateStringToIso } from '@/utils/dateTimeField';
+import {
+  dateTimeStringToIso,
+  isoToDateTimeString,
+  isoToVnDateString,
+  todayInVnDateString,
+  vnDateStringToIso,
+} from '@/utils/dateTimeField';
 import type {
   TransportOrder,
   TransportOrderDropStop,
@@ -58,6 +64,7 @@ import {
 import {
   findStop,
   isMultiDropType,
+  multiDropPickup,
   MULTI_DROP_DAY_OPTIONS,
   MULTI_DROP_DEFAULT_DAYS,
   MULTI_DROP_MAX_STOPS,
@@ -66,7 +73,8 @@ import {
   stopKey,
   wardOptions,
 } from './multiDrop';
-import { PLACE_INPUT_STYLES, PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
+import { useTransportGoodsSuggestions } from './transportGoods';
+import { useTruckLocationOptions, useTruckLocationLabel } from './truckLocations';
 import { notifyTransportOrderSaveError, saveTransportOrder } from './saveTransportOrder';
 import { TransportFeeCards } from './TransportFeeCards';
 import {
@@ -82,12 +90,11 @@ import {
   useTruckTypeOf,
 } from './truckDisplay';
 import { MULTI_DROP_TRUCK_TYPES, useLocations } from './useMultiDrop';
-import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { useReseedFeeNames } from './useReseedFeeNames';
 
 const isMobile = device.isMobile;
 
-type StopRow = TransportOrderDropStop & { key: string };
+type StopRow = Omit<TransportOrderDropStop, 'at'> & { key: string; at: string | null };
 
 type FormValues = FeeFormValues & {
   entryDate: string | null;
@@ -97,10 +104,15 @@ type FormValues = FeeFormValues & {
   truckPlate: string;
   driverId: string;
   driverName: string;
-  from: string;
+
+  pickupLocation: string;
+
+  pickupAt: string | null;
   stops: StopRow[];
 
   totalDays: string;
+
+  goods: string;
   laborCost: number;
   transportContractNo: string;
   customerCode: string;
@@ -110,11 +122,18 @@ type FormValues = FeeFormValues & {
 };
 
 function blankStop(): StopRow {
-  return { key: '', province: '', ward: '', distanceKm: 0 };
+  return { key: '', province: '', ward: '', distanceKm: 0, at: null };
 }
 
-function toStopRows(stops: readonly TransportOrderDropStop[] | undefined): StopRow[] {
-  const rows = (stops ?? []).map((s) => ({ ...s, key: stopKey(s) }));
+function toStopRows(
+  stops: readonly TransportOrderDropStop[] | undefined,
+  keepTimes: boolean,
+): StopRow[] {
+  const rows = (stops ?? []).map((s) => ({
+    ...s,
+    key: stopKey(s),
+    at: keepTimes ? isoToDateTimeString(s.at) : null,
+  }));
   return rows.length > 0 ? rows : [blankStop()];
 }
 
@@ -126,9 +145,11 @@ function blankValues(): FormValues {
     truckPlate: '',
     driverId: '',
     driverName: '',
-    from: '',
+    pickupLocation: '',
+    pickupAt: null,
     stops: [blankStop()],
     totalDays: String(MULTI_DROP_DEFAULT_DAYS),
+    goods: '',
     fees: initialFees(),
     vatRatePercent: DEFAULT_VAT_PERCENT,
     advanceAmount: 0,
@@ -151,9 +172,11 @@ function valuesFromOrder(o: TransportOrder, copy: boolean): FormValues {
     truckPlate: o.truckPlate,
     driverId: o.driverId,
     driverName: o.driverName,
-    from: md?.from ?? '',
-    stops: toStopRows(md?.stops),
+    pickupLocation: md ? multiDropPickup(md) : '',
+    pickupAt: copy ? null : isoToDateTimeString(md?.pickupAt),
+    stops: toStopRows(md?.stops, !copy),
     totalDays: String(md?.totalDays ?? MULTI_DROP_DEFAULT_DAYS),
+    goods: md?.goods ?? '',
     fees: toFeeRows(o),
     vatRatePercent: Math.round((o.vatRate ?? 0) * 100),
     advanceAmount: copy ? 0 : (o.advanceAmount ?? 0),
@@ -233,8 +256,12 @@ export function TransportOrderMultiDropFormPage() {
   const truckTypeOf = useTruckTypeOf();
   const truckTypeLabel = useTruckTypeLabel();
   const driverWithPlate = useDriverWithPlate();
-  const placeSuggestions = usePlaceSuggestions();
   const { provinces, failed: locationsFailed } = useLocations();
+
+  const goodsSuggestions = useTransportGoodsSuggestions();
+
+  const locationOptions = useTruckLocationOptions();
+  const locationLabel = useTruckLocationLabel();
 
   const form = useForm<FormValues>({
     initialValues: copyFrom ? valuesFromOrder(copyFrom, true) : blankValues(),
@@ -247,7 +274,7 @@ export function TransportOrderMultiDropFormPage() {
         values.externalTruck && !v.trim() ? t('transportOrders.validation.plateRequired') : null,
       driverId: (v, values) =>
         !values.externalTruck && !v ? t('transportOrders.validation.driverRequired') : null,
-      from: (v) => (!v.trim() ? t('transportOrders.multiDrop.validation.fromRequired') : null),
+      pickupLocation: (v) => (!v ? t('transportOrders.multiDrop.validation.pickupRequired') : null),
       stops: {
         province: (v: string) =>
           !v ? t('transportOrders.multiDrop.validation.provinceRequired') : null,
@@ -296,13 +323,18 @@ export function TransportOrderMultiDropFormPage() {
   const handleSubmit = async (values: FormValues) => {
     setLoading(true);
     const multiDrop: TransportOrderMultiDrop = {
-      from: values.from.trim(),
-      stops: values.stops.map(({ province, ward, distanceKm }) => ({
+      pickupLocation: values.pickupLocation,
+
+      ...(values.pickupAt ? { pickupAt: dateTimeStringToIso(values.pickupAt) } : {}),
+      stops: values.stops.map(({ province, ward, distanceKm, at }) => ({
         province,
         ward,
         distanceKm,
+        ...(at ? { at: dateTimeStringToIso(at) } : {}),
       })),
       totalDays: Number(values.totalDays) || MULTI_DROP_DEFAULT_DAYS,
+
+      ...(values.goods ? { goods: values.goods } : {}),
     };
     const snapshot = snapshotRef.current;
 
@@ -323,7 +355,7 @@ export function TransportOrderMultiDropFormPage() {
         containerNumber: '',
         truckingSize: '',
         shipmentType: snapshot?.shipmentType ?? '',
-        route: routeFromMultiDrop(multiDrop),
+        route: routeFromMultiDrop(multiDrop, locationLabel(values.pickupLocation)),
         fees: feeRowsToFees(values.fees),
         advanceAmount: values.advanceAmount || 0,
         laborCost: values.laborCost || 0,
@@ -412,7 +444,11 @@ export function TransportOrderMultiDropFormPage() {
 
   const setProvince = (i: number, province: string | null) => {
     if ((province ?? '') === form.values.stops[i]?.province) return;
-    form.setFieldValue(`stops.${i}`, { ...blankStop(), province: province ?? '' });
+    form.setFieldValue(`stops.${i}`, {
+      ...blankStop(),
+      province: province ?? '',
+      at: form.values.stops[i]?.at ?? null,
+    });
   };
 
   const setWard = (i: number, ward: string | null) => {
@@ -422,11 +458,19 @@ export function TransportOrderMultiDropFormPage() {
     const stop = ward ? findStop(provinces, stopKey({ province: row.province, ward })) : undefined;
     form.setFieldValue(
       `stops.${i}`,
-      stop ? { ...stop, key: stopKey(stop) } : { ...blankStop(), province: row.province },
+      stop
+        ? { ...stop, key: stopKey(stop), at: row.at }
+        : { ...blankStop(), province: row.province, at: row.at },
     );
   };
 
-  const totalDistance = form.values.stops.reduce((sum, s) => sum + (s.key ? s.distanceKm : 0), 0);
+  const pickupData = (() => {
+    const current = form.values.pickupLocation;
+    const options = locationOptions.map((o) => ({ value: o.value, label: o.label }));
+    return current && !options.some((o) => o.value === current)
+      ? [...options, { value: current, label: locationLabel(current) }]
+      : options;
+  })();
 
   const dayOptions = MULTI_DROP_DAY_OPTIONS.map((n) => ({
     value: String(n),
@@ -489,6 +533,16 @@ export function TransportOrderMultiDropFormPage() {
                 data={dayOptions}
                 allowDeselect={false}
                 {...form.getInputProps('totalDays')}
+              />
+              {/* Free text with the register as suggestions (client's ask): a
+                  Xe Tải job carries whatever ships that day, so the first load
+                  of something new must stay as easy to record as the daily one.
+                  Shown even with an empty register, unlike the pickup below. */}
+              <Autocomplete
+                label={t('transportOrders.multiDrop.goods')}
+                placeholder={t('transportOrders.multiDrop.goodsPlaceholder')}
+                data={goodsSuggestions}
+                {...form.getInputProps('goods')}
               />
 
               <Stack gap={4}>
@@ -580,16 +634,29 @@ export function TransportOrderMultiDropFormPage() {
                   {t('transportOrders.multiDrop.locationsFailed')}
                 </Alert>
               )}
-              {/* Free text for now; the place suggestions are this client's own
-                  history, so the daily depot is one pick away. */}
-              <Autocomplete
-                withAsterisk
-                label={t('transportOrders.multiDrop.from')}
-                data={placeSuggestions}
-                limit={PLACE_SUGGESTION_LIMIT}
-                styles={PLACE_INPUT_STYLES}
-                {...form.getInputProps('from')}
-              />
+              {/* The depot is picked from the client's register, so the place a
+                  job collects from reads the same on every order — the pairing
+                  the drop points already have. The time beside it is typed, like
+                  every estimate in this module. */}
+              <Group align="flex-start" wrap="nowrap" gap="sm">
+                <Select
+                  style={{ flex: 1 }}
+                  withAsterisk
+                  label={t('transportOrders.multiDrop.pickup')}
+                  placeholder={t('transportOrders.multiDrop.pickupPlaceholder')}
+                  data={pickupData}
+                  value={form.values.pickupLocation || null}
+                  onChange={(v) => form.setFieldValue('pickupLocation', v ?? '')}
+                  error={form.errors.pickupLocation}
+                  searchable
+                  clearable
+                />
+                <DateTimeTextField
+                  style={{ flex: 1 }}
+                  label={t('transportOrders.multiDrop.pickupAt')}
+                  {...form.getInputProps('pickupAt')}
+                />
+              </Group>
               {form.values.stops.map((row, i) => (
                 <Group key={i} align="flex-start" wrap="nowrap" gap="sm">
                   <Select
@@ -617,9 +684,11 @@ export function TransportOrderMultiDropFormPage() {
                     searchable
                     clearable
                   />
-                  <Text size="sm" c="dimmed" w={80} ta="right" mt={32}>
-                    {row.key ? t('transportOrders.multiDrop.distance', { km: row.distanceKm }) : ''}
-                  </Text>
+                  <DateTimeTextField
+                    style={{ flex: 1 }}
+                    label={t('transportOrders.multiDrop.dropAt')}
+                    {...form.getInputProps(`stops.${i}.at`)}
+                  />
                   <ActionIcon
                     color="red"
                     variant="subtle"
@@ -635,13 +704,7 @@ export function TransportOrderMultiDropFormPage() {
             </Stack>
 
             <Divider my="sm" />
-            <Group justify="space-between" align="flex-end">
-              <Text size="sm">
-                {t('transportOrders.multiDrop.totalDistance')}:{' '}
-                <Text span fw={600}>
-                  {t('transportOrders.multiDrop.distance', { km: totalDistance })}
-                </Text>
-              </Text>
+            <Group justify="flex-end" align="flex-end">
               {/* LƯƠNG CHUYẾN — a cost we pay the driver, kept beside the run it
                   pays for and outside the customer's totals. */}
               <NumberInput

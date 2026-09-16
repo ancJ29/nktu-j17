@@ -33,6 +33,10 @@ export type ProductInventoryExtra = {
     { receiptNumber: string; byUnit: Record<string, number> }
   >;
 
+  lastInventoryUpdate?: number;
+
+  changeFromLastUpdate?: { counter: number; diff: number };
+
   beginOfPeriod?: Record<string, number>;
   [key: string]: unknown;
 };
@@ -58,4 +62,12 @@ export type ProductInventorySummary = {
 
   readonly secondaryStatus: InventorySecondaryStatus;
   readonly lastUpdatedAt: string | null;
+
+  readonly needsRecheck: boolean;
+
+  readonly driftCounter: number;
+
+  readonly driftDiff: number;
+
+  readonly lastVerifiedAt: number | null;
 };

@@ -50,11 +50,21 @@ export function findStop(
   return undefined;
 }
 
-export function routeFromMultiDrop(md: TransportOrderMultiDrop): TransportOrderRoute {
+export function multiDropPickup(
+  md: Pick<TransportOrderMultiDrop, 'pickupLocation' | 'from'>,
+): string {
+  return md.pickupLocation || md.from || '';
+}
+
+export function routeFromMultiDrop(
+  md: TransportOrderMultiDrop,
+
+  pickupLabel?: string,
+): TransportOrderRoute {
   const labels = md.stops.map(stopLabel);
   const last = labels[labels.length - 1] ?? '';
   return {
-    pickup: md.from,
+    pickup: pickupLabel || multiDropPickup(md),
     stuffing: labels.slice(0, -1).join('; '),
     dropoff: last,
   };

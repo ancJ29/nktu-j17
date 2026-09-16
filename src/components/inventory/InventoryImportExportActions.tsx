@@ -177,6 +177,8 @@ export function InventoryImportExportActions({
     setIsImporting(true);
     try {
       const periodKey = getCurrentPeriodKey();
+
+      const verifiedAt = entityType === 'product' ? Date.now() : null;
       const existingExtraByPair = new Map<string, ExistingRow['extra']>();
       for (const row of rows) {
         if (row.extra) {
@@ -195,6 +197,10 @@ export function InventoryImportExportActions({
             ...(existingExtra?.beginOfPeriod ?? {}),
             [periodKey]: r.beginOfPeriod,
           };
+        }
+        if (verifiedAt !== null) {
+          mergedExtra.lastInventoryUpdate = verifiedAt;
+          mergedExtra.changeFromLastUpdate = { counter: 0, diff: 0 };
         }
         return {
           itemCode: r.itemCode,
@@ -257,7 +263,7 @@ export function InventoryImportExportActions({
     } finally {
       setIsImporting(false);
     }
-  }, [parseResult, onAfterImport, t, ns, rows, items]);
+  }, [parseResult, onAfterImport, t, ns, entityType, rows, items]);
 
   return (
     <>

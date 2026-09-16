@@ -88,6 +88,7 @@ export function CustomerDataTable({
                 <AddressWithMapLink
                   address={item.address}
                   googleMapUrl={item.extra?.addressGoogleMapUrl}
+                  iconLabel={t('common.actions.openInMaps')}
                 />
               ),
             },

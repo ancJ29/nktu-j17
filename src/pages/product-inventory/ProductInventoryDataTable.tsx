@@ -17,6 +17,7 @@ import { isDefaultLocation } from '@/types';
 import { isLocationsEnabled, tableDensity } from '@/utils/permission';
 import { ProductThumb } from '../products/ProductThumb';
 import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
+import { InventoryRecheckBadge } from '@/components/inventory/InventoryRecheckBadge';
 import { InventorySecondaryStatusBadge } from '@/components/inventory/InventorySecondaryStatusBadge';
 import { SalesOrderLink } from '@/components/SalesOrderLink';
 import type { CustomerShortNameResolver } from '@/utils/customerDisplay';
@@ -495,6 +496,15 @@ export function ProductInventoryDataTable({
                     <Badge size="xs" variant="light" color="orange" radius="sm" tt="lowercase">
                       {t('productInventory.stockState.low')}
                     </Badge>
+                  )}
+                  {/* Beside the number it doubts, not in a column of its own:
+                      the claim is about this figure's trustworthiness. */}
+                  {s.needsRecheck && (
+                    <InventoryRecheckBadge
+                      counter={s.driftCounter}
+                      diff={s.driftDiff}
+                      lastVerifiedAt={s.lastVerifiedAt}
+                    />
                   )}
                 </Group>
                 {breakdownEntries.length > 0 && (

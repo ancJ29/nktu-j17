@@ -21,6 +21,7 @@ import {
   IconArrowDown,
   IconArrowRight,
   IconArrowUp,
+  IconCheck,
   IconSwitchHorizontal,
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -28,6 +29,8 @@ import { useTranslation } from 'react-i18next';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { logActivity } from '@/utils/activityLogger';
+import { markInventoryVerified, readDrift } from '@/utils/inventoryDrift';
+import { formatDateTime } from '@/utils/dateFormat';
 import type { Product, ProductInventoryExtra, ProductInventoryRow } from '@/types';
 import { getItemBaseUnit, getItemUnits } from '@/utils/unitConversion';
 import {
@@ -267,12 +270,12 @@ export function ProductInventoryUpdateModal({
             ? `[repack] ${values.note.trim() || `${repackOp.from.qty} ${repackOp.from.unit} → ${repackOp.to.qty} ${repackOp.to.unit}`}`
             : values.note.trim();
 
-        const updatedExtra: ProductInventoryExtra = {
+        const updatedExtra: ProductInventoryExtra = markInventoryVerified({
           ...row.extra,
           onHandByUnit: nextBreakdown,
           ...(noteBase && { lastNote: noteBase }),
           lastUpdatedBy: getCurrentActorId(),
-        };
+        });
 
         await useProductInventoryStore.getState().revalidate();
 
@@ -336,7 +339,53 @@ export function ProductInventoryUpdateModal({
     [row, product, breakdown, mode, repackOp, repackValidation, t, onClose],
   );
 
+  const handleConfirmMatches = useCallback(async () => {
+    if (!row || !product) return;
+    setSubmitting(true);
+    try {
+      const updatedExtra: ProductInventoryExtra = markInventoryVerified({
+        ...row.extra,
+        lastUpdatedBy: getCurrentActorId(),
+      });
+      await useProductInventoryStore.getState().revalidate();
+      await useProductInventoryStore.getState().updateSafely({
+        id: row.id,
+        version: row.version,
+        patch: { extra: updatedExtra },
+      });
+      logActivity('productInventory.verify', product.id, {
+        locationCode: row.locationCode,
+        onHand: row.onHand,
+      });
+      notifications.show({
+        color: 'green',
+        message: t('productInventory.notifications.verifySuccess'),
+      });
+      onClose();
+    } catch (err) {
+      if (err instanceof EntityConflictError) {
+        notifications.show({
+          color: 'yellow',
+          title: t('common.conflict.title'),
+          message: t('common.conflict.message'),
+          autoClose: 8000,
+        });
+        onClose();
+      } else {
+        notifications.show({
+          color: 'red',
+          message: t('productInventory.notifications.verifyError'),
+        });
+      }
+    } finally {
+      setSubmitting(false);
+    }
+  }, [row, product, t, onClose]);
+
   if (!row || !product) return null;
+
+  const drift = readDrift(row.extra);
+  const lastVerifiedAt = row.extra?.lastInventoryUpdate;
 
   const repackNewOnHand = repackApplyPreview?.ok
     ? recomputeOnHand(product, repackApplyPreview.onHandByUnit) - (repackOp?.writeOff?.baseQty ?? 0)
@@ -356,6 +405,26 @@ export function ProductInventoryUpdateModal({
               {contextLabel}
             </Text>
           )}
+
+          {/* How stale this figure is, stated before the operator edits it —
+              the drift is the reason they were sent here in the first place. */}
+          <Group gap={6} wrap="wrap">
+            <Text size="xs" c="dimmed">
+              {lastVerifiedAt
+                ? t('productInventory.verify.lastVerified', {
+                    at: formatDateTime(lastVerifiedAt),
+                  })
+                : t('productInventory.verify.neverVerified')}
+            </Text>
+            {drift.counter > 0 && (
+              <Badge size="xs" variant="light" color="gray" radius="sm" tt="none">
+                {t('productInventory.verify.driftSummary', {
+                  count: drift.counter,
+                  diff: `${drift.diff > 0 ? '+' : ''}${drift.diff.toLocaleString()}`,
+                })}
+              </Badge>
+            )}
+          </Group>
 
           {(() => {
             const modeOptions = [
@@ -647,30 +716,46 @@ export function ProductInventoryUpdateModal({
             {...form.getInputProps('note')}
           />
 
-          <Group justify="flex-end" gap="sm">
-            <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
-              {t('common.actions.cancel')}
-            </Button>
+          <Group justify="space-between" gap="sm" wrap="wrap">
+            {/* Left of the divide because it is not a variant of Save: it
+                submits nothing the form collected, and its whole point is to be
+                available when every field is empty. */}
             <Button
-              type="submit"
+              type="button"
+              variant="light"
+              color="teal"
               size="sm"
-              loading={submitting}
-              disabled={
-                (mode === 'delta' || mode === 'snapshot') &&
-                deltaSnapshotPreview !== null &&
-                !deltaSnapshotPreview.ok
-                  ? true
-                  : mode === 'repack' && repackValidation !== null && !repackValidation.ok
-              }
+              leftSection={<IconCheck size={14} />}
+              disabled={submitting}
+              onClick={handleConfirmMatches}
             >
-              {t(
-                mode === 'delta'
-                  ? 'productInventory.form.submitAdjust'
-                  : mode === 'snapshot'
-                    ? 'productInventory.form.submitStockTake'
-                    : 'productInventory.form.submitRepack',
-              )}
+              {t('productInventory.verify.confirmMatches')}
             </Button>
+            <Group gap="sm" wrap="nowrap">
+              <Button variant="default" size="sm" disabled={submitting} onClick={onClose}>
+                {t('common.actions.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                loading={submitting}
+                disabled={
+                  (mode === 'delta' || mode === 'snapshot') &&
+                  deltaSnapshotPreview !== null &&
+                  !deltaSnapshotPreview.ok
+                    ? true
+                    : mode === 'repack' && repackValidation !== null && !repackValidation.ok
+                }
+              >
+                {t(
+                  mode === 'delta'
+                    ? 'productInventory.form.submitAdjust'
+                    : mode === 'snapshot'
+                      ? 'productInventory.form.submitStockTake'
+                      : 'productInventory.form.submitRepack',
+                )}
+              </Button>
+            </Group>
           </Group>
         </Stack>
       </Form>

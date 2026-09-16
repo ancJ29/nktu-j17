@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import {
   Accordion,
   ActionIcon,
@@ -88,7 +88,6 @@ import {
   type DeliveryNotePaperSize,
   type DeliveryNoteOrientation,
 } from '@/utils/salesOrderDeliveryNote';
-import { exportSalesOrderDeliveryNoteToExcel } from '@/utils/salesOrderDeliveryNoteExcel';
 import { copyDeliveryNoteImageToClipboard } from '@/utils/salesOrderDeliveryNoteImage';
 import { shareDeliveryNotePdf } from '@/utils/salesOrderDeliveryNotePdf';
 import { readVietnameseMoney } from '@/utils/vietnameseNumberToWords';
@@ -254,7 +253,21 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
 
   const [mobileTab, setMobileTab] = useState<string>('overview');
 
+  const [visitedMobileTabs, setVisitedMobileTabs] = useState<ReadonlySet<string>>(
+    () => new Set(['overview']),
+  );
+  const selectMobileTab = useCallback((value: string) => {
+    setMobileTab(value);
+    setVisitedMobileTabs((prev) => (prev.has(value) ? prev : new Set(prev).add(value)));
+  }, []);
+
   const [activeTab, setActiveTab] = useState<string | null>('items');
+  const [visitedTabs, setVisitedTabs] = useState<ReadonlySet<string>>(() => new Set(['items']));
+  const selectTab = useCallback((value: string | null) => {
+    setActiveTab(value);
+    if (value === null) return;
+    setVisitedTabs((prev) => (prev.has(value) ? prev : new Set(prev).add(value)));
+  }, []);
 
   const [togglingDelivery, setTogglingDelivery] = useState(false);
 
@@ -343,7 +356,9 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     }
   };
 
-  const handleExportDeliveryNoteExcel = () => {
+  const handleExportDeliveryNoteExcel = async () => {
+    const { exportSalesOrderDeliveryNoteToExcel } =
+      await import('@/utils/salesOrderDeliveryNoteExcel');
     exportSalesOrderDeliveryNoteToExcel(
       buildDeliveryNoteData(),
       { paperSize, orientation, includePrice },
@@ -570,6 +585,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     <AddressWithMapLink
       address={extra.deliveryAddress}
       googleMapUrl={extra.googleMapUrl}
+      iconLabel={t('common.actions.openInMaps')}
       size="xs"
     />
   );
@@ -578,6 +594,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       address={extra.deliveryAddress}
       googleMapUrl={extra.googleMapUrl}
       fw={500}
+      iconLabel={t('common.actions.openInMaps')}
     />
   );
 
@@ -1277,7 +1294,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             size="sm"
             color="primary"
             leftSection={<IconFileSpreadsheet size={14} />}
-            onClick={handleExportDeliveryNoteExcel}
+            onClick={() => void handleExportDeliveryNoteExcel()}
           >
             {t('common.actions.exportExcel')}
           </Button>
@@ -1700,8 +1717,8 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   if (isMobile) {
     return (
       <Stack gap={0}>
-        <Tabs value={mobileTab} onChange={(v) => setMobileTab(v ?? mobileTabs[0].value)}>
-          <MobileScrollPillTabs tabs={mobileTabs} value={mobileTab} onChange={setMobileTab} />
+        <Tabs value={mobileTab} onChange={(v) => selectMobileTab(v ?? mobileTabs[0].value)}>
+          <MobileScrollPillTabs tabs={mobileTabs} value={mobileTab} onChange={selectMobileTab} />
 
           <Tabs.Panel value="overview">
             {isWarehouseMobileView ? (
@@ -1806,19 +1823,32 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             )}
           </Tabs.Panel>
 
-          <Tabs.Panel value="photos">{photosContent}</Tabs.Panel>
+          {/* `photosContent` carries the linked-DR gallery, which fetches its
+              DRs on mount — wait for the tab so opening an order costs nothing
+              until the operator asks for photos. */}
+          <Tabs.Panel value="photos">{visitedMobileTabs.has('photos') && photosContent}</Tabs.Panel>
 
-          <Tabs.Panel value="productPhotos">
-            <Box p="sm">{productPhotosContent}</Box>
-          </Tabs.Panel>
+          {/* Panels follow the pills: the picking view drops these two tabs, so
+              it must not mount their content either. Product photos are every
+              image of every product on the order at full upload size — a tab
+              with no pill can still cost megabytes. */}
+          {!isWarehouseMobileView && (
+            <Tabs.Panel value="productPhotos">
+              <Box p="sm">{visitedMobileTabs.has('productPhotos') && productPhotosContent}</Box>
+            </Tabs.Panel>
+          )}
 
-          <Tabs.Panel value="chat">
-            <ChatPanel
-              messages={extra.chatHistory ?? []}
-              currentUserId={currentEmployee?.id}
-              onSend={handleSendChat}
-            />
-          </Tabs.Panel>
+          {!isWarehouseMobileView && (
+            <Tabs.Panel value="chat">
+              {visitedMobileTabs.has('chat') && (
+                <ChatPanel
+                  messages={extra.chatHistory ?? []}
+                  currentUserId={currentEmployee?.id}
+                  onSend={handleSendChat}
+                />
+              )}
+            </Tabs.Panel>
+          )}
 
           {/* Lazy-mount on the mobile tab, not `activeTab` — that one belongs to
               the desktop `Tabs` and never moves here, so reading it would leave
@@ -1998,7 +2028,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       </Card>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onChange={setActiveTab}>
+      <Tabs value={activeTab} onChange={selectTab}>
         <Tabs.List>
           <Tabs.Tab value="items" leftSection={<IconPackage size={16} />}>
             {t('salesOrders.detail.itemsTitle')}
@@ -2047,18 +2077,22 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
           </TitledCard>
         </Tabs.PanelCard>
 
-        <Tabs.PanelCard value="photos">{photosContent}</Tabs.PanelCard>
+        <Tabs.PanelCard value="photos">{visitedTabs.has('photos') && photosContent}</Tabs.PanelCard>
 
-        <Tabs.PanelCard value="productPhotos">{productPhotosContent}</Tabs.PanelCard>
+        <Tabs.PanelCard value="productPhotos">
+          {visitedTabs.has('productPhotos') && productPhotosContent}
+        </Tabs.PanelCard>
 
         <Tabs.PanelCard value="attachments">{attachmentsContent}</Tabs.PanelCard>
 
         <Tabs.Panel value="chat">
-          <ChatPanel
-            messages={extra.chatHistory ?? []}
-            currentUserId={currentEmployee?.id}
-            onSend={handleSendChat}
-          />
+          {visitedTabs.has('chat') && (
+            <ChatPanel
+              messages={extra.chatHistory ?? []}
+              currentUserId={currentEmployee?.id}
+              onSend={handleSendChat}
+            />
+          )}
         </Tabs.Panel>
 
         <Tabs.PanelCard value="activity">{activityContent}</Tabs.PanelCard>

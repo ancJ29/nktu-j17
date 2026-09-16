@@ -612,6 +612,7 @@ export function ImageUploadPanel({
                     w="100%"
                     h="100%"
                     fit="cover"
+                    loading="lazy"
                     fallbackSrc="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>"
                   />
                   {queueId && (

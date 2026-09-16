@@ -226,4 +226,15 @@ export const BASE_PERMISSIONS: Permissions = {
     canEdit: false,
     canDelete: false,
   },
+
+  quotation: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    query: {
+      canViewAll: false,
+      canViewSelf: false,
+    },
+  },
 };

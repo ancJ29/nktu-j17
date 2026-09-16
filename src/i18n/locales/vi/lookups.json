@@ -9,6 +9,8 @@
     "productCategory": "Danh mục sản phẩm",
     "productUnit": "Đơn vị sản phẩm",
     "shipmentType": "Loại hình",
+    "transportGoods": "Mặt hàng",
+    "truckLocations": "Điểm lấy hàng",
     "truckType": "Loại xe",
     "truckingSize": "Loại cont / kích thước",
     "unit": "Đơn vị tính",

@@ -142,6 +142,7 @@ const productGate = gate('product');
 const customerGate = gate('customer');
 const vendorGate = gate('vendor');
 const salesOrderGate = gate('salesOrder');
+const quotationGate = gate('quotation');
 
 const deliveryNoteGate = gate('deliveryRequest');
 const deliveryRequestGate = gate('deliveryRequest');
@@ -588,22 +589,22 @@ const warehouseDeliveryNoteDetailRoutes: RouteObject[] = [
 const quotationRoutes: RouteObject[] = [
   {
     path: ROUTES.QUOTATIONS.LIST,
-    element: gatedComponent({ requires: salesOrderGate.view }, QuotationListPage),
+    element: gatedComponent({ requires: quotationGate.view }, QuotationListPage),
   },
 ];
 
 const quotationDetailRoutes: RouteObject[] = [
   {
     path: ROUTES.QUOTATIONS.NEW,
-    element: gatedComponent({ requires: salesOrderGate.create }, QuotationFormPage),
+    element: gatedComponent({ requires: quotationGate.create }, QuotationFormPage),
   },
   {
     path: ROUTES.QUOTATIONS.DETAIL,
-    element: gatedComponent({ requires: salesOrderGate.view }, QuotationDetailPage),
+    element: gatedComponent({ requires: quotationGate.view }, QuotationDetailPage),
   },
   {
     path: ROUTES.QUOTATIONS.EDIT,
-    element: gatedComponent({ requires: salesOrderGate.edit }, QuotationFormPage),
+    element: gatedComponent({ requires: quotationGate.edit }, QuotationFormPage),
   },
 ];
 

@@ -96,6 +96,7 @@
   "filterStock": {
     "all": "Tất cả",
     "lowStock": "Dưới mức tối thiểu",
+    "needsRecheck": "Nên kiểm lại",
     "negative": "Đặt trước",
     "noStock": "Chưa có tồn kho",
     "outOfStock": "Hết hàng",
@@ -143,6 +144,7 @@
   },
   "kpis": {
     "lowStock": "{{count}} dưới mức tối thiểu",
+    "needsRecheck": "{{count}} nên kiểm lại",
     "negative": "{{count}} âm",
     "outOfStock": "{{count}} hết hàng",
     "secondaryMustOrder": "{{count}} cần nhập",
@@ -183,7 +185,9 @@
     "repackError": "Không thể đóng gói lại",
     "repackSuccess": "Đã đóng gói lại",
     "stockTakeError": "Không thể lưu kiểm kho",
-    "stockTakeSuccess": "Đã lưu kiểm kho"
+    "stockTakeSuccess": "Đã lưu kiểm kho",
+    "verifyError": "Không thể ghi nhận",
+    "verifySuccess": "Đã ghi nhận tồn kho khớp thực tế"
   },
   "outgoing": {
     "colCustomer": "Khách hàng",
@@ -193,6 +197,10 @@
     "modalTitle": "Đơn bán đang giữ hàng",
     "moreOrders_one": "+{{count}} đơn khác",
     "moreOrders_other": "+{{count}} đơn khác"
+  },
+  "recheck": {
+    "badge": "nên kiểm lại",
+    "tooltip": "Đã thay đổi {{count}} lần ({{diff}}) kể từ lần kiểm gần nhất. Nên kiểm kho thực tế."
   },
   "repack": {
     "balanced": "Đóng gói lại cân bằng theo đơn vị gốc.",
@@ -226,5 +234,11 @@
     "repackInvalid": "Đóng gói lại không hợp lệ",
     "unknownUnit": "Đơn vị '{{unit}}' không có trên sản phẩm này",
     "valueRequired": "Cần nhập giá trị"
+  },
+  "verify": {
+    "confirmMatches": "Khớp với thực tế",
+    "driftSummary": "{{count}} thay đổi ({{diff}})",
+    "lastVerified": "Kiểm gần nhất: {{at}}",
+    "neverVerified": "Chưa từng được kiểm"
   }
 }

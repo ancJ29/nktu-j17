@@ -214,7 +214,7 @@ export function QuotationForm() {
     code ? useCustomerStore.getState().items.find((c) => c.code === code)?.id : undefined;
 
   useEffect(() => {
-    if (isMobile || (isEdit ? !perms.salesOrder.canEdit() : !perms.salesOrder.canCreate())) {
+    if (isMobile || (isEdit ? !perms.quotation.canEdit() : !perms.quotation.canCreate())) {
       navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot route guard

@@ -39,7 +39,8 @@
         "create": "Đã thêm tồn kho cho",
         "import": "Đã nhập tồn kho cho",
         "repack": "Đã đóng gói lại tồn kho cho",
-        "stockTake": "Đã kiểm kê tồn kho cho"
+        "stockTake": "Đã kiểm kê tồn kho cho",
+        "verify": "Đã xác nhận tồn kho khớp thực tế cho"
       },
       "toggleInventoryVisibility": "Đã thay đổi hiển thị trong danh sách tồn kho của",
       "update": "Đã cập nhật",

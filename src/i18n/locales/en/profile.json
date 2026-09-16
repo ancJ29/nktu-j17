@@ -55,6 +55,7 @@
       "permissionManagement": "Permission Management",
       "product": "Product",
       "productInventory": "Product Inventory",
+      "quotation": "Quotation",
       "report": "Report",
       "salesOrder": "Sales Order",
       "transportOrder": "Transport Order",

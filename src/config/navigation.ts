@@ -487,8 +487,7 @@ export const NAV_PERMISSION_MODULE: Partial<Record<NavId, string>> = {
 
   'employee-org': 'permissionManagement',
   'sales-orders': 'salesOrder',
-
-  quotations: 'salesOrder',
+  quotations: 'quotation',
   delivery: 'deliveryRequest',
   'goods-receipts': 'goodsReceipt',
   'transport-orders': 'transportOrder',

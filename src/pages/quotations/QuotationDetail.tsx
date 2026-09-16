@@ -81,11 +81,13 @@ import {
 } from './types';
 
 const isMobile = device.isMobile;
-const canCreate = perms.salesOrder.canCreate();
-const canEdit = perms.salesOrder.canEdit();
-const canDelete = perms.salesOrder.canDelete();
-const canViewAll = perms.salesOrder.canViewAll();
-const canViewSelf = perms.salesOrder.canViewSelf();
+const canCreate = perms.quotation.canCreate();
+const canEdit = perms.quotation.canEdit();
+const canDelete = perms.quotation.canDelete();
+const canViewAll = perms.quotation.canViewAll();
+const canViewSelf = perms.quotation.canViewSelf();
+
+const canCreateSalesOrder = perms.salesOrder.canCreate();
 
 const canSharePdf = isPdfSharingEnabled();
 
@@ -459,7 +461,7 @@ export function QuotationDetail() {
 
   const badge = quotationBadgeProps(status);
 
-  const generateSalesOrderButton = canCreate && (
+  const generateSalesOrderButton = canCreateSalesOrder && (
     <Button
       color="blue"
       size="compact-sm"

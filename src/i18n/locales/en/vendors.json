@@ -5,6 +5,7 @@
     "emptyHint": "No additional contacts yet.",
     "section": "Contacts"
   },
+  "copyInfo": "Copy information",
   "deleteConfirm": {
     "message": "Hide this vendor? It will no longer appear in lists. The record stays in the system for audit.",
     "title": "Delete Vendor"
@@ -65,6 +66,7 @@
     "disableSuccess": "Vendor paused",
     "enableSuccess": "Vendor activated",
     "fetchError": "Failed to load vendors",
+    "infoCopied": "Vendor information copied",
     "toggleError": "Failed to change vendor status",
     "updateError": "Failed to update vendor",
     "updateSuccess": "Vendor updated successfully"

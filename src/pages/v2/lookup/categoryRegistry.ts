@@ -11,6 +11,8 @@ export type LookupV2CategoryId =
   | 'trucking-size'
   | 'shipment-type'
   | 'fee-name'
+  | 'transport-goods'
+  | 'truck-locations'
   | 'vendor-type'
   | 'customer-type';
 
@@ -47,6 +49,10 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
 
   { id: 'fee-name', labelKey: 'lookups.categories.feeName', defaultSortOrder: 1 },
 
+  { id: 'transport-goods', labelKey: 'lookups.categories.transportGoods', defaultSortOrder: 1 },
+
+  { id: 'truck-locations', labelKey: 'lookups.categories.truckLocations', defaultSortOrder: 1 },
+
   { id: 'vendor-type', labelKey: 'lookups.categories.vendorType', defaultSortOrder: 1 },
 
   { id: 'customer-type', labelKey: 'lookups.categories.customerType', defaultSortOrder: 1 },
@@ -61,6 +67,8 @@ const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = [
   'trucking-size',
   'shipment-type',
   'fee-name',
+  'transport-goods',
+  'truck-locations',
 ];
 
 export function getEnabledLookupV2Categories(): LookupV2Category[] {

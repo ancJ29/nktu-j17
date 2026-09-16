@@ -221,7 +221,7 @@ type ProductVerbKey =
   | 'updateImages'
   | 'toggleInventoryVisibility';
 type ProductInventoryVerbKey =
-  'create' | 'adjust' | 'stockTake' | 'repack' | 'import' | 'beginOfPeriod';
+  'create' | 'adjust' | 'stockTake' | 'repack' | 'import' | 'beginOfPeriod' | 'verify';
 type MaterialInventoryVerbKey = 'create' | 'adjust' | 'stockTake' | 'repack';
 type MaterialVerbKey = SimpleVerbKey | 'updateImages';
 type SalesOrderVerbKey =
@@ -429,6 +429,16 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     icon: <IconSwitchHorizontal size={16} />,
     color: 'teal',
     i18nKey: 'products.detail.activityVerbs.inventory.repack',
+    targetType: 'product',
+    showInventoryMemo: true,
+  },
+  // "The shelf matches" — the one inventory verb whose whole point is that
+  // nothing moved, so the memo carries `{ locationCode, onHand }` (create
+  // shape) and the line reads as a confirmation of the standing figure.
+  'productInventory.verify': {
+    icon: <IconClipboardCheck size={16} />,
+    color: 'teal',
+    i18nKey: 'products.detail.activityVerbs.inventory.verify',
     targetType: 'product',
     showInventoryMemo: true,
   },

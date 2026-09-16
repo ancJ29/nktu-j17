@@ -7,6 +7,7 @@ import { lookupLabelOf, useLookupV2Labels, type InboundEntry } from '@/hooks';
 import type { Location, Product, ProductInventorySummary } from '@/types';
 import { isDefaultLocation } from '@/types';
 import { isLocationsEnabled } from '@/utils/permission';
+import { InventoryRecheckBadge } from '@/components/inventory/InventoryRecheckBadge';
 
 const locationsEnabled = isLocationsEnabled();
 
@@ -173,6 +174,13 @@ export function ProductInventoryCardList({
                           : 'productInventory.stockState.low',
                       )}
                     </Badge>
+                  )}
+                  {s.needsRecheck && (
+                    <InventoryRecheckBadge
+                      counter={s.driftCounter}
+                      diff={s.driftDiff}
+                      lastVerifiedAt={s.lastVerifiedAt}
+                    />
                   )}
                   {(() => {
                     const breakdownEntries = Object.entries(s.totalByUnit).filter(

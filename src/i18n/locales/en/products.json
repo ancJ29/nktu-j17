@@ -39,7 +39,8 @@
         "create": "Added stock entry for",
         "import": "Imported stock for",
         "repack": "Repacked stock for",
-        "stockTake": "Recorded stock-take for"
+        "stockTake": "Recorded stock-take for",
+        "verify": "Confirmed stock matches for"
       },
       "toggleInventoryVisibility": "Changed inventory-list visibility of",
       "update": "Updated",

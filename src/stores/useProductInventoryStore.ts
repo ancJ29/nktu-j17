@@ -1,6 +1,7 @@
 import type { ProductInventoryRow, ProductInventoryExtra } from '@/types';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { createEntityStore } from './createEntityStore';
+import { accrueInventoryDrift } from '@/utils/inventoryDrift';
 import { ONE_MINUTE } from '@credo/kits/time';
 
 type ProductInventoryPatch = Omit<
@@ -28,9 +29,13 @@ export const useProductInventoryStore = createEntityStore<
     cMngtConnector
       .getProductInventoryById<ProductInventoryExtra>({ id })
       .then((r) => r.entry as ProductInventoryRow),
+
   update: (id, patch) =>
     cMngtConnector
-      .updateProductInventory<ProductInventoryExtra>({ id, ...patch })
+      .updateProductInventory<ProductInventoryExtra>({
+        id,
+        ...accrueInventoryDrift(currentRow(id), patch),
+      })
       .then((r) => ({ item: r.entry as ProductInventoryRow, listHash: r.listHash })),
   create: (patch) =>
     cMngtConnector
@@ -45,3 +50,7 @@ export const useProductInventoryStore = createEntityStore<
       listHash: r.listHash,
     })),
 });
+
+function currentRow(id: string): ProductInventoryRow | undefined {
+  return useProductInventoryStore.getState().mapById.get(id);
+}

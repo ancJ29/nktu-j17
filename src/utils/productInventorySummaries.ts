@@ -5,6 +5,7 @@ import { deriveSecondaryStatus } from '@/types/inventoryStatus';
 import { isDev } from '@/config/env';
 import { summarizeProductAvailability } from './inventoryCommitment';
 import { type OnHandByUnit, readRowBreakdown, verifyOnHandInvariant } from './inventoryMath';
+import { judgeInventoryRecheck, readDrift } from './inventoryDrift';
 import { getCurrentPeriodKey } from './periodKey';
 import { getItemBaseUnit } from './unitConversion';
 
@@ -37,6 +38,10 @@ export function buildProductInventorySummaries(
     let totalBeginOfPeriod = 0;
     let hasBeginOfPeriod = false;
     let lastUpdatedAt: string | null = null;
+    let needsRecheck = false;
+    let driftCounter = 0;
+    let driftDiff = 0;
+    let lastVerifiedAt: number | null = null;
     for (const r of matching) {
       if (isDev) {
         const drift = verifyOnHandInvariant(p, r);
@@ -49,6 +54,17 @@ export function buildProductInventorySummaries(
         }
       }
       totalOnHand += r.onHand;
+
+      if (judgeInventoryRecheck(r).needed) needsRecheck = true;
+      const rowDrift = readDrift(r.extra);
+      driftCounter += rowDrift.counter;
+      driftDiff += rowDrift.diff;
+      const verifiedAt = r.extra?.lastInventoryUpdate;
+      if (
+        typeof verifiedAt === 'number' &&
+        (lastVerifiedAt === null || verifiedAt < lastVerifiedAt)
+      )
+        lastVerifiedAt = verifiedAt;
       const begin = r.extra?.beginOfPeriod?.[periodKey];
       if (typeof begin === 'number') {
         totalBeginOfPeriod += begin;
@@ -83,6 +99,10 @@ export function buildProductInventorySummaries(
       hasBeginOfPeriod,
       secondaryStatus,
       lastUpdatedAt,
+      needsRecheck,
+      driftCounter,
+      driftDiff,
+      lastVerifiedAt,
     };
   });
 }

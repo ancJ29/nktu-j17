@@ -72,7 +72,7 @@ const canViewGoodsReceipts = perms.goodsReceipt.canView();
 
 const canViewCustomers = perms.customer.canView();
 
-type StockFilter = 'noStock' | 'outOfStock' | 'lowStock' | 'negative' | null;
+type StockFilter = 'noStock' | 'outOfStock' | 'lowStock' | 'negative' | 'needsRecheck' | null;
 
 type SecondaryFilter = 'outOfStock' | 'mustOrder' | 'ok' | null;
 
@@ -114,6 +114,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     variant.showSecondaryFilter ||
     variant.quickChipMode === 'secondary' ||
     variant.showSecondaryKpiBadges;
+
+  const stockLevelFilterEnabled =
+    variant.showStockFilter || variant.quickChipMode === 'stock' || variant.showStockKpiBadges;
 
   const {
     items: allRows,
@@ -173,6 +176,11 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const setSecondaryFilter = useCallback(
     (v: SecondaryFilter) => updateState({ secondary: v }),
     [updateState],
+  );
+
+  const toggleStockFilter = useCallback(
+    (v: StockFilter) => updateState({ stock: filterState.stock === v ? null : v }),
+    [updateState, filterState.stock],
   );
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
@@ -246,11 +254,13 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
         if (!s.product.isActive) return false;
         if (f.category && s.product.extra?.category !== f.category) return false;
 
-        if (f.locationCode && s.rows.length === 0 && f.stock !== 'noStock') return false;
-        if (f.stock === 'noStock' && s.rows.length > 0) return false;
-        if (f.stock === 'outOfStock' && (s.rows.length === 0 || s.totalOnHand !== 0)) return false;
-        if (f.stock === 'negative' && s.totalOnHand >= 0) return false;
-        if (f.stock === 'lowStock') {
+        const stock = f.stock === 'needsRecheck' || stockLevelFilterEnabled ? f.stock : null;
+        if (f.locationCode && s.rows.length === 0 && stock !== 'noStock') return false;
+        if (stock === 'noStock' && s.rows.length > 0) return false;
+        if (stock === 'outOfStock' && (s.rows.length === 0 || s.totalOnHand !== 0)) return false;
+        if (stock === 'negative' && s.totalOnHand >= 0) return false;
+        if (stock === 'needsRecheck' && !s.needsRecheck) return false;
+        if (stock === 'lowStock') {
           const min = s.product.extra?.minimumInventory?.value;
           if (typeof min !== 'number' || s.totalOnHand <= 0 || s.totalOnHand > min) return false;
         }
@@ -274,6 +284,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     negativeCount,
     secondaryMustOrderCount,
     secondaryOutOfStockCount,
+    recheckCount,
   } = useMemo(() => {
     let out = 0;
     let low = 0;
@@ -281,8 +292,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     let total = 0;
     let secondaryOutOfStock = 0;
     let secondaryMustOrder = 0;
+    let recheck = 0;
     for (const s of summaries) {
       if (!s.product.isActive) continue;
+      if (s.needsRecheck) recheck++;
       if (s.secondaryStatus === 'outOfStock') secondaryOutOfStock++;
       else if (s.secondaryStatus === 'mustOrder') secondaryMustOrder++;
       total++;
@@ -296,6 +309,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       }
     }
     return {
+      recheckCount: recheck,
       secondaryOutOfStockCount: secondaryOutOfStock,
       secondaryMustOrderCount: secondaryMustOrder,
       totalCount: total,
@@ -393,6 +407,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       { value: 'outOfStock', label: t('productInventory.filterStock.outOfStock') },
       { value: 'lowStock', label: t('productInventory.filterStock.lowStock') },
       { value: 'negative', label: t('productInventory.filterStock.negative') },
+
+      { value: 'needsRecheck', label: t('productInventory.filterStock.needsRecheck') },
     ],
     [t],
   );
@@ -580,6 +596,13 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                 active: stockFilter === 'outOfStock',
                 onClick: () => setStockFilter(stockFilter === 'outOfStock' ? null : 'outOfStock'),
               },
+              {
+                key: 'needsRecheck',
+                label: t('productInventory.filterStock.needsRecheck'),
+                active: stockFilter === 'needsRecheck',
+                onClick: () =>
+                  setStockFilter(stockFilter === 'needsRecheck' ? null : 'needsRecheck'),
+              },
             ],
     [stockFilter, setStockFilter, secondaryFilter, setSecondaryFilter, variant.quickChipMode, t],
   );
@@ -691,6 +714,26 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                   )}
                 </>
               ) : null}
+              {/* Not variant-gated, unlike the level badges above: the drift
+                  accrual runs for every client, so hiding the one control that
+                  surfaces it would leave the data collected and unreadable —
+                  and it is what makes `needsRecheck` exempt from
+                  `stockLevelFilterEnabled`. Held at count 0 while pressed, for
+                  the same reason as the secondary badges — clearing it must not
+                  require the last matching row to still be there. */}
+              {(recheckCount > 0 || stockFilter === 'needsRecheck') && (
+                <Badge
+                  size="xs"
+                  variant={stockFilter === 'needsRecheck' ? 'filled' : 'light'}
+                  color="orange"
+                  radius="sm"
+                  tt="lowercase"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => toggleStockFilter('needsRecheck')}
+                >
+                  {t('productInventory.kpis.needsRecheck', { count: recheckCount })}
+                </Badge>
+              )}
             </Group>
           }
           cachedAt={cachedAt}
@@ -799,7 +842,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             hasActiveFilters={
               !!search ||
               mobileFilters.some((f) => (f.multi ? f.value.length > 0 : f.value !== 'all')) ||
-              (secondaryFilterEnabled && secondaryFilter !== null)
+              (secondaryFilterEnabled && secondaryFilter !== null) ||
+              stockFilter === 'needsRecheck'
             }
             labelChips
           />
@@ -816,7 +860,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               !!search ||
               desktopFilters.some((f) => f.value !== null) ||
               columnFilters.hasActiveFilters ||
-              (secondaryFilterEnabled && secondaryFilter !== null)
+              (secondaryFilterEnabled && secondaryFilter !== null) ||
+              stockFilter === 'needsRecheck'
             }
           />
         )}

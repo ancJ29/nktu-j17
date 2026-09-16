@@ -105,7 +105,9 @@ import { isValidContainerNumber, normalizeContainerNumber } from './containerNum
 import { reconcileTripLogs } from './tripLogSync';
 import { TransportTripsCard } from './TransportTripsCard';
 import { readTruckingSize } from './truckingSize';
-import { stopLabel } from './multiDrop';
+import { multiDropPickup, stopLabel } from './multiDrop';
+import { useTransportGoodsLabel } from './transportGoods';
+import { useTruckLocationLabel } from './truckLocations';
 import { transportOrderCopyPath, transportOrderEditPath } from './useMultiDrop';
 
 const isMobile = device.isMobile;
@@ -157,6 +159,10 @@ export function TransportOrderDetailPage() {
   const truckingSizeLabel = useTruckingSizeLabel();
   const shipmentTypeLabel = useShipmentTypeLabel();
   const truckTypeLabel = useTruckTypeLabel();
+
+  const goodsLabel = useTransportGoodsLabel();
+
+  const truckLocationLabel = useTruckLocationLabel();
 
   const feeNameLabel = useFeeNameLabel();
 
@@ -875,17 +881,27 @@ export function TransportOrderDetailPage() {
                   {t('transportOrders.multiDrop.routeTitle')}
                 </Text>
                 <Stack gap={6}>
+                  {multiDrop.goods &&
+                    infoRow(
+                      t('transportOrders.multiDrop.goods'),
+                      <Text size="sm">{goodsLabel(multiDrop.goods)}</Text>,
+                    )}
                   {infoRow(
-                    t('transportOrders.multiDrop.from'),
-                    <Text size="sm">{multiDrop.from || '—'}</Text>,
+                    t('transportOrders.multiDrop.pickup'),
+                    <Text size="sm">{truckLocationLabel(multiDropPickup(multiDrop)) || '—'}</Text>,
                   )}
+                  {multiDrop.pickupAt &&
+                    infoRow(
+                      t('transportOrders.multiDrop.pickupAt'),
+                      <Text size="sm">{formatDateTime(multiDrop.pickupAt)}</Text>,
+                    )}
                   {multiDrop.stops.map((stop, i) => (
                     <Box key={i}>
                       {infoRow(
                         t('transportOrders.multiDrop.stop', { n: i + 1 }),
                         <Text size="sm">
-                          {stopLabel(stop)} ·{' '}
-                          {t('transportOrders.multiDrop.distance', { km: stop.distanceKm })}
+                          {stopLabel(stop)}
+                          {stop.at ? ` · ${formatDateTime(stop.at)}` : ''}
                         </Text>,
                       )}
                     </Box>

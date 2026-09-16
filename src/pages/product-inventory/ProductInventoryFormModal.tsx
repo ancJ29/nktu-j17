@@ -15,6 +15,7 @@ import { convertUnit, getItemBaseUnit, getItemUnits } from '@/utils/unitConversi
 import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { isLocationsEnabled } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
+import { markInventoryVerified } from '@/utils/inventoryDrift';
 import { Form } from '@/components/Form';
 
 const locationsEnabled = isLocationsEnabled();
@@ -163,12 +164,13 @@ export function ProductInventoryFormModal({
       try {
         const entryUnit = values.unit || baseUnit;
         const onHandByUnit = values.onHand > 0 ? { [entryUnit]: values.onHand } : {};
-        const extra: ProductInventoryExtra = {
+
+        const extra: ProductInventoryExtra = markInventoryVerified({
           ...(values.note.trim() && { lastNote: values.note.trim() }),
           lastUpdatedBy: getCurrentActorId(),
           unit: baseUnit,
           onHandByUnit,
-        };
+        });
 
         await useProductInventoryStore.getState().revalidate();
 

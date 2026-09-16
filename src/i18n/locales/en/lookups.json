@@ -9,6 +9,8 @@
     "productCategory": "Product Category",
     "productUnit": "Product Unit",
     "shipmentType": "Shipment Type",
+    "transportGoods": "Goods",
+    "truckLocations": "Truck locations",
     "truckType": "Truck Type",
     "truckingSize": "Container / vehicle size",
     "unit": "Unit of Measure",

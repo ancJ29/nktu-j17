@@ -573,6 +573,17 @@ export const perms = {
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
   })(),
+
+  quotation: (() => {
+    let cached: ModulePermissions | undefined;
+    const resolve = () => (cached ??= getModulePermissions('quotation'));
+    return {
+      ...createModulePerms('quotation'),
+
+      canViewAll: () => resolve().query?.canViewAll ?? false,
+      canViewSelf: () => resolve().query?.canViewSelf ?? false,
+    };
+  })(),
   deliveryRequest: (() => {
     let cached: ModulePermissions | undefined;
     const resolve = () => (cached ??= getModulePermissions('deliveryRequest'));

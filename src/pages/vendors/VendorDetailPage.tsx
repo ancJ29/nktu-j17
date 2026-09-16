@@ -481,6 +481,7 @@ export function VendorDetailPage() {
               <AddressWithMapLink
                 address={vendor.address}
                 googleMapUrl={extra.addressGoogleMapUrl}
+                iconLabel={t('common.actions.openInMaps')}
               />
             </Stack>
           </Card>
@@ -498,7 +499,11 @@ export function VendorDetailPage() {
               <Badge variant="light" color="indigo" radius="sm" size="sm" w="fit-content">
                 {t('vendors.detail.pickupAddress')}
               </Badge>
-              <AddressWithMapLink address={pa.address} googleMapUrl={pa.googleMapUrl} />
+              <AddressWithMapLink
+                address={pa.address}
+                googleMapUrl={pa.googleMapUrl}
+                iconLabel={t('common.actions.openInMaps')}
+              />
               {pa.deliveryHours && (
                 <Text size="xs" c="dimmed">
                   {t('vendors.detail.receivingHours')}: {pa.deliveryHours}

@@ -119,15 +119,23 @@ export type TransportOrderDropStop = {
   province: string;
   ward: string;
 
+  at?: string;
+
   distanceKm: number;
 };
 
 export type TransportOrderMultiDrop = {
-  from: string;
+  pickupLocation: string;
+
+  pickupAt?: string;
+
+  from?: string;
 
   stops: TransportOrderDropStop[];
 
   totalDays: number;
+
+  goods?: string;
 };
 
 export type TransportOrderType5Specific = {

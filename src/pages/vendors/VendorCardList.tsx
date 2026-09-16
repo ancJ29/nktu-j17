@@ -3,9 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { PhoneNumber } from '@credo/base-ui/components';
 import { AddressWithMapLink } from '@/components/AddressWithMapLink';
+import { CopyValueButton } from '@/components/CopyValueButton';
 import { ActiveBadge } from '@/components/badges';
 import { ListCardList } from '@/components/ListCardList';
 import { VendorOriginBadge } from './VendorOriginBadge';
+import { buildVendorInfoText } from './vendorInfoText';
 import type { VendorOriginLabels } from './vendorOriginLabels';
 import type { Vendor } from '@/types';
 
@@ -94,6 +96,12 @@ export function VendorCardList({ vendors, isLoading, origin }: VendorCardListPro
               {origin && (
                 <VendorOriginBadge isDomestic={item.extra?.isDomestic ?? true} labels={origin} />
               )}
+              <CopyValueButton
+                value={buildVendorInfoText(item, t)}
+                copiedMessage={t('vendors.notifications.infoCopied')}
+                ariaLabel={t('vendors.copyInfo')}
+                size="md"
+              />
             </Stack>
           </Group>
         );

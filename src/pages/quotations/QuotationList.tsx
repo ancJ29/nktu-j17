@@ -44,8 +44,8 @@ const isMobile = device.isMobile;
 
 const RANGE_DAYS = 90;
 
-const canViewAll = perms.salesOrder.canViewAll();
-const canViewSelf = perms.salesOrder.canViewSelf();
+const canViewAll = perms.quotation.canViewAll();
+const canViewSelf = perms.quotation.canViewSelf();
 
 function detailRoute(id: string): string {
   return ROUTES.QUOTATIONS.DETAIL.replace(':id', id);
@@ -54,7 +54,7 @@ function detailRoute(id: string): string {
 export function QuotationList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const canCreate = perms.salesOrder.canCreate();
+  const canCreate = perms.quotation.canCreate();
 
   const items = useQuotationStore((s) => s.items) as Quotation[];
   const loading = useQuotationStore((s) => s.loading);

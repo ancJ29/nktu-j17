@@ -5,6 +5,7 @@
     "emptyHint": "Chưa có người liên hệ bổ sung.",
     "section": "Người liên hệ"
   },
+  "copyInfo": "Sao chép thông tin",
   "deleteConfirm": {
     "message": "Ẩn nhà cung cấp này? Nhà cung cấp sẽ không xuất hiện trong các danh sách. Dữ liệu vẫn được giữ lại để tra cứu.",
     "title": "Xóa nhà cung cấp"
@@ -65,6 +66,7 @@
     "disableSuccess": "Đã tạm ngưng hợp tác với nhà cung cấp",
     "enableSuccess": "Đã kích hoạt hợp tác với nhà cung cấp",
     "fetchError": "Không thể tải danh sách nhà cung cấp",
+    "infoCopied": "Đã sao chép thông tin nhà cung cấp",
     "toggleError": "Không thể đổi trạng thái nhà cung cấp",
     "updateError": "Không thể cập nhật nhà cung cấp",
     "updateSuccess": "Cập nhật nhà cung cấp thành công"

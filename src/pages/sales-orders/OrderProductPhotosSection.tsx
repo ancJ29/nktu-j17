@@ -82,6 +82,7 @@ export function OrderProductPhotosSection({ items }: Props) {
                         fit="cover"
                         h="100%"
                         w="100%"
+                        loading="lazy"
                         fallbackSrc="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'><rect width='60' height='60' fill='%23eee'/></svg>"
                       />
                     </Card>

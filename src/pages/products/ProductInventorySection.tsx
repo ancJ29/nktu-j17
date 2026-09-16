@@ -9,6 +9,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InventoryRowCard } from '@/components/inventory/InventoryRowCard';
+import { InventoryRecheckBadge } from '@/components/inventory/InventoryRecheckBadge';
 import { useGoodsReceiptStore } from '@/stores/useGoodsReceiptStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import type { Product } from '@/types';
@@ -19,6 +20,7 @@ import { ProductInventoryFormModal } from '../product-inventory/ProductInventory
 import { ProductInventoryUpdateModal } from '../product-inventory/ProductInventoryUpdateModal';
 import { isLocationsEnabled, perms } from '@/utils/permission';
 import { isNoInventoryProduct } from '@/utils/productSet';
+import { judgeInventoryRecheck, readDrift } from '@/utils/inventoryDrift';
 
 const canEditInventory = perms.productInventory.canEdit();
 const canCreateInventory = perms.productInventory.canCreate();
@@ -262,6 +264,9 @@ export function ProductInventorySection({
                 const isLow = typeof minInv === 'number' && row.onHand > 0 && row.onHand <= minInv;
                 const isNegative = row.onHand < 0;
                 const onHandColor = isNegative ? 'red' : isLow ? 'orange' : undefined;
+
+                const needsRecheck = judgeInventoryRecheck(row).needed;
+                const drift = readDrift(row.extra);
                 return (
                   <InventoryRowCard
                     key={row.id}
@@ -282,11 +287,20 @@ export function ProductInventorySection({
                     onHandColor={onHandColor}
                     negativeStateLabel={t('productInventory.stockState.negative')}
                     trailingBadges={
-                      isLow && !isNegative ? (
-                        <Badge size="xs" variant="light" color="orange" radius="sm">
-                          {t('productInventory.stockState.low')}
-                        </Badge>
-                      ) : undefined
+                      <>
+                        {isLow && !isNegative && (
+                          <Badge size="xs" variant="light" color="orange" radius="sm">
+                            {t('productInventory.stockState.low')}
+                          </Badge>
+                        )}
+                        {needsRecheck && (
+                          <InventoryRecheckBadge
+                            counter={drift.counter}
+                            diff={drift.diff}
+                            lastVerifiedAt={row.extra?.lastInventoryUpdate}
+                          />
+                        )}
+                      </>
                     }
                   />
                 );

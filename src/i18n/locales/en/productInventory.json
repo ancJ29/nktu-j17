@@ -96,6 +96,7 @@
   "filterStock": {
     "all": "All",
     "lowStock": "Below minimum",
+    "needsRecheck": "Needs recount",
     "negative": "Back-ordered",
     "noStock": "No stock",
     "outOfStock": "Out of stock",
@@ -143,6 +144,7 @@
   },
   "kpis": {
     "lowStock": "{{count}} below min",
+    "needsRecheck": "{{count}} to recount",
     "negative": "{{count}} back-ordered",
     "outOfStock": "{{count}} out of stock",
     "secondaryMustOrder": "{{count}} back-ordered",
@@ -183,7 +185,9 @@
     "repackError": "Failed to apply repack",
     "repackSuccess": "Repack applied",
     "stockTakeError": "Failed to save count",
-    "stockTakeSuccess": "Stock-take saved"
+    "stockTakeSuccess": "Stock-take saved",
+    "verifyError": "Could not record the check",
+    "verifySuccess": "Recorded as matching"
   },
   "outgoing": {
     "colCustomer": "Customer",
@@ -193,6 +197,10 @@
     "modalTitle": "Sales orders holding this stock",
     "moreOrders_one": "+{{count}} more order",
     "moreOrders_other": "+{{count}} more orders"
+  },
+  "recheck": {
+    "badge": "recount",
+    "tooltip": "Changed {{count}} times ({{diff}}) since the last check. Worth a physical count."
   },
   "repack": {
     "balanced": "Repack balances in base-unit terms.",
@@ -226,5 +234,11 @@
     "repackInvalid": "Repack is invalid",
     "unknownUnit": "Unit '{{unit}}' is not on this product",
     "valueRequired": "Value is required"
+  },
+  "verify": {
+    "confirmMatches": "Matches the shelf",
+    "driftSummary": "{{count}} changes ({{diff}})",
+    "lastVerified": "Last checked: {{at}}",
+    "neverVerified": "Never checked"
   }
 }

@@ -7,7 +7,9 @@ import { PhoneNumber } from '@credo/base-ui/components';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ActiveBadge } from '@/components/badges';
 import { AddressWithMapLink } from '@/components/AddressWithMapLink';
+import { CopyValueButton } from '@/components/CopyValueButton';
 import { VendorOriginBadge } from './VendorOriginBadge';
+import { buildVendorInfoText } from './vendorInfoText';
 import type { VendorOriginLabels } from './vendorOriginLabels';
 
 type VendorDataTableProps = {
@@ -98,6 +100,7 @@ export function VendorDataTable({
                 <AddressWithMapLink
                   address={item.address}
                   googleMapUrl={item.extra?.addressGoogleMapUrl}
+                  iconLabel={t('common.actions.openInMaps')}
                 />
               ),
             },
@@ -113,6 +116,20 @@ export function VendorDataTable({
             activeLabel={t('vendors.status.cooperating')}
             inactiveLabel={t('vendors.status.paused')}
             size="sm"
+          />
+        ),
+      },
+
+      {
+        key: 'copy',
+        width: '56px',
+        ta: 'center' as const,
+        header: '',
+        render: (item: Vendor) => (
+          <CopyValueButton
+            value={buildVendorInfoText(item, t)}
+            copiedMessage={t('vendors.notifications.infoCopied')}
+            ariaLabel={t('vendors.copyInfo')}
           />
         ),
       },
