@@ -1661,6 +1661,9 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             {deliveryPackageSizeField}
           </DetailField>
         )}
+        <DetailField label={t('__new__.01-common.labels.note')}>
+          {order.notes || t('__new__.01-common.empty.noNote')}
+        </DetailField>
       </SimpleGrid>
       {warehouseViewNote && (
         <DetailField
