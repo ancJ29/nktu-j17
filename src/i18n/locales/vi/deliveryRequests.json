@@ -104,6 +104,7 @@
     "customerNameLabel": "Tên khách hàng",
     "customerNamePlaceholder": "Tự động từ đơn hàng, hoặc nhập tay",
     "deliveryAddressPlaceholder": "Nhập địa chỉ giao hàng",
+    "directionAdditional": "Giao bổ sung",
     "directionInbound": "Nhận hàng",
     "directionInboundDesc": "Nhận hàng từ nhà cung cấp — chọn từ danh sách NCC hoặc nhập tay tên NCC vãng lai. Không cần đơn hàng.",
     "directionLabel": "Loại phiếu",

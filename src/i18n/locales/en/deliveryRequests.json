@@ -104,6 +104,7 @@
     "customerNameLabel": "Customer Name",
     "customerNamePlaceholder": "Auto-filled from sales order, or type to override",
     "deliveryAddressPlaceholder": "Enter delivery address",
+    "directionAdditional": "Additional",
     "directionInbound": "Receive",
     "directionInboundDesc": "Goods coming in from a vendor — pick from the vendor list or type a name for a one-off vendor. No sales order needed.",
     "directionLabel": "Type",
