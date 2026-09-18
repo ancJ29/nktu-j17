@@ -158,6 +158,7 @@
     "enableSuccess": "Product activated",
     "exportError": "Failed to export product list",
     "fetchError": "Failed to load products",
+    "inventorySeedError": "Product created, but its inventory entry could not be added. Add it from the product page.",
     "listConflictMessage": "Another user just changed the product list. Code updated to {{code}}. Please review and submit again.",
     "skuCopied": "SKU copied",
     "toggleError": "Failed to update product status",

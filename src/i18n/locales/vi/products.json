@@ -158,6 +158,7 @@
     "enableSuccess": "Đã kích hoạt sản phẩm",
     "exportError": "Không thể xuất danh sách sản phẩm",
     "fetchError": "Không thể tải danh sách sản phẩm",
+    "inventorySeedError": "Đã tạo sản phẩm nhưng chưa thêm được dòng tồn kho. Hãy thêm từ trang sản phẩm.",
     "listConflictMessage": "Một người khác vừa thay đổi danh sách sản phẩm. Mã đã được cập nhật thành {{code}}. Vui lòng kiểm tra và gửi lại.",
     "skuCopied": "Đã sao chép SKU",
     "toggleError": "Không thể cập nhật trạng thái sản phẩm",

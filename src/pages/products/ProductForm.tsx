@@ -10,17 +10,19 @@ import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProductStore } from '@/stores/useProductStore';
+import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { isListVersionConflict, readListHash } from '@/utils/listVersionConflict';
 import { device } from '@credo/base-ui/utils';
 import { Tabs } from '@credo/base-ui/components';
-import { useInitFormFromFetch, useLookupV2Options } from '@/hooks';
+import { getCurrentActorId, useInitFormFromFetch, useLookupV2Options } from '@/hooks';
 import { generateInternalBarcode } from '@/utils/barcode';
 import {
   hasBarcodeForProducts,
   hasBulkImportForProducts,
   hasHideFromInventoryListForProducts,
   isPriceManagementEnabled,
+  isProductInventoryEnabled,
   perms,
 } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
@@ -30,9 +32,17 @@ import {
   generateProductExcelTemplate,
   parseProductExcelFile,
 } from '@/utils/excelParser';
-import type { Product, ProductExtra, ProductMinimumInventory, ProductSetItem } from '@/types';
-import { validateUnitConversions } from '@/utils/unitConversion';
+import type {
+  Product,
+  ProductExtra,
+  ProductInventoryExtra,
+  ProductMinimumInventory,
+  ProductSetItem,
+} from '@/types';
+import { DEFAULT_LOCATION_CODE } from '@/types';
+import { getItemBaseUnit, validateUnitConversions } from '@/utils/unitConversion';
 import { getSetMode, isProductSet } from '@/utils/productSet';
+import { markInventoryVerified } from '@/utils/inventoryDrift';
 import { SingleProductForm, type ProductFormValues } from './SingleProductForm';
 import { ProductBulkImportForm } from './ProductBulkImportForm';
 import type { ProductFormVariant } from './productFormVariant';
@@ -46,6 +56,8 @@ const barcodeEnabled = hasBarcodeForProducts();
 const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 const canCreate = perms.product.canCreate();
 const canEdit = perms.product.canEdit();
+const inventoryEnabled = isProductInventoryEnabled();
+const canCreateInventory = perms.productInventory.canCreate();
 
 function buildNextProductCode(n: number): string {
   const { codePrefix, codePadLength } = appConfig.features.products;
@@ -256,6 +268,50 @@ export function ProductForm({ variant }: ProductFormProps) {
     },
   );
 
+  const seedInventoryRow = useCallback(
+    async (product: Product): Promise<boolean> => {
+      if (!variant.seedInventoryRowOnCreate) return false;
+      if (!inventoryEnabled || !canCreateInventory) return false;
+      if (product.extra?.noInventory) return false;
+      const baseUnit = getItemBaseUnit(product);
+      try {
+        await useProductInventoryStore.getState().loadAll();
+        if (!useProductInventoryStore.getState().initialized) {
+          throw new Error('product-inventory list unavailable');
+        }
+
+        const extra: ProductInventoryExtra = markInventoryVerified({
+          lastUpdatedBy: getCurrentActorId(),
+          unit: baseUnit,
+          onHandByUnit: {},
+        });
+        await useProductInventoryStore.getState().createSafely({
+          patch: {
+            itemCode: product.code,
+            locationCode: DEFAULT_LOCATION_CODE,
+            onHand: 0,
+            extra,
+          },
+        });
+
+        logActivity('productInventory.create', product.id, {
+          locationCode: DEFAULT_LOCATION_CODE,
+          onHand: 0,
+          seeded: true,
+        });
+        return true;
+      } catch {
+        notifications.show({
+          color: 'yellow',
+          message: t('products.notifications.inventorySeedError'),
+          autoClose: 8000,
+        });
+        return false;
+      }
+    },
+    [variant.seedInventoryRowOnCreate, t],
+  );
+
   const handleSubmit = useCallback(
     async (values: ProductFormValues) => {
       setLoading(true);
@@ -388,9 +444,10 @@ export function ProductForm({ variant }: ProductFormProps) {
             color: 'green',
             message: t('products.notifications.createSuccess'),
           });
+          const seeded = await seedInventoryRow(res.product);
 
           navigate(ROUTES.PRODUCTS.DETAIL.replace(':id', res.product.id), {
-            state: { promptInventory: true },
+            state: seeded ? null : { promptInventory: true },
           });
         }
       } catch (err) {
@@ -433,7 +490,7 @@ export function ProductForm({ variant }: ProductFormProps) {
         setLoading(false);
       }
     },
-    [isEdit, id, t, navigate, forceRefresh, form, productToFormValues],
+    [isEdit, id, t, navigate, forceRefresh, form, productToFormValues, seedInventoryRow],
   );
 
   const navigateToList = useCallback(() => navigate(ROUTES.PRODUCTS.LIST), [navigate]);
