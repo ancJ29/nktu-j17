@@ -48,6 +48,7 @@ import {
   TruckAssetListPage,
   TruckAssetDetailPage,
   TruckAssetFormPage,
+  OdometerLogListPage,
   OilTankListPage,
   OilTankDetailPage,
   OilTankFormPage,
@@ -154,6 +155,7 @@ const locationGate = gate('location');
 const materialGate = gate('material');
 const truckGate = gate('truck');
 const oilTankGate = gate('oilTank');
+const odometerLogGate = gate('odometerLog');
 const greenhouseGate = gate('greenhouse');
 const cropGate = gate('crop');
 const cropDiaryTemplateGate = gate('cropDiaryTemplate');
@@ -332,6 +334,7 @@ const locationsEnabled = featureFlags.locations.enabled;
 const materialsEnabled = featureFlags.materials.enabled;
 const trucksEnabled = featureFlags.trucks.enabled;
 const oilTanksEnabled = featureFlags.oilTanks.enabled;
+const odometerLogEnabled = featureFlags.nktuOdometerLog.enabled;
 const farmEnabled = featureFlags.farm.enabled;
 const productInventoryEnabled = featureFlags.productInventory.enabled;
 const materialInventoryEnabled = featureFlags.materialInventory.enabled;
@@ -642,6 +645,17 @@ const truckAssetDetailRoutes: RouteObject[] = [
       TruckAssetFormPage,
     ),
     handle: truckAssetDetailNav,
+  },
+];
+
+const odometerLogRoutes: RouteObject[] = [
+  {
+    path: ROUTES.ODOMETER_LOGS.LIST,
+
+    element: gatedComponent(
+      { enabled: odometerLogEnabled, requires: odometerLogGate.view },
+      OdometerLogListPage,
+    ),
   },
 ];
 
@@ -1273,6 +1287,7 @@ const router = createBrowserRouter([
           ...warehouseDeliveryNoteRoutes,
           ...quotationRoutes,
           ...truckAssetRoutes,
+          ...odometerLogRoutes,
           ...oilTankRoutes,
           ...greenhouseRoutes,
           ...cropRoutes,

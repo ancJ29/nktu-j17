@@ -46,6 +46,8 @@ const PREVIEW_LIMIT = 50;
 
 const MOBILE_PREVIEW = 3;
 
+import { OdometerLogHomeCard } from '@/pages/odometer-logs';
+
 const isMobile = device.isMobile;
 
 const NEW_PROCESSING_STATUSES = new Set(['new', 'confirmed']);
@@ -213,6 +215,11 @@ export default function HomePage() {
     return (
       <Box p="xs">
         <Stack gap="md">
+          {/* First, above the work: the daily odometer log is a task the driver
+              must not leave the depot without doing, and a card further down the
+              scroll is a card nobody sees. It renders itself away for everyone
+              who isn't a driver (flag + department + permission). */}
+          <OdometerLogHomeCard />
           {canSeeOrders && (
             <MobileSection
               title={t('home.sections.newOrders')}

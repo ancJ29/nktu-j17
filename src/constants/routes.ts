@@ -93,6 +93,9 @@ export const ROUTES = {
       EDIT: '/assets/trucks/:id/edit',
     },
   },
+  ODOMETER_LOGS: {
+    LIST: '/odometer-logs',
+  },
   OIL_TANKS: {
     LIST: '/oil-tanks',
     NEW: '/oil-tanks/new',

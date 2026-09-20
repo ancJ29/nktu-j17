@@ -237,4 +237,15 @@ export const BASE_PERMISSIONS: Permissions = {
       canViewSelf: false,
     },
   },
+
+  odometerLog: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    query: {
+      canViewAll: false,
+      canViewSelf: false,
+    },
+  },
 };

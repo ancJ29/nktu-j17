@@ -1,0 +1,61 @@
+{
+  "columns": {
+    "date": "Ngày",
+    "distance": "Quãng đường",
+    "driver": "Lái xe",
+    "km": "Số km",
+    "note": "Ghi chú",
+    "photo": "Ảnh"
+  },
+  "compliance": {
+    "complete": "Đã ghi đủ",
+    "logged": "Đã ghi",
+    "missing": "Chưa ghi",
+    "missingCount_one": "Thiếu {{count}} ngày",
+    "missingCount_other": "Thiếu {{count}} ngày",
+    "noRoster": "Chưa cấu hình bộ phận lái xe nên không có ai để đối chiếu. Cài đặt tại Yêu cầu giao hàng → Bộ phận lái xe.",
+    "title": "Theo dõi hằng ngày"
+  },
+  "detail": {
+    "loggedAt": "Ghi lúc {{at}}",
+    "updatedAt": "Sửa lúc {{at}}"
+  },
+  "empty": "Chưa có số km nào trong kỳ này",
+  "filters": {
+    "driver": "Lái xe",
+    "driverAll": "Tất cả lái xe"
+  },
+  "form": {
+    "addPhoto": "Thêm ảnh đồng hồ km",
+    "date": "Ngày làm việc",
+    "dateLocked": "Ngày này đã khoá. Nhờ quản lý sửa giúp.",
+    "editTitle": "Sửa số km",
+    "km": "Số km trên đồng hồ",
+    "kmHint": "Số hiển thị trên đồng hồ công-tơ-mét, đơn vị km",
+    "note": "Ghi chú",
+    "photo": "Ảnh đồng hồ km",
+    "photoRequired": "Bắt buộc có ảnh chụp đồng hồ km",
+    "title": "Ghi số km"
+  },
+  "home": {
+    "cta": "Ghi số km hôm nay",
+    "done": "Đã ghi số km hôm nay",
+    "prompt": "Ghi số km trước khi kết thúc ca",
+    "title": "Kết thúc ca"
+  },
+  "notifications": {
+    "saveFailed": "Chưa lưu được số km. Kiểm tra kết nối và thử lại — ảnh của bạn vẫn còn.",
+    "saveFailedTitle": "Chưa lưu được",
+    "saved": "Đã lưu số km"
+  },
+  "tabs": {
+    "compliance": "Theo ngày",
+    "entries": "Danh sách"
+  },
+  "title": "Nhật ký số km",
+  "validation": {
+    "dateRequired": "Chọn ngày làm việc",
+    "kmRequired": "Nhập số km"
+  },
+  "viewSelf": "Số km của tôi"
+}

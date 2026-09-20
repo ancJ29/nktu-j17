@@ -51,6 +51,7 @@
       "lookupV2": "Lookup",
       "material": "Material",
       "materialInventory": "Material Inventory",
+      "odometerLog": "Odometer Log",
       "oilTank": "Oil Tank",
       "permissionManagement": "Permission Management",
       "product": "Product",

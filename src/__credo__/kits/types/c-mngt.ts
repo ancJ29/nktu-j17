@@ -341,6 +341,8 @@ export type CMngtAppConfig = AppConfig & {
     oilTanks: CMngtModuleFeatures;
 
     farm: CMngtModuleFeatures;
+
+    nktuOdometerLog: CMngtModuleFeatures;
   };
   layout: CMngtLayoutConfig;
   displaySettings: CMngtDisplaySettings;

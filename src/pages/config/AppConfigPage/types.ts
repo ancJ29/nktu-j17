@@ -19,6 +19,7 @@ export type SectionKey =
   | 'trucks'
   | 'oilTanks'
   | 'farm'
+  | 'nktuOdometerLog'
   | 'customers'
   | 'vendors'
   | 'salesOrders'
@@ -54,6 +55,7 @@ export const ALL_SECTIONS: SectionKey[] = [
   'trucks',
   'oilTanks',
   'farm',
+  'nktuOdometerLog',
   'customers',
   'vendors',
   'salesOrders',

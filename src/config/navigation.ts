@@ -43,6 +43,7 @@ export type NavId =
   | 'lookups-v2'
   | 'truck-assets'
   | 'oil-tanks'
+  | 'odometer-logs'
   | 'farm'
   | 'greenhouses'
   | 'crops'
@@ -296,6 +297,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Truck,
   },
 
+  'odometer-logs': {
+    path: ROUTES.ODOMETER_LOGS.LIST,
+    labelKey: 'odometerLog.title',
+    label: 'Odometer log',
+    defaultIcon: IconName.Ruler,
+  },
+
   'oil-tanks': {
     path: ROUTES.OIL_TANKS.LIST,
     labelKey: 'oilTanks.title',
@@ -441,6 +449,7 @@ type FeatureFlags = {
   lookupV2?: { enabled?: boolean };
   trucks?: { enabled?: boolean };
   oilTanks?: { enabled?: boolean };
+  nktuOdometerLog?: { enabled?: boolean };
   farm?: { enabled?: boolean };
 };
 
@@ -477,6 +486,7 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'lookups-v2': (f) => f.lookupV2?.enabled ?? false,
   'truck-assets': (f) => f.trucks?.enabled ?? false,
   'oil-tanks': (f) => f.oilTanks?.enabled ?? false,
+  'odometer-logs': (f) => f.nktuOdometerLog?.enabled ?? false,
   greenhouses: (f) => f.farm?.enabled ?? false,
   crops: (f) => f.farm?.enabled ?? false,
   'crop-diary-templates': (f) => f.farm?.enabled ?? false,

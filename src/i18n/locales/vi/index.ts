@@ -29,6 +29,7 @@ import materials from './materials.json';
 import materialsV2 from './materialsV2.json';
 import menu from './menu.json';
 import nav from './nav.json';
+import odometerLog from './odometerLog.json';
 import oilTanks from './oilTanks.json';
 import operationLogs from './operationLogs.json';
 import photos from './photos.json';
@@ -81,6 +82,7 @@ export default {
   materialsV2,
   menu,
   nav,
+  odometerLog,
   oilTanks,
   operationLogs,
   photos,

@@ -31,6 +31,7 @@ import {
   hasPositionForEmployees,
   hasStartDateForEmployees,
   isDriverDepartment,
+  hasDriverProfileForEmployees,
 } from '@/utils/permission';
 import { featureFlags } from '@/utils/features';
 import { useIsRoot } from '@/hooks/useIsRoot';
@@ -46,6 +47,8 @@ const hasStartDate = hasStartDateForEmployees();
 const hasAddress = hasAddressForEmployees();
 const hasDateOfBirth = hasDateOfBirthForEmployees();
 const trucksEnabled = featureFlags.trucks.enabled;
+
+const driverProfileEnabled = hasDriverProfileForEmployees();
 
 export type EmployeeFormValues = {
   name: string;
@@ -91,7 +94,7 @@ export function SingleEmployeeForm({
   const { departmentOptions, positionOptions } = useEmployeeFieldOptions();
   const isRootUser = useIsRoot();
 
-  const isDriver = isDriverDepartment(form.values.department);
+  const isDriver = driverProfileEnabled && isDriverDepartment(form.values.department);
 
   const truckAssets = useTruckAssetStore((s) => s.items);
   const loadTrucks = useTruckAssetStore((s) => s.loadAll);

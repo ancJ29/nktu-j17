@@ -32,6 +32,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
+import { clipboardImageFiles, isTextEntryTarget } from '@/utils/clipboardImages';
 import { deleteMedia } from '@/utils/mediaStorage';
 import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/utils/photoUpload';
 import {
@@ -94,6 +95,8 @@ type ImageUploadPanelProps = {
 };
 
 const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+const pasteStack: symbol[] = [];
 
 function usePendingPhotoPreviews(photos: PhotoEntry[]): Record<string, string> {
   const [previews, setPreviews] = useState<Record<string, string>>({});
@@ -394,6 +397,38 @@ export function ImageUploadPanel({
     [marker, t],
   );
 
+  const pasteActionRef = useRef<((files: File[]) => void) | null>(null);
+  useEffect(() => {
+    pasteActionRef.current = uploading ? null : (files: File[]) => void handleUpload(files);
+  }, [uploading, handleUpload]);
+
+  const pasteEnabled = (section === 'all' || section === 'upload') && editable;
+  useEffect(() => {
+    if (!pasteEnabled) return;
+    const token = Symbol('image-upload-panel');
+    pasteStack.push(token);
+
+    const onPaste = (event: ClipboardEvent) => {
+      if (pasteStack[pasteStack.length - 1] !== token) return;
+      const files = clipboardImageFiles(event.clipboardData, {
+        intoTextEntry: isTextEntryTarget(event.target),
+      });
+      if (!files.length) return;
+
+      const upload = pasteActionRef.current;
+      if (!upload) return;
+      event.preventDefault();
+      upload(files);
+    };
+
+    document.addEventListener('paste', onPaste);
+    return () => {
+      document.removeEventListener('paste', onPaste);
+      const at = pasteStack.lastIndexOf(token);
+      if (at >= 0) pasteStack.splice(at, 1);
+    };
+  }, [pasteEnabled]);
+
   const handlePreview = (photo: PhotoEntry, src?: string) => {
     setPreviewUrl(src ?? photo.url);
     openPreview();
@@ -406,24 +441,34 @@ export function ImageUploadPanel({
     <Stack gap={isMobile ? 2 : 'md'} p={isMobile ? 4 : 'md'}>
       {/* Inline file-picker button — the modal-safe control (see `uploadControl`) */}
       {showUpload && editable && uploadControl === 'button' && (
-        <FileButton
-          resetRef={resetRef}
-          onChange={handleUpload}
-          accept={ACCEPTED_TYPES.join(',')}
-          multiple
-        >
-          {(props) => (
-            <Button
-              {...props}
-              size="compact-sm"
-              variant="light"
-              loading={uploading}
-              leftSection={isMobile ? <IconCamera size={14} /> : <IconUpload size={14} />}
-            >
-              {uploadButtonLabel ?? t('photos.addPhotos')}
-            </Button>
+        <Stack gap={4}>
+          <FileButton
+            resetRef={resetRef}
+            onChange={handleUpload}
+            accept={ACCEPTED_TYPES.join(',')}
+            multiple
+          >
+            {(props) => (
+              <Button
+                {...props}
+                size="compact-sm"
+                variant="light"
+                loading={uploading}
+                leftSection={isMobile ? <IconCamera size={14} /> : <IconUpload size={14} />}
+              >
+                {uploadButtonLabel ?? t('photos.addPhotos')}
+              </Button>
+            )}
+          </FileButton>
+          {/* This control has no drop zone to carry the hint, and a paste path
+              nobody knows about is a path nobody uses. Desktop only — a phone
+              has no clipboard image to paste. */}
+          {!isMobile && (
+            <Text size="xs" c="dimmed">
+              {t('photos.pasteHint')}
+            </Text>
           )}
-        </FileButton>
+        </Stack>
       )}
 
       {/* Desktop: drag-and-drop zone */}

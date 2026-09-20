@@ -16,6 +16,7 @@ import {
   hasAvatarForEmployees,
   hasLoginViaQRCode,
   isDriverDepartment,
+  hasDriverProfileForEmployees,
   deepMergePermissions,
   isActivityLoggingEnabled,
   isPermissionManagementEnabled,
@@ -295,7 +296,7 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     />
   ) : null;
 
-  const isDriver = isDriverDepartment(employee.department);
+  const isDriver = hasDriverProfileForEmployees() && isDriverDepartment(employee.department);
 
   const tabIsGone =
     (activeTab === 'driver' && !isDriver) ||

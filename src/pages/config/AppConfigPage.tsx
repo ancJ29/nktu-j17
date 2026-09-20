@@ -117,6 +117,7 @@ import {
   IconNavigation,
   IconPackage,
   IconPackageImport,
+  IconGauge,
   IconPlant2,
   IconRotate,
   IconShield,
@@ -217,6 +218,12 @@ const MODULE_LABELS: Record<string, string> = {
   farmEnabled: 'Enable Farm',
   farmEnabledDesc:
     'When enabled, the Greenhouses, Crops, Crop Diary, and Diary Templates sections are available in navigation (subject to per-user permissions).',
+  nktuOdometerLogModule: 'Odometer Log (NKTU)',
+  nktuOdometerLogModuleDesc:
+    "Daily end-of-shift odometer reading + photo, logged by the delivery department. Built to NKTU's practice — the client code is in the flag name deliberately.",
+  nktuOdometerLogEnabled: 'Enable Odometer Log',
+  nktuOdometerLogEnabledDesc:
+    'When enabled, drivers get the daily log button and managers/accounting get the compliance view (subject to per-user permissions). Who counts as a driver comes from Delivery Requests → Driver Departments.',
 };
 
 const LOOKUP_CATEGORY_LABELS: Record<string, string> = {
@@ -321,6 +328,9 @@ export function ConfigEditor({
   const [farmFeatures, setFarmFeatures] = useState<CMngtModuleFeatures>(
     SCHEMA_DEFAULT_MODULE_FEATURES,
   );
+  const [nktuOdometerLogFeatures, setNktuOdometerLogFeatures] = useState<CMngtModuleFeatures>(
+    SCHEMA_DEFAULT_MODULE_FEATURES,
+  );
   const [customersFeatures, setCustomersFeatures] =
     useState<CMngtCustomerFeatures>(DEFAULT_CUSTOMER_FEATURES);
   const [vendorsFeatures, setVendorsFeatures] = useState<CMngtVendorFeatures>(
@@ -419,6 +429,7 @@ export function ConfigEditor({
           trucks: trucksFeatures,
           oilTanks: oilTanksFeatures,
           farm: farmFeatures,
+          nktuOdometerLog: nktuOdometerLogFeatures,
         },
         layout,
         displaySettings,
@@ -462,6 +473,7 @@ export function ConfigEditor({
       trucksFeatures,
       oilTanksFeatures,
       farmFeatures,
+      nktuOdometerLogFeatures,
       layout,
       displaySettings,
       companyInfo,
@@ -511,6 +523,10 @@ export function ConfigEditor({
     setTrucksFeatures({ ...SCHEMA_DEFAULT_MODULE_FEATURES, ...cfg.features?.trucks });
     setOilTanksFeatures({ ...SCHEMA_DEFAULT_MODULE_FEATURES, ...cfg.features?.oilTanks });
     setFarmFeatures({ ...SCHEMA_DEFAULT_MODULE_FEATURES, ...cfg.features?.farm });
+    setNktuOdometerLogFeatures({
+      ...SCHEMA_DEFAULT_MODULE_FEATURES,
+      ...cfg.features?.nktuOdometerLog,
+    });
     setCustomersFeatures({ ...SCHEMA_DEFAULT_CUSTOMER_FEATURES, ...cfg.features?.customers });
     setVendorsFeatures({ ...SCHEMA_DEFAULT_VENDOR_FEATURES, ...cfg.features?.vendors });
     setMaterialsFeatures({ ...SCHEMA_DEFAULT_MATERIAL_FEATURES, ...cfg.features?.materials });
@@ -818,6 +834,10 @@ export function ConfigEditor({
   const resetTrucks = useCallback(() => setTrucksFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
   const resetOilTanks = useCallback(() => setOilTanksFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
   const resetFarm = useCallback(() => setFarmFeatures(SCHEMA_DEFAULT_MODULE_FEATURES), []);
+  const resetNktuOdometerLog = useCallback(
+    () => setNktuOdometerLogFeatures(SCHEMA_DEFAULT_MODULE_FEATURES),
+    [],
+  );
   const resetVendors = useCallback(() => setVendorsFeatures(DEFAULT_VENDOR_FEATURES), []);
   const resetCustomers = useCallback(() => setCustomersFeatures(DEFAULT_CUSTOMER_FEATURES), []);
   const resetSalesOrders = useCallback(
@@ -897,6 +917,7 @@ export function ConfigEditor({
     trucks: eqDefault(trucksFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     oilTanks: eqDefault(oilTanksFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     farm: eqDefault(farmFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
+    nktuOdometerLog: eqDefault(nktuOdometerLogFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     materials: eqDefault(materialsFeatures, SCHEMA_DEFAULT_MATERIAL_FEATURES),
     materialInventory: eqDefault(
       materialInventoryFeatures,
@@ -1403,6 +1424,13 @@ export function ConfigEditor({
                 features: farmFeatures,
                 setFeatures: setFarmFeatures,
                 reset: resetFarm,
+              },
+              {
+                key: 'nktuOdometerLog' as const,
+                icon: IconGauge,
+                features: nktuOdometerLogFeatures,
+                setFeatures: setNktuOdometerLogFeatures,
+                reset: resetNktuOdometerLog,
               },
             ] as const
           ).map((mod) => (

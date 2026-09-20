@@ -100,4 +100,8 @@ export const featureFlags = {
   farm: {
     enabled: features?.farm?.enabled ?? false,
   },
+
+  nktuOdometerLog: {
+    enabled: features?.nktuOdometerLog?.enabled ?? false,
+  },
 };

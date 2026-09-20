@@ -344,14 +344,14 @@ export function hasDateOfBirthForEmployees() {
   return featureFlags?.employees?.dateOfBirth ?? false;
 }
 
-const driverDepartmentsSet = new Set(featureFlags?.employees?.driverDepartments ?? []);
+export function hasDriverProfileForEmployees(): boolean {
+  return featureFlags?.employees?.driverProfile ?? false;
+}
+
+const driverDepartmentsSet = new Set(getDeliveryRequestDriverDepartments());
 
 export function isDriverDepartment(department?: string): boolean {
-  return (
-    (featureFlags?.employees?.driverProfile ?? false) &&
-    !!department &&
-    driverDepartmentsSet.has(department)
-  );
+  return !!department && driverDepartmentsSet.has(department);
 }
 
 export function hasBulkImportForProducts() {
@@ -652,6 +652,16 @@ export const perms = {
     };
   })(),
   materialInventory: createModulePerms('materialInventory'),
+  odometerLog: (() => {
+    let cached: ModulePermissions | undefined;
+    const resolve = () => (cached ??= getModulePermissions('odometerLog'));
+    return {
+      ...createModulePerms('odometerLog'),
+
+      canViewAll: () => resolve().query?.canViewAll ?? false,
+      canViewSelf: () => resolve().query?.canViewSelf ?? false,
+    };
+  })(),
   lookupV2: createModulePerms('lookupV2'),
 
   report: createModulePerms('report'),

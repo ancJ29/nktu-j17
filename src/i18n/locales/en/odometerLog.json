@@ -1,0 +1,61 @@
+{
+  "columns": {
+    "date": "Date",
+    "distance": "Distance",
+    "driver": "Driver",
+    "km": "Odometer (km)",
+    "note": "Note",
+    "photo": "Photo"
+  },
+  "compliance": {
+    "complete": "All logged",
+    "logged": "Logged",
+    "missing": "Missing",
+    "missingCount_one": "{{count}} day missing",
+    "missingCount_other": "{{count}} days missing",
+    "noRoster": "No driver departments are configured, so there is nobody to expect a log from. Set them in Delivery Requests → Driver Departments.",
+    "title": "Daily compliance"
+  },
+  "detail": {
+    "loggedAt": "Logged {{at}}",
+    "updatedAt": "Corrected {{at}}"
+  },
+  "empty": "No odometer readings in this period",
+  "filters": {
+    "driver": "Driver",
+    "driverAll": "All drivers"
+  },
+  "form": {
+    "addPhoto": "Add odometer photo",
+    "date": "Shift date",
+    "dateLocked": "This day is closed for editing. Ask a manager to correct it.",
+    "editTitle": "Correct odometer reading",
+    "km": "Odometer reading (km)",
+    "kmHint": "The number shown on the dashboard, in kilometres",
+    "note": "Note",
+    "photo": "Odometer photo",
+    "photoRequired": "A photo of the odometer is required",
+    "title": "Log odometer"
+  },
+  "home": {
+    "cta": "Log today's odometer",
+    "done": "Today's odometer is logged",
+    "prompt": "Log your odometer before you finish",
+    "title": "End of shift"
+  },
+  "notifications": {
+    "saveFailed": "The reading could not be saved. Check your connection and try again — your photo is still attached.",
+    "saveFailedTitle": "Reading not saved",
+    "saved": "Odometer reading saved"
+  },
+  "tabs": {
+    "compliance": "By day",
+    "entries": "Entries"
+  },
+  "title": "Odometer log",
+  "validation": {
+    "dateRequired": "Pick the shift date",
+    "kmRequired": "Enter the odometer reading"
+  },
+  "viewSelf": "My readings"
+}
