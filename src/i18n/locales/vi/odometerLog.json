@@ -55,7 +55,7 @@
     "compliance": "Theo ngày",
     "entries": "Danh sách"
   },
-  "title": "Nhật ký số km",
+  "title": "Nhật ký xe",
   "validation": {
     "dateRequired": "Chọn ngày làm việc",
     "kmRequired": "Nhập số km"
