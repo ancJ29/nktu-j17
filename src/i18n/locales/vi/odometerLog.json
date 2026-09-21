@@ -8,6 +8,8 @@
     "photo": "Ảnh"
   },
   "compliance": {
+    "cellTooltip": "{{km}} km · {{delta}} km kể từ {{date}}",
+    "cellTooltipFirst": "{{km}} km · số đầu tiên trong kỳ",
     "complete": "Đã ghi đủ",
     "logged": "Đã ghi",
     "missing": "Chưa ghi",
@@ -35,6 +37,7 @@
     "note": "Ghi chú",
     "photo": "Ảnh đồng hồ km",
     "photoRequired": "Bắt buộc có ảnh chụp đồng hồ km",
+    "takePhoto": "Chụp ảnh đồng hồ km",
     "title": "Ghi số km"
   },
   "home": {

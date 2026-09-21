@@ -8,6 +8,8 @@
     "photo": "Photo"
   },
   "compliance": {
+    "cellTooltip": "{{km}} km · {{delta}} km since {{date}}",
+    "cellTooltipFirst": "{{km}} km · first reading in range",
     "complete": "All logged",
     "logged": "Logged",
     "missing": "Missing",
@@ -35,6 +37,7 @@
     "note": "Note",
     "photo": "Odometer photo",
     "photoRequired": "A photo of the odometer is required",
+    "takePhoto": "Take odometer photo",
     "title": "Log odometer"
   },
   "home": {

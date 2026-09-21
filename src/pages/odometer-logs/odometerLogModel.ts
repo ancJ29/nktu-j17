@@ -100,11 +100,22 @@ export function buildComplianceGrid({
   });
 }
 
-export function distanceSincePrevious(logs: OdometerLog[], log: OdometerLog): number | undefined {
-  const own = liveLogs(logs)
+export function previousReading(logs: OdometerLog[], log: OdometerLog): OdometerLog | undefined {
+  return liveLogs(logs)
     .filter((l) => l.extra?.employeeId === log.extra?.employeeId && l.recordDate < log.recordDate)
-    .sort((a, b) => b.recordDate.localeCompare(a.recordDate));
-  const previous = own[0];
+    .sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
+}
+
+export function dayGap(from: string, to: string): number {
+  const parse = (d: string) => {
+    const [y, m, day] = d.split('-').map(Number);
+    return new Date(y, (m ?? 1) - 1, day ?? 1).getTime();
+  };
+  return Math.round((parse(to) - parse(from)) / 86_400_000);
+}
+
+export function distanceSincePrevious(logs: OdometerLog[], log: OdometerLog): number | undefined {
+  const previous = previousReading(logs, log);
   if (!previous) return undefined;
   return log.extra.km - previous.extra.km;
 }

@@ -19,6 +19,7 @@ import { IconCalendarStats, IconGauge, IconList, IconPencil } from '@tabler/icon
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
+import { EmployeeLink } from '@/components/EmployeeLink';
 import { ImageZoomModal } from '@/components/ImageZoomModal';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
@@ -37,8 +38,10 @@ import { OdometerLogModal } from './OdometerLogModal';
 import {
   buildComplianceGrid,
   canWriteDate,
+  dayGap,
   distanceSincePrevious,
   liveLogs,
+  previousReading,
   visibleLogPhotos,
 } from './odometerLogModel';
 
@@ -126,6 +129,14 @@ export function OdometerLogListPage() {
 
   const driverData = useMemo(() => roster.map((e) => ({ value: e.id, label: e.name })), [roster]);
 
+  const showZoom = useCallback(
+    (url: string) => {
+      setZoomUrl(url);
+      openZoom();
+    },
+    [openZoom],
+  );
+
   const showPhoto = (log: OdometerLog) => {
     const photo = visibleLogPhotos(log.extra.photos)[0];
     if (!photo) return null;
@@ -201,13 +212,27 @@ export function OdometerLogListPage() {
               <Group gap="sm" wrap="nowrap">
                 {showPhoto(log)}
                 <Stack gap={2}>
-                  <Text size="sm" fw={600}>
-                    {log.extra.km.toLocaleString()} km
-                  </Text>
-                  <Text size="xs" c="dimmed">
-                    {formatDate(log.recordDate)}
-                    {canViewAll ? ` · ${log.extra.employeeName}` : ''}
-                  </Text>
+                  <Group gap={6} wrap="nowrap" align="baseline">
+                    <Text size="sm" fw={600}>
+                      {log.extra.km.toLocaleString()} km
+                    </Text>
+                    {/* The card carries the delta too: a driver reading their
+                        own history wants the distance, and the desktop table is
+                        the only place it existed. */}
+                    <DeltaText log={log} logs={scoped} />
+                  </Group>
+                  <Group gap={6} wrap="nowrap" align="center">
+                    <Text size="xs" c="dimmed">
+                      {formatDate(log.recordDate)}
+                    </Text>
+                    {canViewAll && (
+                      <DriverName
+                        id={log.extra.employeeId}
+                        name={log.extra.employeeName}
+                        size="xs"
+                      />
+                    )}
+                  </Group>
                 </Stack>
               </Group>
               {canEditLog(log) && (
@@ -237,7 +262,11 @@ export function OdometerLogListPage() {
               return (
                 <Table.Tr key={log.id}>
                   <Table.Td>{formatDate(log.recordDate)}</Table.Td>
-                  {canViewAll && <Table.Td>{log.extra.employeeName}</Table.Td>}
+                  {canViewAll && (
+                    <Table.Td>
+                      <DriverName id={log.extra.employeeId} name={log.extra.employeeName} />
+                    </Table.Td>
+                  )}
                   <Table.Td ta="right" ff="monospace">
                     {log.extra.km.toLocaleString()}
                   </Table.Td>
@@ -294,27 +323,12 @@ export function OdometerLogListPage() {
               {grid.map((row) => (
                 <Table.Tr key={row.employeeId}>
                   <Table.Td style={{ position: 'sticky', left: 0, background: 'inherit' }}>
-                    {row.employeeName}
+                    <DriverName id={row.employeeId} name={row.employeeName} size="xs" />
                   </Table.Td>
                   {row.cells.map((cell) => (
-                    <Table.Td key={cell.date} ta="center">
+                    <Table.Td key={cell.date} ta="center" px={6}>
                       {cell.log ? (
-                        <Tooltip label={`${cell.log.extra.km.toLocaleString()} km`} withArrow>
-                          <Text
-                            size="xs"
-                            c="teal"
-                            fw={600}
-                            style={{ cursor: 'pointer' }}
-                            onClick={() => {
-                              const photo = visibleLogPhotos(cell.log?.extra.photos)[0];
-                              if (!photo) return;
-                              setZoomUrl(photo.url);
-                              openZoom();
-                            }}
-                          >
-                            ✓
-                          </Text>
-                        </Tooltip>
+                        <ReadingCell log={cell.log} logs={scoped} onOpenPhoto={showZoom} />
                       ) : (
                         <Text size="xs" c="dimmed">
                           ·
@@ -416,4 +430,88 @@ function toDate(value: string | Date | null): Date | null {
 function toDateString(date: Date): string {
   const p = (n: number) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${p(date.getMonth() + 1)}-${p(date.getDate())}`;
+}
+
+function ReadingCell({
+  log,
+  logs,
+  onOpenPhoto,
+}: {
+  readonly log: OdometerLog;
+  readonly logs: OdometerLog[];
+  readonly onOpenPhoto: (url: string) => void;
+}) {
+  const { t } = useTranslation();
+  const previous = previousReading(logs, log);
+  const delta = previous ? log.extra.km - previous.extra.km : undefined;
+  const span = previous ? dayGap(previous.recordDate, log.recordDate) : 0;
+  const photo = visibleLogPhotos(log.extra.photos)[0];
+
+  const tooltip = previous
+    ? t('odometerLog.compliance.cellTooltip', {
+        km: log.extra.km.toLocaleString(),
+        delta: (delta ?? 0).toLocaleString(),
+        date: formatDate(previous.recordDate),
+      })
+    : t('odometerLog.compliance.cellTooltipFirst', { km: log.extra.km.toLocaleString() });
+
+  return (
+    <Tooltip label={tooltip} withArrow>
+      <Stack
+        gap={0}
+        align="center"
+        style={{ cursor: photo ? 'pointer' : 'default' }}
+        onClick={() => photo && onOpenPhoto(photo.url)}
+      >
+        <Text size="xs" fw={600} ff="monospace" style={{ whiteSpace: 'nowrap' }}>
+          {log.extra.km.toLocaleString()}
+        </Text>
+        {delta != null && (
+          <Text
+            size="10px"
+            ff="monospace"
+            c={delta < 0 ? 'red' : 'dimmed'}
+            style={{ whiteSpace: 'nowrap' }}
+          >
+            {span > 1 ? '~' : ''}
+            {delta > 0 ? '+' : ''}
+            {delta.toLocaleString()}
+          </Text>
+        )}
+      </Stack>
+    </Tooltip>
+  );
+}
+
+function DeltaText({ log, logs }: { readonly log: OdometerLog; readonly logs: OdometerLog[] }) {
+  const previous = previousReading(logs, log);
+  if (!previous) return null;
+  const delta = log.extra.km - previous.extra.km;
+  const span = dayGap(previous.recordDate, log.recordDate);
+  return (
+    <Text size="xs" ff="monospace" c={delta < 0 ? 'red' : 'dimmed'}>
+      {span > 1 ? '~' : ''}
+      {delta > 0 ? '+' : ''}
+      {delta.toLocaleString()} km
+    </Text>
+  );
+}
+
+function DriverName({
+  id,
+  name,
+  size = 'sm',
+}: {
+  readonly id: string;
+  readonly name: string;
+  readonly size?: 'xs' | 'sm';
+}) {
+  if (!perms.employee.canView()) {
+    return (
+      <Text size={size} style={{ whiteSpace: 'nowrap' }}>
+        {name}
+      </Text>
+    );
+  }
+  return <EmployeeLink id={id} fallbackLabel={name} size={size} />;
 }

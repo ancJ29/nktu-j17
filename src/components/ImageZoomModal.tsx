@@ -17,6 +17,8 @@ import { device } from '@credo/base-ui/utils';
 
 const isMobileDevice = device.isMobile;
 
+const CONTROL_BAR_HEIGHT = 56;
+
 type ImageZoomModalProps = {
   opened: boolean;
   onClose: () => void;
@@ -122,32 +124,121 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
       styles={{
         body: {
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+
+          flexDirection: 'column',
           backgroundColor: 'rgba(0, 0, 0, 0.95)',
-          padding: '2px',
+          padding: 0,
           overflow: 'hidden',
-          position: 'relative',
         },
         content: {
           backgroundColor: 'transparent',
 
           width: 'fit-content',
+          minWidth: 'min(360px, 95vw)',
           maxHeight: '95vh',
           maxWidth: '95vw',
         },
       }}
     >
+      <div
+        style={{
+          position: 'relative',
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          padding: '2px',
+        }}
+      >
+        {/* Mobile pan controls (when zoomed) */}
+        {isMobileDevice && scale > 1 && (
+          <Stack gap={6} style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000 }}>
+            <Group gap={6} justify="center">
+              <ActionIcon size="lg" variant="filled" color="dark" onClick={handlePanUp} radius="md">
+                <IconArrowUp size={20} />
+              </ActionIcon>
+            </Group>
+            <Group gap={6}>
+              <ActionIcon
+                size="lg"
+                variant="filled"
+                color="dark"
+                onClick={handlePanLeft}
+                radius="md"
+              >
+                <IconArrowLeft size={20} />
+              </ActionIcon>
+              <ActionIcon
+                size="lg"
+                variant="filled"
+                color="dark"
+                onClick={handlePanDown}
+                radius="md"
+              >
+                <IconArrowDown size={20} />
+              </ActionIcon>
+              <ActionIcon
+                size="lg"
+                variant="filled"
+                color="dark"
+                onClick={handlePanRight}
+                radius="md"
+              >
+                <IconArrowRight size={20} />
+              </ActionIcon>
+            </Group>
+          </Stack>
+        )}
+
+        <div
+          ref={imageRef}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          style={{
+            transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px) rotate(${rotation}deg)`,
+            transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+            cursor: isMobileDevice
+              ? 'pointer'
+              : scale > 1
+                ? isDragging
+                  ? 'grabbing'
+                  : 'grab'
+                : 'pointer',
+            touchAction: scale > 1 ? 'none' : 'auto',
+          }}
+        >
+          <Image
+            src={imageUrl}
+            alt="Preview"
+            fit="contain"
+            onClick={scale === 1 ? onClose : undefined}
+            style={{
+              maxHeight: `calc(90vh - ${CONTROL_BAR_HEIGHT}px)`,
+              maxWidth: '90vw',
+              width: 'auto',
+              height: 'auto',
+              userSelect: 'none',
+              pointerEvents: scale > 1 ? 'none' : 'auto',
+            }}
+          />
+        </div>
+      </div>
+
       {/* Zoom slider + rotate controls */}
       <Group
         gap="xs"
         wrap="nowrap"
         style={{
-          position: 'absolute',
-          bottom: 20,
-          right: 20,
-          left: 20,
-          zIndex: 1000,
+          flex: 'none',
+          padding: '8px 12px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.12)',
         }}
       >
         <ActionIcon
@@ -202,72 +293,6 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
           <IconRestore size={20} />
         </ActionIcon>
       </Group>
-
-      {/* Mobile pan controls (when zoomed) */}
-      {isMobileDevice && scale > 1 && (
-        <Stack gap={6} style={{ position: 'absolute', top: 20, right: 20, zIndex: 1000 }}>
-          <Group gap={6} justify="center">
-            <ActionIcon size="lg" variant="filled" color="dark" onClick={handlePanUp} radius="md">
-              <IconArrowUp size={20} />
-            </ActionIcon>
-          </Group>
-          <Group gap={6}>
-            <ActionIcon size="lg" variant="filled" color="dark" onClick={handlePanLeft} radius="md">
-              <IconArrowLeft size={20} />
-            </ActionIcon>
-            <ActionIcon size="lg" variant="filled" color="dark" onClick={handlePanDown} radius="md">
-              <IconArrowDown size={20} />
-            </ActionIcon>
-            <ActionIcon
-              size="lg"
-              variant="filled"
-              color="dark"
-              onClick={handlePanRight}
-              radius="md"
-            >
-              <IconArrowRight size={20} />
-            </ActionIcon>
-          </Group>
-        </Stack>
-      )}
-
-      <div
-        ref={imageRef}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        style={{
-          transform: `scale(${scale}) translate(${position.x / scale}px, ${position.y / scale}px) rotate(${rotation}deg)`,
-          transition: isDragging ? 'none' : 'transform 0.1s ease-out',
-          cursor: isMobileDevice
-            ? 'pointer'
-            : scale > 1
-              ? isDragging
-                ? 'grabbing'
-                : 'grab'
-              : 'pointer',
-          touchAction: scale > 1 ? 'none' : 'auto',
-        }}
-      >
-        <Image
-          src={imageUrl}
-          alt="Preview"
-          fit="contain"
-          onClick={scale === 1 ? onClose : undefined}
-          style={{
-            maxHeight: '90vh',
-            maxWidth: '90vw',
-            width: 'auto',
-            height: 'auto',
-            userSelect: 'none',
-            pointerEvents: scale > 1 ? 'none' : 'auto',
-          }}
-        />
-      </div>
     </Modal>
   );
 }
