@@ -138,7 +138,7 @@
   },
   "kind": {
     "return": "Trả hàng",
-    "sample": "Lấy mẫu"
+    "sample": "Nhận hàng"
   },
   "noItems": "Không có yêu cầu giao hàng nào",
   "notifications": {
