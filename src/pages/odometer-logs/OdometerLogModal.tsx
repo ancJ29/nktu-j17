@@ -206,12 +206,13 @@ function OdometerLogForm({
         {/* Explicit value/onChange rather than `getInputProps`: NumberField's
               props are a union (required vs optional number) that a spread of
               `any`-typed form props can't satisfy. */}
+        {/* No `thousandSeparator` here: NumberField groups by default, in the
+            marks this device prints with. */}
         <NumberField
           label={t('odometerLog.form.km')}
           description={t('odometerLog.form.kmHint')}
           withAsterisk
           min={0}
-          thousandSeparator
           value={form.values.km}
           error={form.errors.km}
           onChange={(value) => form.setFieldValue('km', value)}

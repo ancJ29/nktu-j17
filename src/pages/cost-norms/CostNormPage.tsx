@@ -32,6 +32,7 @@ import { logger } from '@credo/base-ui/utils';
 import { DatePickerField } from '@/components/DatePickerField';
 import { DesktopOnlyGuard } from '@/components/DesktopOnlyGuard';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { getCurrentEmployeeStamp } from '@/hooks';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -523,11 +524,10 @@ export function CostNormPage() {
         >
           <Form form={priceForm} onSubmit={submitPrice}>
             <Stack gap="sm">
-              <NumberInput
+              <GroupedNumberInput
                 withAsterisk
                 label={t('costNorms.price.newPrice')}
                 description={t('costNorms.price.perLiter')}
-                thousandSeparator=","
                 min={0}
                 data-autofocus
                 {...priceForm.getInputProps('price')}

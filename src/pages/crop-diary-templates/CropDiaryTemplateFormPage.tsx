@@ -33,6 +33,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { ROUTES } from '@/constants/routes';
 import { device } from '@credo/base-ui/utils';
 import { useInitFormFromFetch } from '@/hooks';
@@ -500,13 +501,12 @@ export function CropDiaryTemplateFormPage() {
                 placeholder="PI 52"
                 {...form.getInputProps('target')}
               />
-              <NumberInput
+              <GroupedNumberInput
                 label={t('cropDiaryTemplates.plan.seedCount')}
                 description={t('cropDiaryTemplates.plan.seedCountHint')}
                 min={0}
                 allowNegative={false}
                 allowDecimal={false}
-                thousandSeparator=","
                 {...form.getInputProps('seedCount')}
               />
             </SimpleGrid>
@@ -523,13 +523,12 @@ export function CropDiaryTemplateFormPage() {
                 onChange={handleTotalDaysChange}
                 error={form.errors.totalDays}
               />
-              <NumberInput
+              <GroupedNumberInput
                 label={t('cropDiaryTemplates.plan.referencePlantCount')}
                 description={t('cropDiaryTemplates.plan.referencePlantCountHint')}
                 min={0}
                 allowNegative={false}
                 allowDecimal={false}
-                thousandSeparator=","
                 {...form.getInputProps('referencePlantCount')}
               />
               <NumberInput

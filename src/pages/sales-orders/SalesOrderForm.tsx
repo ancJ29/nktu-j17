@@ -145,6 +145,7 @@ import { convertUnit } from '@/utils/unitConversion';
 import { PRODUCT_SET_COLOR } from '@/config/misc';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const locationsEnabled = isLocationsEnabled();
 const deliveryRequestsEnabled = isDeliveryRequestsEnabled();
@@ -2270,20 +2271,18 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                       />
                     )}
                     {variant.showShippingFee && (
-                      <NumberInput
+                      <GroupedNumberInput
                         label={t('salesOrders.billing.shippingFeeLabel')}
                         placeholder={t('salesOrders.billing.shippingFeePlaceholder')}
                         min={0}
-                        thousandSeparator=","
                         {...form.getInputProps('shippingFee')}
                       />
                     )}
-                    <NumberInput
+                    <GroupedNumberInput
                       label={t('salesOrders.billing.paidAmountLabel')}
                       description={t('salesOrders.billing.paidAmountDescription')}
                       placeholder={t('salesOrders.billing.paidAmountPlaceholder')}
                       min={0}
-                      thousandSeparator=","
                       {...form.getInputProps('paidAmount')}
                     />
                   </SimpleGrid>
@@ -2890,11 +2889,10 @@ function DesktopItemTable({
                       </Text>
                     ) : (
                       <Stack gap={2}>
-                        <NumberInput
+                        <GroupedNumberInput
                           size="xs"
                           min={0}
                           disabled={locked}
-                          thousandSeparator=","
                           placeholder={t('common.form.unitPricePlaceholder')}
                           {...form.getInputProps(`items.${idx}.unitPrice`)}
                           styles={

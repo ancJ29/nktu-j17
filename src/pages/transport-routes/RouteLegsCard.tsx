@@ -1,8 +1,8 @@
 import { Button, Group, Table, Text } from '@mantine/core';
 import { IconPlus, IconRoute } from '@tabler/icons-react';
-import { NumberInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { blankLeg, type RouteFormValues } from './routeFormValues';
@@ -78,19 +78,14 @@ export function RouteLegsCard({ form, suggestions }: Props) {
                 />
               </Table.Td>
               <Table.Td>
-                <NumberInput
+                <GroupedNumberInput
                   min={0}
                   decimalScale={1}
-                  thousandSeparator=","
                   {...form.getInputProps(`trips.${i}.distanceKm`)}
                 />
               </Table.Td>
               <Table.Td>
-                <NumberInput
-                  thousandSeparator=","
-                  min={0}
-                  {...form.getInputProps(`trips.${i}.laborCost`)}
-                />
+                <GroupedNumberInput min={0} {...form.getInputProps(`trips.${i}.laborCost`)} />
               </Table.Td>
               <Table.Td>
                 <RouteRowRemove

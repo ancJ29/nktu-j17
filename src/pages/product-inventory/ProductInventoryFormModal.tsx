@@ -1,4 +1,4 @@
-import { Button, Group, NumberInput, Select, Stack, Text, Textarea } from '@mantine/core';
+import { Button, Group, Select, Stack, Text, Textarea } from '@mantine/core';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -17,6 +17,7 @@ import { isLocationsEnabled } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
 import { markInventoryVerified } from '@/utils/inventoryDrift';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const locationsEnabled = isLocationsEnabled();
 
@@ -247,11 +248,10 @@ export function ProductInventoryFormModal({
 
           {/* On-hand + unit selector */}
           <Group gap="sm" grow wrap="nowrap">
-            <NumberInput
+            <GroupedNumberInput
               label={t('productInventory.form.onHandLabel')}
               min={0}
               allowNegative
-              thousandSeparator=","
               withAsterisk
               style={{ flex: 2 }}
               {...form.getInputProps('onHand')}

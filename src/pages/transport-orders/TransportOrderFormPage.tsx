@@ -96,6 +96,7 @@ import type { TransportRouteRow } from '@/types';
 import { findScheduleConflicts, scheduleWindow, WHOLE_ORDER } from './scheduleConflicts';
 import type { ScheduleSlot } from './scheduleConflicts';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { readTruckingSize } from './truckingSize';
 import {
   blankFee,
@@ -1322,8 +1323,7 @@ export function TransportOrderFormPage() {
                         )}
                       </Table.Td>
                       <Table.Td>
-                        <NumberInput
-                          thousandSeparator=","
+                        <GroupedNumberInput
                           min={0}
                           {...form.getInputProps(`trips.${i}.laborCost`)}
                         />
@@ -1408,9 +1408,8 @@ export function TransportOrderFormPage() {
                   the customer's totals (see `TransportOrderTotals`). */}
               <Divider my="sm" />
               <Group justify="flex-end">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('transportOrders.trips.laborCost')}
-                  thousandSeparator=","
                   min={0}
                   w={200}
                   {...form.getInputProps('laborCost')}

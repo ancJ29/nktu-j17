@@ -14,6 +14,7 @@ import { Notifications } from '@mantine/notifications';
 import { theme } from './theme';
 import { setCredoGroup } from '@credo/connectors/connector';
 import { installChunkErrorReload } from '@credo/base-ui/utils';
+import { installErrorReporter } from './utils/errorReporter';
 import { appApiGroup, appCredoStorageHash } from './config/env';
 import { forceClearCache } from './utils/forceClearCache';
 import { isLocalhost } from '@/config/env';
@@ -21,6 +22,10 @@ import { isLocalhost } from '@/config/env';
 // Recover from stale-chunk 404s after a deploy (see @credo/base-ui chunk-error).
 // Registered before the first lazy import so it can catch App's own chunk.
 installChunkErrorReload();
+
+// Surface anything the route boundary can't see (handlers, rejected promises).
+// Installed here so an error thrown during the first render is caught too.
+installErrorReporter();
 
 const App = lazy(() => import('./App'));
 

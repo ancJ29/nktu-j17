@@ -6,7 +6,6 @@ import {
   Checkbox,
   Divider,
   Group,
-  NumberInput,
   Select,
   SimpleGrid,
   Stack,
@@ -33,6 +32,7 @@ import { ROUTES } from '@/constants/routes';
 import { DateField } from '@/components/DateField';
 import { DateTimeTextField } from '@/components/DateTimeTextField';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { CustomerSelector, EmployeeSelector } from '@/components/selectors';
 import { useInitFormFromFetch } from '@/hooks';
@@ -707,9 +707,8 @@ export function TransportOrderMultiDropFormPage() {
             <Group justify="flex-end" align="flex-end">
               {/* LƯƠNG CHUYẾN — a cost we pay the driver, kept beside the run it
                   pays for and outside the customer's totals. */}
-              <NumberInput
+              <GroupedNumberInput
                 label={t('transportOrders.trips.laborCost')}
-                thousandSeparator=","
                 min={0}
                 w={200}
                 {...form.getInputProps('laborCost')}

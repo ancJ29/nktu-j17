@@ -3,7 +3,6 @@ import {
   Card,
   Divider,
   Group,
-  NumberInput,
   SimpleGrid,
   Stack,
   Switch,
@@ -33,6 +32,7 @@ import { perms } from '@/utils/permission';
 import type { OilTankExtra, OilTankRow } from '@/types';
 import { buildNextOilTankCode } from './oilTankCode';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const isMobile = device.isMobile;
 
@@ -273,12 +273,11 @@ export function OilTankFormPage() {
                   styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
                   value={isEdit ? form.values.code : nextCode}
                 />
-                <NumberInput
+                <GroupedNumberInput
                   label={t('oilTanks.form.capacityLabel')}
                   placeholder={t('oilTanks.form.capacityPlaceholder')}
                   description={t('oilTanks.form.capacityHint')}
                   min={0}
-                  thousandSeparator=","
                   suffix=" L"
                   {...form.getInputProps('capacity')}
                 />
@@ -318,11 +317,10 @@ export function OilTankFormPage() {
                 {t('oilTanks.form.openingHint')}
               </Text>
               <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('oilTanks.form.openingLevelLabel')}
                   placeholder={t('oilTanks.form.openingLevelPlaceholder')}
                   min={0}
-                  thousandSeparator=","
                   suffix=" L"
                   {...form.getInputProps('openingLevel')}
                 />

@@ -17,6 +17,7 @@ import {
 import type { UseFormReturnType } from '@mantine/form';
 import { IconGasStation, IconPlus, IconRoad, IconTool, IconTrash } from '@tabler/icons-react';
 import { DatePickerField } from '@/components/DatePickerField';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { TransportOrderLink } from '@/components/TransportOrderLink';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { formatLitres, formatNumber, LITRE_INPUT_PROPS } from '@/utils/number';
@@ -334,28 +335,25 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
               syncTotal(v, form.values.unitPrice);
             }}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.refuel.columns.unitPrice')}
             min={0}
-            thousandSeparator=","
             {...form.getInputProps('unitPrice')}
             onChange={(v) => {
               form.setFieldValue('unitPrice', v);
               syncTotal(form.values.litres, v);
             }}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.refuel.columns.total')}
             min={0}
-            thousandSeparator=","
             {...form.getInputProps('totalAmount')}
           />
         </SimpleGrid>
         <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.refuel.columns.odometerOld')}
             min={0}
-            thousandSeparator=","
             suffix=" km"
             {...form.getInputProps('odometerBefore')}
             onChange={(v) => {
@@ -363,10 +361,9 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
               syncDistance(v, form.values.odometer);
             }}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.refuel.columns.odometerNew')}
             min={0}
-            thousandSeparator=","
             suffix=" km"
             {...form.getInputProps('odometer')}
             onChange={(v) => {
@@ -374,11 +371,10 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
               syncDistance(form.values.odometerBefore, v);
             }}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.refuel.columns.distance')}
             variant="filled"
             readOnly
-            thousandSeparator=","
             suffix=" km"
             {...form.getInputProps('distanceKm')}
           />
@@ -746,11 +742,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
                       />
                     </Table.Td>
                     <Table.Td>
-                      <NumberInput
-                        min={0}
-                        thousandSeparator=","
-                        {...form.getInputProps(`items.${i}.unitPrice`)}
-                      />
+                      <GroupedNumberInput min={0} {...form.getInputProps(`items.${i}.unitPrice`)} />
                     </Table.Td>
                     <Table.Td>
                       {/* Blank is 1, not 0 — a line that exists was serviced. */}
@@ -790,27 +782,24 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
             placeholder={t('operationLogs.maintenance.form.conditionPlaceholder')}
             {...form.getInputProps('condition')}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.maintenance.columns.odometer')}
             min={0}
-            thousandSeparator=","
             suffix=" km"
             {...form.getInputProps('odometer')}
           />
         </SimpleGrid>
         <SimpleGrid cols={{ base: 1, sm: 2, md: 6 }} spacing="md">
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.maintenance.columns.totalAmount')}
             description={t('operationLogs.maintenance.form.totalAmountHint')}
-            thousandSeparator=","
             variant="filled"
             readOnly
             value={totalAmount}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.maintenance.columns.laborCost')}
             min={0}
-            thousandSeparator=","
             {...form.getInputProps('laborCost')}
           />
           {/* VAT — the rate is authored, and the đồng it adds shows underneath
@@ -849,24 +838,21 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
               }
             />
           </Stack>
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.maintenance.columns.total')}
             description={t('operationLogs.maintenance.form.grandTotalHint')}
-            thousandSeparator=","
             variant="filled"
             readOnly
             value={grandTotal}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.maintenance.columns.accountsReceived')}
             min={0}
-            thousandSeparator=","
             {...form.getInputProps('accountsReceived')}
           />
-          <NumberInput
+          <GroupedNumberInput
             label={t('operationLogs.maintenance.columns.outstanding')}
             description={t('operationLogs.maintenance.form.outstandingHint')}
-            thousandSeparator=","
             variant="filled"
             readOnly
             value={outstanding}
@@ -1111,10 +1097,9 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
         />
       </SimpleGrid>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-        <NumberInput
+        <GroupedNumberInput
           label={t('operationLogs.trip.columns.odometer')}
           min={0}
-          thousandSeparator=","
           suffix=" km"
           {...form.getInputProps('odometer')}
         />

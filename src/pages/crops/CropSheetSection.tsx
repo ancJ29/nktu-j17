@@ -11,6 +11,7 @@ import {
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { SheetColumnHeadCells, SheetGroupHeadCells } from '@/components/SheetGridColumnHeads';
 import {
@@ -392,14 +393,13 @@ export function CropSheetSection({
       }
     >
       <Group gap="sm" mb="sm" align="flex-end" wrap="wrap">
-        <NumberInput
+        <GroupedNumberInput
           size="xs"
           w={150}
           label={t('crops.sheet.plantCount')}
           min={0}
           allowDecimal={false}
           allowNegative={false}
-          thousandSeparator=","
           disabled={!canEdit}
           value={typeof draft.plantCount === 'number' ? draft.plantCount : ''}
           onChange={(v) => patchSizing({ plantCount: Number(v) || undefined })}

@@ -1,4 +1,4 @@
-import { Button, Group, NumberInput, Select, Stack, Text } from '@mantine/core';
+import { Button, Group, Select, Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useMemo, useState } from 'react';
@@ -13,6 +13,7 @@ import { getMaterialUnitCategory } from '@/utils/materialConfig';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import type { Material } from '@/types';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 type Props = {
   readonly opened: boolean;
@@ -121,11 +122,10 @@ export function MaterialInventoryFormModal({ opened, onClose, available, fixedMa
             />
           )}
           <Group gap="sm" grow wrap="nowrap" align="flex-end">
-            <NumberInput
+            <GroupedNumberInput
               label={t('materialInventory.form.onHandLabel')}
               withAsterisk
               min={0}
-              thousandSeparator=","
               style={{ flex: 2 }}
               {...form.getInputProps('onHand')}
             />

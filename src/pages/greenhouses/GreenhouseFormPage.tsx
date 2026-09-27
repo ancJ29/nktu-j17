@@ -28,6 +28,7 @@ import { useInitFormFromFetch } from '@/hooks';
 import { perms } from '@/utils/permission';
 import type { Greenhouse, GreenhouseExtra } from '@/types';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const isMobile = device.isMobile;
 
@@ -265,13 +266,12 @@ export function GreenhouseFormPage() {
                   allowDecimal={false}
                   {...form.getInputProps('bedCount')}
                 />
-                <NumberInput
+                <GroupedNumberInput
                   label={t('greenhouses.form.plantCapacityLabel')}
                   placeholder={t('greenhouses.form.plantCapacityPlaceholder')}
                   min={0}
                   allowNegative={false}
                   allowDecimal={false}
-                  thousandSeparator=","
                   {...form.getInputProps('plantCapacity')}
                 />
               </SimpleGrid>

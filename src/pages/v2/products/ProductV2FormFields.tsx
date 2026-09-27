@@ -1,16 +1,7 @@
-import {
-  ActionIcon,
-  Button,
-  Grid,
-  Group,
-  NumberInput,
-  Stack,
-  Switch,
-  Text,
-  TextInput,
-} from '@mantine/core';
+import { ActionIcon, Button, Grid, Group, Stack, Switch, Text, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconCurrencyDong, IconPlus, IconTrash } from '@tabler/icons-react';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { LookupSelect } from '@/components/LookupSelect';
 import { useTranslation } from 'react-i18next';
 import type { ProductV2Attribute } from '@/types';
@@ -63,11 +54,10 @@ export function ProductV2StockFields({ form }: Omit<FieldsProps, 'isEditing'>) {
   const { t } = useTranslation();
   return (
     <Stack gap="md">
-      <NumberInput
+      <GroupedNumberInput
         label={t('productsV2.form.minStock')}
         description={t('productsV2.form.minStockHelp')}
         min={0}
-        thousandSeparator=","
         disabled={form.values.ignoreStockAlert}
         {...form.getInputProps('minStock')}
       />
@@ -143,11 +133,10 @@ export function ProductV2AttributeFields({ form }: Omit<FieldsProps, 'isEditing'
 export function ProductV2PriceFields({ form }: Omit<FieldsProps, 'isEditing'>) {
   const { t } = useTranslation();
   return (
-    <NumberInput
+    <GroupedNumberInput
       label={t('productsV2.form.price')}
       placeholder={t('productsV2.form.pricePlaceholder')}
       min={0}
-      thousandSeparator=","
       leftSection={<IconCurrencyDong size={14} />}
       {...form.getInputProps('price')}
     />

@@ -4,7 +4,6 @@ import {
   Card,
   Divider,
   Group,
-  NumberInput,
   Select,
   Stack,
   Table,
@@ -40,6 +39,7 @@ import {
   type WarehouseDocKind,
 } from './kinds';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const isMobile = device.isMobile;
 
@@ -551,12 +551,11 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
                           </Text>
                         </Table.Td>
                         <Table.Td>
-                          <NumberInput
+                          <GroupedNumberInput
                             ref={(el) => {
                               quantityInputRefs.current[idx] = el;
                             }}
                             min={0}
-                            thousandSeparator=","
                             placeholder="0"
                             {...form.getInputProps(`lines.${idx}.quantity`)}
                           />

@@ -33,6 +33,7 @@ import { ConfirmModal } from '@/components/ConfirmModal';
 import { DangerAction } from '@/components/DangerAction';
 import { DangerZoneCard } from '@/components/DangerZoneCard';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { useInitFormFromFetch } from '@/hooks';
 import { EntityConflictError } from '@/stores/createEntityStore';
@@ -475,9 +476,8 @@ export function TransportRouteFormPage() {
             title={t('transportRoutes.form.pricingSection')}
           >
             <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }} spacing="sm">
-              <NumberInput
+              <GroupedNumberInput
                 label={t('transportRoutes.form.freightAmount')}
-                thousandSeparator=","
                 min={0}
                 {...form.getInputProps('freightAmount')}
               />
@@ -488,15 +488,13 @@ export function TransportRouteFormPage() {
                   giá vốn read. */}
               {!form.values.isMultiTrip && (
                 <>
-                  <NumberInput
+                  <GroupedNumberInput
                     label={t('transportRoutes.form.basePay')}
-                    thousandSeparator=","
                     min={0}
                     {...form.getInputProps('basePay')}
                   />
-                  <NumberInput
+                  <GroupedNumberInput
                     label={t('transportRoutes.form.allowance')}
-                    thousandSeparator=","
                     min={0}
                     {...form.getInputProps('allowance')}
                   />

@@ -1,14 +1,40 @@
-import { Button, Card, Center, Code, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconAlertTriangle, IconRefresh } from '@tabler/icons-react';
-import { useRouteError } from 'react-router';
+import {
+  Button,
+  Card,
+  Center,
+  Code,
+  CopyButton,
+  Group,
+  Stack,
+  Text,
+  ThemeIcon,
+} from '@mantine/core';
+import { IconAlertTriangle, IconCheck, IconCopy, IconRefresh } from '@tabler/icons-react';
+import { useLocation, useRouteError } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { isChunkLoadError } from '@credo/base-ui/utils';
-import { isInternal } from '@/config/env';
+import { buildHash, version } from '@/config/build-version';
 
 export function RouteErrorState() {
   const { t } = useTranslation();
   const error = useRouteError();
+  const location = useLocation();
   const isStaleChunk = isChunkLoadError(error);
+
+  const stack =
+    error instanceof Error && error.stack
+      ? error.stack.split('\n').slice(1, 5).join('\n').slice(0, 600)
+      : '';
+
+  const details = [
+    `path: ${location.pathname}`,
+    `error: ${error instanceof Error ? `${error.name}: ${error.message}` : String(error ?? 'unknown')}`,
+    stack,
+    `build: ${version} (${buildHash})`,
+    `at: ${new Date().toLocaleString()}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
 
   return (
     <Center h="100vh" px="md">
@@ -28,12 +54,33 @@ export function RouteErrorState() {
           <Button leftSection={<IconRefresh size={16} />} onClick={() => window.location.reload()}>
             {t('error.reload')}
           </Button>
-          {/* The raw message is a debugging aid, not operator-facing copy. */}
-          {isInternal && error instanceof Error && (
-            <Code block fz="xs">
-              {error.message}
+          <Stack gap={6} w="100%">
+            <Text size="xs" c="dimmed" ta="center">
+              {t('error.sendScreenshot')}
+            </Text>
+            <Code
+              block
+              fz={10}
+              style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', userSelect: 'text' }}
+            >
+              {details}
             </Code>
-          )}
+            <Group justify="center">
+              <CopyButton value={details}>
+                {({ copied, copy }) => (
+                  <Button
+                    size="compact-xs"
+                    variant="light"
+                    color={copied ? 'teal' : 'gray'}
+                    leftSection={copied ? <IconCheck size={12} /> : <IconCopy size={12} />}
+                    onClick={copy}
+                  >
+                    {copied ? t('error.copied') : t('error.copyDetails')}
+                  </Button>
+                )}
+              </CopyButton>
+            </Group>
+          </Stack>
         </Stack>
       </Card>
     </Center>

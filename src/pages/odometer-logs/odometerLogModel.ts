@@ -42,13 +42,24 @@ export function liveLogs(logs: OdometerLog[]): OdometerLog[] {
   return logs.filter((log) => !log.extra?.isDeleted);
 }
 
+export function readKm(log: OdometerLog | undefined): number | undefined {
+  const raw: unknown = log?.extra?.km;
+  const value = typeof raw === 'string' ? Number(raw) : raw;
+  return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+}
+
+export function readEmployeeId(log: OdometerLog | undefined): string {
+  const raw: unknown = log?.extra?.employeeId;
+  return typeof raw === 'string' ? raw : '';
+}
+
 export function findEntry(
   logs: OdometerLog[],
   employeeId: string,
   date: string,
 ): OdometerLog | undefined {
   return liveLogs(logs).find(
-    (log) => log.recordDate === date && log.extra?.employeeId === employeeId,
+    (log) => log.recordDate === date && readEmployeeId(log) === employeeId,
   );
 }
 
@@ -81,7 +92,7 @@ export function buildComplianceGrid({
 
   const byEmployee = new Map<string, Map<string, OdometerLog>>();
   for (const log of live) {
-    const id = String(log.extra?.employeeId ?? '');
+    const id = readEmployeeId(log);
     if (!id) continue;
     const days = byEmployee.get(id) ?? new Map<string, OdometerLog>();
     days.set(log.recordDate, log);
@@ -101,8 +112,12 @@ export function buildComplianceGrid({
 }
 
 export function previousReading(logs: OdometerLog[], log: OdometerLog): OdometerLog | undefined {
+  const owner = readEmployeeId(log);
   return liveLogs(logs)
-    .filter((l) => l.extra?.employeeId === log.extra?.employeeId && l.recordDate < log.recordDate)
+    .filter(
+      (l) =>
+        readEmployeeId(l) === owner && l.recordDate < log.recordDate && readKm(l) !== undefined,
+    )
     .sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
 }
 
@@ -115,7 +130,8 @@ export function dayGap(from: string, to: string): number {
 }
 
 export function distanceSincePrevious(logs: OdometerLog[], log: OdometerLog): number | undefined {
-  const previous = previousReading(logs, log);
-  if (!previous) return undefined;
-  return log.extra.km - previous.extra.km;
+  const km = readKm(log);
+  const previousKm = readKm(previousReading(logs, log));
+  if (km === undefined || previousKm === undefined) return undefined;
+  return km - previousKm;
 }

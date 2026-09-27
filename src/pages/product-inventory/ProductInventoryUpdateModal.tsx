@@ -5,7 +5,6 @@ import {
   Card,
   Divider,
   Group,
-  NumberInput,
   SegmentedControl,
   Select,
   Stack,
@@ -44,6 +43,7 @@ import {
 } from '@/utils/inventoryMath';
 import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 export type UpdateMode = 'delta' | 'snapshot' | 'repack';
 
@@ -548,7 +548,7 @@ export function ProductInventoryUpdateModal({
           {(mode === 'delta' || mode === 'snapshot') && (
             <>
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t(
                     mode === 'delta'
                       ? 'productInventory.form.deltaLabel'
@@ -560,7 +560,6 @@ export function ProductInventoryUpdateModal({
                   withAsterisk
                   allowNegative={mode === 'delta'}
                   min={mode === 'snapshot' ? 0 : undefined}
-                  thousandSeparator=","
                   leftSection={
                     mode === 'delta' ? (
                       inputValue > 0 ? (
@@ -614,11 +613,10 @@ export function ProductInventoryUpdateModal({
           {mode === 'repack' && (
             <Stack gap="sm">
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('productInventory.repack.fromQtyLabel')}
                   withAsterisk
                   min={0}
-                  thousandSeparator=","
                   style={{ flex: 2 }}
                   {...form.getInputProps('fromQty')}
                 />
@@ -636,11 +634,10 @@ export function ProductInventoryUpdateModal({
               </Group>
 
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('productInventory.repack.toQtyLabel')}
                   withAsterisk
                   min={0}
-                  thousandSeparator=","
                   style={{ flex: 2 }}
                   {...form.getInputProps('toQty')}
                 />
@@ -656,10 +653,9 @@ export function ProductInventoryUpdateModal({
               <Divider my={1} label={t('productInventory.repack.writeOffOptional')} />
 
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('productInventory.repack.writeOffQtyLabel', { unit: baseUnit })}
                   min={0}
-                  thousandSeparator=","
                   style={{ flex: 1 }}
                   {...form.getInputProps('writeOffBaseQty')}
                 />

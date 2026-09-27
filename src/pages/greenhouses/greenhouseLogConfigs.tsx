@@ -1,6 +1,7 @@
-import { NumberInput, SimpleGrid, Text, TextInput, Textarea } from '@mantine/core';
+import { SimpleGrid, Text, TextInput, Textarea } from '@mantine/core';
 import { IconTool } from '@tabler/icons-react';
 import { DatePickerField } from '@/components/DatePickerField';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { formatDate } from '@/utils/dateFormat';
 import { formatNumber } from '@/utils/number';
 import type { GreenhouseMaintenanceLogExtra } from '@/types';
@@ -118,12 +119,11 @@ export const GREENHOUSE_MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
           placeholder={t('operationLogs.greenhouseMaintenance.form.performedByPlaceholder')}
           {...form.getInputProps('performedBy')}
         />
-        <NumberInput
+        <GroupedNumberInput
           label={t('operationLogs.greenhouseMaintenance.columns.cost')}
           placeholder={t('operationLogs.greenhouseMaintenance.form.costPlaceholder')}
           min={0}
           allowNegative={false}
-          thousandSeparator=","
           {...form.getInputProps('cost')}
         />
       </SimpleGrid>

@@ -71,6 +71,7 @@ import {
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const isMobile = device.isMobile;
 const pricingEnabled = isPricingManagementEnabled();
@@ -818,10 +819,9 @@ export function DesktopItemTable({ form, productSelectData, onProductSelect, t }
             </Table.Td>
             {pricingEnabled && (
               <Table.Td>
-                <NumberInput
+                <GroupedNumberInput
                   size="xs"
                   min={0}
-                  thousandSeparator=","
                   placeholder={t('common.form.unitPricePlaceholder')}
                   {...form.getInputProps(`items.${idx}.unitPrice`)}
                 />

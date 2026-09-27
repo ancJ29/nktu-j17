@@ -4,7 +4,6 @@ import {
   Button,
   Card,
   Group,
-  NumberInput,
   SegmentedControl,
   Stack,
   Text,
@@ -29,6 +28,7 @@ import { getBeginOfPeriodValue, getCurrentPeriodKey } from '@/utils/inventoryPer
 import { type BeginOfPeriodMode, computeBeginOfPeriodChange } from '@/utils/inventoryBeginOfPeriod';
 import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 type Props = {
   readonly opened: boolean;
@@ -273,7 +273,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
                 </Group>
               </Card>
 
-              <NumberInput
+              <GroupedNumberInput
                 label={t(
                   mode === 'snapshot'
                     ? 'productInventory.beginOfPeriod.snapshotLabel'
@@ -285,7 +285,6 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
                 withAsterisk
                 allowNegative={mode === 'delta'}
                 min={mode === 'snapshot' ? 0 : undefined}
-                thousandSeparator=","
                 {...form.getInputProps('value')}
               />
 

@@ -1,4 +1,6 @@
 {
+  "copied": "Đã sao chép",
+  "copyDetails": "Sao chép",
   "forbidden": {
     "goToHomeButton": "Về trang chủ",
     "inlineTitle": "Truy cập bị hạn chế",
@@ -17,6 +19,7 @@
     "title": "404"
   },
   "reload": "Tải lại",
+  "sendScreenshot": "Vui lòng chụp màn hình này và gửi cho quản trị viên.",
   "staleChunk": {
     "message": "Ứng dụng đã được cập nhật trong lúc trang này đang mở. Vui lòng tải lại để tiếp tục.",
     "title": "Đã có phiên bản mới"

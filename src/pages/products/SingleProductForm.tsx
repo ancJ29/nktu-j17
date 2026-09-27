@@ -45,6 +45,7 @@ import {
 } from '@/utils/permission';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 export type ProductFormValues = {
   name: string;
@@ -551,28 +552,25 @@ export function SingleProductForm({
         </SimpleGrid>
         {appConfig.features.products.priceManagement && canManagePrice && (
           <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-            <NumberInput
+            <GroupedNumberInput
               label={t('__new__.07-entities.products.labels.basePriceLabel')}
               placeholder={t('products.form.pricePlaceholder')}
               min={0}
-              thousandSeparator=","
               leftSection={<IconCurrencyDong size={14} />}
               {...form.getInputProps('basePrice')}
             />
-            <NumberInput
+            <GroupedNumberInput
               label={t('products.form.priceLabel')}
               placeholder={t('products.form.pricePlaceholder')}
               min={0}
-              thousandSeparator=","
               leftSection={<IconCurrencyDong size={14} />}
               {...form.getInputProps('price')}
             />
-            <NumberInput
+            <GroupedNumberInput
               label={t('products.form.suggestedPriceLabel')}
               description={t('products.form.suggestedPriceDescription')}
               placeholder={t('products.form.pricePlaceholder')}
               min={0}
-              thousandSeparator=","
               leftSection={<IconCurrencyDong size={14} />}
               {...form.getInputProps('suggestedPrice')}
             />

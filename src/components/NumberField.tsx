@@ -1,6 +1,5 @@
-import { NumberInput, type NumberInputProps } from '@mantine/core';
-import { useState, type FocusEvent, type Ref } from 'react';
-import { NUMBER_MARKS, parseLocaleNumber } from '@/utils/number';
+import { useState, type FocusEvent } from 'react';
+import { GroupedNumberInput, type GroupedNumberInputProps } from './GroupedNumberInput';
 
 /**
  * Numeric sibling of `<DateField>`: a Mantine `NumberInput`
@@ -37,20 +36,14 @@ import { NUMBER_MARKS, parseLocaleNumber } from '@/utils/number';
  * <NumberField value={item.extraQuantity} onChange={(v) => patch({ extra: v })} />
  * ```
  *
- * **It GROUPS its digits** (2026-09-08), in the marks this browser prints
- * with — the ones `formatNumber` uses, so the box reads the same way as every
- * figure beside it. `67210000` in a money field is a magnitude the operator
- * has to count out; `67,210,000` is one they can see. It is a default rather
- * than a per-call prop because the alternative is what the app already learned
- * from litres: a rule that lives at call sites is a rule one call site
- * eventually misses.
+ * **It GROUPS its digits** (2026-09-08) — it renders `<GroupedNumberInput>`,
+ * which owns the marks. `67210000` in a money field is a magnitude the operator
+ * has to count out; `67,210,000` is one they can see.
  *
  * **Fuel volumes are the exception and they do NOT come through here** — they
  * spread `LITRE_INPUT_PROPS` into a bare `NumberInput`, because a grouped
  * litre figure is a 1000× hazard with a real incident behind it (see
- * `formatLitres`). A caller that needs the same can pass
- * `thousandSeparator=""`; the defaults sit before the prop spread for exactly
- * that reason.
+ * `formatLitres`).
  *
  * **Not needed for `form.getInputProps(...)` fields.** Mantine's `useForm`
  * stores the `''` verbatim instead of coercing it, so those inputs already
@@ -60,15 +53,8 @@ import { NUMBER_MARKS, parseLocaleNumber } from '@/utils/number';
  * components, …). See `docs/memo/design-system.md` § Numeric input.
  */
 
-type NumberFieldBaseProps = Omit<NumberInputProps, 'value' | 'defaultValue' | 'onChange'> & {
-  /**
-   * The underlying input, for a caller that has to put the caret in it — the
-   * sales-order form focuses the quantity of the row its item search just
-   * added. Declared because Mantine's props type does not carry `ref`; React
-   * 19 passes it through as an ordinary prop from there.
-   */
-  ref?: Ref<HTMLInputElement>;
-};
+/** `ref` included — the sales-order form puts the caret in the row its item search just added. */
+type NumberFieldBaseProps = Omit<GroupedNumberInputProps, 'value' | 'defaultValue' | 'onChange'>;
 
 export type NumberFieldProps =
   /** Required number: `emptyValue` is what an empty box means, so `onChange` never sees `undefined`. */
@@ -100,12 +86,13 @@ export function NumberField({ value, emptyValue, onChange, onBlur, ...props }: N
       return;
     }
     // A string means the box does not hold a finished number: it is empty, or
-    // mid-entry (`1.`, `-`, `1e`). Keep the text, give the model the best
+    // mid-entry (`1.`, `1.50`, `-`). Keep the text, give the model the best
     // number available.
     setDraft(next);
-    // Through the locale-aware parser, never `Number()`: the box groups its
-    // digits, so its own display does not parse with the built-in.
-    const parsed = parseLocaleNumber(next);
+    // Canonical text (`.` decimal, no grouping) whatever the box shows, so the
+    // built-in reads it. A locale-aware parser strips a Vietnamese device's
+    // group mark `.` and hands the model 150 for the `1,50` on screen.
+    const parsed = next.trim() === '' ? Number.NaN : Number(next);
     emit(Number.isFinite(parsed) ? parsed : emptyValue);
   };
 
@@ -115,9 +102,7 @@ export function NumberField({ value, emptyValue, onChange, onBlur, ...props }: N
   };
 
   return (
-    <NumberInput
-      thousandSeparator={NUMBER_MARKS.group}
-      decimalSeparator={NUMBER_MARKS.decimal}
+    <GroupedNumberInput
       {...props}
       value={draft ?? value ?? ''}
       onChange={handleChange}

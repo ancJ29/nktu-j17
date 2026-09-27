@@ -1,4 +1,6 @@
 {
+  "copied": "Copied",
+  "copyDetails": "Copy",
   "forbidden": {
     "goToHomeButton": "Go to Home",
     "inlineTitle": "Restricted access",
@@ -17,6 +19,7 @@
     "title": "404"
   },
   "reload": "Reload",
+  "sendScreenshot": "Please screenshot this screen and send it to your administrator.",
   "staleChunk": {
     "message": "The app was updated while this page was open. Reload to continue.",
     "title": "A new version is available"

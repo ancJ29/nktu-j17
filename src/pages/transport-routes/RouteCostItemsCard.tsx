@@ -2,6 +2,7 @@ import { Alert, Button, Group, NumberInput, Table, Text, TextInput } from '@mant
 import { IconCashBanknote, IconInfoCircle, IconPlus } from '@tabler/icons-react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { formatMoney } from '../transport-orders/transportOrderPricing';
 import { blankCostItem, type RouteFormValues } from './routeFormValues';
@@ -70,11 +71,7 @@ export function RouteCostItemsCard({ form }: Props) {
                 {/* THÀNH TIỀN is authored, not derived from ĐVT × SL — the
                     client's sheet has no unit-price column, so computing it
                     would invent a precision the source lacks. */}
-                <NumberInput
-                  thousandSeparator=","
-                  min={0}
-                  {...form.getInputProps(`costItems.${i}.amount`)}
-                />
+                <GroupedNumberInput min={0} {...form.getInputProps(`costItems.${i}.amount`)} />
               </Table.Td>
               <Table.Td>
                 <TextInput {...form.getInputProps(`costItems.${i}.note`)} />

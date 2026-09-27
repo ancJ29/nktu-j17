@@ -4,7 +4,6 @@ import {
   Card,
   Group,
   Modal,
-  NumberInput,
   SegmentedControl,
   Select,
   Stack,
@@ -17,6 +16,7 @@ import { FieldLabel } from '@credo/base-ui/components';
 import { device } from '@credo/base-ui/utils';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { formatNumber } from '@/utils/number';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import type { InventoryV2Store } from '@/stores/createInventoryV2Store';
@@ -160,7 +160,7 @@ export function InventoryV2UpdateModal({
           </Group>
         </Card>
 
-        <NumberInput
+        <GroupedNumberInput
           label={t(mode === 'delta' ? 'inventoryV2.deltaLabel' : 'inventoryV2.onHand')}
           description={
             mode === 'delta'
@@ -172,7 +172,6 @@ export function InventoryV2UpdateModal({
           value={value}
           onChange={setValue}
           decimalScale={2}
-          thousandSeparator=","
           leftSection={
             mode === 'delta' && hasValue ? (
               entered > 0 ? (

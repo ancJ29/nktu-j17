@@ -3,6 +3,7 @@ import { IconDroplet, IconTruckLoading } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { DatePickerField } from '@/components/DatePickerField';
 import { EmployeeLink } from '@/components/EmployeeLink';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { TruckLink } from '@/components/TruckLink';
 import { formatDate } from '@/utils/dateFormat';
 import { formatLitres, formatNumber, LITRE_INPUT_PROPS } from '@/utils/number';
@@ -156,20 +157,18 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
             syncTotal(form, v, form.values.unitPrice);
           }}
         />
-        <NumberInput
+        <GroupedNumberInput
           label={t('oilTanks.logs.refill.columns.unitPrice')}
           min={0}
-          thousandSeparator=","
           {...form.getInputProps('unitPrice')}
           onChange={(v) => {
             form.setFieldValue('unitPrice', v);
             syncTotal(form, form.values.litres, v);
           }}
         />
-        <NumberInput
+        <GroupedNumberInput
           label={t('oilTanks.logs.refill.columns.total')}
           min={0}
-          thousandSeparator=","
           {...form.getInputProps('totalAmount')}
         />
       </SimpleGrid>
@@ -324,10 +323,9 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
             syncTotal(form, v, form.values.unitPrice);
           }}
         />
-        <NumberInput
+        <GroupedNumberInput
           label={t('oilTanks.logs.issue.columns.unitPrice')}
           min={0}
-          thousandSeparator=","
           {...form.getInputProps('unitPrice')}
           onChange={(v) => {
             form.setFieldValue('unitPrice', v);

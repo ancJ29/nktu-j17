@@ -20,6 +20,7 @@ import {
   IconTrash,
 } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { computeTransportOrderTotals, formatMoney } from './transportOrderPricing';
 import { feeNameSelectData, useFeeNameOptions } from './feeName';
@@ -117,11 +118,7 @@ export function TransportFeeCards<V extends FeeFormValues>({
               <Table.Tr key={i}>
                 <Table.Td>{feeNameSelect(i)}</Table.Td>
                 <Table.Td>
-                  <NumberInput
-                    thousandSeparator=","
-                    min={0}
-                    {...form.getInputProps(`fees.${i}.amount`)}
-                  />
+                  <GroupedNumberInput min={0} {...form.getInputProps(`fees.${i}.amount`)} />
                 </Table.Td>
                 <Table.Td ta="center">
                   <Checkbox {...form.getInputProps(`fees.${i}.vatable`, { type: 'checkbox' })} />
@@ -178,11 +175,7 @@ export function TransportFeeCards<V extends FeeFormValues>({
                 <Table.Tr key={i}>
                   <Table.Td>{feeNameSelect(i)}</Table.Td>
                   <Table.Td>
-                    <NumberInput
-                      thousandSeparator=","
-                      min={0}
-                      {...form.getInputProps(`fees.${i}.amount`)}
-                    />
+                    <GroupedNumberInput min={0} {...form.getInputProps(`fees.${i}.amount`)} />
                   </Table.Td>
                   <Table.Td>
                     <Select
@@ -220,10 +213,9 @@ export function TransportFeeCards<V extends FeeFormValues>({
           />
           {/* TẠM ỨNG sits with the totals it settles — it's only legible next to
               the "còn lại" it produces. */}
-          <NumberInput
+          <GroupedNumberInput
             w={200}
             label={t('transportOrders.billing.advance')}
-            thousandSeparator=","
             min={0}
             {...form.getInputProps('advanceAmount')}
           />

@@ -1,7 +1,8 @@
-import { Button, Group, NumberInput, Table, Text } from '@mantine/core';
+import { Button, Group, Table, Text } from '@mantine/core';
 import { IconPlus, IconRoute } from '@tabler/icons-react';
 import type { UseFormReturnType } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 import { SectionCard } from '@/components/SectionCard';
 import { blankSegment, type RouteFormValues } from './routeFormValues';
 import { routeDistanceTotal } from './routeCosting';
@@ -70,10 +71,9 @@ export function RouteSegmentsCard({ form, suggestions }: Props) {
                 />
               </Table.Td>
               <Table.Td>
-                <NumberInput
+                <GroupedNumberInput
                   min={0}
                   decimalScale={1}
-                  thousandSeparator=","
                   {...form.getInputProps(`segments.${i}.distanceKm`)}
                 />
               </Table.Td>

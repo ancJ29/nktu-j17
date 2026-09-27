@@ -5,7 +5,6 @@ import {
   Card,
   Divider,
   Group,
-  NumberInput,
   SegmentedControl,
   Select,
   Stack,
@@ -43,6 +42,7 @@ import { logActivity } from '@/utils/activityLogger';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import type { Material, MaterialInventoryExtra, MaterialInventoryRow } from '@/types';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 type Props = {
   readonly opened: boolean;
@@ -283,7 +283,7 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
             </Group>
           </Card>
 
-          <NumberInput
+          <GroupedNumberInput
             label={t(
               mode === 'delta'
                 ? 'productInventory.form.deltaLabel'
@@ -293,7 +293,6 @@ function SimpleUpdate({ opened, onClose, row, material, materialName, canDelete 
             withAsterisk
             allowNegative={mode === 'delta'}
             min={mode === 'snapshot' ? 0 : undefined}
-            thousandSeparator=","
             leftSection={
               mode === 'delta' ? (
                 inputValue > 0 ? (
@@ -787,7 +786,7 @@ function PackagingUpdate({
           {(mode === 'delta' || mode === 'snapshot') && (
             <>
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t(
                     mode === 'delta'
                       ? 'productInventory.form.deltaLabel'
@@ -799,7 +798,6 @@ function PackagingUpdate({
                   withAsterisk
                   allowNegative={mode === 'delta'}
                   min={mode === 'snapshot' ? 0 : undefined}
-                  thousandSeparator=","
                   leftSection={
                     mode === 'delta' ? (
                       inputValue > 0 ? (
@@ -842,11 +840,10 @@ function PackagingUpdate({
           {mode === 'repack' && (
             <Stack gap="sm">
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('productInventory.repack.fromQtyLabel')}
                   withAsterisk
                   min={0}
-                  thousandSeparator=","
                   style={{ flex: 2 }}
                   {...form.getInputProps('fromQty')}
                 />
@@ -863,11 +860,10 @@ function PackagingUpdate({
                 <IconArrowDown size={18} color="var(--mantine-color-dimmed)" />
               </Group>
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('productInventory.repack.toQtyLabel')}
                   withAsterisk
                   min={0}
-                  thousandSeparator=","
                   style={{ flex: 2 }}
                   {...form.getInputProps('toQty')}
                 />
@@ -882,10 +878,9 @@ function PackagingUpdate({
               </Group>
               <Divider my={1} label={t('productInventory.repack.writeOffOptional')} />
               <Group gap="sm" grow wrap="nowrap">
-                <NumberInput
+                <GroupedNumberInput
                   label={t('productInventory.repack.writeOffQtyLabel', { unit: baseUnit })}
                   min={0}
-                  thousandSeparator=","
                   style={{ flex: 1 }}
                   {...form.getInputProps('writeOffBaseQty')}
                 />

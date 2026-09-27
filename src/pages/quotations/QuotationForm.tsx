@@ -7,7 +7,6 @@ import {
   Divider,
   Group,
   Modal,
-  NumberInput,
   Select,
   Stack,
   Table,
@@ -75,6 +74,7 @@ import {
   type QuotationPriceTier,
 } from './types';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const isMobile = device.isMobile;
 
@@ -647,9 +647,8 @@ export function QuotationForm() {
                             </Group>
                           </Table.Td>
                           <Table.Td>
-                            <NumberInput
+                            <GroupedNumberInput
                               min={0}
-                              thousandSeparator=","
                               placeholder="0"
                               {...form.getInputProps(`lines.${idx}.quantity`)}
                               onChange={(v) => handleQuantityChange(idx, v)}
@@ -669,10 +668,9 @@ export function QuotationForm() {
                           <Table.Td>
                             <Stack gap={2}>
                               <Group gap={4} wrap="nowrap" align="flex-start">
-                                <NumberInput
+                                <GroupedNumberInput
                                   style={{ flex: 1, minWidth: 0 }}
                                   min={0}
-                                  thousandSeparator=","
                                   placeholder="0"
                                   {...form.getInputProps(`lines.${idx}.unitPrice`)}
                                   styles={
@@ -778,11 +776,10 @@ export function QuotationForm() {
             <Stack gap="xs">
               {tierEditor.rows.map((row, ri) => (
                 <Group key={ri} gap="xs" wrap="nowrap" align="flex-end">
-                  <NumberInput
+                  <GroupedNumberInput
                     style={{ flex: 1 }}
                     label={ri === 0 ? t('quotations.form.priceTiers.minQuantity') : undefined}
                     min={1}
-                    thousandSeparator=","
                     placeholder="0"
                     value={row.minQuantity}
                     onChange={(v) =>
@@ -794,11 +791,10 @@ export function QuotationForm() {
                       })
                     }
                   />
-                  <NumberInput
+                  <GroupedNumberInput
                     style={{ flex: 1 }}
                     label={ri === 0 ? t('quotations.form.priceLabel') : undefined}
                     min={0}
-                    thousandSeparator=","
                     placeholder="0"
                     value={row.unitPrice}
                     onChange={(v) =>

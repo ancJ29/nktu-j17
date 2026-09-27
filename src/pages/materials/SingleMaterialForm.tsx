@@ -6,7 +6,6 @@ import {
   Grid,
   Group,
   MultiSelect,
-  NumberInput,
   Select,
   Stack,
   Switch,
@@ -43,6 +42,7 @@ import {
 import type { UnitConversion } from '@/types';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
+import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 
 const multiUnit = isMaterialMultiUnit();
 const unitCategory = getMaterialUnitCategory();
@@ -294,21 +294,19 @@ export function SingleMaterialForm({
                     />
                   )}
                   {hasPricing && (
-                    <NumberInput
+                    <GroupedNumberInput
                       label={t('materials.form.priceLabel')}
                       placeholder={t('materials.form.pricePlaceholder')}
                       min={0}
-                      thousandSeparator=","
                       {...form.getInputProps('costPrice')}
                     />
                   )}
                   {hasMinimumStock && (
-                    <NumberInput
+                    <GroupedNumberInput
                       label={t('materials.form.minimumStockLabel')}
                       placeholder={t('materials.form.minimumStockPlaceholder')}
                       description={t('materials.form.minimumStockHint')}
                       min={0}
-                      thousandSeparator=","
                       {...form.getInputProps('minimumStock')}
                     />
                   )}
