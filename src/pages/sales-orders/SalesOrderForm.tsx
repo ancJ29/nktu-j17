@@ -1171,17 +1171,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [lockedByReservation, handleImportItems, t],
   );
 
-  const fetching = useInitFormFromFetch(
-    form,
-    id,
-    async (id) => {
-      const res = await cMngtConnector.getSalesOrderById({ id });
-      const o = res.salesOrder as SalesOrder;
+  const seedFromOrder = useCallback(
+    (o: SalesOrder): SalesOrderFormValues | null => {
       snapshotRef.current = o;
       const extra = o.extra as SalesOrderExtra;
 
       if (o.isClosed || extra?.cancellation != null) {
-        navigate(ROUTES.SALES_ORDERS.DETAIL.replace(':id', id), { replace: true });
+        navigate(ROUTES.SALES_ORDERS.DETAIL.replace(':id', o.id), { replace: true });
         return null;
       }
       setFormAttachments(extra?.attachments ?? []);
@@ -1240,6 +1236,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           ...(item.warehouseMemo ? { warehouseMemo: item.warehouseMemo } : {}),
         })),
       };
+    },
+    [customers, navigate],
+  );
+
+  const fetching = useInitFormFromFetch(
+    form,
+    id,
+    async (id) => {
+      const res = await cMngtConnector.getSalesOrderById({ id });
+      return seedFromOrder(res.salesOrder as SalesOrder);
     },
     () => {
       notifications.show({ color: 'red', message: t('salesOrders.notifications.fetchError') });
@@ -1312,7 +1318,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       const filledRows = values.items.filter((row) => !isEmptyRow(row));
 
       setLoading(true);
-      const items: SalesOrderItem[] = filledRows.map((item) => ({
+      const formItems: SalesOrderItem[] = filledRows.map((item) => ({
         productCode: item.productCode.trim(),
         productName: item.productName.trim(),
         quantity: item.quantity,
@@ -1335,6 +1341,14 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         ...(item.role !== 'set-component' &&
           item.warehouseMemo?.trim() && { warehouseMemo: item.warehouseMemo.trim() }),
       }));
+
+      const lockedSnapshot =
+        isEdit &&
+        snapshotRef.current &&
+        shouldLockLineEdits(snapshotRef.current.extra?.status ?? '')
+          ? snapshotRef.current
+          : null;
+      const items = lockedSnapshot ? lockedSnapshot.items : formItems;
 
       const selectedCustomer = values.customerId ? customerMap.get(values.customerId) : undefined;
 
@@ -1712,13 +1726,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         logger.error('Sales order form submit failed:', err);
         if (err instanceof EntityConflictError) {
           if (err.latest) {
-            const latest = err.latest as SalesOrder;
-            snapshotRef.current = latest;
-
-            const latestExtra = latest.extra as SalesOrderExtra | undefined;
-            setLockedByReservation(shouldLockLineEdits(latestExtra?.status ?? ''));
-            setOwnReservedSnapshot(latestExtra?.inventoryLinkage?.reservedSnapshot);
-            setInventoryLinkageState(latestExtra?.inventoryLinkage?.state);
+            const reseeded = seedFromOrder(err.latest as SalesOrder);
+            if (reseeded) form.setValues(reseeded);
           }
           notifications.show({
             color: 'yellow',
@@ -1753,6 +1762,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       formAttachments,
       customerMap,
       splitNotesCfg,
+      seedFromOrder,
+      form,
     ],
   );
 
