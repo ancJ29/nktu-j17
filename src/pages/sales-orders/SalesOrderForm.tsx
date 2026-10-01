@@ -102,6 +102,7 @@ import { buildExpiringUploadDirectory } from '@/utils/uploadPath';
 import { ProductPhotoModal } from './ProductPhotoModal';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import {
+  canSetDeliveryDate,
   getCreateSkipInitialTargetValue,
   getInitialStatusValue,
   isReadyToProcessStatus,
@@ -449,6 +450,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
   const quotationLinkRef = useRef<{ id: string; code?: string } | null>(null);
 
   const [lockedByReservation, setLockedByReservation] = useState(false);
+
+  const [savedStatusAllowsDeliveryDate, setSavedStatusAllowsDeliveryDate] = useState(true);
 
   const [skipInitial, setSkipInitial] = useState(!!createSkipInitialTarget);
 
@@ -1182,6 +1185,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       }
       setFormAttachments(extra?.attachments ?? []);
       setLockedByReservation(shouldLockLineEdits(extra?.status ?? ''));
+      setSavedStatusAllowsDeliveryDate(canSetDeliveryDate(extra?.status ?? ''));
       setOwnReservedSnapshot(extra?.inventoryLinkage?.reservedSnapshot);
       setInventoryLinkageState(extra?.inventoryLinkage?.state);
 
@@ -1806,7 +1810,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             {!isEdit && createSkipInitialTarget && (
               <SegmentTabs<'initial' | 'advance'>
                 value={skipInitial ? 'advance' : 'initial'}
-                onChange={(v) => setSkipInitial(v === 'advance')}
+                onChange={(v) => {
+                  setSkipInitial(v === 'advance');
+
+                  const next = v === 'advance' ? createSkipInitialTarget : defaultStatus;
+                  if (!canSetDeliveryDate(next)) form.setFieldValue('deliveryDate', null);
+                }}
                 data={[
                   {
                     value: 'initial',
@@ -2007,6 +2016,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   {...form.getInputProps('orderDate')}
                 />
               );
+              const deliveryDateEditable = isEdit
+                ? savedStatusAllowsDeliveryDate
+                : canSetDeliveryDate(
+                    createSkipInitialTarget && skipInitial
+                      ? createSkipInitialTarget
+                      : defaultStatus,
+                  );
               const deliveryDateField = (
                 <DateField
                   futureOnly
@@ -2014,6 +2030,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   placeholder={t('salesOrders.form.deliveryDatePlaceholder')}
                   value={form.getValues().deliveryDate}
                   {...form.getInputProps('deliveryDate')}
+                  disabled={!deliveryDateEditable}
                 />
               );
               return variant.headerLayout === 'compactFourColumn' ? (

@@ -5,7 +5,7 @@ import { deriveSecondaryStatus } from '@/types/inventoryStatus';
 import { isDev } from '@/config/env';
 import { summarizeProductAvailability } from './inventoryCommitment';
 import { type OnHandByUnit, readRowBreakdown, verifyOnHandInvariant } from './inventoryMath';
-import { judgeInventoryRecheck, readDrift } from './inventoryDrift';
+import { needsInventoryRecheck, readDrift } from './inventoryDrift';
 import { getCurrentPeriodKey } from './periodKey';
 import { getItemBaseUnit } from './unitConversion';
 
@@ -55,7 +55,7 @@ export function buildProductInventorySummaries(
       }
       totalOnHand += r.onHand;
 
-      if (judgeInventoryRecheck(r).needed) needsRecheck = true;
+      if (needsInventoryRecheck(r)) needsRecheck = true;
       const rowDrift = readDrift(r.extra);
       driftCounter += rowDrift.counter;
       driftDiff += rowDrift.diff;

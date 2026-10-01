@@ -20,7 +20,7 @@ import { ProductInventoryFormModal } from '../product-inventory/ProductInventory
 import { ProductInventoryUpdateModal } from '../product-inventory/ProductInventoryUpdateModal';
 import { isLocationsEnabled, perms } from '@/utils/permission';
 import { isNoInventoryProduct } from '@/utils/productSet';
-import { judgeInventoryRecheck, readDrift } from '@/utils/inventoryDrift';
+import { needsInventoryRecheck, readDrift } from '@/utils/inventoryDrift';
 
 const canEditInventory = perms.productInventory.canEdit();
 const canCreateInventory = perms.productInventory.canCreate();
@@ -265,7 +265,7 @@ export function ProductInventorySection({
                 const isNegative = row.onHand < 0;
                 const onHandColor = isNegative ? 'red' : isLow ? 'orange' : undefined;
 
-                const needsRecheck = judgeInventoryRecheck(row).needed;
+                const needsRecheck = needsInventoryRecheck(row);
                 const drift = readDrift(row.extra);
                 return (
                   <InventoryRowCard

@@ -475,6 +475,10 @@ export function isReadyToProcessStatus(statusValue: string): boolean {
   return stage != null && stage !== 'DRAFT';
 }
 
+export function canSetDeliveryDate(statusValue: string): boolean {
+  return getSalesOrderStatusStage(statusValue) !== 'DRAFT';
+}
+
 export function getInitialStatusValue(): string | undefined {
   for (const opt of getSalesOrderStatusOptions()) {
     if ((opt.capabilities ?? []).some((b) => b.id === 'isInitialStatus')) return opt.value;

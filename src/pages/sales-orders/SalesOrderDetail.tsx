@@ -113,7 +113,7 @@ import {
 } from '@credo/base-ui/components';
 import type { InlineEditLabels } from '@credo/base-ui/components';
 import { useSalesOrderDetail } from './useSalesOrderDetail';
-import { getCancellationTargetStatusValue } from './transitionEngine';
+import { canSetDeliveryDate, getCancellationTargetStatusValue } from './transitionEngine';
 import { StatusChangeModal } from './StatusChangeModal';
 import { CreateDeliveryRequestModal } from '@/pages/delivery-requests/CreateDeliveryRequestModal';
 import { CreateReturnShipmentModal } from '@/pages/delivery-requests/CreateReturnShipmentModal';
@@ -523,7 +523,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     : null;
   const deliveryDateField = (
     <InlineEditField<string | null>
-      canEdit={canEditMeta}
+      canEdit={canEditMeta && canSetDeliveryDate(currentStatus.value)}
       value={deliveryDateForEditor}
       onSave={async (next) =>
         handleMetaPatch({

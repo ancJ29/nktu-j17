@@ -1,10 +1,11 @@
 import type { ProductInventoryExtra, ProductInventoryRow } from '@/types/product-inventory';
 
-export const RECHECK_COUNTER_THRESHOLD = 30;
+export const RECHECK_COUNTER_THRESHOLD = 50;
 
-export const RECHECK_DIFF_RATIO = 0.5;
+export const RECHECK_INTERVAL_DAYS = 30;
+const RECHECK_INTERVAL_MS = RECHECK_INTERVAL_DAYS * 24 * 60 * 60 * 1000;
 
-export const RECHECK_DIFF_MIN_ABS = 20;
+const DRIFT_TRACKING_SINCE = Date.parse('2026-09-16T00:00:00+07:00');
 
 export type InventoryDrift = {
   readonly counter: number;
@@ -57,16 +58,15 @@ export function accrueInventoryDrift<P extends DriftPatch>(
   };
 }
 
-export type RecheckVerdict =
-  | { readonly needed: false }
-  | { readonly needed: true; readonly reason: 'counter' | 'diff'; readonly drift: InventoryDrift };
+export function needsInventoryRecheck(row: ProductInventoryRow, now: number = Date.now()): boolean {
+  const { counter } = readDrift(row.extra);
+  if (counter > RECHECK_COUNTER_THRESHOLD) return true;
+  if (counter === 0) return false;
+  return now - lastCountedAt(row) >= RECHECK_INTERVAL_MS;
+}
 
-export function judgeInventoryRecheck(row: ProductInventoryRow): RecheckVerdict {
-  const drift = readDrift(row.extra);
-  if (drift.counter > RECHECK_COUNTER_THRESHOLD) return { needed: true, reason: 'counter', drift };
-  const magnitude = Math.abs(drift.diff);
-  if (magnitude > RECHECK_DIFF_MIN_ABS && magnitude >= RECHECK_DIFF_RATIO * Math.abs(row.onHand)) {
-    return { needed: true, reason: 'diff', drift };
-  }
-  return { needed: false };
+function lastCountedAt(row: ProductInventoryRow): number {
+  const stamp = row.extra?.lastInventoryUpdate;
+  if (typeof stamp === 'number') return stamp;
+  return Math.max(new Date(row.createdAt).getTime() || 0, DRIFT_TRACKING_SINCE);
 }
