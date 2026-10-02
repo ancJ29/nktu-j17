@@ -18,7 +18,7 @@ import type {
   SalesOrderExtra,
 } from '@/types';
 
-const MAX_PER_RUN = 10;
+const PROGRESS_EVERY = 25;
 
 const V2_FROM_MS = Date.parse('2026-08-19T00:00:00+07:00');
 
@@ -165,8 +165,7 @@ export async function repairNktuCheatHistory(): Promise<number> {
         extra?.cheatAutoComplete != null && !extra.cheatAutoComplete.historyOk && !extra.isDeleted
       );
     })
-    .sort((a, b) => markerAt(b) - markerAt(a))
-    .slice(0, MAX_PER_RUN);
+    .sort((a, b) => markerAt(b) - markerAt(a));
   if (candidates.length === 0) return 0;
 
   const drs = useDeliveryRequestStore.getState().items as DeliveryRequest[];
@@ -202,6 +201,9 @@ export async function repairNktuCheatHistory(): Promise<number> {
       logActivity('productInventory.adjust', entry.productId, entry.memo, plan.shippedAt);
     }
     repaired++;
+    if (repaired % PROGRESS_EVERY === 0) {
+      console.info('[nktu] cheat history repair', { repaired, of: candidates.length });
+    }
   }
   return repaired;
 }
