@@ -19,6 +19,7 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { setSalesOrderQueryRange, useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { applyDelta, readRowBreakdown } from '@/utils/inventoryMath';
+import { indexProductsByCode } from '@/utils/productByCode';
 import { logActivity } from '@/utils/activityLogger';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { isLocationsEnabled } from '@/utils/permission';
@@ -206,11 +207,7 @@ export function ProductInventoryComposeSetModal({
     return { qty: lines.reduce((sum, it) => sum + it.quantity, 0), unit: lines[0].unit };
   }, [selectedSalesOrder, setProduct]);
 
-  const productByCode = useMemo(() => {
-    const m = new Map<string, Product>();
-    for (const p of products) m.set(p.code, p);
-    return m;
-  }, [products]);
+  const productByCode = useMemo(() => indexProductsByCode(products), [products]);
 
   function findRow(productCode: string, target: string): ProductInventoryRow | null {
     return (

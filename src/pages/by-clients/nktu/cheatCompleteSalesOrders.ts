@@ -1,9 +1,14 @@
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
+import { indexProductsByCode } from '@/utils/productByCode';
+import { logActivity } from '@/utils/activityLogger';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
+import { statusChangeMemo } from '@/pages/sales-orders/activityMemo';
+import { recoverPendingShip } from '@/pages/sales-orders/shipRecovery';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
 import {
   getAllowedTransitions,
@@ -28,6 +33,8 @@ import type {
   SalesOrder,
   SalesOrderExtra,
 } from '@/types';
+
+export const CHEAT_AUDIT_TAG = 'nktu-cheat';
 
 type CheatOutcome = 'completed' | 'already-complete' | 'cancelled' | 'not-found' | 'failed';
 
@@ -55,6 +62,26 @@ function isSameLocalDay(a: Date, b: Date): boolean {
     a.getMonth() === b.getMonth() &&
     a.getDate() === b.getDate()
   );
+}
+
+type Actor = { id: string; name: string };
+
+function deliveredAtMs(dr: DeliveryRequest): number {
+  const ms = new Date((dr.extra?.deliveryTimestamp ?? NaN) as string | number).getTime();
+  return Number.isNaN(ms) ? -Infinity : ms;
+}
+
+export function pickDeliveryActor(
+  drs: readonly DeliveryRequest[],
+  employeeName: (id: string) => string | undefined,
+): Actor | undefined {
+  const latestFirst = [...drs].sort((a, b) => deliveredAtMs(b) - deliveredAtMs(a));
+  for (const dr of latestFirst) {
+    const id = dr.extra?.assignedDriverId;
+    if (!id) continue;
+    return { id, name: employeeName(id) ?? dr.extra?.assignedDriverName ?? id };
+  }
+  return undefined;
 }
 
 async function reserveForCompletionIfNeeded(inputs: {
@@ -174,12 +201,11 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
 
   const soStore = useSalesOrderStore.getState();
   const stamp = getCurrentEmployeeStamp();
-  const actor = stamp.userId
+  const sessionActor: Actor | undefined = stamp.userId
     ? { id: stamp.userId, name: stamp.userName ?? stamp.userId }
     : undefined;
-  const productsByCode = new Map<string, Product>();
-  for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
-  const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
+  const employeeName = (id: string) => useEmployeeStore.getState().getById(id)?.name;
+  const productsByCode = indexProductsByCode(useProductStore.getState().items as Product[]);
 
   for (const [soId, soDrs] of drsBySo) {
     const drNumbers = soDrs.map((d) => d.requestNumber);
@@ -206,6 +232,11 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       continue;
     }
 
+    const actor = pickDeliveryActor(soDrs, employeeName) ?? sessionActor;
+
+    await useProductInventoryStore.getState().revalidate();
+    const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
+
     const prep = await reserveForCompletionIfNeeded({
       so,
       targetStatus,
@@ -226,7 +257,7 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       ...prep.order,
       extra: {
         ...prepExtra,
-        cheatAutoComplete: { at: now.getTime(), drNumbers },
+        cheatAutoComplete: { at: now.getTime(), drNumbers, historyOk: true },
       },
     };
 
@@ -238,6 +269,7 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       inventoryByProduct: prep.inventoryByProduct,
 
       actualDeliveryDate: resolveActualDeliveryDate(soDrs),
+      auditTag: CHEAT_AUDIT_TAG,
     });
 
     if (!result.ok) {
@@ -246,6 +278,26 @@ async function runReconcile(): Promise<CheatReconcileSummary> {
       summary.failed++;
       summary.details.push(detail);
       continue;
+    }
+
+    logActivity('salesOrder.statusChange', so.id, {
+      ...statusChangeMemo({
+        updated: result.updated,
+        fromStatus: soExtra.status ?? '',
+        toStatus: targetStatus,
+        trigger: 'background-reconcile',
+        shipPending: result.pendingShip != null,
+      }),
+      auditTag: CHEAT_AUDIT_TAG,
+    });
+
+    if (result.pendingShip) {
+      await recoverPendingShip({
+        so: result.updated,
+        actor,
+        productsByCode,
+        auditTag: CHEAT_AUDIT_TAG,
+      });
     }
 
     detail.outcome = 'completed';

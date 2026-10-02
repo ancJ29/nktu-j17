@@ -14,6 +14,7 @@ import { applyDelta, readRowBreakdown } from './inventoryMath';
 import { logActivity } from './activityLogger';
 import { getItemBaseUnit } from './unitConversion';
 import { isNoInventoryProduct } from './productSet';
+import { findProductByCode } from './productByCode';
 import {
   aggregateByCode,
   distinctItemCodeCount,
@@ -160,7 +161,7 @@ async function applyForKind(
   } else {
     entityPool = [];
   }
-  const findEntity = (code: string): Product | undefined => entityPool.find((e) => e.code === code);
+  const findEntity = (code: string): Product | undefined => findProductByCode(entityPool, code);
 
   let rows: ProductInventoryRow[];
   if (kind === 'product') {
@@ -409,7 +410,7 @@ export async function getGoodsReceiptPostingStatus(
 
   let missingCount = 0;
   for (const itemCode of aggregateByCode(productItems, 1).keys()) {
-    const product = products.find((p) => p.code === itemCode);
+    const product = findProductByCode(products, itemCode);
     if (!product) {
       byItemCode.set(itemCode, 'orphaned');
       continue;
@@ -493,7 +494,7 @@ export async function syncDraftIncomingToInventory(
   const products = useProductStore.getState().items;
   const movesStock = (line: GoodsReceiptItem): boolean => {
     if (line.itemType !== 'product') return true;
-    const product = products.find((p) => p.code === line.itemCode);
+    const product = findProductByCode(products, line.itemCode);
     return !product || !isNoInventoryProduct(product);
   };
 

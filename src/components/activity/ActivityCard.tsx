@@ -1285,6 +1285,22 @@ type InventoryMemo = {
   };
 };
 
+function InventoryDeltaChip({ delta }: { readonly delta: number }) {
+  return (
+    <Group gap={2} wrap="nowrap" align="baseline">
+      {delta > 0 ? (
+        <IconArrowUp size={12} color="var(--mantine-color-teal-6)" />
+      ) : (
+        <IconArrowDown size={12} color="var(--mantine-color-orange-6)" />
+      )}
+      <Text size="xs" fw={600} c={delta > 0 ? 'teal' : 'orange'}>
+        {delta > 0 ? '+' : ''}
+        {delta.toLocaleString()}
+      </Text>
+    </Group>
+  );
+}
+
 /**
  * Renders the location + on-hand change for a `productInventory.*` entry.
  * `create` carries `onHand` (the seed quantity); `adjust` / `stockTake` /
@@ -1334,19 +1350,7 @@ function InventoryMemoLine({ memo }: { readonly memo: InventoryMemo }) {
           <Text size="xs" fw={500}>
             {memo.nextOnHand!.toLocaleString()}
           </Text>
-          {typeof delta === 'number' && delta !== 0 && (
-            <Group gap={2} wrap="nowrap" align="baseline">
-              {delta > 0 ? (
-                <IconArrowUp size={12} color="var(--mantine-color-teal-6)" />
-              ) : (
-                <IconArrowDown size={12} color="var(--mantine-color-orange-6)" />
-              )}
-              <Text size="xs" fw={600} c={delta > 0 ? 'teal' : 'orange'}>
-                {delta > 0 ? '+' : ''}
-                {delta.toLocaleString()}
-              </Text>
-            </Group>
-          )}
+          {typeof delta === 'number' && delta !== 0 && <InventoryDeltaChip delta={delta} />}
         </Group>
       )}
       {!hasPrevNext && typeof memo.onHand === 'number' && (
@@ -1359,6 +1363,19 @@ function InventoryMemoLine({ memo }: { readonly memo: InventoryMemo }) {
           </Text>
         </Group>
       )}
+      {/* A backfilled entry knows the movement but not the on-hand around it
+          (repairCheatHistory.ts) — show what it knows, invent nothing. */}
+      {!hasPrevNext &&
+        typeof memo.onHand !== 'number' &&
+        typeof delta === 'number' &&
+        delta !== 0 && (
+          <Group gap={6} wrap="nowrap" align="baseline">
+            <Text size="xs" c="dimmed">
+              {t('common.labels.onHand')}:
+            </Text>
+            <InventoryDeltaChip delta={delta} />
+          </Group>
+        )}
       {memo.setCode && (
         <Group gap={6} wrap="nowrap" align="baseline">
           <Text size="xs" c="dimmed">

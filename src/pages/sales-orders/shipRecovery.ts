@@ -132,8 +132,10 @@ export async function recoverPendingShip(params: {
   so: SalesOrder;
   actor: { id: string; name: string } | undefined;
   productsByCode: Map<string, Product>;
+
+  auditTag?: string;
 }): Promise<ShipRecoveryResult> {
-  const { actor, productsByCode } = params;
+  const { actor, productsByCode, auditTag } = params;
   let so = params.so;
   const pending = (so.extra as SalesOrderExtra | undefined)?.inventoryLinkage?.pendingShip;
   if (!pending || pending.snapshot.length === 0) return { kind: 'none' };
@@ -165,11 +167,11 @@ export async function recoverPendingShip(params: {
       shippedRowCount = exec.applied.length;
       useProductInventoryStore.getState().forceRefresh();
 
-      emitInventoryActivityForApplied(exec.applied, {
-        kind: 'SO',
-        id: so.id,
-        label: so.orderNumber,
-      });
+      emitInventoryActivityForApplied(
+        exec.applied,
+        { kind: 'SO', id: so.id, label: so.orderNumber },
+        auditTag,
+      );
     }
   }
 

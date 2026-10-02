@@ -5,6 +5,7 @@ import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
+import { indexProductsByCode } from '@/utils/productByCode';
 import { getSalesOrderCompletionEvidence } from '@/utils/permission';
 import type {
   DeliveryRequest,
@@ -103,8 +104,7 @@ export async function advanceSoIfFullyDelivered(params: {
 
   await ensureReconcileStoresLoaded();
 
-  const productsByCode = new Map<string, Product>();
-  for (const p of useProductStore.getState().items as Product[]) productsByCode.set(p.code, p);
+  const productsByCode = indexProductsByCode(useProductStore.getState().items as Product[]);
 
   if (hasPendingShip) {
     const recovery = await runShipRecovery({ so, actor, productsByCode, t });

@@ -78,6 +78,7 @@ import {
   indexInventoryByProduct,
   type LocationAvailability,
 } from '@/utils/inventoryCommitment';
+import { indexProductsByCode } from '@/utils/productByCode';
 import type {
   InventoryLinkageSnapshotEntry,
   InventoryLinkageState,
@@ -288,11 +289,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     () => indexInventoryByProduct(allInventoryRows),
     [allInventoryRows],
   );
-  const productByCode = useMemo(() => {
-    const m = new Map<string, Product>();
-    for (const p of products) m.set(p.code, p);
-    return m;
-  }, [products]);
+  const productByCode = useMemo(() => indexProductsByCode(products), [products]);
   const locationByCode = useMemo(() => {
     const m = new Map<string, string>();
     for (const l of locations) {

@@ -85,7 +85,12 @@ async function flush(): Promise<void> {
   if (pending.length > 0) scheduleFlush(FLUSH_DEBOUNCE_MS);
 }
 
-export function logActivity(action: string, targetId?: string, memo?: Record<string, unknown>) {
+export function logActivity(
+  action: string,
+  targetId?: string,
+  memo?: Record<string, unknown>,
+  at?: number,
+) {
   if (!isActivityLoggingEnabled()) return;
 
   const actorId = resolveActorId();
@@ -100,7 +105,7 @@ export function logActivity(action: string, targetId?: string, memo?: Record<str
     action,
     ...(targetId ? { targetId } : {}),
     ...(memo ? { memo } : {}),
-    timestamp: new Date().toISOString(),
+    timestamp: new Date(at ?? Date.now()).toISOString(),
   });
 
   if (pending.length > MAX_PENDING) {

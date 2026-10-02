@@ -7,6 +7,7 @@ import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { applyReturnRestock } from '@/utils/deliveryRequestReturnInventory';
 import { logActivity } from '@/utils/activityLogger';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
+import { indexProductsByCode } from '@/utils/productByCode';
 import { getDeliveryRequestStatusOptions, isReturnShipmentEnabled } from '@/utils/permission';
 import {
   getAutoShippingTargetValue,
@@ -21,13 +22,7 @@ import {
   ensureReconcileStoresLoaded,
 } from '@/pages/sales-orders/reconcileFromDeliveries';
 import type { DrFollowUp } from './transitionEngine';
-import type {
-  DeliveryRequest,
-  DeliveryRequestExtra,
-  Product,
-  SalesOrder,
-  SalesOrderExtra,
-} from '@/types';
+import type { DeliveryRequest, DeliveryRequestExtra, SalesOrder, SalesOrderExtra } from '@/types';
 
 async function dispatchDrFollowUp(
   followUp: DrFollowUp,
@@ -79,8 +74,7 @@ async function advanceLinkedSoOnDispatch(
   if (fromStatus === targetStatus) return;
 
   const products = useProductStore.getState().items;
-  const productsByCode = new Map<string, Product>();
-  for (const p of products) productsByCode.set(p.code, p);
+  const productsByCode = indexProductsByCode(products);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
   const result = await runSoTransition({

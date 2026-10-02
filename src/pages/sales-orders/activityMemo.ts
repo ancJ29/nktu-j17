@@ -68,7 +68,8 @@ export type SalesOrderInlineFields = {
   driverNote?: { changed: true };
 };
 
-export type SalesOrderStatusChangeTrigger = 'dr-completion' | 'dr-dispatch' | 'self-heal';
+export type SalesOrderStatusChangeTrigger =
+  'dr-completion' | 'dr-dispatch' | 'self-heal' | 'background-reconcile';
 
 export type SalesOrderStatusChangeMemo = {
   orderNumber: string;

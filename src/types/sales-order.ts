@@ -28,6 +28,8 @@ export type SalesOrderActivityEntry = {
   userId?: string;
   userName?: string;
   note?: string;
+
+  auditTag?: string;
 };
 
 export type SalesOrderChatEntry = {
@@ -172,7 +174,7 @@ export type SalesOrderExtra = {
   cancellation?: SalesOrderCancellation;
   inventoryLinkage?: InventoryLinkage;
 
-  cheatAutoComplete?: { at: number; drNumbers: string[] };
+  cheatAutoComplete?: { at: number; drNumbers: string[]; historyOk?: boolean };
 
   isDeleted?: boolean;
 

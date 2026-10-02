@@ -40,6 +40,7 @@ import type { Customer, DeliveryRequest, SalesOrder } from '@/types';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
 import { reconcileNktuCompletedDeliveries } from './cheatCompleteSalesOrders';
+import { repairNktuCheatHistory } from './repairCheatHistory';
 
 const WINDOW_DAYS = 90;
 const PREVIEW_LIMIT = 50;
@@ -97,9 +98,10 @@ export default function HomePage() {
     setDeliveryRequestQueryRange(from, to);
 
     void Promise.all([soStore.forceRefresh(), drStore.forceRefresh()]).then(() => {
-      void reconcileNktuCompletedDeliveries().then((summary) => {
-        if (summary.completed > 0 || summary.failed > 0) {
-          console.info('[nktu] SO-completion reconcile (CHEAT)', summary);
+      void reconcileNktuCompletedDeliveries().then(async (summary) => {
+        const historyRepaired = await repairNktuCheatHistory();
+        if (summary.completed > 0 || summary.failed > 0 || historyRepaired > 0) {
+          console.info('[nktu] SO-completion reconcile (CHEAT)', { ...summary, historyRepaired });
         }
       });
     });

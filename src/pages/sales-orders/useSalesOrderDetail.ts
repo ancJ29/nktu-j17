@@ -44,6 +44,7 @@ import {
 import type { CaptureResult } from '@/components/ImageUploadPanel';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
+import { indexProductsByCode } from '@/utils/productByCode';
 import {
   buildHoldSnapshotForSalesOrder,
   buildLinkageSnapshotFromReserveOps,
@@ -336,11 +337,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     });
   }, [order, drsInit, productsInit, inventoryInit, currentEmployee, t]);
 
-  const productByCode = useMemo(() => {
-    const m = new Map<string, Product>();
-    for (const p of products) m.set(p.code, p);
-    return m;
-  }, [products]);
+  const productByCode = useMemo(() => indexProductsByCode(products), [products]);
 
   const handleStatusChange = useCallback(
     async (newStatus: string, note?: string) => {

@@ -10,6 +10,7 @@ import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { applyDelta, readRowBreakdown } from '@/utils/inventoryMath';
+import { indexProductsByCode } from '@/utils/productByCode';
 import { logActivity } from '@/utils/activityLogger';
 import { isLocationsEnabled } from '@/utils/permission';
 import { getItemBaseUnit } from '@/utils/unitConversion';
@@ -80,11 +81,7 @@ export function ProductInventoryDecomposeSetModal({
     [setCode, setProducts],
   );
 
-  const productByCode = useMemo(() => {
-    const m = new Map<string, Product>();
-    for (const p of products) m.set(p.code, p);
-    return m;
-  }, [products]);
+  const productByCode = useMemo(() => indexProductsByCode(products), [products]);
 
   function findRow(productCode: string, target: string): ProductInventoryRow | null {
     return (

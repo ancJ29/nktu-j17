@@ -6,6 +6,7 @@ import type { DeliveryRequest, Product, ProductInventoryExtra, ProductInventoryR
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
 import { applyDelta, readRowBreakdown, type OnHandByUnit } from './inventoryMath';
 import { logActivity } from './activityLogger';
+import { findProductByCode } from './productByCode';
 import { getItemBaseUnit } from './unitConversion';
 import { isNoInventoryProduct } from './productSet';
 import { getCurrentEmployeeId } from '@/hooks';
@@ -34,7 +35,7 @@ export async function applyReturnRestock(dr: DeliveryRequest): Promise<ReturnRes
   const productStore = useProductStore.getState();
   if (!productStore.initialized) await productStore.loadAll();
   const products = useProductStore.getState().items;
-  const findProduct = (code: string): Product | undefined => products.find((p) => p.code === code);
+  const findProduct = (code: string): Product | undefined => findProductByCode(products, code);
 
   const snap = await cMngtConnector.getAllProductInventory<ProductInventoryExtra>();
   const rows: ProductInventoryRow[] = snap.changed
