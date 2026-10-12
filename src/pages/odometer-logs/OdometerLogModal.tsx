@@ -3,9 +3,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { IconAlertTriangle, IconCamera } from '@tabler/icons-react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device, logger } from '@credo/base-ui/utils';
+import { odometerLogBundle } from '@/stores/useOdometerLogStore';
 import { DateField } from '@/components/DateField';
 import { Form } from '@/components/Form';
 import {
@@ -24,9 +25,10 @@ import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
 import { saveOdometerLog } from './saveOdometerLog';
 import {
   canWriteDate,
-  DRIVER_BACKDATE_DAYS,
   isCompleteEntry,
-  shiftDate,
+  readEmployeeId,
+  readFuelCost,
+  readKm,
   visibleLogPhotos,
 } from './odometerLogModel';
 
@@ -35,6 +37,7 @@ const isMobile = device.isMobile;
 type FormValues = {
   recordDate: string;
   km: number | undefined;
+  fuelCost: number | undefined;
   note: string;
 };
 
@@ -83,6 +86,12 @@ function OdometerLogForm({
   const today = todayInVnDateString();
 
   const [photos, setPhotos] = useState<PhotoEntry[]>(() => existing?.extra?.photos ?? []);
+
+  const [entry, setEntry] = useState<OdometerLog | undefined>(existing);
+  const [loadingDay, setLoadingDay] = useState(false);
+
+  const [dayUnknown, setDayUnknown] = useState(false);
+  const latestDay = useRef('');
   const [saving, setSaving] = useState(false);
   const [capturing, setCapturing] = useState(false);
   const [cameraOpened, { open: openCamera, close: closeCamera }] = useDisclosure(false);
@@ -90,7 +99,8 @@ function OdometerLogForm({
   const form = useForm<FormValues>({
     initialValues: {
       recordDate: initialDate ?? existing?.recordDate ?? today,
-      km: existing?.extra?.km,
+      km: readKm(existing),
+      fuelCost: readFuelCost(existing),
       note: existing?.extra?.note ?? '',
     },
     validate: {
@@ -107,8 +117,41 @@ function OdometerLogForm({
     [employee.id, date],
   );
 
-  const dateAllowed = canWriteDate(date, today, { canEditAny });
+  const dateAllowed = canWriteDate(date, today, { canEditAny, hasEntry: !!entry });
   const complete = isCompleteEntry(form.values.km ?? '', photos);
+  const photoCount = visibleLogPhotos(photos).length;
+
+  const handleDateChange = async (next: string | null) => {
+    if (!next) return;
+    form.setFieldValue('recordDate', next);
+    latestDay.current = next;
+    setLoadingDay(true);
+    try {
+      const partition = await odometerLogBundle.queryPartition(next);
+      if (latestDay.current !== next) return;
+      const found = partition.find(
+        (log) => readEmployeeId(log) === employee.id && !log.extra?.isDeleted,
+      );
+      const stored = new Set((entry?.extra?.photos ?? []).map((p) => p.url));
+      const fresh = photos.filter((p) => !stored.has(p.url));
+      if (found || entry) {
+        form.setValues({
+          km: readKm(found),
+          fuelCost: readFuelCost(found),
+          note: found?.extra?.note ?? '',
+        });
+      }
+      setPhotos([...(found?.extra?.photos ?? []), ...fresh]);
+      setEntry(found);
+      setDayUnknown(false);
+    } catch (err) {
+      if (latestDay.current !== next) return;
+      logger.error('Odometer day lookup failed:', err);
+      setDayUnknown(true);
+    } finally {
+      if (latestDay.current === next) setLoadingDay(false);
+    }
+  };
 
   const handlePhotosChange = useCallback(async (next: PhotoEntry[]) => {
     setPhotos(next);
@@ -162,7 +205,7 @@ function OdometerLogForm({
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
-      if (!complete || !dateAllowed || values.km === undefined) return;
+      if (!complete || !dateAllowed || dayUnknown || values.km === undefined) return;
       setSaving(true);
       try {
         const saved = await saveOdometerLog({
@@ -171,6 +214,7 @@ function OdometerLogForm({
           employeeName: employee.name,
           km: values.km,
           photos,
+          fuelCost: values.fuelCost,
           note: values.note.trim(),
         });
         notifications.show({ color: 'green', message: t('odometerLog.notifications.saved') });
@@ -188,19 +232,21 @@ function OdometerLogForm({
         setSaving(false);
       }
     },
-    [complete, dateAllowed, employee, photos, onClose, onSaved, t],
+    [complete, dateAllowed, dayUnknown, employee, photos, onClose, onSaved, t],
   );
 
   return (
     <Form form={form} onSubmit={handleSubmit}>
       <Stack gap="md">
+        {/* No `minDate`: an older day with an entry is the driver's to correct,
+            and `dateLocked` below explains an older day without one. */}
         <DateField
           label={t('odometerLog.form.date')}
           withAsterisk
           clearable={false}
           maxDate={new Date()}
-          minDate={canEditAny ? undefined : new Date(shiftDate(today, -DRIVER_BACKDATE_DAYS))}
           {...form.getInputProps('recordDate')}
+          onChange={(value) => void handleDateChange(value)}
         />
 
         {/* Explicit value/onChange rather than `getInputProps`: NumberField's
@@ -218,9 +264,20 @@ function OdometerLogForm({
           onChange={(value) => form.setFieldValue('km', value)}
         />
 
+        <NumberField
+          label={t('odometerLog.form.fuelCost')}
+          description={t('odometerLog.form.fuelCostHint')}
+          min={0}
+          allowDecimal={false}
+          value={form.values.fuelCost}
+          onChange={(value) => form.setFieldValue('fuelCost', value)}
+        />
+
         <Stack gap={4}>
           <Text size="sm" fw={500}>
-            {t('odometerLog.form.photo')}
+            {photoCount > 0
+              ? `${t('odometerLog.form.photo')} (${photoCount})`
+              : t('odometerLog.form.photo')}
           </Text>
 
           {isMobile ? (
@@ -238,12 +295,14 @@ function OdometerLogForm({
                 onClick={openCamera}
                 loading={capturing}
               >
-                {t('odometerLog.form.takePhoto')}
+                {photoCount > 0
+                  ? t('odometerLog.form.takeAnotherPhoto')
+                  : t('odometerLog.form.takePhoto')}
               </Button>
               {/* Mounted only once there is something in it — the panel's empty
                   state is a tall placeholder, and this sits in an already-long
                   form. */}
-              {visibleLogPhotos(photos).length > 0 && (
+              {photoCount > 0 && (
                 <ImageUploadPanel
                   section="grid"
                   images={photos}
@@ -270,7 +329,7 @@ function OdometerLogForm({
             />
           )}
 
-          {visibleLogPhotos(photos).length === 0 && (
+          {photoCount === 0 && (
             <Text size="xs" c="dimmed">
               {t('odometerLog.form.photoRequired')}
             </Text>
@@ -284,17 +343,27 @@ function OdometerLogForm({
           {...form.getInputProps('note')}
         />
 
-        {!dateAllowed && (
-          <Alert color="yellow" icon={<IconAlertTriangle size={16} />}>
-            {t('odometerLog.form.dateLocked')}
+        {dayUnknown ? (
+          <Alert color="red" icon={<IconAlertTriangle size={16} />}>
+            {t('odometerLog.form.dayLoadFailed')}
           </Alert>
+        ) : (
+          !dateAllowed && (
+            <Alert color="yellow" icon={<IconAlertTriangle size={16} />}>
+              {t('odometerLog.form.dateLocked')}
+            </Alert>
+          )
         )}
 
         <Group justify="flex-end" gap="sm">
           <Button variant="default" onClick={onClose} disabled={saving}>
             {t('common.actions.cancel')}
           </Button>
-          <Button type="submit" loading={saving} disabled={!complete || !dateAllowed}>
+          <Button
+            type="submit"
+            loading={saving || loadingDay}
+            disabled={!complete || !dateAllowed || dayUnknown}
+          >
             {t('common.actions.save')}
           </Button>
         </Group>

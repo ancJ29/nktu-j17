@@ -9,6 +9,8 @@ export type OdometerLogExtra = {
   km: number;
 
   photos: PhotoEntry[];
+
+  fuelCost?: number;
   note?: string;
 
   isDeleted?: boolean;

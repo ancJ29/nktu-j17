@@ -41,6 +41,7 @@ import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldO
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
 import { reconcileNktuCompletedDeliveries } from './cheatCompleteSalesOrders';
 import { repairNktuCheatHistory } from './repairCheatHistory';
+import { sweepLoadedSalesOrdersPlatformLog } from '@/pages/sales-orders/platformLogSweep';
 
 const WINDOW_DAYS = 90;
 const PREVIEW_LIMIT = 50;
@@ -100,8 +101,18 @@ export default function HomePage() {
     void Promise.all([soStore.forceRefresh(), drStore.forceRefresh()]).then(() => {
       void reconcileNktuCompletedDeliveries().then(async (summary) => {
         const historyRepaired = await repairNktuCheatHistory();
-        if (summary.completed > 0 || summary.failed > 0 || historyRepaired > 0) {
-          console.info('[nktu] SO-completion reconcile (CHEAT)', { ...summary, historyRepaired });
+        const platformLogSwept = await sweepLoadedSalesOrdersPlatformLog();
+        if (
+          summary.completed > 0 ||
+          summary.failed > 0 ||
+          historyRepaired > 0 ||
+          platformLogSwept > 0
+        ) {
+          console.info('[nktu] SO-completion reconcile (CHEAT)', {
+            ...summary,
+            historyRepaired,
+            platformLogSwept,
+          });
         }
       });
     });

@@ -3,6 +3,7 @@
     "date": "Ngày",
     "distance": "Quãng đường",
     "driver": "Lái xe",
+    "fuelCost": "Tiền xăng dầu (đ)",
     "km": "Số km",
     "note": "Ghi chú",
     "photo": "Ảnh"
@@ -19,6 +20,7 @@
     "title": "Theo dõi hằng ngày"
   },
   "detail": {
+    "edited": "đã sửa",
     "loggedAt": "Ghi lúc {{at}}",
     "updatedAt": "Sửa lúc {{at}}"
   },
@@ -31,18 +33,24 @@
     "addPhoto": "Thêm ảnh đồng hồ km",
     "date": "Ngày làm việc",
     "dateLocked": "Ngày này đã khoá. Nhờ quản lý sửa giúp.",
+    "dayLoadFailed": "Chưa tải được số km của ngày này. Kiểm tra kết nối rồi chọn lại ngày.",
     "editTitle": "Sửa số km",
+    "fuelCost": "Tiền xăng dầu trong ngày (đ)",
+    "fuelCostHint": "Số tiền đã đổ xăng dầu trong ngày — để trống nếu không đổ",
     "km": "Số km trên đồng hồ",
     "kmHint": "Số hiển thị trên đồng hồ công-tơ-mét, đơn vị km",
     "note": "Ghi chú",
-    "photo": "Ảnh đồng hồ km",
+    "photo": "Ảnh — đồng hồ km, hoá đơn xăng dầu",
     "photoRequired": "Bắt buộc có ảnh chụp đồng hồ km",
+    "takeAnotherPhoto": "Chụp thêm ảnh",
     "takePhoto": "Chụp ảnh đồng hồ km",
     "title": "Ghi số km"
   },
   "home": {
     "cta": "Ghi số km hôm nay",
     "done": "Đã ghi số km hôm nay",
+    "edit": "Sửa / thêm ảnh",
+    "fuelCost": "Xăng dầu: {{amount}} đ",
     "prompt": "Ghi số km trước khi kết thúc ca",
     "title": "Kết thúc ca"
   },

@@ -1936,6 +1936,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
                 items={order.items}
                 customerPONumber={extra.customerPONumber}
                 defaultHeader={variant.productLabelPrint.defaultHeader}
+                printerPaper={variant.productLabelPrint.printerPaper}
               />
             </>
           )}

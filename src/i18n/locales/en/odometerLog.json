@@ -3,6 +3,7 @@
     "date": "Date",
     "distance": "Distance",
     "driver": "Driver",
+    "fuelCost": "Fuel (₫)",
     "km": "Odometer (km)",
     "note": "Note",
     "photo": "Photo"
@@ -19,6 +20,7 @@
     "title": "Daily compliance"
   },
   "detail": {
+    "edited": "edited",
     "loggedAt": "Logged {{at}}",
     "updatedAt": "Corrected {{at}}"
   },
@@ -31,18 +33,24 @@
     "addPhoto": "Add odometer photo",
     "date": "Shift date",
     "dateLocked": "This day is closed for editing. Ask a manager to correct it.",
+    "dayLoadFailed": "Couldn't load this day's reading. Check the connection, then pick the date again.",
     "editTitle": "Correct odometer reading",
+    "fuelCost": "Fuel money today (₫)",
+    "fuelCostHint": "What you paid for fuel this day — leave empty if you did not refuel",
     "km": "Odometer reading (km)",
     "kmHint": "The number shown on the dashboard, in kilometres",
     "note": "Note",
-    "photo": "Odometer photo",
+    "photo": "Photos — odometer, fuel receipt",
     "photoRequired": "A photo of the odometer is required",
+    "takeAnotherPhoto": "Take another photo",
     "takePhoto": "Take odometer photo",
     "title": "Log odometer"
   },
   "home": {
     "cta": "Log today's odometer",
     "done": "Today's odometer is logged",
+    "edit": "Edit / add photos",
+    "fuelCost": "Fuel: {{amount}} ₫",
     "prompt": "Log your odometer before you finish",
     "title": "End of shift"
   },

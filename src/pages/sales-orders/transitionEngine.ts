@@ -31,6 +31,7 @@ import {
 import {
   getSalesOrderStatusOptions,
   getSalesOrderStatusTransitions,
+  isActivityLoggingEnabled,
   isSkipInitialStageAllowed,
 } from '@/utils/permission';
 import { CAPABILITY_REGISTRY, getCapability } from './capabilities/registry';
@@ -245,6 +246,8 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     ...(actor && { userId: actor.id, userName: actor.name }),
     ...(note ? { note } : {}),
     ...(inputs.auditTag && { auditTag: inputs.auditTag }),
+
+    ...(isActivityLoggingEnabled() && { platformLog: { state: 'pending' as const } }),
   };
 
   const isClosedAfter = deriveIsClosedFromStage(toStatus.stage as Stage);
@@ -313,7 +316,7 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
 
     emitInventoryActivityForApplied(
       exec.applied,
-      { kind: 'SO', id: order.id, label: order.orderNumber },
+      { kind: 'SO', id: order.id, label: order.orderNumber, at: transitionAt },
       inputs.auditTag,
     );
 
@@ -390,7 +393,7 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     if (appliedOps.length > 0) {
       emitInventoryActivityForApplied(
         appliedOps,
-        { kind: 'SO', id: order.id, label: order.orderNumber },
+        { kind: 'SO', id: order.id, label: order.orderNumber, at: transitionAt },
         inputs.auditTag,
       );
     }

@@ -1,8 +1,11 @@
+import type { ProductLabelSize } from '@/utils/salesOrderProductLabel';
+
 export type SalesOrderDetailVariant = {
   showDeliveryNotePrint: boolean;
 
   productLabelPrint?: {
     defaultHeader: string;
+    printerPaper?: ProductLabelSize;
   };
 
   showShippingFee: boolean;
@@ -60,7 +63,8 @@ export const DEFAULT_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
 
 export const NKTU_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
   showDeliveryNotePrint: true,
-  productLabelPrint: { defaultHeader: 'TÂN UYÊN' },
+
+  productLabelPrint: { defaultHeader: 'TÂN UYÊN', printerPaper: 'A7' },
   showShortageAlert: false,
   showShippingFee: false,
   showVatTag: false,

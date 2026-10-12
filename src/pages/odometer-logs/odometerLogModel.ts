@@ -15,11 +15,17 @@ export const DRIVER_BACKDATE_DAYS = 1;
 export function canWriteDate(
   date: string,
   today: string,
-  { canEditAny = false }: { canEditAny?: boolean } = {},
+  { canEditAny = false, hasEntry = false }: { canEditAny?: boolean; hasEntry?: boolean } = {},
 ): boolean {
   if (date > today) return false;
-  if (canEditAny) return true;
+  if (canEditAny || hasEntry) return true;
   return date >= shiftDate(today, -DRIVER_BACKDATE_DAYS);
+}
+
+export function isEdited(log: OdometerLog | undefined): boolean {
+  const created = log?.createdAt;
+  const updated = log?.updatedAt;
+  return typeof created === 'number' && typeof updated === 'number' && updated > created;
 }
 
 export function shiftDate(date: string, days: number): string {
@@ -48,6 +54,12 @@ export function readKm(log: OdometerLog | undefined): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) ? value : undefined;
 }
 
+export function readFuelCost(log: OdometerLog | undefined): number | undefined {
+  const raw: unknown = log?.extra?.fuelCost;
+  const value = typeof raw === 'string' ? Number(raw) : raw;
+  return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
 export function readEmployeeId(log: OdometerLog | undefined): string {
   const raw: unknown = log?.extra?.employeeId;
   return typeof raw === 'string' ? raw : '';
@@ -74,6 +86,8 @@ export type ComplianceRow = {
   cells: ComplianceCell[];
 
   missingCount: number;
+
+  fuelTotal: number;
 };
 
 export function buildComplianceGrid({
@@ -107,6 +121,7 @@ export function buildComplianceGrid({
       employeeName: employee.name,
       cells,
       missingCount: cells.filter((cell) => !cell.log).length,
+      fuelTotal: cells.reduce((sum, cell) => sum + (readFuelCost(cell.log) ?? 0), 0),
     };
   });
 }

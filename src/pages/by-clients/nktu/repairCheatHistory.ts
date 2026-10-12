@@ -8,6 +8,7 @@ import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
+import { V2_FROM_MS } from '@/pages/sales-orders/platformLogSweep';
 import { ensureReconcileStoresLoaded } from '@/pages/sales-orders/reconcileFromDeliveries';
 import { CHEAT_AUDIT_TAG, pickDeliveryActor } from './cheatCompleteSalesOrders';
 import type {
@@ -19,8 +20,6 @@ import type {
 } from '@/types';
 
 const PROGRESS_EVERY = 25;
-
-const V2_FROM_MS = Date.parse('2026-08-19T00:00:00+07:00');
 
 const SCAN_MARGIN_MS = 60 * 60 * 1000;
 

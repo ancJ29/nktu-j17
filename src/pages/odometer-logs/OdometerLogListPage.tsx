@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   Group,
-  Image,
   Stack,
   Table,
   Tabs,
@@ -20,7 +19,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
 import { EmployeeLink } from '@/components/EmployeeLink';
-import { ImageZoomModal } from '@/components/ImageZoomModal';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { Select } from '@mantine/core';
@@ -30,19 +28,24 @@ import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { odometerLogBundle } from '@/stores/useOdometerLogStore';
 import type { Employee, OdometerLog } from '@/types';
 import type { DateRangeValue } from '@/types/date-range';
-import { formatDate } from '@/utils/dateFormat';
+import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
+import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
+import { LogPhotoCell, LogPhotoGalleryModal } from '../operation-logs/OperationLogPhotos';
+import type { TFn } from '../operation-logs/operationLogConfig';
 import { OdometerLogModal } from './OdometerLogModal';
 import {
   buildComplianceGrid,
   canWriteDate,
   dayGap,
   distanceSincePrevious,
+  isEdited,
   liveLogs,
   previousReading,
   readEmployeeId,
+  readFuelCost,
   readKm,
   visibleLogPhotos,
 } from './odometerLogModel';
@@ -52,6 +55,8 @@ const RANGE_DAYS = 30;
 
 export function OdometerLogListPage() {
   const { t } = useTranslation();
+
+  const tr = useCallback<TFn>((key, options) => t(key as never, options), [t]);
   const me = useMyEmployee();
   const canViewAll = perms.odometerLog.canViewAll();
   const canEditAny = perms.odometerLog.canEdit();
@@ -67,8 +72,7 @@ export function OdometerLogListPage() {
     defaultLastNDaysRange(RANGE_DAYS),
   );
   const [driverFilter, setDriverFilter] = useState('');
-  const [zoomUrl, setZoomUrl] = useState<string | null>(null);
-  const [zoomOpened, { open: openZoom, close: closeZoom }] = useDisclosure(false);
+  const [galleryLog, setGalleryLog] = useState<OdometerLog | null>(null);
   const [editing, setEditing] = useState<OdometerLog | undefined>();
   const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
   const today = todayInVnDateString();
@@ -131,37 +135,13 @@ export function OdometerLogListPage() {
 
   const driverData = useMemo(() => roster.map((e) => ({ value: e.id, label: e.name })), [roster]);
 
-  const showZoom = useCallback(
-    (url: string) => {
-      setZoomUrl(url);
-      openZoom();
-    },
-    [openZoom],
+  const showPhoto = (log: OdometerLog) => (
+    <LogPhotoCell photos={log.extra?.photos} onOpen={() => setGalleryLog(log)} t={tr} />
   );
-
-  const showPhoto = (log: OdometerLog) => {
-    const photo = visibleLogPhotos(log.extra?.photos)[0];
-    if (!photo) return null;
-    return (
-      <Image
-        src={photo.url}
-        w={40}
-        h={40}
-        fit="cover"
-        radius="sm"
-        style={{ cursor: 'pointer' }}
-        fallbackSrc="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>"
-        onClick={() => {
-          setZoomUrl(photo.url);
-          openZoom();
-        }}
-      />
-    );
-  };
 
   const canEditLog = (log: OdometerLog) =>
     (canEditAny || (!!me && readEmployeeId(log) === me.id)) &&
-    canWriteDate(log.recordDate, today, { canEditAny });
+    canWriteDate(log.recordDate, today, { canEditAny, hasEntry: true });
 
   const startEdit = (log: OdometerLog) => {
     setEditing(log);
@@ -223,10 +203,12 @@ export function OdometerLogListPage() {
                         the only place it existed. */}
                     <DeltaText log={log} logs={scoped} />
                   </Group>
+                  <FuelText log={log} />
                   <Group gap={6} wrap="nowrap" align="center">
                     <Text size="xs" c="dimmed">
                       {formatDate(log.recordDate)}
                     </Text>
+                    <EditedMark log={log} />
                     {canViewAll && (
                       <DriverName
                         id={readEmployeeId(log)}
@@ -253,6 +235,7 @@ export function OdometerLogListPage() {
               {canViewAll && <Table.Th>{t('odometerLog.columns.driver')}</Table.Th>}
               <Table.Th ta="right">{t('odometerLog.columns.km')}</Table.Th>
               <Table.Th ta="right">{t('odometerLog.columns.distance')}</Table.Th>
+              <Table.Th ta="right">{t('odometerLog.columns.fuelCost')}</Table.Th>
               <Table.Th>{t('odometerLog.columns.photo')}</Table.Th>
               <Table.Th>{t('odometerLog.columns.note')}</Table.Th>
               <Table.Th />
@@ -263,7 +246,12 @@ export function OdometerLogListPage() {
               const delta = distanceSincePrevious(scoped, log);
               return (
                 <Table.Tr key={log.id}>
-                  <Table.Td>{formatDate(log.recordDate)}</Table.Td>
+                  <Table.Td>
+                    <Group gap={6} wrap="nowrap">
+                      {formatDate(log.recordDate)}
+                      <EditedMark log={log} />
+                    </Group>
+                  </Table.Td>
                   {canViewAll && (
                     <Table.Td>
                       <DriverName id={readEmployeeId(log)} name={log.extra?.employeeName ?? ''} />
@@ -278,6 +266,9 @@ export function OdometerLogListPage() {
                     c={delta != null && delta < 0 ? 'red' : undefined}
                   >
                     {delta == null ? '—' : delta.toLocaleString()}
+                  </Table.Td>
+                  <Table.Td ta="right" ff="monospace">
+                    {formatNumber(readFuelCost(log))}
                   </Table.Td>
                   <Table.Td>{showPhoto(log)}</Table.Td>
                   <Table.Td>
@@ -319,6 +310,9 @@ export function OdometerLogListPage() {
                   </Table.Th>
                 ))}
                 <Table.Th ta="right">{t('odometerLog.compliance.missing')}</Table.Th>
+                <Table.Th ta="right" style={{ whiteSpace: 'nowrap' }}>
+                  {t('odometerLog.columns.fuelCost')}
+                </Table.Th>
               </Table.Tr>
             </Table.Thead>
             <Table.Tbody>
@@ -330,7 +324,7 @@ export function OdometerLogListPage() {
                   {row.cells.map((cell) => (
                     <Table.Td key={cell.date} ta="center" px={6}>
                       {cell.log ? (
-                        <ReadingCell log={cell.log} logs={scoped} onOpenPhoto={showZoom} />
+                        <ReadingCell log={cell.log} logs={scoped} onOpenPhotos={setGalleryLog} />
                       ) : (
                         <Text size="xs" c="dimmed">
                           ·
@@ -348,6 +342,9 @@ export function OdometerLogListPage() {
                         {row.missingCount}
                       </Badge>
                     )}
+                  </Table.Td>
+                  <Table.Td ta="right" ff="monospace" style={{ whiteSpace: 'nowrap' }}>
+                    {row.fuelTotal > 0 ? formatNumber(row.fuelTotal) : '—'}
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -402,7 +399,17 @@ export function OdometerLogListPage() {
         </Text>
       )}
 
-      <ImageZoomModal opened={zoomOpened} onClose={closeZoom} imageUrl={zoomUrl ?? ''} />
+      <LogPhotoGalleryModal
+        opened={galleryLog !== null}
+        onClose={() => setGalleryLog(null)}
+        photos={galleryLog?.extra?.photos}
+        title={
+          galleryLog
+            ? `${galleryLog.extra?.employeeName ?? ''} — ${formatDate(galleryLog.recordDate)}`
+            : ''
+        }
+        t={tr}
+      />
 
       {editing && me && (
         <OdometerLogModal
@@ -437,20 +444,21 @@ function toDateString(date: Date): string {
 function ReadingCell({
   log,
   logs,
-  onOpenPhoto,
+  onOpenPhotos,
 }: {
   readonly log: OdometerLog;
   readonly logs: OdometerLog[];
-  readonly onOpenPhoto: (url: string) => void;
+  readonly onOpenPhotos: (log: OdometerLog) => void;
 }) {
   const { t } = useTranslation();
   const km = readKm(log);
   const previous = previousReading(logs, log);
   const delta = distanceSincePrevious(logs, log);
   const span = previous ? dayGap(previous.recordDate, log.recordDate) : 0;
-  const photo = visibleLogPhotos(log.extra?.photos)[0];
+  const hasPhoto = visibleLogPhotos(log.extra?.photos).length > 0;
+  const fuelCost = readFuelCost(log);
 
-  const tooltip =
+  const reading =
     previous && delta != null
       ? t('odometerLog.compliance.cellTooltip', {
           km: formatKm(km),
@@ -458,17 +466,25 @@ function ReadingCell({
           date: formatDate(previous.recordDate),
         })
       : t('odometerLog.compliance.cellTooltipFirst', { km: formatKm(km) });
+  const tooltip = [
+    reading,
+    fuelCost !== undefined && t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) }),
+    isEdited(log) && t('odometerLog.detail.updatedAt', { at: formatDateTime(log.updatedAt) }),
+  ]
+    .filter(Boolean)
+    .join(' · ');
 
   return (
     <Tooltip label={tooltip} withArrow>
       <Stack
         gap={0}
         align="center"
-        style={{ cursor: photo ? 'pointer' : 'default' }}
-        onClick={() => photo && onOpenPhoto(photo.url)}
+        style={{ cursor: hasPhoto ? 'pointer' : 'default' }}
+        onClick={() => hasPhoto && onOpenPhotos(log)}
       >
         <Text size="xs" fw={600} ff="monospace" style={{ whiteSpace: 'nowrap' }}>
           {formatKm(km)}
+          {isEdited(log) ? '*' : ''}
         </Text>
         {delta != null && (
           <Text
@@ -483,6 +499,29 @@ function ReadingCell({
           </Text>
         )}
       </Stack>
+    </Tooltip>
+  );
+}
+
+function FuelText({ log }: { readonly log: OdometerLog }) {
+  const { t } = useTranslation();
+  const fuelCost = readFuelCost(log);
+  if (fuelCost === undefined) return null;
+  return (
+    <Text size="xs" c="dimmed">
+      {t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) })}
+    </Text>
+  );
+}
+
+function EditedMark({ log }: { readonly log: OdometerLog }) {
+  const { t } = useTranslation();
+  if (!isEdited(log)) return null;
+  return (
+    <Tooltip label={t('odometerLog.detail.updatedAt', { at: formatDateTime(log.updatedAt) })}>
+      <Badge size="xs" variant="light" color="gray">
+        {t('odometerLog.detail.edited')}
+      </Badge>
     </Tooltip>
   );
 }

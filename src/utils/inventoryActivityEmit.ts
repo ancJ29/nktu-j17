@@ -9,6 +9,8 @@ export type InventoryActivitySource = {
   id: string;
   label: string;
   suffix?: string;
+
+  at?: number;
 };
 
 export function emitInventoryActivityForApplied(

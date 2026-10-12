@@ -80,6 +80,12 @@ export type SalesOrderStatusChangeMemo = {
   trigger?: SalesOrderStatusChangeTrigger;
 
   shipPending?: boolean;
+
+  timelineAt?: number;
+
+  resent?: boolean;
+
+  performedBy?: { id?: string; name?: string };
 };
 
 export function statusChangeMemo(params: {
@@ -96,6 +102,7 @@ export function statusChangeMemo(params: {
     linkage?.lastTransition?.via?.kind === 'completion-auto-ship'
       ? 'auto-ship-on-completion'
       : linkage?.lastTransition?.action;
+  const timelineAt = statusChangeTimelineAt(updated, toStatus);
   return {
     orderNumber: updated.orderNumber,
     fromStatus,
@@ -104,7 +111,19 @@ export function statusChangeMemo(params: {
     ...(inventoryAction ? { inventoryAction } : {}),
     ...(trigger ? { trigger } : {}),
     ...(shipPending ? { shipPending: true } : {}),
+    ...(timelineAt != null && { timelineAt }),
   };
+}
+
+function statusChangeTimelineAt(updated: SalesOrder, toStatus: string): number | undefined {
+  const log = ((updated.extra ?? {}) as SalesOrderExtra).activityLog ?? [];
+  for (let i = log.length - 1; i >= 0; i--) {
+    const e = log[i]!;
+    if (e.action !== 'status_change' || e.toStatus !== toStatus) continue;
+    const at = new Date(e.timestamp as string | number).getTime();
+    return Number.isFinite(at) ? at : undefined;
+  }
+  return undefined;
 }
 
 export type SalesOrderReleasedRow = {

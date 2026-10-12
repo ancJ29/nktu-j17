@@ -60,7 +60,11 @@ async function flush(): Promise<void> {
   const batch = pending.slice(0, MAX_BATCH);
   inFlight = true;
   try {
-    await credoSmeConnector.logActivities({ activities: batch });
+    const { ids } = await credoSmeConnector.logActivities({ activities: batch });
+
+    if (Array.isArray(ids) && ids.length < batch.length) {
+      throw new Error(`partial write: ${ids.length}/${batch.length} accepted`);
+    }
 
     pending = pending.slice(batch.length);
     attempt = 0;

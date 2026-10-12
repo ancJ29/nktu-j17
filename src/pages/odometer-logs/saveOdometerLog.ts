@@ -8,6 +8,7 @@ export type SaveOdometerLogInput = {
   employeeName: string;
   km: number;
   photos: OdometerLogExtra['photos'];
+  fuelCost?: number | undefined;
   note?: string;
 };
 
@@ -20,13 +21,15 @@ async function findServerEntry(
 }
 
 export async function saveOdometerLog(input: SaveOdometerLogInput): Promise<OdometerLog> {
-  const { recordDate, employeeId, employeeName, km, photos, note } = input;
+  const { recordDate, employeeId, employeeName, km, photos, fuelCost, note } = input;
+
   const extra: OdometerLogExtra = {
     employeeId,
     employeeName,
     km,
     photos,
-    ...(note ? { note } : {}),
+    fuelCost: fuelCost && fuelCost > 0 ? fuelCost : undefined,
+    note: note || undefined,
   };
 
   const existing = await findServerEntry(recordDate, employeeId);

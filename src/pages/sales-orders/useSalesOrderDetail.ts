@@ -79,6 +79,7 @@ import {
 import { deriveSoDeliveryIssues, type SoDeliveryIssue } from './deliveryReconciliation';
 import { dispatchSoFollowUp } from './followUps';
 import { advanceSoIfFullyDelivered, resolveActualDeliveryDate } from './reconcileFromDeliveries';
+import { sweepSalesOrderPlatformLog } from './platformLogSweep';
 import { runShipRecovery } from './shipRecovery';
 import { softDeleteLinkedDeliveryRequests } from '@/pages/delivery-requests/deliveryRequestDelete';
 import type { Stage } from './capabilities/types';
@@ -336,6 +337,16 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       if (fresh && fresh.version !== order.version) setOrder(fresh);
     });
   }, [order, drsInit, productsInit, inventoryInit, currentEmployee, t]);
+
+  const platformLogSweptRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!order || platformLogSweptRef.current === order.id) return;
+    platformLogSweptRef.current = order.id;
+    const swept = order;
+    void sweepSalesOrderPlatformLog(swept).then((written) => {
+      if (written) setOrder((cur) => (cur?.version === swept.version ? written : cur));
+    });
+  }, [order]);
 
   const productByCode = useMemo(() => indexProductsByCode(products), [products]);
 
@@ -1653,6 +1664,17 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             );
             return;
           }
+
+          logActivity(
+            'salesOrder.statusChange',
+            workingOrder.id,
+            statusChangeMemo({
+              updated: result.updated,
+              fromStatus: (workingOrder.extra as SalesOrderExtra | undefined)?.status ?? '',
+              toStatus: target,
+              shipPending: result.pendingShip != null,
+            }),
+          );
           workingOrder = result.updated;
           for (const followUp of result.followUps) {
             await dispatchSoFollowUp(followUp, result.updated, actor, t);

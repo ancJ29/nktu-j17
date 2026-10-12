@@ -169,7 +169,7 @@ export async function recoverPendingShip(params: {
 
       emitInventoryActivityForApplied(
         exec.applied,
-        { kind: 'SO', id: so.id, label: so.orderNumber },
+        { kind: 'SO', id: so.id, label: so.orderNumber, at: new Date(pending.at).getTime() },
         auditTag,
       );
     }

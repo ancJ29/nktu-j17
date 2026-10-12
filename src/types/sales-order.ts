@@ -30,6 +30,17 @@ export type SalesOrderActivityEntry = {
   note?: string;
 
   auditTag?: string;
+
+  platformLog?: SalesOrderPlatformLogMark;
+};
+
+export type SalesOrderPlatformLogMark = {
+  state: 'pending' | 'logged';
+
+  legacy?: true;
+
+  tries?: number;
+  lastTryAt?: number;
 };
 
 export type SalesOrderChatEntry = {

@@ -1283,6 +1283,9 @@ type InventoryMemo = {
     label: string;
     suffix?: string;
   };
+  /** Backfilled by `platformLogSweep.ts`; its actor is whoever ran the sweep. */
+  resent?: boolean;
+  performedBy?: { id?: string; name?: string };
 };
 
 function InventoryDeltaChip({ delta }: { readonly delta: number }) {
@@ -1425,6 +1428,11 @@ function InventoryMemoLine({ memo }: { readonly memo: InventoryMemo }) {
           )}
         </Group>
       )}
+      {memo.resent && (
+        <Text size="xs" c="dimmed" fs="italic">
+          {t('salesOrders.detail.activityMemo.resent', { name: memo.performedBy?.name ?? '—' })}
+        </Text>
+      )}
     </Stack>
   );
 }
@@ -1550,6 +1558,9 @@ type SalesOrderMemo = {
   note?: string;
   inventoryAction?: 'reserve' | 'ship' | 'release' | 'auto-ship-on-completion';
   autoAdvanceOnCreate?: boolean;
+  /** Resent by `platformLogSweep.ts`; its actor is whoever ran the sweep. */
+  resent?: boolean;
+  performedBy?: { id?: string; name?: string };
   // cancel
   reason?: string;
   inventoryReleased?: boolean;
@@ -1608,6 +1619,11 @@ function SalesOrderStatusChangeBody({ memo }: { readonly memo: SalesOrderMemo })
       {memo.autoAdvanceOnCreate && (
         <Text size="xs" c="dimmed" fs="italic">
           {t('salesOrders.detail.activityMemo.autoAdvanceOnCreate')}
+        </Text>
+      )}
+      {memo.resent && (
+        <Text size="xs" c="dimmed" fs="italic">
+          {t('salesOrders.detail.activityMemo.resent', { name: memo.performedBy?.name ?? '—' })}
         </Text>
       )}
       {memo.inventoryAction && (

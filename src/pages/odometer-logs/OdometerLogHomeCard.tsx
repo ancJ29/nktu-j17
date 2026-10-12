@@ -9,9 +9,10 @@ import { odometerLogBundle } from '@/stores/useOdometerLogStore';
 import type { OdometerLog } from '@/types';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { featureFlags } from '@/utils/features';
+import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
 import { OdometerLogModal } from './OdometerLogModal';
-import { visibleLogPhotos } from './odometerLogModel';
+import { readFuelCost, readKm, visibleLogPhotos } from './odometerLogModel';
 
 /**
  * The driver's daily prompt, on their home screen.
@@ -65,7 +66,8 @@ export function OdometerLogHomeCard() {
 
   if (!eligible || !me) return null;
 
-  const photo = visibleLogPhotos(entry?.extra?.photos)[0];
+  const photos = visibleLogPhotos(entry?.extra?.photos);
+  const fuelCost = readFuelCost(entry);
 
   return (
     <Card withBorder radius="md" padding="md">
@@ -85,24 +87,38 @@ export function OdometerLogHomeCard() {
         </Group>
 
         {entry ? (
-          <Group gap="sm" wrap="nowrap" align="center">
-            {photo && (
-              <Image
-                src={photo.url}
-                w={56}
-                h={56}
-                fit="cover"
-                radius="sm"
-                fallbackSrc="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>"
-              />
-            )}
-            <Text size="xl" fw={700} ff="monospace">
-              {entry.extra.km.toLocaleString()}
-              <Text span size="sm" c="dimmed" ff="text">
-                {' km'}
+          <Stack gap="xs">
+            <Group gap="md" wrap="wrap" align="baseline">
+              <Text size="xl" fw={700} ff="monospace">
+                {formatNumber(readKm(entry))}
+                <Text span size="sm" c="dimmed" ff="text">
+                  {' km'}
+                </Text>
               </Text>
-            </Text>
-          </Group>
+              {fuelCost !== undefined && (
+                <Text size="sm" c="dimmed">
+                  {t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) })}
+                </Text>
+              )}
+            </Group>
+            {/* Every photo, not the first: the strip is the driver's receipt
+                that the second shot (or the fuel bill) landed too. */}
+            {photos.length > 0 && (
+              <Group gap={6} wrap="wrap">
+                {photos.map((photo) => (
+                  <Image
+                    key={photo.url}
+                    src={photo.url}
+                    w={48}
+                    h={48}
+                    fit="cover"
+                    radius="sm"
+                    fallbackSrc="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg'/>"
+                  />
+                ))}
+              </Group>
+            )}
+          </Stack>
         ) : (
           <Text size="sm" c="dimmed">
             {t('odometerLog.home.prompt')}
@@ -116,7 +132,7 @@ export function OdometerLogHomeCard() {
           onClick={open}
           loading={!loaded}
         >
-          {entry ? t('odometerLog.form.editTitle') : t('odometerLog.home.cta')}
+          {entry ? t('odometerLog.home.edit') : t('odometerLog.home.cta')}
         </Button>
       </Stack>
 
@@ -126,7 +142,11 @@ export function OdometerLogHomeCard() {
         employee={me}
         existing={entry}
         initialDate={today}
-        onSaved={setEntry}
+        // The modal can save another day (a correction to yesterday); only
+        // today's entry is this card's to show.
+        onSaved={(log) => {
+          if (log.recordDate === today) setEntry(log);
+        }}
       />
     </Card>
   );

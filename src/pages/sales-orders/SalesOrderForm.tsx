@@ -129,7 +129,13 @@ import { formatPlanFailures } from './planFailures';
 import { getItemBaseUnit } from '@/utils/unitConversion';
 import { logActivity } from '@/utils/activityLogger';
 import { markQuotationConverted } from '@/pages/quotations/useQuotationStore';
-import { customerMemo, diffCustomer, diffItems, toMemoItem } from './activityMemo';
+import {
+  customerMemo,
+  diffCustomer,
+  diffItems,
+  statusChangeMemo,
+  toMemoItem,
+} from './activityMemo';
 import type { SalesOrderFormVariant } from './salesOrderFormVariant';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { isBundleSet, isProductSet, isNoInventoryProduct, newSetGroupId } from '@/utils/productSet';
@@ -1699,17 +1705,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 await dispatchSoFollowUp(followUp, transitionResult.updated, actor, t);
               }
 
-              const advancedExtra = (transitionResult.updated.extra ?? {}) as SalesOrderExtra;
-              const inventoryAction =
-                advancedExtra.inventoryLinkage?.lastTransition?.via?.kind === 'completion-auto-ship'
-                  ? 'auto-ship-on-completion'
-                  : advancedExtra.inventoryLinkage?.lastTransition?.action;
               logActivity('salesOrder.statusChange', created.id, {
-                orderNumber: transitionResult.updated.orderNumber,
-                fromStatus: defaultStatus,
-                toStatus: createSkipInitialTarget,
+                ...statusChangeMemo({
+                  updated: transitionResult.updated,
+                  fromStatus: defaultStatus,
+                  toStatus: createSkipInitialTarget,
+                }),
                 autoAdvanceOnCreate: true,
-                ...(inventoryAction ? { inventoryAction } : {}),
               });
             } else {
               notifications.show({
