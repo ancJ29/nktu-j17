@@ -20,6 +20,7 @@
       "canExport": "Xuất Excel",
       "canIssueMagicLink": "Tạo liên kết đăng nhập",
       "canManageInventory": "Quản lý tồn kho",
+      "canManagePayment": "Ghi nhận thanh toán",
       "canManagePhotos": "Quản lý ảnh",
       "canManagePrice": "Quản lý giá",
       "canManualRelease": "Giải phóng tồn kho thủ công",

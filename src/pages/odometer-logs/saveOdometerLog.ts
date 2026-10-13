@@ -6,7 +6,8 @@ export type SaveOdometerLogInput = {
   recordDate: string;
   employeeId: string;
   employeeName: string;
-  km: number;
+
+  km?: number | undefined;
   photos: OdometerLogExtra['photos'];
   fuelCost?: number | undefined;
   note?: string;
@@ -26,7 +27,7 @@ export async function saveOdometerLog(input: SaveOdometerLogInput): Promise<Odom
   const extra: OdometerLogExtra = {
     employeeId,
     employeeName,
-    km,
+    km: km && km > 0 ? km : undefined,
     photos,
     fuelCost: fuelCost && fuelCost > 0 ? fuelCost : undefined,
     note: note || undefined,

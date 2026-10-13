@@ -15,8 +15,10 @@ import {
 } from '@mantine/core';
 import { IconFilter, IconFilterFilled, IconSearch } from '@tabler/icons-react';
 
+import { filterColumnFilterOptions } from './columnFilterQuery';
 import {
   columnFilterSelectionState,
+  selectColumnFilterShown,
   toggleColumnFilterAll,
   toggleColumnFilterValue,
 } from './columnFilterSelection';
@@ -34,6 +36,8 @@ export type DataTableColumnFilterLabels = {
   selectAll?: string;
   clear?: string;
   empty?: string;
+
+  applyResults?: string;
 };
 
 export type DataTableColumnFilterConfig = {
@@ -48,6 +52,7 @@ const DEFAULT_LABELS: Required<DataTableColumnFilterLabels> = {
   selectAll: 'Select all',
   clear: 'Clear',
   empty: 'No values',
+  applyResults: 'Show only these',
 };
 
 export function DataTableColumnFilter({
@@ -76,11 +81,8 @@ export function DataTableColumnFilter({
     onChange(result.selected);
   };
 
-  const visible = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return options;
-    return options.filter((option) => option.label.toLowerCase().includes(q));
-  }, [options, query]);
+  const visible = useMemo(() => filterColumnFilterOptions(options, query), [options, query]);
+  const searching = query.trim() !== '';
 
   const isChecked = (value: string) =>
     state === 'some' ? selectedSet.has(value) : state === 'all';
@@ -93,6 +95,16 @@ export function DataTableColumnFilter({
   const toggleAll = () => apply(toggleColumnFilterAll({ selected, cleared }));
 
   const clear = () => apply({ selected: [], cleared: false });
+
+  const applyShown = () => {
+    const result = selectColumnFilterShown(
+      optionValues,
+      visible.map((option) => option.value),
+    );
+    if (!result) return;
+    apply(result);
+    changeOpened(false);
+  };
 
   return (
     <Popover
@@ -124,6 +136,11 @@ export function DataTableColumnFilter({
             size="xs"
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' || event.nativeEvent.isComposing || !searching) return;
+              event.preventDefault();
+              applyShown();
+            }}
             placeholder={text.search}
             leftSection={<IconSearch size={14} />}
           />
@@ -175,10 +192,19 @@ export function DataTableColumnFilter({
             </Stack>
           </ScrollArea.Autosize>
 
-          {state !== 'all' && (
-            <Button size="compact-xs" variant="subtle" color="orange" onClick={clear}>
-              {text.clear}
-            </Button>
+          {((searching && visible.length > 0) || state !== 'all') && (
+            <Group gap="xs" grow>
+              {searching && visible.length > 0 && (
+                <Button size="compact-xs" variant="light" onClick={applyShown}>
+                  {text.applyResults}
+                </Button>
+              )}
+              {state !== 'all' && (
+                <Button size="compact-xs" variant="subtle" color="orange" onClick={clear}>
+                  {text.clear}
+                </Button>
+              )}
+            </Group>
           )}
         </Stack>
       </Popover.Dropdown>

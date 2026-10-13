@@ -158,6 +158,19 @@ function template2Body(f: ProductLabelFields, packageNo: string, tag?: string): 
   </table>`;
 }
 
+const FIT_TO_LABEL_SCRIPT = `<script>
+  document.querySelectorAll('.label').forEach(function (label) {
+    var table = label.querySelector('table');
+    var box = getComputedStyle(label);
+    var room = label.getBoundingClientRect().height - parseFloat(box.paddingTop) - parseFloat(box.paddingBottom);
+    var px = parseFloat(getComputedStyle(table).fontSize);
+    while (table.getBoundingClientRect().height > room + 1 && px > 6) {
+      px -= 0.5;
+      table.style.fontSize = px + 'px';
+    }
+  });
+</script>`;
+
 export function buildProductLabelHtml(
   fields: ProductLabelFields,
   options: ProductLabelPrintOptions,
@@ -211,6 +224,7 @@ export function buildProductLabelHtml(
   .t1 td { text-align: center; }
   .t1 td.band { font-size: 1.05em; }
   .t1 td.header { font-weight: bold; font-size: 1.3em; }
+  .t2 { font-size: 1.6em; }
   .t2 th, .t2 td { text-align: center; font-weight: bold; }
   .t2 col.label-col { width: 34%; }
   .trial { margin-left: 0.5em; font-weight: bold; }
@@ -218,6 +232,7 @@ export function buildProductLabelHtml(
 </head>
 <body>
 ${sheets}
+${FIT_TO_LABEL_SCRIPT}
 ${
   autoPrint
     ? `<script>

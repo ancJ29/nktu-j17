@@ -5,9 +5,18 @@ export function visibleLogPhotos(photos: PhotoEntry[] | undefined): PhotoEntry[]
   return (photos ?? []).filter((p) => !p.isDeleted);
 }
 
-export function isCompleteEntry(km: number | string, photos: PhotoEntry[] | undefined): boolean {
+export function canSaveEntry(
+  km: number | string | undefined,
+  photos: PhotoEntry[] | undefined,
+): boolean {
+  if (visibleLogPhotos(photos).length === 0) return false;
+  if (km === undefined || km === '') return true;
   const value = typeof km === 'string' ? Number(km) : km;
-  return Number.isFinite(value) && value > 0 && visibleLogPhotos(photos).length > 0;
+  return Number.isFinite(value) && value > 0;
+}
+
+export function hasKm(log: OdometerLog | undefined): boolean {
+  return readKm(log) !== undefined;
 }
 
 export const DRIVER_BACKDATE_DAYS = 1;
@@ -120,7 +129,7 @@ export function buildComplianceGrid({
       employeeId: employee.id,
       employeeName: employee.name,
       cells,
-      missingCount: cells.filter((cell) => !cell.log).length,
+      missingCount: cells.filter((cell) => !hasKm(cell.log)).length,
       fuelTotal: cells.reduce((sum, cell) => sum + (readFuelCost(cell.log) ?? 0), 0),
     };
   });

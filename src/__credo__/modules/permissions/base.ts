@@ -243,6 +243,9 @@ export const BASE_PERMISSIONS: Permissions = {
     canCreate: false,
     canEdit: false,
     canDelete: false,
+    actions: {
+      canManagePayment: false,
+    },
     query: {
       canViewAll: false,
       canViewSelf: false,

@@ -1,6 +1,6 @@
 import { Badge, Button, Card, Group, Image, Stack, Text } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { IconCheck, IconGauge } from '@tabler/icons-react';
+import { IconCheck, IconClockHour4, IconGauge } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { logger } from '@credo/base-ui/utils';
@@ -12,7 +12,7 @@ import { featureFlags } from '@/utils/features';
 import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
 import { OdometerLogModal } from './OdometerLogModal';
-import { readFuelCost, readKm, visibleLogPhotos } from './odometerLogModel';
+import { hasKm, readFuelCost, readKm, visibleLogPhotos } from './odometerLogModel';
 
 /**
  * The driver's daily prompt, on their home screen.
@@ -21,6 +21,11 @@ import { readFuelCost, readKm, visibleLogPhotos } from './odometerLogModel';
  * something to show would be a receipt for work already done; what makes a daily
  * habit stick is an outstanding task that is visibly outstanding. So this renders
  * in both states and leads with the one the driver has to act on.
+ *
+ * A third state sits between them since drivers may save photos first and type
+ * the km at the end of the shift (plan §13): the photos show back, and the card
+ * still leads with the outstanding number, because the grid counts that day
+ * missing until it lands.
  *
  * It also answers "did my tap register?" — the logged state shows the number and
  * the photo back. Without that, the cheapest way for a driver to resolve the
@@ -68,6 +73,8 @@ export function OdometerLogHomeCard() {
 
   const photos = visibleLogPhotos(entry?.extra?.photos);
   const fuelCost = readFuelCost(entry);
+  const done = hasKm(entry);
+  const kmPending = !!entry && !done;
 
   return (
     <Card withBorder radius="md" padding="md">
@@ -79,22 +86,34 @@ export function OdometerLogHomeCard() {
               {t('odometerLog.home.title')}
             </Text>
           </Group>
-          {entry && (
+          {done && (
             <Badge color="teal" variant="light" leftSection={<IconCheck size={11} />}>
               {t('odometerLog.home.done')}
+            </Badge>
+          )}
+          {kmPending && (
+            <Badge color="orange" variant="light" leftSection={<IconClockHour4 size={11} />}>
+              {t('odometerLog.home.kmPending')}
             </Badge>
           )}
         </Group>
 
         {entry ? (
           <Stack gap="xs">
-            <Group gap="md" wrap="wrap" align="baseline">
-              <Text size="xl" fw={700} ff="monospace">
-                {formatNumber(readKm(entry))}
-                <Text span size="sm" c="dimmed" ff="text">
-                  {' km'}
-                </Text>
+            {kmPending && (
+              <Text size="sm" c="dimmed">
+                {t('odometerLog.home.kmPendingPrompt')}
               </Text>
+            )}
+            <Group gap="md" wrap="wrap" align="baseline">
+              {done && (
+                <Text size="xl" fw={700} ff="monospace">
+                  {formatNumber(readKm(entry))}
+                  <Text span size="sm" c="dimmed" ff="text">
+                    {' km'}
+                  </Text>
+                </Text>
+              )}
               {fuelCost !== undefined && (
                 <Text size="sm" c="dimmed">
                   {t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) })}
@@ -127,12 +146,16 @@ export function OdometerLogHomeCard() {
 
         <Button
           fullWidth
-          variant={entry ? 'light' : 'filled'}
+          variant={done ? 'light' : 'filled'}
           leftSection={<IconGauge size={16} />}
           onClick={open}
           loading={!loaded}
         >
-          {entry ? t('odometerLog.home.edit') : t('odometerLog.home.cta')}
+          {done
+            ? t('odometerLog.home.edit')
+            : kmPending
+              ? t('odometerLog.home.addKm')
+              : t('odometerLog.home.cta')}
         </Button>
       </Stack>
 

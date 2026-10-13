@@ -211,6 +211,7 @@
   "filterStaff": "Assigned Staff",
   "filterUrgentOnly": "Urgent only",
   "finance": {
+    "afterTaxLabel": "Amount after tax",
     "exemptError": "Couldn't update the order. Please try again.",
     "exemptLabel": "No financial data needed",
     "grandTotalLabel": "Total payment",
@@ -220,7 +221,8 @@
     "totalsMissing": "{{count}} record(s) missing amount",
     "vatLabel": "VAT",
     "viewFinance": "Finance",
-    "viewOps": "Operations"
+    "viewOps": "Operations",
+    "viewWarehouse": "Warehouse"
   },
   "form": {
     "addItem": "Add Item",

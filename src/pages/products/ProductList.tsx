@@ -17,6 +17,7 @@ import {
   type ColumnFilterValues,
 } from '@credo/base-ui/hooks';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
+import { useColumnFilterLabels } from '@/hooks/useColumnFilterLabels';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useListScrollRestoration, useLookupV2Options } from '@/hooks';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
@@ -149,15 +150,7 @@ export function ProductList({ variant }: ProductListProps) {
     (next: ColumnFilterValues) => updateState({ columnFilters: serializeColumnFilters(next) }),
     [updateState],
   );
-  const columnFilterLabels = useMemo(
-    () => ({
-      search: t('__new__.01-common.filters.columnFilter.search'),
-      selectAll: t('__new__.01-common.filters.columnFilter.selectAll'),
-      clear: t('__new__.01-common.filters.columnFilter.clear'),
-      empty: t('__new__.01-common.filters.columnFilter.empty'),
-    }),
-    [t],
-  );
+  const columnFilterLabels = useColumnFilterLabels();
 
   const columnFilterDefs: ColumnFilterDef<(typeof allProducts)[number]>[] = useMemo(
     () =>

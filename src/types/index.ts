@@ -26,6 +26,7 @@ export * from './truck-asset';
 export * from './oil-tank';
 export * from './operation-log';
 export * from './odometer-log';
+export * from './odometer-fuel';
 export * from './greenhouse';
 export * from './crop';
 export * from './crop-diary-template';

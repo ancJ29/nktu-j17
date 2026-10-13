@@ -20,6 +20,7 @@
       "canExport": "Export Excel",
       "canIssueMagicLink": "Issue Magic Link",
       "canManageInventory": "Manage Inventory",
+      "canManagePayment": "Record payments",
       "canManagePhotos": "Manage Photos",
       "canManagePrice": "Manage Price",
       "canManualRelease": "Manual Release",

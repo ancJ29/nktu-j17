@@ -12,6 +12,7 @@
     "cellTooltip": "{{km}} km · {{delta}} km kể từ {{date}}",
     "cellTooltipFirst": "{{km}} km · số đầu tiên trong kỳ",
     "complete": "Đã ghi đủ",
+    "kmPending": "Mới có ảnh — chưa nhập số km",
     "logged": "Đã ghi",
     "missing": "Chưa ghi",
     "missingCount_one": "Thiếu {{count}} ngày",
@@ -21,6 +22,7 @@
   },
   "detail": {
     "edited": "đã sửa",
+    "kmPending": "chưa có km",
     "loggedAt": "Ghi lúc {{at}}",
     "updatedAt": "Sửa lúc {{at}}"
   },
@@ -38,7 +40,7 @@
     "fuelCost": "Tiền xăng dầu trong ngày (đ)",
     "fuelCostHint": "Số tiền đã đổ xăng dầu trong ngày — để trống nếu không đổ",
     "km": "Số km trên đồng hồ",
-    "kmHint": "Số hiển thị trên đồng hồ công-tơ-mét, đơn vị km",
+    "kmHint": "Số hiển thị trên đồng hồ công-tơ-mét, đơn vị km — có thể nhập sau, khi kết thúc ca",
     "note": "Ghi chú",
     "photo": "Ảnh — đồng hồ km, hoá đơn xăng dầu",
     "photoRequired": "Bắt buộc có ảnh chụp đồng hồ km",
@@ -46,12 +48,46 @@
     "takePhoto": "Chụp ảnh đồng hồ km",
     "title": "Ghi số km"
   },
+  "fuel": {
+    "amount": "Số tiền (đ)",
+    "amountRequired": "Nhập số tiền lớn hơn 0",
+    "caption": "Mỗi lái xe tính từ lần chốt sổ gần nhất, không theo bộ lọc ngày.",
+    "deletePaymentMessage": "{{amount}} đ cho {{name}}, trả đến ngày {{date}}. Khoản này sẽ không còn được tính là đã trả.",
+    "deletePaymentTitle": "Xoá lần thanh toán này?",
+    "driverRequired": "Chọn lái xe",
+    "empty": "Không có lái xe nào",
+    "from": "Tính từ",
+    "loadFailed": "Chưa tải được số liệu tiền xăng.",
+    "noPayments": "Chưa có lần thanh toán nào từ lần chốt sổ gần nhất",
+    "owedThrough": "Còn nợ đến ngày {{date}}: {{amount}} đ",
+    "paid": "Đã trả",
+    "paidThrough": "Trả đến ngày",
+    "pay": "Ghi thanh toán",
+    "payTitle": "Ghi thanh toán tiền xăng",
+    "paymentDeleted": "Đã xoá thanh toán",
+    "paymentSaved": "Đã ghi thanh toán",
+    "payments": "Các lần thanh toán",
+    "recordedBy": "Người ghi",
+    "remaining": "Còn lại",
+    "reset": "Chốt sổ",
+    "resetExplain": "Tiền xăng và các lần thanh toán trước ngày này không còn được tính. Số km, ảnh và thanh toán vẫn được lưu.",
+    "resetFrom": "Tính lại từ ngày",
+    "resetPreview": "Còn lại: {{before}} đ → {{after}} đ",
+    "resetSaved": "Đã chốt sổ",
+    "resetTitle": "Chốt sổ tiền xăng",
+    "retry": "Thử lại",
+    "saveFailed": "Chưa lưu được. Kiểm tra kết nối và thử lại.",
+    "spent": "Đã chi"
+  },
   "home": {
+    "addKm": "Nhập số km",
     "cta": "Ghi số km hôm nay",
     "done": "Đã ghi số km hôm nay",
     "edit": "Sửa / thêm ảnh",
     "fuelCost": "Xăng dầu: {{amount}} đ",
-    "prompt": "Ghi số km trước khi kết thúc ca",
+    "kmPending": "Chưa có số km",
+    "kmPendingPrompt": "Đã lưu ảnh. Nhớ nhập số km khi kết thúc ca.",
+    "prompt": "Chụp ảnh trong ngày, nhập số km khi kết thúc ca",
     "title": "Kết thúc ca"
   },
   "notifications": {
@@ -61,12 +97,13 @@
   },
   "tabs": {
     "compliance": "Theo ngày",
-    "entries": "Danh sách"
+    "entries": "Danh sách",
+    "fuel": "Tiền xăng"
   },
   "title": "Nhật ký xe",
   "validation": {
     "dateRequired": "Chọn ngày làm việc",
-    "kmRequired": "Nhập số km"
+    "kmInvalid": "Số km phải lớn hơn 0"
   },
   "viewSelf": "Số km của tôi"
 }

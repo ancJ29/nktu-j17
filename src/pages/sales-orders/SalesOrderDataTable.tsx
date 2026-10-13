@@ -5,7 +5,8 @@ import { IconAlertTriangle, IconListDetails, IconRobot } from '@tabler/icons-rea
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { SalesOrder, Employee } from '@/types';
-import { DataTable } from '@credo/base-ui/components';
+import { DataTable, type DataTableColumn } from '@credo/base-ui/components';
+import type { DataTableColumnFilterConfig } from '@credo/base-ui/hooks';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission';
 import {
@@ -28,7 +29,7 @@ import {
 } from '@/utils/salesOrderPricing';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
-import type { SalesOrderListVariant } from './salesOrderListVariant';
+import type { SalesOrderListVariant, SalesOrderListView } from './salesOrderListVariant';
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 const vatRate = getPricingVatRate();
@@ -44,6 +45,16 @@ function getDeliveryDateColor(order: SalesOrder): string | undefined {
   if (dd < today) return 'red';
   if (dd.getTime() === today.getTime()) return 'orange';
   return undefined;
+}
+
+function renderDeliveryDate(order: SalesOrder) {
+  const dd = order.extra?.deliveryDate;
+  const color = getDeliveryDateColor(order);
+  return (
+    <Text size="sm" c={color} fw={color ? 600 : undefined}>
+      {dd ? formatDate(dd) : '-'}
+    </Text>
+  );
 }
 
 type SalesOrderDataTableProps = {
@@ -68,7 +79,7 @@ type SalesOrderDataTableProps = {
 
   readonly onShowItems?: (order: SalesOrder) => void;
 
-  readonly financeMode?: boolean;
+  readonly view: SalesOrderListView;
 
   readonly showCheatMarker?: boolean;
 
@@ -80,6 +91,8 @@ type SalesOrderDataTableProps = {
   readonly showPaymentColumns: boolean;
 
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
+
+  readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
 };
 
 export function SalesOrderDataTable({
@@ -99,13 +112,14 @@ export function SalesOrderDataTable({
   someSelected = false,
   disabledIds,
   onShowItems,
-  financeMode = false,
+  view,
   showCheatMarker = false,
   vacuousCompletionIds,
   viewportRef,
   dateColumns,
   showPaymentColumns,
   statusBadgeVariant,
+  getColumnFilter,
 }: SalesOrderDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -117,380 +131,459 @@ export function SalesOrderDataTable({
     return m;
   }, [employees]);
 
-  const columns = useMemo(
-    () =>
-      [
-        ...(selectable
-          ? [
-              selectionColumn<SalesOrder>({
-                keyOf: (o) => o.id,
-                isSelected: (id) => selectedIds?.has(id) ?? false,
-                onToggleRow: (id) => onToggleRow?.(id),
-                onToggleAll: () => onToggleAll?.(),
-                allSelected,
-                someSelected,
-                selectAllLabel: t('deliveryRequests.bulkCreate.openButton'),
-                rowLabel: (o) => o.orderNumber,
-                isDisabled: (o) => disabledIds?.has(o.id) ?? false,
-                disabledTooltip: t('deliveryRequests.bulkCreate.alreadyHasDR'),
-              }),
-            ]
-          : []),
-        {
-          key: 'orderNumber',
-          header: t('salesOrders.columns.orderNumber'),
-          width: '200px',
-          render: (item: SalesOrder) => (
-            <Stack gap={2}>
-              <Group gap={6} wrap="nowrap">
-                <Text fz="md" fw={500}>
-                  {item.orderNumber}
-                </Text>
-                {showCheatMarker && isCheatCompletedSalesOrder(item) && (
-                  <Tooltip
-                    label={t('salesOrders.cheatMarker.tooltip')}
-                    withArrow
-                    multiline
-                    maw={260}
-                  >
-                    <Badge
-                      color="grape"
-                      variant="light"
-                      size="xs"
-                      leftSection={<IconRobot size={10} aria-hidden />}
-                    >
-                      {t('salesOrders.cheatMarker.label')}
-                    </Badge>
-                  </Tooltip>
-                )}
-                {vacuousCompletionIds?.has(item.id) && (
-                  <Tooltip
-                    label={t('salesOrders.vacuousCompletion.tooltip')}
-                    withArrow
-                    multiline
-                    maw={280}
-                  >
-                    <Badge
-                      color="red"
-                      variant="light"
-                      size="xs"
-                      leftSection={<IconAlertTriangle size={10} aria-hidden />}
-                    >
-                      {t('salesOrders.vacuousCompletion.label')}
-                    </Badge>
-                  </Tooltip>
-                )}
-                {financeMode && isSalesOrderMissingMoneyInfo(item, vatRate) && (
+  const financeMode = view === 'finance';
+
+  const columns = useMemo<DataTableColumn<SalesOrder>[]>(() => {
+    const selectionColumns: DataTableColumn<SalesOrder>[] = selectable
+      ? [
+          selectionColumn<SalesOrder>({
+            keyOf: (o) => o.id,
+            isSelected: (id) => selectedIds?.has(id) ?? false,
+            onToggleRow: (id) => onToggleRow?.(id),
+            onToggleAll: () => onToggleAll?.(),
+            allSelected,
+            someSelected,
+            selectAllLabel: t('deliveryRequests.bulkCreate.openButton'),
+            rowLabel: (o) => o.orderNumber,
+            isDisabled: (o) => disabledIds?.has(o.id) ?? false,
+            disabledTooltip: t('deliveryRequests.bulkCreate.alreadyHasDR'),
+          }),
+        ]
+      : [];
+    const leadColumns: DataTableColumn<SalesOrder>[] = [
+      ...selectionColumns,
+      {
+        key: 'orderNumber',
+        header: t('salesOrders.columns.orderNumber'),
+        width: '200px',
+        render: (item: SalesOrder) => (
+          <Stack gap={2}>
+            <Group gap={6} wrap="nowrap">
+              <Text fz="md" fw={500}>
+                {item.orderNumber}
+              </Text>
+              {showCheatMarker && isCheatCompletedSalesOrder(item) && (
+                <Tooltip label={t('salesOrders.cheatMarker.tooltip')} withArrow multiline maw={260}>
                   <Badge
-                    color="orange"
+                    color="grape"
+                    variant="light"
+                    size="xs"
+                    leftSection={<IconRobot size={10} aria-hidden />}
+                  >
+                    {t('salesOrders.cheatMarker.label')}
+                  </Badge>
+                </Tooltip>
+              )}
+              {vacuousCompletionIds?.has(item.id) && (
+                <Tooltip
+                  label={t('salesOrders.vacuousCompletion.tooltip')}
+                  withArrow
+                  multiline
+                  maw={280}
+                >
+                  <Badge
+                    color="red"
                     variant="light"
                     size="xs"
                     leftSection={<IconAlertTriangle size={10} aria-hidden />}
                   >
-                    {t('salesOrders.finance.missingLabel')}
+                    {t('salesOrders.vacuousCompletion.label')}
                   </Badge>
-                )}
-              </Group>
-              {item.extra?.customerPONumber && (
-                <Text size="xs" c="dimmed" lineClamp={1}>
-                  {item.extra.customerPONumber}
-                </Text>
+                </Tooltip>
               )}
-              {item.extra?.deliveryPackageSize && (
-                <Text size="xs" c="dimmed" lineClamp={1}>
-                  {t('salesOrders.detail.deliveryPackageSize')}: {item.extra.deliveryPackageSize}
-                </Text>
+              {financeMode && isSalesOrderMissingMoneyInfo(item, vatRate) && (
+                <Badge
+                  color="orange"
+                  variant="light"
+                  size="xs"
+                  leftSection={<IconAlertTriangle size={10} aria-hidden />}
+                >
+                  {t('salesOrders.finance.missingLabel')}
+                </Badge>
               )}
-              {item.notes && (
-                <Text size="xs" c="dimmed" lineClamp={1}>
-                  {t('__new__.01-common.labels.note')}: {item.notes}
-                </Text>
-              )}
-            </Stack>
+            </Group>
+            {item.extra?.customerPONumber && (
+              <Text size="xs" c="dimmed" lineClamp={1}>
+                {item.extra.customerPONumber}
+              </Text>
+            )}
+            {item.extra?.deliveryPackageSize && (
+              <Text size="xs" c="dimmed" lineClamp={1}>
+                {t('salesOrders.detail.deliveryPackageSize')}: {item.extra.deliveryPackageSize}
+              </Text>
+            )}
+            {item.notes && (
+              <Text size="xs" c="dimmed" lineClamp={1}>
+                {t('__new__.01-common.labels.note')}: {item.notes}
+              </Text>
+            )}
+          </Stack>
+        ),
+      },
+    ];
+    const customerColumn: DataTableColumn<SalesOrder> = {
+      key: 'customerName',
+      width: '200px',
+      header: t('common.labels.customer'),
+      render: (item: SalesOrder) => (
+        <Text fz="md">{resolveSalesOrderCustomerName(item, getCustomerByCode) ?? '-'}</Text>
+      ),
+    };
+    const assignedStaffColumn: DataTableColumn<SalesOrder> = {
+      key: 'assignedStaff',
+      width: '150px',
+      header: t('salesOrders.columns.assignedStaff'),
+      render: (item: SalesOrder) => {
+        const staffId = item.extra?.assignedStaff;
+        return <Text size="sm">{staffId ? (employeeMap.get(staffId) ?? '-') : '-'}</Text>;
+      },
+    };
+    const labelsColumn: DataTableColumn<SalesOrder> = {
+      key: 'labels',
+      header: t('salesOrders.columns.labels'),
+      width: '200px',
+      render: (item: SalesOrder) => (
+        <SalesOrderStatusBadgeBase
+          extra={item.extra ?? {}}
+          resolveStatus={resolveStatus}
+          resolveDeliveryMethod={resolveDeliveryMethod}
+          tagOptions={tagOptions}
+          variant={statusBadgeVariant}
+        />
+      ),
+    };
+    const subtotalColumn: DataTableColumn<SalesOrder> = {
+      key: 'financeSubtotal',
+      header: t('salesOrders.finance.subtotalLabel'),
+      ta: 'right',
+      width: '140px',
+      filter: getColumnFilter?.('financeSubtotal'),
+      render: (item: SalesOrder) => (
+        <Text size="sm" ta="right">
+          {computeSalesOrderTotals(item, vatRate).subtotal.toLocaleString()}
+        </Text>
+      ),
+    };
+    const vatColumn: DataTableColumn<SalesOrder> = {
+      key: 'financeVat',
+      header: t('salesOrders.finance.vatLabel'),
+      ta: 'right',
+      width: '130px',
+      filter: getColumnFilter?.('financeVat'),
+      render: (item: SalesOrder) => (
+        <Text size="sm" ta="right">
+          {computeSalesOrderTotals(item, vatRate).vat.toLocaleString()}
+        </Text>
+      ),
+    };
+
+    const itemsColumns: DataTableColumn<SalesOrder>[] = onShowItems
+      ? [
+          {
+            key: '__items',
+            header: '',
+            width: '56px',
+            ta: 'center',
+            render: (item: SalesOrder) => (
+              <Tooltip label={t('salesOrders.detail.viewItems')} withArrow>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShowItems(item);
+                  }}
+                >
+                  <IconListDetails size={18} />
+                </ActionIcon>
+              </Tooltip>
+            ),
+          },
+        ]
+      : [];
+
+    if (view === 'finance') {
+      return [
+        ...leadColumns,
+        customerColumn,
+        {
+          key: 'financeDate',
+          header: (
+            <SortHeader
+              label={t('__new__.01-common.labels.orderDate')}
+              field="createdAt"
+              current={sortField}
+              onChange={onSortChange}
+            />
+          ),
+          width: '120px',
+          render: (item: SalesOrder) => (
+            <Text size="sm">{formatDate(getSalesOrderReadyDate(item))}</Text>
+          ),
+        },
+        subtotalColumn,
+        vatColumn,
+        {
+          key: 'financeGrandTotal',
+          header: t('salesOrders.finance.grandTotalLabel'),
+          ta: 'right',
+          width: '150px',
+          render: (item: SalesOrder) => (
+            <Text size="sm" fw={600} ta="right">
+              {computeSalesOrderTotals(item, vatRate).grandTotal.toLocaleString()}
+            </Text>
           ),
         },
         {
-          key: 'customerName',
-          width: '200px',
-          header: t('common.labels.customer'),
-          render: (item: SalesOrder) => (
-            <Text fz="md">{resolveSalesOrderCustomerName(item, getCustomerByCode) ?? '-'}</Text>
-          ),
+          key: 'financeInvoice',
+          header: t('salesOrders.billing.invoiceLabel'),
+          width: '120px',
+          render: (item: SalesOrder) =>
+            item.extra?.invoiceIssued ? (
+              <Badge variant="light" size="sm" radius="sm" color="blue">
+                {t('salesOrders.billing.invoiceIssued')}
+              </Badge>
+            ) : (
+              <Text size="sm" ta="center">
+                -
+              </Text>
+            ),
         },
-        ...(financeMode
-          ? [
-              {
-                key: 'financeDate',
+      ];
+    }
 
-                header: t('__new__.01-common.labels.orderDate'),
-                width: '120px',
-                render: (item: SalesOrder) => (
-                  <Text size="sm">{formatDate(getSalesOrderReadyDate(item))}</Text>
-                ),
-              },
+    if (view === 'warehouse') {
+      return [
+        ...selectionColumns,
+        {
+          key: 'deliveryDate',
+          header: (
+            <SortHeader
+              label={t('salesOrders.columns.deliveryDate')}
+              field="deliveryDate"
+              current={sortField}
+              onChange={onSortChange}
+            />
+          ),
+          width: '120px',
+          render: renderDeliveryDate,
+        },
+        customerColumn,
+        ...(showPrice
+          ? [
+              subtotalColumn,
+              vatColumn,
               {
-                key: 'financeSubtotal',
-                header: t('salesOrders.finance.subtotalLabel'),
-                ta: 'right' as const,
-                width: '140px',
-                render: (item: SalesOrder) => (
-                  <Text size="sm" ta="right">
-                    {computeSalesOrderTotals(item, vatRate).subtotal.toLocaleString()}
-                  </Text>
-                ),
-              },
-              {
-                key: 'financeVat',
-                header: t('salesOrders.finance.vatLabel'),
-                ta: 'right' as const,
-                width: '130px',
-                render: (item: SalesOrder) => (
-                  <Text size="sm" ta="right">
-                    {computeSalesOrderTotals(item, vatRate).vat.toLocaleString()}
-                  </Text>
-                ),
-              },
-              {
-                key: 'financeGrandTotal',
-                header: t('salesOrders.finance.grandTotalLabel'),
+                key: 'afterTax',
+                header: t('salesOrders.finance.afterTaxLabel'),
                 ta: 'right' as const,
                 width: '150px',
-                render: (item: SalesOrder) => (
-                  <Text size="sm" fw={600} ta="right">
-                    {computeSalesOrderTotals(item, vatRate).grandTotal.toLocaleString()}
-                  </Text>
-                ),
-              },
-              {
-                key: 'financeInvoice',
-                header: t('salesOrders.billing.invoiceLabel'),
-                width: '120px',
-                render: (item: SalesOrder) =>
-                  item.extra?.invoiceIssued ? (
-                    <Badge variant="light" size="sm" radius="sm" color="blue">
-                      {t('salesOrders.billing.invoiceIssued')}
-                    </Badge>
-                  ) : (
-                    <Text size="sm" ta="center">
-                      -
-                    </Text>
-                  ),
-              },
-            ]
-          : [
-              {
-                key: 'assignedStaff',
-                width: '150px',
-                header: t('salesOrders.columns.assignedStaff'),
+                filter: getColumnFilter?.('afterTax'),
                 render: (item: SalesOrder) => {
-                  const staffId = item.extra?.assignedStaff;
-                  return <Text size="sm">{staffId ? (employeeMap.get(staffId) ?? '-') : '-'}</Text>;
+                  const { subtotal, vat } = computeSalesOrderTotals(item, vatRate);
+                  return (
+                    <Text size="sm" fw={600} ta="right">
+                      {(subtotal + vat).toLocaleString()}
+                    </Text>
+                  );
                 },
               },
-              ...(dateColumns === 'combinedReady'
-                ? [
-                    {
-                      key: 'dates',
+            ]
+          : []),
+        {
+          key: 'customerPONumber',
+          header: t('salesOrders.form.customerPONumberLabel'),
+          width: '160px',
+          filter: getColumnFilter?.('customerPONumber'),
+          render: (item: SalesOrder) => (
+            <Text size="sm">{item.extra?.customerPONumber || '-'}</Text>
+          ),
+        },
+        labelsColumn,
+        assignedStaffColumn,
+        ...itemsColumns,
+      ];
+    }
 
-                      header: t('__new__.01-common.labels.orderDate'),
-                      width: '200px',
-                      render: (item: SalesOrder) => {
-                        const dd = item.extra?.deliveryDate;
-                        const color = getDeliveryDateColor(item);
-                        const readyAt = getSalesOrderReadyDate(item);
-                        return (
-                          <Stack gap={0}>
-                            <Text size="sm">{formatDateTime(readyAt)}</Text>
-                            {dd && (
-                              <Group>
-                                {t('salesOrders.columns.deliveryDate')}:{' '}
-                                <Text size="sm" c={color} fw={color ? 600 : undefined}>
-                                  {formatDate(dd)}
-                                </Text>
-                              </Group>
-                            )}
-                          </Stack>
-                        );
-                      },
-                    },
-                  ]
-                : [
-                    {
-                      key: 'orderDate',
-                      header: (
-                        <SortHeader
-                          label={t('salesOrders.columns.orderDate')}
-                          field="createdAt"
-                          current={sortField}
-                          onChange={onSortChange}
-                        />
-                      ),
-                      render: (item: SalesOrder) => (
-                        <Text size="sm">{formatDateTime(item.createdAt)}</Text>
-                      ),
-                    },
-                    {
-                      key: 'deliveryDate',
-                      header: (
-                        <SortHeader
-                          label={t('salesOrders.columns.deliveryDate')}
-                          field="deliveryDate"
-                          current={sortField}
-                          onChange={onSortChange}
-                        />
-                      ),
-                      render: (item: SalesOrder) => {
-                        const dd = item.extra?.deliveryDate;
-                        const color = getDeliveryDateColor(item);
-                        return (
-                          <Text size="sm" c={color} fw={color ? 600 : undefined}>
-                            {dd ? formatDate(dd) : '-'}
-                          </Text>
-                        );
-                      },
-                    },
-                  ]),
+    const opsColumns: DataTableColumn<SalesOrder>[] = [
+      ...leadColumns,
+      customerColumn,
+      assignedStaffColumn,
+      ...(dateColumns === 'combinedReady'
+        ? [
+            {
+              key: 'dates',
 
-              ...(showPrice
-                ? [
-                    {
-                      key: 'totalIncl',
-                      header: t('salesOrders.billing.totalInclLabel'),
-                      ta: 'right' as const,
-                      width: '150px',
-                      render: (item: SalesOrder) => (
-                        <Text size="sm" fw={500} ta="right">
-                          {computeSalesOrderTotals(item, vatRate).grandTotal.toLocaleString()}
-                        </Text>
-                      ),
-                    },
-                    {
-                      key: 'isPaid',
-                      hidden: !showPaymentColumns,
-                      header: t('salesOrders.billing.paidLabel'),
-                      width: '150px',
-                      render: (item: SalesOrder) => {
-                        const grandTotal = computeSalesOrderTotals(item, vatRate).grandTotal;
-                        const payment = resolveSalesOrderPaymentState(item.extra, grandTotal);
-                        if (payment.state === 'unpaid') {
-                          return (
-                            <Text size="sm" fw={500} ta="center">
-                              -
-                            </Text>
-                          );
-                        }
-                        if (payment.state === 'partial') {
-                          return (
-                            <Stack gap={2} align="flex-start">
-                              <Badge variant="light" size="sm" radius="sm" color="orange">
-                                {t('salesOrders.billing.partial')}
-                              </Badge>
-                              <Text size="xs" c="dimmed">
-                                {payment.paidAmount.toLocaleString()}
-                              </Text>
-                            </Stack>
-                          );
-                        }
-                        return (
-                          <Badge variant="light" size="sm" radius="sm" color={'blue'}>
-                            {t('salesOrders.billing.paid')}
-                          </Badge>
-                        );
-                      },
-                    },
-                    {
-                      key: 'invoiceIssued',
-                      hidden: !showPaymentColumns,
-                      header: t('salesOrders.billing.invoiceLabel'),
-                      width: '150px',
-                      render: (item: SalesOrder) => {
-                        if (!item.extra?.invoiceIssued) {
-                          return (
-                            <Text size="sm" fw={500} ta="center">
-                              -
-                            </Text>
-                          );
-                        }
-                        return (
-                          <Badge
-                            variant="light"
-                            size="sm"
-                            radius="sm"
-                            color={item.extra?.invoiceIssued ? 'blue' : 'gray'}
-                          >
-                            {t('salesOrders.billing.invoiceIssued')}
-                          </Badge>
-                        );
-                      },
-                    },
-                  ]
-                : []),
-              {
-                key: 'labels',
-                header: t('salesOrders.columns.labels'),
-                width: '200px',
-                render: (item: SalesOrder) => (
-                  <SalesOrderStatusBadgeBase
-                    extra={item.extra ?? {}}
-                    resolveStatus={resolveStatus}
-                    resolveDeliveryMethod={resolveDeliveryMethod}
-                    tagOptions={tagOptions}
-                    variant={statusBadgeVariant}
+              header: (
+                <Stack gap={2}>
+                  <SortHeader
+                    label={t('__new__.01-common.labels.orderDate')}
+                    field="createdAt"
+                    current={sortField}
+                    onChange={onSortChange}
                   />
-                ),
+                  <SortHeader
+                    label={t('salesOrders.columns.deliveryDate')}
+                    field="deliveryDate"
+                    current={sortField}
+                    onChange={onSortChange}
+                  />
+                </Stack>
+              ),
+              width: '200px',
+              render: (item: SalesOrder) => {
+                const dd = item.extra?.deliveryDate;
+                const color = getDeliveryDateColor(item);
+                const readyAt = getSalesOrderReadyDate(item);
+                return (
+                  <Stack gap={0}>
+                    <Text size="sm">{formatDateTime(readyAt)}</Text>
+                    {dd && (
+                      <Group>
+                        {t('salesOrders.columns.deliveryDate')}:{' '}
+                        <Text size="sm" c={color} fw={color ? 600 : undefined}>
+                          {formatDate(dd)}
+                        </Text>
+                      </Group>
+                    )}
+                  </Stack>
+                );
               },
+            },
+          ]
+        : [
+            {
+              key: 'orderDate',
+              header: (
+                <SortHeader
+                  label={t('salesOrders.columns.orderDate')}
+                  field="createdAt"
+                  current={sortField}
+                  onChange={onSortChange}
+                />
+              ),
+              render: (item: SalesOrder) => (
+                <Text size="sm">{formatDateTime(getSalesOrderReadyDate(item))}</Text>
+              ),
+            },
+            {
+              key: 'deliveryDate',
+              header: (
+                <SortHeader
+                  label={t('salesOrders.columns.deliveryDate')}
+                  field="deliveryDate"
+                  current={sortField}
+                  onChange={onSortChange}
+                />
+              ),
+              render: renderDeliveryDate,
+            },
+          ]),
 
-              ...(onShowItems
-                ? [
-                    {
-                      key: '__items',
-                      header: '',
-                      width: '56px',
-                      ta: 'center' as const,
-                      render: (item: SalesOrder) => (
-                        <Tooltip label={t('salesOrders.detail.viewItems')} withArrow>
-                          <ActionIcon
-                            variant="subtle"
-                            color="gray"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onShowItems(item);
-                            }}
-                          >
-                            <IconListDetails size={18} />
-                          </ActionIcon>
-                        </Tooltip>
-                      ),
-                    },
-                  ]
-                : []),
-            ]),
-      ].filter((el) => el.hidden !== true),
-    [
-      t,
-      sortField,
-      onSortChange,
-      getCustomerByCode,
-      employeeMap,
-      resolveStatus,
-      resolveDeliveryMethod,
-      tagOptions,
-      selectable,
-      selectedIds,
-      onToggleRow,
-      onToggleAll,
-      allSelected,
-      someSelected,
-      disabledIds,
-      onShowItems,
-      financeMode,
-      showCheatMarker,
-      vacuousCompletionIds,
-      dateColumns,
-      showPaymentColumns,
-      statusBadgeVariant,
-    ],
-  );
+      ...(showPrice
+        ? [
+            {
+              key: 'totalIncl',
+              header: t('salesOrders.billing.totalInclLabel'),
+              ta: 'right' as const,
+              width: '150px',
+              render: (item: SalesOrder) => (
+                <Text size="sm" fw={500} ta="right">
+                  {computeSalesOrderTotals(item, vatRate).grandTotal.toLocaleString()}
+                </Text>
+              ),
+            },
+            {
+              key: 'isPaid',
+              hidden: !showPaymentColumns,
+              header: t('salesOrders.billing.paidLabel'),
+              width: '150px',
+              render: (item: SalesOrder) => {
+                const grandTotal = computeSalesOrderTotals(item, vatRate).grandTotal;
+                const payment = resolveSalesOrderPaymentState(item.extra, grandTotal);
+                if (payment.state === 'unpaid') {
+                  return (
+                    <Text size="sm" fw={500} ta="center">
+                      -
+                    </Text>
+                  );
+                }
+                if (payment.state === 'partial') {
+                  return (
+                    <Stack gap={2} align="flex-start">
+                      <Badge variant="light" size="sm" radius="sm" color="orange">
+                        {t('salesOrders.billing.partial')}
+                      </Badge>
+                      <Text size="xs" c="dimmed">
+                        {payment.paidAmount.toLocaleString()}
+                      </Text>
+                    </Stack>
+                  );
+                }
+                return (
+                  <Badge variant="light" size="sm" radius="sm" color={'blue'}>
+                    {t('salesOrders.billing.paid')}
+                  </Badge>
+                );
+              },
+            },
+            {
+              key: 'invoiceIssued',
+              hidden: !showPaymentColumns,
+              header: t('salesOrders.billing.invoiceLabel'),
+              width: '150px',
+              render: (item: SalesOrder) => {
+                if (!item.extra?.invoiceIssued) {
+                  return (
+                    <Text size="sm" fw={500} ta="center">
+                      -
+                    </Text>
+                  );
+                }
+                return (
+                  <Badge
+                    variant="light"
+                    size="sm"
+                    radius="sm"
+                    color={item.extra?.invoiceIssued ? 'blue' : 'gray'}
+                  >
+                    {t('salesOrders.billing.invoiceIssued')}
+                  </Badge>
+                );
+              },
+            },
+          ]
+        : []),
+      labelsColumn,
+      ...itemsColumns,
+    ];
+    return opsColumns.filter((el) => el.hidden !== true);
+  }, [
+    t,
+    sortField,
+    onSortChange,
+    getCustomerByCode,
+    employeeMap,
+    resolveStatus,
+    resolveDeliveryMethod,
+    tagOptions,
+    selectable,
+    selectedIds,
+    onToggleRow,
+    onToggleAll,
+    allSelected,
+    someSelected,
+    disabledIds,
+    onShowItems,
+    view,
+    financeMode,
+    showCheatMarker,
+    vacuousCompletionIds,
+    dateColumns,
+    showPaymentColumns,
+    statusBadgeVariant,
+    getColumnFilter,
+  ]);
 
   const handleRowClick = (item: SalesOrder) => {
     if (selectable) {

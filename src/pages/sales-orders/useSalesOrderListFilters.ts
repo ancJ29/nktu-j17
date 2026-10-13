@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { serializeColumnFilters, type ColumnFilterValues } from '@credo/base-ui/hooks';
 import { type DateRangeValue } from '@/types/date-range';
 import {
   type SerializedDateRange,
@@ -15,8 +16,10 @@ import {
   shouldEncodeStatusSelection,
 } from '@/utils/listFilterStatusDefault';
 import { getSalesOrderDefaultListStatuses } from '@/utils/permission';
-import { getSalesOrderReadyDate, getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
+import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
 import type { SalesOrder } from '@/types';
+import { compareSalesOrdersForList } from './salesOrderListSort';
+import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 
 const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
@@ -35,6 +38,7 @@ type SalesOrderUrlState = {
   cd?: SerializedDateRange;
   dd?: SerializedDateRange;
   dk?: 'internal' | 'external';
+  cf?: string;
   pg?: number;
 };
 
@@ -50,6 +54,7 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   if (state.cd?.preset) r.cd = state.cd;
   if (state.dd?.preset) r.dd = state.dd;
   if (state.dk) r.dk = state.dk;
+  if (state.cf) r.cf = state.cf;
   if (state.pg && state.pg > DEFAULT_PAGE) r.pg = state.pg;
   return r;
 }
@@ -78,6 +83,7 @@ export function useSalesOrderListFilters(
   );
   const deliveryDateRange = useMemo(() => restoreDateRange(state.dd, EMPTY_DATE_RANGE), [state.dd]);
   const deliveryKind: SalesOrderDeliveryKind = state.dk ?? 'all';
+  const columnFilters = state.cf ?? '';
   const page = state.pg ?? DEFAULT_PAGE;
 
   const setStatusFilter = useCallback(
@@ -134,6 +140,12 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
+  const setColumnFilters = useCallback(
+    (values: ColumnFilterValues) =>
+      updateState({ cf: serializeColumnFilters(values) || undefined, pg: undefined }),
+    [updateState],
+  );
+
   const setPage = useCallback(
     (value: number) => updateState({ pg: value !== DEFAULT_PAGE ? value : undefined }),
     [updateState],
@@ -159,31 +171,13 @@ export function useSalesOrderListFilters(
       return true;
     });
 
-    const [field, dir] = sortField.split('_') as [string, string];
-
-    const mult = dir === 'asc' ? 1 : -1;
-    return filtered.sort((a, b) => {
-      const aU = a.extra?.isUrgent ? 1 : 0;
-      const bU = b.extra?.isUrgent ? 1 : 0;
-      if (aU !== bU) return bU - aU;
-      if (field === 'deliveryDate') {
-        const aVal = a.extra?.deliveryDate ?? '';
-        const bVal = b.extra?.deliveryDate ?? '';
-        return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
-      }
-
-      if (internalDeliveryFirstSort) {
-        const aExternal = a.extra?.isInternalDelivery === false ? 1 : 0;
-        const bExternal = b.extra?.isInternalDelivery === false ? 1 : 0;
-        if (aExternal !== bExternal) {
-          return aExternal - bExternal;
-        }
-      }
-
-      const aVal = getSalesOrderReadyMs(a);
-      const bVal = getSalesOrderReadyMs(b);
-      return aVal < bVal ? -mult : aVal > bVal ? mult : 0;
-    });
+    return filtered.sort(
+      compareSalesOrdersForList(
+        sortField,
+        internalDeliveryFirstSort,
+        salesOrderFieldOptions.resolveStatus,
+      ),
+    );
   }, [
     storeOrders,
     statusFilter,
@@ -210,7 +204,7 @@ export function useSalesOrderListFilters(
     !isDefaultLastNDaysRange(createdDateRange) ||
     deliveryDateRange.preset ||
     deliveryKind !== 'all' ||
-    undefined // search is handled externally by useListFilter
+    undefined // search + the header filters are handled by the page
   );
 
   return {
@@ -234,6 +228,9 @@ export function useSalesOrderListFilters(
     setDeliveryDateRange,
     deliveryKind,
     setDeliveryKind,
+
+    columnFilters,
+    setColumnFilters,
     page,
     setPage,
 

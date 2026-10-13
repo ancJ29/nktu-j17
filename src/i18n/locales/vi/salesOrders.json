@@ -211,6 +211,7 @@
   "filterStaff": "Nhân viên",
   "filterUrgentOnly": "Đơn gấp",
   "finance": {
+    "afterTaxLabel": "Tổng tiền sau thuế",
     "exemptError": "Không cập nhật được đơn hàng. Vui lòng thử lại.",
     "exemptLabel": "Không cần số liệu kế toán",
     "grandTotalLabel": "Tổng tiền thanh toán",
@@ -220,7 +221,8 @@
     "totalsMissing": "{{count}} đơn thiếu số liệu",
     "vatLabel": "Tiền thuế GTGT",
     "viewFinance": "Kế toán",
-    "viewOps": "Vận hành"
+    "viewOps": "Vận hành",
+    "viewWarehouse": "Kho"
   },
   "form": {
     "addItem": "Thêm sản phẩm",

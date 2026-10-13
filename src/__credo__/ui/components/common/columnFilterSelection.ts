@@ -40,6 +40,13 @@ export function toggleColumnFilterAll(current: ColumnFilterSelection): ColumnFil
     : { selected: [], cleared: false };
 }
 
+export function selectColumnFilterShown(
+  options: readonly string[],
+  shown: readonly string[],
+): ColumnFilterSelectionResult | null {
+  return shown.length > 0 ? normalise([...shown], options) : null;
+}
+
 function normalise(next: string[], options: readonly string[]): ColumnFilterSelectionResult {
   if (next.length === 0) return { selected: [], cleared: true };
   if (next.length === options.length) return { selected: [], cleared: false };

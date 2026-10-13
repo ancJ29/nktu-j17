@@ -6,7 +6,7 @@ export type OdometerLogExtra = {
 
   employeeName: string;
 
-  km: number;
+  km?: number;
 
   photos: PhotoEntry[];
 

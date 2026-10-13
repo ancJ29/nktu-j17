@@ -25,12 +25,15 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
-import { getPricingVatRate } from '@/utils/permission';
+import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
 import {
   computeSalesOrderTotals,
   isSalesOrderBillingExempt,
   isSalesOrderMissingMoneyInfo,
 } from '@/utils/salesOrderPricing';
+import type { SalesOrderListView } from './salesOrderListVariant';
+
+const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 
 type SalesOrderCardListProps = {
   readonly orders: SalesOrder[];
@@ -42,7 +45,7 @@ type SalesOrderCardListProps = {
 
   readonly onShowItems?: (order: SalesOrder) => void;
 
-  readonly financeMode?: boolean;
+  readonly view: SalesOrderListView;
 
   readonly onToggleBillingExempt?: (order: SalesOrder) => void;
 
@@ -80,7 +83,7 @@ export function SalesOrderCardList({
   employees,
   tagOptions,
   onShowItems,
-  financeMode = false,
+  view,
   onToggleBillingExempt,
   showCheatMarker = false,
   vacuousCompletionIds,
@@ -90,6 +93,9 @@ export function SalesOrderCardList({
   const vatRate = getPricingVatRate();
   const navigate = useNavigate();
   const getCustomerByCode = useCustomerStore((s) => s.getByCode);
+  const financeMode = view === 'finance';
+  const warehouseMode = view === 'warehouse';
+  const showMoney = financeMode || (warehouseMode && showPrice);
 
   const employeeMap = useMemo(() => {
     const m = new Map<string, string>();
@@ -211,6 +217,12 @@ export function SalesOrderCardList({
                   label={t('common.labels.customer')}
                   value={resolveSalesOrderCustomerName(order, getCustomerByCode) || '-'}
                 />
+                {warehouseMode && extra.customerPONumber && (
+                  <FieldRow
+                    label={t('salesOrders.form.customerPONumberLabel')}
+                    value={extra.customerPONumber}
+                  />
+                )}
                 {staffName && (
                   <FieldRow label={t('salesOrders.detail.assignedStaff')} value={staffName} />
                 )}
@@ -229,7 +241,7 @@ export function SalesOrderCardList({
                 {createdByName && (
                   <FieldRow label={t('salesOrders.detail.createdBy')} value={createdByName} />
                 )}
-                {financeMode &&
+                {showMoney &&
                   (() => {
                     const totals = computeSalesOrderTotals(order, vatRate);
                     return (
@@ -242,27 +254,36 @@ export function SalesOrderCardList({
                           label={t('salesOrders.finance.vatLabel')}
                           value={totals.vat.toLocaleString()}
                         />
-                        <FieldRow
-                          label={t('salesOrders.finance.grandTotalLabel')}
-                          value={totals.grandTotal.toLocaleString()}
-                        />
-                        <FieldRow
-                          label={t('salesOrders.billing.invoiceLabel')}
-                          value={
-                            order.extra?.invoiceIssued
-                              ? t('salesOrders.billing.invoiceIssued')
-                              : '—'
-                          }
-                        />
-                        {onToggleBillingExempt && (
-                          <Checkbox
-                            mt={4}
-                            size="sm"
-                            label={t('salesOrders.finance.exemptLabel')}
-                            checked={isSalesOrderBillingExempt(extra)}
-                            onChange={() => onToggleBillingExempt(order)}
-                            onClick={(e) => e.stopPropagation()}
+                        {warehouseMode ? (
+                          <FieldRow
+                            label={t('salesOrders.finance.afterTaxLabel')}
+                            value={(totals.subtotal + totals.vat).toLocaleString()}
                           />
+                        ) : (
+                          <>
+                            <FieldRow
+                              label={t('salesOrders.finance.grandTotalLabel')}
+                              value={totals.grandTotal.toLocaleString()}
+                            />
+                            <FieldRow
+                              label={t('salesOrders.billing.invoiceLabel')}
+                              value={
+                                order.extra?.invoiceIssued
+                                  ? t('salesOrders.billing.invoiceIssued')
+                                  : '—'
+                              }
+                            />
+                            {onToggleBillingExempt && (
+                              <Checkbox
+                                mt={4}
+                                size="sm"
+                                label={t('salesOrders.finance.exemptLabel')}
+                                checked={isSalesOrderBillingExempt(extra)}
+                                onChange={() => onToggleBillingExempt(order)}
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                            )}
+                          </>
                         )}
                       </>
                     );

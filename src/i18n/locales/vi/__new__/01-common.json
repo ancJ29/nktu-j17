@@ -13,6 +13,7 @@
   },
   "filters": {
     "columnFilter": {
+      "applyResults": "Chỉ hiện các giá trị này",
       "clear": "Xóa lọc",
       "empty": "Không có giá trị",
       "search": "Tìm giá trị",

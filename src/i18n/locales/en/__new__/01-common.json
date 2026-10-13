@@ -13,6 +13,7 @@
   },
   "filters": {
     "columnFilter": {
+      "applyResults": "Show only these",
       "clear": "Clear filter",
       "empty": "No values",
       "search": "Search values",

@@ -20,6 +20,7 @@ import {
   type ColumnFilterValues,
 } from '@credo/base-ui/hooks';
 import { useListScrollRestoration, useLookupV2Labels, useLookupV2Options } from '@/hooks';
+import { useColumnFilterLabels } from '@/hooks/useColumnFilterLabels';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
 import { useOpenInboundByProduct } from '@/hooks/useOpenInboundByProduct';
@@ -207,15 +208,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     (next: ColumnFilterValues) => updateState({ columnFilters: serializeColumnFilters(next) }),
     [updateState],
   );
-  const columnFilterLabels = useMemo(
-    () => ({
-      search: t('__new__.01-common.filters.columnFilter.search'),
-      selectAll: t('__new__.01-common.filters.columnFilter.selectAll'),
-      clear: t('__new__.01-common.filters.columnFilter.clear'),
-      empty: t('__new__.01-common.filters.columnFilter.empty'),
-    }),
-    [t],
-  );
+  const columnFilterLabels = useColumnFilterLabels();
   const secondaryStatusLabels: Record<string, string> = useMemo(
     () => ({
       outOfStock: t('common.secondaryStatus.outOfStock'),

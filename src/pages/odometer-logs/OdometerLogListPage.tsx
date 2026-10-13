@@ -14,7 +14,14 @@ import {
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { IconCalendarStats, IconGauge, IconList, IconPencil } from '@tabler/icons-react';
+import {
+  IconCalendarStats,
+  IconCamera,
+  IconCash,
+  IconGauge,
+  IconList,
+  IconPencil,
+} from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device } from '@credo/base-ui/utils';
@@ -35,12 +42,14 @@ import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
 import { LogPhotoCell, LogPhotoGalleryModal } from '../operation-logs/OperationLogPhotos';
 import type { TFn } from '../operation-logs/operationLogConfig';
+import { OdometerFuelLedger } from './OdometerFuelLedger';
 import { OdometerLogModal } from './OdometerLogModal';
 import {
   buildComplianceGrid,
   canWriteDate,
   dayGap,
   distanceSincePrevious,
+  hasKm,
   isEdited,
   liveLogs,
   previousReading,
@@ -75,6 +84,7 @@ export function OdometerLogListPage() {
   const [galleryLog, setGalleryLog] = useState<OdometerLog | null>(null);
   const [editing, setEditing] = useState<OdometerLog | undefined>();
   const [editOpened, { open: openEdit, close: closeEdit }] = useDisclosure(false);
+  const [tab, setTab] = useState('compliance');
   const today = todayInVnDateString();
 
   useEffect(() => {
@@ -148,24 +158,29 @@ export function OdometerLogListPage() {
     openEdit();
   };
 
+  const showDates = !canViewAll || tab !== 'fuel';
   const filterRow = (
     <Group gap="sm" wrap="wrap">
-      <DateField
-        label={t('odometerLog.columns.date')}
-        value={dateRange.from}
-        clearable={false}
-        maxDate={new Date()}
-        w={isMobile ? '45%' : 170}
-        onChange={(value) => applyDateRange({ ...dateRange, from: toDate(value) })}
-      />
-      <DateField
-        label=" "
-        value={dateRange.to}
-        clearable={false}
-        maxDate={new Date()}
-        w={isMobile ? '45%' : 170}
-        onChange={(value) => applyDateRange({ ...dateRange, to: toDate(value) })}
-      />
+      {showDates && (
+        <>
+          <DateField
+            label={t('odometerLog.columns.date')}
+            value={dateRange.from}
+            clearable={false}
+            maxDate={new Date()}
+            w={isMobile ? '45%' : 170}
+            onChange={(value) => applyDateRange({ ...dateRange, from: toDate(value) })}
+          />
+          <DateField
+            label=" "
+            value={dateRange.to}
+            clearable={false}
+            maxDate={new Date()}
+            w={isMobile ? '45%' : 170}
+            onChange={(value) => applyDateRange({ ...dateRange, to: toDate(value) })}
+          />
+        </>
+      )}
       {canViewAll && (
         <Select
           label={t('odometerLog.filters.driver')}
@@ -195,9 +210,13 @@ export function OdometerLogListPage() {
                 {showPhoto(log)}
                 <Stack gap={2}>
                   <Group gap={6} wrap="nowrap" align="baseline">
-                    <Text size="sm" fw={600}>
-                      {formatKm(readKm(log))} km
-                    </Text>
+                    {hasKm(log) ? (
+                      <Text size="sm" fw={600}>
+                        {formatKm(readKm(log))} km
+                      </Text>
+                    ) : (
+                      <KmPendingBadge />
+                    )}
                     {/* The card carries the delta too: a driver reading their
                         own history wants the distance, and the desktop table is
                         the only place it existed. */}
@@ -258,7 +277,7 @@ export function OdometerLogListPage() {
                     </Table.Td>
                   )}
                   <Table.Td ta="right" ff="monospace">
-                    {formatKm(readKm(log))}
+                    {hasKm(log) ? formatKm(readKm(log)) : <KmPendingBadge />}
                   </Table.Td>
                   <Table.Td
                     ta="right"
@@ -373,7 +392,7 @@ export function OdometerLogListPage() {
       </StickyListChrome>
 
       {canViewAll ? (
-        <Tabs defaultValue="compliance" keepMounted={false}>
+        <Tabs value={tab} onChange={(v) => setTab(v ?? 'compliance')} keepMounted={false}>
           <Tabs.List>
             <Tabs.Tab value="compliance" leftSection={<IconCalendarStats size={14} />}>
               {t('odometerLog.tabs.compliance')}
@@ -381,12 +400,18 @@ export function OdometerLogListPage() {
             <Tabs.Tab value="entries" leftSection={<IconList size={14} />}>
               {t('odometerLog.tabs.entries')}
             </Tabs.Tab>
+            <Tabs.Tab value="fuel" leftSection={<IconCash size={14} />}>
+              {t('odometerLog.tabs.fuel')}
+            </Tabs.Tab>
           </Tabs.List>
           <Tabs.Panel value="compliance" pt="md">
             {complianceTab}
           </Tabs.Panel>
           <Tabs.Panel value="entries" pt="md">
             {entriesTab}
+          </Tabs.Panel>
+          <Tabs.Panel value="fuel" pt="md">
+            <OdometerFuelLedger roster={roster} driverFilter={driverFilter} />
           </Tabs.Panel>
         </Tabs>
       ) : (
@@ -458,8 +483,9 @@ function ReadingCell({
   const hasPhoto = visibleLogPhotos(log.extra?.photos).length > 0;
   const fuelCost = readFuelCost(log);
 
-  const reading =
-    previous && delta != null
+  const reading = !hasKm(log)
+    ? t('odometerLog.compliance.kmPending')
+    : previous && delta != null
       ? t('odometerLog.compliance.cellTooltip', {
           km: formatKm(km),
           delta: delta.toLocaleString(),
@@ -482,10 +508,16 @@ function ReadingCell({
         style={{ cursor: hasPhoto ? 'pointer' : 'default' }}
         onClick={() => hasPhoto && onOpenPhotos(log)}
       >
-        <Text size="xs" fw={600} ff="monospace" style={{ whiteSpace: 'nowrap' }}>
-          {formatKm(km)}
-          {isEdited(log) ? '*' : ''}
-        </Text>
+        {/* Photos without their km: the day still counts missing, and the
+            camera says what is there instead. */}
+        {hasKm(log) ? (
+          <Text size="xs" fw={600} ff="monospace" style={{ whiteSpace: 'nowrap' }}>
+            {formatKm(km)}
+            {isEdited(log) ? '*' : ''}
+          </Text>
+        ) : (
+          <IconCamera size={14} color="var(--mantine-color-orange-6)" />
+        )}
         {delta != null && (
           <Text
             size="10px"
@@ -500,6 +532,15 @@ function ReadingCell({
         )}
       </Stack>
     </Tooltip>
+  );
+}
+
+function KmPendingBadge() {
+  const { t } = useTranslation();
+  return (
+    <Badge size="xs" variant="light" color="orange">
+      {t('odometerLog.detail.kmPending')}
+    </Badge>
   );
 }
 

@@ -6,6 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { getCurrentEmployeeId, getCurrentIsRoot } from '@/hooks/useCurrentEmployee';
+import { useColumnFilterLabels } from '@/hooks/useColumnFilterLabels';
 import { setSalesOrderQueryRange, useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useIsRoot } from '@/hooks/useIsRoot';
@@ -17,6 +18,7 @@ import {
 } from '@/stores/useDeliveryRequestStore';
 import { ListPagination } from '@/components/custom/ListPagination';
 import { device, logger } from '@credo/base-ui/utils';
+import { parseColumnFilters, useColumnFilters } from '@credo/base-ui/hooks';
 import { exportSalesOrdersToExcel } from '@/utils/salesOrderExcel';
 import { exportSalesOrdersToAccountingExcel } from '@/utils/salesOrderAccountingExcel';
 import { useListFilter } from '@/hooks/useListFilter';
@@ -68,8 +70,9 @@ import { SalesOrderDataTable } from './SalesOrderDataTable';
 import { SalesOrderFinanceTotals } from './SalesOrderFinanceTotals';
 import { SalesOrderItemsPreviewDrawer } from './SalesOrderItemsPreviewDrawer';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
+import { buildSalesOrderWarehouseColumnFilterDefs } from './salesOrderWarehouseColumnFilters';
 import { useSalesOrderListFilters } from './useSalesOrderListFilters';
-import type { SalesOrderListVariant } from './salesOrderListVariant';
+import type { SalesOrderListVariant, SalesOrderListView } from './salesOrderListVariant';
 import type { DeliveryRequest, SalesOrder } from '@/types';
 
 const isMobile = device.isMobile;
@@ -105,8 +108,15 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
 
   const [itemsOrder, setItemsOrder] = useState<SalesOrder | null>(null);
 
-  const [viewMode, setViewMode] = useState<'ops' | 'finance'>('ops');
-  const financeMode = showPrice && viewMode === 'finance';
+  const [viewMode, setViewMode] = useState<SalesOrderListView>('ops');
+  const financeMode = viewMode === 'finance';
+  const viewOptions = [
+    { value: 'ops', label: t('salesOrders.finance.viewOps') },
+    ...(showPrice ? [{ value: 'finance', label: t('salesOrders.finance.viewFinance') }] : []),
+    ...(variant.showWarehouseView
+      ? [{ value: 'warehouse', label: t('salesOrders.finance.viewWarehouse') }]
+      : []),
+  ];
 
   const selection = useSelectionMode();
   const {
@@ -196,6 +206,34 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       .finally(() => setDrsReady(true));
   }, [needDeliveryRequests, fetchRange]);
 
+  const columnFiltersShown = !isMobile && viewMode === 'warehouse';
+  const columnFilterLabels = useColumnFilterLabels();
+  const columnFilterDefs = useMemo(
+    () =>
+      columnFiltersShown
+        ? buildSalesOrderWarehouseColumnFilterDefs({
+            priceVisible: showPrice,
+            vatRate: pricingVatRate,
+            labels: columnFilterLabels,
+          })
+        : [],
+    [columnFiltersShown, columnFilterLabels],
+  );
+  const columnFilterValues = useMemo(
+    () => parseColumnFilters(filters.columnFilters),
+    [filters.columnFilters],
+  );
+  const columnFilters = useColumnFilters(filters.allOrders, columnFilterDefs, {
+    value: columnFilterValues,
+    onChange: filters.setColumnFilters,
+  });
+
+  const appliedColumnFilters = columnFilterDefs.some(
+    (def) => (columnFilterValues[def.key]?.length ?? 0) > 0,
+  )
+    ? filters.columnFilters
+    : '';
+
   const {
     search,
     setSearch,
@@ -211,8 +249,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       status: filters.statusFilter,
       customer: filters.customerFilter,
       staff: filters.staffFilter,
+      columnFilters: appliedColumnFilters,
     },
-    filterFn: () => true,
+    filterFn: columnFilters.predicate,
     searchFields: (item) => [
       item.orderNumber,
       item.extra?.customerPONumber ?? '',
@@ -227,7 +266,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
 
   const clearAll = filters.clearFilters;
 
-  const hasActiveFilters = filters.hasActiveFilters || !!search;
+  const hasActiveFilters = filters.hasActiveFilters || !!search || appliedColumnFilters !== '';
 
   const financeSummary = useMemo(() => sumSalesOrderFinance(filtered, pricingVatRate), [filtered]);
 
@@ -659,16 +698,13 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           }}
         />
 
-        {showPrice && (
+        {viewOptions.length > 1 && (
           <Group justify="flex-start">
             <SegmentedControl
               size="sm"
               value={viewMode}
-              onChange={(v) => setViewMode(v as 'ops' | 'finance')}
-              data={[
-                { value: 'ops', label: t('salesOrders.finance.viewOps') },
-                { value: 'finance', label: t('salesOrders.finance.viewFinance') },
-              ]}
+              onChange={(v) => setViewMode(v as SalesOrderListView)}
+              data={viewOptions}
             />
           </Group>
         )}
@@ -778,7 +814,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           tagOptions={tagOptions}
           showCheatMarker={isRootUser}
           vacuousCompletionIds={vacuousCompletionIds}
-          financeMode={financeMode}
+          view={viewMode}
           onToggleBillingExempt={canEditOrders ? handleToggleBillingExempt : undefined}
           statusBadgeVariant={variant.statusBadge}
           {...(variant.showItemsPreview && !financeMode && { onShowItems: setItemsOrder })}
@@ -796,10 +832,11 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           vacuousCompletionIds={vacuousCompletionIds}
           sortField={filters.sortField}
           onSortChange={filters.setSortField}
-          financeMode={financeMode}
+          view={viewMode}
           dateColumns={variant.dateColumns}
           showPaymentColumns={variant.showPaymentColumns}
           statusBadgeVariant={variant.statusBadge}
+          getColumnFilter={columnFilters.filterFor}
           {...(variant.showItemsPreview && !financeMode && { onShowItems: setItemsOrder })}
           {...(variant.bulkDrMode === 'selection' && {
             selectable: canBulkCreateDeliveries && selectionMode,

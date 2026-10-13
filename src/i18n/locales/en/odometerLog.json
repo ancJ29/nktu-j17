@@ -12,6 +12,7 @@
     "cellTooltip": "{{km}} km · {{delta}} km since {{date}}",
     "cellTooltipFirst": "{{km}} km · first reading in range",
     "complete": "All logged",
+    "kmPending": "Photos only — km not entered yet",
     "logged": "Logged",
     "missing": "Missing",
     "missingCount_one": "{{count}} day missing",
@@ -21,6 +22,7 @@
   },
   "detail": {
     "edited": "edited",
+    "kmPending": "no km yet",
     "loggedAt": "Logged {{at}}",
     "updatedAt": "Corrected {{at}}"
   },
@@ -38,7 +40,7 @@
     "fuelCost": "Fuel money today (₫)",
     "fuelCostHint": "What you paid for fuel this day — leave empty if you did not refuel",
     "km": "Odometer reading (km)",
-    "kmHint": "The number shown on the dashboard, in kilometres",
+    "kmHint": "The number on the dashboard, in kilometres — can be entered later, at the end of the shift",
     "note": "Note",
     "photo": "Photos — odometer, fuel receipt",
     "photoRequired": "A photo of the odometer is required",
@@ -46,12 +48,46 @@
     "takePhoto": "Take odometer photo",
     "title": "Log odometer"
   },
+  "fuel": {
+    "amount": "Amount (₫)",
+    "amountRequired": "Enter an amount above 0",
+    "caption": "Each driver counts from their last clear, not from the date filter.",
+    "deletePaymentMessage": "{{amount}} ₫ to {{name}}, paid through {{date}}. It stops counting as paid.",
+    "deletePaymentTitle": "Remove this payment?",
+    "driverRequired": "Pick the driver",
+    "empty": "No drivers to show",
+    "from": "Counted from",
+    "loadFailed": "Couldn't load the fuel money.",
+    "noPayments": "No payments since the last clear",
+    "owedThrough": "Owed through {{date}}: {{amount}} ₫",
+    "paid": "Paid",
+    "paidThrough": "Paid through",
+    "pay": "Record payment",
+    "payTitle": "Record a fuel payment",
+    "paymentDeleted": "Payment removed",
+    "paymentSaved": "Payment recorded",
+    "payments": "Payments",
+    "recordedBy": "Recorded by",
+    "remaining": "Remaining",
+    "reset": "Clear",
+    "resetExplain": "Fuel spent and payments before this date stop counting. Readings, photos and payments stay stored.",
+    "resetFrom": "Count again from",
+    "resetPreview": "Remaining: {{before}} ₫ → {{after}} ₫",
+    "resetSaved": "Cleared",
+    "resetTitle": "Clear the fuel money",
+    "retry": "Try again",
+    "saveFailed": "Couldn't save. Check the connection and try again.",
+    "spent": "Spent"
+  },
   "home": {
+    "addKm": "Enter the km",
     "cta": "Log today's odometer",
     "done": "Today's odometer is logged",
     "edit": "Edit / add photos",
     "fuelCost": "Fuel: {{amount}} ₫",
-    "prompt": "Log your odometer before you finish",
+    "kmPending": "No km yet",
+    "kmPendingPrompt": "Photos saved. Enter the odometer reading when you finish.",
+    "prompt": "Take the photos during the day, enter the km when you finish",
     "title": "End of shift"
   },
   "notifications": {
@@ -61,12 +97,13 @@
   },
   "tabs": {
     "compliance": "By day",
-    "entries": "Entries"
+    "entries": "Entries",
+    "fuel": "Fuel money"
   },
   "title": "Odometer log",
   "validation": {
     "dateRequired": "Pick the shift date",
-    "kmRequired": "Enter the odometer reading"
+    "kmInvalid": "The reading must be above 0"
   },
   "viewSelf": "My readings"
 }

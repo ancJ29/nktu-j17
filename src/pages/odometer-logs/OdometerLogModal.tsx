@@ -24,8 +24,8 @@ import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/uti
 import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
 import { saveOdometerLog } from './saveOdometerLog';
 import {
+  canSaveEntry,
   canWriteDate,
-  isCompleteEntry,
   readEmployeeId,
   readFuelCost,
   readKm,
@@ -105,7 +105,7 @@ function OdometerLogForm({
     },
     validate: {
       recordDate: (v) => (v ? null : t('odometerLog.validation.dateRequired')),
-      km: (v) => (v && v > 0 ? null : t('odometerLog.validation.kmRequired')),
+      km: (v) => (v === undefined || v > 0 ? null : t('odometerLog.validation.kmInvalid')),
     },
   });
 
@@ -118,7 +118,7 @@ function OdometerLogForm({
   );
 
   const dateAllowed = canWriteDate(date, today, { canEditAny, hasEntry: !!entry });
-  const complete = isCompleteEntry(form.values.km ?? '', photos);
+  const savable = canSaveEntry(form.values.km, photos);
   const photoCount = visibleLogPhotos(photos).length;
 
   const handleDateChange = async (next: string | null) => {
@@ -205,7 +205,7 @@ function OdometerLogForm({
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
-      if (!complete || !dateAllowed || dayUnknown || values.km === undefined) return;
+      if (!savable || !dateAllowed || dayUnknown) return;
       setSaving(true);
       try {
         const saved = await saveOdometerLog({
@@ -232,7 +232,7 @@ function OdometerLogForm({
         setSaving(false);
       }
     },
-    [complete, dateAllowed, dayUnknown, employee, photos, onClose, onSaved, t],
+    [savable, dateAllowed, dayUnknown, employee, photos, onClose, onSaved, t],
   );
 
   return (
@@ -254,10 +254,10 @@ function OdometerLogForm({
               `any`-typed form props can't satisfy. */}
         {/* No `thousandSeparator` here: NumberField groups by default, in the
             marks this device prints with. */}
+        {/* No asterisk: the km may follow the photos at the end of the shift. */}
         <NumberField
           label={t('odometerLog.form.km')}
           description={t('odometerLog.form.kmHint')}
-          withAsterisk
           min={0}
           value={form.values.km}
           error={form.errors.km}
@@ -362,7 +362,7 @@ function OdometerLogForm({
           <Button
             type="submit"
             loading={saving || loadingDay}
-            disabled={!complete || !dateAllowed || dayUnknown}
+            disabled={!savable || !dateAllowed || dayUnknown}
           >
             {t('common.actions.save')}
           </Button>

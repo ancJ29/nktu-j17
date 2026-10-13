@@ -657,6 +657,7 @@ export const perms = {
     const resolve = () => (cached ??= getModulePermissions('odometerLog'));
     return {
       ...createModulePerms('odometerLog'),
+      canManagePayment: () => resolve().actions?.canManagePayment ?? false,
 
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,

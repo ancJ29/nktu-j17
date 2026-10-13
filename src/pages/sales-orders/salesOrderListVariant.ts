@@ -4,6 +4,8 @@ import {
   NKTU_SALES_ORDER_STATUS_BADGE_VARIANT,
 } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 
+export type SalesOrderListView = 'ops' | 'finance' | 'warehouse';
+
 export type SalesOrderListVariant = {
   showStatsCards: boolean;
 
@@ -24,6 +26,8 @@ export type SalesOrderListVariant = {
   statusBadge: SalesOrderStatusBadgeVariant;
 
   internalDeliveryFirstSort: boolean;
+
+  showWarehouseView: boolean;
 };
 
 export const DEFAULT_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
@@ -37,6 +41,7 @@ export const DEFAULT_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
   showPaymentColumns: true,
   statusBadge: DEFAULT_SALES_ORDER_STATUS_BADGE_VARIANT,
   internalDeliveryFirstSort: false,
+  showWarehouseView: false,
 };
 
 export const NKTU_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
@@ -52,4 +57,6 @@ export const NKTU_SALES_ORDER_LIST_VARIANT: SalesOrderListVariant = {
   showPaymentColumns: false,
   statusBadge: NKTU_SALES_ORDER_STATUS_BADGE_VARIANT,
   internalDeliveryFirstSort: true,
+
+  showWarehouseView: true,
 };
