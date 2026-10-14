@@ -1,15 +1,4 @@
-import {
-  Alert,
-  Button,
-  Card,
-  Group,
-  Select,
-  Stack,
-  Table,
-  Text,
-  Textarea,
-  Tooltip,
-} from '@mantine/core';
+import { Alert, Button, Card, Group, Select, Stack, Table, Text, Textarea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -216,16 +205,14 @@ export function OdometerFuelLedger({
             <Table.Td>{row.paidThrough ? formatDate(row.paidThrough) : '—'}</Table.Td>
             {canManage && (
               <Table.Td>
-                <Tooltip label={t('odometerLog.fuel.pay')}>
-                  <Button
-                    size="compact-xs"
-                    variant="subtle"
-                    onClick={() => startPay(row.employeeId)}
-                    aria-label={t('odometerLog.fuel.pay')}
-                  >
-                    <IconCash size={14} />
-                  </Button>
-                </Tooltip>
+                <Button
+                  size="compact-xs"
+                  variant="subtle"
+                  onClick={() => startPay(row.employeeId)}
+                  aria-label={t('odometerLog.fuel.pay')}
+                >
+                  <IconCash size={14} />
+                </Button>
               </Table.Td>
             )}
           </Table.Tr>

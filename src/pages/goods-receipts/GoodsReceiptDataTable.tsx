@@ -1,6 +1,6 @@
 import { useMemo, type Ref } from 'react';
 import { useNavigate } from 'react-router';
-import { ActionIcon, Badge, Box, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Box, Group, Stack, Text } from '@mantine/core';
 import { IconCopy, IconListDetails } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -139,18 +139,17 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
               width: '56px',
               ta: 'center' as const,
               render: (item: GoodsReceipt) => (
-                <Tooltip label={t('goodsReceipts.detail.viewItems')} withArrow>
-                  <ActionIcon
-                    variant="subtle"
-                    color="gray"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onShowItems(item);
-                    }}
-                  >
-                    <IconListDetails size={18} />
-                  </ActionIcon>
-                </Tooltip>
+                <ActionIcon
+                  variant="subtle"
+                  color="gray"
+                  aria-label={t('goodsReceipts.detail.viewItems')}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onShowItems(item);
+                  }}
+                >
+                  <IconListDetails size={18} />
+                </ActionIcon>
               ),
             },
           ]

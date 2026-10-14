@@ -17,6 +17,7 @@ import {
   useDeliveryRequestStore,
 } from '@/stores/useDeliveryRequestStore';
 import { ListPagination } from '@/components/custom/ListPagination';
+import { LIST_LAZY_RENDER_CHUNK } from '@/config/listDefaults';
 import { device, logger } from '@credo/base-ui/utils';
 import { parseColumnFilters, useColumnFilters } from '@credo/base-ui/hooks';
 import { exportSalesOrdersToExcel } from '@/utils/salesOrderExcel';
@@ -244,6 +245,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     filtered,
     paginated,
     totalPages,
+    totalItems,
+    hasMore,
+    loadMore,
   } = useListFilter(filters.allOrders, {
     filters: {
       status: filters.statusFilter,
@@ -262,6 +266,13 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     onSearchChange: filters.setSearch,
     page: filters.page,
     onPageChange: filters.setPage,
+
+    lazyKey: ROUTES.SALES_ORDERS.LIST,
+  });
+
+  const loadingMoreLabel = t('__new__.01-common.list.loadingMore', {
+    chunk: Math.min(totalItems - paginated.length, LIST_LAZY_RENDER_CHUNK),
+    total: totalItems,
   });
 
   const clearAll = filters.clearFilters;
@@ -330,9 +341,10 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     [filtered, selectedIds, ordersWithDR],
   );
 
+  const pageOrders = hasMore ? filtered : paginated;
   const selectableOnPage = useMemo(
-    () => paginated.filter((o) => !ordersWithDR.has(o.id)),
-    [paginated, ordersWithDR],
+    () => pageOrders.filter((o) => !ordersWithDR.has(o.id)),
+    [pageOrders, ordersWithDR],
   );
   const selectableOnPageIds = useMemo(() => selectableOnPage.map((o) => o.id), [selectableOnPage]);
   const { allSelected: allPageSelected, someSelected: somePageSelected } =
@@ -817,6 +829,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           view={viewMode}
           onToggleBillingExempt={canEditOrders ? handleToggleBillingExempt : undefined}
           statusBadgeVariant={variant.statusBadge}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
+          loadingMoreLabel={loadingMoreLabel}
           {...(variant.showItemsPreview && !financeMode && { onShowItems: setItemsOrder })}
         />
       ) : (
@@ -837,6 +852,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           showPaymentColumns={variant.showPaymentColumns}
           statusBadgeVariant={variant.statusBadge}
           getColumnFilter={columnFilters.filterFor}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
+          loadingMoreLabel={loadingMoreLabel}
           {...(variant.showItemsPreview && !financeMode && { onShowItems: setItemsOrder })}
           {...(variant.bulkDrMode === 'selection' && {
             selectable: canBulkCreateDeliveries && selectionMode,

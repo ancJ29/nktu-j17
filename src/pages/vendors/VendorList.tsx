@@ -69,7 +69,10 @@ export function VendorList({ variant }: VendorListProps) {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  const showAddress = useMemo(() => allVendors.some((v) => !!v.address), [allVendors]);
+  const showAddress = useMemo(
+    () => allVendors.some((v) => !!(v.address || v.extra?.addressGoogleMapUrl)),
+    [allVendors],
+  );
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
     useListFilter(allVendors, {

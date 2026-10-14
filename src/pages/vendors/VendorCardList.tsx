@@ -78,7 +78,7 @@ export function VendorCardList({ vendors, isLoading, origin }: VendorCardListPro
               {/* Card-only condition: unlike the desktop column (self-gated
                   across the whole list) a card shows the row it has, so an
                   address-less one simply omits the line. */}
-              {item.address && (
+              {(item.address || item.extra?.addressGoogleMapUrl) && (
                 <AddressWithMapLink
                   address={item.address}
                   googleMapUrl={item.extra?.addressGoogleMapUrl}

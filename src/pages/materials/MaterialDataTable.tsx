@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { ActionIcon, Badge, Box, Group, HoverCard, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Box, Group, HoverCard, Stack, Text } from '@mantine/core';
 import { IconPackageExport, IconPackageImport } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -257,37 +257,30 @@ export function MaterialDataTable({
               render: (item: Material) => (
                 <Group gap={2} wrap="nowrap" justify="flex-end">
                   {onCreateReceipt && (
-                    <Tooltip label={t('warehouseDoc.fromMaterials.rowCreateReceipt')} withArrow>
-                      <ActionIcon
-                        variant="subtle"
-                        color="gray"
-                        aria-label={t('warehouseDoc.fromMaterials.rowCreateReceipt')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCreateReceipt(item);
-                        }}
-                      >
-                        <IconPackageImport size={18} />
-                      </ActionIcon>
-                    </Tooltip>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      aria-label={t('warehouseDoc.fromMaterials.rowCreateReceipt')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreateReceipt(item);
+                      }}
+                    >
+                      <IconPackageImport size={18} />
+                    </ActionIcon>
                   )}
                   {onCreateDeliveryNote && (
-                    <Tooltip
-                      label={t('warehouseDoc.fromMaterials.rowCreateDeliveryNote')}
-                      withArrow
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      aria-label={t('warehouseDoc.fromMaterials.rowCreateDeliveryNote')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCreateDeliveryNote(item);
+                      }}
                     >
-                      <ActionIcon
-                        variant="subtle"
-                        color="gray"
-                        aria-label={t('warehouseDoc.fromMaterials.rowCreateDeliveryNote')}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCreateDeliveryNote(item);
-                        }}
-                      >
-                        <IconPackageExport size={18} />
-                      </ActionIcon>
-                    </Tooltip>
+                      <IconPackageExport size={18} />
+                    </ActionIcon>
                   )}
                 </Group>
               ),

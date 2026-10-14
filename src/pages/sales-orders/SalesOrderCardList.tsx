@@ -8,9 +8,9 @@ import {
   Skeleton,
   Stack,
   Text,
-  Tooltip,
 } from '@mantine/core';
 import { IconAlertTriangle, IconListDetails, IconRobot } from '@tabler/icons-react';
+import { InfiniteScrollSentinel } from '@credo/base-ui/components';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -54,6 +54,10 @@ type SalesOrderCardListProps = {
   readonly vacuousCompletionIds?: ReadonlySet<string>;
 
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
+
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 function SalesOrderCardSkeleton() {
@@ -88,6 +92,9 @@ export function SalesOrderCardList({
   showCheatMarker = false,
   vacuousCompletionIds,
   statusBadgeVariant,
+  hasMore = false,
+  onLoadMore,
+  loadingMoreLabel,
 }: SalesOrderCardListProps) {
   const { t } = useTranslation();
   const vatRate = getPricingVatRate();
@@ -149,40 +156,28 @@ export function SalesOrderCardList({
                     {order.orderNumber}
                   </Text>
                   {showCheatMarker && isCheatCompletedSalesOrder(order) && (
-                    <Tooltip
-                      label={t('salesOrders.cheatMarker.tooltip')}
-                      withArrow
-                      multiline
-                      maw={260}
+                    <Badge
+                      color="grape"
+                      variant="light"
+                      size="xs"
+                      leftSection={<IconRobot size={10} aria-hidden />}
+                      style={{ flexShrink: 0 }}
+                      title={t('salesOrders.cheatMarker.tooltip')}
                     >
-                      <Badge
-                        color="grape"
-                        variant="light"
-                        size="xs"
-                        leftSection={<IconRobot size={10} aria-hidden />}
-                        style={{ flexShrink: 0 }}
-                      >
-                        {t('salesOrders.cheatMarker.label')}
-                      </Badge>
-                    </Tooltip>
+                      {t('salesOrders.cheatMarker.label')}
+                    </Badge>
                   )}
                   {vacuousCompletionIds?.has(order.id) && (
-                    <Tooltip
-                      label={t('salesOrders.vacuousCompletion.tooltip')}
-                      withArrow
-                      multiline
-                      maw={280}
+                    <Badge
+                      color="red"
+                      variant="light"
+                      size="xs"
+                      leftSection={<IconAlertTriangle size={10} aria-hidden />}
+                      style={{ flexShrink: 0 }}
+                      title={t('salesOrders.vacuousCompletion.tooltip')}
                     >
-                      <Badge
-                        color="red"
-                        variant="light"
-                        size="xs"
-                        leftSection={<IconAlertTriangle size={10} aria-hidden />}
-                        style={{ flexShrink: 0 }}
-                      >
-                        {t('salesOrders.vacuousCompletion.label')}
-                      </Badge>
-                    </Tooltip>
+                      {t('salesOrders.vacuousCompletion.label')}
+                    </Badge>
                   )}
                   {financeMode && isSalesOrderMissingMoneyInfo(order, vatRate) && (
                     <Badge
@@ -197,18 +192,17 @@ export function SalesOrderCardList({
                   )}
                 </Group>
                 {onShowItems && (
-                  <Tooltip label={t('salesOrders.detail.viewItems')} withArrow>
-                    <ActionIcon
-                      variant="subtle"
-                      color="gray"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onShowItems(order);
-                      }}
-                    >
-                      <IconListDetails size={18} />
-                    </ActionIcon>
-                  </Tooltip>
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    aria-label={t('salesOrders.detail.viewItems')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onShowItems(order);
+                    }}
+                  >
+                    <IconListDetails size={18} />
+                  </ActionIcon>
                 )}
               </Group>
 
@@ -302,6 +296,15 @@ export function SalesOrderCardList({
           </Card>
         );
       })}
+
+      {onLoadMore && (
+        <InfiniteScrollSentinel
+          hasMore={hasMore}
+          onLoadMore={onLoadMore}
+          renderedCount={orders.length}
+          label={loadingMoreLabel}
+        />
+      )}
     </Stack>
   );
 }

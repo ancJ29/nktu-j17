@@ -47,6 +47,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
+import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { device, logger } from '@credo/base-ui/utils';
@@ -581,9 +582,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       }[]) ?? [];
 
     const copyFromCode = (copyFrom.customerCode as string) ?? '';
-    const copyFromId = copyFromCode
-      ? (customers.find((c) => c.code === copyFromCode)?.id ?? '')
-      : '';
+    const copyFromCustomer = copyFromCode
+      ? customers.find((c) => c.code === copyFromCode)
+      : undefined;
+    const copyFromId = copyFromCustomer?.id ?? '';
+    const copyFromAddress = (copyFrom.deliveryAddress as string) ?? '';
     form.setValues({
       orderNumber: '',
       customerPONumber: '',
@@ -592,8 +595,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       isIndividualCustomer: (copyFrom.isIndividualCustomer as boolean) ?? false,
       isInternalDelivery: (copyFrom.isInternalDelivery as boolean) ?? true,
       orderDate: new Date(),
-      deliveryAddress: (copyFrom.deliveryAddress as string) ?? '',
-      googleMapUrl: (copyFrom.googleMapUrl as string) ?? '',
+      deliveryAddress: copyFromAddress,
+      googleMapUrl: fillMapUrlFromCustomer(
+        copyFromCustomer,
+        copyFromAddress,
+        copyFrom.googleMapUrl as string | undefined,
+      ),
       deliveryDate: null,
       deliveryMethod: (copyFrom.deliveryMethod as string) ?? '',
       assignedStaff: (copyFrom.assignedStaff as string) ?? currentEmployeeId,
@@ -650,9 +657,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         setShippingAddressId(firstShipping.id);
         form.setFieldValue('deliveryAddress', firstShipping.address);
         form.setFieldValue('googleMapUrl', firstShipping.googleMapUrl ?? '');
-      } else if (customer.address) {
+      } else if (customer.address || customer.extra?.addressGoogleMapUrl) {
         setShippingAddressId(BILLING_ADDRESS_ID);
-        form.setFieldValue('deliveryAddress', customer.address);
+        form.setFieldValue('deliveryAddress', customer.address ?? '');
         form.setFieldValue('googleMapUrl', customer.extra?.addressGoogleMapUrl ?? '');
       } else {
         setShippingAddressId('');
@@ -1863,7 +1870,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               const selectedCustomer = form.getValues().customerId
                 ? customerMap.get(form.getValues().customerId)
                 : undefined;
-              const billing = selectedCustomer?.address?.trim();
+
+              const billing =
+                selectedCustomer?.address?.trim() ||
+                (selectedCustomer?.extra?.addressGoogleMapUrl
+                  ? t('customers.form.googleMapUrlLabel')
+                  : '');
               const shipping = selectedCustomer?.extra?.shippingAddresses ?? [];
 
               const addressOptionGroups = [

@@ -6,8 +6,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DateField } from '@/components/DateField';
 import { EmployeeSelector } from '@/components/selectors';
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductStore } from '@/stores/useProductStore';
+import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import {
   getDeliveryRequestDriverDepartments,
@@ -127,6 +129,9 @@ export function CreateDeliveryRequestModal({
     if (seededRef.current || !drsInit) return;
     seededRef.current = true;
     const soExtra = (salesOrder.extra ?? {}) as SalesOrderExtra;
+    const customer = soExtra.customerCode
+      ? useCustomerStore.getState().getByCode(soExtra.customerCode)
+      : undefined;
     const allDRs = useDeliveryRequestStore.getState().items;
     const scheduledDate = resolveInitialScheduledDateFromSalesOrder(
       seedScheduledDateFromSalesOrder ? soExtra.deliveryDate : null,
@@ -140,7 +145,7 @@ export function CreateDeliveryRequestModal({
       vendorCode: '',
       vendorName: '',
       deliveryAddress: soExtra.deliveryAddress ?? '',
-      googleMapUrl: soExtra.googleMapUrl ?? '',
+      googleMapUrl: fillMapUrlFromCustomer(customer, soExtra.deliveryAddress, soExtra.googleMapUrl),
       scheduledDate,
       notes: '',
       items: buildRemainingItemsFromSalesOrder(salesOrder.items, salesOrder.id, allDRs),

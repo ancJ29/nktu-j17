@@ -1,4 +1,4 @@
-import { Group, Stack, Text, Tooltip } from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
 import { IconBellOff } from '@tabler/icons-react';
 import type { DataTableColumn } from '@credo/base-ui/components';
 import type { InventoryV2Row } from '@/types';
@@ -37,9 +37,12 @@ export function inventoryV2Column<Row extends { id: string }>(config: {
         <Stack gap={0} align="flex-end">
           <Group gap={4} wrap="nowrap" justify="flex-end">
             {alertsOff && alertsOffTooltip ? (
-              <Tooltip label={alertsOffTooltip} withArrow multiline w={240}>
-                <IconBellOff size={14} stroke={1.75} color="var(--mantine-color-dimmed)" />
-              </Tooltip>
+              <IconBellOff
+                size={14}
+                stroke={1.75}
+                color="var(--mantine-color-dimmed)"
+                title={alertsOffTooltip}
+              />
             ) : null}
             <QuantityWithUnit
               value={formatNumber(onHand)}
@@ -48,11 +51,9 @@ export function inventoryV2Column<Row extends { id: string }>(config: {
             />
           </Group>
           {forecasted !== onHand && (
-            <Tooltip label={forecastLabel} withArrow>
-              <Text size="xs" c="dimmed" ta="right">
-                → {formatNumber(forecasted)}
-              </Text>
-            </Tooltip>
+            <Text size="xs" c="dimmed" ta="right" title={forecastLabel}>
+              → {formatNumber(forecasted)}
+            </Text>
           )}
         </Stack>
       );

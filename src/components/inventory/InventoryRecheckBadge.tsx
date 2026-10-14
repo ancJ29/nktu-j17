@@ -1,4 +1,4 @@
-import { Badge, Text, Tooltip } from '@mantine/core';
+import { Badge } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '@/utils/dateFormat';
 
@@ -13,30 +13,18 @@ type Props = {
 
 export function InventoryRecheckBadge({ counter, diff, lastVerifiedAt, size = 'xs' }: Props) {
   const { t } = useTranslation();
+  const title = [
+    t('productInventory.recheck.tooltip', {
+      count: counter,
+      diff: `${diff > 0 ? '+' : ''}${diff.toLocaleString()}`,
+    }),
+    lastVerifiedAt
+      ? t('productInventory.verify.lastVerified', { at: formatDateTime(lastVerifiedAt) })
+      : t('productInventory.verify.neverVerified'),
+  ].join('\n');
   return (
-    <Tooltip
-      withArrow
-      multiline
-      maw={280}
-      label={
-        <>
-          <Text size="xs">
-            {t('productInventory.recheck.tooltip', {
-              count: counter,
-              diff: `${diff > 0 ? '+' : ''}${diff.toLocaleString()}`,
-            })}
-          </Text>
-          <Text size="xs" c="dimmed">
-            {lastVerifiedAt
-              ? t('productInventory.verify.lastVerified', { at: formatDateTime(lastVerifiedAt) })
-              : t('productInventory.verify.neverVerified')}
-          </Text>
-        </>
-      }
-    >
-      <Badge size={size} variant="light" color="orange" radius="sm" tt="lowercase">
-        {t('productInventory.recheck.badge')}
-      </Badge>
-    </Tooltip>
+    <Badge size={size} variant="light" color="orange" radius="sm" tt="lowercase" title={title}>
+      {t('productInventory.recheck.badge')}
+    </Badge>
   );
 }

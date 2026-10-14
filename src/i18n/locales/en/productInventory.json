@@ -134,7 +134,6 @@
   },
   "inbound": {
     "detailLabel": "Inbound",
-    "forecastedHelp": "Available + inbound from open draft receipts.",
     "fromDrafts_one": "From {{count}} draft receipt",
     "fromDrafts_other": "From {{count}} draft receipts",
     "moreDrafts_one": "+{{count}} more receipt",

@@ -1,4 +1,4 @@
-import { Card, Group, Skeleton, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import { Card, Group, Skeleton, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconPackage, IconPackageOff } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -162,11 +162,15 @@ export function ProductCardList({
                     )}
                     <ProductSetBadge product={item} variant="filled" tt="none" />
                     {isNoInventoryProduct(item) && (
-                      <Tooltip label={t('products.detail.noInventoryBadge')} withArrow>
-                        <ThemeIcon size="sm" variant="light" color="gray" radius="sm">
-                          <IconPackageOff size={12} />
-                        </ThemeIcon>
-                      </Tooltip>
+                      <ThemeIcon
+                        size="sm"
+                        variant="light"
+                        color="gray"
+                        radius="sm"
+                        title={t('products.detail.noInventoryBadge')}
+                      >
+                        <IconPackageOff size={12} />
+                      </ThemeIcon>
                     )}
                   </Group>
                 )}

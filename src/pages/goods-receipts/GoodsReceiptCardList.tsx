@@ -1,4 +1,4 @@
-import { ActionIcon, Badge, Card, Group, Skeleton, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Card, Group, Skeleton, Stack, Text } from '@mantine/core';
 import { IconCopy, IconListDetails } from '@tabler/icons-react';
 import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
@@ -111,18 +111,17 @@ export function GoodsReceiptCardList({ receipts, isLoading, onShowItems }: Props
                     {t(status.labelKey)}
                   </Badge>
                   {onShowItems && (
-                    <Tooltip label={t('goodsReceipts.detail.viewItems')} withArrow>
-                      <ActionIcon
-                        variant="subtle"
-                        color="gray"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onShowItems(r);
-                        }}
-                      >
-                        <IconListDetails size={18} />
-                      </ActionIcon>
-                    </Tooltip>
+                    <ActionIcon
+                      variant="subtle"
+                      color="gray"
+                      aria-label={t('goodsReceipts.detail.viewItems')}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onShowItems(r);
+                      }}
+                    >
+                      <IconListDetails size={18} />
+                    </ActionIcon>
                   )}
                 </Group>
               </Group>

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { IconPlant2 } from '@tabler/icons-react';
-import { ActionIcon, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Group, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Greenhouse } from '@/types';
@@ -149,19 +149,17 @@ export function GreenhouseDataTable({
               width: '56px',
               render: (item: Greenhouse) => (
                 <Group gap={2} wrap="nowrap" justify="flex-end">
-                  <Tooltip label={t('greenhouses.rowAddCrop')} withArrow>
-                    <ActionIcon
-                      variant="subtle"
-                      color="gray"
-                      aria-label={t('greenhouses.rowAddCrop')}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onAddCrop(item);
-                      }}
-                    >
-                      <IconPlant2 size={16} />
-                    </ActionIcon>
-                  </Tooltip>
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    aria-label={t('greenhouses.rowAddCrop')}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddCrop(item);
+                    }}
+                  >
+                    <IconPlant2 size={16} />
+                  </ActionIcon>
                 </Group>
               ),
             },

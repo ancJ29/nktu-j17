@@ -10,7 +10,6 @@ import {
   Tabs,
   Text,
   ThemeIcon,
-  Tooltip,
 } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -501,37 +500,36 @@ function ReadingCell({
     .join(' · ');
 
   return (
-    <Tooltip label={tooltip} withArrow>
-      <Stack
-        gap={0}
-        align="center"
-        style={{ cursor: hasPhoto ? 'pointer' : 'default' }}
-        onClick={() => hasPhoto && onOpenPhotos(log)}
-      >
-        {/* Photos without their km: the day still counts missing, and the
-            camera says what is there instead. */}
-        {hasKm(log) ? (
-          <Text size="xs" fw={600} ff="monospace" style={{ whiteSpace: 'nowrap' }}>
-            {formatKm(km)}
-            {isEdited(log) ? '*' : ''}
-          </Text>
-        ) : (
-          <IconCamera size={14} color="var(--mantine-color-orange-6)" />
-        )}
-        {delta != null && (
-          <Text
-            size="10px"
-            ff="monospace"
-            c={delta < 0 ? 'red' : 'dimmed'}
-            style={{ whiteSpace: 'nowrap' }}
-          >
-            {span > 1 ? '~' : ''}
-            {delta > 0 ? '+' : ''}
-            {delta.toLocaleString()}
-          </Text>
-        )}
-      </Stack>
-    </Tooltip>
+    <Stack
+      title={tooltip}
+      gap={0}
+      align="center"
+      style={{ cursor: hasPhoto ? 'pointer' : 'default' }}
+      onClick={() => hasPhoto && onOpenPhotos(log)}
+    >
+      {/* Photos without their km: the day still counts missing, and the
+          camera says what is there instead. */}
+      {hasKm(log) ? (
+        <Text size="xs" fw={600} ff="monospace" style={{ whiteSpace: 'nowrap' }}>
+          {formatKm(km)}
+          {isEdited(log) ? '*' : ''}
+        </Text>
+      ) : (
+        <IconCamera size={14} color="var(--mantine-color-orange-6)" />
+      )}
+      {delta != null && (
+        <Text
+          size="10px"
+          ff="monospace"
+          c={delta < 0 ? 'red' : 'dimmed'}
+          style={{ whiteSpace: 'nowrap' }}
+        >
+          {span > 1 ? '~' : ''}
+          {delta > 0 ? '+' : ''}
+          {delta.toLocaleString()}
+        </Text>
+      )}
+    </Stack>
   );
 }
 
@@ -559,11 +557,14 @@ function EditedMark({ log }: { readonly log: OdometerLog }) {
   const { t } = useTranslation();
   if (!isEdited(log)) return null;
   return (
-    <Tooltip label={t('odometerLog.detail.updatedAt', { at: formatDateTime(log.updatedAt) })}>
-      <Badge size="xs" variant="light" color="gray">
-        {t('odometerLog.detail.edited')}
-      </Badge>
-    </Tooltip>
+    <Badge
+      size="xs"
+      variant="light"
+      color="gray"
+      title={t('odometerLog.detail.updatedAt', { at: formatDateTime(log.updatedAt) })}
+    >
+      {t('odometerLog.detail.edited')}
+    </Badge>
   );
 }
 

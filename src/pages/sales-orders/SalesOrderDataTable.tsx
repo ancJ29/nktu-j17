@@ -1,6 +1,6 @@
 import { useCallback, useMemo, type Ref } from 'react';
 import { useNavigate } from 'react-router';
-import { ActionIcon, Badge, Group, Stack, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Badge, Group, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle, IconListDetails, IconRobot } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -93,6 +93,10 @@ type SalesOrderDataTableProps = {
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
 
   readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
+
+  readonly hasMore?: boolean;
+  readonly onLoadMore?: () => void;
+  readonly loadingMoreLabel?: string;
 };
 
 export function SalesOrderDataTable({
@@ -120,6 +124,9 @@ export function SalesOrderDataTable({
   showPaymentColumns,
   statusBadgeVariant,
   getColumnFilter,
+  hasMore,
+  onLoadMore,
+  loadingMoreLabel,
 }: SalesOrderDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -163,33 +170,26 @@ export function SalesOrderDataTable({
                 {item.orderNumber}
               </Text>
               {showCheatMarker && isCheatCompletedSalesOrder(item) && (
-                <Tooltip label={t('salesOrders.cheatMarker.tooltip')} withArrow multiline maw={260}>
-                  <Badge
-                    color="grape"
-                    variant="light"
-                    size="xs"
-                    leftSection={<IconRobot size={10} aria-hidden />}
-                  >
-                    {t('salesOrders.cheatMarker.label')}
-                  </Badge>
-                </Tooltip>
+                <Badge
+                  color="grape"
+                  variant="light"
+                  size="xs"
+                  leftSection={<IconRobot size={10} aria-hidden />}
+                  title={t('salesOrders.cheatMarker.tooltip')}
+                >
+                  {t('salesOrders.cheatMarker.label')}
+                </Badge>
               )}
               {vacuousCompletionIds?.has(item.id) && (
-                <Tooltip
-                  label={t('salesOrders.vacuousCompletion.tooltip')}
-                  withArrow
-                  multiline
-                  maw={280}
+                <Badge
+                  color="red"
+                  variant="light"
+                  size="xs"
+                  leftSection={<IconAlertTriangle size={10} aria-hidden />}
+                  title={t('salesOrders.vacuousCompletion.tooltip')}
                 >
-                  <Badge
-                    color="red"
-                    variant="light"
-                    size="xs"
-                    leftSection={<IconAlertTriangle size={10} aria-hidden />}
-                  >
-                    {t('salesOrders.vacuousCompletion.label')}
-                  </Badge>
-                </Tooltip>
+                  {t('salesOrders.vacuousCompletion.label')}
+                </Badge>
               )}
               {financeMode && isSalesOrderMissingMoneyInfo(item, vatRate) && (
                 <Badge
@@ -285,18 +285,17 @@ export function SalesOrderDataTable({
             width: '56px',
             ta: 'center',
             render: (item: SalesOrder) => (
-              <Tooltip label={t('salesOrders.detail.viewItems')} withArrow>
-                <ActionIcon
-                  variant="subtle"
-                  color="gray"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onShowItems(item);
-                  }}
-                >
-                  <IconListDetails size={18} />
-                </ActionIcon>
-              </Tooltip>
+              <ActionIcon
+                variant="subtle"
+                color="gray"
+                aria-label={t('salesOrders.detail.viewItems')}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onShowItems(item);
+                }}
+              >
+                <IconListDetails size={18} />
+              </ActionIcon>
             ),
           },
         ]
@@ -619,6 +618,9 @@ export function SalesOrderDataTable({
       emptyMessage={t('salesOrders.noItems')}
       onRowClick={handleRowClick}
       getRowBg={getRowBg}
+      hasMore={hasMore}
+      onLoadMore={onLoadMore}
+      loadingMoreLabel={loadingMoreLabel}
     />
   );
 }

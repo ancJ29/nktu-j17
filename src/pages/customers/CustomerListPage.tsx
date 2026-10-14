@@ -54,7 +54,10 @@ export function CustomerListPage() {
 
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  const showAddress = useMemo(() => allCustomers.some((c) => !!c.address), [allCustomers]);
+  const showAddress = useMemo(
+    () => allCustomers.some((c) => !!(c.address || c.extra?.addressGoogleMapUrl)),
+    [allCustomers],
+  );
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
     useListFilter(allCustomers, {

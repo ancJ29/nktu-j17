@@ -31,10 +31,12 @@ import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import { device } from '@credo/base-ui/utils';
+import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { useInitFormFromFetch } from '@/hooks';
 import {
   getDeliveryRequestDriverDepartments,
@@ -255,8 +257,14 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
 
         const soRecord = useSalesOrderStore.getState().getById(so.value) as SalesOrder | undefined;
         const soExtra = (soRecord?.extra ?? {}) as SalesOrderExtra;
+        const customer = soExtra.customerCode
+          ? useCustomerStore.getState().getByCode(soExtra.customerCode)
+          : undefined;
         form.setFieldValue('deliveryAddress', soExtra.deliveryAddress ?? '');
-        form.setFieldValue('googleMapUrl', soExtra.googleMapUrl ?? '');
+        form.setFieldValue(
+          'googleMapUrl',
+          fillMapUrlFromCustomer(customer, soExtra.deliveryAddress, soExtra.googleMapUrl),
+        );
 
         const remaining = buildRemainingItemsFromSalesOrder(so.items, so.value, allDRs);
         if (remaining.length > 0) {

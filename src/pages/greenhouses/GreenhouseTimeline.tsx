@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ActionIcon, Box, Button, Card, Group, Text, Tooltip } from '@mantine/core';
+import { ActionIcon, Box, Button, Card, Group, Text } from '@mantine/core';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -150,40 +150,34 @@ export function GreenhouseTimeline({ greenhouses, crops, today }: Props) {
                           ? BAR_COLOR.growing
                           : BAR_COLOR.planned;
                       return (
-                        <Tooltip
+                        <Box
                           key={bar.crop.id}
-                          withArrow
-                          label={`${bar.crop.name} (${bar.crop.code})`}
-                        >
-                          <Box
-                            onClick={() =>
-                              navigate(ROUTES.CROPS.DETAIL.replace(':id', bar.crop.id))
-                            }
-                            style={{
-                              position: 'absolute',
-                              left: `${bar.leftPct}%`,
-                              width: `${bar.widthPct}%`,
-                              top: 6,
-                              height: ROW_HEIGHT - 14,
-                              background: tone,
-                              cursor: 'pointer',
+                          title={`${bar.crop.name} (${bar.crop.code})`}
+                          onClick={() => navigate(ROUTES.CROPS.DETAIL.replace(':id', bar.crop.id))}
+                          style={{
+                            position: 'absolute',
+                            left: `${bar.leftPct}%`,
+                            width: `${bar.widthPct}%`,
+                            top: 6,
+                            height: ROW_HEIGHT - 14,
+                            background: tone,
+                            cursor: 'pointer',
 
-                              borderRadius: 4,
-                              borderTopLeftRadius: bar.clippedStart ? 0 : 4,
-                              borderBottomLeftRadius: bar.clippedStart ? 0 : 4,
-                              borderTopRightRadius: bar.clippedEnd ? 0 : 4,
-                              borderBottomRightRadius: bar.clippedEnd ? 0 : 4,
-                              overflow: 'hidden',
-                              display: 'flex',
-                              alignItems: 'center',
-                              paddingInline: 6,
-                            }}
-                          >
-                            <Text size="xs" c="white" truncate>
-                              {bar.crop.name}
-                            </Text>
-                          </Box>
-                        </Tooltip>
+                            borderRadius: 4,
+                            borderTopLeftRadius: bar.clippedStart ? 0 : 4,
+                            borderBottomLeftRadius: bar.clippedStart ? 0 : 4,
+                            borderTopRightRadius: bar.clippedEnd ? 0 : 4,
+                            borderBottomRightRadius: bar.clippedEnd ? 0 : 4,
+                            overflow: 'hidden',
+                            display: 'flex',
+                            alignItems: 'center',
+                            paddingInline: 6,
+                          }}
+                        >
+                          <Text size="xs" c="white" truncate>
+                            {bar.crop.name}
+                          </Text>
+                        </Box>
                       );
                     })}
                   </Box>

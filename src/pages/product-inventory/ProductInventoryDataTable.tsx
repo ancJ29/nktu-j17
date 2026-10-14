@@ -180,7 +180,6 @@ function ForecastedCell({
   entry: InboundEntry | undefined;
   unitLabels: ReturnType<typeof useLookupV2Labels>;
 }) {
-  const { t } = useTranslation();
   const totalBase = entry?.totalBase || 0;
   const baseUnit = getItemBaseUnit(summary.product);
   const projected = summary.totalAvailable + totalBase;
@@ -191,22 +190,20 @@ function ForecastedCell({
   const crossesMinThreshold = wasBelowMin && wouldClearMin;
   const stillBelowMin = typeof min === 'number' && projected <= min;
   return (
-    <Tooltip label={t('productInventory.inbound.forecastedHelp')} withArrow>
-      <Group gap={6} wrap="nowrap" justify="flex-end">
-        <Text
-          size="sm"
-          fw={crossesMinThreshold ? 700 : 600}
-          c={crossesMinThreshold ? 'green' : stillBelowMin ? 'orange' : undefined}
-        >
-          {projected.toLocaleString()}
+    <Group gap={6} wrap="nowrap" justify="flex-end">
+      <Text
+        size="sm"
+        fw={crossesMinThreshold ? 700 : 600}
+        c={crossesMinThreshold ? 'green' : stillBelowMin ? 'orange' : undefined}
+      >
+        {projected.toLocaleString()}
+      </Text>
+      {baseUnit && (
+        <Text size="xs" c="dimmed">
+          {lookupLabelOf(unitLabels, baseUnit)}
         </Text>
-        {baseUnit && (
-          <Text size="xs" c="dimmed">
-            {lookupLabelOf(unitLabels, baseUnit)}
-          </Text>
-        )}
-      </Group>
-    </Tooltip>
+      )}
+    </Group>
   );
 }
 
@@ -465,15 +462,14 @@ export function ProductInventoryDataTable({
               <Stack gap={2} align="flex-end">
                 <Group gap={6} wrap="nowrap" justify="flex-end">
                   {isOvercommitted && (
-                    <Tooltip
-                      label={t('productInventory.columns.overcommittedTooltip', {
+                    <IconAlertTriangle
+                      size={14}
+                      color="var(--mantine-color-orange-6)"
+                      title={t('productInventory.columns.overcommittedTooltip', {
                         reserved: s.totalReserved.toLocaleString(),
                         onHand: s.totalOnHand.toLocaleString(),
                       })}
-                      withArrow
-                    >
-                      <IconAlertTriangle size={14} color="var(--mantine-color-orange-6)" />
-                    </Tooltip>
+                    />
                   )}
                   <Text
                     size="md"

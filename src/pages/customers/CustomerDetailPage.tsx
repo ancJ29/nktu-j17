@@ -483,7 +483,7 @@ export function CustomerDetailPage() {
   const addressesCard = (
     <SectionCard icon={<IconMapPin size={14} />} title={t('common.labels.addresses')} padding="md">
       <Stack gap="sm">
-        {customer.address ? (
+        {customer.address || extra.addressGoogleMapUrl ? (
           <Card withBorder padding="sm" radius="md">
             <Stack gap={4}>
               <Badge variant="light" color="blue" radius="sm" size="sm" w="fit-content">
@@ -498,7 +498,7 @@ export function CustomerDetailPage() {
           </Card>
         ) : null}
 
-        {shippingAddresses.length === 0 && !customer.address ? (
+        {shippingAddresses.length === 0 && !customer.address && !extra.addressGoogleMapUrl ? (
           <Text size="sm" c="dimmed">
             {t('customers.detail.noShippingAddresses')}
           </Text>

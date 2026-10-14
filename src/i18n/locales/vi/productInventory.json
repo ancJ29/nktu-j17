@@ -134,7 +134,6 @@
   },
   "inbound": {
     "detailLabel": "Hàng về",
-    "forecastedHelp": "Có sẵn + hàng về từ phiếu nhập nháp.",
     "fromDrafts_one": "Từ {{count}} phiếu nháp",
     "fromDrafts_other": "Từ {{count}} phiếu nháp",
     "moreDrafts_one": "+{{count}} phiếu khác",

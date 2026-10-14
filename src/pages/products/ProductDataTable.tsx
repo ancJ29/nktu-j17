@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { Badge, Group, Stack, Text, ThemeIcon, Tooltip } from '@mantine/core';
+import { Badge, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconPackageOff } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
@@ -75,11 +75,15 @@ export function ProductDataTable({
                     </Text>
                     <ProductSetBadge product={item} />
                     {isNoInventoryProduct(item) && (
-                      <Tooltip label={t('products.detail.noInventoryBadge')} withArrow>
-                        <ThemeIcon size="sm" variant="light" color="gray" radius="sm">
-                          <IconPackageOff size={12} />
-                        </ThemeIcon>
-                      </Tooltip>
+                      <ThemeIcon
+                        size="sm"
+                        variant="light"
+                        color="gray"
+                        radius="sm"
+                        title={t('products.detail.noInventoryBadge')}
+                      >
+                        <IconPackageOff size={12} />
+                      </ThemeIcon>
                     )}
                   </Group>
                   <CodeLabel code={item.extra?.sku} />

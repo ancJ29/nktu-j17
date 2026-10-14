@@ -1,4 +1,4 @@
-import { Checkbox, Tooltip } from '@mantine/core';
+import { Checkbox } from '@mantine/core';
 import type { ReactNode } from 'react';
 
 export const SELECTION_COLUMN_KEY = '__select';
@@ -52,24 +52,15 @@ export function selectionColumn<T>({
     render: (item: T) => {
       const key = keyOf(item);
       const disabled = isDisabled?.(item) ?? false;
-      const box = (
+      return (
         <Checkbox
           checked={isSelected(key) && !disabled}
           disabled={disabled}
           onChange={() => onToggleRow(key)}
           onClick={(e) => e.stopPropagation()}
           aria-label={rowLabel?.(item) ?? key}
+          title={disabled ? disabledTooltip : undefined}
         />
-      );
-      if (!disabled || !disabledTooltip) return box;
-      return (
-        <Tooltip
-          label={disabledTooltip}
-          withArrow
-          events={{ hover: true, focus: false, touch: true }}
-        >
-          {box}
-        </Tooltip>
       );
     },
   };

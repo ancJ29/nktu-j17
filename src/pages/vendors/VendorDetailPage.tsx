@@ -472,7 +472,7 @@ export function VendorDetailPage() {
   const addressesCard = (
     <SectionCard icon={<IconMapPin size={14} />} title={t('common.labels.addresses')} padding="md">
       <Stack gap="sm">
-        {vendor.address ? (
+        {vendor.address || extra.addressGoogleMapUrl ? (
           <Card withBorder padding="sm" radius="md">
             <Stack gap={4}>
               <Badge variant="light" color="blue" radius="sm" size="sm" w="fit-content">
@@ -487,7 +487,7 @@ export function VendorDetailPage() {
           </Card>
         ) : null}
 
-        {pickupAddresses.length === 0 && !vendor.address ? (
+        {pickupAddresses.length === 0 && !vendor.address && !extra.addressGoogleMapUrl ? (
           <Text size="sm" c="dimmed">
             {t('vendors.detail.noPickupAddresses')}
           </Text>

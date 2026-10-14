@@ -99,8 +99,9 @@ export const emptyItem: ItemFormValues = {
 /**
  * Resolve a vendor's default inbound (pickup) address + Google Maps URL for an
  * inbound DR. The first declared pickup address wins; otherwise the billing
- * `vendor.address` (+ its `extra.addressGoogleMapUrl`). Returns empty strings
- * for a one-off / unresolved vendor (no registered record to read).
+ * `vendor.address` (+ its `extra.addressGoogleMapUrl`) — a map URL saved with
+ * no address text still counts, it is the only location the vendor gave.
+ * Returns empty strings for a one-off / unresolved vendor.
  *
  * Shared so the DR form (which fills the visible address fields on vendor
  * select) and the NKTU quick-create modal (which has no address field and
@@ -114,9 +115,9 @@ export function resolveVendorInboundAddress(vendor: Vendor | undefined | null): 
   if (firstPickup) {
     return { deliveryAddress: firstPickup.address, googleMapUrl: firstPickup.googleMapUrl ?? '' };
   }
-  if (vendor?.address) {
+  if (vendor?.address || vendor?.extra?.addressGoogleMapUrl) {
     return {
-      deliveryAddress: vendor.address,
+      deliveryAddress: vendor.address ?? '',
       googleMapUrl: vendor.extra?.addressGoogleMapUrl ?? '',
     };
   }
@@ -129,8 +130,9 @@ export function resolveVendorInboundAddress(vendor: Vendor | undefined | null): 
  * the sample — the sample path used to persist a blank address, leaving the
  * detail page showing `-` and no map link). Same ladder the SO form uses when
  * it seeds a delivery address: the first declared shipping address wins,
- * otherwise the billing `customer.address` (+ its `extra.addressGoogleMapUrl`).
- * Returns empty strings for an unresolved customer.
+ * otherwise the billing `customer.address` (+ its `extra.addressGoogleMapUrl`,
+ * which counts even with no address text). Returns empty strings for an
+ * unresolved customer.
  */
 export function resolveCustomerPickupAddress(customer: Customer | undefined | null): {
   deliveryAddress: string;
@@ -143,9 +145,9 @@ export function resolveCustomerPickupAddress(customer: Customer | undefined | nu
       googleMapUrl: firstShipping.googleMapUrl ?? '',
     };
   }
-  if (customer?.address) {
+  if (customer?.address || customer?.extra?.addressGoogleMapUrl) {
     return {
-      deliveryAddress: customer.address,
+      deliveryAddress: customer.address ?? '',
       googleMapUrl: customer.extra?.addressGoogleMapUrl ?? '',
     };
   }
