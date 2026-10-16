@@ -74,8 +74,6 @@ export type TransitionInputs = {
   inventoryByProduct: Map<string, ProductInventoryRow[]>;
 
   actualDeliveryDate?: number;
-
-  auditTag?: string;
 };
 
 export async function runTransition(inputs: TransitionInputs): Promise<TransitionResult> {
@@ -245,7 +243,6 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     toStatus: toStatusValue,
     ...(actor && { userId: actor.id, userName: actor.name }),
     ...(note ? { note } : {}),
-    ...(inputs.auditTag && { auditTag: inputs.auditTag }),
 
     ...(isActivityLoggingEnabled() && { platformLog: { state: 'pending' as const } }),
   };
@@ -314,11 +311,12 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
       };
     }
 
-    emitInventoryActivityForApplied(
-      exec.applied,
-      { kind: 'SO', id: order.id, label: order.orderNumber, at: transitionAt },
-      inputs.auditTag,
-    );
+    emitInventoryActivityForApplied(exec.applied, {
+      kind: 'SO',
+      id: order.id,
+      label: order.orderNumber,
+      at: transitionAt,
+    });
 
     try {
       const confirmed = (await useSalesOrderStore.getState().updateSafely({
@@ -391,11 +389,12 @@ export async function runTransition(inputs: TransitionInputs): Promise<Transitio
     if (allOps.length > 0) useProductInventoryStore.getState().forceRefresh();
 
     if (appliedOps.length > 0) {
-      emitInventoryActivityForApplied(
-        appliedOps,
-        { kind: 'SO', id: order.id, label: order.orderNumber, at: transitionAt },
-        inputs.auditTag,
-      );
+      emitInventoryActivityForApplied(appliedOps, {
+        kind: 'SO',
+        id: order.id,
+        label: order.orderNumber,
+        at: transitionAt,
+      });
     }
 
     return { ok: true, updated: updated as SalesOrder, followUps };

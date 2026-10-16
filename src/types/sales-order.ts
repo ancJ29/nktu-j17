@@ -29,8 +29,6 @@ export type SalesOrderActivityEntry = {
   userName?: string;
   note?: string;
 
-  auditTag?: string;
-
   platformLog?: SalesOrderPlatformLogMark;
 };
 

@@ -21,6 +21,7 @@ export function buildSalesOrderWarehouseColumnFilterDefs({
   labels,
 }: BuildArgs): ColumnFilterDef<SalesOrder>[] {
   return [
+    { key: 'orderNumber', getValue: (o) => o.orderNumber, labels },
     ...(priceVisible
       ? [
           {

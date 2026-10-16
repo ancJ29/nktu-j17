@@ -16,7 +16,6 @@ export type InventoryActivitySource = {
 export function emitInventoryActivityForApplied(
   applied: readonly AppliedOp[],
   source: InventoryActivitySource,
-  auditTag?: string,
 ): void {
   if (applied.length === 0) return;
   const allProducts = useProductStore.getState().items;
@@ -37,7 +36,6 @@ export function emitInventoryActivityForApplied(
       nextOnHand: op.nextOnHand,
       delta: op.nextOnHand - op.prevOnHand,
       source,
-      ...(auditTag && { auditTag }),
     });
   }
 }

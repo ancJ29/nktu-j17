@@ -20,7 +20,7 @@ import {
   statusHasCapability as soStatusHasCapability,
 } from './transitionEngine';
 import { formatAutoTransitionFailure } from './planFailures';
-import { runShipRecovery } from './shipRecovery';
+import { recoverPendingShip, runShipRecovery } from './shipRecovery';
 import { statusChangeMemo } from './activityMemo';
 import { logActivity } from '@/utils/activityLogger';
 
@@ -88,8 +88,9 @@ export async function advanceSoIfFullyDelivered(params: {
   actor: Actor;
   t: TFunction;
   freshDr?: DeliveryRequest;
+  notify?: boolean;
 }): Promise<SoReconcileOutcome> {
-  const { actor, t, freshDr } = params;
+  const { actor, t, freshDr, notify = true } = params;
   let so = params.so;
 
   const preExtra = (so.extra ?? {}) as SalesOrderExtra;
@@ -105,9 +106,13 @@ export async function advanceSoIfFullyDelivered(params: {
   await ensureReconcileStoresLoaded();
 
   const productsByCode = indexProductsByCode(useProductStore.getState().items as Product[]);
+  const recoverShip = (order: SalesOrder) =>
+    notify
+      ? runShipRecovery({ so: order, actor, productsByCode, t })
+      : recoverPendingShip({ so: order, actor, productsByCode });
 
   if (hasPendingShip) {
-    const recovery = await runShipRecovery({ so, actor, productsByCode, t });
+    const recovery = await recoverShip(so);
     if (recovery.kind === 'applied' || recovery.kind === 'confirmed') {
       const fresh = useSalesOrderStore.getState().getById(so.id) as SalesOrder | undefined;
       if (fresh) so = fresh;
@@ -180,25 +185,92 @@ export async function advanceSoIfFullyDelivered(params: {
         shipPending: result.pendingShip != null,
       }),
     );
-    notifications.show({
-      color: 'green',
-      message: t('deliveryRequests.notifications.soAutoAdvancedSuccess', {
-        orderNumber: so.orderNumber,
-        status: targetStatus,
-      }),
-    });
-
-    if (result.pendingShip) {
-      await runShipRecovery({ so: result.updated, actor, productsByCode, t });
+    if (notify) {
+      notifications.show({
+        color: 'green',
+        message: t('deliveryRequests.notifications.soAutoAdvancedSuccess', {
+          orderNumber: so.orderNumber,
+          status: targetStatus,
+        }),
+      });
     }
+
+    if (result.pendingShip) await recoverShip(result.updated);
     return 'advanced';
   }
 
-  notifications.show({
-    color: 'yellow',
-    title: t('deliveryRequests.notifications.soAutoAdvancedFailedTitle'),
-    message: formatAutoTransitionFailure(result.failure, t, productsByCode),
-    autoClose: 10000,
-  });
+  if (notify) {
+    notifications.show({
+      color: 'yellow',
+      title: t('deliveryRequests.notifications.soAutoAdvancedFailedTitle'),
+      message: formatAutoTransitionFailure(result.failure, t, productsByCode),
+      autoClose: 10000,
+    });
+  }
   return 'failed';
+}
+
+export function selectSelfHealCandidates(
+  orders: readonly SalesOrder[],
+  drs: readonly DeliveryRequest[],
+  evidence: CompletionEvidence,
+): SalesOrder[] {
+  const liveDrsBySo = new Map<string, DeliveryRequest[]>();
+  for (const d of drs) {
+    if (!d.salesOrderId || (d.extra as DeliveryRequestExtra | undefined)?.isDeleted) continue;
+    const list = liveDrsBySo.get(d.salesOrderId) ?? [];
+    list.push(d);
+    liveDrsBySo.set(d.salesOrderId, list);
+  }
+  return orders.filter((so) => {
+    const extra = (so.extra ?? {}) as SalesOrderExtra;
+    if (extra.isDeleted) return false;
+    if (extra.inventoryLinkage?.pendingShip != null) return true;
+    if (so.isClosed || extra.cancellation != null) return false;
+    return isFullyDelivered(so, liveDrsBySo.get(so.id) ?? [], evidence);
+  });
+}
+
+let sweepInFlight: Promise<string[]> | null = null;
+
+export function advanceDeliveredSalesOrders(params: {
+  orders: readonly SalesOrder[];
+  actor: Actor;
+  t: TFunction;
+}): Promise<string[]> {
+  if (sweepInFlight) return sweepInFlight;
+  sweepInFlight = runSweep(params).finally(() => {
+    sweepInFlight = null;
+  });
+  return sweepInFlight;
+}
+
+async function runSweep(params: {
+  orders: readonly SalesOrder[];
+  actor: Actor;
+  t: TFunction;
+}): Promise<string[]> {
+  const { orders, actor, t } = params;
+  const candidates = selectSelfHealCandidates(
+    orders,
+    useDeliveryRequestStore.getState().items as DeliveryRequest[],
+    getSalesOrderCompletionEvidence(),
+  );
+
+  if (candidates.length === 0) return [];
+  await ensureReconcileStoresLoaded();
+  const completed: string[] = [];
+  for (const candidate of candidates) {
+    try {
+      await useProductInventoryStore.getState().revalidate();
+      const so =
+        (useSalesOrderStore.getState().getById(candidate.id) as SalesOrder | undefined) ??
+        candidate;
+      const outcome = await advanceSoIfFullyDelivered({ so, actor, t, notify: false });
+      if (outcome === 'advanced') completed.push(so.orderNumber);
+    } catch (err) {
+      console.error('[advanceDeliveredSalesOrders]', candidate.orderNumber, err);
+    }
+  }
+  return completed;
 }

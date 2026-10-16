@@ -299,6 +299,9 @@
     "tooltipReserved": "This order currently holds {{count}} reservation row(s). Cancel or ship to release.",
     "tooltipShipped": "On-hand was deducted at {{at}} via {{status}}."
   },
+  "listAutoComplete": {
+    "summary": "Delivered orders completed automatically ({{count}}): {{orders}}"
+  },
   "manualRelease": {
     "actionButton": "Release Stock Manually",
     "confirmMessage": "Release the inventory reservations still held by this cancelled order? This cannot be undone, but you can re-reserve by re-activating the order.",

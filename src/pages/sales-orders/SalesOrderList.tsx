@@ -73,6 +73,8 @@ import { SalesOrderItemsPreviewDrawer } from './SalesOrderItemsPreviewDrawer';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import { buildSalesOrderWarehouseColumnFilterDefs } from './salesOrderWarehouseColumnFilters';
 import { useSalesOrderListFilters } from './useSalesOrderListFilters';
+import { advanceDeliveredSalesOrders } from './reconcileFromDeliveries';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import type { SalesOrderListVariant, SalesOrderListView } from './salesOrderListVariant';
 import type { DeliveryRequest, SalesOrder } from '@/types';
 
@@ -93,6 +95,8 @@ const canViewSetComponentInventory = perms.salesOrder.canViewSetComponentInvento
 const deliveryEnabled = isDeliveryRequestsEnabled();
 
 const canBulkCreateDeliveries = !isMobile && deliveryEnabled && perms.deliveryRequest.canCreate();
+
+const canAutoCompleteOnList = deliveryEnabled && perms.salesOrder.canTransitionStatus();
 const internalDeliveryAllowed = isInternalDeliveryAllowed();
 
 const deliveryKindFilterEnabled = deliveryEnabled && internalDeliveryAllowed;
@@ -108,16 +112,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   const [bulkDrOpened, { open: openBulkDr, close: closeBulkDr }] = useDisclosure(false);
 
   const [itemsOrder, setItemsOrder] = useState<SalesOrder | null>(null);
-
-  const [viewMode, setViewMode] = useState<SalesOrderListView>('ops');
-  const financeMode = viewMode === 'finance';
-  const viewOptions = [
-    { value: 'ops', label: t('salesOrders.finance.viewOps') },
-    ...(showPrice ? [{ value: 'finance', label: t('salesOrders.finance.viewFinance') }] : []),
-    ...(variant.showWarehouseView
-      ? [{ value: 'warehouse', label: t('salesOrders.finance.viewWarehouse') }]
-      : []),
-  ];
 
   const selection = useSelectionMode();
   const {
@@ -167,6 +161,18 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     variant.internalDeliveryFirstSort,
   );
 
+  const viewOptions = [
+    { value: 'ops', label: t('salesOrders.finance.viewOps') },
+    ...(showPrice ? [{ value: 'finance', label: t('salesOrders.finance.viewFinance') }] : []),
+    ...(variant.showWarehouseView
+      ? [{ value: 'warehouse', label: t('salesOrders.finance.viewWarehouse') }]
+      : []),
+  ];
+  const viewMode: SalesOrderListView = viewOptions.some((o) => o.value === filters.view)
+    ? filters.view
+    : 'ops';
+  const financeMode = viewMode === 'finance';
+
   useEffect(() => {
     if (!initialized && !error) loadAll();
     if (!customersInit) loadCustomers();
@@ -191,6 +197,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   });
 
   const needDeliveryRequests =
+    canAutoCompleteOnList ||
     (canBulkCreateDeliveries && variant.bulkDrMode === 'selection') ||
     isRootUser ||
     (variant.showItemsPreview && itemsOrder !== null);
@@ -206,6 +213,29 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       .forceRefresh()
       .finally(() => setDrsReady(true));
   }, [needDeliveryRequests, fetchRange]);
+
+  const currentEmployee = useMyEmployee();
+  const autoCompleteStartedRef = useRef(false);
+  useEffect(() => {
+    if (!canAutoCompleteOnList || !drsReady || !initialized) return;
+
+    if (autoCompleteStartedRef.current || visibleStoreOrders.length === 0) return;
+    autoCompleteStartedRef.current = true;
+    void advanceDeliveredSalesOrders({
+      orders: visibleStoreOrders,
+      actor: currentEmployee ? { id: currentEmployee.id, name: currentEmployee.name } : undefined,
+      t,
+    }).then((completed) => {
+      if (completed.length === 0) return;
+      notifications.show({
+        color: 'green',
+        message: t('salesOrders.listAutoComplete.summary', {
+          count: completed.length,
+          orders: completed.join(', '),
+        }),
+      });
+    });
+  }, [drsReady, initialized, visibleStoreOrders, currentEmployee, t]);
 
   const columnFiltersShown = !isMobile && viewMode === 'warehouse';
   const columnFilterLabels = useColumnFilterLabels();
@@ -715,7 +745,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             <SegmentedControl
               size="sm"
               value={viewMode}
-              onChange={(v) => setViewMode(v as SalesOrderListView)}
+              onChange={(v) => filters.setView(v as SalesOrderListView)}
               data={viewOptions}
             />
           </Group>

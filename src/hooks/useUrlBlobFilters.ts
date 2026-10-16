@@ -7,6 +7,8 @@ export type UrlBlobFiltersOptions<TState extends object> = {
   cacheKey: string;
 
   compactState: (state: TState) => TState;
+
+  keepOnClear?: readonly (keyof TState)[];
 };
 
 export type UrlBlobFilters<TState extends object> = {
@@ -20,7 +22,7 @@ export type UrlBlobFilters<TState extends object> = {
 export function useUrlBlobFilters<TState extends object>(
   opts: UrlBlobFiltersOptions<TState>,
 ): UrlBlobFilters<TState> {
-  const { cacheKey, compactState } = opts;
+  const { cacheKey, compactState, keepOnClear } = opts;
   const [params, setParams] = useSearchParams();
 
   const [resetCount, setResetCount] = useState(0);
@@ -68,6 +70,19 @@ export function useUrlBlobFilters<TState extends object>(
   }, [state, filterCache, compactState]);
 
   const clearFilters = useCallback(() => {
+    const kept = {} as TState;
+    for (const key of keepOnClear ?? []) {
+      if (state[key] !== undefined) kept[key] = state[key];
+    }
+    const keptCompact = compactState(kept);
+    if (Object.keys(keptCompact).length > 0) {
+      urlUpdate(setParams, (next) => {
+        next.set(URL_KEY, encodeFilterBlob(keptCompact));
+      });
+      filterCache.write(keptCompact);
+      return;
+    }
+
     const urlHadBlob = params.has(URL_KEY);
     urlUpdate(setParams, (next) => {
       next.delete(URL_KEY);
@@ -76,7 +91,7 @@ export function useUrlBlobFilters<TState extends object>(
     if (!urlHadBlob) {
       setResetCount((c) => c + 1);
     }
-  }, [setParams, filterCache, params]);
+  }, [setParams, filterCache, params, keepOnClear, state, compactState]);
 
   return { state, updateState, clearFilters };
 }

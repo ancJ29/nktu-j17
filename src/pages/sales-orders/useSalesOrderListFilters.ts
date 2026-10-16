@@ -19,6 +19,7 @@ import { getSalesOrderDefaultListStatuses } from '@/utils/permission';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
 import type { SalesOrder } from '@/types';
 import { compareSalesOrdersForList } from './salesOrderListSort';
+import type { SalesOrderListView } from './salesOrderListVariant';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 
 const DEFAULT_SORT = 'createdAt_desc';
@@ -40,7 +41,10 @@ type SalesOrderUrlState = {
   dk?: 'internal' | 'external';
   cf?: string;
   pg?: number;
+  v?: Exclude<SalesOrderListView, 'ops'>;
 };
+
+const KEEP_ON_CLEAR: readonly (keyof SalesOrderUrlState)[] = ['v'];
 
 function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   const r: SalesOrderUrlState = {};
@@ -56,6 +60,7 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   if (state.dk) r.dk = state.dk;
   if (state.cf) r.cf = state.cf;
   if (state.pg && state.pg > DEFAULT_PAGE) r.pg = state.pg;
+  if (state.v) r.v = state.v;
   return r;
 }
 
@@ -69,6 +74,7 @@ export function useSalesOrderListFilters(
   const { state, updateState, clearFilters } = useUrlBlobFilters<SalesOrderUrlState>({
     cacheKey: 'cmngt:sales-order-filters',
     compactState,
+    keepOnClear: KEEP_ON_CLEAR,
   });
 
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
@@ -85,6 +91,7 @@ export function useSalesOrderListFilters(
   const deliveryKind: SalesOrderDeliveryKind = state.dk ?? 'all';
   const columnFilters = state.cf ?? '';
   const page = state.pg ?? DEFAULT_PAGE;
+  const view: SalesOrderListView = state.v ?? 'ops';
 
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values, pg: undefined }),
@@ -148,6 +155,11 @@ export function useSalesOrderListFilters(
 
   const setPage = useCallback(
     (value: number) => updateState({ pg: value !== DEFAULT_PAGE ? value : undefined }),
+    [updateState],
+  );
+
+  const setView = useCallback(
+    (value: SalesOrderListView) => updateState({ v: value === 'ops' ? undefined : value }),
     [updateState],
   );
 
@@ -233,6 +245,9 @@ export function useSalesOrderListFilters(
     setColumnFilters,
     page,
     setPage,
+
+    view,
+    setView,
 
     allOrders,
     hasActiveFilters,

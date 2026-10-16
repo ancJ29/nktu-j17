@@ -39,8 +39,6 @@ import { formatDate } from '@/utils/dateFormat';
 import type { Customer, DeliveryRequest, SalesOrder } from '@/types';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
-import { reconcileNktuCompletedDeliveries } from './cheatCompleteSalesOrders';
-import { repairNktuCheatHistory } from './repairCheatHistory';
 import { sweepLoadedSalesOrdersPlatformLog } from '@/pages/sales-orders/platformLogSweep';
 
 const WINDOW_DAYS = 90;
@@ -99,22 +97,7 @@ export default function HomePage() {
     setDeliveryRequestQueryRange(from, to);
 
     void Promise.all([soStore.forceRefresh(), drStore.forceRefresh()]).then(() => {
-      void reconcileNktuCompletedDeliveries().then(async (summary) => {
-        const historyRepaired = await repairNktuCheatHistory();
-        const platformLogSwept = await sweepLoadedSalesOrdersPlatformLog();
-        if (
-          summary.completed > 0 ||
-          summary.failed > 0 ||
-          historyRepaired > 0 ||
-          platformLogSwept > 0
-        ) {
-          console.info('[nktu] SO-completion reconcile (CHEAT)', {
-            ...summary,
-            historyRepaired,
-            platformLogSwept,
-          });
-        }
-      });
+      void sweepLoadedSalesOrdersPlatformLog();
     });
     void empStore.loadAll();
     void custStore.loadAll();

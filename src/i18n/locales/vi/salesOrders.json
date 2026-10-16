@@ -299,6 +299,9 @@
     "tooltipReserved": "Đơn đang giữ {{count}} dòng tồn kho. Hủy đơn hoặc xác nhận xuất để giải phóng.",
     "tooltipShipped": "Tồn kho đã được trừ lúc {{at}} qua trạng thái {{status}}."
   },
+  "listAutoComplete": {
+    "summary": "Đã tự động hoàn tất các đơn đã giao ({{count}}): {{orders}}"
+  },
   "manualRelease": {
     "actionButton": "Giải phóng tồn thủ công",
     "confirmMessage": "Giải phóng phần tồn kho đang bị đơn đã hủy này giữ? Thao tác này không thể hoàn tác, nhưng có thể giữ lại bằng cách kích hoạt lại đơn.",

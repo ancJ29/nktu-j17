@@ -157,70 +157,70 @@ export function SalesOrderDataTable({
           }),
         ]
       : [];
-    const leadColumns: DataTableColumn<SalesOrder>[] = [
-      ...selectionColumns,
-      {
-        key: 'orderNumber',
-        header: t('salesOrders.columns.orderNumber'),
-        width: '200px',
-        render: (item: SalesOrder) => (
-          <Stack gap={2}>
-            <Group gap={6} wrap="nowrap">
-              <Text fz="md" fw={500}>
-                {item.orderNumber}
-              </Text>
-              {showCheatMarker && isCheatCompletedSalesOrder(item) && (
-                <Badge
-                  color="grape"
-                  variant="light"
-                  size="xs"
-                  leftSection={<IconRobot size={10} aria-hidden />}
-                  title={t('salesOrders.cheatMarker.tooltip')}
-                >
-                  {t('salesOrders.cheatMarker.label')}
-                </Badge>
-              )}
-              {vacuousCompletionIds?.has(item.id) && (
-                <Badge
-                  color="red"
-                  variant="light"
-                  size="xs"
-                  leftSection={<IconAlertTriangle size={10} aria-hidden />}
-                  title={t('salesOrders.vacuousCompletion.tooltip')}
-                >
-                  {t('salesOrders.vacuousCompletion.label')}
-                </Badge>
-              )}
-              {financeMode && isSalesOrderMissingMoneyInfo(item, vatRate) && (
-                <Badge
-                  color="orange"
-                  variant="light"
-                  size="xs"
-                  leftSection={<IconAlertTriangle size={10} aria-hidden />}
-                >
-                  {t('salesOrders.finance.missingLabel')}
-                </Badge>
-              )}
-            </Group>
-            {item.extra?.customerPONumber && (
-              <Text size="xs" c="dimmed" lineClamp={1}>
-                {item.extra.customerPONumber}
-              </Text>
+    const orderNumberColumn: DataTableColumn<SalesOrder> = {
+      key: 'orderNumber',
+      header: t('salesOrders.columns.orderNumber'),
+      width: '200px',
+      filter: getColumnFilter?.('orderNumber'),
+      render: (item: SalesOrder) => (
+        <Stack gap={2}>
+          <Group gap={6} wrap="nowrap">
+            <Text fz="md" fw={500}>
+              {item.orderNumber}
+            </Text>
+            {showCheatMarker && isCheatCompletedSalesOrder(item) && (
+              <Badge
+                color="grape"
+                variant="light"
+                size="xs"
+                leftSection={<IconRobot size={10} aria-hidden />}
+                title={t('salesOrders.cheatMarker.tooltip')}
+              >
+                {t('salesOrders.cheatMarker.label')}
+              </Badge>
             )}
-            {item.extra?.deliveryPackageSize && (
-              <Text size="xs" c="dimmed" lineClamp={1}>
-                {t('salesOrders.detail.deliveryPackageSize')}: {item.extra.deliveryPackageSize}
-              </Text>
+            {vacuousCompletionIds?.has(item.id) && (
+              <Badge
+                color="red"
+                variant="light"
+                size="xs"
+                leftSection={<IconAlertTriangle size={10} aria-hidden />}
+                title={t('salesOrders.vacuousCompletion.tooltip')}
+              >
+                {t('salesOrders.vacuousCompletion.label')}
+              </Badge>
             )}
-            {item.notes && (
-              <Text size="xs" c="dimmed" lineClamp={1}>
-                {t('__new__.01-common.labels.note')}: {item.notes}
-              </Text>
+            {financeMode && isSalesOrderMissingMoneyInfo(item, vatRate) && (
+              <Badge
+                color="orange"
+                variant="light"
+                size="xs"
+                leftSection={<IconAlertTriangle size={10} aria-hidden />}
+              >
+                {t('salesOrders.finance.missingLabel')}
+              </Badge>
             )}
-          </Stack>
-        ),
-      },
-    ];
+          </Group>
+          {/* The warehouse view gives the customer PO its own column. */}
+          {view !== 'warehouse' && item.extra?.customerPONumber && (
+            <Text size="xs" c="dimmed" lineClamp={1}>
+              {item.extra.customerPONumber}
+            </Text>
+          )}
+          {item.extra?.deliveryPackageSize && (
+            <Text size="xs" c="dimmed" lineClamp={1}>
+              {t('salesOrders.detail.deliveryPackageSize')}: {item.extra.deliveryPackageSize}
+            </Text>
+          )}
+          {item.notes && (
+            <Text size="xs" c="dimmed" lineClamp={1}>
+              {t('__new__.01-common.labels.note')}: {item.notes}
+            </Text>
+          )}
+        </Stack>
+      ),
+    };
+    const leadColumns: DataTableColumn<SalesOrder>[] = [...selectionColumns, orderNumberColumn];
     const customerColumn: DataTableColumn<SalesOrder> = {
       key: 'customerName',
       width: '200px',
@@ -399,6 +399,7 @@ export function SalesOrderDataTable({
           ),
         },
         labelsColumn,
+        orderNumberColumn,
         assignedStaffColumn,
         ...itemsColumns,
       ];

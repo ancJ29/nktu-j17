@@ -1367,7 +1367,7 @@ function InventoryMemoLine({ memo }: { readonly memo: InventoryMemo }) {
         </Group>
       )}
       {/* A backfilled entry knows the movement but not the on-hand around it
-          (repairCheatHistory.ts) — show what it knows, invent nothing. */}
+          — show what it knows, invent nothing. */}
       {!hasPrevNext &&
         typeof memo.onHand !== 'number' &&
         typeof delta === 'number' &&
