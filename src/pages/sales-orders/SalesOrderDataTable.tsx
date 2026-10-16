@@ -399,8 +399,8 @@ export function SalesOrderDataTable({
           ),
         },
         labelsColumn,
-        orderNumberColumn,
         assignedStaffColumn,
+        orderNumberColumn,
         ...itemsColumns,
       ];
     }
