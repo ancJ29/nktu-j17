@@ -4,6 +4,7 @@ import { buildMantineTheme } from '@credo/base-ui/utils';
 import {
   Accordion,
   Button,
+  Combobox,
   Drawer,
   Input,
   Modal,
@@ -98,6 +99,8 @@ const baseTheme = buildMantineTheme(themeConfig, {
       return styles;
     },
   }),
+
+  Combobox: Combobox.extend({ defaultProps: { keepMounted: false } }),
 
   Select: Select.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
   MultiSelect: MultiSelect.extend({ styles: (_theme, props) => pickerInputStyles(props) }),

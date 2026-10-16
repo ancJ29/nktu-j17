@@ -61,7 +61,7 @@ export function ProductDataTable({
         {
           key: 'name',
           header: t('common.labels.name'),
-          width: '250px',
+          width: '450px',
           filter: getColumnFilter?.('name'),
           render: (item: Product) => {
             const altNames = item.extra?.alternativeNames ?? [];

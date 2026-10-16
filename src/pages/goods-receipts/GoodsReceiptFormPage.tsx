@@ -17,7 +17,7 @@ import {
 } from '@mantine/core';
 import { DateField } from '@/components/DateField';
 import { isoToVnDateString, todayInVnDateString, vnDateStringToIso } from '@/utils/dateTimeField';
-import { useForm } from '@mantine/form';
+import { useForm, type FormValidateInput, type UseFormReturnType } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import {
   IconArrowLeft,
@@ -27,7 +27,7 @@ import {
   IconTrash,
   IconUpload,
 } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { ROUTES } from '@/constants/routes';
@@ -128,6 +128,132 @@ function isEmptyRow(row: ItemFormValues): boolean {
   );
 }
 
+type ItemRowProps = ItemFormValues & {
+  idx: number;
+
+  itemUnits: readonly string[] | undefined;
+  unitLabels: Map<string, string>;
+  itemCodeError: ReactNode;
+  removable: boolean;
+  setFieldValue: UseFormReturnType<FormValues>['setFieldValue'];
+  removeListItem: UseFormReturnType<FormValues>['removeListItem'];
+};
+
+const ItemRow = memo(function ItemRow({
+  idx,
+  itemType,
+  itemCode,
+  itemName,
+  quantity,
+  unit,
+  note,
+  itemUnits,
+  unitLabels,
+  itemCodeError,
+  removable,
+  setFieldValue,
+  removeListItem,
+}: ItemRowProps) {
+  const { t } = useTranslation();
+
+  const unitOptions = Array.from(new Set([...(itemUnits ?? []), ...(unit ? [unit] : [])])).map(
+    (u) => ({ value: u, label: lookupLabelOf(unitLabels, u) }),
+  );
+  return (
+    <Table.Tr>
+      <Table.Td>
+        <Text size="sm" c="dimmed">
+          {idx + 1}
+        </Text>
+      </Table.Td>
+      {itemTypeColumnVisible && (
+        <Table.Td>
+          <Select
+            size="xs"
+            data={[
+              { value: 'product', label: t('common.labels.product') },
+              {
+                value: 'material',
+                label: t('goodsReceipts.itemTypes.material'),
+              },
+            ]}
+            value={itemType}
+            onChange={(v) => {
+              setFieldValue(
+                `items.${idx}.itemType`,
+                (v as GoodsReceiptItemType) ?? defaultItemType,
+              );
+              setFieldValue(`items.${idx}.itemCode`, '');
+              setFieldValue(`items.${idx}.itemName`, '');
+            }}
+          />
+        </Table.Td>
+      )}
+      <Table.Td>
+        {itemType === 'product' ? (
+          <ProductSelector
+            size="xs"
+            placeholder={t('common.labels.name')}
+            code={itemCode || null}
+            name={itemName || null}
+            filter={isReceivableProduct}
+            error={itemCodeError}
+            onChange={(opt) => {
+              if (!opt) {
+                setFieldValue(`items.${idx}.itemCode`, '');
+                setFieldValue(`items.${idx}.itemName`, '');
+                return;
+              }
+              setFieldValue(`items.${idx}.itemCode`, opt.code);
+              setFieldValue(`items.${idx}.itemName`, opt.name);
+              setFieldValue(`items.${idx}.unit`, opt.units[0] ?? '');
+            }}
+          />
+        ) : null}
+      </Table.Td>
+      <Table.Td>
+        <NumberField
+          size="xs"
+          min={0}
+          value={quantity}
+          emptyValue={0}
+          onChange={(next) => setFieldValue(`items.${idx}.quantity`, next)}
+        />
+      </Table.Td>
+      <Table.Td>
+        <Select
+          size="xs"
+          placeholder={t('common.labels.unit')}
+          data={unitOptions}
+          value={unit || null}
+          onChange={(v) => setFieldValue(`items.${idx}.unit`, v ?? '')}
+          disabled={unitOptions.length === 0}
+          allowDeselect={false}
+        />
+      </Table.Td>
+      <Table.Td>
+        <TextInput
+          size="xs"
+          placeholder={t('__new__.01-common.labels.note')}
+          value={note}
+          onChange={(e) => setFieldValue(`items.${idx}.note`, e.currentTarget.value)}
+        />
+      </Table.Td>
+      <Table.Td>
+        <ActionIcon
+          variant="subtle"
+          color="red"
+          size="sm"
+          onClick={() => removeListItem('items', idx)}
+          disabled={!removable}
+        >
+          <IconTrash size={14} />
+        </ActionIcon>
+      </Table.Td>
+    </Table.Tr>
+  );
+});
+
 export function GoodsReceiptFormPage() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -207,22 +333,8 @@ export function GoodsReceiptFormPage() {
     return m;
   }, [products]);
 
-  const form = useForm<FormValues>({
-    initialValues: {
-      receiptNumber: '',
-      vendorCode: '',
-      vendorName: '',
-
-      locationCode: locationsEnabled ? '' : DEFAULT_LOCATION_CODE,
-      locationName: '',
-      receivedDate: todayInVnDateString(),
-      reference: '',
-      notes: '',
-
-      assignedTo: currentEmployeeId,
-      items: [{ ...emptyItem }],
-    },
-    validate: {
+  const validate = useMemo<FormValidateInput<FormValues>>(
+    () => ({
       vendorCode: (v) => (!v ? t('goodsReceipts.validation.vendorRequired') : null),
       ...(locationsEnabled && {
         locationCode: (v: string) => (!v ? t('goodsReceipts.validation.locationRequired') : null),
@@ -248,7 +360,26 @@ export function GoodsReceiptFormPage() {
           return dup ? t('goodsReceipts.validation.itemCodeUnitDuplicate') : null;
         },
       },
+    }),
+    [t],
+  );
+
+  const form = useForm<FormValues>({
+    initialValues: {
+      receiptNumber: '',
+      vendorCode: '',
+      vendorName: '',
+
+      locationCode: locationsEnabled ? '' : DEFAULT_LOCATION_CODE,
+      locationName: '',
+      receivedDate: todayInVnDateString(),
+      reference: '',
+      notes: '',
+
+      assignedTo: currentEmployeeId,
+      items: [{ ...emptyItem }],
     },
+    validate,
   });
 
   const fetching = useInitFormFromFetch(
@@ -798,112 +929,24 @@ export function GoodsReceiptFormPage() {
                     </Table.Tr>
                   </Table.Thead>
                   <Table.Tbody>
-                    {form.getValues().items.map((row, idx) => {
-                      const itemUnits = row.itemCode
-                        ? (productUnitsByCode.get(row.itemCode) ?? [])
-                        : [];
-                      const unitCodes = Array.from(
-                        new Set([...itemUnits, ...(row.unit ? [row.unit] : [])]),
-                      );
-                      const unitOptions = unitCodes.map((u) => ({
-                        value: u,
-                        label: lookupLabelOf(unitLabels, u),
-                      }));
-                      return (
-                        <Table.Tr key={idx}>
-                          <Table.Td>
-                            <Text size="sm" c="dimmed">
-                              {idx + 1}
-                            </Text>
-                          </Table.Td>
-                          {itemTypeColumnVisible && (
-                            <Table.Td>
-                              <Select
-                                size="xs"
-                                data={[
-                                  { value: 'product', label: t('common.labels.product') },
-                                  {
-                                    value: 'material',
-                                    label: t('goodsReceipts.itemTypes.material'),
-                                  },
-                                ]}
-                                value={row.itemType}
-                                onChange={(v) => {
-                                  form.setFieldValue(
-                                    `items.${idx}.itemType`,
-                                    (v as GoodsReceiptItemType) ?? defaultItemType,
-                                  );
-                                  form.setFieldValue(`items.${idx}.itemCode`, '');
-                                  form.setFieldValue(`items.${idx}.itemName`, '');
-                                }}
-                              />
-                            </Table.Td>
-                          )}
-                          <Table.Td>
-                            {row.itemType === 'product' ? (
-                              <ProductSelector
-                                size="xs"
-                                placeholder={t('common.labels.name')}
-                                code={row.itemCode || null}
-                                name={row.itemName || null}
-                                filter={isReceivableProduct}
-                                error={form.errors[`items.${idx}.itemCode`]}
-                                onChange={(opt) => {
-                                  if (!opt) {
-                                    form.setFieldValue(`items.${idx}.itemCode`, '');
-                                    form.setFieldValue(`items.${idx}.itemName`, '');
-                                    return;
-                                  }
-                                  form.setFieldValue(`items.${idx}.itemCode`, opt.code);
-                                  form.setFieldValue(`items.${idx}.itemName`, opt.name);
-                                  form.setFieldValue(`items.${idx}.unit`, opt.units[0] ?? '');
-                                }}
-                              />
-                            ) : null}
-                          </Table.Td>
-                          <Table.Td>
-                            <NumberField
-                              size="xs"
-                              min={0}
-                              value={row.quantity}
-                              emptyValue={0}
-                              onChange={(quantity) =>
-                                form.setFieldValue(`items.${idx}.quantity`, quantity)
-                              }
-                            />
-                          </Table.Td>
-                          <Table.Td>
-                            <Select
-                              size="xs"
-                              placeholder={t('common.labels.unit')}
-                              data={unitOptions}
-                              value={row.unit || null}
-                              onChange={(v) => form.setFieldValue(`items.${idx}.unit`, v ?? '')}
-                              disabled={unitOptions.length === 0}
-                              allowDeselect={false}
-                            />
-                          </Table.Td>
-                          <Table.Td>
-                            <TextInput
-                              size="xs"
-                              placeholder={t('__new__.01-common.labels.note')}
-                              {...form.getInputProps(`items.${idx}.note`)}
-                            />
-                          </Table.Td>
-                          <Table.Td>
-                            <ActionIcon
-                              variant="subtle"
-                              color="red"
-                              size="sm"
-                              onClick={() => form.removeListItem('items', idx)}
-                              disabled={form.getValues().items.length <= 1}
-                            >
-                              <IconTrash size={14} />
-                            </ActionIcon>
-                          </Table.Td>
-                        </Table.Tr>
-                      );
-                    })}
+                    {form.getValues().items.map((row, idx, items) => (
+                      <ItemRow
+                        key={idx}
+                        idx={idx}
+                        itemType={row.itemType}
+                        itemCode={row.itemCode}
+                        itemName={row.itemName}
+                        quantity={row.quantity}
+                        unit={row.unit}
+                        note={row.note}
+                        itemUnits={row.itemCode ? productUnitsByCode.get(row.itemCode) : undefined}
+                        unitLabels={unitLabels}
+                        itemCodeError={form.errors[`items.${idx}.itemCode`]}
+                        removable={items.length > 1}
+                        setFieldValue={form.setFieldValue}
+                        removeListItem={form.removeListItem}
+                      />
+                    ))}
                   </Table.Tbody>
                 </Table>
               </Box>
