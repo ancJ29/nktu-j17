@@ -1,4 +1,4 @@
-import type { Employee, OdometerLog } from '@/types';
+import type { Employee, OdometerLog, OdometerOtherCost } from '@/types';
 import type { PhotoEntry } from '@/components/ImageUploadPanel';
 
 export function visibleLogPhotos(photos: PhotoEntry[] | undefined): PhotoEntry[] {
@@ -69,6 +69,35 @@ export function readFuelCost(log: OdometerLog | undefined): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined;
 }
 
+export function readOtherCosts(log: OdometerLog | undefined): OdometerOtherCost[] {
+  const raw: unknown = log?.extra?.otherCosts;
+  if (!Array.isArray(raw)) return [];
+  const lines: OdometerOtherCost[] = [];
+  for (const line of raw as unknown[]) {
+    if (!line || typeof line !== 'object') continue;
+    const { amount, content } = line as Record<string, unknown>;
+    const value = typeof amount === 'string' ? Number(amount) : amount;
+    if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) continue;
+    lines.push({ amount: value, content: typeof content === 'string' ? content.trim() : '' });
+  }
+  return lines;
+}
+
+export function missingCostHalf(line: {
+  amount: number | undefined;
+  content: string;
+}): 'amount' | 'content' | null {
+  const hasAmount = line.amount !== undefined && line.amount > 0;
+  const hasContent = line.content.trim() !== '';
+  if (hasAmount && !hasContent) return 'content';
+  if (hasContent && !hasAmount) return 'amount';
+  return null;
+}
+
+export function otherCostsTotal(log: OdometerLog | undefined): number {
+  return readOtherCosts(log).reduce((sum, line) => sum + line.amount, 0);
+}
+
 export function readEmployeeId(log: OdometerLog | undefined): string {
   const raw: unknown = log?.extra?.employeeId;
   return typeof raw === 'string' ? raw : '';
@@ -96,7 +125,7 @@ export type ComplianceRow = {
 
   missingCount: number;
 
-  fuelTotal: number;
+  spentTotal: number;
 };
 
 export function buildComplianceGrid({
@@ -130,7 +159,10 @@ export function buildComplianceGrid({
       employeeName: employee.name,
       cells,
       missingCount: cells.filter((cell) => !hasKm(cell.log)).length,
-      fuelTotal: cells.reduce((sum, cell) => sum + (readFuelCost(cell.log) ?? 0), 0),
+      spentTotal: cells.reduce(
+        (sum, cell) => sum + (readFuelCost(cell.log) ?? 0) + otherCostsTotal(cell.log),
+        0,
+      ),
     };
   });
 }

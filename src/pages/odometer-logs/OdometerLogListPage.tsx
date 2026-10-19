@@ -41,6 +41,7 @@ import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
 import { LogPhotoCell, LogPhotoGalleryModal } from '../operation-logs/OperationLogPhotos';
 import type { TFn } from '../operation-logs/operationLogConfig';
+import { OdometerCostLines } from './OdometerCostLines';
 import { OdometerFuelLedger } from './OdometerFuelLedger';
 import { OdometerLogModal } from './OdometerLogModal';
 import {
@@ -51,10 +52,12 @@ import {
   hasKm,
   isEdited,
   liveLogs,
+  otherCostsTotal,
   previousReading,
   readEmployeeId,
   readFuelCost,
   readKm,
+  readOtherCosts,
   visibleLogPhotos,
 } from './odometerLogModel';
 
@@ -221,7 +224,7 @@ export function OdometerLogListPage() {
                         the only place it existed. */}
                     <DeltaText log={log} logs={scoped} />
                   </Group>
-                  <FuelText log={log} />
+                  <OdometerCostLines log={log} />
                   <Group gap={6} wrap="nowrap" align="center">
                     <Text size="xs" c="dimmed">
                       {formatDate(log.recordDate)}
@@ -254,6 +257,7 @@ export function OdometerLogListPage() {
               <Table.Th ta="right">{t('odometerLog.columns.km')}</Table.Th>
               <Table.Th ta="right">{t('odometerLog.columns.distance')}</Table.Th>
               <Table.Th ta="right">{t('odometerLog.columns.fuelCost')}</Table.Th>
+              <Table.Th ta="right">{t('odometerLog.columns.otherCosts')}</Table.Th>
               <Table.Th>{t('odometerLog.columns.photo')}</Table.Th>
               <Table.Th>{t('odometerLog.columns.note')}</Table.Th>
               <Table.Th />
@@ -287,6 +291,9 @@ export function OdometerLogListPage() {
                   </Table.Td>
                   <Table.Td ta="right" ff="monospace">
                     {formatNumber(readFuelCost(log))}
+                  </Table.Td>
+                  <Table.Td ta="right">
+                    <OtherCostsCell log={log} />
                   </Table.Td>
                   <Table.Td>{showPhoto(log)}</Table.Td>
                   <Table.Td>
@@ -329,7 +336,7 @@ export function OdometerLogListPage() {
                 ))}
                 <Table.Th ta="right">{t('odometerLog.compliance.missing')}</Table.Th>
                 <Table.Th ta="right" style={{ whiteSpace: 'nowrap' }}>
-                  {t('odometerLog.columns.fuelCost')}
+                  {t('odometerLog.columns.spent')}
                 </Table.Th>
               </Table.Tr>
             </Table.Thead>
@@ -362,7 +369,7 @@ export function OdometerLogListPage() {
                     )}
                   </Table.Td>
                   <Table.Td ta="right" ff="monospace" style={{ whiteSpace: 'nowrap' }}>
-                    {row.fuelTotal > 0 ? formatNumber(row.fuelTotal) : '—'}
+                    {row.spentTotal > 0 ? formatNumber(row.spentTotal) : '—'}
                   </Table.Td>
                 </Table.Tr>
               ))}
@@ -494,6 +501,12 @@ function ReadingCell({
   const tooltip = [
     reading,
     fuelCost !== undefined && t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) }),
+    ...readOtherCosts(log).map((line) =>
+      t('odometerLog.home.otherCost', {
+        content: line.content || t('odometerLog.home.otherCostUnnamed'),
+        amount: formatNumber(line.amount),
+      }),
+    ),
     isEdited(log) && t('odometerLog.detail.updatedAt', { at: formatDateTime(log.updatedAt) }),
   ]
     .filter(Boolean)
@@ -542,14 +555,19 @@ function KmPendingBadge() {
   );
 }
 
-function FuelText({ log }: { readonly log: OdometerLog }) {
+function OtherCostsCell({ log }: { readonly log: OdometerLog }) {
   const { t } = useTranslation();
-  const fuelCost = readFuelCost(log);
-  if (fuelCost === undefined) return null;
+  const lines = readOtherCosts(log);
+  if (lines.length === 0) return null;
   return (
-    <Text size="xs" c="dimmed">
-      {t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) })}
-    </Text>
+    <Stack gap={0} align="flex-end">
+      <Text size="sm" ff="monospace">
+        {formatNumber(otherCostsTotal(log))}
+      </Text>
+      <Text size="xs" c="dimmed" ta="right" lineClamp={2}>
+        {lines.map((line) => line.content || t('odometerLog.home.otherCostUnnamed')).join(', ')}
+      </Text>
+    </Stack>
   );
 }
 

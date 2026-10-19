@@ -11,8 +11,9 @@ import { todayInVnDateString } from '@/utils/dateTimeField';
 import { featureFlags } from '@/utils/features';
 import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
+import { OdometerCostLines } from './OdometerCostLines';
 import { OdometerLogModal } from './OdometerLogModal';
-import { hasKm, readFuelCost, readKm, visibleLogPhotos } from './odometerLogModel';
+import { hasKm, readKm, visibleLogPhotos } from './odometerLogModel';
 
 /**
  * The driver's daily prompt, on their home screen.
@@ -72,7 +73,6 @@ export function OdometerLogHomeCard() {
   if (!eligible || !me) return null;
 
   const photos = visibleLogPhotos(entry?.extra?.photos);
-  const fuelCost = readFuelCost(entry);
   const done = hasKm(entry);
   const kmPending = !!entry && !done;
 
@@ -114,11 +114,7 @@ export function OdometerLogHomeCard() {
                   </Text>
                 </Text>
               )}
-              {fuelCost !== undefined && (
-                <Text size="sm" c="dimmed">
-                  {t('odometerLog.home.fuelCost', { amount: formatNumber(fuelCost) })}
-                </Text>
-              )}
+              <OdometerCostLines log={entry} size="sm" />
             </Group>
             {/* Every photo, not the first: the strip is the driver's receipt
                 that the second shot (or the fuel bill) landed too. */}

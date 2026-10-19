@@ -11,10 +11,17 @@ export type OdometerLogExtra = {
   photos: PhotoEntry[];
 
   fuelCost?: number;
+
+  otherCosts?: OdometerOtherCost[];
   note?: string;
 
   isDeleted?: boolean;
   [key: string]: unknown;
+};
+
+export type OdometerOtherCost = {
+  amount: number;
+  content: string;
 };
 
 export type OdometerLog = PartitionedRecordRow & {

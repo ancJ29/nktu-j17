@@ -1,5 +1,12 @@
 import type { Employee, OdometerFuelPayment, OdometerFuelReset, OdometerLog } from '@/types';
-import { liveLogs, readEmployeeId, readFuelCost } from './odometerLogModel';
+import {
+  liveLogs,
+  otherCostsTotal,
+  readEmployeeId,
+  readFuelCost,
+  readOtherCosts,
+  shiftDate,
+} from './odometerLogModel';
 
 export const FUEL_LEDGER_FLOOR = '2026-10-08';
 
@@ -22,30 +29,20 @@ export function livePayments(payments: OdometerFuelPayment[]): OdometerFuelPayme
 
 export function ledgerStart(resets: OdometerFuelReset[], employeeId: string): string {
   let latest: OdometerFuelReset | undefined;
-  for (const reset of resets) {
-    const from: unknown = reset.extra?.fromDate;
-    if (reset.extra?.isDeleted || typeof from !== 'string' || !DAY.test(from)) continue;
-    const who = reset.extra.employeeId;
-    if (who && who !== employeeId) continue;
+  for (const reset of clearsFor(resets, employeeId)) {
     if (!latest || (reset.createdAt ?? 0) > (latest.createdAt ?? 0)) latest = reset;
   }
   const from = latest?.extra.fromDate;
   return from && from > FUEL_LEDGER_FLOOR ? from : FUEL_LEDGER_FLOOR;
 }
 
-const NOBODY = '\u0000';
-
-export function ledgerWindowStart(roster: Employee[], resets: OdometerFuelReset[]): string {
-  const ids = new Set([NOBODY, ...roster.map((e) => e.id)]);
-  for (const reset of resets) {
-    if (reset.extra?.employeeId) ids.add(reset.extra.employeeId);
-  }
-  let earliest = '';
-  for (const id of ids) {
-    const start = ledgerStart(resets, id);
-    if (!earliest || start < earliest) earliest = start;
-  }
-  return earliest;
+function clearsFor(resets: OdometerFuelReset[], employeeId: string): OdometerFuelReset[] {
+  return resets.filter((reset) => {
+    const from: unknown = reset.extra?.fromDate;
+    if (reset.extra?.isDeleted || typeof from !== 'string' || !DAY.test(from)) return false;
+    const who = reset.extra.employeeId;
+    return !who || who === employeeId;
+  });
 }
 
 export type FuelLedgerRow = {
@@ -69,6 +66,21 @@ type LedgerInput = {
   resets: OdometerFuelReset[];
 };
 
+function spentBetween(
+  live: OdometerLog[],
+  employeeId: string,
+  from: string,
+  through?: string,
+): number {
+  let spent = 0;
+  for (const l of live) {
+    if (readEmployeeId(l) !== employeeId || l.recordDate < from) continue;
+    if (through && l.recordDate > through) continue;
+    spent += (readFuelCost(l) ?? 0) + otherCostsTotal(l);
+  }
+  return spent;
+}
+
 export function buildFuelLedger({
   roster,
   logs,
@@ -80,9 +92,7 @@ export function buildFuelLedger({
 
   const rowFor = (employeeId: string, employeeName: string): FuelLedgerRow => {
     const from = ledgerStart(resets, employeeId);
-    const spent = live
-      .filter((l) => readEmployeeId(l) === employeeId && l.recordDate >= from)
-      .reduce((sum, l) => sum + (readFuelCost(l) ?? 0), 0);
+    const spent = spentBetween(live, employeeId, from);
     const own = paidRows.filter(
       (p) => paymentEmployeeId(p) === employeeId && p.recordDate >= from && readAmount(p),
     );
@@ -128,13 +138,170 @@ export function owedThrough({
   date,
 }: LedgerInput & { employeeId: string; date: string }): number {
   const from = ledgerStart(resets, employeeId);
-  const spent = liveLogs(logs)
-    .filter((l) => readEmployeeId(l) === employeeId && l.recordDate >= from && l.recordDate <= date)
-    .reduce((sum, l) => sum + (readFuelCost(l) ?? 0), 0);
+  const spent = spentBetween(liveLogs(logs), employeeId, from, date);
   const paid = livePayments(payments)
     .filter((p) => paymentEmployeeId(p) === employeeId && p.recordDate >= from)
     .reduce((sum, p) => sum + (readAmount(p) ?? 0), 0);
   return spent - paid;
+}
+
+export type PaybackLine = { date: string; amount: number; balance: number } & (
+  | { kind: 'carry' }
+  | { kind: 'fuel' }
+  | { kind: 'other'; content: string }
+  | { kind: 'payment'; payment: OdometerFuelPayment }
+);
+
+export type PaybackPeriod = {
+  from: string;
+
+  through?: string;
+
+  to?: string;
+
+  carryIn: number;
+
+  spent: number;
+
+  paid: number;
+
+  balance: number;
+
+  lines: PaybackLine[];
+};
+
+export type EarlierCount = {
+  from: string;
+
+  to: string;
+
+  clear: OdometerFuelReset;
+
+  dropped: number;
+
+  periods: PaybackPeriod[];
+};
+
+export type PaybackHistory = {
+  row: FuelLedgerRow;
+
+  periods: PaybackPeriod[];
+
+  earlier: EarlierCount[];
+};
+
+export function buildPaybackHistory(input: LedgerInput & { roster: Employee[] }): PaybackHistory[] {
+  const live = liveLogs(input.logs);
+  const paidRows = livePayments(input.payments);
+  return buildFuelLedger(input).map((row) => ({
+    row,
+    periods: periodsFor(row.employeeId, row.from, undefined, live, paidRows),
+    earlier: earlierCounts(row, input.resets, live, paidRows),
+  }));
+}
+
+function earlierCounts(
+  row: FuelLedgerRow,
+  resets: OdometerFuelReset[],
+  live: OdometerLog[],
+  paidRows: OdometerFuelPayment[],
+): EarlierCount[] {
+  const cutBy = new Map<string, OdometerFuelReset>();
+  for (const clear of clearsFor(resets, row.employeeId)) {
+    const day = clear.extra.fromDate;
+    if (day <= FUEL_LEDGER_FLOOR || day > row.from) continue;
+    const seen = cutBy.get(day);
+    if (!seen || clear.createdAt > seen.createdAt) cutBy.set(day, clear);
+  }
+  const starts = [FUEL_LEDGER_FLOOR, ...[...cutBy.keys()].filter((d) => d < row.from).sort()];
+  const counts: EarlierCount[] = [];
+  starts.forEach((from, i) => {
+    const next = starts[i + 1] ?? row.from;
+    const clear = cutBy.get(next);
+    if (!clear) return;
+    const to = shiftDate(next, -1);
+    const periods = periodsFor(row.employeeId, from, to, live, paidRows);
+    if (periods.length > 0) {
+      counts.push({ from, to, clear, dropped: periods[0]!.balance, periods });
+    }
+  });
+  return counts.reverse();
+}
+
+type Cost = { date: string; amount: number } & (
+  { kind: 'fuel' } | { kind: 'other'; content: string }
+);
+
+function periodsFor(
+  employeeId: string,
+  from: string,
+  until: string | undefined,
+  live: OdometerLog[],
+  paidRows: OdometerFuelPayment[],
+): PaybackPeriod[] {
+  const within = (day: string) => day >= from && (until === undefined || day <= until);
+  const costs: Cost[] = [];
+  const own = live
+    .filter((l) => readEmployeeId(l) === employeeId && within(l.recordDate))
+    .sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+  for (const l of own) {
+    const fuel = readFuelCost(l);
+    if (fuel !== undefined) costs.push({ kind: 'fuel', date: l.recordDate, amount: fuel });
+    for (const line of readOtherCosts(l)) {
+      costs.push({ kind: 'other', date: l.recordDate, amount: line.amount, content: line.content });
+    }
+  }
+  const payments = paidRows
+    .filter(
+      (p) =>
+        paymentEmployeeId(p) === employeeId && within(p.recordDate) && readAmount(p) !== undefined,
+    )
+    .sort((a, b) => a.recordDate.localeCompare(b.recordDate) || a.createdAt - b.createdAt);
+
+  const periods: PaybackPeriod[] = [];
+  let balance = 0;
+  let start = from;
+  let next = 0;
+  const close = (through: string | undefined, settled: OdometerFuelPayment[]) => {
+    const carryIn = balance;
+    const lines: PaybackLine[] = [];
+    if (carryIn !== 0) lines.push({ kind: 'carry', date: start, amount: carryIn, balance });
+    let spent = 0;
+    while (next < costs.length && (through === undefined || costs[next]!.date <= through)) {
+      const cost = costs[next++]!;
+      spent += cost.amount;
+      balance += cost.amount;
+      lines.push({ ...cost, balance });
+    }
+    let paid = 0;
+    for (const payment of settled) {
+      const amount = readAmount(payment) ?? 0;
+      paid += amount;
+      balance -= amount;
+      lines.push({ kind: 'payment', date: payment.recordDate, amount, payment, balance });
+    }
+    const to = through ?? until;
+    periods.push({
+      from: start,
+      ...(through && { through }),
+      ...(to && { to }),
+      carryIn,
+      spent,
+      paid,
+      balance,
+      lines,
+    });
+    if (through) start = shiftDate(through, 1);
+  };
+
+  for (const through of new Set(payments.map((p) => p.recordDate))) {
+    close(
+      through,
+      payments.filter((p) => p.recordDate === through),
+    );
+  }
+  if (next < costs.length) close(undefined, []);
+  return periods.reverse();
 }
 
 export function withPendingReset(

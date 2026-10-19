@@ -1,8 +1,8 @@
-import { Alert, Button, Group, Stack, Text, Textarea } from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Stack, Text, TextInput, Textarea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import { IconAlertTriangle, IconCamera } from '@tabler/icons-react';
+import { IconAlertTriangle, IconCamera, IconPlus, IconTrash } from '@tabler/icons-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device, logger } from '@credo/base-ui/utils';
@@ -21,24 +21,38 @@ import type { Employee, OdometerLog } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { captureResultToFile, photoUploadErrorKey, uploadPhotoFile } from '@/utils/photoUpload';
+import { formatNumber } from '@/utils/number';
 import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
 import { saveOdometerLog } from './saveOdometerLog';
 import {
   canSaveEntry,
   canWriteDate,
+  missingCostHalf,
   readEmployeeId,
   readFuelCost,
   readKm,
+  readOtherCosts,
   visibleLogPhotos,
 } from './odometerLogModel';
 
 const isMobile = device.isMobile;
 
+type CostLine = { amount: number | undefined; content: string };
+
 type FormValues = {
   recordDate: string;
   km: number | undefined;
   fuelCost: number | undefined;
+  otherCosts: CostLine[];
   note: string;
+};
+
+const costLines = (log: OdometerLog | undefined): CostLine[] =>
+  readOtherCosts(log).map(({ amount, content }) => ({ amount, content }));
+
+const missingHalf = (values: FormValues, path: string) => {
+  const line = values.otherCosts[Number(path.split('.')[1])];
+  return line ? missingCostHalf(line) : null;
 };
 
 type OdometerLogModalProps = {
@@ -101,15 +115,29 @@ function OdometerLogForm({
       recordDate: initialDate ?? existing?.recordDate ?? today,
       km: readKm(existing),
       fuelCost: readFuelCost(existing),
+      otherCosts: costLines(existing),
       note: existing?.extra?.note ?? '',
     },
     validate: {
       recordDate: (v) => (v ? null : t('odometerLog.validation.dateRequired')),
       km: (v) => (v === undefined || v > 0 ? null : t('odometerLog.validation.kmInvalid')),
+      otherCosts: {
+        content: (_, values, path) =>
+          missingHalf(values, path) === 'content'
+            ? t('odometerLog.validation.otherCostContentRequired')
+            : null,
+        amount: (_, values, path) =>
+          missingHalf(values, path) === 'amount'
+            ? t('odometerLog.validation.otherCostAmountRequired')
+            : null,
+      },
     },
   });
 
   const date = form.values.recordDate || today;
+  const otherCosts = form.values.otherCosts;
+  const dayTotal =
+    (form.values.fuelCost ?? 0) + otherCosts.reduce((sum, line) => sum + (line.amount ?? 0), 0);
 
   const imageDirectory = useMemo(
     () =>
@@ -138,6 +166,7 @@ function OdometerLogForm({
         form.setValues({
           km: readKm(found),
           fuelCost: readFuelCost(found),
+          otherCosts: costLines(found),
           note: found?.extra?.note ?? '',
         });
       }
@@ -215,6 +244,10 @@ function OdometerLogForm({
           km: values.km,
           photos,
           fuelCost: values.fuelCost,
+          otherCosts: values.otherCosts.map((line) => ({
+            amount: line.amount ?? 0,
+            content: line.content,
+          })),
           note: values.note.trim(),
         });
         notifications.show({ color: 'green', message: t('odometerLog.notifications.saved') });
@@ -272,6 +305,63 @@ function OdometerLogForm({
           value={form.values.fuelCost}
           onChange={(value) => form.setFieldValue('fuelCost', value)}
         />
+
+        <Stack gap={6}>
+          <div>
+            <Text size="sm" fw={500}>
+              {t('odometerLog.form.otherCosts')}
+            </Text>
+            <Text size="xs" c="dimmed">
+              {t('odometerLog.form.otherCostsHint')}
+            </Text>
+          </div>
+          {otherCosts.map((line, i) => (
+            <Group key={i} gap="xs" wrap="nowrap" align="flex-start">
+              <TextInput
+                placeholder={t('odometerLog.form.otherCostContent')}
+                aria-label={t('odometerLog.form.otherCostContent')}
+                style={{ flex: 1 }}
+                {...form.getInputProps(`otherCosts.${i}.content`)}
+              />
+              <NumberField
+                placeholder={t('odometerLog.form.otherCostAmount')}
+                aria-label={t('odometerLog.form.otherCostAmount')}
+                w={120}
+                min={0}
+                allowDecimal={false}
+                value={line.amount}
+                error={form.errors[`otherCosts.${i}.amount`]}
+                onChange={(value) => form.setFieldValue(`otherCosts.${i}.amount`, value)}
+              />
+              <ActionIcon
+                size="input-sm"
+                variant="subtle"
+                color="red"
+                aria-label={t('odometerLog.form.removeOtherCost')}
+                onClick={() => form.removeListItem('otherCosts', i)}
+              >
+                <IconTrash size={16} />
+              </ActionIcon>
+            </Group>
+          ))}
+          <Group justify="space-between" gap="xs">
+            <Button
+              size="xs"
+              variant="subtle"
+              leftSection={<IconPlus size={14} />}
+              onClick={() => form.insertListItem('otherCosts', { amount: undefined, content: '' })}
+            >
+              {t('odometerLog.form.addOtherCost')}
+            </Button>
+            {/* The figure the office pays back for this day, so the driver
+                  sees the sum before they save it. */}
+            {otherCosts.length > 0 && dayTotal > 0 && (
+              <Text size="xs" c="dimmed">
+                {t('odometerLog.form.dayTotal', { amount: formatNumber(dayTotal) })}
+              </Text>
+            )}
+          </Group>
+        </Stack>
 
         <Stack gap={4}>
           <Text size="sm" fw={500}>

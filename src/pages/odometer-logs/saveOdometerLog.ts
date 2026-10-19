@@ -1,6 +1,6 @@
 import { isDuplicateUniqueFieldError } from '@/utils/code';
 import { odometerLogBundle } from '@/stores/useOdometerLogStore';
-import type { OdometerLog, OdometerLogExtra } from '@/types';
+import type { OdometerLog, OdometerLogExtra, OdometerOtherCost } from '@/types';
 
 export type SaveOdometerLogInput = {
   recordDate: string;
@@ -10,6 +10,8 @@ export type SaveOdometerLogInput = {
   km?: number | undefined;
   photos: OdometerLogExtra['photos'];
   fuelCost?: number | undefined;
+
+  otherCosts?: OdometerOtherCost[];
   note?: string;
 };
 
@@ -23,6 +25,9 @@ async function findServerEntry(
 
 export async function saveOdometerLog(input: SaveOdometerLogInput): Promise<OdometerLog> {
   const { recordDate, employeeId, employeeName, km, photos, fuelCost, note } = input;
+  const otherCosts = (input.otherCosts ?? [])
+    .filter((line) => line.amount > 0)
+    .map((line) => ({ amount: line.amount, content: line.content.trim() }));
 
   const extra: OdometerLogExtra = {
     employeeId,
@@ -30,6 +35,7 @@ export async function saveOdometerLog(input: SaveOdometerLogInput): Promise<Odom
     km: km && km > 0 ? km : undefined,
     photos,
     fuelCost: fuelCost && fuelCost > 0 ? fuelCost : undefined,
+    otherCosts: otherCosts.length > 0 ? otherCosts : undefined,
     note: note || undefined,
   };
 
