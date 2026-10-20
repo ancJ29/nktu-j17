@@ -1,4 +1,4 @@
-import { ActionIcon, Alert, Button, Group, Stack, Text, TextInput, Textarea } from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Select, Stack, Text, Textarea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -25,9 +25,11 @@ import { formatNumber } from '@/utils/number';
 import { buildUploadDirectory, buildUploadFileName } from '@/utils/uploadPath';
 import { saveOdometerLog } from './saveOdometerLog';
 import {
+  OTHER_COST_CONTENTS,
   canSaveEntry,
   canWriteDate,
   missingCostHalf,
+  pickableContent,
   readEmployeeId,
   readFuelCost,
   readKm,
@@ -48,7 +50,10 @@ type FormValues = {
 };
 
 const costLines = (log: OdometerLog | undefined): CostLine[] =>
-  readOtherCosts(log).map(({ amount, content }) => ({ amount, content }));
+  readOtherCosts(log).map(({ amount, content }) => ({
+    amount,
+    content: pickableContent(content),
+  }));
 
 const missingHalf = (values: FormValues, path: string) => {
   const line = values.otherCosts[Number(path.split('.')[1])];
@@ -317,9 +322,11 @@ function OdometerLogForm({
           </div>
           {otherCosts.map((line, i) => (
             <Group key={i} gap="xs" wrap="nowrap" align="flex-start">
-              <TextInput
+              <Select
                 placeholder={t('odometerLog.form.otherCostContent')}
                 aria-label={t('odometerLog.form.otherCostContent')}
+                data={[...OTHER_COST_CONTENTS]}
+                allowDeselect={false}
                 style={{ flex: 1 }}
                 {...form.getInputProps(`otherCosts.${i}.content`)}
               />

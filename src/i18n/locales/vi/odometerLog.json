@@ -7,8 +7,11 @@
     "km": "Số km",
     "note": "Ghi chú",
     "otherCosts": "Chi phí khác (đ)",
+    "paid": "Đã trả (đ)",
     "photo": "Ảnh",
-    "spent": "Đã chi (đ)"
+    "remaining": "Còn lại (đ)",
+    "spent": "Đã chi (đ)",
+    "totalSpent": "Tổng chi (đ)"
   },
   "compliance": {
     "cellTooltip": "{{km}} km · {{delta}} km kể từ {{date}}",
@@ -21,6 +24,11 @@
     "missingCount_other": "Thiếu {{count}} ngày",
     "noRoster": "Chưa cấu hình bộ phận lái xe nên không có ai để đối chiếu. Cài đặt tại Yêu cầu giao hàng → Bộ phận lái xe.",
     "title": "Theo dõi hằng ngày"
+  },
+  "day": {
+    "caption": "Đã trả và Còn lại tính từ ngày chốt sổ gần nhất của từng lái xe, đủ từ ngày đầu — không đổi theo bộ lọc ngày. Khoản trả cho ngày lái xe không ghi nằm ở ngày ghi gần nhất trước đó.",
+    "fuelPart": "xăng {{amount}}",
+    "otherPart": "khác {{amount}}"
   },
   "detail": {
     "edited": "đã sửa",
@@ -49,7 +57,7 @@
     "otherCostAmount": "Số tiền (đ)",
     "otherCostContent": "Nội dung",
     "otherCosts": "Chi phí khác trong ngày",
-    "otherCostsHint": "Gửi xe, cầu đường… mỗi khoản một dòng — bỏ qua nếu không có",
+    "otherCostsHint": "Mỗi khoản một dòng, chọn nội dung từ danh sách — bỏ qua nếu không có",
     "photo": "Ảnh — đồng hồ km, hoá đơn xăng dầu",
     "photoRequired": "Bắt buộc có ảnh chụp đồng hồ km",
     "removeOtherCost": "Xoá khoản này",
@@ -58,20 +66,19 @@
     "title": "Ghi số km"
   },
   "fuel": {
+    "advanceDate": "Ngày ứng",
     "allSettled": "Đã trả đủ cho mọi lái xe",
     "amount": "Số tiền (đ)",
     "amountRequired": "Nhập số tiền lớn hơn 0",
     "amountWithUnit": "{{amount}} đ",
     "balanceAfter": "Còn lại sau kỳ này",
     "balanceShort": "còn {{amount}}",
-    "barUnpaid": "chưa trả {{amount}}",
-    "caption": "Mỗi lái xe tính từ lần chốt sổ gần nhất, không theo bộ lọc ngày.",
+    "caption": "Số tiền tính từ lần chốt sổ gần nhất của từng lái xe; bộ lọc ngày chỉ chọn kỳ nào được hiện.",
     "clearDropped": "bỏ qua {{amount}} chưa trả",
     "clearDroppedOver": "bỏ qua {{amount}} trả dư",
     "clearForAll": "cho mọi lái xe",
-    "clearMarker": "Chốt sổ: tính lại từ {{date}}",
+    "clearMarker": "Đã chốt sổ ({{date}})",
     "clearNothingDropped": "đã trả đủ khi chốt sổ",
-    "colBar": "Đã trả so với số phải trả",
     "colContent": "Nội dung",
     "colPay": "Trả",
     "colPeriod": "Kỳ thanh toán",
@@ -84,6 +91,9 @@
     "earlierPeriods_other": "{{count}} kỳ, {{from}} → {{to}}",
     "empty": "Không có lái xe nào",
     "from": "Tính từ",
+    "hideClears": "Ẩn các lần chốt sổ trước",
+    "lineAdvance": "Ứng trước",
+    "lineAdvanceNote": "Ứng trước: {{note}}",
     "lineCarry": "Còn từ kỳ trước",
     "lineCarryOver": "Trả dư từ kỳ trước",
     "lineFuel": "Xăng dầu",
@@ -91,7 +101,9 @@
     "linePayment": "Thanh toán",
     "linePaymentNote": "Thanh toán: {{note}}",
     "loadFailed": "Chưa tải được số liệu chi phí.",
+    "method": "Hình thức",
     "noPaymentYet": "chưa có lần trả nào",
+    "noPeriodInRange": "Không có kỳ thanh toán nào trong khoảng ngày đã chọn.",
     "noSpending": "Chưa có khoản chi nào từ {{date}}.",
     "owedSummary_one": "Còn phải trả cho {{count}} lái xe:",
     "owedSummary_other": "Còn phải trả cho {{count}} lái xe:",
@@ -115,6 +127,8 @@
     "resetTitle": "Chốt sổ chi phí",
     "retry": "Thử lại",
     "saveFailed": "Chưa lưu được. Kiểm tra kết nối và thử lại.",
+    "showClears_one": "Xem {{count}} lần chốt sổ trước",
+    "showClears_other": "Xem {{count}} lần chốt sổ trước",
     "spent": "Đã chi",
     "statusOver": "Trả dư {{amount}}",
     "statusSettled": "Đã trả đủ",
@@ -149,7 +163,7 @@
     "dateRequired": "Chọn ngày làm việc",
     "kmInvalid": "Số km phải lớn hơn 0",
     "otherCostAmountRequired": "Nhập số tiền",
-    "otherCostContentRequired": "Nhập nội dung khoản chi"
+    "otherCostContentRequired": "Chọn nội dung khoản chi"
   },
   "viewSelf": "Số km của tôi"
 }

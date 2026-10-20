@@ -7,8 +7,11 @@
     "km": "Odometer (km)",
     "note": "Note",
     "otherCosts": "Other costs (₫)",
+    "paid": "Paid (₫)",
     "photo": "Photo",
-    "spent": "Spent (₫)"
+    "remaining": "Remaining (₫)",
+    "spent": "Spent (₫)",
+    "totalSpent": "Total spent (₫)"
   },
   "compliance": {
     "cellTooltip": "{{km}} km · {{delta}} km since {{date}}",
@@ -21,6 +24,11 @@
     "missingCount_other": "{{count}} days missing",
     "noRoster": "No driver departments are configured, so there is nobody to expect a log from. Set them in Delivery Requests → Driver Departments.",
     "title": "Daily compliance"
+  },
+  "day": {
+    "caption": "Paid and Remaining count from each driver's latest clear, in full from the first day — the date filter does not change them. A payment for a day the driver did not log sits on the nearest earlier logged day.",
+    "fuelPart": "fuel {{amount}}",
+    "otherPart": "other {{amount}}"
   },
   "detail": {
     "edited": "edited",
@@ -49,7 +57,7 @@
     "otherCostAmount": "Amount (₫)",
     "otherCostContent": "What for",
     "otherCosts": "Other costs today",
-    "otherCostsHint": "Parking, tolls… one line each — skip if there were none",
+    "otherCostsHint": "One line each, pick what it was for — skip if there were none",
     "photo": "Photos — odometer, fuel receipt",
     "photoRequired": "A photo of the odometer is required",
     "removeOtherCost": "Remove this cost",
@@ -58,20 +66,19 @@
     "title": "Log odometer"
   },
   "fuel": {
+    "advanceDate": "Advanced on",
     "allSettled": "Every driver is paid in full",
     "amount": "Amount (₫)",
     "amountRequired": "Enter an amount above 0",
     "amountWithUnit": "{{amount}} ₫",
     "balanceAfter": "Left after this period",
     "balanceShort": "left {{amount}}",
-    "barUnpaid": "unpaid {{amount}}",
-    "caption": "Each driver counts from their last clear, not from the date filter.",
+    "caption": "Amounts count from each driver's latest clear; the date filter only picks which periods show.",
     "clearDropped": "dropped {{amount}} unpaid",
     "clearDroppedOver": "dropped {{amount}} overpaid",
     "clearForAll": "for every driver",
-    "clearMarker": "Cleared: counted again from {{date}}",
+    "clearMarker": "Cleared ({{date}})",
     "clearNothingDropped": "paid in full when cleared",
-    "colBar": "Paid against what was due",
     "colContent": "What",
     "colPay": "Paid",
     "colPeriod": "Period",
@@ -84,6 +91,9 @@
     "earlierPeriods_other": "{{count}} periods, {{from}} → {{to}}",
     "empty": "No drivers to show",
     "from": "Counted from",
+    "hideClears": "Hide earlier clears",
+    "lineAdvance": "Advance",
+    "lineAdvanceNote": "Advance: {{note}}",
     "lineCarry": "Left from the period before",
     "lineCarryOver": "Overpaid in the period before",
     "lineFuel": "Fuel",
@@ -91,7 +101,9 @@
     "linePayment": "Payment",
     "linePaymentNote": "Payment: {{note}}",
     "loadFailed": "Couldn't load the expenses.",
+    "method": "Type",
     "noPaymentYet": "no payment yet",
+    "noPeriodInRange": "No period falls in the chosen dates.",
     "noSpending": "Nothing spent since {{date}}.",
     "owedSummary_one": "Still to pay {{count}} driver:",
     "owedSummary_other": "Still to pay {{count}} drivers:",
@@ -115,6 +127,8 @@
     "resetTitle": "Clear the expenses",
     "retry": "Try again",
     "saveFailed": "Couldn't save. Check the connection and try again.",
+    "showClears_one": "Show {{count}} earlier clear",
+    "showClears_other": "Show {{count}} earlier clears",
     "spent": "Spent",
     "statusOver": "Overpaid {{amount}}",
     "statusSettled": "Paid in full",
@@ -149,7 +163,7 @@
     "dateRequired": "Pick the shift date",
     "kmInvalid": "The reading must be above 0",
     "otherCostAmountRequired": "Enter the amount",
-    "otherCostContentRequired": "Say what it was for"
+    "otherCostContentRequired": "Pick what it was for"
   },
   "viewSelf": "My readings"
 }

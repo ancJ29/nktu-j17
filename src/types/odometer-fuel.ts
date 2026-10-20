@@ -1,12 +1,16 @@
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
 
+export type OdometerFuelPaymentMethod = 'payment' | 'advance';
+
 export type OdometerFuelPaymentExtra = {
   employeeId: string;
 
   employeeName: string;
 
   amount: number;
+
+  method?: OdometerFuelPaymentMethod;
   note?: string;
 
   recordedByName?: string;

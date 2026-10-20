@@ -6,7 +6,7 @@ import {
   Card,
   ColorSwatch,
   Group,
-  Progress,
+  Radio,
   Select,
   Stack,
   Table,
@@ -20,11 +20,13 @@ import { notifications } from '@mantine/notifications';
 import {
   IconAlertTriangle,
   IconCash,
+  IconChevronDown,
   IconChevronRight,
+  IconChevronUp,
   IconEraser,
   IconTrash,
 } from '@tabler/icons-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { device, logger } from '@credo/base-ui/utils';
 import { ConfirmModal } from '@/components/ConfirmModal';
@@ -33,12 +35,16 @@ import { Form } from '@/components/Form';
 import { NumberField } from '@/components/NumberField';
 import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
-import { odometerLogBundle } from '@/stores/useOdometerLogStore';
 import {
   odometerFuelPaymentBundle,
   useOdometerFuelResetStore,
 } from '@/stores/useOdometerFuelStores';
-import type { Employee, OdometerFuelPayment, OdometerFuelReset, OdometerLog } from '@/types';
+import type {
+  Employee,
+  OdometerFuelPayment,
+  OdometerFuelPaymentMethod,
+  OdometerFuelReset,
+} from '@/types';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { formatNumber } from '@/utils/number';
@@ -48,9 +54,12 @@ import {
   buildPaybackHistory,
   dayToDate,
   FUEL_LEDGER_FLOOR,
+  historyInRange,
   owedThrough,
   readAmount,
+  readMethod,
   withPendingReset,
+  type DayRange,
   type EarlierCount,
   type FuelLedgerRow,
   type PaybackHistory,
@@ -58,36 +67,34 @@ import {
   type PaybackPeriod,
 } from './fuelLedgerModel';
 import { shiftDate } from './odometerLogModel';
+import { balanceColor } from './balanceColor';
+import type { FuelLedgerSource, LedgerData } from './useFuelLedgerData';
 
 const isMobile = device.isMobile;
 
 const TABULAR = { fontVariantNumeric: 'tabular-nums' } as const;
 const DIVIDER = { borderTop: '1px solid var(--mantine-color-default-border)' } as const;
 
-const PERIOD_COLUMNS = '16px 130px 170px minmax(0, 1fr) 110px 110px';
-
-type LedgerData = { logs: OdometerLog[]; payments: OdometerFuelPayment[] };
+const PERIOD_COLUMNS = '16px minmax(130px, 1fr) 180px minmax(110px, 1fr) minmax(110px, 1fr)';
 
 const dayMonth = (day: string) => formatDate(day).slice(0, 5);
 
 export function OdometerFuelLedger({
   roster,
   driverFilter,
+  range,
+  ledger,
 }: {
   readonly roster: Employee[];
   readonly driverFilter: string;
+  readonly range: DayRange;
+  readonly ledger: FuelLedgerSource;
 }) {
   const { t } = useTranslation();
   const canManage = perms.odometerLog.canManagePayment();
 
-  const resets = useOdometerFuelResetStore((s) => s.items);
-  const resetsInitialized = useOdometerFuelResetStore((s) => s.initialized);
-  const resetsError = useOdometerFuelResetStore((s) => s.error);
-  const loadResets = useOdometerFuelResetStore((s) => s.loadAll);
+  const { data, resets, resetsError, loadFailed, retryResets, reload } = ledger;
 
-  const [data, setData] = useState<LedgerData | null>(null);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [reloadKey, setReloadKey] = useState(0);
   const [payFor, setPayFor] = useState('');
   const [payOpened, { open: openPay, close: closePay }] = useDisclosure(false);
   const [resetOpened, { open: openReset, close: closeReset }] = useDisclosure(false);
@@ -95,36 +102,6 @@ export function OdometerFuelLedger({
   const [strikeBusy, setStrikeBusy] = useState(false);
 
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    if (!resetsInitialized && !resetsError) loadResets();
-  }, [resetsInitialized, resetsError, loadResets]);
-
-  useEffect(() => {
-    if (!resetsInitialized) return;
-    let cancelled = false;
-
-    const from = dayToDate(FUEL_LEDGER_FLOOR);
-    const to = new Date();
-    Promise.all([
-      odometerLogBundle.queryRange(from, to),
-      odometerFuelPaymentBundle.queryRange(from, to),
-    ])
-      .then(([logs, payments]) => {
-        if (cancelled) return;
-        setData({ logs, payments });
-        setLoadFailed(false);
-      })
-      .catch((err) => {
-        logger.error('Fuel ledger read failed:', err);
-        if (!cancelled) setLoadFailed(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [resetsInitialized, reloadKey]);
-
-  const reload = useCallback(() => setReloadKey((k) => k + 1), []);
 
   const histories = useMemo(() => {
     if (!data) return [];
@@ -136,6 +113,11 @@ export function OdometerFuelLedger({
 
   const owed = histories.filter((h) => h.row.remaining > 0);
   const owedTotal = owed.reduce((sum, h) => sum + h.row.remaining, 0);
+
+  const shown = useMemo(
+    () => histories.map((full) => ({ full, visible: historyInRange(full, range) })),
+    [histories, range],
+  );
 
   const isOpen = (key: string, byDefault: boolean) => toggled[key] ?? byDefault;
   const toggle = (key: string, byDefault: boolean) =>
@@ -221,7 +203,7 @@ export function OdometerFuelLedger({
             <Button
               size="compact-xs"
               variant="subtle"
-              onClick={() => (resetsError ? loadResets() : reload())}
+              onClick={() => (resetsError ? retryResets() : reload())}
             >
               {t('odometerLog.fuel.retry')}
             </Button>
@@ -235,14 +217,15 @@ export function OdometerFuelLedger({
             {t('odometerLog.fuel.empty')}
           </Text>
         ) : (
-          histories.map((history) => (
+          shown.map(({ full, visible }) => (
             <DriverStatement
-              key={history.row.employeeId}
-              history={history}
+              key={visible.row.employeeId}
+              history={visible}
+              periodsHidden={full.periods.length > visible.periods.length}
               canManage={canManage}
               isOpen={isOpen}
               onToggle={toggle}
-              onPay={() => startPay(history.row.employeeId)}
+              onPay={() => startPay(visible.row.employeeId)}
               onStrike={setStriking}
             />
           ))
@@ -291,12 +274,6 @@ function startsOpen(period: PaybackPeriod): boolean {
   return period.through === undefined;
 }
 
-function balanceColor(value: number): string | undefined {
-  if (value > 0) return 'orange.9';
-  if (value < 0) return 'blue.8';
-  return undefined;
-}
-
 type PeriodHandlers = {
   readonly isOpen: (key: string, byDefault: boolean) => boolean;
   readonly onToggle: (key: string, byDefault: boolean) => void;
@@ -306,6 +283,7 @@ const THIN_DIVIDER = { borderTop: '1px solid var(--mantine-color-gray-1)' } as c
 
 function DriverStatement({
   history,
+  periodsHidden,
   canManage,
   isOpen,
   onToggle,
@@ -313,12 +291,16 @@ function DriverStatement({
   onStrike,
 }: PeriodHandlers & {
   readonly history: PaybackHistory;
+
+  readonly periodsHidden: boolean;
   readonly canManage: boolean;
   readonly onPay: () => void;
   readonly onStrike: (payment: OdometerFuelPayment) => void;
 }) {
   const { t } = useTranslation();
   const { row, periods, earlier } = history;
+  const earlierKey = `${row.employeeId}:earlier`;
+  const earlierShown = isOpen(earlierKey, false);
   const paidNote = row.paidThrough
     ? t('odometerLog.fuel.paidThroughShort', { date: dayMonth(row.paidThrough) })
     : row.spent > 0
@@ -366,7 +348,9 @@ function DriverStatement({
 
       {periods.length === 0 && (
         <Text size="sm" c="gray.7" px="sm" py="xs" style={DIVIDER}>
-          {t('odometerLog.fuel.noSpending', { date: formatDate(row.from) })}
+          {periodsHidden
+            ? t('odometerLog.fuel.noPeriodInRange')
+            : t('odometerLog.fuel.noSpending', { date: formatDate(row.from) })}
         </Text>
       )}
       {periods.length > 0 && !isMobile && (
@@ -382,9 +366,6 @@ function DriverStatement({
           </Text>
           <Text size="xs" c="gray.7">
             {t('odometerLog.fuel.colStatus')}
-          </Text>
-          <Text size="xs" c="gray.7">
-            {t('odometerLog.fuel.colBar')}
           </Text>
           <Text size="xs" c="gray.7" ta="right">
             {t('odometerLog.fuel.spent')}
@@ -405,28 +386,45 @@ function DriverStatement({
           onStrike={onStrike}
         />
       ))}
-      {earlier.map((count) => {
-        const key = `${row.employeeId}:clear:${count.clear.extra.fromDate}`;
-        const open = isOpen(key, false);
-        return (
-          <Box key={key} style={DIVIDER}>
-            <ClearRow count={count} open={open} onToggle={() => onToggle(key, false)} />
-            {open &&
-              count.periods.map((period) => (
-                <PeriodBlock
-                  key={period.from}
-                  employeeId={row.employeeId}
-                  period={period}
-                  readOnly
-                  canManage={false}
-                  isOpen={isOpen}
-                  onToggle={onToggle}
-                  onStrike={onStrike}
-                />
-              ))}
-          </Box>
-        );
-      })}
+      {earlier.length > 0 && (
+        <Box px="sm" py={6} style={DIVIDER}>
+          <Button
+            size="compact-sm"
+            variant="subtle"
+            color="gray"
+            leftSection={earlierShown ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
+            aria-expanded={earlierShown}
+            onClick={() => onToggle(earlierKey, false)}
+          >
+            {earlierShown
+              ? t('odometerLog.fuel.hideClears')
+              : t('odometerLog.fuel.showClears', { count: earlier.length })}
+          </Button>
+        </Box>
+      )}
+      {earlierShown &&
+        earlier.map((count) => {
+          const key = `${row.employeeId}:clear:${count.clear.extra.fromDate}`;
+          const open = isOpen(key, false);
+          return (
+            <Box key={key} style={DIVIDER}>
+              <ClearRow count={count} open={open} onToggle={() => onToggle(key, false)} />
+              {open &&
+                count.periods.map((period) => (
+                  <PeriodBlock
+                    key={period.from}
+                    employeeId={row.employeeId}
+                    period={period}
+                    readOnly
+                    canManage={false}
+                    isOpen={isOpen}
+                    onToggle={onToggle}
+                    onStrike={onStrike}
+                  />
+                ))}
+            </Box>
+          );
+        })}
 
       {canManage && isMobile && (
         <Box p="sm" style={DIVIDER}>
@@ -515,7 +513,7 @@ function ClearRow({
           />
           <Stack gap={0}>
             <Text component="span" size="sm" fw={500}>
-              {t('odometerLog.fuel.clearMarker', { date: formatDate(clear.extra.fromDate) })}
+              {t('odometerLog.fuel.clearMarker', { date: dayMonth(count.to) })}
             </Text>
             <Text component="span" size="xs" c="gray.7">
               {clear.extra.employeeId
@@ -576,7 +574,6 @@ function PeriodRow({
             </Group>
             <PeriodStatus period={period} />
           </Group>
-          <PaybackBar period={period} />
           <Group justify="space-between" wrap="nowrap">
             <Text component="span" size="xs" c="gray.7">
               {t('odometerLog.fuel.spent')}{' '}
@@ -628,7 +625,6 @@ function PeriodRow({
         {range}
       </Text>
       <PeriodStatus period={period} />
-      <PaybackBar period={period} />
       <Text component="span" size="sm" fw={500} ta="right" style={TABULAR}>
         {formatNumber(period.spent)}
       </Text>
@@ -669,37 +665,6 @@ function PeriodStatus({ period }: { readonly period: PaybackPeriod }) {
   );
 }
 
-function PaybackBar({ period }: { readonly period: PaybackPeriod }) {
-  const { t } = useTranslation();
-  const due = Math.max(period.carryIn + period.spent, 0);
-  const total = Math.max(due, period.paid);
-  const unpaid = Math.max(period.balance, 0);
-  const payments = period.lines.filter((line) => line.kind === 'payment');
-  return (
-    <Progress.Root size={isMobile ? 16 : 18} radius="sm">
-      {total > 0 &&
-        payments.map((line, i) => (
-          <Progress.Section
-            key={i}
-            value={(line.amount / total) * 100}
-            color={i % 2 ? 'primary.3' : 'primary.7'}
-          >
-            <Progress.Label c={i % 2 ? 'primary.9' : undefined} style={TABULAR}>
-              {formatNumber(line.amount)}
-            </Progress.Label>
-          </Progress.Section>
-        ))}
-      {total > 0 && unpaid > 0 && (
-        <Progress.Section value={(unpaid / total) * 100} color="orange.3">
-          <Progress.Label c="dark.9" style={TABULAR}>
-            {t('odometerLog.fuel.barUnpaid', { amount: formatNumber(unpaid) })}
-          </Progress.Label>
-        </Progress.Section>
-      )}
-    </Progress.Root>
-  );
-}
-
 function LineWhat({ line }: { readonly line: PaybackLine }) {
   const { t } = useTranslation();
   let title: string;
@@ -720,9 +685,12 @@ function LineWhat({ line }: { readonly line: PaybackLine }) {
       const note = line.payment.extra?.note;
       const by = line.payment.extra?.recordedByName;
       const at = formatDateTime(line.payment.createdAt);
+      const advance = readMethod(line.payment) === 'advance';
       title = note
-        ? t('odometerLog.fuel.linePaymentNote', { note })
-        : t('odometerLog.fuel.linePayment');
+        ? t(advance ? 'odometerLog.fuel.lineAdvanceNote' : 'odometerLog.fuel.linePaymentNote', {
+            note,
+          })
+        : t(advance ? 'odometerLog.fuel.lineAdvance' : 'odometerLog.fuel.linePayment');
       sub = by
         ? t('odometerLog.fuel.recordedByAt', { name: by, at })
         : t('odometerLog.fuel.recordedAt', { at });
@@ -897,6 +865,7 @@ function FuelPaymentModal({
 
 type PaymentValues = {
   employeeId: string;
+  method: OdometerFuelPaymentMethod;
   recordDate: string;
   amount: number | undefined;
   note: string;
@@ -926,6 +895,7 @@ function FuelPaymentForm({
   const form = useForm<PaymentValues>({
     initialValues: {
       employeeId: initialEmployeeId,
+      method: 'payment',
       recordDate: today,
       amount: positive(owed(initialEmployeeId, today)),
       note: '',
@@ -936,9 +906,12 @@ function FuelPaymentForm({
       amount: (v) => (v !== undefined && v > 0 ? null : t('odometerLog.fuel.amountRequired')),
     },
   });
-  const { employeeId, recordDate } = form.values;
-  const refill = (nextEmployee: string, nextDate: string) =>
+  const { employeeId, method, recordDate } = form.values;
+
+  const refill = (nextEmployee: string, nextDate: string) => {
+    if (method === 'advance') return;
     form.setFieldValue('amount', positive(owed(nextEmployee, nextDate)));
+  };
 
   const handleSubmit = async (values: PaymentValues) => {
     if (!values.amount) return;
@@ -951,6 +924,7 @@ function FuelPaymentForm({
             employeeId: values.employeeId,
             employeeName: roster.find((e) => e.id === values.employeeId)?.name ?? '',
             amount: values.amount,
+            method: values.method,
             note: values.note.trim() || undefined,
             recordedByName: me?.name,
           },
@@ -983,8 +957,29 @@ function FuelPaymentForm({
             refill(v ?? '', recordDate);
           }}
         />
+        <Radio.Group
+          label={t('odometerLog.fuel.method')}
+          value={method}
+          onChange={(v) => {
+            const next: OdometerFuelPaymentMethod = v === 'advance' ? 'advance' : 'payment';
+            form.setFieldValue('method', next);
+            form.setFieldValue(
+              'amount',
+              next === 'advance' ? undefined : positive(owed(employeeId, recordDate)),
+            );
+          }}
+        >
+          <Group gap="lg" mt={6}>
+            <Radio value="payment" label={t('odometerLog.fuel.linePayment')} />
+            <Radio value="advance" label={t('odometerLog.fuel.lineAdvance')} />
+          </Group>
+        </Radio.Group>
         <DateField
-          label={t('odometerLog.fuel.paidThrough')}
+          label={
+            method === 'advance'
+              ? t('odometerLog.fuel.advanceDate')
+              : t('odometerLog.fuel.paidThrough')
+          }
           withAsterisk
           clearable={false}
           maxDate={new Date()}

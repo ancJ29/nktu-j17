@@ -69,6 +69,18 @@ export function readFuelCost(log: OdometerLog | undefined): number | undefined {
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined;
 }
 
+export const OTHER_COST_CONTENTS = [
+  'Chành',
+  'Vá Xe',
+  'Sửa Xe',
+  'Thay Nhớt',
+  'Mua Hàng Cty',
+  'Cp Khác',
+] as const;
+
+export const pickableContent = (content: string): string =>
+  (OTHER_COST_CONTENTS as readonly string[]).includes(content) ? content : '';
+
 export function readOtherCosts(log: OdometerLog | undefined): OdometerOtherCost[] {
   const raw: unknown = log?.extra?.otherCosts;
   if (!Array.isArray(raw)) return [];

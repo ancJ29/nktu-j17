@@ -1,4 +1,10 @@
-import type { Employee, OdometerFuelPayment, OdometerFuelReset, OdometerLog } from '@/types';
+import type {
+  Employee,
+  OdometerFuelPayment,
+  OdometerFuelPaymentMethod,
+  OdometerFuelReset,
+  OdometerLog,
+} from '@/types';
 import {
   liveLogs,
   otherCostsTotal,
@@ -16,6 +22,10 @@ export function readAmount(payment: OdometerFuelPayment | undefined): number | u
   const raw: unknown = payment?.extra?.amount;
   const value = typeof raw === 'string' ? Number(raw) : raw;
   return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined;
+}
+
+export function readMethod(payment: OdometerFuelPayment): OdometerFuelPaymentMethod {
+  return payment.extra?.method === 'advance' ? 'advance' : 'payment';
 }
 
 function paymentEmployeeId(payment: OdometerFuelPayment): string {
@@ -190,6 +200,22 @@ export type PaybackHistory = {
   earlier: EarlierCount[];
 };
 
+export type DayRange = { from: string; to: string };
+
+const touches = (from: string, to: string | undefined, range: DayRange) =>
+  from <= range.to && (to === undefined || to >= range.from);
+
+export function historyInRange(history: PaybackHistory, range: DayRange): PaybackHistory {
+  const shown = (periods: PaybackPeriod[]) => periods.filter((p) => touches(p.from, p.to, range));
+  return {
+    row: history.row,
+    periods: shown(history.periods),
+    earlier: history.earlier
+      .filter((count) => touches(count.from, count.to, range))
+      .map((count) => ({ ...count, periods: shown(count.periods) })),
+  };
+}
+
 export function buildPaybackHistory(input: LedgerInput & { roster: Employee[] }): PaybackHistory[] {
   const live = liveLogs(input.logs);
   const paidRows = livePayments(input.payments);
@@ -302,6 +328,102 @@ function periodsFor(
   }
   if (next < costs.length) close(undefined, []);
   return periods.reverse();
+}
+
+export type DayStatement = {
+  spent: number;
+  fuel: number;
+  other: number;
+
+  paid: number;
+
+  paidThrough?: string;
+
+  balance: number;
+
+  closed?: { clear: OdometerFuelReset; dropped: number; nextFrom: string };
+};
+
+export const dayKey = (employeeId: string, day: string) => `${employeeId}|${day}`;
+
+export function buildDayStatements(
+  histories: PaybackHistory[],
+  logs: OdometerLog[],
+): Map<string, DayStatement> {
+  const live = liveLogs(logs);
+  const out = new Map<string, DayStatement>();
+
+  const countInto = (
+    employeeId: string,
+    from: string,
+    until: string | undefined,
+    periods: PaybackPeriod[],
+    closing?: { clear: OdometerFuelReset; dropped: number },
+  ) => {
+    const days = [
+      ...new Set(
+        live
+          .filter(
+            (l) =>
+              readEmployeeId(l) === employeeId &&
+              l.recordDate >= from &&
+              (until === undefined || l.recordDate <= until),
+          )
+          .map((l) => l.recordDate),
+      ),
+    ].sort();
+    if (days.length === 0) return;
+    const byDay = new Map<string, DayStatement>(
+      days.map((day) => [day, { spent: 0, fuel: 0, other: 0, paid: 0, balance: 0 }]),
+    );
+    const touched = new Set<string>();
+    const lines = [...periods].reverse().flatMap((period) => period.lines);
+    for (const line of lines) {
+      if (line.kind === 'carry') continue;
+      const landed =
+        line.kind === 'payment'
+          ? ([...days].reverse().find((d) => d <= line.date) ?? days[0]!)
+          : line.date;
+      const day = byDay.get(landed);
+      if (!day) continue;
+      touched.add(landed);
+      if (line.kind === 'payment') {
+        day.paid += line.amount;
+        if (line.date !== landed && (!day.paidThrough || line.date > day.paidThrough)) {
+          day.paidThrough = line.date;
+        }
+      } else {
+        day.spent += line.amount;
+        day[line.kind === 'fuel' ? 'fuel' : 'other'] += line.amount;
+      }
+      day.balance = line.balance;
+    }
+    let carried = 0;
+    for (const d of days) {
+      const day = byDay.get(d)!;
+
+      if (!touched.has(d)) day.balance = carried;
+      carried = day.balance;
+      out.set(dayKey(employeeId, d), day);
+    }
+    if (closing) {
+      out.get(dayKey(employeeId, days[days.length - 1]!))!.closed = {
+        ...closing,
+        nextFrom: closing.clear.extra.fromDate,
+      };
+    }
+  };
+
+  for (const { row, periods, earlier } of histories) {
+    countInto(row.employeeId, row.from, undefined, periods);
+    for (const count of earlier) {
+      countInto(row.employeeId, count.from, count.to, count.periods, {
+        clear: count.clear,
+        dropped: count.dropped,
+      });
+    }
+  }
+  return out;
 }
 
 export function withPendingReset(

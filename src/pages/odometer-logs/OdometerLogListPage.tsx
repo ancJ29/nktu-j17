@@ -28,22 +28,37 @@ import { EmployeeLink } from '@/components/EmployeeLink';
 import { ListPageHeader } from '@/components/ListPageHeader';
 import { StickyListChrome } from '@/components/StickyListChrome';
 import { Select } from '@mantine/core';
-import { DateField } from '@/components/DateField';
+import { DatePickerField } from '@/components/DatePickerField';
+import { useDatePresetLabels } from '@/hooks/useDatePresetLabels';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { odometerLogBundle } from '@/stores/useOdometerLogStore';
 import type { Employee, OdometerLog } from '@/types';
-import type { DateRangeValue } from '@/types/date-range';
+import { EMPTY_DATE_RANGE, type DateRangePreset, type DateRangeValue } from '@/types/date-range';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
-import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
+import {
+  defaultLastNDaysRange,
+  ensureValidDateRange,
+  getPresetRange,
+} from '@/utils/listFilterDateRange';
 import { formatNumber } from '@/utils/number';
 import { isDriverDepartment, perms } from '@/utils/permission';
 import { LogPhotoCell, LogPhotoGalleryModal } from '../operation-logs/OperationLogPhotos';
 import type { TFn } from '../operation-logs/operationLogConfig';
 import { OdometerCostLines } from './OdometerCostLines';
+import { balanceColor } from './balanceColor';
 import { OdometerFuelLedger } from './OdometerFuelLedger';
 import { OdometerLogModal } from './OdometerLogModal';
+import {
+  buildDayStatements,
+  buildPaybackHistory,
+  dayKey,
+  dayToDate,
+  type DayRange,
+  type DayStatement,
+} from './fuelLedgerModel';
+import { useFuelLedgerData } from './useFuelLedgerData';
 import {
   buildComplianceGrid,
   canWriteDate,
@@ -58,6 +73,7 @@ import {
   readFuelCost,
   readKm,
   readOtherCosts,
+  shiftDate,
   visibleLogPhotos,
 } from './odometerLogModel';
 
@@ -101,7 +117,7 @@ export function OdometerLogListPage() {
 
   const applyDateRange = useCallback(
     (next: DateRangeValue) => {
-      const effective = next.from && next.to ? next : defaultLastNDaysRange(RANGE_DAYS);
+      const effective = ensureValidDateRange(next, defaultLastNDaysRange(RANGE_DAYS));
       setDateRange(effective);
 
       odometerLogBundle.setRange(effective.from, effective.to);
@@ -117,6 +133,13 @@ export function OdometerLogListPage() {
       ),
     [employees],
   );
+
+  const ledger = useFuelLedgerData(canViewAll && tab !== 'compliance');
+  const dayStatements = useMemo(() => {
+    if (!ledger.data) return undefined;
+    const histories = buildPaybackHistory({ roster, ...ledger.data, resets: ledger.resets });
+    return buildDayStatements(histories, ledger.data.logs);
+  }, [roster, ledger.data, ledger.resets]);
 
   const scoped = useMemo(() => {
     const live = liveLogs(items as OdometerLog[]);
@@ -134,15 +157,23 @@ export function OdometerLogListPage() {
     [scoped],
   );
 
+  const days = useMemo<DayRange>(
+    () => ({
+      from: dateRange.from ? toDateString(dateRange.from) : today,
+
+      to: dateRange.to && toDateString(dateRange.to) < today ? toDateString(dateRange.to) : today,
+    }),
+    [dateRange, today],
+  );
+
   const grid = useMemo(
     () =>
       buildComplianceGrid({
         roster: driverFilter ? roster.filter((e) => e.id === driverFilter) : roster,
         logs: scoped,
-        from: dateRange.from ? toDateString(dateRange.from) : today,
-        to: dateRange.to ? toDateString(dateRange.to) : today,
+        ...days,
       }),
-    [roster, scoped, dateRange, driverFilter, today],
+    [roster, scoped, days, driverFilter],
   );
 
   const driverData = useMemo(() => roster.map((e) => ({ value: e.id, label: e.name })), [roster]);
@@ -160,29 +191,14 @@ export function OdometerLogListPage() {
     openEdit();
   };
 
-  const showDates = !canViewAll || tab !== 'fuel';
   const filterRow = (
-    <Group gap="sm" wrap="wrap">
-      {showDates && (
-        <>
-          <DateField
-            label={t('odometerLog.columns.date')}
-            value={dateRange.from}
-            clearable={false}
-            maxDate={new Date()}
-            w={isMobile ? '45%' : 170}
-            onChange={(value) => applyDateRange({ ...dateRange, from: toDate(value) })}
-          />
-          <DateField
-            label=" "
-            value={dateRange.to}
-            clearable={false}
-            maxDate={new Date()}
-            w={isMobile ? '45%' : 170}
-            onChange={(value) => applyDateRange({ ...dateRange, to: toDate(value) })}
-          />
-        </>
-      )}
+    <Group gap="sm" wrap="wrap" align="flex-end">
+      <DateRangeFilterField
+        label={t('odometerLog.columns.date')}
+        shown={days}
+        today={today}
+        onChange={applyDateRange}
+      />
       {canViewAll && (
         <Select
           label={t('odometerLog.filters.driver')}
@@ -200,6 +216,11 @@ export function OdometerLogListPage() {
 
   const entriesTab = (
     <Stack gap="xs">
+      {canViewAll && rows.length > 0 && (
+        <Text size="xs" c="gray.7">
+          {t('odometerLog.day.caption')}
+        </Text>
+      )}
       {rows.length === 0 ? (
         <Text c="dimmed" size="sm" ta="center" py="xl">
           {t('odometerLog.empty')}
@@ -225,6 +246,11 @@ export function OdometerLogListPage() {
                     <DeltaText log={log} logs={scoped} />
                   </Group>
                   <OdometerCostLines log={log} />
+                  {canViewAll && (
+                    <DayMoneyBlock
+                      statement={dayStatements?.get(dayKey(readEmployeeId(log), log.recordDate))}
+                    />
+                  )}
                   <Group gap={6} wrap="nowrap" align="center">
                     <Text size="xs" c="dimmed">
                       {formatDate(log.recordDate)}
@@ -251,21 +277,75 @@ export function OdometerLogListPage() {
       ) : (
         <Table striped highlightOnHover>
           <Table.Thead>
-            <Table.Tr>
-              <Table.Th>{t('odometerLog.columns.date')}</Table.Th>
-              {canViewAll && <Table.Th>{t('odometerLog.columns.driver')}</Table.Th>}
-              <Table.Th ta="right">{t('odometerLog.columns.km')}</Table.Th>
-              <Table.Th ta="right">{t('odometerLog.columns.distance')}</Table.Th>
-              <Table.Th ta="right">{t('odometerLog.columns.fuelCost')}</Table.Th>
-              <Table.Th ta="right">{t('odometerLog.columns.otherCosts')}</Table.Th>
-              <Table.Th>{t('odometerLog.columns.photo')}</Table.Th>
-              <Table.Th>{t('odometerLog.columns.note')}</Table.Th>
-              <Table.Th />
-            </Table.Tr>
+            {canViewAll ? (
+              <Table.Tr>
+                <Table.Th>{t('odometerLog.columns.date')}</Table.Th>
+                <Table.Th>{t('odometerLog.columns.driver')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.km')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.totalSpent')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.paid')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.remaining')}</Table.Th>
+                <Table.Th>{t('odometerLog.columns.photo')}</Table.Th>
+                <Table.Th>{t('odometerLog.columns.note')}</Table.Th>
+              </Table.Tr>
+            ) : (
+              <Table.Tr>
+                <Table.Th>{t('odometerLog.columns.date')}</Table.Th>
+                {canViewAll && <Table.Th>{t('odometerLog.columns.driver')}</Table.Th>}
+                <Table.Th ta="right">{t('odometerLog.columns.km')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.distance')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.fuelCost')}</Table.Th>
+                <Table.Th ta="right">{t('odometerLog.columns.otherCosts')}</Table.Th>
+                <Table.Th>{t('odometerLog.columns.photo')}</Table.Th>
+                <Table.Th>{t('odometerLog.columns.note')}</Table.Th>
+                <Table.Th />
+              </Table.Tr>
+            )}
           </Table.Thead>
           <Table.Tbody>
             {rows.map((log) => {
               const delta = distanceSincePrevious(scoped, log);
+              if (canViewAll) {
+                return (
+                  <Table.Tr key={log.id}>
+                    <Table.Td>
+                      <Group gap={6} wrap="nowrap">
+                        {formatDate(log.recordDate)}
+                        <EditedMark log={log} />
+                        {canEditLog(log) && (
+                          <Button size="compact-xs" variant="subtle" onClick={() => startEdit(log)}>
+                            <IconPencil size={14} />
+                          </Button>
+                        )}
+                      </Group>
+                    </Table.Td>
+                    <Table.Td>
+                      <DriverName id={readEmployeeId(log)} name={log.extra?.employeeName ?? ''} />
+                    </Table.Td>
+                    <Table.Td ta="right">
+                      <Stack gap={0} align="flex-end">
+                        {hasKm(log) ? (
+                          <Text size="sm" ff="monospace">
+                            {formatKm(readKm(log))}
+                          </Text>
+                        ) : (
+                          <KmPendingBadge />
+                        )}
+                        <DeltaText log={log} logs={scoped} />
+                      </Stack>
+                    </Table.Td>
+                    <DayMoneyCells
+                      statement={dayStatements?.get(dayKey(readEmployeeId(log), log.recordDate))}
+                    />
+                    <Table.Td>{showPhoto(log)}</Table.Td>
+                    <Table.Td>
+                      <Text size="xs" c="dimmed" lineClamp={2}>
+                        {log.extra?.note}
+                      </Text>
+                    </Table.Td>
+                  </Table.Tr>
+                );
+              }
               return (
                 <Table.Tr key={log.id}>
                   <Table.Td>
@@ -417,7 +497,12 @@ export function OdometerLogListPage() {
             {entriesTab}
           </Tabs.Panel>
           <Tabs.Panel value="fuel" pt="md">
-            <OdometerFuelLedger roster={roster} driverFilter={driverFilter} />
+            <OdometerFuelLedger
+              roster={roster}
+              driverFilter={driverFilter}
+              range={days}
+              ledger={ledger}
+            />
           </Tabs.Panel>
         </Tabs>
       ) : (
@@ -462,9 +547,56 @@ export function OdometerLogListPage() {
   );
 }
 
-function toDate(value: string | Date | null): Date | null {
-  if (!value) return null;
-  return typeof value === 'string' ? new Date(value) : value;
+function DateRangeFilterField({
+  label,
+  shown,
+  today,
+  onChange,
+}: {
+  readonly label: string;
+  readonly shown: DayRange;
+  readonly today: string;
+  readonly onChange: (range: DateRangeValue) => void;
+}) {
+  const presetLabels = useDatePresetLabels();
+  const [pendingStart, setPendingStart] = useState<string | null>(null);
+  const presets = useMemo(
+    () =>
+      Object.entries(presetLabels)
+        .filter(([preset]) => preset !== 'custom')
+        .map(([preset, presetLabel]) => {
+          const range = getPresetRange(preset as DateRangePreset);
+          const to = toDateString(range.to);
+          return {
+            value: [toDateString(range.from), to < today ? to : today] as [string, string],
+            label: presetLabel,
+          };
+        }),
+    [presetLabels, today],
+  );
+  return (
+    <DatePickerField
+      type="range"
+      label={label}
+      value={pendingStart ? [pendingStart, null] : [shown.from, shown.to]}
+      maxDate={today}
+      presets={presets}
+      dropdownType={isMobile ? 'modal' : 'popover'}
+      w={isMobile ? '100%' : 250}
+      onDropdownClose={() => setPendingStart(null)}
+      onChange={([from, to]) => {
+        if (from && to) {
+          setPendingStart(null);
+          onChange({ from: dayToDate(from), to: dayToDate(to), preset: 'custom' });
+        } else if (from) {
+          setPendingStart(from);
+        } else {
+          setPendingStart(null);
+          onChange(EMPTY_DATE_RANGE);
+        }
+      }}
+    />
+  );
 }
 
 function toDateString(date: Date): string {
@@ -542,6 +674,140 @@ function ReadingCell({
           {delta.toLocaleString()}
         </Text>
       )}
+    </Stack>
+  );
+}
+
+const dayMonth = (day: string) => formatDate(day).slice(0, 5);
+
+function ClosedMark({ statement }: { readonly statement: DayStatement }) {
+  const { t } = useTranslation();
+  if (!statement.closed) return null;
+  return (
+    <Badge size="xs" variant="light" color="gray" style={{ textTransform: 'none' }}>
+      {t('odometerLog.fuel.clearMarker', {
+        date: dayMonth(shiftDate(statement.closed.nextFrom, -1)),
+      })}
+    </Badge>
+  );
+}
+
+function SpentParts({ statement }: { readonly statement: DayStatement }) {
+  const { t } = useTranslation();
+  const parts = [
+    statement.fuel !== 0 && t('odometerLog.day.fuelPart', { amount: formatNumber(statement.fuel) }),
+    statement.other !== 0 &&
+      t('odometerLog.day.otherPart', { amount: formatNumber(statement.other) }),
+  ].filter(Boolean);
+  if (parts.length === 0) return null;
+  return (
+    <Text size="xs" c="dimmed" ta="right">
+      {parts.join(' · ')}
+    </Text>
+  );
+}
+
+function PaidText({ statement }: { readonly statement: DayStatement }) {
+  const { t } = useTranslation();
+  return (
+    <>
+      <Text size="sm" ff="monospace">
+        {formatNumber(statement.paid)}
+      </Text>
+      {statement.paidThrough && (
+        <Text size="xs" c="dimmed">
+          {t('odometerLog.fuel.paidThroughShort', { date: dayMonth(statement.paidThrough) })}
+        </Text>
+      )}
+    </>
+  );
+}
+
+function DayMoneyCells({ statement }: { readonly statement?: DayStatement }) {
+  if (!statement) {
+    return (
+      <>
+        {[0, 1, 2].map((i) => (
+          <Table.Td key={i} ta="right" c="dimmed">
+            —
+          </Table.Td>
+        ))}
+      </>
+    );
+  }
+  return (
+    <>
+      <Table.Td ta="right">
+        {statement.spent !== 0 ? (
+          <Stack gap={0} align="flex-end">
+            <Text size="sm" ff="monospace">
+              {formatNumber(statement.spent)}
+            </Text>
+            <SpentParts statement={statement} />
+          </Stack>
+        ) : (
+          '—'
+        )}
+      </Table.Td>
+      <Table.Td ta="right">
+        {statement.paid !== 0 ? (
+          <Stack gap={0} align="flex-end">
+            <PaidText statement={statement} />
+          </Stack>
+        ) : (
+          '—'
+        )}
+      </Table.Td>
+      <Table.Td ta="right">
+        <Stack gap={2} align="flex-end">
+          <Text
+            size="sm"
+            fw={600}
+            ff="monospace"
+            c={balanceColor(statement.balance)}
+            data-testid="odometer-day-balance"
+          >
+            {formatNumber(statement.balance)}
+          </Text>
+          <ClosedMark statement={statement} />
+        </Stack>
+      </Table.Td>
+    </>
+  );
+}
+
+function DayMoneyBlock({ statement }: { readonly statement?: DayStatement }) {
+  const { t } = useTranslation();
+  if (!statement) return null;
+  return (
+    <Stack gap={2} pt={4}>
+      {statement.spent !== 0 && (
+        <Group gap={6} wrap="nowrap">
+          <Text size="xs" c="dimmed">
+            {t('odometerLog.columns.totalSpent')}
+          </Text>
+          <Text size="xs" ff="monospace">
+            {formatNumber(statement.spent)}
+          </Text>
+        </Group>
+      )}
+      {statement.paid !== 0 && (
+        <Group gap={6} wrap="nowrap">
+          <Text size="xs" c="dimmed">
+            {t('odometerLog.columns.paid')}
+          </Text>
+          <PaidText statement={statement} />
+        </Group>
+      )}
+      <Group gap={6} wrap="nowrap">
+        <Text size="xs" c="dimmed">
+          {t('odometerLog.columns.remaining')}
+        </Text>
+        <Text size="sm" fw={600} ff="monospace" c={balanceColor(statement.balance)}>
+          {formatNumber(statement.balance)}
+        </Text>
+      </Group>
+      <ClosedMark statement={statement} />
     </Stack>
   );
 }
