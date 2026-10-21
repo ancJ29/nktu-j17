@@ -348,7 +348,10 @@ export function hasDriverProfileForEmployees(): boolean {
   return featureFlags?.employees?.driverProfile ?? false;
 }
 
-const driverDepartmentsSet = new Set(getDeliveryRequestDriverDepartments());
+const driverDepartmentsSet = new Set([
+  ...getDeliveryRequestDriverDepartments(),
+  ...(featureFlags?.employees?.driverDepartments ?? []),
+]);
 
 export function isDriverDepartment(department?: string): boolean {
   return !!department && driverDepartmentsSet.has(department);
