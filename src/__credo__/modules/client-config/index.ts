@@ -55,6 +55,7 @@ export function createClientConfigModule(config: ClientConfigModuleConfig) {
       return load(scope);
     },
 
+    
     async getCurrentHash(scope: string): Promise<string | undefined> {
       const envelope = await loadEnvelope<ClientConfig>(storage, serviceCode, key(scope));
       return envelope.meta.hash;

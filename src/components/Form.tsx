@@ -5,9 +5,9 @@ import { blockImplicitSubmit } from './blockImplicitSubmit';
 type FormProps<T> = {
   readonly form: UseFormReturnType<T>;
   readonly onSubmit: (values: T) => void;
-
+  
   readonly onError?: Parameters<UseFormReturnType<T>['onSubmit']>[1];
-
+  
   readonly submitOnEnter?: boolean;
   readonly children: ReactNode;
 } & Omit<FormHTMLAttributes<HTMLFormElement>, 'onSubmit' | 'onError' | 'children'>;

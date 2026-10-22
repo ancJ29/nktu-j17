@@ -1,9 +1,10 @@
 import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
 
 export type CustomerV2Extra = {
+  
   isDeleted?: boolean;
   shortName?: string;
-
+  
   customerType?: string;
   taxCode?: string;
   addressGoogleMapUrl?: string;
@@ -11,6 +12,7 @@ export type CustomerV2Extra = {
 };
 
 export type CustomerV2Row = SingleRecordRow & {
+  
   code: string;
   name: string;
   phone?: string;

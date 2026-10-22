@@ -1,21 +1,24 @@
+
+
 export type StockEntryMode = 'delta' | 'snapshot';
 
 export type StockEntryError = 'valueRequired' | 'deltaRequired';
 
 export type StockEntry = {
+  
   readonly next: number;
-
+  
   readonly variance: number;
-
+  
   readonly hasValue: boolean;
   readonly error: StockEntryError | null;
 };
 
 export function resolveStockEntry(params: {
   readonly mode: StockEntryMode;
-
+  
   readonly current: number;
-
+  
   readonly value: number | string;
 }): StockEntry {
   const { mode, current, value } = params;
@@ -27,7 +30,10 @@ export function resolveStockEntry(params: {
 
   const error: StockEntryError | null = !hasValue
     ? 'valueRequired'
-    : mode === 'delta' && entered === 0
+    : 
+      
+      
+      mode === 'delta' && entered === 0
       ? 'deltaRequired'
       : null;
 

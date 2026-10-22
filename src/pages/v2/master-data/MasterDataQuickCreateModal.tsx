@@ -1,3 +1,5 @@
+
+
 import { Button, Group, Modal, Stack } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { Form } from '@/components/Form';
@@ -18,9 +20,9 @@ export function MasterDataQuickCreateModal<
   readonly spec: MasterDataSpec<Row, Values>;
   readonly opened: boolean;
   readonly onClose: () => void;
-
+  
   readonly onCreated: (row: Row) => void;
-
+  
   readonly initialName?: string;
 }) {
   const { t } = useTranslation();
@@ -63,12 +65,14 @@ function QuickCreateBody<Row extends MasterDataRow, Values extends MasterDataFor
   const { t } = useTranslation();
   const text = spec.text(t);
   const { save, busy } = useMasterDataWrites(spec);
-
+  
+  
   const form = useMasterDataForm(spec, null, initialName);
 
   const submit = async (values: Values) => {
     const saved = await save(values, null, form);
-
+    
+    
     if (!saved) return;
     onCreated(saved);
     onClose();

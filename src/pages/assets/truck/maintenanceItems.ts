@@ -5,7 +5,11 @@ export function readMaintenanceItems(e: MaintenanceLogExtra | undefined): Mainte
   const legacyName = e?.item?.trim();
   const legacyPrice = e?.totalAmount ?? e?.unitPrice;
   if (!legacyName && legacyPrice == null) return [];
-
+  
+  
+  
+  
+  
   return [{ name: legacyName ?? '', unitPrice: legacyPrice ?? 0 }];
 }
 

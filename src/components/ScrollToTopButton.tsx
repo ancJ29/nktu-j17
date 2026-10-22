@@ -1,3 +1,5 @@
+
+
 import { ActionIcon, Affix, Transition } from '@mantine/core';
 import { useReducedMotion } from '@mantine/hooks';
 import { IconArrowUp } from '@tabler/icons-react';
@@ -25,7 +27,8 @@ export function ScrollToTopButton() {
       frame = 0;
       const reveal = Math.max(MIN_REVEAL_PX, window.innerHeight * REVEAL_VIEWPORTS);
       const y = window.scrollY;
-
+      
+      
       setVisible((shown) => (shown ? y > reveal * HIDE_RATIO : y > reveal));
     };
 
@@ -34,6 +37,8 @@ export function ScrollToTopButton() {
       frame = requestAnimationFrame(evaluate);
     };
 
+    
+    
     window.addEventListener('scroll', onScroll, { passive: true });
     evaluate();
     return () => {
@@ -48,16 +53,19 @@ export function ScrollToTopButton() {
         bottom: `calc(${BOTTOM_NAV_HEIGHT + NAV_GAP}px + env(safe-area-inset-bottom))`,
         left: '50%',
       }}
-
+      
+      
       zIndex={99}
-
+      
+      
       style={{ transform: 'translateX(-50%)' }}
     >
       <Transition transition="slide-up" mounted={visible} duration={150}>
         {(styles) => (
           <ActionIcon
             style={styles}
-
+            
+            
             size={48}
             radius="xl"
             variant="filled"

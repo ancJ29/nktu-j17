@@ -1,3 +1,5 @@
+
+
 import { Button, Drawer, Divider, Group, Modal, Stack, Text } from '@mantine/core';
 import { CodeLabel, type DataTableColumn } from '@credo/base-ui/components';
 import { device } from '@credo/base-ui/utils';
@@ -45,7 +47,7 @@ type ListFilters = {
   status: FilterStatus;
   search: string;
   page: number;
-
+  
   extra?: Record<string, string>;
 };
 
@@ -77,10 +79,17 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
     if (!initialized && !loading) void loadAll();
   }, [initialized, loading, loadAll]);
 
+  
   const live = useMemo(() => items.filter((row) => !row.extra?.isDeleted), [items]);
 
+  
+  
+  
   const sorted = useMemo(() => [...live].sort((a, b) => a.code.localeCompare(b.code)), [live]);
 
+  
+  
+  
   const shouldPagination = LIST_PAGINATION_DEFAULT && live.length >= LIST_PAGINATION_MIN_ROWS;
 
   const {
@@ -98,7 +107,8 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
       const next = { ...(filterState.extra ?? {}) };
       if (value === null) delete next[key];
       else next[key] = value;
-
+      
+      
       updateState({ extra: Object.keys(next).length > 0 ? next : undefined });
     },
     [filterState.extra, updateState],
@@ -107,11 +117,18 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
   const useRegisterFilters = spec.list.useFilters ?? useNoListFilters;
   const registerFilters = useRegisterFilters(live, extraValues, setExtraValue);
 
+  
+  
   const listFilters = useMemo(
     () => ({ status: filterState.status, ...extraValues }),
     [filterState.status, extraValues],
   );
 
+  
+  
+  
+  
+  
   const registerPredicate = registerFilters.predicate;
   const filterFn = useCallback(
     (item: Row, f: { status: FilterStatus }) => {
@@ -144,10 +161,15 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
     onSearchChange,
     page: filterState.page,
     onPageChange,
-
+    
+    
     lazyKey: spec.routes.LIST,
   });
 
+  
+  
+  
+  
   const hasActiveFilters =
     !!search ||
     filterState.status !== FILTER_DEFAULTS.status ||
@@ -167,6 +189,8 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
   );
 
   const columns = useMemo<Array<DataTableColumn<Row>>>(() => {
+    
+    
     const kept: Array<DataTableColumn<Row>> = [
       {
         key: 'code',
@@ -212,6 +236,7 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
       },
     ].filter((column) => !ignoreColumns.has(column.key));
 
+    
     const rank = (key: string, index: number) => displayOrderColumns[key] ?? (index + 1) * 1e6;
     const ranked = kept
       .map((column, index) => ({ column, rank: rank(column.key, index) }))
@@ -229,6 +254,7 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
     text.statusLabels,
   ]);
 
+  
   const mobileMoreFilters = useMemo<MoreFilterDef[]>(
     () => [
       {
@@ -255,7 +281,8 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
         .map<MoreFilterDef>((f, index) => ({
           type: 'select',
           key: f.title ?? `filter-${index}`,
-
+          
+          
           title: f.title ?? f.placeholder,
           placeholder: f.placeholder,
           value: f.value,
@@ -297,12 +324,14 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
       setViewing(null);
       openForm();
     },
-
+    
     [spec, openForm],
   );
 
   const openRow = useCallback(
     (row: Row) => {
+      
+      
       if (spec.simpleMode && !isMobile) setViewing(row);
       else navigate(spec.routes.DETAIL.replace(':id', row.id));
     },
@@ -339,7 +368,9 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
               label: text.addItem,
               enabled: spec.can.create,
               onClick: openCreate,
-
+              
+              
+              
               mobileVariant: 'hidden',
             }}
           />

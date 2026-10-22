@@ -15,10 +15,10 @@ import type { ReservationOrderStatusSource } from './useReservationOrderStatus';
 type Props = {
   readonly opened: boolean;
   readonly onClose: () => void;
-
+  
   readonly product: Product | null;
   readonly reservations: readonly ReservationRollup[];
-
+  
   readonly orderStatus: ReservationOrderStatusSource;
 };
 
@@ -40,7 +40,8 @@ export function ProductInventoryOutgoingModal({
   useEffect(() => {
     if (!opened) return;
     if (!customersInitialized) loadCustomers();
-
+    
+    
     hydrateOrders(true);
   }, [opened, customersInitialized, loadCustomers, hydrateOrders]);
 
@@ -54,7 +55,9 @@ export function ProductInventoryOutgoingModal({
       reservations.map((r) => {
         const state = orderStatus.resolve(r.id);
         const extra = (state.order?.extra ?? {}) as SalesOrderExtra;
-
+        
+        
+        
         const customer =
           resolveCustomerName(
             extra.customerName ?? r.customerName,
@@ -69,13 +72,17 @@ export function ProductInventoryOutgoingModal({
     [reservations, orderStatus, resolveCustomerName, unitLabels],
   );
 
+  
+  
   const showLoader = orderStatus.firstLoad;
 
   return (
     <ResponsiveModal
       opened={opened}
       onClose={onClose}
-
+      
+      
+      
       size="xl"
       title={
         <Stack gap={0}>
@@ -117,7 +124,7 @@ export function ProductInventoryOutgoingModal({
                   <Table.Td>
                     <ReservationStatusBadge
                       state={r.state}
-
+                      
                       fallback={
                         <Text size="sm" c="dimmed">
                           —

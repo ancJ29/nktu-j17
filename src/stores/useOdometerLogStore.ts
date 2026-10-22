@@ -6,10 +6,12 @@ export const odometerLogBundle = createPartitionedRecordsStore<OdometerLog>({
   entity: 'odometer-logs',
   partitionLocate: 'explicit',
   uniqueField: 'extra.employeeId',
-
-  cacheKey: 'odo1.7c3f92',
+  
+  
+  cacheKey: 'odo1.7c3f92', 
   cacheTTL: ONE_MINUTE,
   staleTime: ONE_MINUTE,
-
+  
+  
   defaultRangeDays: 31,
 });

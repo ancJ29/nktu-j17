@@ -1,3 +1,4 @@
+
 export const CONTAINER_NUMBER_PATTERN = /^[A-Z]{3}[UJZ][0-9]{7}$/;
 
 export function normalizeContainerNumber(value: string): string {

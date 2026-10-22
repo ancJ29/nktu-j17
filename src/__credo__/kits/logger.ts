@@ -1,3 +1,5 @@
+
+
 import { yamlify } from './object';
 
 export type LoggerLevel = 'silent' | 'trace' | 'debug' | 'info' | 'warn' | 'error';
@@ -65,7 +67,7 @@ export function createLogger(
     prettyPrint?: boolean;
     withColor?: boolean;
     color?: string;
-    timezone?: string;
+    timezone?: string; 
     level?: LoggerLevel;
     skipTimestamp?: boolean;
     logFile?: string; // file path to append logs to
@@ -79,6 +81,7 @@ export function createLogger(
   const enabled = levelValue > LEVEL_MAP.SILENT;
   const NAMESPACE = namespace.toUpperCase();
 
+  
   const logFile = options.logFile;
   if (logFile) ensureDir(logFile);
 
@@ -114,10 +117,12 @@ export function createLogger(
           ? `[${NAMESPACE}] [${level}]`
           : `[${timestamp}] [${NAMESPACE}] [${level}]`;
 
+        
         const consoleArgs = options.prettyPrint ? args.map(yamlify) : args;
-
+        
         console[method](`${color}${prefix} ${message}`, ...consoleArgs);
 
+        
         if (writeToFile) writeToFile(prefix, message, args);
       }
     : () => {};
@@ -139,6 +144,7 @@ export function createLogger(
       log('ERROR', 'error', message, ...args);
     },
     raw: (message: string, ...args: any[]) => {
+      
       console.log(message, ...args);
     },
   };
@@ -153,5 +159,6 @@ function mkdirSync(_dirPath: string, _options: { recursive: boolean }): void {
 }
 
 function dirname(_path: string): string {
+  
   return '';
 }

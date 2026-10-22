@@ -14,6 +14,7 @@ export interface CreateSalesOrderInput<TExtra = Record<string, unknown>> {
 }
 
 export interface UpdateSalesOrderInput<TExtra = Record<string, unknown>> {
+  
   version?: string;
   customerName?: string;
   items?: SalesOrderItem[];

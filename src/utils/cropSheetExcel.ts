@@ -30,7 +30,9 @@ export async function parseCropSheetFile(
 ): Promise<CropSheetImport> {
   const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array' });
   const parsed = parseCropSheetGrid(workbookToGrid(workbook), opts);
-
+  
+  
+  
   if (!parsed) throw new ExcelParseError(['Ngày thực tế']);
   return parsed;
 }
@@ -60,7 +62,7 @@ const META = {
   seeds: 'Hạt',
   plants: 'Số lượng cây',
   memo: 'Ghi chú chung',
-
+  
   prepMaterial: 'Vật tư',
 } as const;
 
@@ -75,7 +77,7 @@ export function buildCropSheetRows(
   opts?: SheetCropContext & {
     startDate?: string;
     dayDate?: (day: number) => string | undefined;
-
+    
     crop?: Partial<CropSheetExtra>;
   },
 ): (string | number)[][] {
@@ -88,12 +90,19 @@ export function buildCropSheetRows(
   ];
   const groups = plan.columns.map((c) => c.group ?? '');
 
+  
+  
+  
   const meta = sheetHeader(plan, opts?.crop);
-
+  
+  
+  
   const rows: (string | number)[][] = meta.memos.map((memo) => [META.memo, memo.key, memo.value]);
   if (meta.target) rows.push([META.target, meta.target]);
   if (meta.seedCount !== undefined) rows.push([META.seeds, meta.seedCount]);
   if (meta.plantCount !== undefined) {
+    
+    
     rows.push([
       META.plants,
       meta.plantCount,
@@ -101,12 +110,21 @@ export function buildCropSheetRows(
     ]);
   }
 
+  
+  
+  
   for (const job of plan.preparation ?? []) {
+    
+    
     const date =
       (opts?.startDate ? addDays(opts.startDate, job.dayOffset) : undefined) ?? undefined;
     rows.push([
       job.label ?? '',
-
+      
+      
+      
+      
+      
       date ? sheetDate(date) : job.dayOffset,
       date ? weekdayLabel(date) : '',
       job.activity,
@@ -125,12 +143,16 @@ export function buildCropSheetRows(
       const raw = day.values[column.key];
       const n = numericValue(raw);
       if (n === undefined) return raw === undefined ? '' : String(raw);
-
+      
+      
+      
+      
       const value = column.kind === 'ratio' ? n * (columnScale(column, plan, opts) ?? 1) : n;
       if (column.kind === 'ratio') totals[i] += value;
       return value;
     });
-
+    
+    
     const date = opts?.dayDate?.(day.day) ?? '';
     rows.push([
       stageStart.get(day.day) ?? '',

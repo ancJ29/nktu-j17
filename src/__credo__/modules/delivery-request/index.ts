@@ -44,6 +44,7 @@ export function createDeliveryRequestModule(config: DeliveryRequestModuleConfig)
   const { storage, serviceCode, keyPrefix = 'delivery-requests' } = config;
 
   return {
+    
     async getById(scope: string, id: string): Promise<DeliveryRequest | null> {
       const period = extractPeriodFromId(id);
       if (!period) return null;
@@ -58,6 +59,7 @@ export function createDeliveryRequestModule(config: DeliveryRequestModuleConfig)
       return items.find((r) => r.id === id) ?? null;
     },
 
+    
     async getByIds(scope: string, ids: string[]): Promise<DeliveryRequest[]> {
       if (ids.length === 0) return [];
 
@@ -84,6 +86,7 @@ export function createDeliveryRequestModule(config: DeliveryRequestModuleConfig)
       return partitions.flat();
     },
 
+    
     async create(scope: string, input: CreateDeliveryRequestInput): Promise<DeliveryRequest> {
       validateCreateInput(input);
       const period = getCurrentPeriod();
@@ -103,6 +106,7 @@ export function createDeliveryRequestModule(config: DeliveryRequestModuleConfig)
       return request;
     },
 
+    
     async update(
       scope: string,
       id: string,
@@ -136,6 +140,7 @@ export function createDeliveryRequestModule(config: DeliveryRequestModuleConfig)
       return updated;
     },
 
+    
     async query(scope: string, filter: DeliveryRequestFilter): Promise<DeliveryRequest[]> {
       let allRequests: DeliveryRequest[];
 
@@ -162,6 +167,7 @@ export function createDeliveryRequestModule(config: DeliveryRequestModuleConfig)
       return filterRequests(allRequests, filter);
     },
 
+    
     async querySync(
       scope: string,
       params: { fromPeriod: string; toPeriod: string; partitionHashes?: Record<string, string> },

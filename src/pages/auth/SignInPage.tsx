@@ -1,3 +1,5 @@
+
+
 import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { takeSessionExpiredNotice, useAuthStore } from '@/stores/useAuthStore';
@@ -24,6 +26,15 @@ export function SignInPage() {
   const { t, i18n } = useTranslation();
   const login = useAuthStore((state) => state.login);
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
   useEffect(() => {
     const notice = takeSessionExpiredNotice();
     if (!notice) return;
@@ -62,6 +73,8 @@ export function SignInPage() {
   const { isLoading, error, handleSubmit } = useAuthSubmit({
     onSubmit: (values: SignInFormValues) =>
       login({
+        
+        
         email: resolveLoginIdentifier(values.identifier),
         password: values.password,
         remember: values.remember,
@@ -69,7 +82,8 @@ export function SignInPage() {
     onSuccess: () => {
       markPendingLogin('password');
       markPostLoginReloads();
-
+      
+      
       cacheFlush();
       window.location.assign(ROUTES.APP.MAIN);
     },
@@ -99,7 +113,9 @@ export function SignInPage() {
       isLoading={isLoading}
       error={error}
       themeConfig={themeConfig.auth}
-
+      
+      
+      
       showQrLogin
       branding={{
         appName: appBrand.name,

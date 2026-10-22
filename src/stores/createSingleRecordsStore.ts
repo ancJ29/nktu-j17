@@ -1,3 +1,5 @@
+
+
 import { cMngtConnector } from '@credo/connectors/connector';
 import type { CMngtSingleRecordTarget } from '@credo/connectors/types';
 import { createEntityStore } from './createEntityStore';
@@ -9,10 +11,11 @@ type FlatUpdateBody = { version: string; expectedListHash?: string } & Record<st
 type FlatCreateBody = { expectedListHash?: string } & Record<string, unknown>;
 
 export type SingleRecordsStoreConfig = {
+  
   entity: string;
-
+  
   uniqueField?: string | string[];
-
+  
   cacheKey: string;
   cacheTTL?: number;
   staleTime?: number;
@@ -25,6 +28,8 @@ export function createSingleRecordsStore<T extends SingleRecordRow>(
 ) {
   const { entity, uniqueField, cacheKey, cacheTTL, staleTime } = config;
 
+  
+  
   if (FOREIGN_WRITER_ENTITIES.has(entity)) {
     throw new Error(
       `[single-records] "${entity}" is served by another BFF — routing it through ` +
@@ -33,6 +38,7 @@ export function createSingleRecordsStore<T extends SingleRecordRow>(
     );
   }
 
+  
   const target: CMngtSingleRecordTarget = {
     entity,
     ...(uniqueField !== undefined && { uniqueField }),

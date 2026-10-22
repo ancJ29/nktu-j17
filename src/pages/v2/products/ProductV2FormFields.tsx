@@ -1,3 +1,5 @@
+
+
 import { ActionIcon, Button, Grid, Group, Stack, Switch, Text, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { IconCurrencyDong, IconPlus, IconTrash } from '@tabler/icons-react';
@@ -26,7 +28,8 @@ export function ProductV2IdentityFields({ form, isEditing }: FieldsProps) {
           description={t('productsV2.form.codeHelp')}
           placeholder={t('productsV2.form.codeAuto')}
           autoFocus={!isEditing}
-
+          
+          
           disabled={isEditing}
           {...form.getInputProps('code')}
         />
@@ -85,6 +88,9 @@ export function ProductV2AttributeFields({ form }: Omit<FieldsProps, 'isEditing'
         {t('productsV2.form.attributesHelp')}
       </Text>
       {rows.map((row, index) => (
+        
+        
+        
         <Group key={index} gap="xs" wrap="nowrap" align="flex-start">
           <TextInput
             aria-label={t('productsV2.form.attributeKey')}

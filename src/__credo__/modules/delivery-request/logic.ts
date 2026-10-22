@@ -37,11 +37,16 @@ export function validateCreateInput(input: CreateDeliveryRequestInput): void {
   if (!input.requestNumber.trim()) {
     fields['requestNumber'] = 'Request number is required';
   }
-
+  
+  
   if (input.direction != null && input.direction !== 'outbound' && input.direction !== 'inbound') {
     fields['direction'] = "Direction must be 'outbound' or 'inbound'";
   }
-
+  
+  
+  
+  
+  
   if (input.items && input.items.length > 0) {
     for (let i = 0; i < input.items.length; i++) {
       Object.assign(fields, validateItem(input.items[i]!, i));
@@ -115,7 +120,7 @@ export function applyUpdate(
     ...(input.notes !== undefined ? { notes: input.notes.trim() } : {}),
     ...(input.extra !== undefined ? { extra: input.extra } : {}),
     updatedAt: now,
-
+    
     version: newVersion(),
   };
 }

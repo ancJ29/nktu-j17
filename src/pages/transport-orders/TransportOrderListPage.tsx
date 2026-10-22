@@ -73,6 +73,8 @@ export function TransportOrderListPage() {
   const { t, i18n } = useTranslation();
   const scrollViewportRef = useListScrollRestoration(ROUTES.TRANSPORT_ORDERS.LIST);
 
+  
+  
   const { items, loading, initialized, error, cachedAt, loadAll, forceRefresh } =
     useTransportOrderStore(
       useShallow((s) => ({
@@ -88,6 +90,7 @@ export function TransportOrderListPage() {
 
   const filters = useTransportOrderListFilters(items, RANGE_DAYS);
 
+  
   const customers = useCustomerStore((s) => s.items);
   const customersInit = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
@@ -117,6 +120,7 @@ export function TransportOrderListPage() {
     }
   }, [error, t]);
 
+  
   useTransactionalRangeRefetch({
     range: filters.createdDateRange,
     setStoreRange: setTransportOrderQueryRange,
@@ -134,6 +138,8 @@ export function TransportOrderListPage() {
     paginated,
     totalPages,
   } = useListFilter(filters.allOrders, {
+    
+    
     filters: {},
     filterFn: () => true,
     searchFields: (o) => [
@@ -146,7 +152,10 @@ export function TransportOrderListPage() {
       o.route?.stuffing ?? '',
       o.route?.dropoff ?? '',
       o.notes,
-
+      
+      
+      
+      
       ...(o.trips ?? []).flatMap((trip) => [
         trip.truckPlate,
         trip.driverName,
@@ -154,16 +163,21 @@ export function TransportOrderListPage() {
         trip.destination,
       ]),
     ],
-
+    
+    
     search: filters.search,
     onSearchChange: filters.setSearch,
     page: filters.page,
     onPageChange: filters.setPage,
   });
 
+  
+
+  
+  
   const statusData = useMemo(
     () => transportOrderStatuses().map((s) => ({ value: s.value, label: s.label })),
-
+    
     [i18n.language],
   );
   const statusLabel = (v: string) => statusData.find((s) => s.value === v)?.label ?? v;
@@ -177,6 +191,9 @@ export function TransportOrderListPage() {
   );
   const customerLabel = (code: string) => customerData.find((c) => c.value === code)?.label ?? code;
 
+  
+  
+  
   const truckData = useMemo(
     () =>
       trucks
@@ -186,6 +203,11 @@ export function TransportOrderListPage() {
   );
   const truckLabel = (id: string) => truckData.find((tr) => tr.value === id)?.label ?? id;
 
+  
+  
+  
+  
+  
   const driverData = useMemo(() => {
     const driverIds = new Set<string>();
     for (const o of items) {
@@ -198,20 +220,36 @@ export function TransportOrderListPage() {
   }, [items, employees]);
   const driverLabel = (id: string) => driverData.find((e) => e.value === id)?.label ?? id;
 
+  
+  
+  
+  
   const shipmentData = useShipmentTypeOptions();
   const shipmentTypeLabel = useShipmentTypeLabel();
-
+  
+  
+  
   const truckingSizeData = useTruckingSizeOptions();
   const truckingSizeLabel = useTruckingSizeLabel();
-
+  
+  
+  
+  
   const feeNameLabel = useFeeNameLabel();
   const feeNameOptions = useFeeNameOptions();
 
+  
+  
+  
+  
+  
+  
   const truckTypeData = useOrderTruckTypeOptions();
   const truckTypeLabel = useTruckTypeLabel();
 
+  
   const showTruckTypeTabs = ORDER_TRUCK_TYPES.length > 0;
-
+  
   const truckTypeTabs = useMemo(
     () => [{ value: ALL_TRUCK_TYPES_TAB, label: t('common.filters.all') }, ...truckTypeData],
     [truckTypeData, t],
@@ -219,10 +257,12 @@ export function TransportOrderListPage() {
   const activeTruckTypeTab = filters.truckTypeFilter ?? ALL_TRUCK_TYPES_TAB;
   const setTruckTypeTab = (value: string) =>
     filters.setTruckTypeFilter(value === ALL_TRUCK_TYPES_TAB ? null : value);
-
+  
+  
   const [chooseTypeOpen, setChooseTypeOpen] = useState(false);
   const navigate = useNavigate();
 
+  
   const truckTypeSegments = useMemo(
     () =>
       truckTypeTabs.map((tab) => {
@@ -240,6 +280,7 @@ export function TransportOrderListPage() {
     [truckTypeTabs, activeTruckTypeTab],
   );
 
+  
   const truckTypeMobileTabs = useMemo(
     () =>
       truckTypeTabs.map((tab) => ({
@@ -259,8 +300,12 @@ export function TransportOrderListPage() {
     [truckTypeTabs],
   );
 
+  
+  
   const getTruckPlate = useTruckPlate();
 
+  
+  
   const handleExport = () => {
     if (filtered.length === 0) {
       notifications.show({
@@ -272,16 +317,20 @@ export function TransportOrderListPage() {
     try {
       exportTransportOrdersToExcel(filtered, {
         language: i18n.language,
-
+        
+        
         companyName: getCompanyInfo().name,
         resolveStatus: statusLabel,
         resolveShipmentType: shipmentTypeLabel,
         resolveTruckingSize: truckingSizeLabel,
         resolveFeeName: feeNameLabel,
-
+        
+        
+        
         feeNames: feeNameOptions.map((o) => o.label),
         getTruckPlate,
-
+        
+        
         resolveCustomer: (code) => customerData.find((c) => c.value === code)?.label,
         includeMoney: canViewPrice,
       });
@@ -298,6 +347,16 @@ export function TransportOrderListPage() {
     }
   };
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const handleExportCustomerReport = () => {
     const code = filters.customerFilter.length === 1 ? filters.customerFilter[0]! : null;
     if (!code) {
@@ -312,7 +371,8 @@ export function TransportOrderListPage() {
       return;
     }
     const customer = customers.find((c) => c.code === code);
-
+    
+    
     const shipmentSuffix =
       filters.shipmentFilter !== 'all'
         ? `- ${shipmentTypeLabel(filters.shipmentFilter).toLocaleUpperCase('vi')}`
@@ -321,6 +381,7 @@ export function TransportOrderListPage() {
       const count = exportCustomerReport(resolveCustomerReportType(code), filtered, {
         seller: getCompanyInfo(),
         customer: {
+          
           name: customer?.name ?? filtered.find((o) => o.customerName)?.customerName ?? code,
           address: customer?.address,
           taxCode: customer?.extra?.taxCode,
@@ -333,6 +394,7 @@ export function TransportOrderListPage() {
         fileTag: code,
       });
       if (count === 0) {
+        
         notifications.show({
           color: 'yellow',
           message: t('transportOrders.notifications.exportEmpty'),
@@ -359,6 +421,9 @@ export function TransportOrderListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.statusFilter, statusData, t]);
 
+  
+  
+  
   const customerPlaceholder = useMemo(() => {
     if (filters.customerFilter.length === 0) return t('transportOrders.form.customer');
     if (filters.customerFilter.length === 1) return customerLabel(filters.customerFilter[0]!);
@@ -376,10 +441,18 @@ export function TransportOrderListPage() {
     custom: t('common.datePreset.custom'),
   };
 
+  
+
   const statsCells: ListStatCell[] = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const o of filtered) counts[o.status] = (counts[o.status] ?? 0) + 1;
 
+    
+    
+    
+    
+    
+    
     let revenue = 0;
     let driverPay = 0;
     let balanceDue = 0;
@@ -395,7 +468,8 @@ export function TransportOrderListPage() {
 
     return [
       { key: 'total', label: t('transportOrders.stats.total'), value: filtered.length },
-
+      
+      
       ...transportOrderStatuses()
         .slice(0, 3)
         .map((s) => ({
@@ -430,6 +504,8 @@ export function TransportOrderListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `i18n.language` is the intended key: the status resolver reads the active language internally, so labels must re-resolve on a language switch.
   }, [filtered, i18n.language, t]);
 
+  
+
   const desktopFilters: (SelectFilter | MultiSelectFilter)[] = [
     {
       multi: true,
@@ -440,6 +516,10 @@ export function TransportOrderListPage() {
       w: 200,
     },
     {
+      
+      
+      
+      
       value: filters.shipmentFilter === 'all' ? null : filters.shipmentFilter,
       onChange: (v) => filters.setShipmentFilter(v ?? 'all'),
       data: shipmentData,
@@ -470,6 +550,12 @@ export function TransportOrderListPage() {
 
   const allLabel = t('common.filters.all');
 
+  
+  
+  
+  
+  
+  
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
@@ -491,6 +577,7 @@ export function TransportOrderListPage() {
     }),
   ];
 
+  
   const moreFilters: MoreFilterDef[] = [
     {
       type: 'dateRange',
@@ -506,7 +593,20 @@ export function TransportOrderListPage() {
       value: filters.entryDateRange,
       onChange: filters.setEntryDateRange,
     },
-
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     ...(!showTruckTypeTabs && truckTypeData.length > 0
       ? ([
           {
@@ -557,6 +657,11 @@ export function TransportOrderListPage() {
     },
   ];
 
+  
+  
+  
+  
+  
   const mobileQuickChips: QuickFilterChip[] = useMemo(
     () => [
       ...shipmentData.map((s) => ({
@@ -576,8 +681,16 @@ export function TransportOrderListPage() {
     [filters, shipmentData, t],
   );
 
+  
+  
+  
+  
+  
+  
+  
   const shipmentChipsShown = shipmentData.length > 0;
-
+  
+  
   const desktopMoreFilters = moreFilters.filter((f) => f.key !== 'shipmentType');
   const mobileMoreFilters: MoreFilterDef[] = [
     {
@@ -589,7 +702,9 @@ export function TransportOrderListPage() {
       options: customerData,
       onChange: filters.setCustomerFilter,
     },
-
+    
+    
+    
     ...moreFilters.filter(
       (f) => f.key !== 'hideCancelled' && !(shipmentChipsShown && f.key === 'shipmentType'),
     ),
@@ -598,8 +713,17 @@ export function TransportOrderListPage() {
   const hasActiveFilters = filters.hasActiveFilters || !!search;
   const clearAll = filters.clearFilters;
 
+  
+  
+  
+  
+  
+  
   const showBarPills = !isMobile;
-
+  
+  
+  
+  
   const showStatusPills = showBarPills && !filters.statusFilterIsDefault;
   const showShipmentPill = !isMobile || !shipmentChipsShown;
 
@@ -640,6 +764,10 @@ export function TransportOrderListPage() {
             )
           }
           createCta={
+            
+            
+            
+            
             showTruckTypeTabs && !filters.truckTypeFilter
               ? {
                   onClick: () => setChooseTypeOpen(true),
@@ -659,12 +787,14 @@ export function TransportOrderListPage() {
             they sum the filtered set, which the tab narrows. */}
         {showTruckTypeTabs &&
           (isMobile ? (
+            
             <MobileScrollPillTabs
               tabs={truckTypeMobileTabs}
               value={activeTruckTypeTab}
               onChange={setTruckTypeTab}
             />
           ) : (
+            
             <Group>
               <SegmentedControl
                 size="lg"

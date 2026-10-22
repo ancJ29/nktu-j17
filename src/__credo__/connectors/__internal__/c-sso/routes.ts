@@ -6,6 +6,7 @@ export const C_SSO_ROUTES = {
     OPERATOR: '/operator',
   },
   SUB_ROUTES: {
+    
     SSO: {
       GET_PUBLIC_KEY: { PATH: '/public-key', METHOD: 'GET' },
       LOGIN: { PATH: '/login', METHOD: 'POST' },
@@ -13,7 +14,7 @@ export const C_SSO_ROUTES = {
       REFRESH_TOKEN: { PATH: '/refresh-token', METHOD: 'POST' },
       LOGIN_WITH_TOKEN: { PATH: '/login-with-token', METHOD: 'POST' },
     },
-
+    
     OPERATOR: {
       OPERATOR_ADD_USER: { PATH: '/add-user', METHOD: 'POST' },
       OPERATOR_GENERATE_LOGIN_TOKEN: {
@@ -28,7 +29,7 @@ export const C_SSO_ROUTES = {
     HEALTH: {
       HEALTH_CHECK: { PATH: '/health', METHOD: 'GET' },
     },
-
+    
     ADMIN: {
       ENSURE_KEYPAIRS: { PATH: '/ensure-keypairs', METHOD: 'POST' },
       ENSURE_SERVICE: { PATH: '/ensure-service', METHOD: 'POST' },

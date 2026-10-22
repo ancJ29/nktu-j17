@@ -1,3 +1,5 @@
+
+
 import type { ZodType } from 'zod';
 import type { Product, ProductInventoryRow, SalesOrder } from '@/types';
 import type { PlannedOp, PlanFailure } from '@/utils/inventoryReservation';
@@ -16,23 +18,23 @@ export type CapabilityDefinition = {
   id: CapabilityId;
   label: Translatable;
   description: Translatable;
-
+  
   allowedStages: Stage[];
-
+  
   requires?: CapabilityId[];
-
+  
   conflictsWith?: CapabilityId[];
-
+  
   supersedes?: CapabilityId[];
-
+  
   priority?: number;
-
+  
   singleton?: boolean;
-
+  
   optional?: boolean;
-
+  
   configSchema?: ZodType;
-
+  
   onEnter?: HandlerId;
 };
 
@@ -67,6 +69,7 @@ export type HandlerPlanResult =
   | { ok: false; failures: PlanFailure[] };
 
 export type Handler = {
+  
   id: HandlerId;
   plan(ctx: HandlerContext): HandlerPlanResult;
 };

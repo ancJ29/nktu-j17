@@ -25,8 +25,9 @@ export interface CreateGoodsReceiptInput<TExtra = Record<string, unknown>> {
 }
 
 export interface UpdateGoodsReceiptInput<TExtra = Record<string, unknown>> {
+  
   version?: string;
-
+  
   status?: GoodsReceiptStatus;
   vendorCode?: string;
   vendorName?: string;

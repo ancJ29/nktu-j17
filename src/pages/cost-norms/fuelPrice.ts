@@ -1,3 +1,4 @@
+
 import type { FuelPriceRow } from '@/types';
 
 function isLive(row: FuelPriceRow): boolean {

@@ -2,15 +2,16 @@ import { addDays, windowDayCount } from './cropSchedule';
 import type { Crop } from '@/types';
 
 export type TimelineTick = {
+  
   date: string;
-
+  
   leftPct: number;
 };
 
 export type TimelineWindow = {
   start: string;
   end: string;
-
+  
   days: number;
   ticks: TimelineTick[];
 };
@@ -19,9 +20,9 @@ export type TimelineBar = {
   crop: Crop;
   leftPct: number;
   widthPct: number;
-
+  
   clippedStart: boolean;
-
+  
   clippedEnd: boolean;
 };
 
@@ -46,8 +47,9 @@ export function spanGeometry(
   window: TimelineWindow,
 ): Omit<TimelineBar, 'crop'> | null {
   if (!fromDate || !toDate) return null;
-  if (windowDayCount(fromDate, toDate) === null) return null;
+  if (windowDayCount(fromDate, toDate) === null) return null; 
 
+  
   if (toDate < window.start || fromDate > window.end) return null;
 
   const visibleStart = fromDate < window.start ? window.start : fromDate;
@@ -58,6 +60,7 @@ export function spanGeometry(
   if (offsetDays === null || spanDays === null) return null;
 
   return {
+    
     leftPct: ((offsetDays - 1) / window.days) * 100,
     widthPct: (spanDays / window.days) * 100,
     clippedStart: fromDate < window.start,

@@ -34,7 +34,7 @@ export function InventoryV2UpdateModal({
 }: {
   readonly opened: boolean;
   readonly onClose: () => void;
-
+  
   readonly row: InventoryV2Row | undefined;
   readonly itemId: string;
   readonly itemName: string;
@@ -42,7 +42,8 @@ export function InventoryV2UpdateModal({
   readonly useStore: InventoryV2Store;
 }) {
   const { t } = useTranslation();
-
+  
+  
   const [mode, setMode] = useState<StockEntryMode>(row ? 'delta' : 'snapshot');
   const [value, setValue] = useState<number | string>('');
   const [note, setNote] = useState(row?.note ?? '');
@@ -55,7 +56,8 @@ export function InventoryV2UpdateModal({
 
   const switchMode = useCallback((raw: string) => {
     setMode(raw as StockEntryMode);
-
+    
+    
     setValue('');
   }, []);
 
@@ -65,7 +67,8 @@ export function InventoryV2UpdateModal({
     try {
       const trimmed = note.trim();
       const patch = { itemId, onHand: next, ...(trimmed ? { note: trimmed } : {}) };
-
+      
+      
       if (row) {
         await useStore.getState().updateSafely({ id: row.id, version: row.version, patch });
       } else {
@@ -74,6 +77,10 @@ export function InventoryV2UpdateModal({
       notifications.show({ color: 'green', message: t('inventoryV2.notifications.saved') });
       onClose();
     } catch (err) {
+      
+      
+      
+      
       const conflict = err instanceof EntityConflictError;
       notifications.show({
         color: conflict ? 'yellow' : 'red',

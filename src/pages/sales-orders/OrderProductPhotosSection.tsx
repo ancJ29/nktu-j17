@@ -22,6 +22,10 @@ export function OrderProductPhotosSection({ items }: Props) {
     return m;
   }, [products]);
 
+  
+  
+  
+  
   const groups = useMemo(() => {
     const seen = new Set<string>();
     const out: Array<{ code: string; name: string | undefined }> = [];

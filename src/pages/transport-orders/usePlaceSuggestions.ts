@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState } from 'react';
 import { logger } from '@credo/base-ui/utils';
 import { ONE_MINUTE } from '@credo/kits/time';
@@ -54,6 +55,9 @@ export function usePlaceSuggestions(): string[] {
   const loadRoutes = useTransportRouteStore((s) => s.loadAll);
   const [history, setHistory] = useState<TransportOrder[]>(windowOrders);
 
+  
+  
+  
   useEffect(() => {
     if (!routesInit) loadRoutes();
   }, [routesInit, loadRoutes]);

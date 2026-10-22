@@ -1,3 +1,5 @@
+
+
 import { MultiSelect, Stack, Switch } from '@mantine/core';
 import { LOOKUP_CATEGORY_IDS, type LookupsV2Form } from './lookupFields';
 
@@ -8,6 +10,8 @@ export function LookupsSection({
   value: LookupsV2Form;
   onChange: (next: LookupsV2Form) => void;
 }) {
+  
+  
   const data = [...new Set([...LOOKUP_CATEGORY_IDS, ...value.enabledCategories])];
 
   return (

@@ -11,6 +11,10 @@ import type { DateTimeInput } from '@credo/kits/types';
 export function validateCreateInput(input: CreateEmployeeInput): void {
   const fields: Record<string, string> = {};
 
+  
+  
+  
+  
   if (typeof input?.name !== 'string' || !input.name.trim()) {
     fields['name'] = 'Name is required';
   }

@@ -66,6 +66,7 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
     onClose();
   }, [busy, onClose, resetView]);
 
+  
   const persistUrl = useCallback(
     async (nextUrl: string | undefined): Promise<boolean> => {
       const nextExtra: EmployeeExtra = { ...employee.extra, profileImage: nextUrl };
@@ -162,10 +163,14 @@ export function EmployeeProfileImageModal({ opened, onClose, employee, onUpdated
         });
         return;
       }
-
+      
+      
       const previousUrl = currentUrl;
       const persisted = await persistUrl(presign.fileUrl);
       if (!persisted) {
+        
+        
+        
         deleteMedia(presign.fileUrl);
         return;
       }

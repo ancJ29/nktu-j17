@@ -33,7 +33,7 @@ import { GroupedNumberInput } from '@/components/GroupedNumberInput';
 type Props = {
   readonly opened: boolean;
   readonly onClose: () => void;
-
+  
   readonly rows: readonly ProductInventoryRow[];
 };
 
@@ -56,7 +56,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
   const periodKey = getCurrentPeriodKey();
 
   const selectedProduct = picked?.product ?? null;
-
+  
   const selectedRow = useMemo(() => {
     if (!selectedProduct) return null;
     return (
@@ -72,7 +72,8 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
   const baseUnit = selectedProduct ? getItemBaseUnit(selectedProduct) : '';
   const baseUnitLabel = lookupLabelOf(unitLabels, baseUnit);
   const currentOnHand = selectedRow?.onHand ?? 0;
-
+  
+  
   const oldBegin = getBeginOfPeriodValue(selectedRow?.extra, periodKey) ?? currentOnHand;
 
   const form = useForm<Values>({
@@ -86,15 +87,18 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
     },
   });
 
+  
   useEffect(() => {
     if (!opened) return;
-
+    
     setMode('snapshot');
     setPicked(null);
     form.setValues({ value: '', note: '' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened]);
 
+  
+  
   useEffect(() => {
     if (!opened) return;
     form.setValues((c) => ({ ...c, value: '' }));
@@ -122,6 +126,8 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
         return;
       }
 
+      
+      
       const breakdown = selectedRow ? readRowBreakdown(selectedRow, baseUnit) : {};
       let nextBreakdown = breakdown;
       let resolvedOnHand = currentOnHand;
@@ -156,6 +162,7 @@ export function ProductInventoryBeginOfPeriodModal({ opened, onClose, rows }: Pr
 
       setSubmitting(true);
       try {
+        
         await useProductInventoryStore.getState().revalidate();
 
         if (selectedRow) {

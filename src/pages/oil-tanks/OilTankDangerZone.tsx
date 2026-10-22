@@ -1,3 +1,5 @@
+
+
 import { Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -23,7 +25,7 @@ const canDelete = perms.oilTank.canDelete();
 
 type Props = {
   readonly tank: OilTankRow;
-
+  
   readonly onUpdated: (tank: OilTankRow) => void;
 };
 
@@ -108,6 +110,7 @@ export function OilTankDangerZone({ tank, onUpdated }: Props) {
     }
   }, [tank, t, navigate, forceRefresh, surfaceConflict, closeDelete]);
 
+  
   if (isMobile || (!canEdit && !canDelete)) return null;
 
   return (

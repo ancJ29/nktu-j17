@@ -1,3 +1,5 @@
+
+
 import { useAuthStore } from '@/stores/useAuthStore';
 
 export function useIsRoot(): boolean {

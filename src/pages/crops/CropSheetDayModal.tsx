@@ -10,17 +10,18 @@ import type { MaterialLine } from '@/types';
 import type { CropDiaryEntry } from '@/types';
 
 type Props = {
+  
   readonly view: SheetDayView | null;
-
+  
   readonly events?: CropDiaryEntry[];
   readonly onClose: () => void;
   readonly editable: boolean;
   readonly dirty: boolean;
   readonly saving: boolean;
   readonly onCellChange: (day: number, columnKey: string, raw: string) => void;
-
+  
   readonly onMaterialsChange?: (day: number, columnKey: string, lines: MaterialLine[]) => void;
-
+  
   readonly onReset?: (day: number) => void;
   readonly onSave: () => void;
 };
@@ -130,6 +131,7 @@ export function CropSheetDayModal({
             <Stack gap="xs">
               <SectionLabel>{t('crops.sheet.day.notes')}</SectionLabel>
               {view.notes.map((line) => (
+                
                 <Textarea
                   key={line.column.key}
                   size="xs"
@@ -253,7 +255,9 @@ function DayLineTable({
                   ta="center"
                   readOnly={!editable}
                   aria-label={`${line.column.label || line.column.key} — ${t('crops.sheet.day.dose')}`}
-
+                  
+                  
+                  
                   value={cellInputText(line)}
                   onChange={(e) =>
                     onCellChange(

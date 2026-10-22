@@ -6,12 +6,13 @@ import { FilterPill } from './FilterPill';
 import { LIST_DEFAULT_RANGE_PILL } from '@/config/listDefaults';
 
 type TransactionalFilterPillsRowProps = {
+  
   readonly defaultRange: {
     readonly label: string;
     readonly range: DateRangeValue;
     readonly presetLabels: Partial<Record<DateRangePreset, string>>;
   };
-
+  
   readonly children?: ReactNode;
 };
 

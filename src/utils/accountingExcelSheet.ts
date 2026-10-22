@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import { formatDate } from '@/utils/dateFormat';
 
@@ -28,7 +30,8 @@ export function resolveAccountingPeriodLabel(dates: Iterable<unknown>): string {
     earliest = Math.min(earliest, t);
     latest = Math.max(latest, t);
   }
-
+  
+  
   if (!Number.isFinite(earliest)) {
     const now = new Date();
     return `Tháng ${now.getMonth() + 1} năm ${now.getFullYear()}`;
@@ -42,16 +45,17 @@ export function resolveAccountingPeriodLabel(dates: Iterable<unknown>): string {
 }
 
 export type AccountingSheetSpec = {
+  
   title: string;
-
+  
   periodLabel: string;
-
+  
   headers: readonly string[];
-
+  
   colWidths: readonly number[];
-
+  
   dataRows: ReadonlyArray<ReadonlyArray<string | number>>;
-
+  
   numericCols: ReadonlyArray<NumericColumnFormat>;
 };
 
@@ -78,7 +82,7 @@ export function buildAccountingWorksheet({
     ...dataRows.map((row) => [...row]),
   ]);
   worksheet['!cols'] = colWidths.map((width) => ({ width }));
-
+  
   worksheet['!merges'] = [
     { s: { r: R_TITLE, c: 0 }, e: { r: R_TITLE, c: lastCol } },
     { s: { r: R_PERIOD, c: 0 }, e: { r: R_PERIOD, c: lastCol } },
@@ -90,12 +94,15 @@ export function buildAccountingWorksheet({
     cell.s = { ...(cell.s ?? {}), ...style };
   };
 
+  
   setStyle(R_TITLE, 0, { font: { bold: true, sz: 16 }, alignment: { horizontal: 'center' } });
   setStyle(R_PERIOD, 0, {
     font: { bold: true, italic: true, sz: 12 },
     alignment: { horizontal: 'center' },
   });
 
+  
+  
   for (let c = 0; c <= lastCol; c++) {
     setStyle(R_HEADER, c, {
       font: { bold: true },
@@ -105,6 +112,7 @@ export function buildAccountingWorksheet({
     });
   }
 
+  
   for (let i = 0; i < dataRows.length; i++) {
     const r = R_FIRST_DATA + i;
     for (const [col, fmt] of numericCols) {

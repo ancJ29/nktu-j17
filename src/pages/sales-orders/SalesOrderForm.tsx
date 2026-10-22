@@ -187,21 +187,21 @@ type ItemFormValues = {
   quantity: number;
   unit: string;
   unitPrice: number;
-
+  
   fromLocationCode: string;
-
+  
   groupId?: string;
-
+  
   role?: 'set' | 'set-component';
-
+  
   sourceSetCode?: string;
-
+  
   memo?: string;
-
+  
   extraQuantity?: number;
-
+  
   isReady?: boolean;
-
+  
   warehouseMemo?: string;
 };
 
@@ -220,19 +220,19 @@ type SalesOrderFormValues = {
   assignedStaff: string;
   isUrgent: boolean;
   tags: string[];
-
+  
   needVAT: boolean;
   needShippingFee: boolean;
-
+  
   vatRatePercent: number | '';
   vatTag: string;
   shippingFee: number | '';
   isPaid: boolean;
-
+  
   paidAmount: number | '';
   invoiceIssued: boolean;
   notes: string;
-
+  
   warehouseNote: string;
   driverNote: string;
   items: ItemFormValues[];
@@ -273,14 +273,19 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
   const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
-
+  
+  
+  
+  
   const copyFrom = !isEdit ? extractCopyFromState(location.state) : undefined;
   const forceRefresh = useSalesOrderStore((s) => s.forceRefresh);
   const { deliveryMethodOptions, tagOptions } = salesOrderFieldOptions;
 
+  
   const customers = useCustomerStore((s) => s.items);
   const products = useProductStore((s) => s.items);
 
+  
   const locations = useLocationStore((s) => s.items);
   const allInventoryRows = useProductInventoryStore((s) => s.items);
   const inventoryInitialized = useProductInventoryStore((s) => s.initialized);
@@ -291,6 +296,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     if (!inventoryInitialized) loadInventory();
   }, [inventoryInitialized, loadInventory]);
 
+  
+  
+  
+  
+  
+  
   const inventoryByProduct = useMemo(
     () => indexInventoryByProduct(allInventoryRows),
     [allInventoryRows],
@@ -304,10 +315,19 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     return m;
   }, [locations]);
 
+  
+  
+  
+  
+  
+  
   const [ownReservedSnapshot, setOwnReservedSnapshot] = useState<
     readonly InventoryLinkageSnapshotEntry[] | undefined
   >(undefined);
-
+  
+  
+  
+  
   const [inventoryLinkageState, setInventoryLinkageState] = useState<
     InventoryLinkageState | undefined
   >(undefined);
@@ -318,17 +338,25 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       if (stockSettled) return null;
       const prod = productByCode.get(productCode);
       if (!prod) return null;
-
+      
       if (isNoInventoryProduct(prod)) return null;
       const target = locationCode || DEFAULT_LOCATION_CODE;
       const base = getProductLocationAvailability(prod, target, inventoryByProduct);
-
+      
+      
+      
       const ownReserved = getOwnReservedAtLocation(prod, target, ownReservedSnapshot);
       return { ...base, available: base.available + ownReserved };
     },
     [productByCode, inventoryByProduct, ownReservedSnapshot, stockSettled],
   );
 
+  
+  
+  
+  
+  
+  
   const unitAvailability = useCallback(
     (productCode: string, locationCode: string, unit: string): number | null => {
       if (stockSettled) return null;
@@ -347,6 +375,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [productByCode, inventoryByProduct, ownReservedSnapshot, stockSettled],
   );
 
+  
+  
+  
+  
   const breakdownParentIndex = useMemo(() => buildBreakdownParentIndex(products), [products]);
   const breakdownCoverage = useCallback(
     (productCode: string, locationCode: string, quantity: number, unit: string) => {
@@ -366,29 +398,39 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [breakdownParentIndex, productByCode, inventoryByProduct, ownReservedSnapshot, stockSettled],
   );
 
+  
   const locationSelectData = useMemo(() => {
     if (!locationsEnabled) return [];
     const out = locations
       .filter((l) => l.isActive)
       .map((l) => ({ value: l.code, label: l.name || l.code }));
-
+    
+    
     if (!out.some((o) => isDefaultLocation(o.value))) {
       out.unshift({ value: DEFAULT_LOCATION_CODE, label: t('common.labels.defaultLocation') });
     }
     return out;
   }, [locations, t]);
 
+  
+  
+  
   const hasCustomerRegistry = useMemo(
     () => customers.some((c) => c.isActive && !c.extra?.isDeleted),
     [customers],
   );
 
+  
+  
   const customerMap = useMemo(() => {
     const m = new Map<string, Customer>();
     for (const c of customers) m.set(c.id, c);
     return m;
   }, [customers]);
 
+  
+  
+  
   const customerNameCodeData = useMemo(
     () =>
       variant.customerPicker === 'nameCodeSelect'
@@ -402,16 +444,28 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [customers, variant.customerPicker],
   );
 
+  
+  
+  
+
+  
+  
   const currentEmployee = useMyEmployee();
   const currentEmployeeId = currentEmployee?.id ?? '';
 
+  
+  
+  
   const productSelectData = useMemo(
     () =>
       products
         .filter((p) => p.isActive)
         .map((p) => ({
           value: p.code,
-
+          
+          
+          
+          
           label: `${p.code} — ${p.name}${isBundleSet(p) ? ' [SET]' : ''}`,
           name: p.name,
           unit: p.unit,
@@ -428,8 +482,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     return m;
   }, [productSelectData]);
 
+  
+  
+  
+  
   const defaultStatus = getInitialStatusValue() ?? '';
 
+  
+  
+  
+  
   useEffect(() => {
     if (isMobile) {
       notifications.show({
@@ -446,20 +508,28 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
   const [loading, setLoading] = useState(false);
   const [formAttachments, setFormAttachments] = useState<SalesOrderAttachment[]>([]);
-
+  
   const [shippingAddressId, setShippingAddressId] = useState<string>('');
   const snapshotRef = useRef<SalesOrder | null>(null);
-
+  
   const quotationLinkRef = useRef<{ id: string; code?: string } | null>(null);
-
+  
   const [lockedByReservation, setLockedByReservation] = useState(false);
-
+  
+  
+  
+  
   const [skipInitial, setSkipInitial] = useState(!!createSkipInitialTarget);
-
+  
   const [photoProduct, setPhotoProduct] = useState<{ code: string; name: string } | null>(null);
-
+  
+  
+  
   const productImagesEnabled = hasImagesForProducts();
 
+  
+  
+  
   const [generatedUploadId] = useState(() => Math.random().toString(36).slice(2, 10));
   const uploadId = id ?? generatedUploadId;
   const imageDirectory = useMemo(
@@ -467,6 +537,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [uploadId],
   );
 
+  
+  
+  
+  
+  
   const splitNotesCfg = variant.clientSpecific?.NKTU?.splitNotes;
   const noteDept = currentEmployee?.department ?? null;
   const isNoteDriverDept = noteDept != null && soDriverDepartments.includes(noteDept);
@@ -475,6 +550,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
   const form = useForm<SalesOrderFormValues>({
     initialValues: {
+      
+      
       orderNumber: '',
       customerPONumber: '',
       customerId: '',
@@ -503,6 +580,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       items: [{ ...emptyItem }],
     },
     validate: {
+      
+      
       orderNumber: () => null,
       customerId: (v, vals) =>
         vals.isIndividualCustomer || v.trim() ? null : t('salesOrders.validation.customerRequired'),
@@ -510,13 +589,19 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         vals.isIndividualCustomer && !v.trim()
           ? t('salesOrders.validation.customerNameRequired')
           : null,
-
+      
+      
+      
+      
       items: {
         productCode: (v, vals, path) => {
           if (isEmptyRowAt(vals.items, path)) return null;
           const code = v.trim();
           if (!code) return t('salesOrders.validation.productCodeRequired');
-
+          
+          
+          
+          
           const m = path.match(/^items\.(\d+)\./);
           const idx = m ? Number(m[1]) : -1;
           if (idx < 0 || vals.items[idx]?.role === 'set-component') return null;
@@ -535,7 +620,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             : t('salesOrders.validation.productNameRequired'),
         quantity: (v, vals, path) => {
           if (isEmptyRowAt(vals.items, path)) return null;
-
+          
+          
+          
+          
+          
           const m = path.match(/^items\.(\d+)\./);
           if (m && vals.items[Number(m[1])]?.role === 'set-component') return null;
           return v > 0 ? null : t('common.validation.quantityRequired');
@@ -552,6 +641,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     },
   });
 
+  
   useEffect(() => {
     if (!isEdit && currentEmployeeId && !form.getValues().assignedStaff) {
       form.setFieldValue('assignedStaff', currentEmployeeId);
@@ -559,9 +649,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEmployeeId, isEdit]);
 
+  
   useEffect(() => {
     if (!copyFrom) return;
-
+    
+    
     const link = copyFrom.quotationLink as { id?: string; code?: string } | undefined;
     quotationLinkRef.current = link?.id ? { id: link.id, code: link.code } : null;
     const items =
@@ -577,7 +669,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         sourceSetCode?: string;
         extraQuantity?: number;
       }[]) ?? [];
-
+    
+    
+    
     const copyFromCode = (copyFrom.customerCode as string) ?? '';
     const copyFromCustomer = copyFromCode
       ? customers.find((c) => c.code === copyFromCode)
@@ -585,25 +679,27 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     const copyFromId = copyFromCustomer?.id ?? '';
     const copyFromAddress = (copyFrom.deliveryAddress as string) ?? '';
     form.setValues({
+      
+      
       orderNumber: '',
-      customerPONumber: '',
+      customerPONumber: '', 
       customerId: copyFromId,
       customerName: (copyFrom.customerName as string) ?? '',
       isIndividualCustomer: (copyFrom.isIndividualCustomer as boolean) ?? false,
       isInternalDelivery: (copyFrom.isInternalDelivery as boolean) ?? true,
-      orderDate: new Date(),
+      orderDate: new Date(), 
       deliveryAddress: copyFromAddress,
       googleMapUrl: fillMapUrlFromCustomer(
         copyFromCustomer,
         copyFromAddress,
         copyFrom.googleMapUrl as string | undefined,
       ),
-      deliveryDate: null,
+      deliveryDate: null, 
       deliveryMethod: (copyFrom.deliveryMethod as string) ?? '',
       assignedStaff: (copyFrom.assignedStaff as string) ?? currentEmployeeId,
       isUrgent: (copyFrom.isUrgent as boolean) ?? false,
       tags: (copyFrom.tags as string[]) ?? [],
-
+      
       needVAT: (copyFrom.needVAT as boolean | undefined) ?? true,
       needShippingFee: (copyFrom.needShippingFee as boolean | undefined) ?? false,
       vatRatePercent:
@@ -614,7 +710,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       paidAmount: '',
       invoiceIssued: false,
       notes: (copyFrom.notes as string) ?? '',
-
+      
       warehouseNote: '',
       driverNote: '',
       items:
@@ -636,6 +732,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [copyFrom]);
 
+  
+  
+  
+  
   const handleCustomerChange = useCallback(
     (selection: CustomerSelectorChange | null) => {
       if (!selection) {
@@ -655,6 +755,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         form.setFieldValue('deliveryAddress', firstShipping.address);
         form.setFieldValue('googleMapUrl', firstShipping.googleMapUrl ?? '');
       } else if (customer.address || customer.extra?.addressGoogleMapUrl) {
+        
         setShippingAddressId(BILLING_ADDRESS_ID);
         form.setFieldValue('deliveryAddress', customer.address ?? '');
         form.setFieldValue('googleMapUrl', customer.extra?.addressGoogleMapUrl ?? '');
@@ -664,10 +765,15 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         form.setFieldValue('googleMapUrl', '');
       }
     },
-
+    
     [],
   );
 
+  
+  
+  
+  
+  
   const handlePickAddress = useCallback(
     (id: string | null) => {
       setShippingAddressId(id ?? '');
@@ -685,10 +791,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         form.setFieldValue('googleMapUrl', sa.googleMapUrl ?? '');
       }
     },
-
+    
     [customerMap],
   );
 
+  
+  
+  
   const handleIndividualCustomerToggle = useCallback(
     (checked: boolean) => {
       form.setFieldValue('isIndividualCustomer', checked);
@@ -701,10 +810,23 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         form.setFieldValue('googleMapUrl', '');
       }
     },
-
+    
     [],
   );
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const buildSetExpansion = useCallback(
     (parentProduct: Product, parentQty: number, groupId: string): ItemFormValues[] => {
       const setItems = parentProduct.extra?.setItems ?? [];
@@ -714,7 +836,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         productName: parentProduct.name,
         quantity: parentQty,
         unit: parentProduct.unit,
-
+        
+        
+        
+        
+        
         unitPrice: baseUnitPrice,
         fromLocationCode: DEFAULT_LOCATION_CODE,
         groupId,
@@ -722,7 +848,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       };
       const children: ItemFormValues[] = setItems.map((c) => {
         const componentProduct = productMap.get(c.productCode)?.product;
-
+        
+        
+        
+        
         const unitsPool = componentProduct?.extra?.units ?? [componentProduct?.unit ?? c.unit];
         let unit = c.unit;
         let quantity = c.quantity * parentQty;
@@ -761,12 +890,29 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [productMap],
   );
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const handleProductSelect = useCallback(
     (idx: number, opt: ProductSelectorChange | null) => {
       const currentItems = form.getValues().items;
       const target = currentItems[idx];
       const outgoingGroupId = target?.role === 'set' && target.groupId ? target.groupId : null;
-
+      
+      
+      
       const base = outgoingGroupId
         ? currentItems.filter((l, i) => i === idx || l.groupId !== outgoingGroupId)
         : currentItems;
@@ -786,7 +932,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         return;
       }
       const { product, code, name, units } = opt;
-
+      
+      
       if (isBundleSet(product)) {
         const currentQty = base[idx]?.quantity ?? 1;
         const expansion = buildSetExpansion(product, currentQty || 1, newSetGroupId());
@@ -816,10 +963,14 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       );
       form.setFieldValue('items', next);
     },
-
+    
     [buildSetExpansion, t],
   );
 
+  
+  
+  
+  
   const handleExplodeSet = useCallback(
     (groupId: string) => {
       const current = form.getValues().items;
@@ -840,10 +991,23 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         autoClose: 3500,
       });
     },
-
+    
     [t],
   );
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const handleParentQuantityChange = useCallback(
     (parentIdx: number, nextQty: number) => {
       const current = form.getValues().items;
@@ -854,17 +1018,23 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       }
       const parentProduct = productMap.get(parent.productCode)?.product;
       if (!parentProduct || !isProductSet(parentProduct)) {
+        
+        
         form.setFieldValue(`items.${parentIdx}.quantity`, nextQty);
         return;
       }
       const rebuilt = buildSetExpansion(parentProduct, nextQty, parent.groupId);
-
+      
+      
+      
       rebuilt[0] = {
         ...rebuilt[0],
         unitPrice: parent.unitPrice,
         fromLocationCode: parent.fromLocationCode,
       };
-
+      
+      
+      
       const groupId = parent.groupId;
       let firstIdx = parentIdx;
       let lastIdx = parentIdx;
@@ -875,10 +1045,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       const next = [...current.slice(0, firstIdx), ...rebuilt, ...current.slice(lastIdx + 1)];
       form.setFieldValue('items', next);
     },
-
+    
     [buildSetExpansion, productMap],
   );
 
+  
   const handleParentLocationChange = useCallback(
     (parentIdx: number, nextLocation: string) => {
       const current = form.getValues().items;
@@ -897,16 +1068,21 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       });
       form.setFieldValue('items', next);
     },
-
+    
     [],
   );
 
+  
+  
+  
   const handleRemoveItem = useCallback(
     (idx: number) => {
       const current = form.getValues().items;
       const target = current[idx];
       if (!target) return;
       if (target.role === 'set-component') {
+        
+        
         return;
       }
       if (target.role === 'set' && target.groupId) {
@@ -919,10 +1095,18 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       }
       form.removeListItem('items', idx);
     },
-
+    
     [],
   );
 
+  
+  
+  
+  
+  
+  
+  
+  
   const handleDownloadTemplate = useCallback(() => {
     if (variant.excelMode === 'by-name') {
       const sampleItems = products.slice(0, 3).map((p) => ({ name: p.name }));
@@ -952,6 +1136,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           return;
         }
 
+        
+        
         type SkuHit = {
           code: string;
           name: string;
@@ -978,7 +1164,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             unmatched.push(row.sku);
             continue;
           }
-
+          
+          
+          
+          
           const typedUnit = row.unit?.toLowerCase();
           const unit =
             (typedUnit && hit.units.find((u) => u.toLowerCase() === typedUnit)) ??
@@ -1000,7 +1189,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             title: t('salesOrders.notifications.importNoMatchTitle'),
             message: t('salesOrders.notifications.importUnmatched', {
               count: unmatched.length,
-
+              
               skus: unmatched.join(', '),
             }),
             autoClose: 8000,
@@ -1008,6 +1197,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           return;
         }
 
+        
+        
+        
         const current = form.getValues().items;
         const allEmpty = current.every(isEmptyRow);
         form.setFieldValue('items', allEmpty ? matched : [...current, ...matched]);
@@ -1047,10 +1239,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         }
       }
     },
-
+    
     [products, t],
   );
 
+  
+  
+  
+  
+  
+  
   const handleImportItemsByName = useCallback(
     async (file: File) => {
       try {
@@ -1063,6 +1261,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           return;
         }
 
+        
+        
+        
         const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, ' ');
         type NameHit = { code: string; name: string; units: string[]; price: number };
         const nameMap = new Map<string, NameHit>();
@@ -1092,7 +1293,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             productName: hit.name,
             quantity: row.quantity,
             unit: hit.units[0] ?? '',
-
+            
+            
             unitPrice: typeof row.unitPrice === 'number' ? row.unitPrice : hit.price,
             fromLocationCode: DEFAULT_LOCATION_CODE,
           });
@@ -1115,6 +1317,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         const allEmpty = current.every(isEmptyRow);
         form.setFieldValue('items', allEmpty ? matched : [...current, ...matched]);
 
+        
         if (customerPONumber) {
           form.setFieldValue('customerPONumber', customerPONumber);
         }
@@ -1152,10 +1355,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         }
       }
     },
-
+    
     [products, t],
   );
 
+  
+  
   const handleImportItems = useCallback(
     async (file: File | null) => {
       if (!file) return;
@@ -1165,6 +1370,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [variant.excelMode, handleImportItemsBySku, handleImportItemsByName],
   );
 
+  
+  
+  
+  
+  
+  
+  
   const handleClaimExcelFiles = useCallback(
     (files: File[]) => {
       const isExcel = (f: File) => /\.(xlsx|xls|csv)$/i.test(f.name);
@@ -1181,11 +1393,17 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [lockedByReservation, handleImportItems, t],
   );
 
+  
+  
+  
+  
   const seedFromOrder = useCallback(
     (o: SalesOrder): SalesOrderFormValues | null => {
       snapshotRef.current = o;
       const extra = o.extra as SalesOrderExtra;
-
+      
+      
+      
       if (o.isClosed || extra?.cancellation != null) {
         navigate(ROUTES.SALES_ORDERS.DETAIL.replace(':id', o.id), { replace: true });
         return null;
@@ -1194,7 +1412,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       setLockedByReservation(shouldLockLineEdits(extra?.status ?? ''));
       setOwnReservedSnapshot(extra?.inventoryLinkage?.reservedSnapshot);
       setInventoryLinkageState(extra?.inventoryLinkage?.state);
-
+      
+      
+      
+      
+      
+      
       const persistedCode = extra?.customerCode ?? '';
       const persistedCustomer = persistedCode
         ? customers.find((c) => c.code === persistedCode)
@@ -1250,6 +1473,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     [customers, navigate],
   );
 
+  
   const fetching = useInitFormFromFetch(
     form,
     id,
@@ -1263,18 +1487,27 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     },
   );
 
+  
   const totalAmount = useMemo(
     () => form.getValues().items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
-
+    
     [form.getValues().items],
   );
 
+  
+  
+  
+  
   const totalQuantity = useMemo(
     () => getSalesOrderTotalQuantity(form.getValues().items.filter((i) => i.productCode)),
-
+    
     [form.getValues().items],
   );
 
+  
+  
+  
+  
   type LineShortage = {
     idx: number;
     productCode: string;
@@ -1289,13 +1522,19 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     const out: LineShortage[] = [];
     form.getValues().items.forEach((item, idx) => {
       if (!item.productCode) return;
-
+      
+      
+      
+      
       if (item.role === 'set-component') return;
       const avail = lineAvailability(item.productCode, item.fromLocationCode);
       if (!avail) return;
-
+      
+      
       const physicalQty = getLinePhysicalQuantity(item);
-
+      
+      
+      
       const coverage = breakdownCoverage(
         item.productCode,
         item.fromLocationCode,
@@ -1325,6 +1564,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
   const handleSubmit = useCallback(
     async (values: SalesOrderFormValues) => {
+      
+      
+      
       const filledRows = values.items.filter((row) => !isEmptyRow(row));
 
       setLoading(true);
@@ -1333,25 +1575,42 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         productName: item.productName.trim(),
         quantity: item.quantity,
         unit: item.unit.trim(),
-
+        
+        
+        
         unitPrice: item.role === 'set-component' ? 0 : item.unitPrice,
         fromLocationCode: item.fromLocationCode || DEFAULT_LOCATION_CODE,
         ...(item.groupId && { groupId: item.groupId }),
         ...(item.role && { role: item.role }),
         ...(item.sourceSetCode && { sourceSetCode: item.sourceSetCode }),
-
+        
+        
         ...(item.role !== 'set-component' && item.memo?.trim() && { memo: item.memo.trim() }),
-
+        
+        
+        
+        
         ...(!item.role &&
           item.extraQuantity &&
           item.extraQuantity > 0 && { extraQuantity: item.extraQuantity }),
-
+        
+        
+        
+        
+        
+        
         ...(item.role !== 'set-component' && item.isReady === true && { isReady: true }),
-
+        
+        
+        
         ...(item.role !== 'set-component' &&
           item.warehouseMemo?.trim() && { warehouseMemo: item.warehouseMemo.trim() }),
       }));
 
+      
+      
+      
+      
       const lockedSnapshot =
         isEdit &&
         snapshotRef.current &&
@@ -1360,8 +1619,14 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           : null;
       const items = lockedSnapshot ? lockedSnapshot.items : formItems;
 
+      
+      
+      
       const selectedCustomer = values.customerId ? customerMap.get(values.customerId) : undefined;
 
+      
+      
+      
       const quotationLink =
         quotationLinkRef.current ??
         (() => {
@@ -1371,6 +1636,11 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           return qId ? { id: qId, code: qCode } : null;
         })();
 
+      
+      
+      
+      
+      
       const productWarehouseMemos = buildSalesOrderWarehouseMemo(items, productByCode);
 
       const extra: SalesOrderExtra = {
@@ -1395,7 +1665,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         ...(values.assignedStaff && { assignedStaff: values.assignedStaff }),
         ...(values.isUrgent && { isUrgent: true }),
         ...(values.tags.length > 0 && { tags: values.tags }),
-
+        
+        
+        
+        
         ...(pricingEnabled && values.needVAT === false && { needVAT: false }),
         ...(pricingEnabled && values.needShippingFee && { needShippingFee: true }),
         ...(pricingEnabled &&
@@ -1407,14 +1680,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           typeof values.shippingFee === 'number' &&
           values.shippingFee > 0 && { shippingFee: values.shippingFee }),
         ...(pricingEnabled && values.isPaid && { isPaid: true }),
-
+        
         ...(pricingEnabled &&
           !values.isPaid &&
           typeof values.paidAmount === 'number' &&
           values.paidAmount > 0 && { paidAmount: values.paidAmount }),
         ...(pricingEnabled && values.invoiceIssued && { invoiceIssued: true }),
         ...(formAttachments.length > 0 && { attachments: formAttachments }),
-
+        
+        
+        
         ...(splitNotesCfg && {
           clientSpecific: {
             NKTU: {
@@ -1429,9 +1704,35 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         if (isEdit && id) {
           const snapshot = snapshotRef.current;
           if (!snapshot) throw new Error('Sales order snapshot missing');
-
+          
+          
+          
+          
+          
           const snapshotExtra = (snapshot.extra ?? {}) as SalesOrderExtra;
 
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
           const oldLinkage = snapshotExtra.inventoryLinkage;
           const linkageActive =
             oldLinkage?.state === 'reserved' &&
@@ -1442,6 +1743,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           let appliedInventoryOps: readonly AppliedOp[] = [];
 
           if (linkageActive) {
+            
+            
             await useProductInventoryStore.getState().revalidate();
             const freshInventoryByProduct = indexInventoryByProduct(
               useProductInventoryStore.getState().items,
@@ -1464,12 +1767,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               return;
             }
 
+            
+            
+            
+            
             if (getShortagePolicy() === 'block') {
               const shortageFailures: PlanFailure[] = [];
               for (const op of diffResult.plan.ops) {
                 const product = productByCode.get(op.itemCode);
                 if (!product) continue;
-
+                
                 let positiveBaseDelta = 0;
                 const baseUnit = getItemBaseUnit(product);
                 for (const [u, q] of Object.entries(op.deltas)) {
@@ -1489,7 +1796,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   op.locationCode,
                   freshInventoryByProduct,
                 );
-
+                
+                
                 const ownReserved = getOwnReservedAtLocation(
                   product,
                   op.locationCode,
@@ -1518,6 +1826,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               }
             }
 
+            
+            
+            
+            
             if (diffResult.plan.ops.length > 0) {
               const exec = await executeReservationPlan(diffResult.plan.ops);
               if (!exec.ok) {
@@ -1534,6 +1846,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               appliedInventoryOps = exec.applied as typeof appliedInventoryOps;
             }
 
+            
+            
+            
+            
             const actor = currentEmployee
               ? { id: currentEmployee.id, name: currentEmployee.name }
               : undefined;
@@ -1570,7 +1886,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               chatHistory: snapshotExtra.chatHistory,
             }),
             ...(snapshotExtra.photos !== undefined && { photos: snapshotExtra.photos }),
-
+            
+            
             ...(snapshotExtra.billingNotRequired !== undefined && {
               billingNotRequired: snapshotExtra.billingNotRequired,
             }),
@@ -1589,6 +1906,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               },
             });
           } catch (err) {
+            
+            
+            
             if (appliedInventoryOps.length > 0) {
               const rb = await rollbackAppliedOps(appliedInventoryOps);
               useProductInventoryStore.getState().forceRefresh();
@@ -1604,7 +1924,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           snapshotRef.current = updated;
           forceRefresh();
           if (linkageActive) useProductInventoryStore.getState().forceRefresh();
-
+          
+          
+          
+          
           if (appliedInventoryOps.length > 0) {
             emitInventoryActivityForApplied(appliedInventoryOps, {
               kind: 'SO',
@@ -1613,7 +1936,13 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               suffix: '(edit)',
             });
           }
-
+          
+          
+          
+          
+          
+          
+          
           const itemDiff = diffItems(snapshot.items, items);
           const customerDiff = diffCustomer(snapshotExtra, mergedExtra);
           logActivity('salesOrder.update', id, {
@@ -1635,6 +1964,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           });
           navigate(ROUTES.SALES_ORDERS.DETAIL.replace(':id', id));
         } else {
+          
+          
+          
+          
           const activityLog = [
             {
               timestamp: Date.now(),
@@ -1644,6 +1977,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             },
           ];
 
+          
+          
+          
+          
           const today = businessDateString();
           const todaysOrders = await cMngtConnector.querySalesOrders<SalesOrderExtra>({
             fromPeriod: today,
@@ -1662,15 +1999,19 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             extra: {
               ...extra,
               status: defaultStatus,
-
+              
               createdBy: currentEmployeeId,
               activityLog,
-
+              
+              
+              
+              
               ...(isReadyToProcessStatus(defaultStatus) ? { readyAt: Date.now() } : {}),
             },
           });
           forceRefresh();
-
+          
+          
           if (quotationLink) {
             const poDateRaw = res.salesOrder.extra?.orderDate ?? res.salesOrder.createdAt;
             void markQuotationConverted(quotationLink.id, {
@@ -1679,7 +2020,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               poDate: poDateRaw ? new Date(poDateRaw).getTime() : Date.now(),
             });
           }
-
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
           logActivity('salesOrder.create', res.salesOrder.id, {
             orderNumber: res.salesOrder.orderNumber,
             ...customerMemo(extra),
@@ -1691,6 +2041,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             message: t('salesOrders.notifications.createSuccess'),
           });
 
+          
+          
+          
+          
+          
+          
           if (createSkipInitialTarget && skipInitial) {
             const created = res.salesOrder as SalesOrder;
             const actor = currentEmployee
@@ -1704,10 +2060,17 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               inventoryByProduct,
             });
             if (transitionResult.ok) {
+              
+              
+              
+              
               for (const followUp of transitionResult.followUps) {
                 await dispatchSoFollowUp(followUp, transitionResult.updated, actor, t);
               }
-
+              
+              
+              
+              
               logActivity('salesOrder.statusChange', created.id, {
                 ...statusChangeMemo({
                   updated: transitionResult.updated,
@@ -1731,6 +2094,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       } catch (err) {
         logger.error('Sales order form submit failed:', err);
         if (err instanceof EntityConflictError) {
+          
+          
+          
+          
           if (err.latest) {
             const reseeded = seedFromOrder(err.latest as SalesOrder);
             if (reseeded) form.setValues(reseeded);
@@ -1861,14 +2228,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               const selectedCustomer = form.getValues().customerId
                 ? customerMap.get(form.getValues().customerId)
                 : undefined;
-
+              
               const billing =
                 selectedCustomer?.address?.trim() ||
                 (selectedCustomer?.extra?.addressGoogleMapUrl
                   ? t('customers.form.googleMapUrlLabel')
                   : '');
               const shipping = selectedCustomer?.extra?.shippingAddresses ?? [];
-
+              
+              
+              
               const addressOptionGroups = [
                 ...(billing
                   ? [
@@ -1956,6 +2325,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 />
               );
               return variant.headerLayout === 'compactFourColumn' ? (
+                
+                
+                
                 <SimpleGrid cols={COMPACT_FORM_COLS}>
                   <TextInput
                     label={t('salesOrders.form.customerPONumberLabel')}
@@ -2002,7 +2374,9 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   value={form.getValues().deliveryMethod || null}
                   onChange={(v) => {
                     form.setFieldValue('deliveryMethod', v ?? '');
-
+                    
+                    
+                    
                     if (variant.clientSpecific?.NKTU?.deliveryMethodDrivesInternalDelivery) {
                       form.setFieldValue('isInternalDelivery', v === 'internal' || v === 'freight');
                     }
@@ -2381,36 +2755,36 @@ type ItemEditorProps = {
   form: ReturnType<typeof useForm<SalesOrderFormValues>>;
   productSelectData: ProductSelectOption[];
   onProductSelect: (idx: number, opt: ProductSelectorChange | null) => void;
-
+  
   onParentQuantityChange: (idx: number, nextQty: number) => void;
-
+  
   onParentLocationChange: (idx: number, nextLocation: string) => void;
-
+  
   onRemove: (idx: number) => void;
-
+  
   onExplodeSet: (groupId: string) => void;
   t: TFunction;
   locationSelectData: { value: string; label: string }[];
   lineAvailability: (productCode: string, locationCode: string) => LocationAvailability | null;
-
+  
   breakdownCoverage: (
     productCode: string,
     locationCode: string,
     quantity: number,
     unit: string,
   ) => BreakdownCoverage | null;
-
+  
   unitAvailability: (productCode: string, locationCode: string, unit: string) => number | null;
   locationByCode: Map<string, string>;
-
+  
   unitLabels: Map<string, string>;
-
+  
   productByCode: Map<string, Product>;
-
+  
   locked: boolean;
-
+  
   showPhotoButton: boolean;
-
+  
   onShowPhotos: (productCode: string, productName: string) => void;
 };
 
@@ -2451,6 +2825,10 @@ function AvailabilityHint({
     : (locationByCode.get(avail.locationCode) ?? avail.locationCode);
   const unitLabel = unit ? lookupLabelOf(unitLabels, unit) : '';
 
+  
+  
+  
+  
   const coverage = breakdownCoverage(productCode, locationCode, quantity, unit);
   if (coverage?.parentLock) {
     const lockLine = (
@@ -2492,6 +2870,10 @@ function AvailabilityHint({
 
   const short = quantity - avail.available;
   if (short > 0) {
+    
+    
+    
+    
     const product = productByCode.get(productCode);
     const isSet = (product?.extra?.setItems?.length ?? 0) > 0;
     return (
@@ -2638,10 +3020,20 @@ function DesktopItemTable({
   showPhotoButton,
   onShowPhotos,
 }: ItemEditorProps) {
+  
+  
+  
+  
+  
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
   const showLocationCol = locationsEnabled && locationSelectData.length > 0;
   const items = form.getValues().items;
-
+  
+  
+  
+  
+  
+  
   const groupContext = useMemo(() => {
     const ctx = new Map<string, { parentQty: number; additionalSets: number }>();
     for (const item of items) {
@@ -2682,14 +3074,16 @@ function DesktopItemTable({
         {items.map((item, idx) => {
           const isSetParent = item.role === 'set';
           const isSetChild = item.role === 'set-component';
-
+          
+          
           const rowLocked = locked || isSetChild;
           const codeColor = isSetParent
             ? `var(--mantine-color-${PRODUCT_SET_COLOR}-0)`
             : isSetChild
               ? 'var(--mantine-color-gray-0)'
               : undefined;
-
+          
+          
           const lineProduct = productByCode.get(item.productCode);
           const hasPhoto = (lineProduct?.extra?.images?.length ?? 0) > 0;
           const suggestedPrice = getProductSuggestedPrice(lineProduct);

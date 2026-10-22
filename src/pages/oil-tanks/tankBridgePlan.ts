@@ -1,8 +1,11 @@
+
+
 import type { OilTankIssueLogExtra, OperationLog, RefuelLogExtra } from '@/types';
 
 export type MirrorBinding = { id: string; code: string };
 
 export type MirrorPlan =
+  
   | { kind: 'none' }
   /** Same counterpart before and after: reconcile the existing mirror in place. */
   | { kind: 'reconcile'; target: MirrorBinding }
@@ -39,7 +42,8 @@ export function tankBindingOf(log: OperationLog | null): MirrorBinding | undefin
   if (!log) return undefined;
   const extra = log.extra as RefuelLogExtra | undefined;
   if (extra?.sourceIssueLogId) return undefined;
-
+  
+  
   if (extra?.fuelSource !== 'tank') return undefined;
   const id = typeof extra.oilTankId === 'string' ? extra.oilTankId.trim() : '';
   if (!id) return undefined;

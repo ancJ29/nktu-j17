@@ -1,3 +1,5 @@
+
+
 import type { UnitConversion } from '@/types/product';
 import { convertUnit, getItemBaseUnit, getItemUnits } from './unitConversion';
 
@@ -67,7 +69,8 @@ export function availableByUnit(
     if (onHand === 0 && reserved === 0) continue;
     out[u] = onHand - reserved;
   }
-
+  
+  
   for (const u of Object.keys(reservedByUnit)) {
     if (!allowed.has(u)) out[u] = (out[u] ?? 0) - (reservedByUnit[u] ?? 0);
   }
@@ -88,6 +91,7 @@ export type ApplyResult =
   | { ok: false; reason: 'negative'; unit: string; wouldBe: number };
 
 export type ApplyDeltaOptions = {
+  
   allowNegative?: boolean;
 };
 
@@ -107,7 +111,9 @@ export function applyDelta(
     if (nextQty < 0 && !opts.allowNegative) {
       return { ok: false, reason: 'negative', unit, wouldBe: nextQty };
     }
-
+    
+    
+    
     if (nextQty === 0) delete next[unit];
     else next[unit] = nextQty;
   }
@@ -120,9 +126,9 @@ export type UnpackLeg = { from: string; to: string; qty: number; produced: numbe
 export type OutflowResult = {
   onHandByUnit: OnHandByUnit;
   onHand: number;
-
+  
   unpacked: UnpackLeg[];
-
+  
   shortfallByUnit: OnHandByUnit;
 };
 
@@ -138,6 +144,7 @@ export function applyOutflowWithUnpack(
   const unpacked: UnpackLeg[] = [];
   const shortfallByUnit: OnHandByUnit = {};
 
+  
   const sizeOf = (unit: string): number =>
     unit === baseUnit ? 1 : (convertUnit(1, unit, baseUnit, conversions) ?? 0);
 
@@ -146,6 +153,7 @@ export function applyOutflowWithUnpack(
     if (q !== undefined && Math.abs(q) <= REPACK_BALANCE_TOLERANCE) delete next[unit];
   };
 
+  
   const requests = Object.entries(outflows)
     .filter(([, qty]) => qty > 0)
     .sort(([a], [b]) => sizeOf(b) - sizeOf(a));
@@ -153,6 +161,7 @@ export function applyOutflowWithUnpack(
   for (const [unit, requested] of requests) {
     let need = requested;
 
+    
     const onHandHere = next[unit] ?? 0;
     if (onHandHere > 0) {
       const take = Math.min(onHandHere, need);
@@ -161,6 +170,7 @@ export function applyOutflowWithUnpack(
       prune(unit);
     }
 
+    
     if (need > REPACK_BALANCE_TOLERANCE && units.includes(unit)) {
       const targetSize = sizeOf(unit);
       const candidates = units
@@ -171,7 +181,7 @@ export function applyOutflowWithUnpack(
         if (need <= REPACK_BALANCE_TOLERANCE) break;
         const perPackage = convertUnit(1, from, unit, conversions);
         if (perPackage === null || perPackage <= 0) continue;
-
+        
         const wanted = Math.ceil(need / perPackage - REPACK_BALANCE_TOLERANCE);
         const open = Math.min(wanted, next[from] ?? 0);
         if (open <= 0) continue;
@@ -188,6 +198,7 @@ export function applyOutflowWithUnpack(
       }
     }
 
+    
     if (need > REPACK_BALANCE_TOLERANCE) {
       next[unit] = (next[unit] ?? 0) - need;
       shortfallByUnit[unit] = need;
@@ -306,7 +317,7 @@ export function applyShip(
     if (reservedAfter < -REPACK_BALANCE_TOLERANCE) {
       return { ok: false, reason: 'reservation-mismatch', unit, wouldBe: reservedAfter };
     }
-
+    
     if (onHandAfter === 0) delete onHandNext[unit];
     else onHandNext[unit] = onHandAfter;
     if (Math.abs(reservedAfter) <= REPACK_BALANCE_TOLERANCE) delete reservedNext[unit];
@@ -335,7 +346,7 @@ export function applyRepack(
 export type RepackOp = {
   from: { unit: string; qty: number };
   to: { unit: string; qty: number };
-
+  
   writeOff?: { baseQty: number; reason: string };
 };
 

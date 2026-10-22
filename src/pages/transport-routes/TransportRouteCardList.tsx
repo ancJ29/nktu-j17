@@ -89,6 +89,10 @@ export function TransportRouteCardList({ routes, isLoading }: Props) {
                   {truckingSizeLabel(readTruckingSize(r))}
                 </Badge>
               ) : (
+                
+                
+                
+                
                 routeTruckingSizeMissing(r) && (
                   <Badge size="xs" variant="light" color="orange" tt="none" radius="sm">
                     {t('transportRoutes.form.truckingSizeMissing')}

@@ -1,3 +1,5 @@
+
+
 import { GoodsReceiptList } from './GoodsReceiptList';
 import { DEFAULT_GOODS_RECEIPT_LIST_VARIANT } from './goodsReceiptListVariant';
 

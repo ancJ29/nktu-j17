@@ -1,3 +1,5 @@
+
+
 import {
   DELIVERY_NOTE_DEFAULT_STATUS_FLOW,
   DELIVERY_NOTE_STAGE_CATALOGUE,
@@ -27,7 +29,7 @@ export type DeliveryNotesV2Form = {
   codePadLength: number;
   statusFlow: StatusFlowDraft | null;
   defaultListStatuses: string[];
-
+  
   customFields: CustomFieldDef[];
   listColumns: string[];
   hiddenColumns: string[];
@@ -40,7 +42,7 @@ const DEFAULTS = {
   codePrefix: 'DN-',
   codePadLength: 3,
   defaultListStatuses: [],
-
+  
   deliveryPhotoRequired: true,
 } as const;
 
@@ -61,7 +63,10 @@ export const readDeliveryNotesV2 = (config: CredoAppConfig | null): DeliveryNote
     statusFlow: readStatusFlowDraft(v2?.statusFlow).draft,
     defaultListStatuses: [...(v2?.defaultListStatuses ?? DEFAULTS.defaultListStatuses)],
     deliveryPhotoRequired: v2?.deliveryPhotoRequired ?? DEFAULTS.deliveryPhotoRequired,
-
+    
+    
+    
+    
     customFields: readCustomFieldDrafts(v2?.customFields),
     listColumns: [...(v2?.listColumns ?? [])],
     hiddenColumns: [...(v2?.hiddenColumns ?? [])],
@@ -163,7 +168,8 @@ export const applyDeliveryNotesV2 = (
   return mergeFeature(storedFeatures, 'deliveryNotesV2', {
     ...rest,
     statusFlow: statusFlow === null ? undefined : assembleStatusFlow(statusFlow),
-
+    
+    
     customFields: customFields.length > 0 ? customFields.map(assembleCustomField) : undefined,
   });
 };
@@ -176,6 +182,7 @@ const assembleCustomField = (field: CustomFieldDef): CustomFieldDef => ({
   ...((field.viewDepartments ?? []).length > 0 ? { viewDepartments: field.viewDepartments } : {}),
   ...((field.editDepartments ?? []).length > 0 ? { editDepartments: field.editDepartments } : {}),
   ...(field.showInList === true ? { showInList: true } : {}),
-
+  
+  
   ...(field.width !== undefined && field.width !== 'full' ? { width: field.width } : {}),
 });

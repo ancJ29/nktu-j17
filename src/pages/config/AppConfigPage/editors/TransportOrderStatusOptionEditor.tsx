@@ -42,6 +42,7 @@ export function TransportOrderStatusOptionEditor({
       ),
     );
 
+  
   const setInitial = (idx: number) =>
     onChange(options.map((opt, i) => ({ ...opt, isInitial: i === idx ? true : undefined })));
 

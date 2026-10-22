@@ -114,6 +114,11 @@ export function TransportRouteFormPage() {
   const createSafely = useTransportRouteStore((s) => s.createSafely);
   const updateSafely = useTransportRouteStore((s) => s.updateSafely);
 
+  
+  
+  
+  
+  
   const ordersInit = useTransportOrderStore((s) => s.initialized);
   const loadOrders = useTransportOrderStore((s) => s.loadAll);
   const placeSuggestions = usePlaceSuggestions();
@@ -127,19 +132,31 @@ export function TransportRouteFormPage() {
   const truckTypeOptions = useTruckTypeOptions();
   const truckingSizeOptions = useTruckingSizeOptions();
 
+  
+  
+  
+  
   const { norms, fuelPricePerLiter } = useRouteCosting();
 
   const form = useForm<RouteFormValues>({
     initialValues: blankRouteFormValues(),
     validate: {
+      
+      
+      
+      
       name: (v) => (v.trim() ? null : t('transportRoutes.validation.nameRequired')),
       truckType: (v) => (v.trim() ? null : t('transportRoutes.validation.truckTypeRequired')),
-
+      
       truckingSize: (v, values) =>
+        
+        
         values.truckType.trim() && !v.trim()
           ? t('transportRoutes.validation.truckingSizeRequired')
           : null,
-
+      
+      
+      
       pickup: (v, values) =>
         !values.isMultiTrip && !v.trim() ? t('transportRoutes.validation.pickupRequired') : null,
       dropoff: (v, values) =>
@@ -174,7 +191,8 @@ export function TransportRouteFormPage() {
         code: r.code,
         name: r.name || '',
         isMultiTrip: !!r.isMultiTrip,
-
+        
+        
         trips: (r.trips ?? []).map((leg, i) => ({
           departure: leg.departure || '',
           destination: leg.destination || '',
@@ -187,10 +205,16 @@ export function TransportRouteFormPage() {
         truckType: r.truckType || '',
         truckingSize: readTruckingSize(r),
         freightAmount: r.freightAmount || 0,
-
+        
+        
+        
+        
+        
         basePay: r.basePay ?? r.laborCost ?? 0,
         allowance: r.allowance ?? 0,
-
+        
+        
+        
         segments: r.segments?.length ? r.segments.map((seg) => ({ ...seg })) : [blankSegment()],
         costItems: r.costItems?.length
           ? r.costItems.map((item) => ({ note: '', ...item }))
@@ -212,7 +236,8 @@ export function TransportRouteFormPage() {
       try {
         const prevExtra = snapshotRef.current?.extra ?? {};
         const extra: TransportRouteExtra = { ...prevExtra };
-
+        
+        
         if (values.notes.trim()) extra.notes = values.notes.trim();
         else delete extra.notes;
 
@@ -242,6 +267,10 @@ export function TransportRouteFormPage() {
             message: t('transportRoutes.notifications.updated'),
           });
         } else {
+          
+          
+          
+          
           const attempted: string[] = [];
           let created: TransportRouteRow | null = null;
           for (let attempt = 0; attempt <= MAX_CODE_RETRIES; attempt++) {
@@ -287,6 +316,7 @@ export function TransportRouteFormPage() {
     [isEdit, id, t, navigate, createSafely, updateSafely],
   );
 
+  
   const handleDelete = useCallback(async () => {
     if (!id) return;
     const snapshot = snapshotRef.current;
@@ -312,15 +342,19 @@ export function TransportRouteFormPage() {
     }
   }, [id, t, navigate, updateSafely]);
 
+  
+  
+  
   const suggestedCode = useMemo(
     () => (isEdit ? '' : buildNextRouteCode()),
-
+    
     [isEdit, routesInit, routeCount],
   );
 
   if (fetching) return null;
   if (isMobile) return null;
 
+  
   const handleMultiTripToggle = (checked: boolean) => {
     form.setFieldValue('isMultiTrip', checked);
     if (checked && form.values.trips.length === 0) form.setFieldValue('trips', [blankLeg()]);
@@ -328,6 +362,7 @@ export function TransportRouteFormPage() {
 
   const draftNorm = form.values.truckType ? norms.get(form.values.truckType) : undefined;
 
+  
   const draftCosting = computeRouteCosting(
     {
       segments: form.values.isMultiTrip
@@ -337,17 +372,25 @@ export function TransportRouteFormPage() {
       markupPercent: form.values.markupPercent,
       isMultiTrip: form.values.isMultiTrip,
       trips: form.values.trips,
-
+      
+      
+      
+      
       laborCost: (form.values.basePay || 0) + (form.values.allowance || 0),
     },
     { litersPer100km: draftNorm, fuelPricePerLiter },
   );
 
+  
+  
   const withCurrent = (options: { value: string; label: string }[], current: string) =>
     current && !options.some((o) => o.value === current)
       ? [...options, { value: current, label: current }]
       : options;
 
+  
+  
+  
   const truckingSizeData = withCurrent(truckingSizeOptions, form.values.truckingSize);
 
   return (
@@ -370,7 +413,7 @@ export function TransportRouteFormPage() {
           <SectionCard
             icon={<IconRoute size={14} />}
             title={t('transportRoutes.form.infoSection')}
-
+            
             actions={
               <Switch
                 label={t('transportRoutes.form.multiTrip')}

@@ -62,6 +62,9 @@ export const ThemeConfigSection = memo(function ThemeConfigSection({
 }) {
   const namedPalette = brandPalettes[theme.mainColor];
 
+  
+  
+  
   const [draft, setDraft] = useState(() =>
     theme.customPalette ? formatPalette(theme.customPalette) : '',
   );

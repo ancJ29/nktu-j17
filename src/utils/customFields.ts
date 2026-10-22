@@ -1,3 +1,5 @@
+
+
 export type CustomFieldType = 'text' | 'number' | 'date' | 'select';
 
 export const CUSTOM_FIELD_TYPES: readonly CustomFieldType[] = [
@@ -8,18 +10,19 @@ export const CUSTOM_FIELD_TYPES: readonly CustomFieldType[] = [
 ] as const;
 
 export type CustomFieldDef = {
+  
   key: string;
-
+  
   label: string;
   type: CustomFieldType;
-
+  
   options?: string[];
-
+  
   viewDepartments?: string[];
   editDepartments?: string[];
-
+  
   showInList?: boolean;
-
+  
   width?: CustomFieldWidth;
 };
 
@@ -37,8 +40,9 @@ export const customFieldSpan = (field: CustomFieldDef): { base: number; sm: numb
 export type ViewerCustomField = CustomFieldDef & { editable: boolean };
 
 export type CustomFieldValidation = {
+  
   errors: string[];
-
+  
   warnings: string[];
 };
 
@@ -136,6 +140,8 @@ export function validateCustomFields(
     seen.add(key);
 
     if (!field.label || field.label.trim() === '') {
+      
+      
       errors.push(`${label}: "${key}" has no label`);
     }
 
@@ -162,6 +168,9 @@ export function validateCustomFields(
       warnings.push(`${label}: options are ignored on a ${field.type} field`);
     }
 
+    
+    
+    
     if (field.editDepartments && field.viewDepartments) {
       const missing = field.editDepartments.filter((d) => !field.viewDepartments!.includes(d));
       if (missing.length > 0) {

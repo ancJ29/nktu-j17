@@ -2,19 +2,20 @@ import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStor
 import type { PhotoEntry } from '@/components/ImageUploadPanel';
 
 export type OdometerLogExtra = {
+  
   employeeId: string;
-
+  
   employeeName: string;
-
+  
   km?: number;
-
+  
   photos: PhotoEntry[];
-
+  
   fuelCost?: number;
-
+  
   otherCosts?: OdometerOtherCost[];
   note?: string;
-
+  
   isDeleted?: boolean;
   [key: string]: unknown;
 };
@@ -25,6 +26,7 @@ export type OdometerOtherCost = {
 };
 
 export type OdometerLog = PartitionedRecordRow & {
+  
   recordDate: string;
   createdAt: number;
   updatedAt: number;

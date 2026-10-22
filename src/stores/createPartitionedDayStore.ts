@@ -34,7 +34,7 @@ type Reconciled<T> = {
   items: T[];
   writes: Array<[string, { items: T[]; hash: string }]>;
   clears: string[];
-
+  
   hashes: Record<string, string>;
 };
 
@@ -68,7 +68,8 @@ function reconcileDays<T>(
     }
 
     out.items.push(...answer.items);
-
+    
+    
     if (answer.items.length > 0) out.writes.push([day, { items: answer.items, hash: answer.hash }]);
     else out.clears.push(day);
   }
@@ -77,8 +78,9 @@ function reconcileDays<T>(
 }
 
 export function createPartitionedDayStore<T extends { id: string }>(config: {
+  
   cacheKey: string;
-
+  
   querySync: (input: {
     days: string[];
     knownHashes: Record<string, string>;
@@ -88,10 +90,12 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
 
   let currentRange: Range = defaultRange(DEFAULT_RANGE_DAYS);
 
+  
   const dayHashes = new Map<string, string>();
 
   let lastCombinedHash: string | null = null;
 
+  
   const fetchAll = async () => {
     const { from, to } = currentRange;
     const days = enumerateDates(from, to);
@@ -121,11 +125,13 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
 
   const store = createEntityStore<T>({
     cacheKey,
-
+    
+    
     cacheTTL: ONE_MINUTE,
     fetchAll,
   });
 
+  
   const settleWrite = async (item: T, day: string, listHash: string | undefined) => {
     dayHashes.delete(day);
     if (listHash) dayHashes.set(day, listHash);
@@ -135,8 +141,10 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
     void store.getState().revalidate();
   };
 
+  
   const hashOf = (day: string): string | undefined => dayHashes.get(day);
 
+  
   const refreshDay = async (day: string): Promise<void> => {
     const res = await querySync({ days: [day], knownHashes: {} });
     const answer = res.days?.[day];
@@ -160,6 +168,7 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
   return {
     store,
 
+    
     async fetchWindow(
       fromDay: string,
       toDay: string,
@@ -201,6 +210,7 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
       return items;
     },
 
+    
     setRange(range: Range): boolean {
       const days = enumerateDates(range.from, range.to);
       if (days.length === 0) return false;
@@ -214,6 +224,7 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
       return moved;
     },
 
+    
     async write(call: () => Promise<DayWriteResult<T>>): Promise<T> {
       try {
         const res = await call();
@@ -224,6 +235,7 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
       }
     },
 
+    
     async writeSafely(
       record: { version: string },
       day: string,
@@ -245,7 +257,9 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
             await refreshDay(day).catch(() => undefined);
             continue;
           }
-
+          
+          
+          
           if (isVersionConflict(error) || isListVersionConflict(error)) {
             await refreshDay(day).catch(() => undefined);
           }
@@ -254,6 +268,7 @@ export function createPartitionedDayStore<T extends { id: string }>(config: {
       }
     },
 
+    
     async transitionSafely(
       record: { version: string; derivativesPending?: boolean },
       day: string,

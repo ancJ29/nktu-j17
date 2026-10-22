@@ -1,3 +1,5 @@
+
+
 import { Alert, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconUsers } from '@tabler/icons-react';
@@ -28,12 +30,25 @@ export function ClientsPanel() {
   const [deleting, setDeleting] = useState(false);
   const [ssoAdminKey, setSsoAdminKey] = useState<string>(() => readSecret(SSO_ADMIN_KEY_STORAGE));
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const location = useLocation();
   const navigate = useNavigate();
   const requestedCode = readRequestedCode(location.hash);
-
+  
+  
+  
+  
   const configuring = clients?.find((client) => client.clientServiceCode === requestedCode) ?? null;
 
+  
   const selectClient = useCallback(
     (code: string) => {
       void navigate(
@@ -61,6 +76,7 @@ export function ClientsPanel() {
   }, []);
 
   useEffect(() => {
+    
     void load();
   }, [load]);
 
@@ -70,6 +86,10 @@ export function ClientsPanel() {
     const { clientServiceCode, version } = pendingDelete;
     const issues: string[] = [];
 
+    
+    
+    
+    
     try {
       const res = await credoSmeConnector.removeClient({
         clientServiceCode,
@@ -79,7 +99,8 @@ export function ClientsPanel() {
       if (!res.success) {
         issues.push(`removeClient: ${(res as { message?: string }).message ?? 'failed'}`);
       }
-
+      
+      
       if (res.ssoIssues?.length) issues.push(...res.ssoIssues);
     } catch (err) {
       issues.push(`removeClient: ${err instanceof Error ? err.message : String(err)}`);

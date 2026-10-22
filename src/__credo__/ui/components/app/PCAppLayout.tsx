@@ -66,7 +66,7 @@ type PCAppLayoutProps = {
   navigation: CredoNavigationItem[];
   getNavLabel: (item: CredoNavigationItem) => string;
   appName: string;
-
+  
   appNameHtml?: string;
   logoSrc: string;
   user?: UserInfo;
@@ -90,21 +90,21 @@ type PCAppLayoutProps = {
   navbarWidth?: number;
   displayIconWhenCollapsed?: boolean;
   showLanguageSwitcher?: boolean;
-
+  
   onRefresh?: () => void;
   showRefreshConfig?: boolean;
   onRefreshConfig?: () => void;
   showInstallApp?: boolean;
   onInstallApp?: () => void;
-
+  
   onClearCache?: () => void;
-
+  
   navbarOpenedProp?: boolean;
-
+  
   onNavbarToggle?: () => void;
-
+  
   navbarVariant?: 'dark' | 'light';
-
+  
   headerVariant?: 'dark' | 'light';
 };
 
@@ -149,10 +149,12 @@ export function PCAppLayout({
   const isLightNav = navbarVariant === 'light';
   const isLightHeader = headerVariant === 'light';
 
+  
   const [internalNavbarOpened, setInternalNavbarOpened] = useState(true);
   const navbarOpened = navbarOpenedProp !== undefined ? navbarOpenedProp : internalNavbarOpened;
   const [expandedMenuId, setExpandedMenuId] = useState<string | undefined>();
 
+  
   const iconOnly = displayIconWhenCollapsed && !navbarOpened;
   const effectiveNavbarWidth = iconOnly ? NAVBAR_COLLAPSED_WIDTH : navbarWidth;
 
@@ -166,7 +168,7 @@ export function PCAppLayout({
 
   useEffect(() => {
     onMount?.();
-  }, []);
+  }, []); 
 
   const getColor = useCallback(
     (color: MantineColor) => {
@@ -183,11 +185,14 @@ export function PCAppLayout({
     return `linear-gradient(180deg, ${getColor(`${mainColor}.9`)} 0%, ${getColor(`${mainColor}.8`)} 100%)`;
   }, [getColor, mainColor]);
 
+  
+  
   const navbarBackground = isLightNav ? getColor('neutral.0') : navbarGradient;
   const navTextColor = isLightNav ? getColor('neutral.8') : 'white';
   const navIconColor = isLightNav ? getColor('neutral.7') : 'white';
   const navActiveIconColor = isLightNav ? getColor(`${mainColor}.7`) : 'white';
-
+  
+  
   const headerBackground = isLightHeader ? getColor('neutral.0') : headerGradient;
   const headerTextColor = isLightHeader ? getColor('neutral.8') : 'white';
   const headerIconColor = isLightHeader ? getColor('neutral.7') : 'white';
@@ -196,6 +201,7 @@ export function PCAppLayout({
     ? `1.5px solid ${getColor('neutral.3')}`
     : '1.5px solid rgba(255, 255, 255, 0.9)';
 
+  
   const navCssVars = isLightNav
     ? ({
         '--credo-nav-accent': getColor(`${mainColor}.7`),
@@ -209,6 +215,9 @@ export function PCAppLayout({
     setExpandedMenuId((prev) => (prev === id ? undefined : id));
   }, []);
 
+  
+  
+  
   const handleCollapsedGroupClick = useCallback(
     (id: string) => {
       toggleNavbar();

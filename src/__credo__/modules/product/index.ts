@@ -81,6 +81,7 @@ export function createProductModule(config: ProductModuleConfig) {
       return product;
     },
 
+    
     async createMany(
       scope: string,
       inputs: CreateProductInput[],
@@ -99,6 +100,9 @@ export function createProductModule(config: ProductModuleConfig) {
       const errors: Array<{ index: number; message: string }> = [];
       const now = Date.now();
 
+      
+      
+      
       const seenCodes = new Set(envelope.items.map((p) => p.code));
       const seenSkus = new Set(envelope.items.map((p) => getProductSku(p)).filter((s) => s !== ''));
 

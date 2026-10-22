@@ -13,6 +13,12 @@ export const FeatureToggleRow = memo(function FeatureToggleRow({
   onChange: (checked: boolean) => void;
 }) {
   return (
+    
+    
+    
+    
+    
+    
     <Group
       justify="space-between"
       wrap="nowrap"

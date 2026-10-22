@@ -1,3 +1,5 @@
+
+
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
@@ -21,6 +23,9 @@ export type ReturnRestockResult = {
 export async function applyReturnRestock(dr: DeliveryRequest): Promise<ReturnRestockResult> {
   const result: ReturnRestockResult = { attempted: 0, succeeded: 0, failed: 0, errors: [] };
 
+  
+  
+  
   const byRow = new Map<string, { itemCode: string; locationCode: string; deltas: OnHandByUnit }>();
   for (const line of dr.items) {
     if (line.quantity <= 0) continue;
@@ -37,6 +42,7 @@ export async function applyReturnRestock(dr: DeliveryRequest): Promise<ReturnRes
   const products = useProductStore.getState().items;
   const findProduct = (code: string): Product | undefined => findProductByCode(products, code);
 
+  
   const snap = await cMngtConnector.getAllProductInventory<ProductInventoryExtra>();
   const rows: ProductInventoryRow[] = snap.changed
     ? snap.productInventory
@@ -54,7 +60,7 @@ export async function applyReturnRestock(dr: DeliveryRequest): Promise<ReturnRes
       result.errors.push(`${itemCode} — product master-data not found`);
       continue;
     }
-
+    
     if (isNoInventoryProduct(product)) {
       result.attempted -= 1;
       continue;
@@ -96,6 +102,7 @@ export async function applyReturnRestock(dr: DeliveryRequest): Promise<ReturnRes
           note,
         });
       } else {
+        
         const applied = applyDelta(product, {}, deltas);
         if (!applied.ok) {
           result.failed += 1;

@@ -1,6 +1,7 @@
 import type { Product } from '@/types';
 
 export type Option = {
+  
   value: string;
   label: string;
   code: string;

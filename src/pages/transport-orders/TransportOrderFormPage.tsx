@@ -118,11 +118,11 @@ type TripRow = {
   departure: string;
   destination: string;
   date: string | null;
-
+  
   loadingAt: string | null;
-
+  
   unloadingAt: string | null;
-
+  
   externalTruck: boolean;
   truckId: string;
   truckPlate: string;
@@ -142,23 +142,24 @@ function typeSourceTruckId(v: {
 }
 
 type FormValues = {
+  
   isMultiTrip: boolean;
   trips: TripRow[];
   entryDate: string | null;
-
+  
   externalTruck: boolean;
   truckId: string;
   truckPlate: string;
   driverId: string;
   driverName: string;
-
+  
   truckType: string;
-
+  
   customerOrderNumber: string;
-
+  
   requestedPickupDate: string | null;
   dropoffDate: string | null;
-
+  
   moocStorageDays: number | string;
   billNumber: string;
   declarationNumber: string;
@@ -168,17 +169,17 @@ type FormValues = {
   pickup: string;
   stuffing: string;
   dropoff: string;
-
+  
   pickupAt: string | null;
   stuffingAt: string | null;
   dropoffAt: string | null;
   fees: FeeRow[];
-
+  
   advanceAmount: number;
-
+  
   laborCost: number;
   vatRatePercent: number;
-
+  
   roundDown: boolean;
   transportContractNo: string;
   customerCode: string;
@@ -199,10 +200,12 @@ function blankTrip(): TripRow {
     departure: '',
     destination: '',
     date: todayInVnDateString(),
-
+    
+    
     loadingAt: null,
     unloadingAt: null,
-
+    
+    
     externalTruck: false,
     truckId: '',
     truckPlate: '',
@@ -244,13 +247,16 @@ function blankValues(presetTruckType = ''): FormValues {
     isMultiTrip: false,
     trips: [],
     entryDate: todayInVnDateString(),
-
+    
     externalTruck: false,
     truckId: '',
     truckPlate: '',
     driverId: '',
     driverName: '',
-
+    
+    
+    
+    
     truckType: presetTruckType,
     customerOrderNumber: '',
     requestedPickupDate: null,
@@ -259,7 +265,7 @@ function blankValues(presetTruckType = ''): FormValues {
     billNumber: '',
     declarationNumber: '',
     containerNumber: '',
-
+    
     truckingSize: '',
     shipmentType: DEFAULT_SHIPMENT_TYPE,
     pickup: '',
@@ -299,7 +305,8 @@ function copiedValues(src: TransportOrder): FormValues {
       date: todayInVnDateString(),
       loadingAt: null,
       unloadingAt: null,
-
+      
+      
       externalTruck: isExternalTruck(trip),
       truckId: trip.truckId,
       truckPlate: trip.truckPlate,
@@ -313,11 +320,14 @@ function copiedValues(src: TransportOrder): FormValues {
     truckPlate: src.truckPlate,
     driverId: src.driverId,
     driverName: src.driverName,
-
+    
+    
     truckType: src.extra?.truckType ?? '',
-
+    
+    
     customerOrderNumber: src.extra?.customerOrderNumber ?? '',
-
+    
+    
     requestedPickupDate: null,
     dropoffDate: null,
     moocStorageDays: '',
@@ -332,13 +342,16 @@ function copiedValues(src: TransportOrder): FormValues {
     pickupAt: null,
     stuffingAt: null,
     dropoffAt: null,
-
+    
     fees: toFeeRows(src),
     advanceAmount: 0,
-
+    
+    
     laborCost: src.laborCost ?? 0,
     vatRatePercent: Math.round((src.vatRate ?? 0) * 100),
-
+    
+    
+    
     roundDown: !!src.roundDown,
     transportContractNo: src.transportContractNo || '',
     customerCode: src.customerCode || '',
@@ -368,9 +381,12 @@ export function TransportOrderFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
+  
+  
   const copyFrom = isEdit ? null : extractCopyFrom(location.state);
   const presetTruckType = isEdit ? '' : readPresetTruckType(location.search);
-
+  
+  
   const belongsToMultiDrop =
     !isEdit &&
     (isMultiDropType(presetTruckType, MULTI_DROP_TRUCK_TYPES) ||
@@ -410,10 +426,23 @@ export function TransportOrderFormPage() {
   const customersInit = useCustomerStore((s) => s.initialized);
   const getCustomerByCode = useCustomerStore((s) => s.getByCode);
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const savedOrders = useTransportOrderStore((s) => s.items);
   const ordersInit = useTransportOrderStore((s) => s.initialized);
   const loadOrders = useTransportOrderStore((s) => s.loadAll);
 
+  
+  
+  
   const savedRoutes = useTransportRouteStore((s) => s.items);
   const routesInit = useTransportRouteStore((s) => s.initialized);
   const loadRoutes = useTransportRouteStore((s) => s.loadAll);
@@ -422,7 +451,8 @@ export function TransportOrderFormPage() {
     if (isMobile) return;
     if (!trucksInit) loadTrucks();
     if (!customersInit) loadCustomers();
-
+    
+    
     if (!ordersInit) loadOrders();
     if (!routesInit) loadRoutes();
   }, [
@@ -442,7 +472,9 @@ export function TransportOrderFormPage() {
         .filter((a) => a.isActive && !a.extra?.isDeleted)
         .map((a) => ({
           value: a.id,
-
+          
+          
+          
           label: truckOptionLabel(a),
           plate: a.name,
         })),
@@ -451,30 +483,54 @@ export function TransportOrderFormPage() {
 
   const statusSelectData = useMemo(
     () => transportOrderStatuses().map((s) => ({ value: s.value, label: s.label })),
-
+    
     [i18n.language],
   );
 
+  
+  
   const truckingSizeOptions = useTruckingSizeOptions();
-
+  
   const driverWithPlate = useDriverWithPlate();
-
+  
+  
   const truckTypeOf = useTruckTypeOf();
-
+  
+  
+  
+  
+  
+  
+  
   const truckTypeOptions = useOrderTruckTypeOptions().filter(
     (o) => !isMultiDropType(o.value, MULTI_DROP_TRUCK_TYPES),
   );
-
+  
+  
+  
   const placeSuggestions = usePlaceSuggestions();
-
+  
+  
   const shipmentTypeOptions = useShipmentTypeOptions();
-
+  
   const freightFeeName = useFreightFeeName();
   const shipmentTypeLabel = useShipmentTypeLabel();
 
   const form = useForm<FormValues>({
+    
+    
+    
+    
     initialValues: copyFrom ? copiedValues(copyFrom) : blankValues(presetTruckType),
     validate: {
+      
+      
+      
+      
+      
+      
+      
+      
       truckId: (v, values) =>
         !values.isMultiTrip && !values.externalTruck && !v
           ? t('transportOrders.validation.truckRequired')
@@ -490,10 +546,11 @@ export function TransportOrderFormPage() {
       entryDate: (v, values) =>
         !values.isMultiTrip && !v ? t('transportOrders.validation.entryDateRequired') : null,
       customerCode: (v) => (!v ? t('transportOrders.validation.customerRequired') : null),
-
+      
       truckingSize: (v, values) => {
         if (v) return null;
-
+        
+        
         if (!values.truckType) return null;
         return t('transportOrders.validation.truckingSizeRequired');
       },
@@ -523,6 +580,7 @@ export function TransportOrderFormPage() {
     },
   });
 
+  
   const isCopyCreate = !!copyFrom;
   const seededShipmentTypeRef = useRef(false);
   useEffect(() => {
@@ -541,19 +599,21 @@ export function TransportOrderFormPage() {
     form,
     id,
     async (fetchId) => {
+      
+      
       const { item: o } = await transportOrderBundle.fetchById(fetchId);
       snapshotRef.current = o;
       if (o.extra?.isDeleted) {
         navigate(ROUTES.TRANSPORT_ORDERS.LIST, { replace: true });
         return null;
       }
-
+      
       if (isTransportOrderLocked(o.status)) {
         notifications.show({ color: 'yellow', message: t('transportOrders.locked.notice') });
         navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', o.id), { replace: true });
         return null;
       }
-
+      
       if (isMultiDropType(o.extra?.truckType, MULTI_DROP_TRUCK_TYPES)) {
         navigate(ROUTES.TRANSPORT_ORDERS.EDIT_MULTI_DROP.replace(':id', o.id), { replace: true });
         return null;
@@ -566,7 +626,8 @@ export function TransportOrderFormPage() {
           date: trip.date ? isoToVnDateString(trip.date) : null,
           loadingAt: isoToDateTimeString(trip.loadingAt),
           unloadingAt: isoToDateTimeString(trip.unloadingAt),
-
+          
+          
           externalTruck: isExternalTruck(trip),
           truckId: trip.truckId,
           truckPlate: trip.truckPlate,
@@ -600,7 +661,8 @@ export function TransportOrderFormPage() {
         pickupAt: isoToDateTimeString(o.route?.pickupAt),
         stuffingAt: isoToDateTimeString(o.route?.stuffingAt),
         dropoffAt: isoToDateTimeString(o.route?.dropoffAt),
-
+        
+        
         fees: toFeeRows(o),
         advanceAmount: o.advanceAmount ?? 0,
         laborCost: o.laborCost ?? 0,
@@ -626,9 +688,12 @@ export function TransportOrderFormPage() {
       const trips: TransportOrderTrip[] = values.trips.map((trip) => ({
         departure: trip.departure.trim(),
         destination: trip.destination.trim(),
-
+        
+        
+        
         date: vnDateStringToIso(tripDate(trip)),
-
+        
+        
         ...(trip.loadingAt ? { loadingAt: dateTimeStringToIso(trip.loadingAt) } : {}),
         ...(trip.unloadingAt ? { unloadingAt: dateTimeStringToIso(trip.unloadingAt) } : {}),
         truckId: trip.truckId,
@@ -641,13 +706,21 @@ export function TransportOrderFormPage() {
         pickup: values.pickup.trim(),
         stuffing: values.stuffing.trim(),
         dropoff: values.dropoff.trim(),
-
+        
+        
+        
+        
+        
         ...(values.pickupAt ? { pickupAt: dateTimeStringToIso(values.pickupAt) } : {}),
         ...(values.stuffingAt ? { stuffingAt: dateTimeStringToIso(values.stuffingAt) } : {}),
         ...(values.dropoffAt ? { dropoffAt: dateTimeStringToIso(values.dropoffAt) } : {}),
       };
       const vatRate = (values.vatRatePercent || 0) / 100;
 
+      
+      
+      
+      
       const write = (extra: TransportOrderExtra) =>
         buildTransportOrderWrite({
           isMultiTrip: values.isMultiTrip,
@@ -722,29 +795,38 @@ export function TransportOrderFormPage() {
     [isEdit, id, t, navigate, invalidateCache],
   );
 
+  
+  
+  
   const scheduleConflicts = useMemo(
     () =>
       findScheduleConflicts(draftScheduleSlots(form.values), savedOrders, {
+        
         ...(id ? { excludeOrderId: id } : {}),
       }),
     [form.values, savedOrders, id],
   );
 
+  
   const draftTruckType = form.values.truckType;
 
+  
   const typeTruckId = typeSourceTruckId(form.values);
 
+  
   const autoTypedFrom = useRef<string | null>(null);
   useEffect(() => {
     if (!typeTruckId || autoTypedFrom.current === typeTruckId) return;
-
+    
     if (autoTypedFrom.current === null && form.getValues().truckType) {
       autoTypedFrom.current = typeTruckId;
       return;
     }
-
+    
+    
+    
     const registered = truckTypeOf(typeTruckId);
-
+    
     if (!registered || isMultiDropType(registered, MULTI_DROP_TRUCK_TYPES)) return;
     autoTypedFrom.current = typeTruckId;
     form.setFieldValue('truckType', registered);
@@ -774,16 +856,22 @@ export function TransportOrderFormPage() {
     savedRoutes,
   ]);
 
+  
   const [appliedRoute, setAppliedRoute] = useState<TransportRouteRow | undefined>();
   const appliedRouteCode = appliedRoute?.code;
 
+  
+
+  
   const routeTruckIssues = useMemo(() => {
     const wanted = appliedRoute?.truckType;
     if (!wanted) return [];
 
+    
     const mismatch: RouteTruckIssue[] =
       draftTruckType && draftTruckType !== wanted ? [{ leg: WHOLE_ORDER, kind: 'mismatch' }] : [];
 
+    
     const missing = (leg: number, truckId: string, external: boolean): RouteTruckIssue[] =>
       !external && !truckId ? [{ leg, kind: 'missing' }] : [];
 
@@ -802,11 +890,13 @@ export function TransportOrderFormPage() {
     form.values.externalTruck,
   ]);
 
+  
   const applyRoute = useCallback(
     (route: TransportRouteRow, opts?: { fillJourney?: boolean }) => {
       if (opts?.fillJourney) {
         form.setFieldValue('isMultiTrip', !!route.isMultiTrip);
         if (route.isMultiTrip) {
+          
           const current = form.getValues().trips;
           form.setFieldValue(
             'trips',
@@ -819,11 +909,17 @@ export function TransportOrderFormPage() {
           );
         } else {
           form.setFieldValue('pickup', route.route?.pickup ?? '');
-
+          
+          
+          
           form.setFieldValue('stuffing', route.route?.stuffing ?? '');
           form.setFieldValue('dropoff', route.route?.dropoff ?? '');
         }
-
+        
+        
+        
+        
+        
         const routeSize = readTruckingSize(route);
         if (routeSize) form.setFieldValue('truckingSize', routeSize);
       }
@@ -839,6 +935,8 @@ export function TransportOrderFormPage() {
       form.setFieldValue('fees', fees);
 
       if (route.isMultiTrip) {
+        
+        
         (route.trips ?? []).forEach((leg, i) => {
           form.setFieldValue(`trips.${i}.laborCost`, leg.laborCost || 0);
         });
@@ -852,7 +950,7 @@ export function TransportOrderFormPage() {
         message: t('transportRoutes.suggestion.applied', { code: route.code }),
       });
     },
-
+    
     [t, freightFeeName],
   );
 
@@ -861,11 +959,13 @@ export function TransportOrderFormPage() {
 
   const pageTitle = isEdit ? t('transportOrders.edit') : t('transportOrders.new');
 
+  
   const handleMultiTripToggle = (checked: boolean) => {
     form.setFieldValue('isMultiTrip', checked);
     if (checked && form.values.trips.length === 0) form.setFieldValue('trips', [blankTrip()]);
   };
 
+  
   const setTripTruck = (i: number, truckId: string | null) => {
     const picked = truckSelectData.find((tr) => tr.value === truckId);
     form.setFieldValue(`trips.${i}.truckId`, truckId ?? '');
@@ -877,6 +977,7 @@ export function TransportOrderFormPage() {
     }
   };
 
+  
   const setExternalTruck = (checked: boolean) => {
     form.setFieldValue('externalTruck', checked);
     form.setFieldValue('truckId', '');
@@ -909,12 +1010,18 @@ export function TransportOrderFormPage() {
 
   const tripLaborTotal = computeTripLaborTotal(form.values.trips);
 
+  
+  
+  
   const currentSize = form.values.truckingSize;
   const truckingSizeData =
     currentSize && !truckingSizeOptions.some((o) => o.value === currentSize)
       ? [...truckingSizeOptions, { value: currentSize, label: `${currentSize}ft` }]
       : truckingSizeOptions;
 
+  
+  
+  
   const currentShipmentType = form.values.shipmentType;
   const shipmentTypeData =
     currentShipmentType && !shipmentTypeOptions.some((o) => o.value === currentShipmentType)
@@ -924,6 +1031,9 @@ export function TransportOrderFormPage() {
         ]
       : shipmentTypeOptions;
 
+  
+  
+  
   const currentTruckType = form.values.truckType;
   const truckTypeSelectData =
     currentTruckType && !truckTypeOptions.some((o) => o.value === currentTruckType)
@@ -957,7 +1067,7 @@ export function TransportOrderFormPage() {
           <SectionCard
             icon={<IconTruck size={14} />}
             title={t('transportOrders.form.jobSection')}
-
+            
             actions={
               <Switch
                 label={t('transportOrders.form.multiTrip')}
@@ -991,7 +1101,9 @@ export function TransportOrderFormPage() {
               <CustomerSelector
                 label={t('transportOrders.form.customer')}
                 withAsterisk
-
+                
+                
+                
                 value={
                   form.values.customerCode
                     ? (getCustomerByCode(form.values.customerCode)?.id ?? null)
@@ -1058,7 +1170,8 @@ export function TransportOrderFormPage() {
                           const picked = truckSelectData.find((tr) => tr.value === v);
                           form.setFieldValue('truckId', v ?? '');
                           form.setFieldValue('truckPlate', picked?.plate ?? '');
-
+                          
+                          
                           const truck = v ? trucks.find((a) => a.id === v) : undefined;
                           if (truck?.extra?.driverId) {
                             form.setFieldValue('driverId', truck.extra.driverId);
@@ -1080,6 +1193,8 @@ export function TransportOrderFormPage() {
                     />
                   </Stack>
                   {form.values.externalTruck ? (
+                    
+                    
                     <TextInput
                       label={t('transportOrders.form.externalDriver')}
                       {...form.getInputProps('driverName')}
@@ -1092,7 +1207,8 @@ export function TransportOrderFormPage() {
                       onChange={(sel) => {
                         form.setFieldValue('driverId', sel?.id ?? '');
                         form.setFieldValue('driverName', sel?.name ?? '');
-
+                        
+                        
                         const linkedId = sel?.employee.extra?.truckAssetId;
                         const linkedTruck = linkedId
                           ? truckSelectData.find((tr) => tr.value === linkedId)
@@ -1150,7 +1266,9 @@ export function TransportOrderFormPage() {
                 label={t('transportOrders.form.truckingSize')}
                 data={truckingSizeData}
                 value={form.values.truckingSize || null}
-
+                
+                
+                
                 onChange={(v) =>
                   form.setFieldValue('truckingSize', (v as TransportOrderTruckingSize) ?? '')
                 }
@@ -1259,7 +1377,9 @@ export function TransportOrderFormPage() {
                             data={placeSuggestions}
                             limit={PLACE_SUGGESTION_LIMIT}
                             styles={PLACE_INPUT_STYLES}
-
+                            
+                            
+                            
                             title={form.values.trips[i]!.departure || undefined}
                             {...form.getInputProps(`trips.${i}.departure`)}
                           />

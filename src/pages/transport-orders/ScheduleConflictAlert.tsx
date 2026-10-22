@@ -18,6 +18,8 @@ export function ScheduleConflictAlert({
       ? t('transportOrders.conflicts.wholeOrder')
       : t('transportOrders.conflicts.leg', { n: tripIndex + 1 });
 
+  
+  
   const windowLabel = (c: ScheduleConflict) =>
     c.start === c.end
       ? formatDateTime(c.start)

@@ -1,3 +1,5 @@
+
+
 import { byClient } from '@/config/client';
 
 type VendorOriginLabelKey =
@@ -7,8 +9,9 @@ type VendorOriginLabelKey =
   | 'vendors.origin.china';
 
 export type VendorOriginLabels = {
+  
   readonly domestic: VendorOriginLabelKey;
-
+  
   readonly overseas: VendorOriginLabelKey;
 };
 

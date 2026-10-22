@@ -103,6 +103,7 @@ function canDropOn(
   const targetPath = findPath(state, targetId);
   if (!sourcePath || !targetPath) return false;
 
+  
   if (position === 'into') {
     if (targetPath.kind !== 'top') return false;
     const target = state[targetPath.index];
@@ -110,6 +111,8 @@ function canDropOn(
     return true;
   }
 
+  
+  
   return true;
 }
 
@@ -125,11 +128,12 @@ function moveItem(
   if (!canDropOn(state, sourceId, targetId, position)) return state;
 
   const { next: stripped, removed } = removeAt(state, sourcePath);
-
+  
   const newTargetPath = findPath(stripped, targetId);
   if (!newTargetPath) return state;
 
   if (position === 'into') {
+    
     const sub = stripSubs(removed);
     const groupIndex = (newTargetPath as Extract<Path, { kind: 'top' }>).index;
     return stripped.map((item, i) => {
@@ -138,11 +142,12 @@ function moveItem(
     });
   }
 
+  
   if (newTargetPath.kind === 'top') {
     const insertIdx = position === 'before' ? newTargetPath.index : newTargetPath.index + 1;
     return [...stripped.slice(0, insertIdx), removed, ...stripped.slice(insertIdx)];
   }
-
+  
   const sub = stripSubs(removed);
   const { groupIndex, subIndex } = newTargetPath;
   const insertSubIdx = position === 'before' ? subIndex : subIndex + 1;
@@ -273,7 +278,7 @@ const TreeRow = memo(function TreeRow({
   expanded?: boolean;
   onToggleExpand?: (id: string) => void;
   subCount?: number;
-
+  
   showNavbarBadge?: boolean;
 }) {
   const entry = getRegistryEntry(item.id);
@@ -378,9 +383,9 @@ function NavItemDetail({
   state: NavPlatformState;
   selectedId: string | null;
   onChange: (next: NavPlatformState) => void;
-
+  
   showNavbarPin?: boolean;
-
+  
   maxNavbarPinned?: number;
 }) {
   if (!selectedId) {
@@ -454,7 +459,7 @@ function NavItemDetail({
           const cap = maxNavbarPinned ?? 4;
           const pinnedCount = countNavbarPinned(state);
           const pinned = !!item.navbar;
-
+          
           const disabled = !isTopLevel || (!pinned && pinnedCount >= cap);
           return (
             <Group justify="space-between">
@@ -611,6 +616,7 @@ export function NavTreeEditor({
     e.preventDefault();
     e.dataTransfer.dropEffect = 'move';
 
+    
     const rect = e.currentTarget.getBoundingClientRect();
     const offsetY = e.clientY - rect.top;
     const third = rect.height / 3;
@@ -626,6 +632,7 @@ export function NavTreeEditor({
     else position = 'after';
 
     if (!canDropOn(stateRef.current, dragSourceRef.current, id, position) && position === 'into') {
+      
       position = offsetY < rect.height / 2 ? 'before' : 'after';
     }
 
@@ -633,6 +640,7 @@ export function NavTreeEditor({
   }, []);
 
   const handleDragLeaveRow = useCallback((e: DragEvent<HTMLDivElement>) => {
+    
     const related = e.relatedTarget as Node | null;
     if (related && e.currentTarget.contains(related)) return;
     setDragOver((prev) => prev);
@@ -663,7 +671,7 @@ export function NavTreeEditor({
   const handleAddGroup = useCallback(() => {
     const next = addCustomGroup(stateRef.current, 'New group');
     onChange(next);
-
+    
     setSelectedId(next[next.length - 1].id);
   }, [onChange]);
 

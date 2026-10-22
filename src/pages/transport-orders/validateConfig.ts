@@ -1,3 +1,5 @@
+
+
 import type { CMngtTransportOrderFeatures } from '@credo/kits/types';
 
 export type TransportOrderConfigInvariantError =
@@ -17,7 +19,7 @@ export type TransportOrderValidationResult =
 
 export function validateTransportOrderConfig(
   features: CMngtTransportOrderFeatures,
-
+  
   knownDepartments?: ReadonlySet<string>,
 ): TransportOrderValidationResult {
   if (!features.enabled) return { ok: true };
@@ -27,6 +29,7 @@ export function validateTransportOrderConfig(
   const transitions = features.statusTransitions ?? {};
 
   if (statusOptions.length === 0) {
+    
     return { ok: false, errors: [{ kind: 'no-statuses' }] };
   }
 
@@ -51,12 +54,15 @@ export function validateTransportOrderConfig(
     }
   }
 
+  
   const initials = statusOptions.filter((o) => o.isInitial);
   if (initials.length === 0) errors.push({ kind: 'initial-missing' });
   else if (initials.length > 1) {
     errors.push({ kind: 'initial-duplicated', statuses: initials.map((o) => o.value) });
   }
 
+  
+  
   for (const [from, tos] of Object.entries(transitions)) {
     const fromKnown = seen.has(from);
     for (const to of tos) {
@@ -64,6 +70,7 @@ export function validateTransportOrderConfig(
     }
   }
 
+  
   const reachable = new Set<string>();
   for (const tos of Object.values(transitions)) for (const to of tos) reachable.add(to);
 
@@ -72,14 +79,16 @@ export function validateTransportOrderConfig(
     const outbound = (transitions[opt.value] ?? []).length > 0;
     const closed = !!opt.terminal || !!opt.locked;
 
+    
+    
     if (closed && outbound) {
       errors.push({ kind: 'terminal-has-transitions', statusValue: opt.value });
     }
-
+    
     if (!opt.isInitial && !reachable.has(opt.value)) {
       errors.push({ kind: 'status-unreachable', statusValue: opt.value });
     }
-
+    
     if (!closed && !outbound) {
       errors.push({ kind: 'status-dead-end', statusValue: opt.value });
     }

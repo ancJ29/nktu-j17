@@ -1,3 +1,5 @@
+
+
 import { MATERIAL_V2_LIST_COLUMNS } from '@/pages/v2/materials/listColumns';
 import type { CredoAppConfig } from '../schema';
 import { mergeFeature } from './featureMerge';
@@ -7,7 +9,7 @@ export type MaterialsV2Form = {
   simpleMode: boolean;
   codePrefix: string;
   codePadLength: number;
-
+  
   unitCategory: 'unit' | 'material-unit';
   inventory: boolean;
   listColumns: string[];

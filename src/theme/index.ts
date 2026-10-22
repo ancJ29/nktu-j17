@@ -38,6 +38,7 @@ const pickerInputStyles = (props: { leftSection?: ReactNode }) => ({
 });
 
 const baseTheme = buildMantineTheme(themeConfig, {
+  
   InputWrapper: Input.Wrapper.extend({
     defaultProps: {
       inputWrapperOrder: ['label', 'input', 'description', 'error'],
@@ -99,9 +100,9 @@ const baseTheme = buildMantineTheme(themeConfig, {
       return styles;
     },
   }),
-
+  
   Combobox: Combobox.extend({ defaultProps: { keepMounted: false } }),
-
+  
   Select: Select.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
   MultiSelect: MultiSelect.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
   TagsInput: TagsInput.extend({ styles: (_theme, props) => pickerInputStyles(props) }),
@@ -147,7 +148,7 @@ export const theme = createTheme({
   },
   defaultRadius: 'md',
   cursorType: 'pointer',
-
+  
   fontFamily: '"Noto Sans", sans-serif',
   headings: {
     fontFamily: '"Noto Sans", sans-serif',

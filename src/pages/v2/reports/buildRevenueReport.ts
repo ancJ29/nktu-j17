@@ -1,3 +1,5 @@
+
+
 import type { SalesOrderStage } from '@credo/connectors/status-flow';
 import type { SalesOrderV2 } from '@/types/sales-order-v2';
 import { anchorDayOf, dayOfUtc7 } from '../anchorDay';
@@ -32,7 +34,7 @@ export function isoWeekKeyOf(dateStr: string): string {
   const d = new Date(`${dateStr}T00:00:00Z`);
   const monday = new Date(d);
   monday.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));
-
+  
   const thursday = new Date(monday);
   thursday.setUTCDate(monday.getUTCDate() + 3);
   const year = thursday.getUTCFullYear();
@@ -82,9 +84,10 @@ export function periodKeysInRange(
 export const REVENUE_STAGES: ReadonlyArray<SalesOrderStage> = ['confirmed', 'fulfilled'];
 
 export interface RevenueScope {
+  
   fromDay: string;
   toDay: string;
-
+  
   resolveStage: (status: string) => SalesOrderStage | undefined;
 }
 
@@ -112,22 +115,23 @@ export function filterRevenueOrders(
 }
 
 export interface RevenuePeriodRow {
+  
   periodKey: string;
-
+  
   revenue: number;
-
+  
   orders: number;
   pricedOrders: number;
-
+  
   unpricedOrders: number;
 }
 
 export interface RevenueReport {
   grouping: RevenueGrouping;
-
+  
   rows: RevenuePeriodRow[];
   totals: Omit<RevenuePeriodRow, 'periodKey'>;
-
+  
   unknownStatusOrders: number;
 }
 
@@ -146,7 +150,7 @@ export function buildRevenueReport(
   const { orders, unknownStatusOrders } = filterRevenueOrders(rows, input);
   for (const { order, anchorDay } of orders) {
     const row = byKey.get(periodKeyOf(grouping, anchorDay));
-    if (!row) continue;
+    if (!row) continue; 
     row.orders += 1;
     if (typeof order.totalAmount === 'number') {
       row.pricedOrders += 1;

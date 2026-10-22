@@ -1,3 +1,5 @@
+
+
 import type { CapabilityDefinition, CapabilityId, Stage } from './types';
 import { z } from 'zod';
 
@@ -14,6 +16,7 @@ const canCreateDRConfigSchema = z
   .optional();
 
 export const CAPABILITY_REGISTRY: Record<CapabilityId, CapabilityDefinition> = {
+  
   isInitialStatus: {
     id: 'isInitialStatus',
     label: { en: 'Initial status', vi: 'Trạng thái khởi đầu' },
@@ -89,6 +92,7 @@ export const CAPABILITY_REGISTRY: Record<CapabilityId, CapabilityDefinition> = {
     allowedStages: ['COMPLETED', 'EXCEPTIONAL'],
   },
 
+  
   lockLineEdits: {
     id: 'lockLineEdits',
     label: { en: 'Lock line edits', vi: 'Khóa sửa dòng' },
@@ -159,6 +163,7 @@ export const CAPABILITY_REGISTRY: Record<CapabilityId, CapabilityDefinition> = {
     allowedStages: ['IN_PROGRESS'],
   },
 
+  
   reservesStock: {
     id: 'reservesStock',
     label: { en: 'Reserves stock', vi: 'Giữ hàng' },
@@ -179,6 +184,7 @@ export const CAPABILITY_REGISTRY: Record<CapabilityId, CapabilityDefinition> = {
     onEnter: 'reserve',
   },
 
+  
   autoShipsOnCompletion: {
     id: 'autoShipsOnCompletion',
     label: { en: 'Auto-ships on completion', vi: 'Tự động xuất kho khi hoàn tất' },

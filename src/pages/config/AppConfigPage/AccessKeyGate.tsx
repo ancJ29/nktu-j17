@@ -22,6 +22,7 @@ export function AccessKeyGate({ children }: { children: (accessKey: string) => R
     setError('');
 
     try {
+      
       const clientCode = resolveClientCode();
       if (!clientCode) {
         setError('No client code resolved');

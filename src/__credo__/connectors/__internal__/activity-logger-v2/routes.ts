@@ -4,11 +4,13 @@ export const ACTIVITY_LOGGER_V2_ROUTES = {
   },
   SUB_ROUTES: {
     ACTIVITY: {
+      
+      
       LOG_ACTIVITIES: {
         PATH: '',
         METHOD: 'POST',
       },
-
+      
       GET_BY_ACTOR: {
         PATH: '/by-actor/:actorId',
         METHOD: 'GET',

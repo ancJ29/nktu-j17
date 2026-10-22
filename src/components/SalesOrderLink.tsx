@@ -5,11 +5,12 @@ import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type SalesOrderLinkProps = {
+  
   id: string | undefined | null;
-
+  
   fallbackLabel?: string | null;
   size?: LinkSize;
-
+  
   color?: string;
 };
 

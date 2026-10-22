@@ -19,8 +19,9 @@ const canEdit = perms.truck.canEdit();
 const canCreate = perms.truck.canCreate();
 
 type TruckDetailShellProps = {
+  
   headerStats?: (truck: TruckAssetRow) => ReactNode;
-
+  
   children: (truck: TruckAssetRow, dangerZone: ReactNode) => ReactNode;
 };
 
@@ -33,6 +34,9 @@ export function TruckDetailShell({ headerStats, children }: TruckDetailShellProp
   const [truck, setTruck] = useState<TruckAssetRow | null>(null);
   const [loading, setLoading] = useState(true);
 
+  
+  
+  
   const handleCopy = useCallback(() => {
     if (!truck) return;
     const e = truck.extra ?? {};
@@ -62,6 +66,7 @@ export function TruckDetailShell({ headerStats, children }: TruckDetailShellProp
     if (!id) return;
     const cached = useTruckAssetStore.getState().getById(id) as TruckAssetRow | undefined;
     if (cached && !cached.extra?.isDeleted) {
+      
       setTruck(cached);
       setLoading(false);
       return;

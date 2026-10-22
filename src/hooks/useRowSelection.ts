@@ -1,14 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
 
 export type RowSelection = {
+  
   readonly selectedKeys: ReadonlySet<string>;
   readonly count: number;
   readonly isSelected: (key: string) => boolean;
   readonly toggle: (key: string) => void;
   readonly clear: () => void;
-
+  
   readonly toggleAllIn: (keys: readonly string[]) => void;
-
+  
   readonly headerState: (keys: readonly string[]) => {
     allSelected: boolean;
     someSelected: boolean;
@@ -21,7 +22,7 @@ export function useRowSelection(): RowSelection {
   const toggle = useCallback((key: string) => {
     setSelectedKeys((prev) => {
       const next = new Set(prev);
-
+      
       if (!next.delete(key)) next.add(key);
       return next;
     });
@@ -72,7 +73,7 @@ export function useRowSelection(): RowSelection {
 export type SelectionMode = RowSelection & {
   readonly selectionMode: boolean;
   readonly enterSelectionMode: () => void;
-
+  
   readonly exitSelectionMode: () => void;
   readonly toggleSelectionMode: () => void;
 };

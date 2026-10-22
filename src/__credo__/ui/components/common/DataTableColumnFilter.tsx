@@ -25,9 +25,9 @@ import {
 
 export type DataTableFilterOption = {
   value: string;
-
+  
   label: string;
-
+  
   count?: number;
 };
 
@@ -36,7 +36,7 @@ export type DataTableColumnFilterLabels = {
   selectAll?: string;
   clear?: string;
   empty?: string;
-
+  
   applyResults?: string;
 };
 
@@ -64,7 +64,10 @@ export function DataTableColumnFilter({
   const text = { ...DEFAULT_LABELS, ...labels };
   const [opened, setOpened] = useState(false);
   const [query, setQuery] = useState('');
-
+  
+  
+  
+  
   const [cleared, setCleared] = useState(false);
 
   const active = selected.length > 0;
@@ -96,6 +99,8 @@ export function DataTableColumnFilter({
 
   const clear = () => apply({ selected: [], cleared: false });
 
+  
+  
   const applyShown = () => {
     const result = selectColumnFilterShown(
       optionValues,
@@ -122,6 +127,8 @@ export function DataTableColumnFilter({
           color={active ? 'primary' : 'gray'}
           aria-label={text.search}
           onClick={(event) => {
+            
+            
             event.stopPropagation();
             changeOpened(!opened);
           }}
@@ -137,6 +144,7 @@ export function DataTableColumnFilter({
             value={query}
             onChange={(event) => setQuery(event.currentTarget.value)}
             onKeyDown={(event) => {
+              
               if (event.key !== 'Enter' || event.nativeEvent.isComposing || !searching) return;
               event.preventDefault();
               applyShown();

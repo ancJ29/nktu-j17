@@ -27,6 +27,7 @@ export interface OperationLogModuleConfig {
 export function createOperationLogModule(config: OperationLogModuleConfig) {
   const { storage, serviceCode, keyPrefix = 'operation-logs' } = config;
 
+  
   async function getByTarget(
     scope: string,
     targetId: string,
@@ -44,6 +45,7 @@ export function createOperationLogModule(config: OperationLogModuleConfig) {
   return {
     getByTarget,
 
+    
     async create(scope: string, input: CreateOperationLogInput): Promise<OperationLog> {
       validateCreateInput(input);
       const part = partitionId(input.targetId, yearOf(input.logDate));
@@ -56,6 +58,7 @@ export function createOperationLogModule(config: OperationLogModuleConfig) {
       return entry;
     },
 
+    
     async update(scope: string, id: string, input: UpdateOperationLogInput): Promise<OperationLog> {
       const sourcePart = partitionId(input.targetId, input.period);
       const items = await loadPartition<OperationLog>(
@@ -77,6 +80,7 @@ export function createOperationLogModule(config: OperationLogModuleConfig) {
         return updated;
       }
 
+      
       items.splice(index, 1);
       await savePartition(storage, serviceCode, keyPrefix, scope, sourcePart, items);
 
@@ -93,6 +97,7 @@ export function createOperationLogModule(config: OperationLogModuleConfig) {
       return updated;
     },
 
+    
     async remove(
       scope: string,
       id: string,

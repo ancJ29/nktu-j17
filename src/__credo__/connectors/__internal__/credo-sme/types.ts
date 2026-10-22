@@ -1,12 +1,13 @@
 import type { DateTimeInput } from '@credo/kits/types';
 
 type BaseMutationRequest = {
+  
   expectedListHash?: string;
 };
 
 type BaseMutationResponse = {
   success: boolean;
-
+  
   listHash?: string;
 };
 
@@ -34,9 +35,9 @@ export type ProvisionClientRequest<TExtra = Record<string, unknown>> = BaseMutat
   contactEmail?: string;
   domains: string[];
   rootEmail: string;
-
+  
   rootPassword?: string;
-
+  
   ssoAdminAccessKey: string;
   extra?: TExtra;
 };
@@ -47,7 +48,7 @@ export type ProvisionClientResponse<TExtra = Record<string, unknown>> = BaseMuta
   operatorAccessKey: string;
   rootEmail: string;
   rootPassword: string;
-
+  
   configIssue?: string;
 };
 
@@ -59,19 +60,20 @@ export type ListClientsResponse<TExtra = Record<string, unknown>> = {
 export type RemoveClientRequest = BaseMutationRequest & {
   clientServiceCode: string;
   version: string;
-
+  
   ssoAdminAccessKey?: string;
 };
 export type RemoveClientResponse = BaseDeleteResponse & {
+  
   ssoIssues?: string[];
 };
 
 export type CredoAppConfig = {
   [key: string]: unknown;
   version: string;
-
+  
   date?: DateTimeInput | undefined;
-
+  
   schemaVersion?: number | undefined;
   app: {
     [key: string]: unknown;
@@ -86,7 +88,7 @@ export type CredoAppConfig = {
   features?:
     | {
         [key: string]: unknown;
-
+        
         vendorsV2?:
           | {
               [key: string]: unknown;
@@ -96,7 +98,7 @@ export type CredoAppConfig = {
               codePadLength?: number | undefined;
             }
           | undefined;
-
+        
         customersV2?:
           | {
               [key: string]: unknown;
@@ -106,7 +108,7 @@ export type CredoAppConfig = {
               codePadLength?: number | undefined;
             }
           | undefined;
-
+        
         materialsV2?:
           | {
               [key: string]: unknown;
@@ -117,7 +119,7 @@ export type CredoAppConfig = {
               unitCategory?: string | undefined;
             }
           | undefined;
-
+        
         productsV2?:
           | {
               [key: string]: unknown;
@@ -128,7 +130,7 @@ export type CredoAppConfig = {
               priceManagement?: boolean | undefined;
             }
           | undefined;
-
+        
         goodsReceiptsV2?:
           | {
               [key: string]: unknown;
@@ -138,7 +140,7 @@ export type CredoAppConfig = {
               statusFlow?: unknown;
             }
           | undefined;
-
+        
         salesOrdersV2?:
           | {
               [key: string]: unknown;
@@ -148,7 +150,7 @@ export type CredoAppConfig = {
               statusFlow?: unknown;
             }
           | undefined;
-
+        
         deliveryNotesV2?:
           | {
               [key: string]: unknown;
@@ -181,19 +183,19 @@ export type AuthMintResponse = {
   success: boolean;
   error?: string;
   userUuid?: string;
-
+  
   authId?: string;
-
+  
   authExpiresAt?: number;
-
+  
   token?: string;
-
+  
   refreshToken?: string;
 };
 
 export type GenerateEmployeeLoginTokenRequest = {
   id: string;
-
+  
   expiration?: number;
 };
 export type GenerateEmployeeLoginTokenResponse = {
@@ -208,14 +210,14 @@ export type LogActivitiesRequest = {
     action: string;
     targetId?: string;
     memo?: Record<string, unknown>;
-
+    
     timestamp?: string;
   }[];
 };
 
 export type LogActivitiesResponse = {
   success: boolean;
-
+  
   ids: string[];
 };
 
@@ -228,9 +230,9 @@ export type MyInformation = {
   position: string;
   department: string;
   isActive: boolean;
-
+  
   userUuid?: string;
-
+  
   extra: Record<string, unknown>;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
@@ -249,21 +251,22 @@ export type EffectiveModulePermissions = {
 export type EffectivePermissions = Record<string, EffectiveModulePermissions>;
 
 export type GetMeResponse = {
+  
   isRootUser: boolean;
-
+  
   email: string;
-
+  
   name: string;
   myInformation: MyInformation | null;
-
+  
   permissions: EffectivePermissions | null;
-
+  
   profileHash: string;
 };
 
 export type GetMeNoChangeResponse = {
   noChange: true;
-
+  
   profileHash: string;
 };
 
@@ -274,16 +277,17 @@ export type PermissionMismatchEntry = {
 };
 
 export type ReportPermissionMismatchRequest = {
+  
   entries: PermissionMismatchEntry[];
-
+  
   total: number;
   truncated: boolean;
-
+  
   versions?: { cfg?: string | undefined; emp?: string | undefined };
-
+  
   browserEmployeeId?: string | undefined;
   browserDepartment?: string | undefined;
-
+  
   appVersion?: string | undefined;
 };
 
@@ -293,36 +297,39 @@ export type LookupRecord = {
   id: string;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
-
+  
   version: string;
 } & Record<string, unknown>;
 
 export type GetAllLookupsRequest = {
+  
   hash?: string;
 };
 export type GetAllLookupsResponse = {
   success: boolean;
   changed: boolean;
-
+  
   items?: LookupRecord[];
   hash?: string;
 };
 
 export type CreateLookupRequest = {
+  
   item: Record<string, unknown>;
-
+  
   expectedListHash?: string;
 };
 export type CreateLookupResponse = {
   success: boolean;
   item: LookupRecord;
-
+  
   listHash?: string;
 };
 
 export type UpdateLookupRequest = {
+  
   version: string;
-
+  
   patch: Record<string, unknown>;
   expectedListHash?: string;
 };
@@ -333,8 +340,9 @@ export type UpdateLookupResponse = {
 };
 
 export type DeleteLookupRequest = {
+  
   version: string;
-
+  
   expectedListHash?: string;
 };
 export type DeleteLookupResponse = {
@@ -344,18 +352,19 @@ export type DeleteLookupResponse = {
 };
 
 export type ImportBatchLookupsRequest = {
+  
   items: Array<Record<string, unknown>>;
-
+  
   expectedListHash?: string;
 };
 export type ImportBatchLookupsResponse = {
   success: boolean;
   summary: { total: number; created: number; updated: number; errors: number };
-
+  
   created: LookupRecord[];
   updated: LookupRecord[];
   errors: Array<{ index: number; message: string }>;
-
+  
   listHash?: string;
 };
 
@@ -363,17 +372,18 @@ export type MasterDataRecord = {
   id: string;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
-
+  
   version: string;
 } & Record<string, unknown>;
 
 export type GetAllMasterDataRequest = {
+  
   hash?: string;
 };
 export type GetAllMasterDataResponse = {
   success: boolean;
   changed: boolean;
-
+  
   items?: MasterDataRecord[];
   hash?: string;
 };
@@ -384,20 +394,22 @@ export type GetMasterDataByIdResponse = {
 };
 
 export type CreateMasterDataRequest = {
+  
   item: Record<string, unknown>;
-
+  
   expectedListHash?: string;
 };
 export type CreateMasterDataResponse = {
   success: boolean;
   item: MasterDataRecord;
-
+  
   listHash?: string;
 };
 
 export type UpdateMasterDataRequest = {
+  
   version: string;
-
+  
   patch: Record<string, unknown>;
   expectedListHash?: string;
 };
@@ -408,8 +420,9 @@ export type UpdateMasterDataResponse = {
 };
 
 export type ArchiveMasterDataRequest = {
+  
   version: string;
-
+  
   expectedListHash?: string;
 };
 export type ArchiveMasterDataResponse = {
@@ -424,10 +437,11 @@ export type GetAllEmployeesResponse = GetAllMasterDataResponse;
 export type GetEmployeeByIdResponse = GetMasterDataByIdResponse;
 
 export type EmployeeSsoOutcome = {
+  
   ssoWarning?: string;
-
+  
   ssoError?: unknown;
-
+  
   loginPassword?: string;
 };
 
@@ -442,7 +456,7 @@ export type ArchiveEmployeeResponse = ArchiveMasterDataResponse & EmployeeSsoOut
 
 export type UpdateEmployeeLoginPasswordRequest = {
   id: string;
-
+  
   version: string;
   password: string;
   expectedListHash?: string;
@@ -501,49 +515,51 @@ export type InventoryRecord = {
   id: string;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
-
+  
   version: string;
-
+  
   itemId: string;
-
+  
   itemCode: string;
-
+  
   onHand: number;
-
+  
   incoming?: number;
-
+  
   incomingBy?: Array<{ receiptId: string; receiptNumber: string; quantity: number }>;
-
+  
   outgoing?: number;
-
+  
   outgoingBy?: Array<{ orderId: string; orderNumber: string; quantity: number }>;
-
+  
   note?: string;
 };
 
 export type GetAllInventoryRequest = {
+  
   hash?: string;
 };
 export type GetAllInventoryResponse = {
   success: boolean;
   changed: boolean;
-
+  
   items?: InventoryRecord[];
   hash?: string;
 };
 
 export type SetInventoryRequest = {
+  
   onHand: number;
   note?: string;
-
+  
   version?: string;
-
+  
   expectedListHash?: string;
 };
 export type SetInventoryResponse = {
   success: boolean;
   item: InventoryRecord;
-
+  
   listHash?: string;
 };
 
@@ -566,14 +582,15 @@ export type GoodsReceiptLine = {
   itemId: string;
   itemCode: string;
   itemName: string;
-
+  
   quantity: number;
-
+  
   unit?: string;
   note?: string;
 };
 
 export type GoodsReceiptLineInput = {
+  
   itemType?: GoodsReceiptItemType;
   itemId: string;
   quantity: number;
@@ -586,37 +603,38 @@ export type GoodsReceiptRecord = {
   id: string;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
-
+  
   version: string;
-
+  
   receiptNumber: string;
   status: GoodsReceiptStatus;
-
+  
   vendorId?: string;
-
+  
   vendorCode?: string;
   vendorName?: string;
-
+  
   receivedDate?: string;
   reference?: string;
   notes?: string;
   items: GoodsReceiptLine[];
-
+  
   totalQuantity: number;
-
+  
   receivedAt?: DateTimeInput;
   receivedBy?: string;
   cancelledAt?: DateTimeInput;
   cancelledBy?: string;
-
+  
   derivativesPending?: boolean;
-
+  
   extra?: Record<string, unknown>;
 };
 
 export type QuerySyncGoodsReceiptsRequest = {
+  
   days: string[];
-
+  
   knownHashes?: Record<string, string>;
 };
 export type GoodsReceiptDaySync =
@@ -629,7 +647,7 @@ export type QuerySyncGoodsReceiptsResponse = {
 export type GetGoodsReceiptByIdResponse = {
   success: boolean;
   item: GoodsReceiptRecord;
-
+  
   day: string;
 };
 
@@ -638,33 +656,34 @@ export type CreateGoodsReceiptRequest = {
   receivedDate?: string;
   reference?: string;
   notes?: string;
-
+  
   items: GoodsReceiptLineInput[];
-
+  
   extra?: Record<string, unknown>;
 };
 export type CreateGoodsReceiptResponse = {
   success: boolean;
   item: GoodsReceiptRecord;
-
+  
   day: string;
-
+  
   listHash?: string;
 };
 
 export type UpdateGoodsReceiptRequest = {
+  
   version: string;
   patch: {
     vendorId?: string | null;
     receivedDate?: string;
     reference?: string;
     notes?: string;
-
+    
     items?: GoodsReceiptLineInput[];
-
+    
     extra?: Record<string, unknown>;
   };
-
+  
   expectedListHash?: string;
 };
 export type UpdateGoodsReceiptResponse = {
@@ -675,10 +694,11 @@ export type UpdateGoodsReceiptResponse = {
 };
 
 export type TransitionGoodsReceiptRequest = {
+  
   to: string;
-
+  
   version?: string;
-
+  
   expectedListHash?: string;
 };
 export type TransitionGoodsReceiptResponse = {
@@ -695,14 +715,14 @@ export type SalesOrderLine = {
   itemId: string;
   itemCode: string;
   itemName: string;
-
+  
   quantity: number;
   unit?: string;
-
+  
   unitPrice?: number;
-
+  
   lineTotal?: number;
-
+  
   deliveredQuantity?: number;
   note?: string;
 };
@@ -711,7 +731,7 @@ export type SalesOrderLineInput = {
   itemType?: SalesOrderItemType;
   itemId: string;
   quantity: number;
-
+  
   unitPrice?: number;
   note?: string;
 };
@@ -723,46 +743,46 @@ export type SalesOrderRecord = {
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
   version: string;
-
+  
   orderNumber: string;
   status: SalesOrderStatus;
-
+  
   customerId?: string;
   customerCode?: string;
   customerName?: string;
-
+  
   customerPhone?: string;
   customerAddress?: string;
-
+  
   orderDate?: string;
-
+  
   requestedDate?: string;
   reference?: string;
   notes?: string;
   items: SalesOrderLine[];
-
+  
   totalQuantity: number;
-
+  
   totalAmount?: number;
-
+  
   confirmedAt?: DateTimeInput;
   confirmedBy?: string;
   fulfilledAt?: DateTimeInput;
   fulfilledBy?: string;
   cancelledAt?: DateTimeInput;
   cancelledBy?: string;
-
+  
   deliveryNotes?: SalesOrderDeliveryNoteRef[];
-
+  
   remainderReduced?: SalesOrderRemainderReduced;
-
+  
   paymentStatus?: SalesOrderPaymentStatus;
   paidAmount?: number;
   paidAt?: DateTimeInput;
   paidBy?: string;
-
+  
   derivativesPending?: boolean;
-
+  
   extra?: Record<string, unknown>;
 };
 
@@ -773,7 +793,7 @@ export type SalesOrderRemainderReduced = {
     itemType: SalesOrderItemType;
     itemId: string;
     itemCode: string;
-
+    
     quantity: number;
   }>;
 };
@@ -802,7 +822,7 @@ export type GetSalesOrderByIdResponse = {
 
 export type CreateSalesOrderRequest = {
   customerId?: string;
-
+  
   customerName?: string;
   customerPhone?: string;
   customerAddress?: string;
@@ -823,10 +843,11 @@ export type CreateSalesOrderResponse = {
 export type UpdateSalesOrderRequest = {
   version: string;
   patch: {
+    
     customerId?: string | null;
-
+    
     customerName?: string;
-
+    
     customerPhone?: string;
     customerAddress?: string;
     orderDate?: string;
@@ -834,7 +855,7 @@ export type UpdateSalesOrderRequest = {
     reference?: string;
     notes?: string;
     items?: SalesOrderLineInput[];
-
+    
     extra?: Record<string, unknown>;
   };
   expectedListHash?: string;
@@ -848,7 +869,7 @@ export type UpdateSalesOrderResponse = {
 
 export type TransitionSalesOrderRequest = {
   to: string;
-
+  
   reduceRemaining?: boolean;
   version?: string;
   expectedListHash?: string;
@@ -862,7 +883,7 @@ export type TransitionSalesOrderResponse = {
 
 export type SalesOrderInventoryRequest = {
   action: 'lock' | 'release';
-
+  
   lines?: Array<{ itemType?: SalesOrderItemType; itemId: string }>;
   version?: string;
   expectedListHash?: string;
@@ -878,7 +899,7 @@ export type SalesOrderPaymentStatus = 'unpaid' | 'partial' | 'paid';
 
 export type SetSalesOrderPaymentRequest = {
   status: SalesOrderPaymentStatus;
-
+  
   paidAmount?: number;
   version?: string;
   expectedListHash?: string;
@@ -899,10 +920,10 @@ export type DeliveryNoteLine = {
   itemId: string;
   itemCode: string;
   itemName: string;
-
+  
   quantity: number;
   unit?: string;
-
+  
   reducedQuantity: number;
   note?: string;
 };
@@ -921,41 +942,41 @@ export type DeliveryNoteRecord = {
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
   version: string;
-
+  
   noteNumber: string;
   status: DeliveryNoteStatus;
-
+  
   salesOrderId: string;
   salesOrderNumber: string;
-
+  
   customerId?: string;
   customerCode?: string;
   customerName?: string;
   deliveryType: DeliveryNoteType;
-
+  
   assignedTo?: string;
   assignedToName?: string;
-
+  
   carrier?: string;
-
+  
   deliveryDate?: string;
   reference?: string;
   notes?: string;
   items: DeliveryNoteLine[];
-
+  
   totalQuantity: number;
-
+  
   completesSalesOrder: boolean;
-
+  
   photoRefs?: string[];
-
+  
   deliveredAt?: DateTimeInput;
   deliveredBy?: string;
   cancelledAt?: DateTimeInput;
   cancelledBy?: string;
-
+  
   derivativesPending?: boolean;
-
+  
   extra?: Record<string, unknown>;
 };
 
@@ -985,7 +1006,7 @@ export type CreateDeliveryNoteRequest = {
   reference?: string;
   notes?: string;
   items?: DeliveryNoteLineInput[];
-
+  
   completesSalesOrder?: boolean;
   extra?: Record<string, unknown>;
 };
@@ -1000,7 +1021,7 @@ export type UpdateDeliveryNoteRequest = {
   version: string;
   patch: {
     deliveryType?: DeliveryNoteType;
-
+    
     assignedTo?: string | null;
     carrier?: string;
     deliveryDate?: string;
@@ -1008,7 +1029,7 @@ export type UpdateDeliveryNoteRequest = {
     notes?: string;
     items?: DeliveryNoteLineInput[];
     completesSalesOrder?: boolean;
-
+    
     extra?: Record<string, unknown>;
   };
   expectedListHash?: string;
@@ -1022,9 +1043,9 @@ export type UpdateDeliveryNoteResponse = {
 
 export type TransitionDeliveryNoteRequest = {
   to: string;
-
+  
   photoRefs?: string[];
-
+  
   acknowledge?: string[];
   version?: string;
   expectedListHash?: string;
@@ -1038,7 +1059,7 @@ export type TransitionDeliveryNoteResponse = {
 
 export type DeliveryNoteInventoryRequest = {
   action: 'reduce';
-
+  
   amounts?: Array<{ itemType?: DeliveryNoteItemType; itemId: string; quantity: number }>;
   version?: string;
   expectedListHash?: string;

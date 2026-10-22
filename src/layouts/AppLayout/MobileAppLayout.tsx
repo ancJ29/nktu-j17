@@ -29,12 +29,17 @@ const logoSrc =
 export function MobileAppLayout() {
   const { t, i18n } = useTranslation();
   const { user, loadProfile, isProfileLoaded } = useAuthStore();
-
+  
+  
+  
+  
   const signedIn = isSignedIn();
 
+  
   useLanguageSync({ isProfileLoaded });
   useCurrentEmployee({ isProfileLoaded, email: user?.email });
 
+  
   const handleLanguageChange = useCallback(
     async (languageCode: string) => {
       sharedUserStorage.set(SharedStorageKey.LANGUAGE, languageCode);
@@ -50,6 +55,8 @@ export function MobileAppLayout() {
     [t],
   );
 
+  
+  
   const isRoot = useIsRoot();
   const navbarItems = useMemo<NavigationItem[]>(() => {
     return stripRootOnlyNavItems(appConfig.navigation.mobile, isRoot)
@@ -69,15 +76,23 @@ export function MobileAppLayout() {
     }
   }, [signedIn, isProfileLoaded, loadProfile]);
 
+  
+  
   const handleRefresh = useCallback(() => {
     cacheFlush();
     reloadPage('manual refresh');
   }, []);
 
+  
+  
+  
   const clearCache = useClearCacheConfirm();
 
   return (
     <MobileAppLayoutUI
+      
+      
+      
       navigation={navbarItems as CredoNavigationItem[]}
       getNavLabel={getNavLabel}
       appName={appBrand.name}

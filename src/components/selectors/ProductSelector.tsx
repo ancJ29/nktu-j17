@@ -11,10 +11,11 @@ import {
 } from './productSelectorOptions';
 
 export type ProductSelectorChange = {
+  
   code: string;
-
+  
   name: string;
-
+  
   units: string[];
   sku?: string;
   product: Product;
@@ -24,11 +25,12 @@ export type ProductSelectorProps = Omit<
   SelectProps,
   'data' | 'value' | 'onChange' | 'filter' | 'name'
 > & {
+  
   code: string | null;
-
+  
   name?: string | null;
   onChange: (selection: ProductSelectorChange | null) => void;
-
+  
   filter?: (p: Product) => boolean;
 };
 
@@ -63,6 +65,10 @@ export function ProductSelector({
     return m;
   }, [options]);
 
+  
+  
+  
+  
   const selectedValue = useMemo(() => {
     if (!code) return null;
     const exact = options.find((o) => o.code === code && o.name === name);

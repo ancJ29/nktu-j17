@@ -19,11 +19,13 @@ export const NavigationSection = memo(function NavigationSection({
     configToState(navigation.mobile, ALL_NAV_IDS),
   );
 
+  
   useEffect(() => {
     setPcState(configToState(navigation.pc, ALL_NAV_IDS));
     setMobileState(configToState(navigation.mobile, ALL_NAV_IDS));
   }, [navigation]);
 
+  
   const emitChange = useCallback(
     (pc: NavPlatformState, mobile: NavPlatformState) => {
       onChange({
@@ -34,6 +36,7 @@ export const NavigationSection = memo(function NavigationSection({
     [onChange],
   );
 
+  
   const pcStateRef = useRef(pcState);
   const mobileStateRef = useRef(mobileState);
   useEffect(() => {

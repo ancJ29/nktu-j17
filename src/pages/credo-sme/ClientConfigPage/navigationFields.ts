@@ -1,3 +1,5 @@
+
+
 import { stripHiddenNavItems, type NavId } from '@/config/navigation';
 import type { NavigationItem } from '@/types';
 import type { CredoAppConfig } from '../schema';
@@ -18,6 +20,7 @@ export const V2_NAV_IDS: NavId[] = [
 export type ViewerRule = { hiddenForDepartments: string[]; visibleForEmployeeIds: string[] };
 
 export type NavigationForm = {
+  
   pc: NavigationItem[] | null;
   rules: Record<string, ViewerRule>;
 };
@@ -81,6 +84,8 @@ export const applyNavigation = (
   form: NavigationForm,
 ): CredoAppConfig['navigationV2'] => {
   if (!form.pc) return undefined;
-
+  
+  
+  
   return { ...(storedNav ?? {}), pc: withRules(stripHiddenNavItems(form.pc), form.rules) };
 };

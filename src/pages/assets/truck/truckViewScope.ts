@@ -1,3 +1,4 @@
+
 import type { TruckAssetRow } from '@/types';
 
 export type TruckViewScope = {

@@ -1,3 +1,4 @@
+
 import { cMngtConnector } from '@credo/connectors/connector';
 import { transportOrderBundle } from '@/stores/useTransportOrderStore';
 import { featureFlags } from '@/utils/features';
@@ -21,6 +22,8 @@ function partitionReader() {
 }
 
 export async function reconcileTripLogs(order: TransportOrder): Promise<TransportOrder> {
+  
+  
   if (!featureFlags.trucks.enabled) return order;
 
   const plans = planTripLogs(order);
@@ -54,6 +57,8 @@ export async function reconcileTripLogs(order: TransportOrder): Promise<Transpor
     const existing = (await readPartition(op.ref.targetId, op.ref.period)).get(op.ref.logId);
 
     if (op.kind === 'delete') {
+      
+      
       if (!existing) continue;
       await cMngtConnector.deleteOperationLog({
         id: op.ref.logId,
@@ -64,6 +69,8 @@ export async function reconcileTripLogs(order: TransportOrder): Promise<Transpor
       continue;
     }
 
+    
+    
     if (!existing) {
       const { operationLog } = await cMngtConnector.createOperationLog<TripLogExtra>({
         targetId: op.plan.targetId,
@@ -86,13 +93,15 @@ export async function reconcileTripLogs(order: TransportOrder): Promise<Transpor
       period: op.ref.period,
       version: existing.version,
       logDate: op.plan.logDate,
-
+      
+      
       extra: { ...(existing.extra as TripLogExtra), ...op.plan.extra },
     });
     nextRefs.push({
       logId: op.ref.logId,
       targetId: op.ref.targetId,
-
+      
+      
       period: periodOf(op.plan.logDate),
       tripIndex: op.plan.tripIndex,
     });

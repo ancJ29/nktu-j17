@@ -1,3 +1,5 @@
+
+
 import {
   GOODS_RECEIPT_DEFAULT_STATUS_FLOW,
   GOODS_RECEIPT_STAGE_CATALOGUE,
@@ -27,7 +29,7 @@ export type GoodsReceiptsV2Form = {
   codePadLength: number;
   statusFlow: StatusFlowDraft | null;
   defaultListStatuses: string[];
-
+  
   customFields: CustomFieldDef[];
   listColumns: string[];
   hiddenColumns: string[];
@@ -57,7 +59,10 @@ export const readGoodsReceiptsV2 = (config: CredoAppConfig | null): GoodsReceipt
     codePadLength: v2?.codePadLength ?? DEFAULTS.codePadLength,
     statusFlow: readStatusFlowDraft(v2?.statusFlow).draft,
     defaultListStatuses: [...(v2?.defaultListStatuses ?? DEFAULTS.defaultListStatuses)],
-
+    
+    
+    
+    
     customFields: readCustomFieldDrafts(v2?.customFields),
     listColumns: [...(v2?.listColumns ?? [])],
     hiddenColumns: [...(v2?.hiddenColumns ?? [])],
@@ -159,7 +164,8 @@ export const applyGoodsReceiptsV2 = (
   return mergeFeature(storedFeatures, 'goodsReceiptsV2', {
     ...rest,
     statusFlow: statusFlow === null ? undefined : assembleStatusFlow(statusFlow),
-
+    
+    
     customFields: customFields.length > 0 ? customFields.map(assembleCustomField) : undefined,
   });
 };
@@ -172,6 +178,7 @@ const assembleCustomField = (field: CustomFieldDef): CustomFieldDef => ({
   ...((field.viewDepartments ?? []).length > 0 ? { viewDepartments: field.viewDepartments } : {}),
   ...((field.editDepartments ?? []).length > 0 ? { editDepartments: field.editDepartments } : {}),
   ...(field.showInList === true ? { showInList: true } : {}),
-
+  
+  
   ...(field.width !== undefined && field.width !== 'full' ? { width: field.width } : {}),
 });

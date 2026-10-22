@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -86,6 +88,7 @@ export function createSheetWriter(colCount: number) {
     aoa.push([]);
   };
 
+  
   const banner = (text: string): number => {
     const r = aoa.length;
     const row = emptyRow();
@@ -95,6 +98,7 @@ export function createSheetWriter(colCount: number) {
     return r;
   };
 
+  
   const letterhead = (
     seller: CustomerReportInput['seller'],
     customer: CustomerReportInput['customer'],
@@ -111,6 +115,7 @@ export function createSheetWriter(colCount: number) {
     return { rSeller, rTitle, rDear };
   };
 
+  
   const headerBand = () => {
     const rHead1 = aoa.length;
     const rHead2 = rHead1 + 1;
@@ -131,6 +136,7 @@ export function createSheetWriter(colCount: number) {
     return { rHead1, rHead2, leaf, group };
   };
 
+  
   const signatureRow = (customerName: string, sellerName: string) => {
     blankRow();
     const rSign = aoa.length;
@@ -150,12 +156,13 @@ export function createSheetWriter(colCount: number) {
 type StyleSpec = Record<string, unknown>;
 
 export function makeStyler(ws: XLSX.WorkSheet) {
+  
   const setStyle = (r: number, c: number, style: StyleSpec) => {
     const ref = XLSX.utils.encode_cell({ r, c });
     const cell = (ws[ref] ?? (ws[ref] = { t: 's', v: '' })) as StyledCell;
     cell.s = { ...(cell.s ?? {}), ...style };
   };
-
+  
   const setFmt = (r: number, c: number, z: string) => {
     const ref = XLSX.utils.encode_cell({ r, c });
     const cell = ws[ref] as StyledCell | undefined;
@@ -175,6 +182,7 @@ export function makeStyler(ws: XLSX.WorkSheet) {
     setStyle(rDear, 0, { font: { bold: true } });
   };
 
+  
   const styleHeaderBand = (
     rows: ReadonlyArray<number>,
     lastCol: number,

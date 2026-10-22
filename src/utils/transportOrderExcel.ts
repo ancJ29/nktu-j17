@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder } from '@/types';
 import { FMT_MONEY, type StyledCell } from '@/utils/accountingExcelSheet';
@@ -32,22 +34,22 @@ function exportedSpan(
 
 export type TransportOrderExportOptions = {
   language?: string;
-
+  
   companyName?: string;
-
+  
   resolveStatus: (value: string) => string;
-
+  
   resolveShipmentType: (value: string) => string;
   resolveTruckingSize: (value: string) => string;
-
+  
   resolveFeeName: (value: string) => string;
-
+  
   feeNames: ReadonlyArray<string>;
-
+  
   getTruckPlate: (truckId: string | undefined | null) => string | undefined;
-
+  
   resolveCustomer: (code: string) => string | undefined;
-
+  
   includeMoney?: boolean;
 };
 
@@ -102,7 +104,7 @@ export const buildTransportOrderWorkbook = (
     | 'balanceDue'
     | 'cancelled'
     | 'notes';
-
+  
   type Column = {
     key: ColumnKey;
     header: string;
@@ -156,10 +158,17 @@ export const buildTransportOrderWorkbook = (
         notes: 'Notes',
       };
 
+  
+  
   const rowFees = orders.map((o) =>
     includeMoney ? feeAmountsByName(o, resolveFeeName) : undefined,
   );
 
+  
+  
+  
+  
+  
   const feeColumns: FeeColumn[] = [];
   const feeColumnKeys = new Set<string>();
   const addFeeColumn = (header: string, key: string) => {
@@ -171,6 +180,8 @@ export const buildTransportOrderWorkbook = (
     for (const name of feeNames) addFeeColumn(name.trim(), feeKey(name));
     for (const o of orders) {
       for (const fee of readFeeLines(o)) {
+        
+        
         if (!isBillableFee(fee)) continue;
         const label = resolveFeeName(fee.label).trim();
         addFeeColumn(label, feeKey(label));
@@ -193,6 +204,8 @@ export const buildTransportOrderWorkbook = (
     { key: 'contractNo', header: labels.contractNo, width: 16 },
     ...(includeMoney
       ? ([
+          
+          
           ...feeColumns,
           { key: 'subtotal', header: labels.subtotal, width: 14, money: true },
           { key: 'vatAmount', header: labels.vatAmount, width: 12, money: true },
@@ -215,6 +228,8 @@ export const buildTransportOrderWorkbook = (
     const trips = o.isMultiTrip ? (o.trips ?? []) : [];
     const multi = trips.length > 0;
 
+    
+    
     const route = multi
       ? trips.map((tr, i) => `${i + 1}. ${tr.departure} → ${tr.destination}`).join('; ')
       : [o.route?.pickup, o.route?.stuffing, o.route?.dropoff].filter(Boolean).join(' → ');
@@ -230,7 +245,8 @@ export const buildTransportOrderWorkbook = (
 
     const cells: Record<ColumnKey, string | number> = {
       orderNumber: o.orderNumber,
-
+      
+      
       date: formatDate(orderPlanDate(o)),
       shipmentType: o.shipmentType ? resolveShipmentType(o.shipmentType) : '',
       containerNumber: o.containerNumber ?? '',
@@ -252,12 +268,19 @@ export const buildTransportOrderWorkbook = (
       cancelled: o.extra?.cancellation ? yes : no,
       notes: o.notes ?? '',
     };
-
+    
+    
+    
     return columns.map((c) => (c.fee ? (fees?.get(c.fee) ?? '') : cells[c.key as ColumnKey]));
   });
 
   const headerRow = columns.map((c) => c.header);
 
+  
+  
+  
+  
+  
   type BannerLine = { text: string; style: Record<string, unknown> };
   const TITLE_STYLE = { font: { bold: true, sz: 16 }, alignment: { horizontal: 'center' } };
   const SUB_STYLE = {
@@ -286,14 +309,15 @@ export const buildTransportOrderWorkbook = (
       style: SUB_STYLE,
     });
   }
-
+  
+  
   banner.push({
     text: isVietnamese
       ? `Tổng: ${orders.length} đơn · Xuất lúc ${formatDateTime(Date.now())}`
       : `Total: ${orders.length} orders · Exported ${formatDateTime(Date.now())}`,
     style: META_STYLE,
   });
-
+  
   banner.push({ text: '', style: {} });
 
   const R_HEADER = banner.length;
@@ -303,9 +327,15 @@ export const buildTransportOrderWorkbook = (
   const worksheet = XLSX.utils.aoa_to_sheet([...bannerRows, headerRow, ...dataRows]);
   worksheet['!cols'] = columns.map((c) => ({ width: c.width }));
 
+  
+  
+  
+  
   const lastCol = columns.length - 1;
   const lastRow = R_HEADER + dataRows.length;
 
+  
+  
   worksheet['!merges'] = banner.map((_, r) => ({ s: { r, c: 0 }, e: { r, c: lastCol } }));
 
   const styleOf = (r: number, c: number, style: Record<string, unknown>) => {
@@ -315,8 +345,12 @@ export const buildTransportOrderWorkbook = (
     return cell;
   };
 
+  
   banner.forEach((line, r) => styleOf(r, 0, line.style));
 
+  
+  
+  
   worksheet['!rows'] = [...Array(R_HEADER).fill({}), { hpt: 30 }];
   for (let c = 0; c <= lastCol; c++) {
     styleOf(R_HEADER, c, {
@@ -327,6 +361,8 @@ export const buildTransportOrderWorkbook = (
     });
   }
 
+  
+  
   for (let i = 0; i < dataRows.length; i++) {
     const r = R_FIRST_DATA + i;
     for (let c = 0; c <= lastCol; c++) {
@@ -334,6 +370,10 @@ export const buildTransportOrderWorkbook = (
     }
   }
 
+  
+  
+  
+  
   for (const [c, col] of columns.entries()) {
     if (!col.money) continue;
     for (let i = 0; i < dataRows.length; i++) {
@@ -345,6 +385,11 @@ export const buildTransportOrderWorkbook = (
     }
   }
 
+  
+  
+  
+  
+  
   worksheet['!autofilter'] = {
     ref: XLSX.utils.encode_range({ s: { r: R_HEADER, c: 0 }, e: { r: lastRow, c: lastCol } }),
   };
@@ -361,6 +406,8 @@ export const exportTransportOrdersToExcel = (
 ): void => {
   const workbook = buildTransportOrderWorkbook(orders, options);
 
+  
+  
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, '0');

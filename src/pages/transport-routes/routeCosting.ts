@@ -1,31 +1,34 @@
+
 import type { TransportRouteRow } from '@/types';
 import { routeLaborTotal } from './routeSummary';
 
 export type RouteCostingGap = 'norm' | 'price';
 
 export type RouteCostingInputs = {
+  
   litersPer100km?: number | undefined;
-
+  
   fuelPricePerLiter?: number | undefined;
 };
 
 export type RouteCosting = {
+  
   distanceKm: number;
-
+  
   liters: number;
-
+  
   fuelCost: number;
-
+  
   laborTotal: number;
-
+  
   itemsTotal: number;
-
+  
   costPrice: number;
-
+  
   markupPercent: number;
-
+  
   suggestedPrice: number;
-
+  
   missing: RouteCostingGap[];
 };
 
@@ -51,9 +54,10 @@ export function computeRouteCosting(
   const price = inputs.fuelPricePerLiter ?? 0;
 
   const missing: RouteCostingGap[] = [];
-
+  
+  
   if (distanceKm > 0 && !norm) missing.push('norm');
-
+  
   if (distanceKm > 0 && norm > 0 && !price) missing.push('price');
 
   const liters = (distanceKm / 100) * norm;

@@ -100,7 +100,9 @@ export function CropDiaryTemplateListPage() {
             searchPlaceholder={t('cropDiaryTemplates.searchPlaceholder')}
             hideStatus
             onClear={clearFilters}
-
+            
+            
+            
             labelChips
           />
         ) : (

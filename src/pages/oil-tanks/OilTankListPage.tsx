@@ -71,6 +71,11 @@ export function OilTankListPage() {
       onPageChange,
     });
 
+  
+  
+  
+  
+  
   const hasActiveFilters = !!search || filter !== FILTER_DEFAULTS.status;
 
   useEffect(() => {

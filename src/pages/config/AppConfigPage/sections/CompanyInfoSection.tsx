@@ -28,6 +28,9 @@ export const CompanyInfoSection = memo(function CompanyInfoSection({
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
       onChange(value.map((c, i) => (i === index ? { ...c, [key]: e.currentTarget.value } : c)));
 
+  
+  
+  
   const add = () => onChange([...value, ...DEFAULT_COMPANY_INFOS]);
   const remove = (index: number) => onChange(value.filter((_, i) => i !== index));
   const makeDefault = (index: number) =>

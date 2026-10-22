@@ -1,3 +1,5 @@
+
+
 import { appConfig } from '@/config';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -53,9 +55,16 @@ export function DebugPage() {
   };
 
   const resolvedEmail = user?.email;
-
+  
+  
+  
   const matchedEmployee = useMyEmployee() ?? null;
 
+  
+  
+  
+  
+  
   const emailMatch = useMemo(() => {
     if (!resolvedEmail || !employeesLoaded) return null;
     return findEmployeeByLoginEmail(employees, resolvedEmail) ?? null;

@@ -74,11 +74,16 @@ export function MaterialListPage() {
     forceRefresh,
   } = useMaterialStore();
 
+  
+  
   const invRows = useMaterialInventoryStore((s) => s.items);
   const invInitialized = useMaterialInventoryStore((s) => s.initialized);
   const loadInventory = useMaterialInventoryStore((s) => s.loadAll);
   const forceRefreshInventory = useMaterialInventoryStore((s) => s.forceRefresh);
 
+  
+  
+  
   const invByCode = useMemo(() => {
     const map = new Map<string, MaterialInventoryRow>();
     if (canManageInventory)
@@ -93,7 +98,8 @@ export function MaterialListPage() {
   } = useCachedListFilters('cmngt:material-list-filters', FILTER_DEFAULTS);
   const filter = filterState.status;
   const categoryFilter = filterState.category;
-
+  
+  
   const stockFilter = filterState.stock;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
   const setCategoryFilter = useCallback(
@@ -107,6 +113,9 @@ export function MaterialListPage() {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
+  
+  
+  
   const categoryLookups = useLookupV2Options(MATERIAL_CATEGORY_LOOKUP);
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
@@ -121,7 +130,8 @@ export function MaterialListPage() {
         if (f.status === 'active' && !item.isActive) return false;
         if (f.status === 'inactive' && item.isActive) return false;
         if (f.category && item.extra?.category !== f.category) return false;
-
+        
+        
         if (canManageInventory && f.stock) {
           const onHand = invByCode.get(item.code)?.onHand ?? 0;
           if (f.stock === 'inStock' && onHand <= 0) return false;
@@ -138,9 +148,17 @@ export function MaterialListPage() {
       onPageChange,
     });
 
+  
+  
+  
+  
+  
+  
   const selection = useSelectionMode();
   const { selectionMode, selectedKeys, count: selectedCount, toggle: toggleRow } = selection;
 
+  
+  
   const pageCodes = useMemo(() => paginated.map((m) => m.code), [paginated]);
   const { allSelected: allPageSelected, someSelected: somePageSelected } =
     selection.headerState(pageCodes);
@@ -149,6 +167,10 @@ export function MaterialListPage() {
     [selection, pageCodes],
   );
 
+  
+  
+  
+  
   const startWarehouseDoc = useCallback(
     (route: string, codes: string[]) => {
       if (codes.length === 0) return;
@@ -171,6 +193,8 @@ export function MaterialListPage() {
     return { totalCount: allMaterials.length, inactiveCount: inactive };
   }, [allMaterials]);
 
+  
+  
   const { trackedCount, negativeCount } = useMemo(() => {
     if (!canManageInventory) return { trackedCount: 0, negativeCount: 0 };
     let tracked = 0;
@@ -183,6 +207,8 @@ export function MaterialListPage() {
     return { trackedCount: tracked, negativeCount: negative };
   }, [invRows]);
 
+  
+  
   const lowStockCount = useMemo(() => {
     if (!lowStockEnabled) return 0;
     let low = 0;
@@ -211,11 +237,15 @@ export function MaterialListPage() {
     }
   }, [error, t]);
 
+  
+  
   const handleForceRefresh = useCallback(() => {
     forceRefresh();
     if (canManageInventory) forceRefreshInventory();
   }, [forceRefresh, forceRefreshInventory]);
 
+  
+  
   const stockOptions = useMemo(
     () => [
       { value: 'inStock', label: t('materials.filterStockInStock') },
@@ -265,6 +295,9 @@ export function MaterialListPage() {
     ],
   );
 
+  
+  
+  
   const mobileFilters: MobileFilterDef[] = useMemo(
     () => [
       ...(categoryOptions.length > 0
@@ -384,7 +417,9 @@ export function MaterialListPage() {
             }}
             filters={mobileFilters.length > 0 ? mobileFilters : undefined}
             onClear={clearFilters}
-
+            
+            
+            
             labelChips
           />
         ) : (

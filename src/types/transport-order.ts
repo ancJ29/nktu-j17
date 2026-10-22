@@ -1,3 +1,4 @@
+
 import type { DateTimeInput } from '@credo/kits/types';
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 
@@ -6,37 +7,39 @@ export type TransportOrderTruckingSize = string;
 export type TransportOrderShipmentType = string;
 
 export type TransportOrderRoute = {
+  
   pickup: string;
-
+  
   pickupAt?: DateTimeInput;
-
+  
   stuffing: string;
-
+  
   stuffingAt?: DateTimeInput;
-
+  
   dropoff: string;
-
+  
   dropoffAt?: DateTimeInput;
 };
 
 export type TransportOrderTrip = {
+  
   departure: string;
-
+  
   destination: string;
-
+  
   date: DateTimeInput;
-
+  
   loadingAt?: DateTimeInput;
   unloadingAt?: DateTimeInput;
-
+  
   truckId: string;
-
+  
   truckPlate: string;
-
+  
   driverId: string;
-
+  
   driverName: string;
-
+  
   laborCost: number;
 };
 
@@ -45,25 +48,27 @@ export type TransportOrderFeeKind = 'service' | 'passthrough';
 export type TransportOrderFeePayer = 'company' | 'customer';
 
 export type TransportOrderFee = {
+  
   label: string;
-
+  
   amount: number;
-
+  
   vatable: boolean;
   kind: TransportOrderFeeKind;
-
+  
   payer?: TransportOrderFeePayer;
-
+  
   invoiceNo: string;
-
+  
   memo?: string;
 };
 
 export type TransportOrderDisbursement = {
+  
   name: string;
-
+  
   amount: number;
-
+  
   invoiceNo: string;
 };
 
@@ -88,7 +93,7 @@ export type TransportOrderTripLogRef = {
   logId: string;
   targetId: string;
   period: string;
-
+  
   tripIndex: number;
 };
 
@@ -98,19 +103,20 @@ export type TransportOrderTripLogSync = {
 };
 
 export type TransportOrderExtra = {
+  
   isDeleted?: boolean;
   cancellation?: TransportOrderCancellation;
   createdBy?: string;
   activityLog?: TransportOrderActivityEntry[];
-
+  
   tripLogSync?: TransportOrderTripLogSync;
-
+  
   truckType?: string;
-
+  
   customerOrderNumber?: string;
-
+  
   type5Specific?: TransportOrderType5Specific;
-
+  
   multiDrop?: TransportOrderMultiDrop;
   [key: string]: unknown;
 };
@@ -118,81 +124,84 @@ export type TransportOrderExtra = {
 export type TransportOrderDropStop = {
   province: string;
   ward: string;
-
+  
   at?: string;
-
+  
   distanceKm: number;
 };
 
 export type TransportOrderMultiDrop = {
+  
   pickupLocation: string;
-
+  
   pickupAt?: string;
-
+  
   from?: string;
-
+  
   stops: TransportOrderDropStop[];
-
+  
   totalDays: number;
-
+  
   goods?: string;
 };
 
 export type TransportOrderType5Specific = {
+  
   requestedPickupDate?: string;
   dropoffDate?: string;
-
+  
   moocStorageDays?: number;
 };
 
 export type TransportOrder = PartitionedRecordRow & {
+  
   orderNumber: string;
-
+  
   isMultiTrip?: boolean;
-
+  
   trips?: TransportOrderTrip[];
-
+  
   entryDate: DateTimeInput;
-
+  
   truckId: string;
-
+  
   truckPlate: string;
-
+  
   driverId: string;
-
+  
   driverName: string;
-
+  
   billNumber: string;
-
+  
   declarationNumber?: string;
-
+  
   containerNumber: string;
-
+  
   truckingSize?: TransportOrderTruckingSize;
-
+  
   containerSize?: string;
   shipmentType: TransportOrderShipmentType;
   route: TransportOrderRoute;
-
+  
   fees: TransportOrderFee[];
-
+  
   disbursements?: TransportOrderDisbursement[];
-
+  
   advanceAmount?: number;
-
+  
   laborCost?: number;
-
+  
   vatRate: number;
-
+  
   roundDown?: boolean;
-
+  
   transportContractNo: string;
-
+  
   customerCode?: string;
   customerName?: string;
-
+  
   status: string;
-
+  
   totalAmount: number;
   notes: string;
   extra: TransportOrderExtra;

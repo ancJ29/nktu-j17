@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -89,7 +91,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
     seller,
     customer,
     resolveShipmentType,
-
+    
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -99,6 +101,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
   const columnOf = serviceColumnReader(resolveFeeName);
   const truckLabel = truckLabeler(getTruckPlate);
 
+  
   const chiHoLines = (o: TransportOrder): TransportOrderFee[] =>
     readFeeLines(o)
       .filter((f) => f.kind === 'passthrough' && isBillableFee(f) && (f.amount || 0) !== 0)
@@ -111,6 +114,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
   const vatHeader =
     uniformRate && uniformRate > 0 ? `VAT ${Number((uniformRate * 100).toFixed(2))}%` : 'VAT';
 
+  
   const C_STT = 0;
   const C_DATE = 1;
   const C_TRUCK = 2;
@@ -141,6 +145,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
   const sheet = createSheetWriter(colCount);
   const { aoa, merges, blankRow, banner } = sheet;
 
+  
   const rSeller = banner(seller.name);
   banner(seller.address);
   banner(`MST: ${seller.taxCode}`);
@@ -151,6 +156,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
   banner(`MST: ${customer.taxCode ?? ''}`);
   blankRow();
 
+  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
@@ -170,6 +176,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
     Array.from({ length: groups }, () => [...CHI_HO_GROUP_HEADERS]).flat(),
   );
 
+  
   const sums = new Map<number, number>();
   const sizeCounts = SIZE_BUCKETS.map(() => 0);
 
@@ -196,6 +203,8 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
+    
+    
     const feeSums = new Map<number, number>();
     for (const fee of readFeeLines(o)) {
       if (fee.kind !== 'service') continue;
@@ -219,6 +228,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
   });
   const rLastData = aoa.length - 1;
 
+  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -231,6 +241,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
     merges.push({ s: { r: rTotalRow, c: C_STT }, e: { r: rTotalRow, c: C_CONT } });
   }
 
+  
   blankRow();
   const C_SUMMARY_LABEL = C_VAT - 1;
   const C_NOTE_VALUE = C_TRUCK;
@@ -270,6 +281,7 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
 
   const signature = sheet.signatureRow(customer.name, seller.name);
 
+  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -307,6 +319,8 @@ export const buildCustomerReportType9: CustomerReportBuilder = (
 
   for (const r of introRows) setStyle(r, C_DATE, { font: { bold: true, italic: true } });
 
+  
+  
   const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
   const formulas = [
     ref(rTotalRow, C_TOTAL),

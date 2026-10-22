@@ -1,8 +1,10 @@
+
+
 import type { CredoAppConfig } from '../schema';
 
 export type AppIdentityForm = {
   name: string;
-
+  
   nameHtml: string;
   description: string;
 };

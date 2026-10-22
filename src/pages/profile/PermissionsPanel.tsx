@@ -27,10 +27,11 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type PermissionsPanelProps = {
+  
   permissions?: PartialPermissions;
-
+  
   resolvedBase?: Permissions;
-
+  
   onSave?: (perms: PartialPermissions) => Promise<void> | void;
 };
 
@@ -38,34 +39,47 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
   const { t } = useTranslation();
   const editable = !!onSave;
 
+  
   const cleanedPermissions = useMemo(
     () => (editable ? stripRedundant(permissions ?? {}, resolvedBase) : {}),
-
+    
+    
     [permissions, resolvedBase],
   );
 
+  
   const [draft, setDraft] = useState<PartialPermissions>(cleanedPermissions);
   const [saving, setSaving] = useState(false);
 
+  
   useEffect(() => {
+    
     if (editable) setDraft(cleanedPermissions);
   }, [cleanedPermissions, editable]);
 
+  
   const isDirty = editable && JSON.stringify(draft) !== JSON.stringify(cleanedPermissions);
 
+  
+  
   const displayPerms: Permissions = editable
     ? deepMergePermissions(resolvedBase ?? BASE_PERMISSIONS, draft)
     : getEffectivePermissions();
 
+  
+  
   const clientResolved = useMemo(
     () => deepMergePermissions(BASE_PERMISSIONS, appConfig.permissions),
     [],
   );
   const moduleKeys = Object.keys(displayPerms).filter((key) => hasAnyGranted(clientResolved[key]));
 
+  
+  
+  
   const defaultOpenModules = useMemo(
     () => moduleKeys.filter((key) => moduleHasSubPerms(displayPerms[key])),
-
+    
     [],
   );
 
@@ -107,6 +121,7 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
     [editable, resolvedBase],
   );
 
+  
   const handleSetAllForModule = useCallback(
     (moduleKey: string, value: boolean) => {
       if (!editable) return;
@@ -187,14 +202,25 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
         {moduleKeys.map((moduleKey) => {
           const mod = displayPerms[moduleKey];
           const enabledCount = CRUD_KEYS.filter((k) => mod[k]).length;
-
+          
+          
           const moduleCustom = editable && isModuleCustom(draft, moduleKey);
-
+          
+          
+          
           const hasSubPerms = moduleHasSubPerms(mod);
 
           return (
             <Accordion.Item key={moduleKey} value={moduleKey}>
               <Accordion.Control
+                
+                
+                
+                
+                
+                
+                
+                
                 disabled={!hasSubPerms && !editable}
                 chevron={hasSubPerms ? undefined : null}
                 style={!hasSubPerms ? { opacity: 1, cursor: 'default' } : undefined}
@@ -267,6 +293,7 @@ export function PermissionsPanel({ permissions, resolvedBase, onSave }: Permissi
                     style={{ cursor: editable ? 'default' : undefined }}
                   >
                     {CRUD_KEYS.map((key) => {
+                      
                       const crudCustom = editable && isCrudCustom(draft, moduleKey, key);
                       return (
                         <Box key={key} w={44} ta="center" pos="relative">
@@ -344,12 +371,14 @@ function stripRedundant(overlay: PartialPermissions, base?: Permissions): Partia
 
     const cleaned: PartialPermissions[string] = {};
 
+    
     for (const key of CRUD_KEYS) {
       if (mod[key] !== undefined && mod[key] !== baseMod[key]) {
         (cleaned as Record<string, unknown>)[key] = mod[key];
       }
     }
 
+    
     if (mod.actions) {
       const cleanedActions: Record<string, boolean> = {};
       for (const [k, v] of Object.entries(mod.actions)) {
@@ -360,6 +389,7 @@ function stripRedundant(overlay: PartialPermissions, base?: Permissions): Partia
       if (Object.keys(cleanedActions).length > 0) cleaned.actions = cleanedActions;
     }
 
+    
     if (mod.query) {
       const cleanedQuery: Record<string, boolean> = {};
       for (const [k, v] of Object.entries(mod.query)) {
@@ -370,6 +400,7 @@ function stripRedundant(overlay: PartialPermissions, base?: Permissions): Partia
       if (Object.keys(cleanedQuery).length > 0) cleaned.query = cleanedQuery;
     }
 
+    
     const hasCrud = CRUD_KEYS.some((k) => (cleaned as Record<string, unknown>)[k] !== undefined);
     if (hasCrud || cleaned.actions || cleaned.query) {
       result[moduleKey] = cleaned;
@@ -381,7 +412,7 @@ function stripRedundant(overlay: PartialPermissions, base?: Permissions): Partia
 
 function isModuleCustom(overlay: PartialPermissions, moduleKey: string): boolean {
   const mod = overlay[moduleKey];
-
+  
   return !!mod && Object.keys(mod).length > 0;
 }
 
@@ -441,7 +472,7 @@ function SubPermissions({
   mod: ModulePermissions;
   moduleKey: string;
   editable: boolean;
-
+  
   overlay?: PartialPermissions;
   onToggle: (module: string, group: 'actions' | 'query', key: string, checked: boolean) => void;
 }) {
@@ -499,7 +530,7 @@ function SubGroup({
   moduleKey: string;
   group: 'actions' | 'query';
   editable: boolean;
-
+  
   overlay?: PartialPermissions;
   onToggle: (module: string, group: 'actions' | 'query', key: string, checked: boolean) => void;
 }) {
@@ -512,6 +543,7 @@ function SubGroup({
       </Text>
       <Group gap="xs" wrap="wrap">
         {Object.entries(entries).map(([key, value]) => {
+          
           const custom = !!overlay && isSubCustom(overlay, moduleKey, group, key);
           return (
             <Tooltip

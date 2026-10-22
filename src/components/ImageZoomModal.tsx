@@ -33,6 +33,8 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const imageRef = useRef<HTMLDivElement>(null);
 
+  
+  
   useEffect(() => {
     if (!opened) {
       setScale(1);
@@ -41,7 +43,9 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
       setIsDragging(false);
     }
   }, [opened]);
+  
 
+  
   useEffect(() => {
     if (isMobileDevice) return;
 
@@ -56,6 +60,7 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
     return () => window.removeEventListener('wheel', handleWheel);
   }, [opened]);
 
+  
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!isMobileDevice && scale > 1) {
       setIsDragging(true);
@@ -73,6 +78,7 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
     if (!isMobileDevice) setIsDragging(false);
   };
 
+  
   const handleTouchStart = (e: React.TouchEvent) => {
     if (isMobileDevice && scale > 1 && e.touches.length === 1) {
       e.preventDefault();
@@ -124,7 +130,10 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
       styles={{
         body: {
           display: 'flex',
-
+          
+          
+          
+          
           flexDirection: 'column',
           backgroundColor: 'rgba(0, 0, 0, 0.95)',
           padding: 0,
@@ -132,7 +141,10 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
         },
         content: {
           backgroundColor: 'transparent',
-
+          
+          
+          
+          
           width: 'fit-content',
           minWidth: 'min(360px, 95vw)',
           maxHeight: '95vh',
@@ -220,6 +232,8 @@ export function ImageZoomModal({ opened, onClose, imageUrl }: ImageZoomModalProp
             fit="contain"
             onClick={scale === 1 ? onClose : undefined}
             style={{
+              
+              
               maxHeight: `calc(90vh - ${CONTROL_BAR_HEIGHT}px)`,
               maxWidth: '90vw',
               width: 'auto',

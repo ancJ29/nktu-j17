@@ -1,3 +1,4 @@
+
 import type { TransportOrder, TransportRouteRow } from '@/types';
 
 export const PLACE_SUGGESTION_LIMIT = 12;
@@ -51,7 +52,7 @@ export function collectTransportPlaces(
       entry.count += 1;
       const labelCount = (entry.labelCounts.get(label) ?? 0) + 1;
       entry.labelCounts.set(label, labelCount);
-
+      
       if (labelCount > (entry.labelCounts.get(entry.label) ?? 0)) entry.label = label;
       seen.set(key, entry);
     }

@@ -17,6 +17,9 @@ export function MobileScrollPillTabs({ tabs, value, onChange }: Props) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<Record<string, HTMLButtonElement | null>>({});
 
+  
+  
+  
   useEffect(() => {
     const el = itemRefs.current[value];
     if (!el) return;

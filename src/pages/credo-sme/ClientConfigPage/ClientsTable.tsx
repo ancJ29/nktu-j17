@@ -1,3 +1,5 @@
+
+
 import {
   ActionIcon,
   Alert,
@@ -25,6 +27,7 @@ export function ClientsTable({
   onConfigure,
   onDelete,
 }: {
+  
   clients: CredoSmeClientConfig[] | null;
   loading: boolean;
   loadError: string | null;

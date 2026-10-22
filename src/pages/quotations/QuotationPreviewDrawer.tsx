@@ -1,3 +1,5 @@
+
+
 import {
   Anchor,
   Badge,
@@ -23,9 +25,10 @@ import { quotationBadgeProps, quotationListDate, type Quotation } from './types'
 const isMobile = device.isMobile;
 
 type QuotationPreviewDrawerProps = {
+  
   readonly quotation: Quotation | null;
   readonly onClose: () => void;
-
+  
   readonly customerName: string | undefined;
 };
 

@@ -8,7 +8,9 @@ type FlatUpdateBody = { version: string; expectedListHash?: string } & Record<st
 type FlatCreateBody = { expectedListHash?: string } & Record<string, unknown>;
 
 export const useLookupV2Store = createEntityStore<LookupV2Row, FlatUpdateBody, FlatCreateBody>({
-  cacheKey: 'lkpv2.6a8be4',
+  
+  
+  cacheKey: 'lkpv2.6a8be4', 
   cacheTTL: 10 * ONE_MINUTE,
 
   fetchAll: (hash) =>

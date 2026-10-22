@@ -8,13 +8,14 @@ export interface CreateEmployeeInput<TExtra = Record<string, unknown>> {
   position?: string;
   department?: string;
   extra?: TExtra;
-
+  
   expectedListHash?: string;
 }
 
 export interface UpdateEmployeeInput<TExtra = Record<string, unknown>> {
+  
   version?: string;
-
+  
   expectedListHash?: string;
   name?: string;
   code?: string;

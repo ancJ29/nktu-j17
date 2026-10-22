@@ -79,10 +79,11 @@ const adminApi = createApiGroup({
 
 export const cSsoConnector = {
   useLocal: () => cSsoConnector.setBaseUrl(`http://localhost:${PORTS.CREDO_SSO}/dev`),
-
+  
   setTarget: (target: string) => {
     storages.target = target;
-
+    
+    
     registerStagePrefix(storages.baseUrl, target);
     return cSsoConnector;
   },
@@ -99,7 +100,7 @@ export const cSsoConnector = {
     }
     return cSsoConnector;
   },
-
+  
   removeAccessKey: () => {
     storages.accessKey = '';
     return cSsoConnector;
@@ -110,6 +111,10 @@ export const cSsoConnector = {
     }
     return cSsoConnector;
   },
+
+  
+  
+  
 
   login: ({
     serviceCode,
@@ -146,7 +151,12 @@ export const cSsoConnector = {
       body: { serviceCode, token },
     }),
 
+  
   getPublicKey: () => ssoApi<GetPublicKeyResponse>(SSO_ROUTES.GET_PUBLIC_KEY),
+
+  
+  
+  
 
   addService: ({ serviceCode, name, description, operatorAccessKey }: AddServiceRequest) =>
     adminApi<AddServiceResponse>(ADMIN_ROUTES.ADD_SERVICE, {
@@ -171,6 +181,10 @@ export const cSsoConnector = {
         allowResetPassword,
       },
     }),
+
+  
+  
+  
 
   operatorAddUser: (
     operatorAccessKey: string,

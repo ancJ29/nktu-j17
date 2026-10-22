@@ -55,7 +55,8 @@ export function sheetHeader(plan: CropProcessPlan, crop?: Partial<CropSheetExtra
     ...((crop?.adjustmentRate ?? plan.referenceAdjustmentRate) !== undefined && {
       adjustmentRate: crop?.adjustmentRate ?? plan.referenceAdjustmentRate,
     }),
-
+    
+    
     memos: crop?.memos ?? plan.memos ?? [],
   };
 }
@@ -91,6 +92,8 @@ export function resizeSheetDays(days: SheetDay[], total: number): SheetDay[] {
 function cleanValues(values: SheetDayValues, knownKeys?: Set<string>): SheetDayValues {
   const out: SheetDayValues = {};
   for (const key of Object.keys(values)) {
+    
+    
     if (knownKeys && !knownKeys.has(key)) continue;
     const value = values[key];
     if (typeof value === 'number') {
@@ -168,7 +171,9 @@ export function cleanPreparation(preparation: PlanPreparation[]): PlanPreparatio
       dayOffset: Math.trunc(p.dayOffset),
       activity: p.activity.trim(),
       ...(p.label?.trim() && { label: p.label.trim() }),
-
+      
+      
+      
       ...(p.kind === 'material' && { kind: p.kind }),
     }))
     .filter((p) => p.activity)
@@ -184,7 +189,8 @@ export function cleanPlan(plan: CropProcessPlan): CropProcessPlan {
     stages: cleanStages(plan.stages, totalDays),
     totalDays,
     days: resizeSheetDays(plan.days, totalDays).map((d) => cleanDay(d, known)),
-
+    
+    
     ...(plan.referencePlantCount &&
       plan.referencePlantCount > 0 && { referencePlantCount: plan.referencePlantCount }),
     ...(plan.referenceAdjustmentRate &&
@@ -192,7 +198,10 @@ export function cleanPlan(plan: CropProcessPlan): CropProcessPlan {
         referenceAdjustmentRate: plan.referenceAdjustmentRate,
       }),
     ...(plan.preparation?.length && { preparation: cleanPreparation(plan.preparation) }),
-
+    
+    
+    
+    
     ...(plan.target?.trim() && { target: plan.target.trim() }),
     ...(plan.referenceSeedCount &&
       plan.referenceSeedCount > 0 && { referenceSeedCount: plan.referenceSeedCount }),
@@ -214,7 +223,8 @@ export function makeCropSheetExtra(
     days: cleaned.days.map((d) => ({
       day: d.day,
       values: { ...d.values },
-
+      
+      
       ...(d.materials && { materials: { ...d.materials } }),
     })),
     ...(opts?.templateCode?.trim() && { templateCode: opts.templateCode.trim() }),
@@ -223,7 +233,7 @@ export function makeCropSheetExtra(
 
 export type SheetCropContext = {
   plantCount?: number;
-
+  
   adjustmentRate?: number;
 };
 
@@ -252,6 +262,10 @@ export function columnScale(
   const count =
     typeof crop?.plantCount === 'number' && crop.plantCount > 0 ? crop.plantCount : undefined;
 
+  
+  
+  
+  
   const referenceRate = positive(plan.referenceAdjustmentRate) ?? 1;
   const rate = positive(crop?.adjustmentRate) ?? referenceRate;
   const intensity = rate / referenceRate;
@@ -267,21 +281,21 @@ function positive(value: number | undefined): number | undefined {
 
 export type SheetCell = {
   column: SheetColumn;
-
+  
   value?: number | string;
-
+  
   planned?: number | string;
-
+  
   changed: boolean;
-
+  
   scale?: number;
-
+  
   materials?: MaterialLine[];
 };
 
 export type SheetRow = {
   day: number;
-
+  
   date?: string;
   stage?: string;
   cells: SheetCell[];
@@ -383,20 +397,21 @@ export function cellInputToStored(text: string, cell: Pick<SheetCell, 'column' |
 
 export type SheetDayLine = {
   column: SheetColumn;
-
+  
   scale?: number;
-
+  
   unit?: string;
-
+  
   value?: number | string;
-
+  
   planned?: number | string;
   changed: boolean;
-
+  
   materials?: MaterialLine[];
 };
 
 export type SheetDayGroup = {
+  
   name?: string;
   lines: SheetDayLine[];
 };
@@ -405,18 +420,18 @@ export type SheetDayView = {
   day: number;
   totalDays: number;
   date?: string;
-
+  
   weekday?: string;
   stage?: string;
-
+  
   doses: SheetDayGroup[];
-
+  
   activities: SheetDayLine[];
-
+  
   notes: SheetDayLine[];
-
+  
   changed: boolean;
-
+  
   empty: boolean;
 };
 
@@ -461,25 +476,26 @@ export function sheetDayView(
     activities,
     notes,
     changed: row.cells.some((c) => c.changed),
-
+    
     empty: !row.cells.some((c) => hasValue(c.value) || c.materials?.length),
   };
 }
 
 export type SheetColumnTotal = {
+  
   columnKey: string;
   kind: 'ratio' | 'activity';
   label: string;
   unit?: string;
-
+  
   materialCode?: string;
-
+  
   group?: string;
-
+  
   quantity: number;
-
+  
   total?: number;
-
+  
   dayCount: number;
 };
 
@@ -502,7 +518,8 @@ export function seasonTotals(extra: CropSheetExtra, opts?: SheetCropContext): Sh
       }
       if (!dayCount) continue;
       const scale = columnScale(column, extra.plan, crop);
-
+      
+      
       const materialCode = columnMaterialCode(column, extra);
       const unit = columnUnit(column, extra);
       out.push({
@@ -520,9 +537,16 @@ export function seasonTotals(extra: CropSheetExtra, opts?: SheetCropContext): Sh
     }
 
     if (column.kind === 'activity') {
+      
+      
+      
+      
       const buckets = new Map<string, { unit?: string; quantity: number; dayCount: number }>();
       for (const day of extra.days) {
         for (const line of day.materials?.[column.key] ?? []) {
+          
+          
+          
           if (!line.materialCode.trim()) continue;
           const id = `${line.materialCode}\u0000${line.unit ?? ''}`;
           const bucket = buckets.get(id) ?? {
@@ -588,14 +612,15 @@ export function resetDayToPlan(extra: CropSheetExtra, day: number): SheetDay[] {
 }
 
 export type SheetCostLine = SheetColumnTotal & {
+  
   cost?: number;
 };
 
 export type SheetCost = {
   lines: SheetCostLine[];
-
+  
   total: number;
-
+  
   unpriced: string[];
 };
 

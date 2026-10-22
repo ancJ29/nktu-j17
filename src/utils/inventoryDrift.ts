@@ -1,3 +1,5 @@
+
+
 import type { ProductInventoryExtra, ProductInventoryRow } from '@/types/product-inventory';
 
 export const RECHECK_COUNTER_THRESHOLD = 50;
@@ -8,8 +10,9 @@ const RECHECK_INTERVAL_MS = RECHECK_INTERVAL_DAYS * 24 * 60 * 60 * 1000;
 const DRIFT_TRACKING_SINCE = Date.parse('2026-09-16T00:00:00+07:00');
 
 export type InventoryDrift = {
+  
   readonly counter: number;
-
+  
   readonly diff: number;
 };
 
@@ -45,6 +48,9 @@ export function accrueInventoryDrift<P extends DriftPatch>(
   const delta = patch.onHand - prev.onHand;
   if (delta === 0) return patch;
 
+  
+  
+  
   const base = patch.extra ?? prev.extra ?? {};
   if (base.lastInventoryUpdate !== prev.extra?.lastInventoryUpdate) return patch;
 

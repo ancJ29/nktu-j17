@@ -1,25 +1,29 @@
+
+
 import type { SalesOrderV2 } from '@/types/sales-order-v2';
 import { filterRevenueOrders, type RevenueScope } from './buildRevenueReport';
 
 export interface ProductSalesEntry {
+  
   key: string;
-
+  
   name: string;
   code: string;
   unit?: string;
-
+  
   quantity: number;
-
+  
   revenue: number;
   pricedLines: number;
   unpricedLines: number;
-
+  
   orders: number;
 }
 
 export interface ProductSalesReport {
+  
   entries: ProductSalesEntry[];
-
+  
   totals: { revenue: number; orders: number };
   unknownStatusOrders: number;
 }

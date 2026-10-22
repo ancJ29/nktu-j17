@@ -1,3 +1,5 @@
+
+
 import { Grid, Group, Stack, Text } from '@mantine/core';
 import { ColorBadge } from '@credo/base-ui/components';
 import { IconInfoCircle, IconListDetails } from '@tabler/icons-react';

@@ -104,6 +104,8 @@ function serverMessage(err: unknown): string | undefined {
 }
 
 function cloneFormValues(values: LogFormValues): LogFormValues {
+  
+  
   return Object.fromEntries(
     Object.entries(values).map(([k, v]) => [
       k,
@@ -116,28 +118,32 @@ type Props = {
   readonly targetId: string;
   readonly targetCode: string;
   readonly config: OperationLogConfig;
-
+  
   readonly perms: OperationLogPerms;
-
+  
   readonly context?: OperationLogContext;
 };
 
 export function OperationLogSection({ targetId, targetCode, config, perms, context }: Props) {
   const { canView, canCreate, canEdit, canDelete } = perms;
   const { t, i18n } = useTranslation();
-
+  
+  
   const tr = useCallback<TFn>((key, options) => t(key as never, options), [t]);
 
   const [logs, setLogs] = useState<OperationLog[]>([]);
   const [loading, setLoading] = useState(true);
   const [year, setYear] = useState(CURRENT_YEAR);
-
+  
+  
   const [month, setMonth] = useState<string>('all');
-
+  
+  
   const [bucket, setBucket] = useState<string>(config.quickFilters?.options[0]?.value ?? '');
-
+  
   const [entity, setEntity] = useState<string | null>(null);
-
+  
+  
   const [sortKey, setSortKey] = useState<string>('');
 
   const [formOpened, formHandlers] = useDisclosure(false);
@@ -147,12 +153,25 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
   const [deleteTarget, setDeleteTarget] = useState<OperationLog | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  
   const photoCfg = config.photos;
-
+  
+  
   const [galleryLog, setGalleryLog] = useState<OperationLog | null>(null);
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const [draftPhotoId, setDraftPhotoId] = useState(() => randomId(DRAFT_PHOTO_PREFIX));
 
+  
+  
   const [expanded, setExpanded] = useState<ReadonlySet<string>>(new Set());
   const toggleExpanded = useCallback((id: string) => {
     setExpanded((prev) => {
@@ -182,12 +201,16 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     return [{ value: 'all', label: tr('operationLogs.allMonths') }, ...months];
   }, [i18n.language, tr]);
 
+  
+  
+  
   const visibleLogs = useMemo(() => {
     if (month === 'all') return logs;
     const m = Number(month);
     return logs.filter((l) => Number(datePart(l.logDate).slice(5, 7)) === m);
   }, [logs, month]);
 
+  
   const entityOptions = useMemo(() => {
     const valueOf = config.entityFilter?.valueOf;
     if (!valueOf) return [];
@@ -199,6 +222,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     return [...seen].sort((a, b) => a.localeCompare(b)).map((v) => ({ value: v, label: v }));
   }, [visibleLogs, config.entityFilter]);
 
+  
   const filteredLogs = useMemo(() => {
     const match = config.quickFilters?.options.find((o) => o.value === bucket)?.match;
     const valueOf = config.entityFilter?.valueOf;
@@ -209,6 +233,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     });
   }, [visibleLogs, bucket, entity, config.quickFilters, config.entityFilter]);
 
+  
   const sortedLogs = useMemo(() => {
     if (!sortKey) return filteredLogs;
     const [field, dir] = sortKey.split('_');
@@ -219,8 +244,10 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     return [...filteredLogs].sort((a, b) => (valueOf(a) - valueOf(b)) * mult);
   }, [filteredLogs, sortKey, config.columns]);
 
+  
   const rows = useMemo(() => groupRows(sortedLogs, config.group), [sortedLogs, config.group]);
 
+  
   const sortOptions = useMemo(() => {
     const sortable = config.columns.filter((c) => c.sortValue && c.sortField);
     if (sortable.length === 0) return [];
@@ -256,7 +283,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   useEffect(() => {
     if (!canView) return;
-
+    
     load(CURRENT_YEAR);
   }, [load, canView]);
 
@@ -276,7 +303,7 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
     form.setValues({
       ...cloneFormValues(config.emptyForm),
       logDate: todayString(),
-
+      
       ...(photoCfg && { [PHOTOS_FIELD]: [] }),
     });
     form.resetDirty();
@@ -294,10 +321,11 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
       form.resetDirty();
       formHandlers.open();
     },
-
+    
     [config, photoCfg, formHandlers],
   );
 
+  
   const runAfterWrite = useCallback(
     async (event: OperationLogWriteEvent) => {
       if (!config.afterWrite) return;
@@ -316,6 +344,9 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
 
   const handleSubmit = useCallback(
     async (values: LogFormValues) => {
+      
+      
+      
       const errors = config.validateOnSubmit?.({ values, previous: editing, context, t: tr });
       if (errors && Object.keys(errors).length > 0) {
         form.setErrors(errors);
@@ -323,7 +354,11 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
       }
       setSaving(true);
       const logDate = String(values.logDate);
-
+      
+      
+      
+      
+      
       const photos = photoCfg ? formPhotos(values) : [];
       const extra = {
         ...config.buildExtra(values),
@@ -360,7 +395,9 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
             message: tr('operationLogs.notifications.createSuccess'),
           });
         }
-
+        
+        
+        
         await runAfterWrite({
           op: editing ? 'update' : 'create',
           log: saved,
@@ -441,10 +478,11 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
   const showActions = canEdit || canDelete;
   const expandable = Boolean(config.renderExpanded);
   const photoLabel = tr(photoCfg?.labelKey ?? 'operationLogs.photos.label');
-
+  
   const detailColSpan =
     config.columns.length + (expandable ? 1 : 0) + (photoCfg ? 1 : 0) + (showActions ? 1 : 0);
 
+  
   const controls = (
     <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'}>
       {/* Mobile only: the cards have no column headers, so without this the
@@ -555,6 +593,10 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
           {tr(config.emptyKey, { year })}
         </Text>
       ) : isMobile ? (
+        
+        
+        
+        
         <OperationLogCards
           rows={rows}
           visibleLogs={sortedLogs}
@@ -596,12 +638,14 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               {rows.map(({ log, grouped, firstOfGroup }, index) => {
                 const tone = config.rowTone?.(log, sortedLogs);
                 const isOpen = expanded.has(log.id);
-
+                
                 const locked = config.rowLocked?.(log) ?? false;
                 const row = (
                   <Table.Tr
                     key={log.id}
                     style={{
+                      
+                      
                       ...(tone?.danger
                         ? { backgroundColor: 'var(--mantine-color-red-light)' }
                         : grouped
@@ -716,7 +760,12 @@ export function OperationLogSection({ targetId, targetCode, config, perms, conte
               <LogPhotoField
                 photos={formPhotos(form.values)}
                 onChange={(next) => form.setFieldValue(PHOTOS_FIELD, next)}
-
+                
+                
+                
+                
+                
+                
                 directory={buildExpiringUploadDirectory({
                   type: photoCfg.directoryType,
                   id: editing?.id ?? draftPhotoId,

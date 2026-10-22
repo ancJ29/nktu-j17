@@ -1,3 +1,4 @@
+
 import type { ReactNode } from 'react';
 import { ActionIcon, Box, Card, Group, Stack, Text } from '@mantine/core';
 import { IconChevronDown, IconChevronRight, IconPencil, IconTrash } from '@tabler/icons-react';
@@ -7,7 +8,7 @@ import { LogPhotoCell } from './OperationLogPhotos';
 
 type Props = {
   readonly rows: GroupedRow[];
-
+  
   readonly visibleLogs: OperationLog[];
   readonly config: OperationLogConfig;
   readonly t: TFn;
@@ -53,7 +54,7 @@ export function OperationLogCards({
       {rows.map(({ log, grouped, firstOfGroup }, index) => {
         const tone = config.rowTone?.(log, visibleLogs);
         const isOpen = expanded.has(log.id);
-
+        
         const locked = config.rowLocked?.(log) ?? false;
         const showActions = (canEdit || canDelete) && !locked;
 
@@ -63,7 +64,8 @@ export function OperationLogCards({
             withBorder
             radius="md"
             padding="sm"
-
+            
+            
             bg={
               tone?.danger
                 ? 'var(--mantine-color-red-light)'
@@ -72,6 +74,8 @@ export function OperationLogCards({
                   : undefined
             }
             style={
+              
+              
               firstOfGroup && index > 0 ? { marginTop: 'var(--mantine-spacing-md)' } : undefined
             }
           >
@@ -137,6 +141,9 @@ export function OperationLogCards({
               )}
 
               {expandable && isOpen && (
+                
+                
+                
                 <Box style={{ overflowX: 'auto' }} pt={4}>
                   {config.renderExpanded?.(log, t)}
                 </Box>

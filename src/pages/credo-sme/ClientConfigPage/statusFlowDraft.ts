@@ -1,23 +1,25 @@
+
+
 import type { StatusFlowConfig, StatusFlowTransition } from '@credo/connectors/status-flow';
 
 export type StatusFlowDraftRow<Stage extends string> = {
   value: string;
   label: string;
   color: string;
-
+  
   actionLabel: string;
   actionColor: string;
   stage: Stage;
-
+  
   capabilities: string[];
 };
 
 export type StatusFlowDraftOf<Stage extends string> = {
   statuses: Array<StatusFlowDraftRow<Stage>>;
   initial: string;
-
+  
   transitions: Record<string, string[]>;
-
+  
   targetDepartments: Record<string, string[]>;
 };
 
@@ -74,7 +76,10 @@ export const readStatusFlowDraftOf = <Stage extends string>(
   raw: unknown,
 ): { draft: StatusFlowDraftOf<Stage> | null; unreadable: boolean; flattened: string[] } => {
   if (raw === undefined) return { draft: null, unreadable: false, flattened: [] };
-
+  
+  
+  
+  
   const shaped =
     raw !== null &&
     typeof raw === 'object' &&

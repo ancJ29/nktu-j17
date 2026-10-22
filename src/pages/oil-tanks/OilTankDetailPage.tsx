@@ -60,6 +60,12 @@ const TANK_LOG_PERMS = {
 };
 
 function useIssueTruckOptions() {
+  
+  
+  
+  
+  
+  
   const enabled = featureFlags.trucks.enabled && perms.truck.canEdit();
   const items = useTruckAssetStore((s) => s.items);
   const initialized = useTruckAssetStore((s) => s.initialized);
@@ -91,6 +97,7 @@ export function OilTankDetailPage() {
   const [activeTab, setActiveTab] = useState<string | null>('overview');
   const [recomputing, setRecomputing] = useState(false);
 
+  
   const stored = useOilTankStore((s) =>
     id ? (s.items.find((r) => r.id === id) as OilTankRow | undefined) : undefined,
   );
@@ -100,6 +107,7 @@ export function OilTankDetailPage() {
     if (!id) return;
     const cached = useOilTankStore.getState().getById(id) as OilTankRow | undefined;
     if (cached) {
+      
       setFetched(cached);
       setLoading(false);
       return;
@@ -119,6 +127,7 @@ export function OilTankDetailPage() {
 
   const handleUpdated = useCallback((next: OilTankRow) => setFetched(next), []);
 
+  
   const handleRecompute = useCallback(async () => {
     if (!id) return;
     setRecomputing(true);
@@ -146,7 +155,8 @@ export function OilTankDetailPage() {
   }, [id, t]);
 
   if (loading) return null;
-
+  
+  
   if (!tank || tank.extra?.isDeleted) {
     return (
       <NotFoundState
@@ -164,6 +174,8 @@ export function OilTankDetailPage() {
   const tone = levelTone(extra);
   const hasLevel = typeof extra.currentLevel === 'number';
 
+  
+  
   const statbook = (
     <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'} style={{ flexShrink: 0 }}>
       <StatPill
@@ -171,7 +183,9 @@ export function OilTankDetailPage() {
         label={t('oilTanks.detail.statLevel')}
         value={hasLevel ? formatLitres(extra.currentLevel) : '—'}
         suffix={hasLevel ? t('oilTanks.unitLitre') : undefined}
-
+        
+        
+        
         tone={tone === 'danger' || tone === 'warning' ? 'danger' : hasLevel ? 'neutral' : 'dim'}
         compact={isMobile}
       />
@@ -263,6 +277,8 @@ export function OilTankDetailPage() {
     </SectionCard>
   );
 
+  
+  
   const notesCard = (
     <SectionCard icon={<IconNote size={14} />} title={t('__new__.01-common.labels.note')}>
       <Text size="sm" style={{ whiteSpace: 'pre-wrap' }} c={extra.note ? undefined : 'dimmed'}>
@@ -394,7 +410,10 @@ export function OilTankDetailPage() {
               targetId={tank.id}
               targetCode={tank.code}
               perms={TANK_LOG_PERMS}
-
+              
+              
+              
+              
               context={{ tankCurrentLevel: extra.currentLevel, truckOptions }}
             />
           )}

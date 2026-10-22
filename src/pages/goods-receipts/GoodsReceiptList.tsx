@@ -92,6 +92,10 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     forceRefresh,
   } = useGoodsReceiptStore();
 
+  
+  
+  
+  
   const { items: vendors, loadAll: loadVendors, initialized: vendorsInit } = useVendorStore();
   const {
     items: employees,
@@ -103,13 +107,23 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     loadAll: loadLocations,
     initialized: locationsInit,
   } = useLocationStore();
-
+  
+  
+  
+  
+  
   const products = useProductStore((s) => s.items);
-
+  
   const unitLabels = useLookupV2Labels('product-unit');
 
+  
+  
+  
   const [itemsReceipt, setItemsReceipt] = useState<GoodsReceipt | null>(null);
 
+  
+  
+  
   const skuByItemCode = useMemo(() => {
     const m = new Map<string, string>();
     for (const p of products) {
@@ -148,12 +162,21 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     }
   }, [error, t]);
 
+  
+  
   useTransactionalRangeRefetch({
     range: filters.createdDateRange,
     setStoreRange: setGoodsReceiptQueryRange,
     forceRefresh,
   });
 
+  
+  
+  
+  
+  
+  
+  
   const {
     search,
     setSearch,
@@ -165,9 +188,13 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     paginated,
     totalPages,
   } = useListFilter(filters.allReceipts, {
-    filters: { _: 'noop' },
+    filters: { _: 'noop' }, 
     filterFn: () => true,
-
+    
+    
+    
+    
+    
     searchFields: (item) => {
       const fields: (string | undefined)[] = [
         item.receiptNumber,
@@ -180,18 +207,29 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
       }
       return fields;
     },
-
+    
+    
+    
     search: filters.search,
     onSearchChange: filters.setSearch,
     page: filters.page,
     onPageChange: filters.setPage,
   });
 
+  
+  
   const clearAll = filters.clearFilters;
 
   const hasActiveFilters = filters.hasActiveFilters || !!search;
 
+  
+  
+  
+  
+  
   const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
+
+  
 
   const statusFilterData = useMemo(
     () =>
@@ -213,11 +251,17 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     [vendors],
   );
 
+  
+  
+  
   const staffFilterData = useMemo(
     () => employees.filter(picEmployeeFilter).map((e) => ({ value: e.id, label: e.name })),
     [employees],
   );
 
+  
+  
+  
   const employeeNames = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.name);
@@ -229,6 +273,12 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     [locations],
   );
 
+  
+  
+  
+  
+  
+  
   const employeeCodes = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.code);
@@ -243,6 +293,9 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     (getCurrentIsRoot() ||
       (!!myDepartment && variant.accountingExport.allowedDepartments.includes(myDepartment)));
 
+  
+  
+  
   const handleAccountingExport = useCallback(() => {
     if (filtered.length === 0) {
       notifications.show({
@@ -271,6 +324,13 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     }
   }, [filtered, employeeCodes, t]);
 
+  
+  
+  
+  
+  
+  
+
   const statsCells = useMemo<ListStatCell[]>(() => {
     if (!shouldDisplayStats) return [];
     const byCounts: Record<string, number> = {};
@@ -289,6 +349,8 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     ];
   }, [filtered, t, shouldDisplayStats]);
 
+  
+
   const statusPlaceholder = useMemo(() => {
     if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) {
@@ -298,6 +360,8 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);
 
+  
+
   const presetLabels: Partial<Record<DateRangePreset, string>> = {
     today: t('common.datePreset.today'),
     yesterday: t('common.datePreset.yesterday'),
@@ -305,7 +369,9 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     thisWeek: t('common.datePreset.thisWeek'),
     lastWeek: t('common.datePreset.lastWeek'),
     nextWeek: t('common.datePreset.nextWeek'),
-
+    
+    
+    
     custom: t('goodsReceipts.datePreset.custom'),
   };
 
@@ -339,6 +405,9 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     },
   ];
 
+  
+  
+  
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
@@ -381,6 +450,17 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
       : []),
   ];
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const draftActive = filters.statusFilter.length === 1 && filters.statusFilter[0] === 'draft';
   const todayActive = filters.createdDateRange.preset === 'today';
   const thisWeekActive = filters.createdDateRange.preset === 'thisWeek';
@@ -433,6 +513,8 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
     },
     ...dateAndExtraFilters,
   ];
+
+  
 
   return (
     <Stack gap={isMobile ? 'md' : 'lg'}>
@@ -590,6 +672,8 @@ export function GoodsReceiptList({ variant }: GoodsReceiptListProps) {
       >
         {itemsReceipt &&
           (isMobile ? (
+            
+            
             <GoodsReceiptItemsListMobile
               items={itemsReceipt.items}
               unitLabels={unitLabels}

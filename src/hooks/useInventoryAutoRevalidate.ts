@@ -1,3 +1,5 @@
+
+
 import { useEffect } from 'react';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { isProductInventoryEnabled } from '@/utils/permission';
@@ -11,6 +13,7 @@ function revalidateBoth(): void {
 
 export function useInventoryAutoRevalidate(): void {
   useEffect(() => {
+    
     if (!inventoryEnabled) {
       return;
     }

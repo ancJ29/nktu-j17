@@ -1,3 +1,5 @@
+
+
 import type { OilTankExtra } from '@/types';
 
 const OVERFILL_PERCENT = 100;
@@ -18,7 +20,8 @@ export function fillPercent(extra: OilTankExtra | undefined): number | null {
   const level = extra?.currentLevel;
   const capacity = extra?.capacity;
   if (typeof level !== 'number' || typeof capacity !== 'number' || capacity <= 0) return null;
-
+  
+  
   return Math.round((level / capacity) * 100);
 }
 

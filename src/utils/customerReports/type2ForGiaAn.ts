@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder } from '@/types';
 import {
@@ -9,14 +11,18 @@ import { SERVICE_FEE_COLUMNS, buildBangKeWorksheet, type BangKeLayout } from './
 import type { CustomerReportBuilder } from './types';
 
 const TYPE2_LAYOUT: BangKeLayout = {
+  
   serviceColumns: SERVICE_FEE_COLUMNS.filter((c) => c.key !== 'demurrage').flatMap((c) =>
     c.key === 'freight' ? [c, { feeValue: 'PHU_PHI_DAU', header: 'PHỤ PHÍ DẦU' }] : [c],
   ),
 
+  
   chiHoSlots: ['amount', 'invoiceNo', 'name'],
 
+  
   reservedChiHo: [{ feeValue: 'PHI_NEO_XE', header: 'PHÍ NEO XE', slots: ['amount'] }],
 
+  
   periodPrefix: 'T',
 };
 
@@ -54,6 +60,12 @@ export const buildCustomerReportType2: CustomerReportBuilder = (orders, input) =
   let rowCount = 0;
 
   for (const sheet of SHEETS) {
+    
+    
+    
+    
+    
+    
     const { ws, rowCount: n } = buildBangKeWorksheet(
       orders.filter((o) => sheet.belongs(o, input.resolveFeeName)),
       { ...input, titleSuffix: sheet.titleSuffix },

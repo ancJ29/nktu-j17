@@ -34,7 +34,7 @@ type Mode = 'tunnel' | 'body-encode' | 'plain';
 export type CallApiOptions = RequestInit & {
   params?: Record<string, string | undefined> | undefined;
   queryParams?: Record<string, string> | undefined;
-
+  
   timeoutMs?: number | null | undefined;
 };
 
@@ -48,7 +48,8 @@ export function setDefaultRequestTimeout(ms: number | null): void {
 
 function getDefaultRequestTimeout(): number | null {
   if (defaultTimeoutMs !== undefined) return defaultTimeoutMs;
-
+  
+  
   return IS_BROWSER() ? DEFAULT_BROWSER_TIMEOUT_MS : null;
 }
 
@@ -94,6 +95,7 @@ async function runOnce<T>(
   init: RequestInit,
   timeoutMs: number | null | undefined,
 ): Promise<OnceResult<T>> {
+  
   if (init.method !== 'GET' && !init.body) {
     init.body = '{}';
   }
@@ -103,6 +105,8 @@ async function runOnce<T>(
   const headers = (init.headers ?? {}) as Record<string, string>;
   init.headers = headers;
 
+  
+  
   const target = headers['x-target'];
 
   let mode = selectMode(origin, headers);
@@ -119,6 +123,9 @@ async function runOnce<T>(
   const traceCtx = configureTrace(mode === 'tunnel', parsed.pathname, built.url);
   built.url = traceCtx.url;
 
+  
+  
+  
   const budget = timeoutMs !== undefined ? timeoutMs : getDefaultRequestTimeout();
   let timer: ReturnType<typeof setTimeout> | undefined;
   if (budget && budget > 0 && !built.init.signal && typeof AbortController !== 'undefined') {
@@ -133,6 +140,9 @@ async function runOnce<T>(
     fetchOptions: built.init,
   });
 
+  
+  
+  
   try {
     let response: Response;
     try {
@@ -144,6 +154,18 @@ async function runOnce<T>(
 
     recordServerEncoding(response, origin, target);
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     if (
       response.status === 406 &&
       response.headers.get(ENCODING_HEADER) === 'msgpack' &&
@@ -187,6 +209,9 @@ function selectMode(origin: string, headers: Record<string, string>): Mode {
   const serverMode = getEncodingMode(origin, target) ?? DEFAULT_MODE;
   if (serverMode === 'json') return 'plain';
 
+  
+  
+  
   const optIn = getTransportMode(origin, target);
   if (optIn) return optIn;
 
@@ -224,6 +249,14 @@ function buildTunnelRequest(
   parsed: URL,
   headers: Record<string, string>,
 ): Built {
+  
+  
+  
+  
+  
+  
+  
+  
   const stage = getStagePrefix(parsed.origin, headers['x-target']);
   const segments = parsed.pathname.split('/').filter(Boolean);
   const hasStage = Boolean(stage) && segments[0] === stage;
@@ -263,10 +296,16 @@ function buildBodyEncodedRequest(
   init: RequestInit,
   headers: Record<string, string>,
 ): Built {
+  
+  
+  
+  
   if (init.method === 'GET' || init.method === 'HEAD') {
     return buildPlainRequest(url, init, headers);
   }
 
+  
+  
   const bodyJson = init.body ? JSON.parse(init.body as string) : undefined;
   const envelope =
     bodyJson && typeof bodyJson === 'object' && !Array.isArray(bodyJson)

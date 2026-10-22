@@ -1,3 +1,5 @@
+
+
 import { Button, Divider, Grid, Group, Stack } from '@mantine/core';
 import {
   IconArrowLeft,
@@ -38,6 +40,8 @@ export function MasterDataDetailPage<
     if (!initialized && !loading) void loadAll();
   }, [initialized, loading, loadAll]);
 
+  
+  
   const row = useMemo(
     () => items.find((it) => it.id === id && !it.extra?.isDeleted) ?? null,
     [items, id],
@@ -53,10 +57,12 @@ export function MasterDataDetailPage<
     if (await setActive(row, !row.isActive)) setConfirmingToggle(false);
   }, [setActive, row]);
 
+  
   if (!initialized) return null;
 
   const Shell = isMobile && !spec.mobile ? DesktopOnlyGuard : Fragment;
 
+  
   const statusAction =
     row && spec.can.edit ? (
       <Button

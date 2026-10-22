@@ -1,3 +1,5 @@
+
+
 import type { PermissionConfigSource, PermissionEmployeeSource } from './select.js';
 
 export const FIXTURE: {

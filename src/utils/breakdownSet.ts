@@ -1,3 +1,5 @@
+
+
 import type { Product, ProductSetItem } from '@/types/product';
 import type { ProductInventoryRow } from '@/types/product-inventory';
 import type {
@@ -13,7 +15,7 @@ import { convertUnit, getItemBaseUnit } from './unitConversion';
 
 export type BreakdownParentLink = {
   readonly parent: Product;
-
+  
   readonly item: ProductSetItem;
 };
 
@@ -34,28 +36,29 @@ export function buildBreakdownParentIndex(
 }
 
 export type BreakdownCoverage = {
+  
   readonly componentQty: number;
-
+  
   readonly parentLock: {
     readonly product: Product;
     readonly unit: string;
     readonly quantity: number;
   } | null;
-
+  
   readonly remainder: number;
-
+  
   readonly residual: number;
 };
 
 export type PlanBreakdownCoverageInputs = {
   readonly component: Product;
-
+  
   readonly quantity: number;
   readonly unit: string;
   readonly locationCode: string;
   readonly parentIndex: Map<string, BreakdownParentLink[]>;
   readonly inventoryByProduct: Map<string, ProductInventoryRow[]>;
-
+  
   readonly ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[];
 };
 
@@ -84,6 +87,9 @@ export function planBreakdownCoverage(
   }
   const { parent, item } = links[0];
 
+  
+  
+  
   const perParent =
     item.unit === unit
       ? item.quantity
@@ -101,15 +107,18 @@ export function planBreakdownCoverage(
     getOwnReservedAtLocation(component, locationCode, ownReservedSnapshot);
   const componentReserve = Math.max(0, Math.min(quantity, componentAvailable));
   const shortfall = quantity - componentReserve;
-  if (shortfall <= 0) return null;
+  if (shortfall <= 0) return null; 
 
+  
+  
+  
   const parentAvailable =
     getProductLocationAvailability(parent, locationCode, inventoryByProduct).available +
     getOwnReservedAtLocation(parent, locationCode, ownReservedSnapshot);
 
   const wanted = Math.ceil(shortfall / perParent);
   const lockQty = Math.max(0, Math.min(wanted, Math.floor(parentAvailable)));
-  if (lockQty === 0) return null;
+  if (lockQty === 0) return null; 
 
   const covered = lockQty * perParent;
   const residual = Math.max(0, shortfall - covered);
@@ -131,7 +140,8 @@ export function planLineBreakdown(inputs: {
 }): BreakdownCoverage | null {
   const { line, productsByCode, inventoryByProduct, parentIndex, ownReservedSnapshot } = inputs;
   if (!line.productCode || parentIndex.size === 0) return null;
-
+  
+  
   if (line.role) return null;
   const component = productsByCode.get(line.productCode);
   if (!component) return null;
@@ -179,7 +189,8 @@ export function collectBreakdownRemainders(inputs: {
       unit: line.unit,
       quantity: coverage.remainder,
     };
-
+    
+    
     const bucket = out.get(key);
     if (!bucket) {
       out.set(key, [credit]);

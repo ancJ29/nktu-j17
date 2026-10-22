@@ -1,3 +1,5 @@
+
+
 import { ActionIcon, Box, Group, Stack, Title, Tooltip } from '@mantine/core';
 import { IconCamera } from '@tabler/icons-react';
 import { CodeLabel, ColorBadge } from '@credo/base-ui/components';
@@ -75,6 +77,10 @@ export function EmployeeDetailHeader({
     avatar
   );
 
+  
+  
+  
+  
   const departmentLabel =
     hasDepartment && employee.department ? resolveDepartment(employee.department) : null;
   const positionLabel =

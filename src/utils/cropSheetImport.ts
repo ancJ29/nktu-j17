@@ -30,7 +30,7 @@ function text(value: string | number | undefined): string {
   if (typeof value === 'number') return Number.isFinite(value) ? String(value) : '';
   if (typeof value !== 'string') return '';
   const trimmed = value.normalize('NFC').trim();
-
+  
   return trimmed === '-' ? '' : trimmed;
 }
 
@@ -75,6 +75,13 @@ function readDataRow(
     if (day !== undefined && date && day >= 1) return { day, date, at };
   }
 
+  
+  
+  
+  
+  
+  
+  
   const day = parseNumber(cell(row, dateIndex - 1));
   if (day === undefined || day < 1 || !Number.isInteger(day)) return undefined;
   return { day, date: '', at: dateIndex };
@@ -82,15 +89,24 @@ function readDataRow(
 
 function columnKindFor(label: string, values: string[], group?: string): SheetColumnKind {
   if (WATER_TOTAL_HEADER.test(label)) return 'ratio';
-
+  
+  
   if (MEASURE_HEADER.test(label) || NOTE_HEADER.test(label)) return 'text';
-
+  
+  
+  
   if (ACTIVITY_HEADER.test(label)) return 'activity';
 
   const filled = values.filter(Boolean);
-
+  
+  
+  
   if (!filled.length) return group ? 'ratio' : 'text';
 
+  
+  
+  
+  
   const numeric = filled.filter((v) => parseNumber(v) !== undefined).length;
   return numeric >= filled.length / 2 ? 'ratio' : 'text';
 }
@@ -109,19 +125,19 @@ export type ImportedEvent = {
   entryDate: string;
   activity: string;
   label?: string;
-
+  
   kind?: PrepActivityKind;
 };
 
 export type CropSheetImport = {
   plan: CropProcessPlan;
-
+  
   events: ImportedEvent[];
-
+  
   startDate?: string;
-
+  
   footerValues: number[];
-
+  
   derivedColumns: string[];
 };
 
@@ -135,6 +151,9 @@ export function parseCropSheetGrid(
   const headerRow = grid[header.row] ?? [];
   const groupRow = header.row > 0 ? (grid[header.row - 1] ?? []) : [];
 
+  
+  
+  
   const firstDataIndex = header.dateIndex + 2;
   const labels: string[] = [];
   const groups: string[] = [];
@@ -146,6 +165,8 @@ export function parseCropSheetGrid(
     groups.push(lastGroup);
   }
 
+  
+  
   const parsed: { day: number; date: string; values: string[]; stage: string }[] = [];
   const footerValues: number[] = [];
   for (let row = header.row + 1; row < grid.length; row++) {
@@ -162,13 +183,15 @@ export function parseCropSheetGrid(
     parsed.push({
       day: located.day,
       date: located.date,
-
+      
+      
       stage: located.at >= 2 ? cell(current, located.at - 2) : '',
       values: labels.map((_, i) => cell(current, located.at + 2 + i)),
     });
   }
   if (!parsed.length) return undefined;
 
+  
   const events: ImportedEvent[] = [];
   for (let row = 0; row < header.row; row++) {
     const current = grid[row] ?? [];
@@ -176,9 +199,11 @@ export function parseCropSheetGrid(
     if (at < 0) continue;
     const entryDate = parseSheetDate(cell(current, at));
     if (!entryDate) continue;
-
+    
+    
     const texts = current.slice(at + 1).map((c) => text(c));
-
+    
+    
     const kind: PrepActivityKind | undefined = texts.some((t) => PREP_MATERIAL_CELL.test(t))
       ? 'material'
       : undefined;
@@ -186,12 +211,14 @@ export function parseCropSheetGrid(
       .filter((t) => !PREP_MATERIAL_CELL.test(t))
       .reduce((best, t) => (t.length > best.length ? t : best), '');
     if (!activity) continue;
-
+    
+    
     let label = '';
     for (let i = at - 1; i >= 0 && !label; i--) label = cell(current, i);
     events.push({ entryDate, activity, ...(label && { label }), ...(kind && { kind }) });
   }
 
+  
   const derivedColumns: string[] = [];
   const columns: SheetColumn[] = [];
   const keptIndexes: number[] = [];
@@ -209,7 +236,9 @@ export function parseCropSheetGrid(
       kind,
       label,
       ...(materialCode && { materialCode }),
-
+      
+      
+      
       ...(kind === 'ratio' && groups[i] && { group: groups[i] }),
     });
     keptIndexes.push(i);
@@ -231,10 +260,13 @@ export function parseCropSheetGrid(
     });
   }
 
+  
   const stages: SheetStage[] = [];
   for (const p of parsed) {
     const name = p.stage.replace(/\s+/g, ' ').trim();
-
+    
+    
+    
     if (name && parseNumber(name) === undefined) {
       stages.push({ fromDay: p.day, toDay: totalDays, name });
     }
@@ -246,6 +278,9 @@ export function parseCropSheetGrid(
 
   const startDate = parsed.find((p) => p.day === 1)?.date;
 
+  
+  
+  
   const preparation: PlanPreparation[] = startDate
     ? events.map((e) => ({
         dayOffset: Math.round(
@@ -330,7 +365,7 @@ export function findPlantCount(grid: SheetGrid): number | undefined {
     if (at < 0) continue;
     for (let i = at + 1; i < row.length; i++) {
       const n = parseNumber(cell(row, i));
-
+      
       if (n !== undefined && n >= 100) return n;
     }
   }

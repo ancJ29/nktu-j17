@@ -9,6 +9,9 @@ export function useInitFormFromFetch<TValues>(
 ): boolean {
   const [fetching, setFetching] = useState<boolean>(!!id);
 
+  
+  
+  
   const formRef = useRef(form);
   const initRef = useRef(init);
   const onErrorRef = useRef(onError);
@@ -18,13 +21,26 @@ export function useInitFormFromFetch<TValues>(
     onErrorRef.current = onError;
   });
 
+  
+  
+  
   const inflightRef = useRef<{ id: string; promise: Promise<TValues | null> } | null>(null);
 
   useEffect(() => {
+    
+    
+    
+    
+    
+    
+    
     setFetching(!!id);
     if (!id) return;
     let cancelled = false;
 
+    
+    
+    
     let promise: Promise<TValues | null>;
     if (inflightRef.current && inflightRef.current.id === id) {
       promise = inflightRef.current.promise;
@@ -45,6 +61,9 @@ export function useInitFormFromFetch<TValues>(
         onErrorRef.current?.(err);
       })
       .finally(() => {
+        
+        
+        
         if (inflightRef.current?.promise === promise) inflightRef.current = null;
         if (cancelled) return;
         setFetching(false);

@@ -1,3 +1,4 @@
+
 import type { DateTimeInput } from '@credo/kits/types';
 import type { TransportOrder } from '@/types';
 
@@ -6,22 +7,24 @@ export type ScheduleSubject = 'truck' | 'driver';
 export const WHOLE_ORDER = -1;
 
 export type ScheduleSlot = {
+  
   tripIndex: number;
   truckId: string;
   driverId: string;
-
+  
   start: number;
   end: number;
 };
 
 export type ScheduleConflict = {
+  
   tripIndex: number;
   subject: ScheduleSubject;
-
+  
   orderId: string;
   orderNumber: string;
   otherTripIndex: number;
-
+  
   start: number;
   end: number;
 };

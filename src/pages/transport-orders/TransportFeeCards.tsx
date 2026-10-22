@@ -32,7 +32,8 @@ export function TransportFeeCards<V extends FeeFormValues>({
   form: UseFormReturnType<V>;
 }) {
   const { t } = useTranslation();
-
+  
+  
   const feeNameOptions = useFeeNameOptions();
   const fees = form.values.fees;
 
@@ -45,6 +46,8 @@ export function TransportFeeCards<V extends FeeFormValues>({
   const serviceRows = rowsIndexed.filter(({ row }) => row.kind !== 'passthrough');
   const passthroughRows = rowsIndexed.filter(({ row }) => row.kind === 'passthrough');
 
+  
+  
   const totals = computeTransportOrderTotals(
     fees,
     (form.values.vatRatePercent || 0) / 100,
@@ -63,6 +66,10 @@ export function TransportFeeCards<V extends FeeFormValues>({
     </Group>
   );
 
+  
+  
+  
+  
   const feeNameSelect = (i: number) => {
     const props = form.getInputProps(`fees.${i}.label`);
     return (
@@ -93,7 +100,8 @@ export function TransportFeeCards<V extends FeeFormValues>({
             size="compact-sm"
             variant="light"
             leftSection={<IconPlus size={14} />}
-
+            
+            
             onClick={() => form.insertListItem('fees', blankFee() as never)}
           >
             {t('transportOrders.fees.add')}

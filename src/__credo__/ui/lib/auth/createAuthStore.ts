@@ -1,3 +1,5 @@
+
+
 import { CallApiError } from '@credo/connectors/connector';
 import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
@@ -33,6 +35,7 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
     // devProfile = { name: 'Dev User', email: 'dev@example.com' } as TProfile,
   } = config;
 
+  
   function loadAuthFromStorage(): AuthData {
     const storedAuth = storage.get<AuthData>(storageKeys.AUTH) || {
       userUuid: null,
@@ -42,19 +45,23 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
     return storedAuth;
   }
 
+  
   function saveAuthToStorage(auth: AuthData) {
     storage.set(storageKeys.LOGIN_USER_ID, auth.userUuid);
     storage.set(storageKeys.AUTH, auth);
   }
 
+  
   function clearAuthFromStorage() {
     storage.remove(storageKeys.LOGIN_USER_ID);
     storage.remove(storageKeys.AUTH);
   }
 
+  
   function getOrCreateDeviceId(): string {
     const existingId = storage.get<string>(storageKeys.DEVICE_ID);
-
+    
+    
     if (existingId && existingId.length > 20) {
       return existingId;
     }
@@ -82,12 +89,17 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
             if (!token || !refreshToken) return 'anonymous';
             if (!isTokenExpired(token)) return 'valid';
 
+            
+            
+            
             if (isTokenExpired(refreshToken, 0)) {
               logger.info('Refresh token expired, logging out');
               get().logout('refresh-token-expired');
               return 'logged-out';
             }
 
+            
+            
             const outcome = await asyncDeduplicator.call<TokenRefreshOutcome>(
               'refreshToken',
               async () => {
@@ -98,6 +110,7 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
                     const response = await api.refreshToken({ refreshToken });
 
                     if (response.success && response.token) {
+                      
                       if (!get().token) return 'logged-out';
 
                       const updatedAuth: AuthData = {
@@ -110,6 +123,7 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
                       return 'refreshed';
                     }
 
+                    
                     logger.error('Token refresh rejected by server:', response.error);
                     get().logout('refresh-rejected');
                     return 'logged-out';
@@ -127,6 +141,8 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
                   }
                 }
 
+                
+                
                 logger.warn(
                   'Token refresh unavailable, keeping session for a later retry:',
                   lastError,
@@ -139,6 +155,12 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
           },
 
           loadProfile: async () => {
+            
+            
+            
+            
+            
+
             try {
               const outcome = await get().checkAndRefreshToken();
               const state = get();
@@ -149,6 +171,11 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
                 throw new Error('Token is required');
               }
 
+              
+              
+              
+              
+              
               if (outcome === 'deferred') {
                 logger.warn('Skipping profile fetch: token refresh was deferred');
                 set({ isProfileLoaded: true });
@@ -157,6 +184,11 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
 
               const user = await asyncDeduplicator.call(`getProfile-${token}`, async () => {
                 const profile = await api.getProfile({ token }).catch((error: unknown) => {
+                  
+                  
+                  
+                  
+                  
                   if (isAuthRejection(error)) {
                     logger.error('Profile fetch rejected (401/403), logging out');
                     get().logout('profile-rejected');
@@ -171,6 +203,9 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
               if (user) {
                 set({ user, isProfileLoaded: true });
               } else {
+                
+                
+                
                 set({ isProfileLoaded: true });
               }
             } catch (error) {
@@ -207,7 +242,12 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
 
           logout: (reason = 'unknown') => {
             logger.info('Logging out', { reason });
-
+            
+            
+            
+            
+            
+            
             set({
               user: { name: '' } as TProfile,
               userUuid: null,
@@ -295,7 +335,10 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
             userUuid: state.userUuid,
             token: state.token,
             refreshToken: state.refreshToken,
-
+            
+            
+            
+            
             user: state.user,
           }),
         },

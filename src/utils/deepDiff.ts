@@ -1,6 +1,9 @@
-export type FieldDiff = {
-  readonly from?: unknown;
 
+
+export type FieldDiff = {
+  
+  readonly from?: unknown;
+  
   readonly to?: unknown;
 };
 
@@ -19,6 +22,10 @@ function structurallyEqual(a: unknown, b: unknown): boolean {
   if (a instanceof Date && b instanceof Date) return a.getTime() === b.getTime();
   if (typeof a !== typeof b) return false;
   if (a && b && typeof a === 'object') {
+    
+    
+    
+    
     return JSON.stringify(a) === JSON.stringify(b);
   }
   return false;

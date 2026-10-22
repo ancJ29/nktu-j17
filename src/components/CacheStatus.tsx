@@ -10,7 +10,7 @@ type CacheStatusProps = {
   cachedAt: number | null;
   loading?: boolean;
   onRefresh: () => void;
-
+  
   compact?: boolean;
 };
 
@@ -19,9 +19,14 @@ export function CacheStatus({ cachedAt, loading, onRefresh, compact }: CacheStat
   const [, setTick] = useState(0);
   const [seconds, setSeconds] = useState(0);
 
+  
+  
+  
   const onRefreshRef = useRef(onRefresh);
   const loadingRef = useRef(loading);
-
+  
+  
+  
   const autoFiredForRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -29,6 +34,7 @@ export function CacheStatus({ cachedAt, loading, onRefresh, compact }: CacheStat
     loadingRef.current = loading;
   }, [onRefresh, loading]);
 
+  
   useEffect(() => {
     if (!cachedAt) return;
     const id = setInterval(() => setTick((n) => n + 1), 30_000);
@@ -40,7 +46,9 @@ export function CacheStatus({ cachedAt, loading, onRefresh, compact }: CacheStat
     const compute = () => {
       const s = Math.floor((Date.now() - cachedAt) / 1000);
       setSeconds(s);
-
+      
+      
+      
       if (
         s >= AUTO_REFRESH_AFTER_SECONDS &&
         !loadingRef.current &&

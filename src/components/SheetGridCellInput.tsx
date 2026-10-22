@@ -3,14 +3,14 @@ import './SheetGridCellInput.css';
 type Props = {
   readonly value: string;
   readonly onChange: (value: string) => void;
-
+  
   readonly name: string;
-
+  
   readonly label: string;
   readonly readOnly?: boolean;
-
+  
   readonly changed?: boolean;
-
+  
   readonly multiline?: boolean;
 };
 
@@ -43,7 +43,9 @@ export function SheetGridCellInput({
       className="sheet-grid-cell"
       name={name}
       aria-label={label}
-
+      
+      
+      
       autoComplete="off"
       value={value}
       readOnly={readOnly}

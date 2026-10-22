@@ -1,3 +1,5 @@
+
+
 import { Group, Stack, Text, Title } from '@mantine/core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +17,7 @@ export function MasterDataDetailHeader<
 }: {
   readonly spec: MasterDataSpec<Row, Values>;
   readonly row: Row;
-
+  
   readonly showTimestamps?: boolean;
 }) {
   const { t } = useTranslation();

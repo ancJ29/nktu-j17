@@ -1,6 +1,7 @@
 import { appConfig } from './index';
 
 export type CompanyInfo = {
+  
   id: string;
   name: string;
   address: string;
@@ -20,6 +21,11 @@ const FALLBACK_COMPANY_INFO: CompanyInfo = {
 
 function overlay(cfg: Partial<CompanyInfo> | undefined, index: number): CompanyInfo {
   return {
+    
+    
+    
+    
+    
     id: cfg?.id?.trim() || String(index),
     name: cfg?.name?.trim() || FALLBACK_COMPANY_INFO.name,
     address: cfg?.address?.trim() || FALLBACK_COMPANY_INFO.address,

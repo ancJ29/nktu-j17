@@ -67,12 +67,14 @@ export function LocationDetailPage() {
     if (!id) return;
     const cached = useLocationStore.getState().getById(id) as Location | undefined;
     if (cached) {
+      
       setLocation(cached);
       setLoading(false);
       return;
     }
     setLoading(true);
 
+    
     asyncDeduplicator.call(`location:${id}`, async () => {
       await cMngtConnector
         .getLocationById<LocationExtra>({ id })

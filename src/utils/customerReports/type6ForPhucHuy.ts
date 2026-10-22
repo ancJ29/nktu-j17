@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -80,7 +82,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
     seller,
     customer,
     resolveShipmentType,
-
+    
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -90,11 +92,15 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   const columnOf = serviceColumnReader(resolveFeeName);
   const truckLabel = truckLabeler(getTruckPlate);
 
+  
   const chiHoLines = (o: TransportOrder): TransportOrderFee[] =>
     readFeeLines(o)
       .filter((f) => f.kind === 'passthrough' && isBillableFee(f) && (f.amount || 0) !== 0)
       .map((f) => ({ ...f, label: resolveFeeName(f.label) }));
 
+  
+  
+  
   const groups = Math.max(1, ...rows.map((o) => chiHoLines(o).length));
 
   const rates = new Set(rows.map((o) => o.vatRate ?? 0));
@@ -102,6 +108,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   const vatHeader =
     uniformRate && uniformRate > 0 ? `VAT ${Number((uniformRate * 100).toFixed(2))}%` : 'VAT';
 
+  
   const C_STT = 0;
   const C_DATE = 1;
   const C_TRUCK = 2;
@@ -117,7 +124,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   const C_TOTAL = C_VAT + 1;
   const C_CONTRACT = C_TOTAL + 1;
   const C_CHI_HO0 = C_CONTRACT + 1;
-
+  
   const C_KHACH_AMOUNT = C_CHI_HO0 + groups * CHI_HO_GROUP_WIDTH;
   const C_KHACH_INVOICE = C_KHACH_AMOUNT + 1;
   const C_NOTE = C_KHACH_INVOICE + 1;
@@ -141,6 +148,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   const sheet = createSheetWriter(colCount);
   const { aoa, merges, blankRow, banner } = sheet;
 
+  
   const rSeller = banner(seller.name);
   banner(seller.address);
   banner(`MST: ${seller.taxCode}`);
@@ -151,6 +159,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   banner(`MST: ${customer.taxCode ?? ''}`);
   blankRow();
 
+  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
@@ -172,6 +181,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   group(C_KHACH_AMOUNT, C_KHACH_INVOICE, 'CHI HỘ (HD KHACH)', ['PHÍ NÂNG', 'SỐ HĐ']);
   leaf(C_NOTE, 'GHI CHÚ');
 
+  
   const sums = new Map<number, number>();
   const addSum = (c: number, amount: number) => sums.set(c, (sums.get(c) ?? 0) + amount);
   const sizeCounts = SIZE_BUCKETS.map(() => 0);
@@ -199,6 +209,8 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
+    
+    
     const feeSums = new Map<number, number>();
     for (const fee of readFeeLines(o)) {
       if (fee.kind !== 'service') continue;
@@ -227,6 +239,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
   });
   const rLastData = aoa.length - 1;
 
+  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -238,6 +251,7 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
     aoa.push(row);
   }
 
+  
   blankRow();
   const C_FOOTER_LABEL = C_FEE0 + SERVICE_COLUMNS.length - 1;
   const service = sums.get(C_TOTAL) ?? 0;
@@ -261,8 +275,10 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
     aoa.push(row);
   }
 
+  
   const signature = sheet.signatureRow(customer.name, seller.name);
 
+  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -307,6 +323,9 @@ export const buildCustomerReportType6: CustomerReportBuilder = (
 
   styleTotalRow(rTotalRow, lastCol, isMoneyCol);
 
+  
+  
+  
   const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
   if (rows.length > 0) {
     (ws[ref(rTotalRow, C_KHACH_AMOUNT)] as StyledCell).f =

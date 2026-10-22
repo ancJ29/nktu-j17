@@ -1,3 +1,5 @@
+
+
 import { cMngtConnector } from '@credo/connectors/connector';
 import type { SalesOrder, SalesOrderExtra } from '@/types';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
@@ -37,6 +39,8 @@ export async function aggregateSalesReport(
     return d >= period.startStr && d <= period.endStr;
   });
 
+  
+  
   await Promise.all([useEmployeeStore.getState().loadAll(), useCustomerStore.getState().loadAll()]);
   const empName = new Map(useEmployeeStore.getState().items.map((e) => [e.id, e.name]));
 

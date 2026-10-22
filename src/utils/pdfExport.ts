@@ -1,3 +1,5 @@
+
+
 import { PAPER_MM, type Orientation, type PaperSize } from './printDocument';
 
 export const PX_PER_MM = 96 / 25.4;
@@ -14,7 +16,7 @@ export function downloadBlob(blob: Blob, filename: string): void {
   document.body.appendChild(a);
   a.click();
   a.remove();
-
+  
   setTimeout(() => URL.revokeObjectURL(url), 0);
 }
 
@@ -25,9 +27,9 @@ export function sanitizeFilenameBase(name: string, fallback = 'document'): strin
 export type PdfPageOptions = {
   paperSize: PaperSize;
   orientation: Orientation;
-
+  
   marginMm?: number;
-
+  
   jpegQuality?: number;
 };
 
@@ -71,7 +73,8 @@ export async function htmlToPdfBlob(html: string, options: PdfPageOptions): Prom
     idoc.open();
     idoc.write(html);
     idoc.close();
-
+    
+    
     idoc.body.style.padding = `${marginMm}mm 0`;
     idoc.body.style.background = '#ffffff';
 
@@ -91,10 +94,12 @@ export async function htmlToPdfBlob(html: string, options: PdfPageOptions): Prom
     const pdf = new jsPDF({ unit: 'mm', format, orientation });
     const pdfW = pdf.internal.pageSize.getWidth();
     const pdfH = pdf.internal.pageSize.getHeight();
-
+    
     const imgHmm = (canvas.height / canvas.width) * pdfW;
     const image = canvas.toDataURL('image/jpeg', jpegQuality);
 
+    
+    
     pdf.addImage(image, 'JPEG', 0, 0, pdfW, imgHmm);
     let heightLeftMm = imgHmm - pdfH;
     let offsetMm = 0;

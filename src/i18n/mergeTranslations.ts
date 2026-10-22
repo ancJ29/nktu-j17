@@ -1,8 +1,11 @@
+
+
 export type TranslationTree = Record<string, unknown>;
 
 export type PruneResult = {
+  
   readonly pruned: TranslationTree;
-
+  
   readonly dropped: readonly string[];
 };
 
@@ -22,6 +25,7 @@ export function pruneShapeChangingOverrides(
     const path = pathPrefix ? `${pathPrefix}.${key}` : key;
     const bundled = base[key];
 
+    
     if (!(key in base)) {
       pruned[key] = value;
       continue;
@@ -37,12 +41,15 @@ export function pruneShapeChangingOverrides(
 
     if (bundledIsBranch && overrideIsBranch) {
       const child = pruneShapeChangingOverrides(bundled, value, path);
-
+      
+      
+      
       if (Object.keys(child.pruned).length > 0) pruned[key] = child.pruned;
       dropped.push(...child.dropped);
       continue;
     }
 
+    
     pruned[key] = value;
   }
 

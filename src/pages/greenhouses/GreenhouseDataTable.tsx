@@ -16,11 +16,11 @@ import { formatPlannedDate } from '@/utils/cropSchedule';
 type GreenhouseDataTableProps = {
   readonly greenhouses: Greenhouse[];
   readonly isLoading?: boolean;
-
+  
   readonly occupancyByGreenhouse?: Map<string, GreenhouseOccupancy>;
-
+  
   readonly activeCropCounts?: Map<string, number>;
-
+  
   readonly onAddCrop?: (greenhouse: Greenhouse) => void;
 };
 
@@ -56,7 +56,9 @@ export function GreenhouseDataTable({
       {
         key: 'area',
         header: t('greenhouses.columns.area'),
-
+        
+        
+        
         render: (item: Greenhouse) => {
           const capacity = item.extra?.plantCapacity;
           if (item.area <= 0 && !capacity) {
@@ -80,7 +82,11 @@ export function GreenhouseDataTable({
           );
         },
       },
-
+      
+      
+      
+      
+      
       ...(occupancyByGreenhouse
         ? [
             {
@@ -140,7 +146,10 @@ export function GreenhouseDataTable({
           </Group>
         ),
       },
-
+      
+      
+      
+      
       ...(onAddCrop
         ? [
             {

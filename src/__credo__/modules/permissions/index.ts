@@ -1,3 +1,5 @@
+
+
 export { BASE_PERMISSIONS } from './base.js';
 export { deepMergePermissions, resolvePermissions } from './resolve.js';
 export { EXPECTED_LAYERS, FIXTURE } from './agreement-fixture.js';

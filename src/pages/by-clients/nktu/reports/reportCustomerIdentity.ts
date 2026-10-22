@@ -1,9 +1,12 @@
+
+
 import type { Customer, SalesOrder } from '@/types';
 
 export interface CustomerIdentity {
+  
   key: string;
   name: string;
-
+  
   code?: string;
 }
 
@@ -17,7 +20,8 @@ export function createReportCustomerResolver(
     const code = o.extra?.customerCode?.trim();
     if (code) {
       const c = byCode.get(code);
-
+      
+      
       return { key: `code:${code}`, name: c?.extra?.shortName?.trim() || c?.name || code, code };
     }
     const name = o.extra?.customerName?.trim() || o.customerName?.trim();

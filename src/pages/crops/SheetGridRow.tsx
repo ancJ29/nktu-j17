@@ -63,7 +63,9 @@ export const SheetGridRow = memo(function SheetGridRow({
             label={`${cell.column.label || cell.column.key} — ${dayLabel} ${row.day}`}
             readOnly={!editable}
             changed={cell.changed}
-
+            
+            
+            
             value={cellInputText(cell)}
             onChange={(value) =>
               onCellChange(row.day, cell.column.key, cellInputToStored(value, cell))

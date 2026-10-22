@@ -1,3 +1,5 @@
+
+
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { notifications } from '@mantine/notifications';
@@ -14,13 +16,14 @@ export function useDriverTruckReconcile() {
       if (!appConfig.features.trucks.enabled) return;
 
       const newTruckId = values.truckAssetId || undefined;
-
+      
       if (!newTruckId && !prevTruckId) return;
 
       try {
         await syncTruckLinkFromDriver({
           driverId: employeeId,
-
+          
+          
           driver: {
             id: employeeId,
             name: values.name,

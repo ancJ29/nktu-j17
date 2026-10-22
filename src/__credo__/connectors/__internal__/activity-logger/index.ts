@@ -53,7 +53,7 @@ export const activityLoggerConnector = {
   useLocal: () => {
     return activityLoggerConnector.setBaseUrl(`http://localhost:${PORTS.ACTIVITY_LOGGER}`);
   },
-
+  
   setTarget: (target: string) => {
     storages.target = target;
     return activityLoggerConnector;
@@ -63,6 +63,17 @@ export const activityLoggerConnector = {
     return activityLoggerConnector;
   },
   setInternalAccessKey: (internalAccessKey: string) => {
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     storages.internalAccessKey = internalAccessKey;
     return activityLoggerConnector;
   },

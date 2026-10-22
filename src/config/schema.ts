@@ -25,8 +25,9 @@ const CMngtNavigationConfigSchema = z.object({
 });
 
 const CMngtNavigationItemV2Schema = CMngtNavigationItemSchema.extend({
+  
   hiddenForDepartments: z.array(z.string()).optional(),
-
+  
   visibleForEmployeeIds: z.array(z.string()).optional(),
   get subs() {
     return z.array(CMngtNavigationItemV2Schema).optional();
@@ -41,7 +42,7 @@ const TranslatableSchema = z.record(z.string(), z.string());
 
 const OptionSchema = z.object({
   value: z.string(),
-
+  
   label: TranslatableSchema,
 });
 
@@ -67,9 +68,11 @@ export type DepartmentOption = z.infer<typeof DepartmentOptionSchema>;
 const EmployeesFeaturesSchema = z
   .object({
     enabled: z.boolean().default(true),
-
+    
+    
+    
     selfManage: z.boolean().default(false),
-
+    
     v2: z.boolean().default(false),
     email: z.boolean().default(false),
     position: z.boolean().default(false),
@@ -113,7 +116,7 @@ const PermissionManagementFeaturesSchema = z
     enabled: z.boolean().default(false),
     rootUserOnly: z.boolean().default(true),
     showRestrictedItems: z.boolean().default(false),
-
+    
     useServerPermissions: z.boolean().default(false),
   })
   .default({
@@ -132,13 +135,14 @@ const ActivityLogFeaturesSchema = z
 const PricingFeaturesSchema = z
   .object({
     enabled: z.boolean().default(true),
-
+    
     vatRate: z.number().min(0).default(0.08),
   })
   .default({ enabled: true, vatRate: 0.08 });
 
 const QuotationFeaturesSchema = z
   .object({
+    
     priceByMinQuantity: z.boolean().default(false),
   })
   .default({ priceByMinQuantity: false });
@@ -175,9 +179,9 @@ const VendorsV2FeaturesSchema = z
     simpleMode: z.boolean().default(true),
     codePrefix: z.string().default('VND-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
-
+    
     listColumns: z.array(z.string()).default([]),
-
+    
     hiddenColumns: z.array(z.string()).default([]),
   })
   .default({
@@ -195,7 +199,7 @@ const CustomersV2FeaturesSchema = z
     simpleMode: z.boolean().default(true),
     codePrefix: z.string().default('CST-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
-
+    
     listColumns: z.array(z.string()).default([]),
     hiddenColumns: z.array(z.string()).default([]),
   })
@@ -216,14 +220,14 @@ const ProductsV2FeaturesSchema = z
     codePadLength: z.number().int().min(0).max(12).default(4),
     priceManagement: z.boolean().default(false),
     productPhoto: z.boolean().default(false),
-
+    
     inventory: z.boolean().default(false),
-
+    
     incomingColumn: z.boolean().default(false),
     incomingReceipts: z.boolean().default(false),
-
+    
     outgoingOrders: z.boolean().default(false),
-
+    
     listColumns: z.array(z.string()).default([]),
     hiddenColumns: z.array(z.string()).default([]),
   })
@@ -249,9 +253,9 @@ const MaterialsV2FeaturesSchema = z
     codePrefix: z.string().default('MAT-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
     unitCategory: z.string().default('material-unit'),
-
+    
     inventory: z.boolean().default(false),
-
+    
     listColumns: z.array(z.string()).default([]),
     hiddenColumns: z.array(z.string()).default([]),
   })
@@ -270,18 +274,18 @@ const GoodsReceiptsV2FeaturesSchema = z
   .object({
     enabled: z.boolean().default(false),
     defaultRangeDays: z.number().int().min(1).max(92).default(14),
-
+    
     codePrefix: z.string().default('GR-'),
     codePadLength: z.number().int().min(0).max(12).default(3),
-
+    
     statusFlow: z.unknown().optional(),
-
+    
     customFields: z.unknown().optional(),
-
+    
     listColumns: z.array(z.string()).default([]),
-
+    
     hiddenColumns: z.array(z.string()).default([]),
-
+    
     defaultListStatuses: z.array(z.string()).default([]),
   })
   .default({
@@ -305,9 +309,9 @@ const SalesOrdersV2FeaturesSchema = z
     listColumns: z.array(z.string()).default([]),
     hiddenColumns: z.array(z.string()).default([]),
     defaultListStatuses: z.array(z.string()).default([]),
-
+    
     paymentTracking: z.boolean().default(false),
-
+    
     autoCompleteOnFullDelivery: z.boolean().default(false),
   })
   .default({
@@ -333,7 +337,7 @@ const DeliveryNotesV2FeaturesSchema = z
     listColumns: z.array(z.string()).default([]),
     hiddenColumns: z.array(z.string()).default([]),
     defaultListStatuses: z.array(z.string()).default([]),
-
+    
     deliveryPhotoRequired: z.boolean().default(true),
   })
   .default({
@@ -361,11 +365,17 @@ const ProductFeaturesSchema = z
     codePadLength: z.number().int().min(0).max(12).default(4),
     priceManagement: z.boolean().default(false),
     bulkImport: z.boolean().default(false),
-
+    
+    
+    
+    
     technicalSpecs: z.boolean().default(true),
     barcode: z.boolean().default(true),
     images: z.boolean().default(true),
-
+    
+    
+    
+    
     hideFromInventoryList: z.boolean().default(false),
   })
   .default({
@@ -385,11 +395,14 @@ export type ProductFeatures = z.infer<typeof ProductFeaturesSchema>;
 const MaterialFeaturesSchema = z
   .object({
     enabled: z.boolean().default(false),
-
+    
+    
+    
     multiUnit: z.boolean().default(false),
-
+    
+    
     unitCategory: z.enum(['unit', 'material-unit']).default('material-unit'),
-
+    
     description: z.boolean().default(false),
     specification: z.boolean().default(false),
     memo: z.boolean().default(false),
@@ -397,9 +410,12 @@ const MaterialFeaturesSchema = z
     tags: z.boolean().default(false),
     attributes: z.boolean().default(false),
     images: z.boolean().default(false),
-
+    
+    
     minimumStock: z.boolean().default(false),
-
+    
+    
+    
     bulkImport: z.boolean().default(false),
   })
   .default({
@@ -434,7 +450,9 @@ const CustomerFeaturesSchema = z
     enabled: z.boolean().default(false),
     codePrefix: z.string().default('CST-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
-
+    
+    
+    
     shippingAddress: z.boolean().default(true),
     customerTypeOptions: z.array(OptionSchema).default([]),
   })
@@ -460,7 +478,7 @@ const SalesOrderStatusOptionSchema = OptionSchema.extend({
   icon: z.string().optional(),
   stage: SalesOrderStageSchema,
   capabilities: z.array(StatusCapabilityBindingSchema).default([]),
-
+  
   allowedDepartments: z.array(z.string()).default([]),
 });
 
@@ -487,27 +505,27 @@ const SalesOrderFeaturesSchema = z
     codePrefix: z.string().default('SO-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
     statusOptions: z.array(SalesOrderStatusOptionSchema).default([]),
-
+    
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
     deliveryMethodOptions: z.array(OptionSchema).default([]),
     tagOptions: z.array(TagOptionSchema).default([]),
-
+    
     deliveryPackageSizeOptions: z.array(z.string()).default([]),
-
+    
     defaultListStatuses: z.array(z.string()).default([]),
-
+    
     picDepartments: z.array(z.string()).default([]),
-
+    
     allowInternalDelivery: z.boolean().default(true),
-
+    
     allowAdditionalDR: z.boolean().default(true),
-
+    
     allowSkipInitialStage: z.boolean().default(false),
-
+    
     shortagePolicy: z.enum(['block', 'allow']).default('allow'),
-
+    
     completionEvidence: z.enum(['quantities', 'closedDeliveries']).default('quantities'),
-
+    
     allowExtraDeliveryQuantity: z.boolean().default(false),
   })
   .default({
@@ -535,13 +553,13 @@ const DeliveryRequestFeaturesSchema = z
     codePrefix: z.string().default('DR-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
     statusOptions: z.array(DeliveryRequestStatusOptionSchema).default([]),
-
+    
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
-
+    
     defaultListStatuses: z.array(z.string()).default([]),
-
+    
     driverDepartments: z.array(z.string()).default([]),
-
+    
     returnShipment: z
       .object({
         enabled: z.boolean().default(false),
@@ -565,11 +583,11 @@ const GoodsReceiptFeaturesSchema = z
     enabled: z.boolean().default(false),
     codePrefix: z.string().default('PNK-'),
     codePadLength: z.number().int().min(0).max(12).default(4),
-
+    
     picDepartments: z.array(z.string()).default([]),
-
+    
     allowNoInventoryProducts: z.boolean().default(false),
-
+    
     defaultListStatuses: z.array(z.string()).default([]),
   })
   .default({
@@ -603,7 +621,7 @@ const TransportOrderStatusOptionSchema = OptionSchema.extend({
   isInitial: z.boolean().optional(),
   terminal: z.boolean().optional(),
   locked: z.boolean().optional(),
-
+  
   allowedDepartments: z.array(z.string()).default([]),
 });
 
@@ -612,21 +630,21 @@ const TransportOrderFeaturesSchema = z
     enabled: z.boolean().default(false),
     codePrefix: z.string().default('VC-'),
     codePadLength: z.number().int().min(0).max(12).default(3),
-
+    
     routeCodePrefix: z.string().default('TUYEN-'),
-
+    
     orderTruckTypes: z.array(z.string()).default([]),
-
+    
     multiDropTruckTypes: z.array(z.string()).default([]),
-
+    
     statusOptions: z.array(TransportOrderStatusOptionSchema).default([]),
-
+    
     statusTransitions: z.record(z.string(), z.array(z.string())).default({}),
-
+    
     driverDepartments: z.array(z.string()).default([]),
-
+    
     defaultListStatuses: z.array(z.string()).default([]),
-
+    
     customerReportTypes: z.record(z.string(), z.number().int().positive()).default({}),
   })
   .default({
@@ -681,13 +699,25 @@ const FeaturesSchema = z
       .object({
         darkMode: z.boolean().default(false),
         languageSwitcher: z.boolean().default(true),
-
+        
+        
+        
         enablePdfSharing: z.boolean().default(false),
-
+        
+        
+        
         enableStats: z.boolean().default(false),
-
+        
+        
+        
+        
+        
+        
         notifyNewVersion: z.boolean().default(false),
-
+        
+        
+        
+        
         tableDensity: z.enum(['comfortable', 'compact']).default('comfortable'),
       })
       /**
@@ -727,13 +757,19 @@ const FeaturesSchema = z
     productInventory: ModuleFeaturesSchema,
     materialInventory: MaterialInventoryFeaturesSchema,
     lookupV2: LookupFeaturesSchema,
-
+    
     trucks: ModuleFeaturesSchema,
-
+    
+    
+    
     oilTanks: ModuleFeaturesSchema,
-
+    
     farm: ModuleFeaturesSchema,
-
+    
+    
+    
+    
+    
     nktuOdometerLog: ModuleFeaturesSchema,
   })
   .default({
@@ -808,16 +844,17 @@ const TranslationsSchema = z.record(z.string(), z.record(z.string(), z.unknown()
 export type { CompanyInfoConfig } from './companyInfoSchema';
 
 export const CMngtAppConfigSchema = CredoAppConfigSchema.extend({
+  
   schemaVersion: z.number().int().optional(),
-
+  
   companyInfo: CompanyInfoSchema,
   features: FeaturesSchema,
   layout: LayoutSchema,
   displaySettings: DisplaySettingsSchema,
   translations: TranslationsSchema,
-
+  
   permissions: PartialPermissionsSchema,
-
+  
   navigation: CMngtNavigationConfigSchema,
   navigationV2: CMngtNavigationV2Schema.optional(),
 });
@@ -837,6 +874,7 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
   themeConfig: { mainColor: 'terracotta' },
 
   languages: [
+    
     { code: 'vi', label: 'Tiếng Việt', flag: '🇻🇳' },
     { code: 'en', label: 'English', flag: '🇺🇸' },
   ],

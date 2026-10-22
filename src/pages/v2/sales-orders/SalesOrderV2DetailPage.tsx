@@ -1,3 +1,5 @@
+
+
 import {
   Alert,
   Badge,
@@ -83,22 +85,27 @@ export function SalesOrderV2DetailPage() {
     loading,
   } = useRecordById<SalesOrderV2>(id, getSalesOrderV2ById);
   const [acting, setActing] = useState(false);
-
+  
+  
   const loadProducts = useProductV2Store((s) => s.loadAll);
   const loadMaterials = useMaterialV2Store((s) => s.loadAll);
   const loadCustomers = useCustomerV2Store((s) => s.loadAll);
-
+  
+  
   const [confirmTarget, setConfirmTarget] = useState<SalesOrderFlowStatus | null>(null);
-
+  
   const [reduceRemaining, setReduceRemaining] = useState(false);
   const [cancelTarget, setCancelTarget] = useState<SalesOrderFlowStatus | null>(null);
   const [retrying, setRetrying] = useState(false);
-
+  
+  
   const [stockAction, setStockAction] = useState<'lock' | 'release' | null>(null);
   const [issuing, setIssuing] = useState(false);
-
+  
+  
   const { read: lineStock, pending: stockPending } = useSalesOrderLineStock();
-
+  
+  
   const department = useCurrentDepartment();
   const customFields = useSalesOrderCustomFields();
 
@@ -108,6 +115,7 @@ export function SalesOrderV2DetailPage() {
     if (featureFlags.materialsV2.enabled) void loadMaterials();
   }, [loadProducts, loadCustomers, loadMaterials]);
 
+  
   const runTransition = useCallback(
     async (to: string, options: { reduceRemaining?: boolean } = {}) => {
       if (!order) return;
@@ -117,6 +125,8 @@ export function SalesOrderV2DetailPage() {
         setOrder(next);
         const toStage = salesOrderStageOf(to);
         if (toStage === 'confirmed' && next.derivativesPending) {
+          
+          
           notifications.show({
             color: 'orange',
             autoClose: false,
@@ -129,6 +139,9 @@ export function SalesOrderV2DetailPage() {
           });
         }
       } catch (error) {
+        
+        
+        
         const fields = validationFieldsOf(error);
         notifications.show({
           color: 'red',
@@ -146,6 +159,7 @@ export function SalesOrderV2DetailPage() {
     [order, day, t, setOrder],
   );
 
+  
   const runStockAction = useCallback(
     async (action: 'lock' | 'release') => {
       if (!order) return;
@@ -166,6 +180,7 @@ export function SalesOrderV2DetailPage() {
     [order, day, t, setOrder],
   );
 
+  
   const handleCopy = useCallback(() => {
     if (!order) return;
     void navigate(ROUTES.SALES_ORDERS_V2.NEW, {
@@ -188,26 +203,37 @@ export function SalesOrderV2DetailPage() {
 
   const stage = salesOrderStageOf(order.status);
   const isDraftStage = stage === 'draft';
-
+  
   const filledCustomFields = customFields.flatMap((field) => {
     const value = readCustomFieldValue(order.extra, field);
     return value === undefined ? [] : [{ field, text: String(value) }];
   });
   const pending = order.derivativesPending === true;
-
+  
   const stockFor = (line: SalesOrderV2['items'][number]) => lineStock(line, order.id);
-
+  
+  
   const canEdit = isDraftStage && perms.salesOrder.canEdit();
 
+  
+  
+  
   const flagFor = (targetStage: string | undefined) =>
     targetStage === 'cancelled'
       ? perms.salesOrder.canCancel()
       : perms.salesOrder.canTransitionStatus();
 
+  
+  
+  
+  
+  
   const canRetry = pending && flagFor(stage);
-
+  
+  
+  
   const postingTarget = retrying ? order.status : (confirmTarget?.value ?? order.status);
-
+  
   const isCompletion = !retrying && salesOrderStageOf(postingTarget) === 'fulfilled';
   const remainders = order.items.map((line) => ({
     line,
@@ -215,19 +241,20 @@ export function SalesOrderV2DetailPage() {
     remaining: Math.max(0, line.quantity - (line.deliveredQuantity ?? 0)),
   }));
   const nothingLeft = remainders.every(({ remaining }) => remaining === 0);
-
+  
   const delivery = salesOrderDeliveryOf(order);
-
+  
   const stockVerb = salesOrderStockVerb({
     pending: stockPending,
     holdsStock: order.items.some((line) => (stockFor(line)?.held ?? 0) > 0),
     nothingLeft,
   });
-
+  
   const priced = order.totalAmount !== undefined;
-
+  
   const showAvailable = !salesOrderIsTerminal(order.status);
-
+  
+  
   const showDelivered =
     order.items.some((line) => line.deliveredQuantity !== undefined) ||
     order.remainderReduced !== undefined;

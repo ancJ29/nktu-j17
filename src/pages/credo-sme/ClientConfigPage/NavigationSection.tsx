@@ -1,3 +1,5 @@
+
+
 import { Alert, Button, Group, MultiSelect, Stack, Table, TagsInput, Text } from '@mantine/core';
 import { useCallback, useMemo, useState } from 'react';
 import { NAV_PERMISSION_MODULE, NAV_REGISTRY, type NavId } from '@/config/navigation';
@@ -47,13 +49,15 @@ export function NavigationSection({
   onChange,
 }: {
   value: NavigationForm;
-
+  
   legacyPc: NavigationItem[];
   departmentOptions: DepartmentOption[];
-
+  
   permissions: PermissionForm;
   onChange: (next: NavigationForm) => void;
 }) {
+  
+  
   const [treeState, setTreeState] = useState<NavPlatformState>(() =>
     configToState(value.pc ?? [], V2_NAV_IDS),
   );

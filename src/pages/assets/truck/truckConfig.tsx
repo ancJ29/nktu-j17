@@ -1,3 +1,5 @@
+
+
 import type { ReactNode } from 'react';
 import { Group, Stack, Text } from '@mantine/core';
 import { IconTruck } from '@tabler/icons-react';
@@ -16,14 +18,14 @@ export type TruckColumnsContext = {
   typeLabels: Map<string, string>;
   formatDate: (iso: string) => string;
   todayIso: string;
-
+  
   sortField?: string;
   onSortChange?: (field: string) => void;
 };
 
 export type TruckConfig = {
   routes: { LIST: string; NEW: string; DETAIL: string; EDIT: string };
-
+  
   i18nKey: string;
   Icon: typeof IconTruck;
   columns: (ctx: TruckColumnsContext) => DataTableColumn<TruckAssetRow>[];
@@ -99,7 +101,10 @@ export const TRUCK_CONFIG: TruckConfig = {
     },
     {
       key: 'expiry',
-
+      
+      
+      
+      
       header: (
         <SortHeader
           label={t('assets.truck.columns.compliance')}
@@ -109,7 +114,8 @@ export const TRUCK_CONFIG: TruckConfig = {
           firstDir="asc"
         />
       ),
-
+      
+      
       render: (i) => (
         <TruckExpiryLines extra={i.extra} todayIso={todayIso} t={t} formatDate={formatDate} />
       ),

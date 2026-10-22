@@ -32,6 +32,10 @@ export function createApiGroup(config: ApiGroupConfig) {
 
     const storages = callStorages !== undefined ? callStorages : config.storages;
 
+    
+    
+    
+    
     const send = () => {
       const headers = {
         ...buildHeadersWithRoute({
@@ -56,7 +60,7 @@ export function createApiGroup(config: ApiGroupConfig) {
 
     const gate = storages?.beforeRequest;
     if (!gate) return send();
-
+    
     return Promise.resolve()
       .then(gate)
       .catch(() => undefined)

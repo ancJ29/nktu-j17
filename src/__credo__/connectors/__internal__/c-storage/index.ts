@@ -91,7 +91,7 @@ export const cStorageConnector = {
   useLocal: () => {
     return cStorageConnector.setBaseUrl(`http://localhost:${PORTS.C_STORAGE}`);
   },
-
+  
   setTarget: (target: string) => {
     if (target) {
       storages.target = target;
@@ -131,8 +131,9 @@ export const cStorageConnector = {
     if (!internalAccessKey) {
       return cStorageConnector;
     }
-
+    
     if (isBrowser()) {
+      
       console.warn(
         '[cStorageConnector] setInternalAccessKey is disabled in browser context. c-storage is not intended for direct FE access.',
       );
@@ -147,6 +148,9 @@ export const cStorageConnector = {
     }
     return cStorageConnector;
   },
+  
+  
+  
 
   getPublicRecords: <T>({ serviceCode, cursor, limit, noData }: GetPublicRecordsRequest) =>
     recordApi<GetPublicRecordsResponse<T>>(RECORD_ROUTES.GET_PUBLIC_RECORDS, {
@@ -169,6 +173,7 @@ export const cStorageConnector = {
       accessKeyRequired: true,
     }),
 
+  
   getRecordByKey: (<T>({
     serviceCode,
     key,
@@ -256,6 +261,10 @@ export const cStorageConnector = {
       accessKey,
       accessKeyRequired: true,
     }),
+
+  
+  
+  
 
   getAllServices: ({ fullData }: GetAllServicesRequest = {}) =>
     serviceApi<GetAllServicesResponse>(SERVICE_ROUTES.GET_ALL_SERVICES, {

@@ -43,6 +43,8 @@ function chargeReloadBudget(): boolean {
     sessionStorage.setItem(RELOAD_GUARD_KEY, JSON.stringify(next));
     return next.count <= RELOAD_GUARD_MAX;
   } catch {
+    
+    
     return true;
   }
 }
@@ -59,6 +61,8 @@ export function reloadPage(reason?: string): boolean {
   }
 
   if (!chargeReloadBudget()) {
+    
+    
     console.error(
       `[RELOAD-PAGE] reload loop detected (>${RELOAD_GUARD_MAX} reloads in ${
         RELOAD_GUARD_WINDOW_MS / 1000
@@ -86,6 +90,9 @@ export async function clearAllCache(): Promise<void> {
     logger.error('[CLEAR-CACHE] sessionStorage', e);
   }
 
+  
+  
+  
   try {
     const idb = globalThis.indexedDB;
     const list = typeof idb?.databases === 'function' ? await idb.databases() : [];
@@ -111,6 +118,10 @@ export async function clearAllCache(): Promise<void> {
     logger.error('[CLEAR-CACHE] indexedDB', e);
   }
 
+  
+  
+  
+  
   try {
     const registrations = (await navigator.serviceWorker?.getRegistrations()) ?? [];
     await Promise.all(registrations.map((r) => r.unregister()));
@@ -118,6 +129,7 @@ export async function clearAllCache(): Promise<void> {
     logger.error('[CLEAR-CACHE] serviceWorker', e);
   }
 
+  
   try {
     if (typeof caches !== 'undefined') {
       const keys = await caches.keys();
@@ -127,6 +139,7 @@ export async function clearAllCache(): Promise<void> {
     logger.error('[CLEAR-CACHE] caches', e);
   }
 
+  
   try {
     for (const pair of document.cookie.split(';')) {
       const name = pair.split('=')[0]?.trim();

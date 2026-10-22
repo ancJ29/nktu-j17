@@ -66,6 +66,7 @@ export function GreenhouseDetailPage() {
     if (!id) return;
     const cached = useGreenhouseStore.getState().getById(id) as Greenhouse | undefined;
     if (cached) {
+      
       setGreenhouse(cached);
       setLoading(false);
       return;
@@ -83,6 +84,8 @@ export function GreenhouseDetailPage() {
     });
   }, [id, t]);
 
+  
+  
   const allCrops = useCropStore((s) => s.items);
   const cropsInitialized = useCropStore((s) => s.initialized);
   const loadCrops = useCropStore((s) => s.loadAll);
@@ -116,6 +119,8 @@ export function GreenhouseDetailPage() {
   const detail = occupancyDetail(occupancy);
   const occupancyDetailText = detail ? t(detail.key, detail.values) : null;
 
+  
+  
   const statbook = (
     <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'} style={{ flexShrink: 0 }}>
       <StatPill
@@ -126,6 +131,11 @@ export function GreenhouseDetailPage() {
         compact={isMobile}
       />
       {canViewCrops && (
+        
+        
+        
+        
+        
         <StatPill
           icon={<IconPlant2 size={isMobile ? 12 : 14} />}
           label={t('greenhouses.detail.statOccupancy')}
@@ -181,6 +191,7 @@ export function GreenhouseDetailPage() {
     </Card>
   );
 
+  
   const infoCard = (
     <SectionCard icon={<IconInfoCircle size={14} />} title={t('greenhouses.detail.infoTitle')}>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
@@ -215,6 +226,8 @@ export function GreenhouseDetailPage() {
     </SectionCard>
   );
 
+  
+  
   const notesCard = (
     <SectionCard icon={<IconNote size={14} />} title={t('__new__.01-common.labels.note')}>
       <Text size="sm" style={{ whiteSpace: 'pre-wrap' }} c={extra.notes ? undefined : 'dimmed'}>

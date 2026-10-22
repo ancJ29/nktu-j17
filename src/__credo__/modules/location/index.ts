@@ -48,6 +48,7 @@ export function createLocationModule(config: LocationModuleConfig) {
     return saveItems(storage, serviceCode, key(scope), items);
   }
 
+  
   async function load(scope: string): Promise<Location[]> {
     const items = await loadItems<Location>(storage, serviceCode, key(scope));
     const result = ensureDefaultLocation(items, new Date().toISOString());
@@ -99,6 +100,7 @@ export function createLocationModule(config: LocationModuleConfig) {
       return location;
     },
 
+    
     async createMany(
       scope: string,
       inputs: CreateLocationInput[],

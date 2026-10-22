@@ -1,3 +1,5 @@
+
+
 const UTC_PLUS_7_OFFSET_MS = 7 * 60 * 60 * 1000;
 
 export const getCurrentPeriodKey = (now: number = Date.now()): string => {

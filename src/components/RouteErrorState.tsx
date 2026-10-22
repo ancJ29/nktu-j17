@@ -21,6 +21,9 @@ export function RouteErrorState() {
   const location = useLocation();
   const isStaleChunk = isChunkLoadError(error);
 
+  
+  
+  
   const stack =
     error instanceof Error && error.stack
       ? error.stack.split('\n').slice(1, 5).join('\n').slice(0, 600)

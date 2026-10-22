@@ -6,9 +6,10 @@ export function useInventoryV2(
   useStore: InventoryV2Store,
   enabled: boolean,
 ): {
+  
   readonly byItemId: ReadonlyMap<string, InventoryV2Row>;
   readonly loading: boolean;
-
+  
   readonly ready: boolean;
 } {
   const items = useStore((s) => s.items);

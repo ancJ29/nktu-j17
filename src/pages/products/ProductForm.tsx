@@ -79,13 +79,20 @@ export function ProductForm({ variant }: ProductFormProps) {
   const forceRefresh = useProductStore((s) => s.forceRefresh);
   const totalProducts = useProductStore((s) => s.items.length);
 
+  
+  
+  
   const categoryOptions = useLookupV2Options('product-category');
   const unitOptions = useLookupV2Options('product-unit');
 
+  
+  
+  
   const snapshotRef = useRef<Product | null>(null);
 
   const [activeTab, setActiveTab] = useState<string | null>('single');
 
+  
   const bulkNavTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(bulkNavTimer.current), []);
 
@@ -102,6 +109,7 @@ export function ProductForm({ variant }: ProductFormProps) {
     | undefined
   >();
 
+  
   useEffect(() => {
     let canView = true;
     if (isMobile) {
@@ -118,21 +126,32 @@ export function ProductForm({ variant }: ProductFormProps) {
 
   const [loading, setLoading] = useState(false);
 
+  
+  
+  
+  
   const skuIsCustomRef = useRef(false);
 
   const form = useForm<ProductFormValues>({
     initialValues: {
       name: '',
-
+      
       code: isEdit ? '' : buildNextProductCode(totalProducts + 1),
       description: '',
       units: [],
       price: 0,
       isActive: true,
       alternativeNames: [],
-
+      
+      
+      
+      
+      
       sku: isEdit ? '' : buildNextProductCode(totalProducts + 1),
-
+      
+      
+      
+      
       barcode: isEdit || !barcodeEnabled ? '' : generateInternalBarcode(),
       basePrice: 0,
       suggestedPrice: 0,
@@ -150,7 +169,16 @@ export function ProductForm({ variant }: ProductFormProps) {
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       code: (v) => (v.trim() ? null : t('common.validation.codeRequired')),
-
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       sku: (v, values) => {
         const sku = v.trim();
         const items = useProductStore.getState().items;
@@ -171,7 +199,9 @@ export function ProductForm({ variant }: ProductFormProps) {
         if (result === 'disconnected') return t('products.validation.unitsNotConnected');
         return null;
       },
-
+      
+      
+      
       minInventoryValue: (v, values) =>
         !hasValue(v) && hasUnit(values.minInventoryUnit)
           ? t('products.validation.pairValueRequired')
@@ -180,7 +210,11 @@ export function ProductForm({ variant }: ProductFormProps) {
         hasValue(values.minInventoryValue) && !hasUnit(v)
           ? t('products.validation.pairUnitRequired')
           : null,
-
+      
+      
+      
+      
+      
       setItems: (rows, values) => {
         if (!rows || rows.length === 0) return null;
         const allProducts = useProductStore.getState().items;
@@ -200,15 +234,25 @@ export function ProductForm({ variant }: ProductFormProps) {
     },
   });
 
+  
+  
+  
+  
+  
+  
+  
   useEffect(() => {
     if (isEdit || skuIsCustomRef.current) return;
     const nextCode = buildNextProductCode(totalProducts + 1);
     form.setFieldValue('code', nextCode);
-
+    
     form.setFieldValue('sku', nextCode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, totalProducts]);
 
+  
+  
+  
   const handleSkuChange = useCallback(
     (value: string) => {
       if (value.trim() === '') {
@@ -245,7 +289,8 @@ export function ProductForm({ variant }: ProductFormProps) {
       minInventoryValue: min?.value ?? '',
       minInventoryUnit: min?.unit ?? '',
       noInventory: p.extra?.noInventory ?? false,
-
+      
+      
       hiddenFromInventoryList: p.extra?.hiddenFromInventoryList ?? false,
       unitConversions: p.extra?.unitConversions ?? [],
       setItems: p.extra?.setItems ?? [],
@@ -268,6 +313,7 @@ export function ProductForm({ variant }: ProductFormProps) {
     },
   );
 
+  
   const seedInventoryRow = useCallback(
     async (product: Product): Promise<boolean> => {
       if (!variant.seedInventoryRowOnCreate) return false;
@@ -275,11 +321,20 @@ export function ProductForm({ variant }: ProductFormProps) {
       if (product.extra?.noInventory) return false;
       const baseUnit = getItemBaseUnit(product);
       try {
+        
+        
+        
+        
+        
+        
         await useProductInventoryStore.getState().loadAll();
         if (!useProductInventoryStore.getState().initialized) {
           throw new Error('product-inventory list unavailable');
         }
-
+        
+        
+        
+        
         const extra: ProductInventoryExtra = markInventoryVerified({
           lastUpdatedBy: getCurrentActorId(),
           unit: baseUnit,
@@ -293,7 +348,8 @@ export function ProductForm({ variant }: ProductFormProps) {
             extra,
           },
         });
-
+        
+        
         logActivity('productInventory.create', product.id, {
           locationCode: DEFAULT_LOCATION_CODE,
           onHand: 0,
@@ -316,9 +372,15 @@ export function ProductForm({ variant }: ProductFormProps) {
     async (values: ProductFormValues) => {
       setLoading(true);
       try {
+        
+        
+        
+        
+        
         const user = useAuthStore.getState().user;
         const updatedBy = user?.email ?? 'unknown';
 
+        
         const core = {
           name: values.name,
           code: values.code,
@@ -328,8 +390,15 @@ export function ProductForm({ variant }: ProductFormProps) {
           isActive: values.isActive,
         };
 
+        
+        
+        
+        
+        
+        
         const images = snapshotRef.current?.extra?.images ?? [];
 
+        
         let minimumInventory: ProductMinimumInventory | undefined;
         if (
           !values.noInventory &&
@@ -362,7 +431,9 @@ export function ProductForm({ variant }: ProductFormProps) {
             alternativeNames: values.alternativeNames,
           }),
           ...(images.length > 0 && { images }),
-
+          
+          
+          
           ...((isEdit ? values.sku.trim() : values.code.trim()) && {
             sku: isEdit ? values.sku.trim() : values.code.trim(),
           }),
@@ -370,7 +441,10 @@ export function ProductForm({ variant }: ProductFormProps) {
           ...(values.basePrice > 0 && { basePrice: values.basePrice }),
           ...(values.suggestedPrice > 0 && { suggestedPrice: values.suggestedPrice }),
           ...(values.category.trim() && { category: values.category.trim() }),
-
+          
+          
+          
+          
           ...(() => {
             const cleaned = values.attributes
               .map((a) => ({ key: a.key.trim(), value: a.value.trim() }))
@@ -386,7 +460,9 @@ export function ProductForm({ variant }: ProductFormProps) {
               (c) => c.unit.trim() && c.baseUnit.trim() && c.quantity > 0,
             ),
           }),
-
+          
+          
+          
           ...(() => {
             const cleaned: ProductSetItem[] = values.setItems
               .map((r) => ({
@@ -396,7 +472,9 @@ export function ProductForm({ variant }: ProductFormProps) {
               }))
               .filter((r) => r.productCode && r.unit && r.quantity > 0);
             if (cleaned.length === 0) return {};
-
+            
+            
+            
             return values.setMode === 'breakdown'
               ? { setItems: cleaned, setMode: 'breakdown' as const }
               : { setItems: cleaned };
@@ -420,10 +498,12 @@ export function ProductForm({ variant }: ProductFormProps) {
             .getState()
             .updateSafely({ id, version: snapshot.version, patch: after });
           const diff = deepDiff(before, after);
-
+          
+          
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           logActivity(onlyIsActive ? 'product.toggleStatus' : 'product.update', id, diff);
-
+          
+          
           snapshotRef.current = updated;
           notifications.show({
             color: 'green',
@@ -438,14 +518,21 @@ export function ProductForm({ variant }: ProductFormProps) {
             ...(expectedListHash && { expectedListHash }),
           });
           logActivity('product.create', res.product.id);
-
+          
+          
           forceRefresh();
           notifications.show({
             color: 'green',
             message: t('products.notifications.createSuccess'),
           });
           const seeded = await seedInventoryRow(res.product);
-
+          
+          
+          
+          
+          
+          
+          
           navigate(ROUTES.PRODUCTS.DETAIL.replace(':id', res.product.id), {
             state: seeded ? null : { promptInventory: true },
           });
@@ -464,8 +551,14 @@ export function ProductForm({ variant }: ProductFormProps) {
             autoClose: 8000,
           });
         } else if (!isEdit && isListVersionConflict(err)) {
+          
+          
+          
+          
           await useProductStore.getState().forceRefresh();
-
+          
+          
+          
           let newCode = form.values.code;
           if (!skuIsCustomRef.current) {
             newCode = buildNextProductCode(useProductStore.getState().items.length + 1);
@@ -495,14 +588,23 @@ export function ProductForm({ variant }: ProductFormProps) {
 
   const navigateToList = useCallback(() => navigate(ROUTES.PRODUCTS.LIST), [navigate]);
 
+  
   const handleDownloadSample = useCallback(async () => {
     setIsDownloading(true);
     try {
+      
+      
+      
+      
+      
       const categories = categoryOptions.map((o) => o.label);
       const units = unitOptions.map((o) => o.label);
       const categoryLabels = Object.fromEntries(categoryOptions.map((o) => [o.value, o.label]));
       const unitLabels = Object.fromEntries(unitOptions.map((o) => [o.value, o.label]));
-
+      
+      
+      
+      
       if (!useProductStore.getState().initialized) {
         await useProductStore.getState().loadAll();
       }
@@ -560,6 +662,14 @@ export function ProductForm({ variant }: ProductFormProps) {
         return;
       }
 
+      
+      
+      
+      
+      
+      
+      
+      
       const catLabelToValue = new Map<string, string>();
       for (const o of categoryOptions) catLabelToValue.set(o.label.trim().toLowerCase(), o.value);
       const unitLabelToValue = new Map<string, string>();
@@ -570,7 +680,9 @@ export function ProductForm({ variant }: ProductFormProps) {
       for (const p of products) {
         const cat = p.category?.trim();
         if (cat && !catLabelToValue.has(cat.toLowerCase())) unknownCategories.add(cat);
-
+        
+        
+        
         for (const raw of [p.unit, p.minInventoryUnit]) {
           const unit = raw?.trim();
           if (unit && !unitLabelToValue.has(unit.toLowerCase())) unknownUnits.add(unit);
@@ -602,13 +714,25 @@ export function ProductForm({ variant }: ProductFormProps) {
         return;
       }
 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       const user = useAuthStore.getState().user;
       const updatedBy = user?.email ?? 'unknown';
       const now = Date.now();
       let nextCodeNum = totalProducts + 1;
       const items = products.map((p) => {
         const code = p.sku?.trim() || buildNextProductCode(nextCodeNum++);
-
+        
+        
         const resolveUnit = (raw: string | undefined) => {
           const label = raw?.trim();
           return label ? (unitLabelToValue.get(label.toLowerCase()) ?? '') : '';
@@ -619,28 +743,45 @@ export function ProductForm({ variant }: ProductFormProps) {
           typeof p.minInventoryValue === 'number' && p.minInventoryValue > 0
             ? p.minInventoryValue
             : undefined;
-
+        
+        
         const category = p.category?.trim()
           ? catLabelToValue.get(p.category.trim().toLowerCase())
           : undefined;
         const extra: ProductExtra = {
+          
+          
+          
+          
           sku: code,
           ...(barcodeEnabled && {
             barcode: p.barcode?.trim() || generateInternalBarcode(),
           }),
           ...(category && { category }),
-
+          
+          
+          
+          
           ...(p.noInventory && { noInventory: true }),
           ...(hideFromInventoryListEnabled &&
             p.hiddenFromInventoryList && { hiddenFromInventoryList: true }),
-
+          
+          
+          
+          
+          
           ...(unit && { units: [unit] }),
           ...(priceManageable &&
             typeof p.basePrice === 'number' &&
             p.basePrice > 0 && {
               basePrice: p.basePrice,
             }),
-
+          
+          
+          
+          
+          
+          
           ...(minValue !== undefined &&
             minUnit && {
               minimumInventory: {
@@ -669,7 +810,8 @@ export function ProductForm({ variant }: ProductFormProps) {
       const failed = res.summary?.errors ?? Math.max(0, total - created - skippedCount);
       const rowName = (index: number) =>
         products[index]?.name ?? t('common.bulkImport.rowLabel', { n: index + 1 });
-
+      
+      
       const skippedNames = (res.skipped ?? []).map((s) => {
         const reason =
           s.reason === 'duplicate-sku'
@@ -686,6 +828,8 @@ export function ProductForm({ variant }: ProductFormProps) {
         errors: errorNames.length > 0 ? errorNames : undefined,
       });
 
+      
+      
       if (failed === 0 && skippedCount === 0) {
         notifications.show({
           color: 'green',
@@ -703,6 +847,10 @@ export function ProductForm({ variant }: ProductFormProps) {
       }
     } catch (err) {
       if (err instanceof ExcelParseError) {
+        
+        
+        
+        
         const labels: Record<string, string> = {
           name: t('common.labels.name'),
         };
@@ -727,7 +875,7 @@ export function ProductForm({ variant }: ProductFormProps) {
   const validateFileType = useCallback((f: File) => {
     const validTypes = [
       'text/csv',
-
+      
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ];
@@ -750,6 +898,8 @@ export function ProductForm({ variant }: ProductFormProps) {
     />
   );
 
+  
+  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button

@@ -48,6 +48,7 @@ export function NotesSection({ notes, canEdit, onAdd, onRemove }: NotesSectionPr
     }
   };
 
+  
   const sortedNotes = [...notes].sort((a, b) => b.createdAt - a.createdAt);
 
   return (

@@ -1,3 +1,5 @@
+
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDisclosure } from '@mantine/hooks';
@@ -35,13 +37,14 @@ type InventoryStoreSlice<TRow extends InventoryRowBase> = {
 type Options<TEntity extends EntityBase, TRow extends InventoryRowBase> = {
   readonly entity: TEntity;
   readonly store: InventoryStoreSlice<TRow>;
-
+  
   readonly unitLookup?: string;
 };
 
 export type InventorySection<TRow extends InventoryRowBase> = {
+  
   readonly rows: TRow[];
-
+  
   readonly allRows: readonly TRow[];
   readonly totalOnHand: number;
   readonly baseUnit: string;
@@ -50,14 +53,14 @@ export type InventorySection<TRow extends InventoryRowBase> = {
   readonly unitLabels: ReturnType<typeof useLookupV2Labels>;
   readonly locationByCode: Map<string, Location>;
   readonly forceRefresh: () => unknown;
-
+  
   readonly isReady: boolean;
   readonly update: {
     readonly opened: boolean;
     readonly activeRow: TRow | null;
     readonly open: (row: TRow) => void;
     readonly close: () => void;
-
+    
     readonly contextLabel: string | undefined;
     readonly noLocation: boolean;
   };

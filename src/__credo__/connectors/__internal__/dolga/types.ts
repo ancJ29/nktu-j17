@@ -1,3 +1,5 @@
+
+
 export type JsonValue =
   string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
 
@@ -5,11 +7,11 @@ export type ConfigData = { [key: string]: JsonValue };
 
 export type ConfigRecord = {
   config: ConfigData;
-
+  
   version: number;
-
+  
   updatedAt: string;
-
+  
   adminKeyConfigured: boolean;
 };
 
@@ -34,6 +36,7 @@ export type SetConfigRequest = ConfigData;
 export type SetConfigResponse = ConfigRecord;
 
 export type RotateAdminKeyRequest = {
+  
   adminKey: string | null;
 };
 export type RotateAdminKeyResponse = ConfigRecord;
@@ -81,29 +84,29 @@ export type DevServerOkResponse = {
   success: true;
   instanceId: string;
   state?: DevServerState;
-
+  
   action?: 'start' | 'stop' | 'sync-ip';
-
+  
   changed?: boolean;
-
+  
   previousState?: DevServerState;
-
+  
   ip?: string;
-
+  
   ipSource?: 'body' | 'sourceIp';
-
+  
   sgId?: string;
-
+  
   ports?: string[];
-
+  
   changes?: DevServerSyncIpChange[];
 };
 
 export type DevServerErrorResponse = {
   success: false;
-
+  
   message: string;
-
+  
   ip?: string;
 };
 
@@ -123,19 +126,19 @@ export type DevServerSyncIpResponse = DevServerResponse;
 
 export type HealthService = {
   serviceName: string;
-
+  
   lastHeartbeat: string;
-
+  
   nextExpectedAt: string;
-
+  
   lastAlertedAt: string | null;
-
+  
   overdue: boolean;
 };
 
 export type HealthHeartbeatRequest = {
   serviceName: string;
-
+  
   ttlSeconds: number;
 };
 export type HealthHeartbeatResponse =
@@ -181,7 +184,7 @@ export type ConfigAccessKeyEntry = {
   accessKey: string;
   configKey: string;
   label: string;
-
+  
   createdAt: number;
 };
 
@@ -198,10 +201,11 @@ export type ConfigRevokeKeyResponse =
   { success: true; revoked: boolean } | { success: false; message: string };
 
 export type DnsSyncReportRequest = {
+  
   instanceKey: string;
-
+  
   secret: string;
-
+  
   ip?: string;
 };
 export type DnsSyncReportResponse =
@@ -212,14 +216,15 @@ export type DnsSyncReportResponse =
       status: 'updated';
       oldIp: string;
       ip: string;
-
+      
       updated: number;
-
+      
       total: number;
     }
   | { success: false; message: string };
 
 export type DnsSyncSetSecretRequest = {
+  
   secret: string | null;
 };
 export type DnsSyncSetSecretResponse =
@@ -228,7 +233,7 @@ export type DnsSyncSetSecretResponse =
 export type DnsSyncEntry = {
   instanceKey: string;
   lastIp: string;
-
+  
   updatedAt: string;
 };
 
@@ -241,19 +246,20 @@ export type DnsSyncRemoveResponse =
   { success: true; instanceKey: string; removed: boolean } | { success: false; message: string };
 
 export type MediaUploadUrlRequest = {
+  
   imageDirectory: string;
-
+  
   fileName: string;
 };
 export type MediaUploadUrlResponse = {
   success: boolean;
-
+  
   uploadUrl?: string;
-
+  
   fileUrl?: string;
-
+  
   expiresIn?: number;
-
+  
   key?: string;
   error?: string;
 };
@@ -269,18 +275,19 @@ export type MediaDeleteResponse = {
 };
 
 export type Ec2Schedule = {
+  
   instanceId: string;
-
+  
   label?: string;
-
+  
   startHour: number;
-
+  
   stopHour: number;
-
+  
   skipWeekends?: boolean;
-
+  
   timezoneOffsetMinutes?: number;
-
+  
   enabled?: boolean;
 };
 

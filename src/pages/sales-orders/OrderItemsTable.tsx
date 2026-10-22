@@ -55,24 +55,24 @@ type OrderItemsTableProps = {
   items: SalesOrderItem[];
   showShortageAlert?: boolean;
   totalAmount?: number | null;
-
+  
   ownReservedSnapshot?: readonly InventoryLinkageSnapshotEntry[];
-
+  
   currentOrderNumber?: string;
-
+  
   inventoryLinkageState?: InventoryLinkageState;
-
+  
   canEditItemMemo?: boolean;
   onItemMemoSave?: (itemIndex: number, memo: string) => Promise<void>;
-
+  
   showItemReady?: boolean;
   onItemReadySave?: (itemIndex: number, isReady: boolean) => Promise<void>;
-
+  
   showItemWarehouseMemo?: boolean;
   onItemWarehouseMemoSave?: (itemIndex: number, warehouseMemo: string) => Promise<void>;
-
+  
   productPhotoOnHover?: boolean;
-
+  
   pickingView?: boolean;
 };
 
@@ -92,15 +92,28 @@ export function OrderItemsTable({
   pickingView = false,
   currentOrderNumber,
 }: OrderItemsTableProps) {
+  
+  
+  
   const stockSettled = inventoryLinkageState === 'shipped' || inventoryLinkageState === 'released';
   const { t } = useTranslation();
-
+  
   const [photoProduct, setPhotoProduct] = useState<{ code: string; name: string } | null>(null);
-
+  
+  
+  
+  
   const extraQtyEnabled = isExtraDeliveryQuantityAllowed();
 
+  
+  
+  
+  
   const memoEditable = canEditItemMemo && !!onItemMemoSave;
-
+  
+  
+  
+  
   const [readySaving, setReadySaving] = useState<number | null>(null);
   const readyEditable = showItemReady && !!onItemReadySave;
   const renderReadyBox = (item: SalesOrderItem) => {
@@ -164,6 +177,9 @@ export function OrderItemsTable({
     />
   );
 
+  
+  
+  
   const products = useProductStore((s) => s.items);
   const locations = useLocationStore((s) => s.items);
   const inventoryRows = useProductInventoryStore((s) => s.items);
@@ -171,6 +187,9 @@ export function OrderItemsTable({
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
   const unitLabels = useLookupV2Labels('product-unit');
 
+  
+  
+  
   const inboundByProduct = useOpenInboundByProduct();
 
   useEffect(() => {
@@ -202,10 +221,14 @@ export function OrderItemsTable({
     if (stockSettled) return null;
     const product = productByCode.get(productCode);
     if (!product) return null;
-
+    
     if (isNoInventoryProduct(product)) return null;
     const target = locationCode || DEFAULT_LOCATION_CODE;
-
+    
+    
+    
+    
+    
     const incoming = AVAILABILITY_INCLUDES_INCOMING
       ? (inboundByProduct.get(productCode)?.totalBase ?? 0)
       : 0;
@@ -215,6 +238,7 @@ export function OrderItemsTable({
     });
   }
 
+  
   function getUnitAvailable(
     productCode: string,
     locationCode: string | undefined,
@@ -234,6 +258,11 @@ export function OrderItemsTable({
     );
   }
 
+  
+  
+  
+  
+  
   const displayItems = useMemo(
     () =>
       canViewSetComponentInventory ? items : items.filter((it) => it.role !== 'set-component'),
@@ -246,7 +275,10 @@ export function OrderItemsTable({
         {displayItems.map((item, idx) => {
           const isSetParent = item.role === 'set';
           const isSetChild = item.role === 'set-component';
-
+          
+          
+          
+          
           const available = isSetChild
             ? getUnitAvailable(item.productCode, item.fromLocationCode, item.unit)
             : getAvailable(item.productCode, item.fromLocationCode);
@@ -530,7 +562,9 @@ export function OrderItemsTable({
           {displayItems.map((item, idx) => {
             const isSetParent = item.role === 'set';
             const isSetChild = item.role === 'set-component';
-
+            
+            
+            
             const available = isSetChild
               ? getUnitAvailable(item.productCode, item.fromLocationCode, item.unit)
               : getAvailable(item.productCode, item.fromLocationCode);

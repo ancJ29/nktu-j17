@@ -1,3 +1,5 @@
+
+
 import type { ComponentType, ReactNode } from 'react';
 import type { DataTableColumn } from '@credo/base-ui/components';
 import type { UseFormReturnType } from '@mantine/form';
@@ -47,7 +49,7 @@ export type MasterDataRoutes = {
 
 export type MasterDataText = {
   readonly navTitle: string;
-
+  
   readonly statusLabels?: { readonly active: string; readonly inactive: string };
   readonly searchPlaceholder: string;
   readonly noItems: string;
@@ -74,7 +76,7 @@ export type MasterDataText = {
     readonly description: string;
     readonly confirm: (name: string) => string;
   };
-
+  
   readonly duplicate: { readonly live: string; readonly archived: string };
   readonly notifications: {
     readonly created: string;
@@ -96,17 +98,19 @@ export type MasterDataFormSection<Values extends MasterDataFormValues> = {
 };
 
 export type MasterDataHeaderText = {
+  
   readonly secondary?: string;
-
+  
   readonly tag?: string;
 };
 
 export type MasterDataSpec<Row extends MasterDataRow, Values extends MasterDataFormValues> = {
+  
   readonly filterCacheKey: string;
   readonly routes: MasterDataRoutes;
-
+  
   readonly simpleMode: boolean;
-
+  
   readonly can: {
     readonly create: boolean;
     readonly edit: boolean;
@@ -116,19 +120,19 @@ export type MasterDataSpec<Row extends MasterDataRow, Values extends MasterDataF
   readonly text: (t: Translate) => MasterDataText;
   readonly list: {
     readonly searchFields: (row: Row) => Array<string | undefined | null>;
-
+    
     readonly secondaryOf?: (row: Row) => string | undefined;
-
+    
     readonly useColumns: (rows: readonly Row[]) => Array<DataTableColumn<Row>>;
-
+    
     readonly ignoreColumns?: ReadonlyArray<string>;
-
+    
     readonly displayOrderColumns?: Readonly<Record<string, number>>;
-
+    
     readonly listColumnOrder?: readonly string[];
-
+    
     readonly hiddenColumns?: readonly string[];
-
+    
     readonly useFilters?: MasterDataListFiltersHook<Row>;
   };
   readonly form: {
@@ -137,12 +141,13 @@ export type MasterDataSpec<Row extends MasterDataRow, Values extends MasterDataF
     readonly patchOf: (values: Values, editing: Row | null) => Record<string, unknown>;
     readonly sections: ReadonlyArray<MasterDataFormSection<Values>>;
   };
-
+  
   readonly mobile?: {
+    
     readonly Card: ComponentType<{ readonly row: Row }>;
   };
   readonly useHeaderText: (row: Row) => MasterDataHeaderText;
   readonly DetailBody: ComponentType<{ readonly row: Row }>;
-
+  
   readonly DetailSide?: ComponentType<{ readonly row: Row }>;
 };

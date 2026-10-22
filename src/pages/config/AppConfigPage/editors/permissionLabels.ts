@@ -1,3 +1,5 @@
+
+
 export const PERM_MODULE_LABELS: Record<string, string> = {
   crop: 'Crop',
   cropDiary: 'Crop Diary',
@@ -9,7 +11,7 @@ export const PERM_MODULE_LABELS: Record<string, string> = {
   goodsReceipt: 'Goods Receipt',
   greenhouse: 'Greenhouse',
   location: 'Location',
-
+  
   lookup: 'Lookup (v1 — retired, no effect)',
   lookupV2: 'Lookup (v2)',
   material: 'Material',

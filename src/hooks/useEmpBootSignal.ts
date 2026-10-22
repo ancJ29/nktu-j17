@@ -1,9 +1,11 @@
+
 import { useCallback, useRef } from 'react';
 import { markEmpReady } from '@/utils/bootState';
 
 export type EmpBootSignal = {
+  
   setResolvedOk: (ok: boolean) => void;
-
+  
   markMasterDataSettled: () => void;
 };
 

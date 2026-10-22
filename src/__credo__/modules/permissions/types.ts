@@ -1,3 +1,5 @@
+
+
 export type ModulePermissions = {
   canView: boolean;
   canCreate: boolean;

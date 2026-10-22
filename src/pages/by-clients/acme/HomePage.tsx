@@ -127,6 +127,7 @@ function OpsKpis({
 }
 
 function ManagerDashboard() {
+  
   const { today, monday, fetchFromDay } = useMemo(() => {
     const t = todayUtc7();
     const m = mondayOf(t);
@@ -148,6 +149,7 @@ function ManagerDashboard() {
     ...goodsReceiptFlowErrors,
   ];
 
+  
   const inventoryOn = featureFlags.productsV2.inventory && canViewProducts;
   const stock = useInventoryV2(useProductInventoryV2Store, inventoryOn);
   const products = useProductV2Store((s) => s.items);
@@ -307,6 +309,8 @@ function ManagerDashboard() {
 }
 
 export default function AcmeHomePage() {
+  
+  
   const canAccess = useCanAccessReports();
   return canAccess ? <ManagerDashboard /> : <DefaultHomePage />;
 }

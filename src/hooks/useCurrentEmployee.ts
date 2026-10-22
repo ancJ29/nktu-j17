@@ -1,3 +1,5 @@
+
+
 import { useEffect, useRef } from 'react';
 import { appConfig } from '@/config';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -35,7 +37,7 @@ function adoptServerPermissionsIfAsked(context: 'employee' | 'root'): void {
 
 type UseCurrentEmployeeOptions = {
   isProfileLoaded: boolean;
-
+  
   email: string | undefined | null;
 };
 
@@ -44,15 +46,27 @@ let _currentEmployeeId: string | null = null;
 export function getCurrentEmployeeId(): string | null {
   if (_currentEmployeeId) return _currentEmployeeId;
 
+  
+  
+  
+  
+  
   const mine = useAuthStore.getState().user?.myInformation?.id;
   if (mine) {
     _currentEmployeeId = mine;
     return mine;
   }
 
+  
+  
+  
+  
+  
+  
   const email = useAuthStore.getState().user?.email;
   if (!email) return null;
-
+  
+  
   const match = findEmployeeByLoginEmail(useEmployeeStore.getState().items, email);
   if (!match) return null;
   _currentEmployeeId = match.id;
@@ -80,23 +94,53 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
   const { items: employees, initialized } = useEmployeeStore();
   const isRoot = useIsRoot();
 
+  
+  
+  
+  
   const { setResolvedOk, markMasterDataSettled } = useEmpBootSignal();
 
+  
+  
+  
+  
   useEffect(() => {
     if (isProfileLoaded && email && !initialized) {
       loadAllMasterData().finally(markMasterDataSettled);
     }
   }, [isProfileLoaded, email, initialized, markMasterDataSettled]);
 
+  
   useEffect(() => {
     if (!isProfileLoaded || !email || !initialized) return;
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     const myId = useAuthStore.getState().user?.myInformation?.id;
     const match = myId
       ? employees.find((e) => e.id === myId)
       : findEmployeeByLoginEmail(employees, email);
     const extra = match?.extra as EmployeeExtra | undefined;
 
+    
+    
+    
+    
+    
+    
+    
     if (match && !match.isActive) {
       if (!lockedHandled.current) {
         lockedHandled.current = true;
@@ -105,18 +149,34 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
           isDeleted: extra?.isDeleted ?? false,
         });
         useAuthStore.getState().logout('account-locked');
-
+        
+        
         scheduleReload('current employee locked', 2000);
       }
       setResolvedOk(false);
       return;
     }
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     const empPermVersion = extra?.permissionsVersion;
     const cachedPrv = cacheGet('prv') as { cfg?: string; emp?: string } | undefined;
     if (hasResolved.current && empPermVersion === cachedPrv?.emp) return;
     hasResolved.current = true;
 
+    
+    
     _currentEmployeeId = null;
 
     const config = appConfig as CMngtAppConfig;
@@ -125,8 +185,10 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
     const cfgVersion = config.version;
 
     if (match) {
+      
       _currentEmployeeId = match.id;
 
+      
       if (match.department) {
         sharedUserStorage.set(SharedStorageKey.DEPARTMENT, match.department);
       }
@@ -134,6 +196,18 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
       const versions = { cfg: cfgVersion, emp: empPermVersion };
       const cachedVersions = cachedPrv;
 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       const isFirstResolve = cachedVersions == null;
       const versionChanged = !isFirstResolve && hasVersionChanged(cachedVersions, versions);
       const needsReload = isFirstResolve || versionChanged;
@@ -145,14 +219,19 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
         extra?.permissions,
         versions,
       );
-
+      
+      
+      
+      
       reportPermissionMismatch(effective, {
         employeeId: match.id,
         department: match.department,
         versions,
       });
       adoptServerPermissionsIfAsked('employee');
-
+      
+      
+      
       cacheSet('emo', { o: extra?.permissions, v: empPermVersion });
 
       if (needsReload) {
@@ -164,13 +243,22 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
           current: versions,
           reason,
         });
-
+        
+        
+        
+        
         setResolvedOk(false);
         scheduleReload(reason);
         return;
       }
       cacheFlush();
 
+      
+      
+      
+      
+      
+      
       if (tickPostLoginReload()) {
         setResolvedOk(false);
         scheduleReload('post-login permission settle', POST_LOGIN_RELOAD_DELAY_MS);
@@ -187,15 +275,26 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
       setResolvedOk(true);
       firePendingLoginLog();
     } else {
+      
+      
+      
+      
+      
       const versions = { cfg: cfgVersion };
       const effective = buildEffectivePermissions(clientPerms, null, deptOptions, null, versions);
-
+      
+      
+      
+      
       reportPermissionMismatch(effective, { versions });
       adoptServerPermissionsIfAsked('root');
-
+      
+      
       cacheClear('emo');
       cacheFlush();
 
+      
+      
       if (tickPostLoginReload()) {
         setResolvedOk(false);
         scheduleReload('post-login permission settle', POST_LOGIN_RELOAD_DELAY_MS);
@@ -221,6 +320,8 @@ function hasVersionChanged(
   cached: { cfg?: string; emp?: string },
   current: { cfg?: string; emp?: string },
 ): boolean {
+  
+  
   if (cached.emp && current.emp && cached.emp !== current.emp) return true;
   return false;
 }

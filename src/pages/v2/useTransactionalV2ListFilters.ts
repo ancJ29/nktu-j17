@@ -1,3 +1,5 @@
+
+
 import { useCallback, useEffect, useMemo } from 'react';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
 import type { DayRange } from './anchorDay';
@@ -25,14 +27,15 @@ type TransactionalV2UrlState = {
 };
 
 export type TransactionalV2FilterOptions<M extends string, F extends string> = {
+  
   readonly cacheKey: string;
-
+  
   readonly defaultStatuses: readonly string[];
   readonly rangeDays: number;
-
+  
   readonly multiKeys?: readonly M[];
   readonly flagKeys?: readonly F[];
-
+  
   readonly setStoreRange: (range: { from: string; to: string }) => boolean;
   readonly loadAll: () => Promise<void>;
   readonly forceRefresh: () => Promise<void>;
@@ -54,10 +57,15 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
   const multiKeys = options.multiKeys ?? (EMPTY_VALUES as readonly M[]);
   const flagKeys = options.flagKeys ?? (EMPTY_VALUES as readonly F[]);
 
+  
+  
   const compactState = useCallback(
     (state: TransactionalV2UrlState): TransactionalV2UrlState => {
       const result: TransactionalV2UrlState = {};
-
+      
+      
+      
+      
       if (shouldEncodeStatusSelection(state.s, defaultStatuses)) result.s = state.s;
       const multi = Object.fromEntries(
         Object.entries(state.m ?? {}).filter(([, values]) => values.length > 0),
@@ -78,8 +86,12 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
     clearFilters: dropState,
   } = useUrlBlobFilters<TransactionalV2UrlState>({ cacheKey, compactState });
 
+  
+  
   const statuses = useMemo(() => state.s ?? [...defaultStatuses], [state.s, defaultStatuses]);
 
+  
+  
   const multi = useMemo(() => {
     const bag = state.m ?? {};
     return Object.fromEntries(multiKeys.map((key) => [key, bag[key] ?? []])) as Record<M, string[]>;
@@ -95,12 +107,16 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
     [state.d, rangeDays],
   );
 
+  
   const anchorRange: DayRange | undefined = state.a;
   const clearAnchorRange = useCallback(() => {
     updateState({ a: undefined, d: undefined });
     setStoreRange(storeWindowOf(defaultLastNDaysRange(rangeDays), rangeDays));
     void forceRefresh();
   }, [updateState, rangeDays, setStoreRange, forceRefresh]);
+
+  
+  
 
   const storeWindow = useMemo(() => storeWindowOf(dateRange, rangeDays), [dateRange, rangeDays]);
   useEffect(() => {
@@ -109,6 +125,8 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  
+  
   const setStatuses = useCallback((values: string[]) => updateState({ s: values }), [updateState]);
 
   const setMulti = useCallback(
@@ -131,6 +149,7 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
     [updateState],
   );
 
+  
   const setDateRange = useCallback(
     (next: DateRangeValue) => {
       const effective = next.from && next.to ? next : defaultLastNDaysRange(rangeDays);
@@ -155,6 +174,7 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
     Object.values<string[]>(multi).some((values) => values.length > 0) ||
     Object.values<boolean>(flags).some(Boolean);
 
+  
   const clearFilters = useCallback(() => {
     dropState();
     if (!dateRangeIsDefault) {
@@ -166,7 +186,7 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
   return {
     statuses,
     setStatuses,
-
+    
     statusesAreDefault,
     multi,
     setMulti,
@@ -175,7 +195,7 @@ export function useTransactionalV2ListFilters<M extends string = never, F extend
     dateRange,
     setDateRange,
     dateRangeIsDefault,
-
+    
     anchorRange,
     clearAnchorRange,
     search: state.q ?? '',

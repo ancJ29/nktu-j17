@@ -1,3 +1,5 @@
+
+
 import { featureFlags } from '@/config';
 import type { Employee, EmployeeExtra } from '@/types';
 import { cMngtConnector, credoSmeConnector } from '@credo/connectors/connector';
@@ -7,8 +9,9 @@ import { ONE_MINUTE } from '@credo/kits/time';
 type EmployeePatch = Omit<Parameters<typeof cMngtConnector.updateEmployee<EmployeeExtra>>[0], 'id'>;
 
 export type EmployeeUpdateMeta = {
+  
   ssoWarning?: string;
-
+  
   loginPassword?: string;
 };
 
@@ -58,7 +61,7 @@ const v2 = {
         meta: { ssoWarning: r.ssoWarning, loginPassword: r.loginPassword },
       }));
   },
-
+  
   delete: (id: string, version: string, expectedListHash?: string) =>
     credoSmeConnector
       .archiveEmployee({
@@ -85,6 +88,7 @@ export type EmployeeWriteResult = { employee: Employee; ssoWarning?: string };
 export const createEmployee = async (
   input: Partial<Employee> & { extra: EmployeeExtra },
 ): Promise<EmployeeWriteResult> => {
+  
   const expectedListHash = useEmployeeStore.getState().hash ?? undefined;
 
   if (!usesV2) {
@@ -106,6 +110,12 @@ export const archiveEmployee = async (
   employee: Employee,
 ): Promise<{ item: Employee; meta?: EmployeeUpdateMeta }> => {
   if (usesV2) {
+    
+    
+    
+    
+    
+    
     const store = useEmployeeStore.getState();
     const expectedListHash = store.hash ?? undefined;
     try {
@@ -115,13 +125,17 @@ export const archiveEmployee = async (
         ...(expectedListHash !== undefined && { expectedListHash }),
       });
       const item = res.item as Employee;
-
+      
+      
+      
       store.upsertItem(item);
       return {
         item,
         ...(res.ssoWarning !== undefined && { meta: { ssoWarning: res.ssoWarning } }),
       };
     } catch (err) {
+      
+      
       store.invalidate();
       throw toEntityConflictError<Employee>(err);
     }
@@ -140,7 +154,7 @@ export const archiveEmployee = async (
 export const updateEmployeeLoginPassword = async (args: {
   id: string;
   password: string;
-
+  
   version: string;
 }): Promise<{ ssoWarning?: string }> => {
   if (!usesV2) {
@@ -158,7 +172,9 @@ export const updateEmployeeLoginPassword = async (args: {
     password: args.password,
     ...(expectedListHash !== undefined && { expectedListHash }),
   });
-
+  
+  
+  
   useEmployeeStore.getState().upsertItem(res.item as Employee);
   return {};
 };

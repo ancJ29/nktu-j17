@@ -1,3 +1,5 @@
+
+
 import { Button, Divider, Grid, Group, Stack } from '@mantine/core';
 import {
   IconArrowLeft,
@@ -24,6 +26,9 @@ export function EmployeeDetailPage() {
   if (!parts.ready) return null;
   const { employee, canEdit, header, cards, tabs, panels, modals } = parts;
 
+  
+  
+  
   const detailsContent = isMobile ? (
     <Stack gap="md">
       {cards.quickActions}
@@ -50,6 +55,8 @@ export function EmployeeDetailPage() {
     </Grid>
   );
 
+  
+  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button

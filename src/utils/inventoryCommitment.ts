@@ -1,3 +1,5 @@
+
+
 import type { ProductInventoryRow } from '@/types/product-inventory';
 import type { Product } from '@/types/product';
 import type { InventoryLinkageSnapshotEntry } from '@/types/sales-order';
@@ -15,7 +17,7 @@ export type RowAvailability = {
   readonly row: ProductInventoryRow;
   readonly onHand: number;
   readonly reserved: number;
-
+  
   readonly available: number;
   readonly onHandByUnit: OnHandByUnit;
   readonly reservedByUnit: OnHandByUnit;
@@ -33,11 +35,11 @@ export type ProductAvailability = {
   readonly rows: RowAvailability[];
   readonly totalOnHand: number;
   readonly totalReserved: number;
-
+  
   readonly totalIncoming: number;
-
+  
   readonly totalAvailable: number;
-
+  
   readonly reservedByUnit: OnHandByUnit;
   readonly perLocation: Map<string, LocationAvailability>;
 };
@@ -130,6 +132,8 @@ export function getProductLocationAvailability(
   const matching = rows.filter(
     (r) =>
       r.locationCode === locationCode ||
+      
+      
       (isDefaultLocation(r.locationCode) && isDefaultLocation(locationCode)),
   );
   const summary = summarizeProductAvailability(product, matching);
@@ -199,12 +203,14 @@ export function getSequentialAvailability(
   const rows = (byProduct.get(product.code) ?? []).filter(
     (r) =>
       !r.extra?.isDeleted &&
+      
       (r.locationCode === locationCode ||
         (isDefaultLocation(r.locationCode) && isDefaultLocation(locationCode))),
   );
   const baseUnit = getItemBaseUnit(product);
   let onHand = 0;
-
+  
+  
   const heldByOrder = new Map<string, { orderNumber: string; qty: number }>();
   for (const row of rows) {
     onHand += recomputeOnHand(product, readRowBreakdown(row, baseUnit));

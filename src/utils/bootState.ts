@@ -1,3 +1,5 @@
+
+
 import { useSyncExternalStore } from 'react';
 
 type BootState = { cfgReady: boolean; empReady: boolean; clientUnconfigured: boolean };

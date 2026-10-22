@@ -1,3 +1,5 @@
+
+
 import { resolvePermissions } from '@credo/modules/permissions';
 
 import { cacheGet, cacheSet, cacheClear } from '@/utils/appCache';
@@ -49,6 +51,10 @@ export function bootstrapPermissionCache(params: {
   });
   cacheSet('prm', bootstrapPerms);
 
+  
+  
+  
+  
   if (cachedEmo?.o && cachedEmo.v && params.cfgVersion) {
     cacheSet('prv', { cfg: params.cfgVersion, emp: cachedEmo.v });
   }

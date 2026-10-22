@@ -102,6 +102,7 @@ export function createProductInventoryModule(config: ProductInventoryModuleConfi
       return entry;
     },
 
+    
     async createMany(
       scope: string,
       inputs: CreateProductInventoryInput[],

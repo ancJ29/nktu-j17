@@ -77,6 +77,8 @@ export const EmployeeFeaturesSection = memo(function EmployeeFeaturesSection({
   languages: Language[];
   onChange: (f: CMngtEmployeeFeatures) => void;
 }) {
+  
+  
   const departmentMultiSelectData = useMemo(
     () =>
       (features.departmentOptions ?? []).map((d) => {

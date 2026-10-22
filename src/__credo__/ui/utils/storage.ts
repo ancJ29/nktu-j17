@@ -1,3 +1,5 @@
+
+
 import { logger } from './logger';
 
 export function generateStorage<Key extends string>() {
@@ -83,6 +85,7 @@ export function generateUserStorage<
       localStorage.setItem(getStorageKey(loginUserId), JSON.stringify(this.userData[loginUserId]));
     },
 
+    
     get<Key extends UserStorageKey>(key: Key): Settings[Key] {
       const loginUserId = this.loginUserId || storage.get<string>(userIdKey);
       if (!loginUserId) {
@@ -96,6 +99,7 @@ export function generateUserStorage<
       return value !== undefined ? (value as Settings[Key]) : defaultSettings[key];
     },
 
+    
     set<Key extends UserStorageKey>(key: Key, value: Settings[Key]): void {
       const loginUserId = storage.get<string>(userIdKey);
       if (!loginUserId) {
@@ -114,6 +118,7 @@ export function generateUserStorage<
       }
     },
 
+    
     exportSettings(): Partial<Settings> {
       const loginUserId = this.loginUserId || storage.get<string>(userIdKey);
       if (!loginUserId) return {};
@@ -121,6 +126,7 @@ export function generateUserStorage<
       return { ...this.userData[loginUserId] };
     },
 
+    
     importSettings(settings: Partial<Settings>): void {
       logger.debug(`[${new Date().toISOString()}] import-settings...`, settings);
       const loginUserId = this.loginUserId || storage.get<string>(userIdKey);
@@ -141,6 +147,7 @@ export function generateUserStorage<
       );
     },
 
+    
     onChange(callback: () => void): void {
       onChangeCallback = callback;
     },

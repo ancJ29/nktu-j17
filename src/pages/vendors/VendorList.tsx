@@ -1,3 +1,5 @@
+
+
 import { Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -69,6 +71,10 @@ export function VendorList({ variant }: VendorListProps) {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
+  
+  
+  
+  
   const showAddress = useMemo(
     () => allVendors.some((v) => !!(v.address || v.extra?.addressGoogleMapUrl)),
     [allVendors],
@@ -81,7 +87,7 @@ export function VendorList({ variant }: VendorListProps) {
         if (item.extra?.isDeleted) return false;
         if (f.status === 'active' && !item.isActive) return false;
         if (f.status === 'inactive' && item.isActive) return false;
-
+        
         const isDomestic = item.extra?.isDomestic ?? true;
         if (f.origin === 'domestic' && !isDomestic) return false;
         if (f.origin === 'overseas' && isDomestic) return false;
@@ -148,6 +154,9 @@ export function VendorList({ variant }: VendorListProps) {
             filters={
               variant.origin
                 ? [
+                    
+                    
+                    
                     allOptionFilter<OriginFilter>({
                       title: t('vendors.form.originLabel'),
                       value: originFilter,

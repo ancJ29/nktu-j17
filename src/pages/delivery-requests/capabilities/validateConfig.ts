@@ -1,3 +1,5 @@
+
+
 import type {
   CMngtDeliveryRequestFeatures,
   CMngtDeliveryRequestStatusOption,
@@ -24,6 +26,7 @@ export function validateDeliveryRequestConfig(
   const statusByValue = new Map<string, CMngtDeliveryRequestStatusOption>();
   for (const opt of statusOptions) statusByValue.set(opt.value, opt);
 
+  
   for (const opt of statusOptions) {
     const seen = new Set<string>();
     for (const binding of opt.capabilities ?? []) {
@@ -57,6 +60,7 @@ export function validateDeliveryRequestConfig(
     }
   }
 
+  
   for (const def of Object.values(CAPABILITY_REGISTRY)) {
     if (!def.singleton) continue;
     const carriers = statusOptions.filter((opt) =>
@@ -74,6 +78,7 @@ export function validateDeliveryRequestConfig(
     }
   }
 
+  
   for (const [from, tos] of Object.entries(transitions)) {
     const fromOpt = statusByValue.get(from);
     if (!fromOpt) {

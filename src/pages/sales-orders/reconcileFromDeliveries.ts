@@ -1,3 +1,5 @@
+
+
 import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
@@ -51,9 +53,12 @@ export function isFullyDelivered(
   if (closed.length === 0) return false;
 
   if (evidence === 'closedDeliveries') {
+    
+    
     return outbound.every((d) => d.isClosed);
   }
 
+  
   const deliveredByKey = new Map<string, number>();
   for (const d of closed) {
     const items = (d.extra as DeliveryRequestExtra)?.deliveredItems ?? [];
@@ -93,6 +98,12 @@ export async function advanceSoIfFullyDelivered(params: {
   const { actor, t, freshDr, notify = true } = params;
   let so = params.so;
 
+  
+  
+  
+  
+  
+  
   const preExtra = (so.extra ?? {}) as SalesOrderExtra;
   const hasPendingShip = preExtra.inventoryLinkage?.pendingShip != null;
   const targetStatus = getAutoCompletionTargetValue();
@@ -111,9 +122,15 @@ export async function advanceSoIfFullyDelivered(params: {
       ? runShipRecovery({ so: order, actor, productsByCode, t })
       : recoverPendingShip({ so: order, actor, productsByCode });
 
+  
+  
+  
+  
   if (hasPendingShip) {
     const recovery = await recoverShip(so);
     if (recovery.kind === 'applied' || recovery.kind === 'confirmed') {
+      
+      
       const fresh = useSalesOrderStore.getState().getById(so.id) as SalesOrder | undefined;
       if (fresh) so = fresh;
     }
@@ -121,11 +138,17 @@ export async function advanceSoIfFullyDelivered(params: {
 
   if (!mayAdvance || !targetStatus) return 'skipped';
   const soExtra = (so.extra ?? {}) as SalesOrderExtra;
-
+  
+  
   if (so.isClosed || soExtra.cancellation != null) return 'skipped';
   const fromStatus = soExtra.status ?? '';
   if (!soStatusHasCapability(fromStatus, 'autoAdvanceOnFullDelivery')) return 'skipped';
 
+  
+  
+  
+  
+  
   const allDrs = useDeliveryRequestStore.getState().items as DeliveryRequest[];
   const drsForSo = allDrs
     .map((d) => (freshDr && d.id === freshDr.id ? freshDr : d))
@@ -139,9 +162,13 @@ export async function advanceSoIfFullyDelivered(params: {
   if (!isFullyDelivered(so, drsForSo, getSalesOrderCompletionEvidence())) return 'skipped';
 
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
-
+  
+  
   const actualDeliveryDate = resolveActualDeliveryDate(drsForSo);
 
+  
+  
+  
   let result = await runSoTransition({
     order: so,
     toStatusValue: targetStatus,
@@ -151,13 +178,16 @@ export async function advanceSoIfFullyDelivered(params: {
     actualDeliveryDate,
   });
 
+  
+  
+  
   if (!result.ok && result.failure.kind === 'patch-conflict') {
     await useSalesOrderStore.getState().forceRefresh();
     const fresh = useSalesOrderStore.getState().getById(so.id) as SalesOrder | undefined;
     if (fresh) {
       const freshExtra = (fresh.extra ?? {}) as SalesOrderExtra;
       const freshStatus = freshExtra.status ?? '';
-
+      
       if (fresh.isClosed || freshStatus === targetStatus) return 'skipped';
       if (freshExtra.cancellation == null && freshStatus === fromStatus) {
         so = fresh;
@@ -174,6 +204,11 @@ export async function advanceSoIfFullyDelivered(params: {
   }
 
   if (result.ok) {
+    
+    
+    
+    
+    
     logActivity(
       'salesOrder.statusChange',
       so.id,
@@ -194,7 +229,9 @@ export async function advanceSoIfFullyDelivered(params: {
         }),
       });
     }
-
+    
+    
+    
     if (result.pendingShip) await recoverShip(result.updated);
     return 'advanced';
   }
@@ -256,7 +293,7 @@ async function runSweep(params: {
     useDeliveryRequestStore.getState().items as DeliveryRequest[],
     getSalesOrderCompletionEvidence(),
   );
-
+  
   if (candidates.length === 0) return [];
   await ensureReconcileStoresLoaded();
   const completed: string[] = [];
@@ -269,6 +306,7 @@ async function runSweep(params: {
       const outcome = await advanceSoIfFullyDelivered({ so, actor, t, notify: false });
       if (outcome === 'advanced') completed.push(so.orderNumber);
     } catch (err) {
+      
       console.error('[advanceDeliveredSalesOrders]', candidate.orderNumber, err);
     }
   }

@@ -1,3 +1,5 @@
+
+
 import { credoSmeConnector } from '@credo/connectors/connector';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { resolveClientCode } from '@/config/client-code';
@@ -61,17 +63,21 @@ async function flush(): Promise<void> {
   inFlight = true;
   try {
     const { ids } = await credoSmeConnector.logActivities({ activities: batch });
-
+    
+    
+    
     if (Array.isArray(ids) && ids.length < batch.length) {
       throw new Error(`partial write: ${ids.length}/${batch.length} accepted`);
     }
-
+    
     pending = pending.slice(batch.length);
     attempt = 0;
     persist();
   } catch (err) {
     attempt++;
     if (attempt >= MAX_ATTEMPTS) {
+      
+      
       logger.warn('[activityLogger] giving up this session; queue persisted for next load', {
         count: pending.length,
         err,
@@ -104,6 +110,9 @@ export function logActivity(
   }
 
   pending.push({
+    
+    
+    
     clientId: resolveClientCode(),
     actorId,
     action,
@@ -139,6 +148,7 @@ if (typeof window !== 'undefined') {
     if (document.visibilityState === 'hidden') flushOnExit();
   });
 
+  
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {

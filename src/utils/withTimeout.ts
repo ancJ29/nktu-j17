@@ -1,3 +1,4 @@
+
 export class OperationTimeoutError extends Error {
   constructor(message = 'timeout') {
     super(message);

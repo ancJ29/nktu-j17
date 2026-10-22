@@ -5,18 +5,19 @@ import type { CMngtSalesOrderItem as BaseSalesOrderItem } from '@credo/connector
 export type SalesOrderSetRole = 'set' | 'set-component';
 
 export type SalesOrderItem = BaseSalesOrderItem & {
+  
   groupId?: string;
-
+  
   role?: SalesOrderSetRole;
-
+  
   sourceSetCode?: string;
-
+  
   memo?: string;
-
+  
   extraQuantity?: number;
-
+  
   isReady?: boolean;
-
+  
   warehouseMemo?: string;
 };
 
@@ -28,15 +29,15 @@ export type SalesOrderActivityEntry = {
   userId?: string;
   userName?: string;
   note?: string;
-
+  
   platformLog?: SalesOrderPlatformLogMark;
 };
 
 export type SalesOrderPlatformLogMark = {
   state: 'pending' | 'logged';
-
+  
   legacy?: true;
-
+  
   tries?: number;
   lastTryAt?: number;
 };
@@ -81,6 +82,7 @@ export type SalesOrderCancellation = {
 export type InventoryLinkageState = 'none' | 'reserved' | 'shipped' | 'released';
 
 export type BreakdownRemainderCredit = {
+  
   itemCode: string;
   unit: string;
   quantity: number;
@@ -90,9 +92,9 @@ export type InventoryLinkageSnapshotEntry = {
   rowId: string;
   itemCode: string;
   locationCode: string;
-
+  
   byUnit: Record<string, number>;
-
+  
   remainderCredits?: BreakdownRemainderCredit[];
 };
 
@@ -159,6 +161,7 @@ export type InventoryLinkageTransition = {
 };
 
 export type PendingInventoryShip = {
+  
   snapshot: InventoryLinkageSnapshotEntry[];
   at: DateTimeInput;
   by?: { id: string; name: string };
@@ -167,84 +170,87 @@ export type PendingInventoryShip = {
 
 export type InventoryLinkage = {
   state: InventoryLinkageState;
-
+  
   reservedSnapshot?: InventoryLinkageSnapshotEntry[];
-
+  
   shippedSnapshot?: InventoryLinkageSnapshotEntry[];
-
+  
   pendingShip?: PendingInventoryShip;
   lastTransition?: InventoryLinkageTransition;
 };
 
 export type SalesOrderExtra = {
   status?: string;
-
+  
   readyAt?: number;
   cancellation?: SalesOrderCancellation;
   inventoryLinkage?: InventoryLinkage;
-
+  
   cheatAutoComplete?: { at: number; drNumbers: string[]; historyOk?: boolean };
-
+  
   isDeleted?: boolean;
-
+  
   customerName?: string;
-
+  
   customerCode?: string;
-
+  
   isIndividualCustomer?: boolean;
-
+  
   isInternalDelivery?: boolean;
-
+  
   orderDate?: NullableDateTimeInput;
-
+  
   customerPONumber?: string;
   deliveryAddress?: string;
-
+  
   googleMapUrl?: string;
-
+  
   deliveryDate?: NullableDateTimeInput;
   deliveryMethod?: string;
-
+  
   deliveryPackageSize?: string;
 
+  
   productWarehouseMemos?: string;
   assignedStaff?: string;
   createdBy?: string;
   isUrgent?: boolean;
   tags?: string[];
-
+  
+  
   needVAT?: boolean;
-
+  
   needShippingFee?: boolean;
-
+  
   vatRate?: number;
-
+  
   vatTag?: string;
-
+  
   shippingFee?: number;
-
+  
   isPaid?: boolean;
-
+  
   paidAmount?: number;
-
+  
   invoiceIssued?: boolean;
-
+  
   billingNotRequired?: boolean;
   activityLog?: SalesOrderActivityEntry[];
   chatHistory?: SalesOrderChatEntry[];
   photos?: SalesOrderPhoto[];
   attachments?: SalesOrderAttachment[];
-
+  
   deliveryRequestIds?: string[];
-
+  
   quotationId?: string;
   quotationCode?: string;
-
+  
   clientSpecific?: {
     NKTU?: {
+      
       warehouseNote?: string;
       driverNote?: string;
-
+      
       quotationId?: string;
       quotationCode?: string;
     };

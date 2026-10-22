@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder } from '@/types';
 import {
@@ -45,7 +47,8 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
   {
     seller,
     customer,
-
+    
+    
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -57,6 +60,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
   const isLift = feeMatcher(resolveFeeName, LIFT_FEE);
   const isDrop = feeMatcher(resolveFeeName, DROP_FEE);
 
+  
   const readMoney = (o: TransportOrder) => {
     let freight = 0;
     let other = 0;
@@ -100,6 +104,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
       ? `Thuế VAT ${Number((uniformRate * 100).toFixed(2))}%`
       : 'Thuế VAT';
 
+  
   const C_STT = 0;
   const C_BOOKING = 1;
   const C_CONT = 2;
@@ -124,6 +129,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
   const colCount = C_GRAND + 1;
   const lastCol = colCount - 1;
 
+  
   const MANUAL_COLS = [C_LIFT_DATE, C_DROP_DATE, C_CONTRACT_DATE];
   const moneyCols = [
     C_LIFT,
@@ -145,6 +151,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
     bangKeTitle(titleSuffix, bangKePeriodLabel(rows)),
   );
 
+  
   const { rHead1, rHead2, leaf } = sheet.headerBand();
   leaf(C_STT, 'STT');
   leaf(C_BOOKING, 'Số Booking');
@@ -168,6 +175,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
   leaf(C_CONTRACT_DATE, 'Ngày HĐ vận chuyển');
   leaf(C_GRAND, 'Tổng');
 
+  
   const sums = new Map<number, number>();
   const sizeCounts = SIZE_BUCKETS.map(() => 0);
 
@@ -188,7 +196,8 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
       row[C_SIZE0 + size] = SIZE_MARK;
       sizeCounts[size] += 1;
     }
-
+    
+    
     row[C_LIFT_PORT] = o.route?.pickup ?? '';
     row[C_DROP_PORT] = o.route?.dropoff ?? '';
 
@@ -209,6 +218,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
   });
   const rLastData = aoa.length - 1;
 
+  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -220,6 +230,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
     aoa.push(row);
   }
 
+  
   blankRow();
   const freightTotal = sums.get(C_FREIGHT_TOTAL) ?? 0;
   const chiHo = (sums.get(C_LIFT) ?? 0) + (sums.get(C_DROP) ?? 0);
@@ -241,6 +252,7 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
 
   const signature = sheet.signatureRow(customer.name, seller.name);
 
+  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -276,6 +288,8 @@ export const buildCustomerReportType8: CustomerReportBuilder = (
 
   styleTotalRow(rTotalRow, lastCol, isMoneyCol);
 
+  
+  
   const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
   const formulas = [
     ref(rTotalRow, C_FREIGHT_TOTAL),

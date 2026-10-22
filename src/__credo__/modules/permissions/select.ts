@@ -1,3 +1,5 @@
+
+
 import type { PartialPermissions } from './types.js';
 
 export type PermissionConfigSource = {

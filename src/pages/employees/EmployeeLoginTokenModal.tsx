@@ -36,6 +36,7 @@ export function EmployeeLoginTokenModal({
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const qrCopiedTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
+  
   useEffect(() => () => clearTimeout(qrCopiedTimer.current), []);
 
   const generateToken = useCallback(async () => {
@@ -50,9 +51,12 @@ export function EmployeeLoginTokenModal({
       if (res.token) {
         logActivity('employee.generateLoginToken', employee.id);
         const baseUrl = window.location.origin;
-
+        
+        
+        
         const params = new URLSearchParams({ token: wrapLoginToken(res.token) });
-
+        
+        
         const clientCode = resolveClientCode();
         if (clientCode) params.set('code', clientCode);
         const link = `${baseUrl}${ROUTES.AUTH.LOGIN_VIA_QR_CODE}?${params.toString()}`;
@@ -94,8 +98,10 @@ export function EmployeeLoginTokenModal({
     }
   }, [qrCodeData, t]);
 
+  
   useEffect(() => {
     if (opened) {
+      
       void generateToken();
     }
   }, [opened, generateToken]);
@@ -109,6 +115,16 @@ export function EmployeeLoginTokenModal({
     onClose();
   };
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const handleConfirmRegenerate = () => {
     setConfirmRegenerate(false);
     void generateToken();

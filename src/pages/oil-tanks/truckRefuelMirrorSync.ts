@@ -1,3 +1,5 @@
+
+
 import { cMngtConnector } from '@credo/connectors/connector';
 import { notifications } from '@mantine/notifications';
 import type { OilTankIssueLogExtra, OperationLog, OperationLogExtra } from '@/types';
@@ -67,7 +69,9 @@ async function updateMirror(
   await cMngtConnector.updateOperationLog<OperationLogExtra>({
     id: mirror.id,
     targetId: truck.id,
-
+    
+    
+    
     period: String(yearOf(datePart(mirror.logDate))),
     version: mirror.version,
     logDate: datePart(issue.logDate),
@@ -79,16 +83,19 @@ export async function syncTruckRefuelMirror(event: OperationLogWriteEvent, t: TF
   try {
     const issue = event.log;
     const plan = planWriteEvent(event, truckBindingOf);
-
+    
+    
     if (plan.kind === 'none') return;
 
     const tank = { id: event.targetId, code: event.targetCode };
-
+    
+    
     const previousYear = yearOf(datePart((event.previous ?? issue).logDate));
 
     if (plan.kind === 'reconcile') {
       const mirror = await findMirror(plan.target.id, previousYear, issue.id);
-
+      
+      
       if (mirror) await updateMirror(plan.target, mirror, issue, tank);
       else await createMirror(plan.target, issue, tank);
       return;

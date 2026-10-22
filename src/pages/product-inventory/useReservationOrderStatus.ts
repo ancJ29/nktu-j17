@@ -1,3 +1,5 @@
+
+
 import { useCallback, useMemo, useRef } from 'react';
 
 import { getCancellationTargetStatusValue } from '@/pages/sales-orders/transitionEngine';
@@ -10,18 +12,20 @@ import type { ResolvedStatusOption } from '@/utils/permission';
 export const SO_FETCH_DAYS = 90;
 
 export type ReservationOrderStatus = {
+  
   order: SalesOrder | undefined;
-
+  
   status: ResolvedStatusOption | undefined;
-
+  
   cancelled: boolean;
 };
 
 const UNKNOWN: ReservationOrderStatus = { order: undefined, status: undefined, cancelled: false };
 
 export type ReservationOrderStatusSource = {
+  
   readonly hydrate: (force?: boolean) => void;
-
+  
   readonly firstLoad: boolean;
   readonly resolve: (salesOrderId: string) => ReservationOrderStatus;
 };
@@ -40,7 +44,9 @@ export function useReservationOrderStatus(): ReservationOrderStatusSource {
       hydrated.current = true;
       const range = defaultLastNDaysRange(SO_FETCH_DAYS);
       setSalesOrderQueryRange(range.from, range.to);
-
+      
+      
+      
       if (initialized) forceRefresh();
       else loadAll();
     },
@@ -58,7 +64,12 @@ export function useReservationOrderStatus(): ReservationOrderStatusSource {
       const order = orderById.get(salesOrderId);
       if (!order) return UNKNOWN;
       const extra = (order.extra ?? {}) as SalesOrderExtra;
-
+      
+      
+      
+      
+      
+      
       const cancelled = extra.cancellation != null;
       const statusValue = cancelled
         ? (getCancellationTargetStatusValue() ?? extra.status)
@@ -72,6 +83,8 @@ export function useReservationOrderStatus(): ReservationOrderStatusSource {
     [orderById],
   );
 
+  
+  
   const firstLoad = loading && !initialized;
   return useMemo(() => ({ hydrate, firstLoad, resolve }), [hydrate, firstLoad, resolve]);
 }

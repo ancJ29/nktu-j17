@@ -1,3 +1,5 @@
+
+
 import {
   Button,
   Group,
@@ -40,9 +42,9 @@ type ReturnLine = {
   productName: string;
   unit: string;
   unitPrice: number;
-
+  
   returnable: number;
-
+  
   quantity: number;
 };
 
@@ -59,9 +61,9 @@ type ReturnFormValues = {
 type CreateReturnShipmentModalProps = {
   opened: boolean;
   onClose: () => void;
-
+  
   salesOrder: SalesOrder;
-
+  
   onCreated?: () => void;
 };
 
@@ -102,6 +104,9 @@ export function CreateReturnShipmentModal({
     },
   });
 
+  
+  
+  
   const seededRef = useRef(false);
   useEffect(() => {
     if (!opened) {
@@ -120,7 +125,8 @@ export function CreateReturnShipmentModal({
       returnable: d.quantity,
       quantity: d.quantity, // default "return all"
     }));
-
+    
+    
     const seedLocation = DEFAULT_LOCATION_CODE;
     form.setValues({
       locationCode: seedLocation,
@@ -142,6 +148,8 @@ export function CreateReturnShipmentModal({
   };
 
   const handleSubmit = async (values: ReturnFormValues) => {
+    
+    
     const items: DeliveryRequestItem[] = values.updateInventory
       ? values.lines
           .filter((line) => line.quantity > 0)
@@ -173,7 +181,7 @@ export function CreateReturnShipmentModal({
         salesOrderId: salesOrder.id,
         salesOrderNumber: salesOrder.orderNumber,
         customerName: salesOrder.customerName,
-
+        
         customerCode: (salesOrder.extra as SalesOrderExtra | undefined)?.customerCode ?? '',
         vendorCode: '',
         vendorName: '',

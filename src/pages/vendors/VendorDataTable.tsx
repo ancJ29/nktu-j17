@@ -15,9 +15,9 @@ import type { VendorOriginLabels } from './vendorOriginLabels';
 type VendorDataTableProps = {
   readonly vendors: Vendor[];
   readonly isLoading?: boolean;
-
+  
   readonly showAddress?: boolean;
-
+  
   readonly origin?: VendorOriginLabels;
   readonly viewportRef?: Ref<HTMLDivElement>;
 };
@@ -119,7 +119,9 @@ export function VendorDataTable({
           />
         ),
       },
-
+      
+      
+      
       {
         key: 'copy',
         width: '56px',

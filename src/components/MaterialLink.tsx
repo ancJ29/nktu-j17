@@ -5,8 +5,9 @@ import { useMaterialStore } from '@/stores/useMaterialStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type MaterialLinkProps = {
+  
   code: string | undefined | null;
-
+  
   name?: string | undefined | null;
   size?: LinkSize;
 };

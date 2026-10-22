@@ -1,3 +1,5 @@
+
+
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Loader, Stack, Text } from '@mantine/core';
@@ -34,7 +36,7 @@ export function EmployeeActivityPanel({ employeeId }: Props) {
           limit: PAGE_SIZE,
           ...(cursor ? { cursor } : {}),
         }),
-
+      
       ...(appActivityLoggerV1InternalAccessKey
         ? [
             ((cursor) =>
@@ -59,6 +61,8 @@ export function EmployeeActivityPanel({ employeeId }: Props) {
     loadMore: handleLoadMore,
   } = useActivityHistory(fetchers);
 
+  
+  
   const resolveTargetLabel = (targetId: string | null) => {
     if (!targetId) return null;
     const match = employees.find((e) => e.id === targetId);

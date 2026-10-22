@@ -1,3 +1,4 @@
+
 import type {
   TransportRouteCostItem,
   TransportRouteExtra,
@@ -9,22 +10,23 @@ import type {
 export type TransportRouteWriteLeg = TransportRouteLeg & { distanceKm?: number };
 
 export type TransportRouteWriteInput = {
+  
   name: string;
   isMultiTrip: boolean;
-
+  
   route: { pickup: string; stuffing: string; dropoff: string };
-
+  
   trips: TransportRouteWriteLeg[];
   truckType: string;
   truckingSize: string;
   freightAmount: number;
-
+  
   basePay: number;
-
+  
   allowance: number;
-
+  
   segments: TransportRouteSegment[];
-
+  
   costItems: TransportRouteCostItem[];
   markupPercent: number;
   isActive: boolean;
@@ -101,13 +103,18 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
 
   const common = {
     isActive: input.isActive,
-
+    
+    
+    
     name: input.name.trim(),
     truckType,
-
+    
+    
+    
+    
     truckingSize,
     freightAmount: input.freightAmount || 0,
-
+    
     costItems: input.costItems.map(normalizeCostItem).filter((i) => !isBlankCostItem(i)),
     markupPercent: input.markupPercent || 0,
     extra: input.extra,
@@ -121,15 +128,20 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
       ...common,
       isMultiTrip: true,
       trips,
-
+      
       segments: deriveSegmentsFromLegs(input.trips),
-
+      
+      
       route: {
         pickup: first?.departure ?? '',
         stuffing: '',
         dropoff: last?.destination ?? '',
       },
-
+      
+      
+      
+      
+      
       basePay: 0,
       allowance: 0,
       laborCost: 0,
@@ -139,7 +151,7 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
   return {
     ...common,
     isMultiTrip: false,
-
+    
     segments: input.segments.map(normalizeSegment).filter((seg) => !isBlankSegment(seg)),
     route: {
       pickup: input.route.pickup.trim(),
@@ -149,7 +161,9 @@ export function buildTransportRouteWrite(input: TransportRouteWriteInput): Trans
     trips: [],
     basePay: input.basePay || 0,
     allowance: input.allowance || 0,
-
+    
+    
+    
     laborCost: (input.basePay || 0) + (input.allowance || 0),
   };
 }

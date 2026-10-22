@@ -1,3 +1,5 @@
+
+
 import { Alert, Badge, Button, Code, Divider, Group, Stack, Text, Textarea } from '@mantine/core';
 import { IconFileImport } from '@tabler/icons-react';
 import { useMemo, useState } from 'react';
@@ -13,8 +15,9 @@ export function ConfigJsonSection({
   stored,
   onApply,
 }: {
+  
   config: CredoAppConfig | null;
-
+  
   stored: CredoAppConfig | null;
   onApply: (config: CredoAppConfig) => void;
 }) {
@@ -32,6 +35,8 @@ export function ConfigJsonSection({
       return { kind: 'invalid', reason: err instanceof Error ? err.message : 'Not valid JSON' };
     }
 
+    
+    
     const parsed = CredoAppConfigSchema.safeParse(raw);
     if (!parsed.success) {
       return {

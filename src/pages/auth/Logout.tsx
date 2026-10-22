@@ -12,7 +12,8 @@ export function LogoutPage() {
   useEffect(() => {
     logout('user');
     sessionStorage.clear();
-
+    
+    
     cacheFlush();
     navigate(ROUTES.AUTH.LOGIN);
   }, [logout, navigate]);

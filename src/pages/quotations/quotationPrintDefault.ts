@@ -1,3 +1,5 @@
+
+
 import {
   buildSelfPrintingHtml,
   buildStaticHtml,
@@ -43,6 +45,7 @@ function buildParts(
   const photoPx = isA5 ? 42 : 52;
   const widthMm = contentWidthMm(paperSize, orientation, marginMm);
 
+  
   const labelSpan = showPhoto ? 6 : 5;
 
   const rows = data.lines
@@ -64,6 +67,9 @@ function buildParts(
     )
     .join('');
 
+  
+  
+  
   const vatSummaryRows = showVat
     ? `
         <tr class="sum">

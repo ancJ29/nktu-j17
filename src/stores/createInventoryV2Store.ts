@@ -34,7 +34,9 @@ export function createInventoryV2Store(config: { cacheKey: string; wire: Invento
 
   return createEntityStore<InventoryV2Row, FlatUpdateBody, FlatCreateBody>({
     cacheKey,
-
+    
+    
+    
     cacheTTL: ONE_MINUTE,
 
     fetchAll: (hash) =>
@@ -53,6 +55,8 @@ export function createInventoryV2Store(config: { cacheKey: string; wire: Invento
         ...(r.listHash !== undefined && { listHash: r.listHash }),
       })),
 
+    
+    
     update: (_id, body) =>
       wire
         .set({

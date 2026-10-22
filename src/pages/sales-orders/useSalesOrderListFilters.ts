@@ -1,3 +1,5 @@
+
+
 import { useCallback, useMemo } from 'react';
 import { serializeColumnFilters, type ColumnFilterValues } from '@credo/base-ui/hooks';
 import { type DateRangeValue } from '@/types/date-range';
@@ -15,10 +17,18 @@ import {
   isDefaultStatusSelection,
   shouldEncodeStatusSelection,
 } from '@/utils/listFilterStatusDefault';
-import { getSalesOrderDefaultListStatuses } from '@/utils/permission';
+import {
+  getPricingVatRate,
+  getSalesOrderDefaultListStatuses,
+  isPricingManagementEnabled,
+  perms,
+} from '@/utils/permission';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
-import type { SalesOrder } from '@/types';
+import { useCustomerStore } from '@/stores/useCustomerStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import type { Customer, SalesOrder } from '@/types';
 import { compareSalesOrdersForList } from './salesOrderListSort';
+import { getCancellationTargetStatusValue } from './transitionEngine';
 import type { SalesOrderListView } from './salesOrderListVariant';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 
@@ -26,6 +36,11 @@ const DEFAULT_SORT = 'createdAt_desc';
 const DEFAULT_PAGE = 1;
 
 const DEFAULT_STATUS: readonly string[] = getSalesOrderDefaultListStatuses();
+
+const STATUS_ORDER: readonly string[] = salesOrderFieldOptions.statusOptions.map((o) => o.value);
+const CANCELLATION_TARGET_STATUS = getCancellationTargetStatusValue();
+const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
+const vatRate = getPricingVatRate();
 
 export type SalesOrderDeliveryKind = 'all' | 'internal' | 'external';
 
@@ -48,7 +63,8 @@ const KEEP_ON_CLEAR: readonly (keyof SalesOrderUrlState)[] = ['v'];
 
 function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   const r: SalesOrderUrlState = {};
-
+  
+  
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.c) r.c = state.c;
   if (state.f) r.f = state.f;
@@ -66,9 +82,9 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
 
 export function useSalesOrderListFilters(
   storeOrders: SalesOrder[],
-
+  
   defaultDateRangeDays?: number,
-
+  
   internalDeliveryFirstSort = false,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<SalesOrderUrlState>({
@@ -76,7 +92,29 @@ export function useSalesOrderListFilters(
     compactState,
     keepOnClear: KEEP_ON_CLEAR,
   });
+  
+  
+  const customers = useCustomerStore((s) => s.items);
+  const employees = useEmployeeStore((s) => s.items);
+  const sortLookups = useMemo(() => {
+    const customerByCode = new Map<string, Customer>();
+    for (const c of customers) customerByCode.set(c.code, c);
+    const employeeNameById = new Map<string, string>();
+    for (const e of employees) employeeNameById.set(e.id, e.name);
+    return {
+      resolveStatus: salesOrderFieldOptions.resolveStatus,
+      statusOrder: STATUS_ORDER,
+      cancellationTargetStatus: CANCELLATION_TARGET_STATUS,
+      getCustomerByCode: (code: string) => customerByCode.get(code),
+      getEmployeeName: (id: string) => employeeNameById.get(id),
+      showPrice,
+      vatRate,
+    };
+  }, [customers, employees]);
 
+  
+  
+  
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
@@ -93,6 +131,10 @@ export function useSalesOrderListFilters(
   const page = state.pg ?? DEFAULT_PAGE;
   const view: SalesOrderListView = state.v ?? 'ops';
 
+  
+  
+  
+  
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
@@ -127,6 +169,10 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
+  
+  
+  
+  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({
@@ -147,6 +193,8 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
+  
+  
   const setColumnFilters = useCallback(
     (values: ColumnFilterValues) =>
       updateState({ cf: serializeColumnFilters(values) || undefined, pg: undefined }),
@@ -158,18 +206,24 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
+  
   const setView = useCallback(
     (value: SalesOrderListView) => updateState({ v: value === 'ops' ? undefined : value }),
     [updateState],
   );
 
+  
   const allOrders = useMemo(() => {
     const filtered = storeOrders.filter((o) => {
       if (statusFilter.length > 0 && !statusFilter.includes(o.extra?.status ?? '')) return false;
       if (customerFilter && o.extra?.customerCode !== customerFilter) return false;
       if (staffFilter && o.extra?.assignedStaff !== staffFilter) return false;
       if (urgentOnly && !o.extra?.isUrgent) return false;
-
+      
+      
+      
+      
+      
       if (!isInDateRange(getSalesOrderReadyDate(o), createdDateRange)) return false;
       if (
         deliveryDateRange.preset &&
@@ -177,18 +231,17 @@ export function useSalesOrderListFilters(
         !isInDateRange(o.extra.deliveryDate, deliveryDateRange)
       )
         return false;
-
+      
+      
+      
+      
       if (deliveryKind === 'internal' && o.extra?.isInternalDelivery === false) return false;
       if (deliveryKind === 'external' && o.extra?.isInternalDelivery !== false) return false;
       return true;
     });
 
     return filtered.sort(
-      compareSalesOrdersForList(
-        sortField,
-        internalDeliveryFirstSort,
-        salesOrderFieldOptions.resolveStatus,
-      ),
+      compareSalesOrdersForList(sortField, internalDeliveryFirstSort, sortLookups),
     );
   }, [
     storeOrders,
@@ -201,8 +254,12 @@ export function useSalesOrderListFilters(
     deliveryKind,
     sortField,
     internalDeliveryFirstSort,
+    sortLookups,
   ]);
 
+  
+  
+  
   const statusFilterIsDefault = useMemo(
     () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
@@ -220,9 +277,10 @@ export function useSalesOrderListFilters(
   );
 
   return {
+    
     statusFilter,
     setStatusFilter,
-
+    
     statusFilterIsDefault,
     customerFilter,
     setCustomerFilter,
@@ -240,18 +298,20 @@ export function useSalesOrderListFilters(
     setDeliveryDateRange,
     deliveryKind,
     setDeliveryKind,
-
+    
     columnFilters,
     setColumnFilters,
     page,
     setPage,
-
+    
     view,
     setView,
 
+    
     allOrders,
     hasActiveFilters,
 
+    
     clearFilters,
   };
 }

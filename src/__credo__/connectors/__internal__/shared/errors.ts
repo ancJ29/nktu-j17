@@ -1,3 +1,4 @@
+
 export class CallApiError extends Error {
   readonly status: number;
   readonly payload: unknown;

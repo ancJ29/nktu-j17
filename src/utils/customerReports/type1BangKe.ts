@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -39,29 +41,34 @@ export const SERVICE_FEE_COLUMNS: ReadonlyArray<{ key: Type1FeeColumnKey; header
 const FALLBACK_FEE_COLUMN: Type1FeeColumnKey = 'other';
 
 const FEE_NAME_COLUMN: Readonly<Record<string, Type1FeeColumnKey>> = {
-  PHI_VAN_CHUYEN: 'freight',
-  PHI_GUI: 'other',
-  PHI_HA_SOM: 'other',
-  PHI_KHAC: 'other',
-  PHI_NEO_XE: 'demurrage',
-  PHI_TRAM: 'surcharge',
-  PHI_DIEN_KHOAN: 'other',
-
-  PHU_THU_VAN_CHUYEN: 'surcharge',
-  BOC_XEP: 'handling',
-  VE_TRAM_PHU_HUU: 'surcharge',
-  VE_TRAM_XLHN: 'surcharge',
-  PHI_THAO_NHAN: 'other',
-  LO_XE: 'other',
-  VE_SINH_CONT: 'other',
-
+  PHI_VAN_CHUYEN: 'freight', 
+  PHI_GUI: 'other', 
+  PHI_HA_SOM: 'other', 
+  PHI_KHAC: 'other', 
+  PHI_NEO_XE: 'demurrage', 
+  PHI_TRAM: 'surcharge', 
+  PHI_DIEN_KHOAN: 'other', 
+  
+  
+  PHU_THU_VAN_CHUYEN: 'surcharge', 
+  BOC_XEP: 'handling', 
+  VE_TRAM_PHU_HUU: 'surcharge', 
+  VE_TRAM_XLHN: 'surcharge', 
+  PHI_THAO_NHAN: 'other', 
+  LO_XE: 'other', 
+  VE_SINH_CONT: 'other', 
+  
+  
+  
+  
+  
   PHU_PHI_DAU: 'other', // Phụ phí dầu
 };
 
 export const CHI_HO_FEE_NAMES: ReadonlyArray<string> = [
-  'PHI_CAN_XE',
-  'PHI_NANG',
-  'PHI_HA',
+  'PHI_CAN_XE', 
+  'PHI_NANG', 
+  'PHI_HA', 
   'PHI_QUA_KHAU', // Phí qua khẩu
 ];
 
@@ -98,7 +105,7 @@ const PAYMENT_BLOCKS = [
   {
     intro:
       'Vui lòng thanh toán cho công ty chúng tôi PHÍ VẬN CHUYỂN trên bằng chuyển khoản theo thông tin:',
-
+    
     beneficiaryLabel: 'Công ty thụ hưởng:',
     beneficiary: undefined as string | undefined,
     account: '102 796 7777  Tại ngân hàng Vietcombank, Chi nhánh Hồ Chí Minh',
@@ -135,16 +142,17 @@ type ServiceColumn =
   | { key?: undefined; header: string; feeValue: string };
 
 export type BangKeLayout = {
+  
   serviceColumns: ReadonlyArray<ServiceColumn>;
-
+  
   chiHoSlots: ReadonlyArray<ChiHoSlot>;
-
+  
   reservedChiHo?: ReadonlyArray<{
     feeValue: string;
     header: string;
     slots: ReadonlyArray<ChiHoSlot>;
   }>;
-
+  
   periodPrefix?: string;
 };
 
@@ -159,7 +167,9 @@ export const buildBangKeWorksheet = (
     seller,
     customer,
     resolveShipmentType,
-
+    
+    
+    
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -168,9 +178,13 @@ export const buildBangKeWorksheet = (
 ): { ws: XLSX.WorkSheet; rowCount: number } => {
   const rows = statementRows(orders);
 
+  
+  
+  
+  
   const feeCols = layout.serviceColumns;
   const labelKeyed = buildLabelKeyedColumns(resolveFeeName);
-
+  
   const feeColIndexOf = (key: Type1FeeColumnKey) => {
     const i = feeCols.findIndex((c) => c.key === key);
     if (i >= 0) return i;
@@ -180,10 +194,12 @@ export const buildBangKeWorksheet = (
     );
   };
 
+  
   const pinnedFeeKeys = feeCols.map((c) =>
     c.feeValue === undefined ? undefined : feeKey(resolveFeeName(c.feeValue)),
   );
 
+  
   const feeColOf = (fee: TransportOrderFee) => {
     const key = feeKey(fee.label);
     const pinned = pinnedFeeKeys.findIndex((k) => k !== undefined && k === key);
@@ -191,12 +207,18 @@ export const buildBangKeWorksheet = (
     return feeColIndexOf(serviceFeeColumnOf(fee.label, resolveFeeName(fee.label), labelKeyed));
   };
 
+  
+
+  
+  
   const chiHoLines = (o: TransportOrder) =>
     billedLines(o, 'passthrough', resolveFeeName).filter((f) => (f.amount || 0) !== 0);
 
+  
   const reservedFees = layout.reservedChiHo ?? [];
   const reservedKeys = reservedFees.map((r) => feeKey(resolveFeeName(r.feeValue)));
 
+  
   const splitChiHo = (o: TransportOrder) => {
     const lines = chiHoLines(o);
     const taken = new Set<number>();
@@ -209,17 +231,22 @@ export const buildBangKeWorksheet = (
     return { reserved, rest: lines.filter((_, k) => !taken.has(k)) };
   };
 
+  
   let dynamicGroups = 0;
   for (const o of rows) {
     dynamicGroups = Math.max(dynamicGroups, splitChiHo(o).rest.length);
   }
 
+  
   const chiHoGroupLine = (o: TransportOrder, g: number) => {
     const { reserved, rest } = splitChiHo(o);
     return g < reservedFees.length ? reserved[g] : rest[g - reservedFees.length];
   };
 
+  
   const chiHoColumns: ReadonlyArray<{ group: number; slot: ChiHoSlot; header: string }> = [
+    
+    
     ...reservedFees.flatMap((r, g) =>
       r.slots.map((slot, s) => ({
         group: g,
@@ -236,16 +263,21 @@ export const buildBangKeWorksheet = (
     ).flat(),
   ];
 
+  
   const chiHoSlotAt = (c: number) => chiHoColumns[c - C_CHIHO0]?.slot;
 
+  
   const hasNotes = rows.some((o) => !!o.notes?.trim());
   const showFooter = true;
 
+  
+  
   const rates = new Set(rows.map((o) => o.vatRate ?? 0));
   const uniformRate = rates.size === 1 ? [...rates][0]! : undefined;
   const vatHeader =
     uniformRate && uniformRate > 0 ? `VAT ${Number((uniformRate * 100).toFixed(2))}%` : 'VAT';
 
+  
   const C_STT = 0;
   const C_DATE = 1;
   const C_TRUCK = 2;
@@ -267,12 +299,14 @@ export const buildBangKeWorksheet = (
   const sheet = createSheetWriter(colCount);
   const { aoa, merges, blankRow } = sheet;
 
+  
   const letterheadRows = sheet.letterhead(
     seller,
     customer,
     bangKeTitle(titleSuffix, bangKePeriodLabel(rows, layout.periodPrefix)),
   );
 
+  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
 
   leaf(C_STT, 'STT');
@@ -295,6 +329,7 @@ export const buildBangKeWorksheet = (
     );
   }
 
+  
   const truckLabel = truckLabeler(getTruckPlate);
 
   let sumService = 0;
@@ -308,7 +343,8 @@ export const buildBangKeWorksheet = (
     row[C_TRUCK] = joinedPlates(o, truckLabel);
     row[C_BL] = o.billNumber ?? '';
     row[C_CONT] = o.containerNumber ?? '';
-
+    
+    
     const s = sizeBucketIndex(readTruckingSize(o));
     if (s >= 0) row[C_SIZE0 + s] = 1;
     row[C_TYPE] = o.shipmentType ? resolveShipmentType(o.shipmentType).toLocaleUpperCase('vi') : '';
@@ -316,6 +352,10 @@ export const buildBangKeWorksheet = (
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
+    
+    
+    
+    
     const feeSums = new Map<number, number>();
     for (const fee of billedLines(o, 'service', resolveFeeName)) {
       const c = C_FEE0 + feeColOf(fee);
@@ -329,9 +369,17 @@ export const buildBangKeWorksheet = (
     if (serviceTotal !== 0) row[C_TOTAL] = serviceTotal;
     if (hasNotes) row[C_NOTE] = o.notes ?? '';
 
+    
+    
+    
+    
+    
+    
+    
+    
     chiHoColumns.forEach((col, i) => {
       const fee = chiHoGroupLine(o, col.group);
-      if (!fee) return;
+      if (!fee) return; 
       row[C_CHIHO0 + i] =
         col.slot === 'amount'
           ? fee.amount
@@ -339,7 +387,9 @@ export const buildBangKeWorksheet = (
             ? (fee.invoiceNo ?? '')
             : fee.label;
     });
-
+    
+    
+    
     for (const fee of chiHoLines(o)) sumChiHo += fee.amount;
 
     sumService += totals.serviceSubtotal;
@@ -348,6 +398,7 @@ export const buildBangKeWorksheet = (
   });
   const rLastData = aoa.length - 1;
 
+  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -367,7 +418,8 @@ export const buildBangKeWorksheet = (
     });
     row[C_VAT] = sumVat;
     row[C_TOTAL] = sumService + sumVat;
-
+    
+    
     chiHoColumns.forEach((col, i) => {
       if (col.slot !== 'amount') return;
       let sum = 0;
@@ -377,6 +429,7 @@ export const buildBangKeWorksheet = (
     aoa.push(row);
   }
 
+  
   let rFirstSummary = -1;
   let rLastSummary = -1;
   if (showFooter) {
@@ -395,6 +448,12 @@ export const buildBangKeWorksheet = (
     rLastSummary = summary('Tổng số tiền cần thanh toán:', sumService + sumVat + sumChiHo);
   }
 
+  
+  
+  
+  
+  
+  
   const paymentLines: number[] = [];
   const introRows = new Set<number>();
   const fullWidthRow = (text: string): number => {
@@ -413,8 +472,10 @@ export const buildBangKeWorksheet = (
     fullWidthRow(`Số tài khoản: ${block.account}`);
   }
 
+  
   const signature = sheet.signatureRow(customer.name, seller.name);
 
+  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -426,7 +487,9 @@ export const buildBangKeWorksheet = (
     if (c === C_TYPE) return { wch: 10 };
     if (c >= C_PICKUP && c <= C_DROPOFF) return { wch: 26 };
     if (c === C_NOTE) return { wch: 22 };
-
+    
+    
+    
     if (c >= C_CHIHO0) {
       const slot = chiHoSlotAt(c);
       if (slot === 'invoiceNo') return { wch: 10 };
@@ -464,6 +527,9 @@ export const buildBangKeWorksheet = (
     setFmt(r, C_TOTAL, FMT_MONEY);
   }
 
+  
+  
+  
   for (const r of paymentLines) {
     setStyle(r, 0, {
       font: { bold: introRows.has(r), italic: introRows.has(r) },

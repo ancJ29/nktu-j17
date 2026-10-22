@@ -1,3 +1,5 @@
+
+
 import { featureFlags } from '@/utils/features';
 import { perms } from '@/utils/permission';
 import type { MaterialV2Row } from '@/types';
@@ -13,7 +15,7 @@ export type MaterialV2FormValues = {
   code: string;
   name: string;
   category: string;
-
+  
   unit: string;
   isActive: boolean;
 };

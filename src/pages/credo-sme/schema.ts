@@ -21,17 +21,20 @@ const OptionWithPermissionsSchema = OptionSchema.extend({
 });
 
 export const CredoAppConfigSchema = z.looseObject({
+  
   date: z.coerce.date().optional().describe('The date and time the config was updated'),
   version: z.string().describe('The version of the config'),
-
+  
   schemaVersion: z.number().optional().describe('The schema version of the config'),
   features: z
     .looseObject({
+      
+      
       employees: z
         .looseObject({
           enabled: z.boolean().optional(),
           selfManage: z.boolean().optional(),
-
+          
           v2: z.boolean().optional(),
           email: z.boolean().optional(),
           position: z.boolean().optional(),
@@ -45,13 +48,13 @@ export const CredoAppConfigSchema = z.looseObject({
           driverProfile: z.boolean().optional(),
           codePrefix: z.string().optional(),
           codePadLength: z.number().int().min(0).max(12).optional(),
-
+          
           departmentOptions: z.array(OptionWithPermissionsSchema).optional(),
-
+          
           positionOptions: z.array(OptionSchema).optional(),
         })
         .optional(),
-
+      
       activityLog: z.looseObject({ enabled: z.boolean().optional() }).optional(),
       lookupV2: z
         .looseObject({
@@ -102,7 +105,9 @@ export const CredoAppConfigSchema = z.looseObject({
             .max(12)
             .optional()
             .describe('Zero-pad width for the numeric part of the code'),
-
+          
+          
+          
           unitCategory: z
             .string()
             .optional()
@@ -133,7 +138,9 @@ export const CredoAppConfigSchema = z.looseObject({
             .describe('Trailing days the list opens on (the sync caps at 92)'),
           codePrefix: z.string().optional().describe('Receipt-number prefix, e.g. GR-'),
           codePadLength: z.number().optional().describe('Zero-pad width for the daily sequence'),
-
+          
+          
+          
           statusFlow: z
             .unknown()
             .optional()
@@ -142,7 +149,9 @@ export const CredoAppConfigSchema = z.looseObject({
             .array(z.string())
             .optional()
             .describe("The receipt list's resting status selection"),
-
+          
+          
+          
           customFields: z
             .unknown()
             .optional()
@@ -157,7 +166,8 @@ export const CredoAppConfigSchema = z.looseObject({
             .describe('Columns the receipt table never draws — hiding wins over pinning'),
         })
         .optional(),
-
+      
+      
       salesOrdersV2: z
         .looseObject({
           enabled: z.boolean().optional().describe('Show the credo-sme sales-order pages'),
@@ -316,7 +326,7 @@ export const CredoAppConfigSchema = z.looseObject({
         .optional(),
     })
     .optional(),
-
+  
   permissions: z
     .looseObject({
       employee: ModuleOverlaySchema,
@@ -326,7 +336,7 @@ export const CredoAppConfigSchema = z.looseObject({
     .optional(),
   app: z.looseObject({
     name: z.string().describe('The name of the app'),
-
+    
     nameHtml: z.string().optional().describe('The name of the app, as inline HTML'),
     description: z.string().optional().describe('The description of the app'),
     logoUrl: z.string().optional().describe('The URL of the logo'),
@@ -336,14 +346,14 @@ export const CredoAppConfigSchema = z.looseObject({
     pwaIcon512Url: z.string().optional().describe('The URL of the PWA icon 512x512'),
     pwaIconMaskableUrl: z.string().optional().describe('The URL of the PWA icon maskable 512x512'),
   }),
-
+  
   themeConfig: z
     .looseObject({
       mainColor: z.string().optional(),
       customPalette: z.array(z.string()).optional(),
     })
     .optional(),
-
+  
   layout: z
     .looseObject({
       navbar: z
@@ -356,7 +366,7 @@ export const CredoAppConfigSchema = z.looseObject({
       header: z.looseObject({ variant: z.string().optional() }).optional(),
     })
     .optional(),
-
+  
   navigationV2: z
     .looseObject({
       pc: z.array(z.looseObject({ id: z.string() })),

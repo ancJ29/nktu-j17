@@ -1,3 +1,5 @@
+
+
 import { Button, Divider, Grid, Group, Stack, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconArrowLeft } from '@tabler/icons-react';
@@ -27,6 +29,7 @@ export function MasterDataFormPage<Row extends MasterDataRow, Values extends Mas
     if (!initialized && !loading) void loadAll();
   }, [initialized, loading, loadAll]);
 
+  
   const blockedOnMobile = isMobile && !!spec.mobile;
   useEffect(() => {
     if (!blockedOnMobile) return;
@@ -44,6 +47,7 @@ export function MasterDataFormPage<Row extends MasterDataRow, Values extends Mas
     [items, id],
   );
 
+  
   if (blockedOnMobile) return null;
   if (id && !initialized) return null;
   return <MasterDataFormBody spec={spec} editing={editing} isEdit={!!id} />;

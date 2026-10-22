@@ -7,7 +7,7 @@ type Props = {
   readonly todayIso: string;
   readonly t: (key: string) => string;
   readonly formatDate: (iso: string) => string;
-
+  
   readonly urgentOnly?: boolean;
 };
 
@@ -49,6 +49,8 @@ function ExpiryLine({
   t: (key: string) => string;
   formatDate: (iso: string) => string;
 }) {
+  
+  
   const color = entry.expired ? 'red' : entry.daysLeft <= 30 ? 'orange' : undefined;
   const label = entry.detail ? `${t(entry.kindKey)} · ${entry.detail}` : t(entry.kindKey);
 

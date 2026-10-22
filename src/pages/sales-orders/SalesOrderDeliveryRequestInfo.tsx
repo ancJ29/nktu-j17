@@ -1,3 +1,5 @@
+
+
 import { Anchor, Badge, Card, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconArrowBackUp, IconCalendar, IconTruckDelivery } from '@tabler/icons-react';
 import { type ReactNode } from 'react';
@@ -13,7 +15,7 @@ const { resolveStatus } = deliveryRequestStatusOptions;
 
 type SalesOrderDeliveryRequestInfoProps = {
   readonly requests: DeliveryRequest[];
-
+  
   readonly compact?: boolean;
 };
 
@@ -36,12 +38,16 @@ export function SalesOrderDeliveryRequestInfo({
 
   if (requests.length === 0) return null;
 
+  
+  
   const ordered = [...requests].sort((a, b) => {
     const aAdd = (a.extra as DeliveryRequestExtra | undefined)?.isAdditional ? 1 : 0;
     const bAdd = (b.extra as DeliveryRequestExtra | undefined)?.isAdditional ? 1 : 0;
     return aAdd - bAdd;
   });
 
+  
+  
   const cols = compact || ordered.length < 2 ? 1 : { base: 1, sm: 2 };
 
   return (
@@ -49,7 +55,8 @@ export function SalesOrderDeliveryRequestInfo({
       {ordered.map((dr) => {
         const extra = (dr.extra ?? {}) as DeliveryRequestExtra;
         const status = resolveStatus(extra.status);
-
+        
+        
         const isReturn = dr.direction === 'inbound' && extra.inboundKind === 'customer-return';
         const color = isReturn
           ? 'var(--mantine-color-orange-6)'

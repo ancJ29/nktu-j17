@@ -1,3 +1,5 @@
+
+
 import {
   ActionIcon,
   Badge,
@@ -47,7 +49,7 @@ function ColorSelect({
   onChange,
 }: {
   value: string;
-
+  
   fallback: string;
   placeholder: string;
   onChange: (next: string) => void;
@@ -160,6 +162,9 @@ function StatusRowModal<Stage extends string>({
                 No effect can be attached to a {row.stage}-stage status in this module.
               </Text>
             ) : (
+              
+              
+              
               offered.map((capability) => (
                 <Checkbox
                   key={capability.id}
@@ -200,18 +205,19 @@ function StatusRowModal<Stage extends string>({
 }
 
 export type StatusFlowVocabulary<Stage extends string> = {
+  
   stages: Array<{ value: Stage; label: string }>;
-
+  
   stageColors: Readonly<Record<Stage, string>>;
-
+  
   defaultFlow: StatusFlowConfig<Stage>;
-
+  
   initialStage: Stage;
-
+  
   recordNoun: string;
-
+  
   defaultLifecycle: string;
-
+  
   capabilities?: Array<StatusCapability<Stage> & { label: string; description: string }>;
 };
 
@@ -226,16 +232,18 @@ export function StatusFlowEditor<Stage extends string>({
   value: StatusFlowDraftOf<Stage> | null;
   onChange: (next: StatusFlowDraftOf<Stage> | null) => void;
   departmentOptions: Array<{ value: string; label: string }>;
-
+  
   storedUnreadable: boolean;
 }) {
   const draft = value;
   const { stageColors, defaultFlow, initialStage, recordNoun, defaultLifecycle } = vocabulary;
   const capabilities = vocabulary.capabilities ?? [];
 
+  
   const [editing, setEditing] = useState<number | null>(null);
   const editingRow = draft !== null && editing !== null ? draft.statuses[editing] : undefined;
 
+  
   const renameValue = (from: StatusFlowDraftOf<Stage>, oldValue: string, newValue: string) => {
     const rekey = (map: Record<string, string[]>) =>
       Object.fromEntries(
@@ -260,7 +268,9 @@ export function StatusFlowEditor<Stage extends string>({
       statuses: draft.statuses.map((row, i) => {
         if (i !== idx) return row;
         const merged = { ...row, ...patch };
-
+        
+        
+        
         return {
           ...merged,
           capabilities: merged.capabilities.filter((id) =>
@@ -295,7 +305,8 @@ export function StatusFlowEditor<Stage extends string>({
 
   const addRow = () => {
     if (!draft) return;
-
+    
+    
     setEditing(draft.statuses.length);
     onChange({
       ...draft,
@@ -307,7 +318,8 @@ export function StatusFlowEditor<Stage extends string>({
           color: '',
           actionLabel: '',
           actionColor: '',
-
+          
+          
           stage: initialStage,
           capabilities: [],
         },
@@ -417,6 +429,8 @@ export function StatusFlowEditor<Stage extends string>({
                         size="lg"
                         aria-label="Remove status"
                         onClick={(e) => {
+                          
+                          
                           e.stopPropagation();
                           removeRow(idx);
                         }}

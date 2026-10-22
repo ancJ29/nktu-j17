@@ -1,3 +1,5 @@
+
+
 import { SimpleGrid, Stack, Text } from '@mantine/core';
 import { IconId, IconLicense, IconTruck } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +25,7 @@ const EMPLOYEE_LOG_PERMS = {
 
 type EmployeeDriverTabProps = {
   readonly employee: Employee;
-
+  
   readonly isVisible: boolean;
 };
 
@@ -69,6 +71,9 @@ export function EmployeeDriverTab({ employee, isVisible }: EmployeeDriverTabProp
       {trucksEnabled && (
         <SectionCard icon={<IconTruck size={14} />} title={t('employees.driver.linkedTruck')}>
           {employee.extra?.truckAssetId ? (
+            
+            
+            
             <TruckLink
               id={employee.extra.truckAssetId}
               fallbackLabel={employee.extra?.truckAssetCode || t('employees.driver.viewTruck')}

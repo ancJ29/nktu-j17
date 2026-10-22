@@ -1,3 +1,5 @@
+
+
 import {
   ActionIcon,
   Alert,
@@ -128,8 +130,16 @@ function detectFileKind(data: unknown): ImportedFileKind {
 }
 
 export function SystemAdminPage() {
+  
+  
   const [authed, setAuthed] = useState<boolean>(hasGateSecret);
 
+  
+  
+  
+  
+  
+  
   useEffect(() => {
     if (authed) {
       cMngtConnector.setAccessKey(readSecret(GATE_FIELD));
@@ -165,16 +175,23 @@ function isTabValue(v: string | null): v is TabValue {
 }
 
 function AdminTabs() {
+  
+  
+  
+  
   const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState<TabValue>(() => {
     const fromUrl = searchParams.get('tab');
     return isTabValue(fromUrl) ? fromUrl : 'provision';
   });
-
+  
   const [selectedClient, setSelectedClient] = useState<string | null>(
     () => searchParams.get('client-code') || null,
   );
 
+  
+  
+  
   useEffect(() => {
     setSearchParams(
       (prev) => {
@@ -188,7 +205,7 @@ function AdminTabs() {
       { replace: true },
     );
   }, [tab, selectedClient, setSearchParams]);
-
+  
   const [refreshSignal, setRefreshSignal] = useState(0);
   const bumpRefresh = useCallback(() => setRefreshSignal((n) => n + 1), []);
 
@@ -322,6 +339,12 @@ function AuthGate({ onAuthed }: { onAuthed: (cMngtAdminAccessKey: string) => voi
 
     const trimmed = value.trim();
 
+    
+    
+    
+    
+    
+    
     cMngtConnector.setAccessKey(trimmed);
     try {
       const res = await cMngtConnector.listClients();
@@ -428,18 +451,19 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
   const [running, setRunning] = useState(false);
   const [lastError, setLastError] = useState<string | null>(null);
   const [result, setResult] = useState<ProvisionClientResponse | null>(null);
-
+  
   const [configWarning, setConfigWarning] = useState<string | null>(null);
 
+  
   const [importedAppConfig, setImportedAppConfig] = useState<Record<string, unknown> | null>(null);
-
+  
   const [importedDepartments, setImportedDepartments] = useState<DepartmentOption[] | null>(null);
   const [importedFiles, setImportedFiles] = useState<
     { name: string; kind: ImportedFileKind; error?: string }[]
   >([]);
 
   const [confirmOpen, { open: openConfirm, close: closeConfirm }] = useDisclosure(false);
-
+  
   const [ssoAdminKey, setSsoAdminKey] = useState<string>(() => readSecret('ssoAdminAccessKey'));
 
   const applyBaseData = useCallback((data: Record<string, unknown>) => {
@@ -537,7 +561,8 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
         domains,
         rootEmail: rootEmail.trim(),
         rootPassword: rootPassword.trim() || undefined,
-
+        
+        
         ssoAdminAccessKey: ssoAdminKey.trim(),
       });
 
@@ -557,6 +582,11 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
       });
       onProvisioned();
 
+      
+      
+      
+      
+      
       try {
         const baseConfig = (importedAppConfig ?? minimalAppConfig) as Record<string, unknown>;
         const baseApp = (baseConfig.app ?? {}) as Record<string, unknown>;
@@ -580,7 +610,9 @@ function ProvisionPanel({ onProvisioned }: { onProvisioned: () => void }) {
         };
         const cfgRes = await cMngtConnector.setAppConfig({
           clientServiceCode: trimmedCode,
-
+          
+          
+          
           config: configPayload as unknown as Parameters<
             typeof cMngtConnector.setAppConfig
           >[0]['config'],
@@ -984,7 +1016,7 @@ function ClientsPanel({
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<ClientConfig | null>(null);
   const [deleting, setDeleting] = useState(false);
-
+  
   const [ssoAdminKey, setSsoAdminKey] = useState<string>(() => readSecret('ssoAdminAccessKey'));
 
   const load = useCallback(async () => {
@@ -1004,7 +1036,9 @@ function ClientsPanel({
     }
   }, []);
 
+  
   useEffect(() => {
+    
     void load();
   }, [load, refreshSignal]);
 
@@ -1014,6 +1048,16 @@ function ClientsPanel({
     const { clientServiceCode, version } = pendingDelete;
     const issues: string[] = [];
 
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     try {
       const res = await cMngtConnector.removeClient({
         clientServiceCode,
@@ -1023,7 +1067,8 @@ function ClientsPanel({
       if (!res.success) {
         issues.push(`c-mngt removeClient: ${(res as { message?: string }).message ?? 'failed'}`);
       }
-
+      
+      
       if (res.ssoIssues?.length) issues.push(...res.ssoIssues);
     } catch (err) {
       issues.push(`c-mngt removeClient: ${err instanceof Error ? err.message : String(err)}`);
@@ -1212,6 +1257,7 @@ function ConfigPanel({
   const [clients, setClients] = useState<ClientConfig[] | null>(null);
   const [listError, setListError] = useState<string | null>(null);
 
+  
   useEffect(() => {
     let cancelled = false;
     cMngtConnector
@@ -1281,6 +1327,9 @@ function ConfigPanel({
       </SectionCard>
 
       {selectedClient && cMngtAdminAccessKey && (
+        
+        
+        
         <ConfigEditor
           key={selectedClient}
           accessKey={cMngtAdminAccessKey}
@@ -1305,6 +1354,8 @@ function ValidatePanel({ refreshSignal }: { refreshSignal: number }) {
   const [results, setResults] = useState<Map<string, ValidationResult>>(new Map());
   const [running, setRunning] = useState(false);
 
+  
+  
   useEffect(() => {
     let cancelled = false;
     cMngtConnector
@@ -1330,11 +1381,13 @@ function ValidatePanel({ refreshSignal }: { refreshSignal: number }) {
   const handleRun = useCallback(async () => {
     if (!clients) return;
     setRunning(true);
-
+    
     setResults(
       new Map(clients.map((c) => [c.clientServiceCode, { status: 'pending' } as ValidationResult])),
     );
 
+    
+    
     await Promise.all(
       clients.map(async (client) => {
         let next: ValidationResult;
@@ -1520,7 +1573,7 @@ function ValidationIssuesCell({ result }: { result: ValidationResult | undefined
       </Text>
     );
   }
-
+  
   const shown = result.issues.slice(0, 20);
   const hidden = result.issues.length - shown.length;
   return (

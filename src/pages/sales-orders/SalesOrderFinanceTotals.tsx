@@ -12,7 +12,9 @@ export function SalesOrderFinanceTotals({ summary }: { summary: SalesOrderFinanc
       radius="md"
       padding="sm"
       shadow="sm"
-
+      
+      
+      
       bg="var(--mantine-color-body)"
       style={{ position: 'sticky', bottom: 0, zIndex: 3 }}
     >

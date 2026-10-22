@@ -1,3 +1,5 @@
+
+
 import {
   ActionIcon,
   Alert,
@@ -86,7 +88,7 @@ type LineDraft = {
   itemName: string;
   unit: string | undefined;
   quantity: number;
-
+  
   unitPrice: number | undefined;
   note: string;
 };
@@ -113,6 +115,7 @@ export function SalesOrderV2FormPage() {
   const { id } = useParams<{ id: string }>();
   const editing = Boolean(id);
 
+  
   const location = useLocation();
   const copyFrom = editing
     ? undefined
@@ -129,36 +132,47 @@ export function SalesOrderV2FormPage() {
 
   const [order, setOrder] = useState<SalesOrderV2 | null>(null);
   const [day, setDay] = useState('');
-
+  
+  
+  
+  
+  
+  
   const [customerId, setCustomerId] = useState<string | null>(copyFrom?.customerId ?? null);
   const [customerName, setCustomerName] = useState(copyFrom?.customerName ?? '');
   const [customerPhone, setCustomerPhone] = useState(copyFrom?.customerPhone ?? '');
   const [customerAddress, setCustomerAddress] = useState(copyFrom?.customerAddress ?? '');
-
+  
   const [contactFromProfile, setContactFromProfile] = useState(false);
-
+  
   const [creatingCustomer, setCreatingCustomer] = useState<string | null>(null);
   const [orderDate, setOrderDate] = useState('');
   const [requestedDate, setRequestedDate] = useState('');
   const [reference, setReference] = useState(copyFrom?.reference ?? '');
   const [notes, setNotes] = useState(copyFrom?.notes ?? '');
-
+  
+  
+  
   const [lines, setLines] = useState<LineDraft[]>(() => (copyFrom?.items ?? []).map(toLineDraft));
-
+  
   const [highlightKey, setHighlightKey] = useState<string | null>(null);
-
+  
   const pendingFocus = useRef<string | null>(null);
   const quantityRefs = useRef(new Map<string, HTMLInputElement>());
   const rowRefs = useRef(new Map<string, HTMLTableRowElement>());
-
+  
+  
+  
   const [customDraft, setCustomDraft] = useState<Record<string, string>>(() =>
     customDraftOf(copyFrom?.extra),
   );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  
+  
   const [moreOpen, setMoreOpen] = useState(true);
-
+  
+  
   const { read: lineStock } = useSalesOrderLineStock();
   const customFields = useSalesOrderCustomFields();
   const editableFields = useMemo(
@@ -166,7 +180,7 @@ export function SalesOrderV2FormPage() {
     [customFields],
   );
   const [fieldErrors, setFieldErrors] = useState<Record<string, 'number' | 'date' | 'option'>>({});
-
+  
   const moreSummary = [
     reference.trim() ? `${t('salesOrdersV2.form.reference')}: ${reference.trim()}` : '',
     ...customFields.map((field) => {
@@ -178,6 +192,10 @@ export function SalesOrderV2FormPage() {
     .filter(Boolean)
     .join(' · ');
 
+  
+  
+  
+  
   const form = useForm({ initialValues: {} });
 
   useEffect(() => {
@@ -192,7 +210,8 @@ export function SalesOrderV2FormPage() {
     getSalesOrderV2ById(id)
       .then(({ item, day: onDay }) => {
         if (!live) return;
-
+        
+        
         if (salesOrderStageOf(item.status) !== 'draft') {
           void navigate(ROUTES.SALES_ORDERS_V2.DETAIL.replace(':id', item.id), { replace: true });
           return;
@@ -200,7 +219,8 @@ export function SalesOrderV2FormPage() {
         setOrder(item);
         setDay(onDay);
         setCustomerId(item.customerId ?? null);
-
+        
+        
         setCustomerName(item.customerName ?? '');
         setCustomerPhone(item.customerPhone ?? '');
         setCustomerAddress(item.customerAddress ?? '');
@@ -208,7 +228,9 @@ export function SalesOrderV2FormPage() {
         setRequestedDate(item.requestedDate ?? '');
         setReference(item.reference ?? '');
         setNotes(item.notes ?? '');
-
+        
+        
+        
         setLines(
           item.items.map((line) => ({
             itemType: line.itemType,
@@ -231,6 +253,7 @@ export function SalesOrderV2FormPage() {
     };
   }, [id, navigate]);
 
+  
   const searchableItems = useMemo<SearchableItem[]>(() => {
     const fromProducts = products.filter(isLiveRow).map((row) => ({
       id: row.id,
@@ -262,6 +285,7 @@ export function SalesOrderV2FormPage() {
     [lines],
   );
 
+  
   const orderTotal = useMemo(() => {
     const priced = lines.filter((line) => line.unitPrice !== undefined);
     if (priced.length === 0) return undefined;
@@ -272,6 +296,7 @@ export function SalesOrderV2FormPage() {
     setLines((prev) => prev.map((line, i) => (i === index ? { ...line, ...patch } : line)));
   }, []);
 
+  
   const pickCustomer = useCallback((row: CustomerV2Row) => {
     setCustomerId(row.id);
     setCustomerName(row.name);
@@ -280,12 +305,14 @@ export function SalesOrderV2FormPage() {
     setContactFromProfile(true);
   }, []);
 
+  
   const typeCustomer = useCallback((value: string) => {
     setCustomerId(null);
     setCustomerName(value);
     setContactFromProfile(false);
   }, []);
 
+  
   const addItem = useCallback(
     (item: SearchableItem) => {
       const key = `${item.itemType}:${item.id}`;
@@ -316,6 +343,10 @@ export function SalesOrderV2FormPage() {
     [products],
   );
 
+  
+  
+  
+  
   useEffect(() => {
     const key = pendingFocus.current;
     if (!key) return;
@@ -326,6 +357,8 @@ export function SalesOrderV2FormPage() {
     rowRefs.current.get(key)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [lines]);
 
+  
+  
   useEffect(() => {
     if (!highlightKey) return;
     const timer = setTimeout(() => setHighlightKey(null), 1400);
@@ -348,16 +381,21 @@ export function SalesOrderV2FormPage() {
       notifications.show({ color: 'red', message });
     };
 
+    
     if (!customerId && customerName.trim() === '') {
       refuse(t('salesOrdersV2.validation.customerRequired'));
       return;
     }
-
+    
+    
+    
     if (customerPhone.trim() !== '' && !isValidPhone(customerPhone)) {
       refuse(t('salesOrdersV2.validation.phoneInvalid'));
       return;
     }
 
+    
+    
     if (payload.length === 0) {
       refuse(t('salesOrdersV2.validation.itemsRequired'));
       return;
@@ -366,7 +404,8 @@ export function SalesOrderV2FormPage() {
       refuse(t('salesOrdersV2.validation.quantityPositive'));
       return;
     }
-
+    
+    
     if (payload.some((line) => line.unitPrice !== undefined && line.unitPrice < 0)) {
       refuse(t('salesOrdersV2.validation.unitPriceNonNegative'));
       return;
@@ -379,12 +418,18 @@ export function SalesOrderV2FormPage() {
       return;
     }
 
+    
+    
+    
     const extra = mergeCustomFieldExtra(
       order?.extra ?? copyFrom?.extra,
       editableFields,
       customDraft,
     );
 
+    
+    
+    
     const linkedId = customerId;
     const typedName = linkedId ? '' : customerName.trim();
 
@@ -395,7 +440,8 @@ export function SalesOrderV2FormPage() {
         editing && order
           ? await updateSalesOrderV2(order, day, {
               customerId: linkedId,
-
+              
+              
               ...(linkedId === null ? { customerName: typedName } : {}),
               customerPhone,
               customerAddress,

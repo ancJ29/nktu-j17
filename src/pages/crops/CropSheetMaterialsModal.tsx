@@ -12,9 +12,9 @@ import type { CropColumnChoice, SheetColumn } from '@/types';
 type Props = {
   readonly opened: boolean;
   readonly onClose: () => void;
-
+  
   readonly columns: SheetColumn[];
-
+  
   readonly value: Record<string, CropColumnChoice>;
   readonly onChange: (next: Record<string, CropColumnChoice>) => void;
   readonly editable: boolean;
@@ -52,11 +52,13 @@ export function CropSheetMaterialsModal({
   }, [materials]);
   const unitLabels = useLookupV2Labels(getMaterialUnitCategory());
 
+  
   const configurable = useMemo(() => columns.filter((c) => c.kind === 'ratio'), [columns]);
 
   const set = (key: string, choice: CropColumnChoice) => {
     const next = { ...value };
-
+    
+    
     if (choice.materialCode || choice.unit) next[key] = choice;
     else delete next[key];
     onChange(next);
@@ -66,7 +68,9 @@ export function CropSheetMaterialsModal({
     const units = code ? (unitsOf.get(code) ?? []) : [];
     set(column.key, {
       ...(code && { materialCode: code }),
-
+      
+      
+      
       ...(() => {
         const unit = unitAfterMaterialChange(columnUnit(column, { columnMaterials: value }), units);
         return unit ? { unit } : {};
@@ -121,7 +125,9 @@ export function CropSheetMaterialsModal({
                             disabled={!editable}
                             placeholder={t('crops.sheet.materialsPlaceholder')}
                             data={options}
-
+                            
+                            
+                            
                             value={columnMaterialCode(column, { columnMaterials: value }) ?? null}
                             onChange={(code) => pickMaterial(column, code)}
                             comboboxProps={{ withinPortal: true }}
@@ -132,7 +138,9 @@ export function CropSheetMaterialsModal({
                               w={110}
                               disabled={!editable}
                               placeholder={t('crops.sheet.materialsUnit')}
-
+                              
+                              
+                              
                               data={materialUnitOptions(
                                 unitsOf.get(materialCode) ?? [],
                                 unit,
@@ -148,6 +156,9 @@ export function CropSheetMaterialsModal({
                               comboboxProps={{ withinPortal: true }}
                             />
                           ) : (
+                            
+                            
+                            
                             <TextInput
                               size="xs"
                               w={110}

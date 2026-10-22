@@ -18,7 +18,7 @@ export type RefuelTotals = {
   litres: number;
   cost: number;
   distance: number;
-
+  
   avgConsumption: number | null;
 };
 

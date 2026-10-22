@@ -98,20 +98,20 @@ type StopRow = Omit<TransportOrderDropStop, 'at'> & { key: string; at: string | 
 
 type FormValues = FeeFormValues & {
   entryDate: string | null;
-
+  
   externalTruck: boolean;
   truckId: string;
   truckPlate: string;
   driverId: string;
   driverName: string;
-
+  
   pickupLocation: string;
-
+  
   pickupAt: string | null;
   stops: StopRow[];
-
+  
   totalDays: string;
-
+  
   goods: string;
   laborCost: number;
   transportContractNo: string;
@@ -257,9 +257,9 @@ export function TransportOrderMultiDropFormPage() {
   const truckTypeLabel = useTruckTypeLabel();
   const driverWithPlate = useDriverWithPlate();
   const { provinces, failed: locationsFailed } = useLocations();
-
+  
   const goodsSuggestions = useTransportGoodsSuggestions();
-
+  
   const locationOptions = useTruckLocationOptions();
   const locationLabel = useTruckLocationLabel();
 
@@ -278,7 +278,7 @@ export function TransportOrderMultiDropFormPage() {
       stops: {
         province: (v: string) =>
           !v ? t('transportOrders.multiDrop.validation.provinceRequired') : null,
-
+        
         key: (v: string, values: FormValues, path: string) => {
           if (v) return null;
           const index = Number(path.split('.')[1]);
@@ -306,7 +306,7 @@ export function TransportOrderMultiDropFormPage() {
         navigate(ROUTES.TRANSPORT_ORDERS.DETAIL.replace(':id', o.id), { replace: true });
         return null;
       }
-
+      
       if (!isMultiDropType(o.extra?.truckType, MULTI_DROP_TRUCK_TYPES)) {
         navigate(ROUTES.TRANSPORT_ORDERS.EDIT.replace(':id', o.id), { replace: true });
         return null;
@@ -324,7 +324,8 @@ export function TransportOrderMultiDropFormPage() {
     setLoading(true);
     const multiDrop: TransportOrderMultiDrop = {
       pickupLocation: values.pickupLocation,
-
+      
+      
       ...(values.pickupAt ? { pickupAt: dateTimeStringToIso(values.pickupAt) } : {}),
       stops: values.stops.map(({ province, ward, distanceKm, at }) => ({
         province,
@@ -333,11 +334,13 @@ export function TransportOrderMultiDropFormPage() {
         ...(at ? { at: dateTimeStringToIso(at) } : {}),
       })),
       totalDays: Number(values.totalDays) || MULTI_DROP_DEFAULT_DAYS,
-
+      
+      
       ...(values.goods ? { goods: values.goods } : {}),
     };
     const snapshot = snapshotRef.current;
-
+    
+    
     const write = (extra: TransportOrderExtra) =>
       buildTransportOrderWrite({
         isMultiTrip: false,
@@ -411,6 +414,8 @@ export function TransportOrderMultiDropFormPage() {
     ? t('transportOrders.multiDrop.editTitle', { type: typeLabel })
     : t('transportOrders.multiDrop.newTitle', { type: typeLabel });
 
+  
+  
   const truckSelectData = trucks
     .filter(
       (a) =>
@@ -430,6 +435,8 @@ export function TransportOrderMultiDropFormPage() {
     }
   };
 
+  
+  
   const setExternalTruck = (checked: boolean) => {
     form.setFieldValue('externalTruck', checked);
     form.setFieldValue('truckId', '');
@@ -438,10 +445,14 @@ export function TransportOrderMultiDropFormPage() {
     form.setFieldValue('driverName', '');
   };
 
+  
+  
   const withCurrent = (options: string[], current: string) =>
     current && !options.includes(current) ? [...options, current] : options;
   const provinceData = provinceOptions(provinces);
 
+  
+  
   const setProvince = (i: number, province: string | null) => {
     if ((province ?? '') === form.values.stops[i]?.province) return;
     form.setFieldValue(`stops.${i}`, {
@@ -464,6 +475,8 @@ export function TransportOrderMultiDropFormPage() {
     );
   };
 
+  
+  
   const pickupData = (() => {
     const current = form.values.pickupLocation;
     const options = locationOptions.map((o) => ({ value: o.value, label: o.label }));
@@ -693,7 +706,7 @@ export function TransportOrderMultiDropFormPage() {
                     color="red"
                     variant="subtle"
                     mt={28}
-
+                    
                     disabled={form.values.stops.length <= 1}
                     onClick={() => form.removeListItem('stops', i)}
                   >

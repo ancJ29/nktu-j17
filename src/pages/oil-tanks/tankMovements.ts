@@ -1,3 +1,5 @@
+
+
 import { cMngtConnector } from '@credo/connectors/connector';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useOilTankStore, OIL_TANK_RECORD_TARGET } from '@/stores/useOilTankStore';
@@ -28,18 +30,32 @@ async function patchLevel(
       return (await useOilTankStore.getState().updateSafely({
         id: tank.id,
         version: tank.version,
-
+        
+        
+        
+        
         patch: { extra: { ...tank.extra, currentLevel: nextFor(tank) } },
       })) as OilTankRow;
     } catch (err) {
       if (!(err instanceof EntityConflictError) || attempt >= MAX_LEVEL_RETRIES) throw err;
-
+      
+      
+      
+      
       tank = (err.latest as OilTankRow | undefined) ?? (await fetchTank(tank.id));
     }
   }
 }
 
 export async function applyMovementToTankLevel(event: OperationLogWriteEvent): Promise<void> {
+  
+  
+  
+  
+  
+  
+  
+  
   const previous =
     event.op === 'create' ? null : event.op === 'update' ? event.previous : event.log;
   const next = event.op === 'delete' ? null : event.log;
@@ -48,14 +64,18 @@ export async function applyMovementToTankLevel(event: OperationLogWriteEvent): P
   await patchLevel(event.targetId, (tank) => {
     const current = tank.extra?.currentLevel;
     const base = typeof current === 'number' && Number.isFinite(current) ? current : 0;
-
+    
+    
+    
     return Math.round((base + delta) * 100) / 100;
   });
 }
 
 async function readLedger(tank: OilTankRow, toYear: number): Promise<OperationLog[]> {
   const openingYear = Number(String(tank.extra?.openingDate ?? '').slice(0, 4));
-
+  
+  
+  
   const fromYear = Number.isFinite(openingYear)
     ? openingYear
     : new Date(tank.createdAt).getFullYear();
@@ -74,12 +94,13 @@ async function readLedger(tank: OilTankRow, toYear: number): Promise<OperationLo
 }
 
 export type RecomputeResult = {
+  
   level: number;
-
+  
   previousLevel: number | null;
-
+  
   drift: number;
-
+  
   movementCount: number;
 };
 
@@ -94,6 +115,10 @@ export async function recomputeTankLevel(
   const before = tank.extra?.currentLevel;
   const previousLevel = typeof before === 'number' && Number.isFinite(before) ? before : null;
 
+  
+  
+  
+  
   await patchLevel(tankId, () => level, tank);
 
   return {

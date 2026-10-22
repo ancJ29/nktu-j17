@@ -1,3 +1,4 @@
+
 import type { CSSProperties } from 'react';
 
 export const FLOATING_PANEL_STYLE: CSSProperties = {

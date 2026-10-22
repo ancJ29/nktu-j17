@@ -1,3 +1,4 @@
+
 import { notifications } from '@mantine/notifications';
 import { logger } from '@credo/base-ui/utils';
 import { appConfig } from '@/config';
@@ -11,14 +12,15 @@ import { isDuplicateOrderNumberError, MAX_ORDER_NUMBER_RETRIES } from './transpo
 import { appendTimelineEntry, createMemo, diffTransportOrder, isEmptyDiff } from './activityMemo';
 
 export type TransportOrderSaveInput = {
+  
   id?: string | undefined;
-
+  
   snapshot: TransportOrder | null;
-
+  
   status: string;
-
+  
   write: (extra: TransportOrderExtra) => Record<string, unknown>;
-
+  
   invalidate: () => void;
 };
 
@@ -38,7 +40,8 @@ export async function saveTransportOrder({
       version: snapshot.version,
       patch: write({ ...snapshot.extra, createdBy: snapshot.extra?.createdBy ?? actor }),
     });
-
+    
+    
     const fields = diffTransportOrder(snapshot, updated);
     if (!isEmptyDiff(fields)) {
       logActivity('transportOrder.update', id, { orderNumber: updated.orderNumber, fields });
@@ -46,12 +49,16 @@ export async function saveTransportOrder({
     return updated;
   }
 
+  
+  
   const todays = await transportOrderBundle.queryPartition(businessDateString());
   const baseNumber = buildDailySequentialCode(
     appConfig.features.transportOrders.codePrefix,
     todays.map((o) => o.orderNumber),
   );
 
+  
+  
   const createdExtra: TransportOrderExtra = { createdBy: actor };
   createdExtra.activityLog = appendTimelineEntry(createdExtra, {
     action: 'created',
@@ -59,6 +66,9 @@ export async function saveTransportOrder({
     ...getCurrentEmployeeStamp(),
   });
 
+  
+  
+  
   for (let attempt = 0; attempt <= MAX_ORDER_NUMBER_RETRIES; attempt++) {
     const orderNumber = bumpSequentialCode(baseNumber, attempt);
     try {

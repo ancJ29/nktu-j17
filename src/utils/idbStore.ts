@@ -2,7 +2,7 @@ import { logger } from '@credo/base-ui/utils';
 
 export type IdbStore<T> = {
   get(id: string): Promise<T | null>;
-
+  
   put(value: T): Promise<boolean>;
   getAll(): Promise<T[]>;
   remove(id: string): Promise<void>;
@@ -15,7 +15,7 @@ export function createIdbStore<T extends { id: string }>({
 }: {
   dbName: string;
   storeName: string;
-
+  
   label: string;
 }): IdbStore<T> {
   let dbPromise: Promise<IDBDatabase | null> | null = null;
@@ -74,6 +74,8 @@ export function createIdbStore<T extends { id: string }>({
       return (await runTx<T | undefined>('readonly', (store) => store.get(id))) ?? null;
     },
     async put(value) {
+      
+      
       return (await runTx('readwrite', (store) => store.put(value))) != null;
     },
     async getAll() {

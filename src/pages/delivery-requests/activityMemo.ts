@@ -1,3 +1,5 @@
+
+
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
 import type { CMngtDeliveryRequestDirection as DeliveryRequestDirection } from '@credo/connectors/types';
 import type {
@@ -34,14 +36,14 @@ export type DeliveryRequestItemDiff = {
 
 export type DeliveryRequestPartyMemo = {
   direction: DeliveryRequestDirection;
-
+  
   inboundKind?: DeliveryRequestInboundKind;
-
+  
   salesOrderId?: string;
   salesOrderNumber?: string;
   customerCode?: string;
   customerName?: string;
-
+  
   vendorCode?: string;
   vendorName?: string;
 };
@@ -134,7 +136,7 @@ export function partyMemo(request: {
   const direction = request.direction ?? 'outbound';
   if (direction === 'inbound') {
     const inboundKind = request.inboundKind ?? 'vendor';
-
+    
     if (inboundKind === 'customer-return') {
       return {
         direction,
@@ -145,7 +147,7 @@ export function partyMemo(request: {
         ...(request.customerName && { customerName: request.customerName }),
       };
     }
-
+    
     if (inboundKind === 'customer-sample') {
       return {
         direction,
@@ -154,7 +156,7 @@ export function partyMemo(request: {
         ...(request.customerName && { customerName: request.customerName }),
       };
     }
-
+    
     return {
       direction,
       ...(request.vendorCode && { vendorCode: request.vendorCode }),

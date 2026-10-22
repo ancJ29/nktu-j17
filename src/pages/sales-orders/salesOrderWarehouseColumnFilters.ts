@@ -1,11 +1,14 @@
+
+
 import type { ColumnFilterDef, DataTableColumnFilterLabels } from '@credo/base-ui/hooks';
 
 import type { SalesOrder } from '@/types';
 import { computeSalesOrderTotals } from '@/utils/salesOrderPricing';
 
 type BuildArgs = {
+  
   readonly priceVisible: boolean;
-
+  
   readonly vatRate: number;
   readonly labels: DataTableColumnFilterLabels;
 };
@@ -34,7 +37,7 @@ export function buildSalesOrderWarehouseColumnFilterDefs({
           },
           {
             key: 'afterTax',
-
+            
             getValue: (o: SalesOrder) => {
               const { subtotal, vat } = computeSalesOrderTotals(o, vatRate);
               return String(subtotal + vat);

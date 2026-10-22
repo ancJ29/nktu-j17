@@ -1,3 +1,5 @@
+
+
 import type { CredoAppConfig } from '../schema';
 import { mergeFeature } from './featureMerge';
 import { applyOverlay, readOverlay, type PermissionForm } from './permissionFields';
@@ -9,7 +11,8 @@ export type PositionOption = NonNullable<Employees['positionOptions']>[number];
 export const readLanguageCodes = (config: CredoAppConfig | null): string[] => {
   const languages = (config?.['languages'] ?? []) as Array<{ code?: unknown }>;
   const codes = languages.map((l) => l.code).filter((c): c is string => typeof c === 'string');
-
+  
+  
   return codes.length > 0 ? codes : ['vi'];
 };
 
@@ -59,7 +62,7 @@ export const readAllDepartmentPermissions = (
       const states = forms.map((f) => f[moduleKey][flag] === true);
       const every = states.every(Boolean);
       form[moduleKey][flag] = every;
-
+      
       mixed[moduleKey][flag] = states.length > 0 && !every && states.some(Boolean);
     }
   }

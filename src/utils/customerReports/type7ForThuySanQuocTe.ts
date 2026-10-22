@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -69,7 +71,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
     seller,
     customer,
     resolveShipmentType,
-
+    
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -79,6 +81,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
   const columnOf = serviceColumnReader(resolveFeeName);
   const truckLabel = truckLabeler(getTruckPlate);
 
+  
   const chiHoLines = (o: TransportOrder): TransportOrderFee[] =>
     readFeeLines(o)
       .filter((f) => f.kind === 'passthrough' && (f.amount || 0) !== 0)
@@ -91,6 +94,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
   const vatHeader =
     uniformRate && uniformRate > 0 ? `VAT ${Number((uniformRate * 100).toFixed(2))}%` : 'VAT';
 
+  
   const C_STT = 0;
   const C_DATE = 1;
   const C_TRUCK = 2;
@@ -121,6 +125,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
   const sheet = createSheetWriter(colCount);
   const { aoa, merges, blankRow, banner } = sheet;
 
+  
   const rSeller = banner(seller.name);
   const rAddress = banner(`Địa chỉ: ${seller.address}`);
   banner(`Mã số thuế: ${seller.taxCode}`);
@@ -129,6 +134,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
   const rTitle = banner(bangKeTitle(titleSuffix, '').trim());
   blankRow();
 
+  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
@@ -141,7 +147,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
   group(C_FEE0, C_VAT, 'CƯỚC DỊCH VỤ', [...SERVICE_COLUMNS.map((s) => s.header), vatHeader]);
   leaf(C_TOTAL, 'TỔNG CỘNG');
   leaf(C_NOTE, 'Ghi chú');
-
+  
   group(
     C_CHI_HO0,
     lastCol,
@@ -149,6 +155,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
     Array.from({ length: groups }, () => [...CHI_HO_GROUP_HEADERS]).flat(),
   );
 
+  
   const sums = new Map<number, number>();
   const addSum = (c: number, amount: number) => sums.set(c, (sums.get(c) ?? 0) + amount);
   const sizeCounts = SIZE_BUCKETS.map(() => 0);
@@ -176,6 +183,8 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
     row[C_STUFFING] = o.route?.stuffing ?? '';
     row[C_DROPOFF] = o.route?.dropoff ?? '';
 
+    
+    
     const feeSums = new Map<number, number>();
     for (const fee of readFeeLines(o)) {
       if (fee.kind !== 'service') continue;
@@ -200,6 +209,7 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
   });
   const rLastData = aoa.length - 1;
 
+  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -212,11 +222,13 @@ export const buildCustomerReportType7: CustomerReportBuilder = (
     merges.push({ s: { r: rTotalRow, c: C_STT }, e: { r: rTotalRow, c: C_CONT } });
   }
 
+  
   const signature = sheet.signatureRow(
     `Xác nhận của ${customer.name}`,
     `Xác nhận của ${seller.name}`,
   );
 
+  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {

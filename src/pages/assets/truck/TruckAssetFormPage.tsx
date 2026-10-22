@@ -119,7 +119,7 @@ type TruckFormValues = {
   year: number | string;
   capacityTons: number | string;
   description: string;
-
+  
   boxType: string;
   engineNumber: string;
   chassisNumber: string;
@@ -128,15 +128,15 @@ type TruckFormValues = {
   boxHeightMm: number | string;
   boxVolumeM3: number | string;
   tireSize: string;
-
+  
   inspectionExpiry: string | null;
   badgeExpiry: string | null;
-
+  
   registrationType: RegistrationType;
   registrationCopyExpiry: string | null;
-
+  
   insurances: InsuranceRow[];
-
+  
   driverId: string;
   driverName: string;
   driverPhone: string;
@@ -182,19 +182,29 @@ export function TruckAssetFormPage() {
   const { loading, submit } = useTruckFormSave();
   const snapshotRef = useRef<TruckAssetRow | null>(null);
 
+  
+  
+  
   const totalTrucks = useTruckAssetStore((s) => s.items.length);
   const trucksInitialized = useTruckAssetStore((s) => s.initialized);
   const trucksError = useTruckAssetStore((s) => s.error);
   const loadTrucks = useTruckAssetStore((s) => s.loadAll);
 
+  
+  
+  
   const truckTypes = useLookupV2Options(TRUCK_TYPE_CATEGORY);
   const hasTruckTypes = truckTypes.length > 0;
-
+  
+  
+  
   const truckTypesRef = useRef(truckTypes);
   useEffect(() => {
     truckTypesRef.current = truckTypes;
   }, [truckTypes]);
 
+  
+  
   const copyFrom = !isEdit
     ? (location.state as { copyFrom?: TruckAssetCopyFrom } | null)?.copyFrom
     : undefined;
@@ -209,7 +219,8 @@ export function TruckAssetFormPage() {
   const form = useForm<TruckFormValues>({
     initialValues: {
       name: '',
-
+      
+      
       code: '',
       truckType: '',
       plateNumber: '',
@@ -243,7 +254,9 @@ export function TruckAssetFormPage() {
     },
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
-
+      
+      
+      
       truckType: (v) =>
         truckTypesRef.current.length > 0 && !v ? t('assets.truck.validation.typeRequired') : null,
       plateNumber: (v) => (v.trim() ? null : t('assets.truck.validation.plateNumberRequired')),
@@ -266,10 +279,20 @@ export function TruckAssetFormPage() {
     },
   });
 
+  
+  
   useEffect(() => {
     if (!isEdit && !trucksInitialized && !trucksError) loadTrucks();
   }, [isEdit, trucksInitialized, trucksError, loadTrucks]);
 
+  
+  
+  
+  
+  
+  
+  
+  
   useEffect(() => {
     if (isEdit) return;
     const types = truckTypes;
@@ -291,6 +314,8 @@ export function TruckAssetFormPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, truckTypes, form.values.truckType, totalTrucks]);
 
+  
+  
   const typeSelectData = useMemo(() => {
     const picked = form.values.truckType;
     if (picked && !truckTypes.some((o) => o.value === picked)) {
@@ -327,7 +352,8 @@ export function TruckAssetFormPage() {
         tireSize: e.tireSize ?? '',
         inspectionExpiry: e.inspectionExpiry ?? null,
         badgeExpiry: e.badgeExpiry ?? null,
-
+        
+        
         registrationType: e.registrationType ?? (e.registrationCopyExpiry ? 'copy' : 'original'),
         registrationCopyExpiry: e.registrationCopyExpiry ?? null,
         insurances: seedInsuranceRows(e),
@@ -348,12 +374,18 @@ export function TruckAssetFormPage() {
     },
   );
 
+  
+  
+  
+  
+  
   useEffect(() => {
     if (!copyFrom) return;
     form.setValues({
       name: copyFrom.name,
       description: copyFrom.description,
-
+      
+      
       truckType: copyFrom.truckType ?? '',
       makeModel: copyFrom.makeModel ?? '',
       model: copyFrom.model ?? '',
@@ -375,6 +407,7 @@ export function TruckAssetFormPage() {
 
   const handleSubmit = useCallback(
     async (values: TruckFormValues) => {
+      
       const cleanInsurances: TruckInsurance[] = values.insurances
         .map((r) => ({
           ...(r.company.trim() && { company: r.company.trim() }),
@@ -383,6 +416,8 @@ export function TruckAssetFormPage() {
         }))
         .filter((r) => Object.keys(r).length > 0);
 
+      
+      
       const extra: TruckAssetExtra = {
         ...snapshotRef.current?.extra,
         ...(values.truckType.trim() && { truckType: values.truckType.trim() }),
@@ -402,20 +437,26 @@ export function TruckAssetFormPage() {
         ...(values.tireSize.trim() && { tireSize: values.tireSize.trim() }),
         ...(values.inspectionExpiry && { inspectionExpiry: values.inspectionExpiry }),
         ...(values.badgeExpiry && { badgeExpiry: values.badgeExpiry }),
-
+        
+        
+        
         registrationType: values.registrationType,
         registrationCopyExpiry:
           values.registrationType === 'copy'
             ? values.registrationCopyExpiry || undefined
             : undefined,
-
+        
+        
         registrationOriginalExpiry: undefined,
         insurances: cleanInsurances.length ? cleanInsurances : undefined,
         civilInsuranceCompany: undefined,
         civilInsuranceExpiry: undefined,
         otherInsuranceCompany: undefined,
         otherInsuranceExpiry: undefined,
-
+        
+        
+        
+        
         driverId: values.driverId || undefined,
         driverName: values.driverId ? values.driverName.trim() || undefined : undefined,
         driverPhone: values.driverId ? values.driverPhone.trim() || undefined : undefined,
@@ -423,10 +464,12 @@ export function TruckAssetFormPage() {
         licenseClass: values.driverId ? values.licenseClass.trim() || undefined : undefined,
         ...(values.baseLocation.trim() && { baseLocation: values.baseLocation.trim() }),
         ...(values.region.trim() && { region: values.region.trim() }),
-
+        
+        
         ...(copyFromId && { copyFromId }),
       };
-
+      
+      
       const prevDriverId = snapshotRef.current?.extra?.driverId;
       const result = await submit({
         isEdit,
@@ -442,7 +485,8 @@ export function TruckAssetFormPage() {
       });
       if (result) {
         snapshotRef.current = result;
-
+        
+        
         try {
           await syncDriverLinkFromTruck({
             truckId: result.id,
@@ -509,7 +553,7 @@ export function TruckAssetFormPage() {
                       placeholder={t('assets.truck.form.typePlaceholder')}
                       data={typeSelectData}
                       withAsterisk
-
+                      
                       disabled={isEdit || truckTypes.length === 1}
                       searchable
                       allowDeselect={false}
@@ -769,7 +813,8 @@ export function TruckAssetFormPage() {
                           form.setFieldValue('licenseClass', '');
                           return;
                         }
-
+                        
+                        
                         const de = sel.employee.extra ?? {};
                         form.setFieldValue('driverId', sel.id);
                         form.setFieldValue('driverName', sel.name);

@@ -30,11 +30,16 @@ export function PermissionOverlayEditor({
   resolvedBase?: Permissions;
   showBulkToggle?: boolean;
 }) {
+  
   const base = resolvedBase ?? BASE_PERMISSIONS;
   const resolved = deepMergePermissions(base, permissions);
-
+  
+  
   const storeValue = resolvedBase ? false : true;
 
+  
+  
+  
   const visibleEntries = useMemo(() => {
     const entries = Object.entries(BASE_PERMISSIONS);
     if (!resolvedBase) return entries;
@@ -42,6 +47,10 @@ export function PermissionOverlayEditor({
   }, [resolvedBase]);
   const visibleKeys = useMemo(() => visibleEntries.map(([k]) => k), [visibleEntries]);
 
+  
+  
+  
+  
   const setAllModules = (enable: boolean) => {
     onChange(enable === storeValue ? buildFullOverlay(storeValue, visibleKeys) : {});
   };
@@ -58,8 +67,10 @@ export function PermissionOverlayEditor({
   const toggleCrud = (moduleKey: string, key: string, checked: boolean) => {
     const mod = permissions[moduleKey] ?? {};
     const next = { ...mod };
-
+    
+    
     if (checked !== storeValue) {
+      
       delete (next as Record<string, unknown>)[key];
     } else {
       (next as Record<string, unknown>)[key] = storeValue;

@@ -10,6 +10,7 @@ type FilterStatus = 'all' | 'active' | 'inactive';
 const CHIPS_PER_ROW = 2;
 
 type MobileFilterChipDisplay = {
+  
   displayValue?: string;
 };
 
@@ -32,34 +33,35 @@ export type MobileMultiFilterDef = MobileFilterChipDisplay & {
 };
 
 type MobileFilterBarProps = {
+  
   noSearchInput?: boolean;
-
+  
   recordCount?: number;
   search: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
-
+  
   status?: FilterStatus;
   onStatusChange?: (value: FilterStatus) => void;
   statusTitle?: string;
-
+  
   statusLabels?: { all: string; active: string; inactive: string };
-
+  
   hideStatus?: boolean;
-
+  
   filters?: (MobileFilterDef | MobileMultiFilterDef)[];
-
+  
   moreSection?: ReactNode;
   onClear: () => void;
-
+  
   hasActiveFilters?: boolean;
-
+  
   clearLabel?: string;
-
+  
   actionsBelow?: boolean;
-
+  
   labelChips?: boolean;
-
+  
   wrapFilters?: boolean;
 };
 
@@ -86,9 +88,13 @@ export function MobileFilterBar({
   const hasActiveFilters =
     hasActiveFiltersProp ??
     (!!search ||
+      
+      
+      
       (!hideStatus && (status ?? 'all') !== 'all') ||
       filters?.some((f) => (f.multi ? f.value.length > 0 : f.value && f.value !== 'all')) === true);
 
+  
   const visibleFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [];
 
   if (!hideStatus && statusLabels) {
@@ -112,9 +118,22 @@ export function MobileFilterBar({
     }
   }
 
+  
   const showSearch =
     !noSearchInput && (recordCount === undefined || recordCount > LIST_SEARCH_MIN_ROWS);
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const labelled = !!labelChips || !!clearLabelProp;
   const clearLabel = clearLabelProp;
   const wrapFilters = wrapFiltersProp ?? (labelled && visibleFilters.length > CHIPS_PER_ROW);
@@ -141,7 +160,8 @@ export function MobileFilterBar({
         displayValue={f.displayValue}
       />
     );
-
+    
+    
     return wrapFilters ? (
       <Box key={i} style={{ flex: '1 1 45%', minWidth: 0, display: 'flex' }}>
         {chip}
@@ -151,6 +171,18 @@ export function MobileFilterBar({
     );
   });
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const clearControl = !hasActiveFilters ? null : clearLabel ? (
     <Button
       variant="subtle"
@@ -174,6 +206,15 @@ export function MobileFilterBar({
     </ActionIcon>
   );
 
+  
+  
+  
+  
+  
+
+  
+  
+  
   const actions = moreSection || clearControl;
 
   return (

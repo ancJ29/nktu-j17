@@ -28,7 +28,7 @@ export const C_MNGT_ROUTES = {
       GET_BY_ID: { PATH: '/:id', METHOD: 'GET' },
       CREATE: { PATH: '', METHOD: 'POST' },
       UPDATE: { PATH: '/:id', METHOD: 'PATCH' },
-
+      
       GENERATE_LOGIN_TOKEN: { PATH: '/:id/generate-login-token', METHOD: 'POST' },
       UPDATE_LOGIN_PASSWORD: { PATH: '/:id/update-login-password', METHOD: 'POST' },
       IMPORT_BATCH: { PATH: '/import-batch', METHOD: 'POST' },
@@ -62,7 +62,10 @@ export const C_MNGT_ROUTES = {
     },
     CONFIG: {
       GET: { PATH: '/:clientServiceCode', METHOD: 'GET' },
-
+      
+      
+      
+      
       SET_EMPLOYEE: { PATH: '/employee', METHOD: 'PUT' },
     },
     MASTER_DATA: {
@@ -71,7 +74,8 @@ export const C_MNGT_ROUTES = {
     },
     SALES_ORDER: {
       QUERY: { PATH: '/query', METHOD: 'GET' },
-
+      
+      
       QUERY_SYNC: { PATH: '/query-sync', METHOD: 'POST' },
       GET_BY_ID: { PATH: '/:id', METHOD: 'GET' },
       CREATE: { PATH: '', METHOD: 'POST' },
@@ -120,7 +124,9 @@ export const C_MNGT_ROUTES = {
       DELETE: { PATH: '/:id', METHOD: 'DELETE' },
       IMPORT_BATCH: { PATH: '/import-batch', METHOD: 'POST' },
     },
-
+    
+    
+    
     ACTIVITY: {
       LOG_ACTIVITIES: { PATH: '', METHOD: 'POST' },
     },
@@ -132,13 +138,17 @@ export const C_MNGT_ROUTES = {
     },
     GENERIC_RECORD: {
       QUERY: { PATH: '/query', METHOD: 'GET' },
-
+      
+      
       QUERY_SYNC: { PATH: '/query-sync', METHOD: 'POST' },
       CREATE: { PATH: '', METHOD: 'POST' },
       UPDATE: { PATH: '/:id', METHOD: 'PATCH' },
       DELETE: { PATH: '/:id', METHOD: 'DELETE' },
     },
-
+    
+    
+    
+    
     SINGLE_RECORDS: {
       GET_ALL: { PATH: '/:entity', METHOD: 'GET' },
       IMPORT_BATCH: { PATH: '/:entity/import-batch', METHOD: 'POST' },
@@ -148,6 +158,8 @@ export const C_MNGT_ROUTES = {
       DELETE: { PATH: '/:entity/:id', METHOD: 'DELETE' },
     },
     PARTITIONED_RECORDS: {
+      
+      
       QUERY: { PATH: '/:entity/query', METHOD: 'POST' },
       QUERY_SYNC: { PATH: '/:entity/query-sync', METHOD: 'POST' },
       GET_BY_ID: { PATH: '/:entity/:id', METHOD: 'GET' },
@@ -155,10 +167,14 @@ export const C_MNGT_ROUTES = {
       UPDATE: { PATH: '/:entity/:id', METHOD: 'PATCH' },
       DELETE: { PATH: '/:entity/:id', METHOD: 'DELETE' },
     },
-
+    
+    
+    
     AUTH: {
       ME: { PATH: '/me', METHOD: 'GET' },
-
+      
+      
+      
       LOGIN: { PATH: '/login', METHOD: 'POST' },
       REFRESH: { PATH: '/refresh', METHOD: 'POST' },
       LOGIN_WITH_TOKEN: { PATH: '/login-with-token', METHOD: 'POST' },

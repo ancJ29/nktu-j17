@@ -16,16 +16,16 @@ export type DataTableColumn<T> = {
   accessor?: keyof T;
   width?: string | number;
   hidden?: boolean;
-
+  
   onCellClick?: (item: T, event: React.MouseEvent) => void;
-
+  
   filter?: DataTableColumnFilterConfig;
 };
 
 export type DataTableDensity = 'comfortable' | 'compact';
 
 const COMPACT_FONT_SCALE = {
-  '--mantine-font-size-sm': '0.8125rem',
+  '--mantine-font-size-sm': '0.8125rem', 
   '--mantine-font-size-xs': '0.6875rem', // 12px → 11px
 } as React.CSSProperties;
 
@@ -50,17 +50,17 @@ type DataTableProps<T> = {
   readonly onRowClick?: (item: T) => void;
   readonly onActionCellClick?: (event: React.MouseEvent) => void;
   readonly getRowBg?: (item: T) => string | undefined;
-
+  
   readonly maxHeight?: number | string;
-
+  
   readonly stickyHeader?: boolean;
-
+  
   readonly viewportRef?: React.Ref<HTMLDivElement>;
-
+  
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;
-
+  
   readonly density?: DataTableDensity;
 };
 
@@ -94,6 +94,13 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   const bounded = maxHeight != null;
   const sticky = stickyHeader ?? bounded;
 
+  
+  
+  
+  
+  
+  
+  
   const localViewportRef = useRef<HTMLDivElement | null>(null);
   const setViewport = useCallback(
     (node: HTMLDivElement | null) => {
@@ -126,12 +133,14 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
           verticalSpacing={SPACING[density].vertical}
           horizontalSpacing={SPACING[density].horizontal}
           stickyHeader={sticky}
-
+          
+          
           style={density === 'compact' ? COMPACT_FONT_SCALE : undefined}
         >
           <Table.Thead
             px="xs"
-
+            
+            
             style={sticky ? { backgroundColor: 'var(--mantine-color-body)' } : undefined}
           >
             <Table.Tr>
@@ -188,6 +197,9 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
               );
             })}
             {lazy && (
+              
+              
+              
               <Table.Tr>
                 <Table.Td colSpan={columnCount}>
                   <InfiniteScrollSentinel
@@ -195,7 +207,9 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
                     onLoadMore={onLoadMore!}
                     renderedCount={data.length}
                     label={loadingMoreLabel}
-
+                    
+                    
+                    
                     rootRef={bounded ? localViewportRef : undefined}
                   />
                 </Table.Td>

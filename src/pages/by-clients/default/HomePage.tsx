@@ -7,6 +7,8 @@ import { ROUTES } from '@/constants/routes';
 import { useRootFirstRunRedirect } from '@/hooks/useRootFirstRunRedirect';
 
 export default function HomePage() {
+  
+  
   const onboardingRedirect = useRootFirstRunRedirect();
   if (onboardingRedirect) return <Navigate to={onboardingRedirect} replace />;
 

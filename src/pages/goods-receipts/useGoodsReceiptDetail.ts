@@ -1,3 +1,5 @@
+
+
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useDisclosure } from '@mantine/hooks';
@@ -37,35 +39,41 @@ const canCreate = perms.goodsReceipt.canCreate();
 export type ConfirmAction = 'confirmReceived' | 'cancel';
 
 export type UseGoodsReceiptDetailReturn = {
+  
   receipt: GoodsReceipt | null;
   loading: boolean;
   actionLoading: boolean;
 
+  
   status: GoodsReceiptStatusOption | null;
   isDraft: boolean;
   isReceived: boolean;
   isCancelled: boolean;
 
+  
   showConfirmCta: boolean;
   showCancelCta: boolean;
   showEditCta: boolean;
   showCopyCta: boolean;
-
+  
   canEditItems: boolean;
-
+  
   stockPostedOnDraft: boolean;
 
+  
   confirmAction: ConfirmAction | null;
   confirmOpened: boolean;
   openConfirm: (action: ConfirmAction) => void;
   closeConfirm: () => void;
   runAction: () => Promise<void>;
 
+  
   handleCopyReceipt: () => void;
 
+  
   postingStatus: GoodsReceiptPostingStatus | null;
   postingStatusLoading: boolean;
-
+  
   showRepostCta: boolean;
   repostOpened: boolean;
   openRepost: () => void;
@@ -73,6 +81,7 @@ export type UseGoodsReceiptDetailReturn = {
   reposting: boolean;
   handleRepostInventory: () => Promise<void>;
 
+  
   editingItemIdx: number | null;
   setEditingItemIdx: (idx: number | null) => void;
   savingItem: boolean;
@@ -89,19 +98,31 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
   const [actionLoading, setActionLoading] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction | null>(null);
   const [confirmOpened, confirmHandlers] = useDisclosure(false);
-
+  
+  
+  
   const [editingItemIdx, setEditingItemIdx] = useState<number | null>(null);
   const [savingItem, setSavingItem] = useState(false);
-
+  
   const [postingStatus, setPostingStatus] = useState<GoodsReceiptPostingStatus | null>(null);
   const [postingStatusLoading, setPostingStatusLoading] = useState(false);
   const [reposting, setReposting] = useState(false);
   const [repostOpened, repostHandlers] = useDisclosure(false);
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
   useEffect(() => {
     if (!id) return;
     const cached = useGoodsReceiptStore.getState().getById(id) as GoodsReceipt | undefined;
     if (cached) {
+      
       setReceipt(cached);
       setLoading(false);
       return;
@@ -131,6 +152,10 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     };
   }, [id, t, navigate]);
 
+  
+  
+  
+  
   useEffect(() => {
     void useProductInventoryStore.getState().revalidate();
   }, []);
@@ -143,6 +168,11 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     [confirmHandlers],
   );
 
+  
+  
+  
+  
+  
   const refreshPostingStatus = useCallback(
     async (target: GoodsReceipt): Promise<GoodsReceiptPostingStatus | null> => {
       if (target.status !== 'received') return null;
@@ -152,6 +182,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         setPostingStatus(status);
         return status;
       } catch {
+        
+        
         setPostingStatus(null);
         return null;
       } finally {
@@ -161,6 +193,10 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     [],
   );
 
+  
+  
+  
+  
   useEffect(() => {
     if (!receipt || receipt.status !== 'received') return;
     let cancelled = false;
@@ -169,6 +205,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         if (!cancelled) setPostingStatus(status);
       })
       .catch(() => {
+        
+        
         if (!cancelled) setPostingStatus(null);
       });
     return () => {
@@ -179,10 +217,16 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
   const runAction = useCallback(async () => {
     if (!id || !receipt || !confirmAction) return;
     setActionLoading(true);
-
+    
+    
+    
     const priorStatus = receipt.status;
     const isConfirm = confirmAction === 'confirmReceived';
-
+    
+    
+    
+    
+    
     const draftCarriesPostedStock =
       priorStatus === 'draft' && receipt.extra?.inventoryPosted === true;
 
@@ -191,6 +235,19 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     let stockMoved = false;
 
     try {
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       if (isConfirm && priorStatus === 'draft') {
         const fresh = (await cMngtConnector.getGoodsReceiptById({ id })).goodsReceipt as
           GoodsReceipt | undefined;
@@ -208,6 +265,24 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         }
       }
 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       if (isConfirm && priorStatus === 'draft') {
         stockMoved = true;
         try {
@@ -217,13 +292,17 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
             failed: effect.failed,
             complete: effect.complete,
           };
-
+          
+          
+          
+          
           fullyPosted = effect.complete;
           if (effect.failed > 0) {
             notifications.show({
               color: 'yellow',
               title: t('goodsReceipts.notifications.inventoryPartial'),
-
+              
+              
               message:
                 effect.errors.slice(0, 5).join('\n') ||
                 t('goodsReceipts.notifications.inventoryPartialBody', {
@@ -234,6 +313,9 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
             });
           }
         } catch {
+          
+          
+          
           notifications.show({
             color: 'yellow',
             title: t('goodsReceipts.notifications.inventoryPartial'),
@@ -243,6 +325,12 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         }
       }
 
+      
+      
+      
+      
+      
+      
       let workingVersion = receipt.version;
       if (isConfirm && priorStatus === 'draft') {
         const actor = getCurrentActorId();
@@ -259,7 +347,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         });
         workingVersion = stamped.version;
       }
-
+      
+      
       const updated = await useGoodsReceiptStore.getState().updateSafely({
         id,
         version: workingVersion,
@@ -267,6 +356,24 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       });
       invalidateCache();
 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       if (!isConfirm) {
         try {
           if (priorStatus === 'received' || draftCarriesPostedStock) {
@@ -281,7 +388,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
               notifications.show({
                 color: 'yellow',
                 title: t('goodsReceipts.notifications.inventoryPartial'),
-
+                
+                
                 message:
                   effect.errors.slice(0, 5).join('\n') ||
                   t('goodsReceipts.notifications.inventoryPartialBody', {
@@ -307,6 +415,10 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
             }
           }
         } catch {
+          
+          
+          
+          
           notifications.show({
             color: 'yellow',
             title: t('goodsReceipts.notifications.inventoryPartial'),
@@ -316,8 +428,13 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         }
       }
 
+      
+      
+      
       setReceipt(updated);
-
+      
+      
+      
       if (!inventoryEffect || inventoryEffect.complete) {
         notifications.show({
           color: 'green',
@@ -330,6 +447,23 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
       }
       confirmHandlers.close();
 
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       const productsByCode = useProductStore.getState().mapByCode;
       const breakdownParents = buildBreakdownParentIndex(productsByCode.values());
       const receivedSetCodes = stockMoved
@@ -338,7 +472,15 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
           )
         : [];
 
+      
+      
+      
       void (async () => {
+        
+        
+        
+        
+        
         if (isConfirm && fullyPosted) {
           try {
             await clearGoodsReceiptMarkers(receipt);
@@ -352,6 +494,13 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         }
       })();
 
+      
+      
+      
+      
+      
+      
+      
       const baseMemo = {
         receiptNumber: receipt.receiptNumber,
         ...vendorMemo(receipt),
@@ -359,13 +508,17 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         ...(inventoryEffect && {
           inventoryAttempted: inventoryEffect.attempted,
           inventoryFailed: inventoryEffect.failed,
-
+          
+          
           inventoryComplete: inventoryEffect.complete,
         }),
       };
       if (isConfirm) {
         logActivity('goodsReceipt.confirmReceived', id, baseMemo);
       } else {
+        
+        
+        
         logActivity('goodsReceipt.cancel', id, {
           ...baseMemo,
           fromStatus: priorStatus,
@@ -373,6 +526,10 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         });
       }
     } catch (err) {
+      
+      
+      
+      
       if (err instanceof EntityConflictError) {
         const conflict = err as EntityConflictError<GoodsReceipt>;
         if (conflict.latest) setReceipt(conflict.latest);
@@ -399,6 +556,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     }
   }, [id, receipt, confirmAction, t, invalidateCache, confirmHandlers]);
 
+  
   const handleRepostInventory = useCallback(async () => {
     if (!receipt || receipt.status !== 'received') return;
     setReposting(true);
@@ -410,7 +568,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         notifications.show({
           color: 'yellow',
           title: t('goodsReceipts.notifications.inventoryPartial'),
-
+          
           message: effect.errors.slice(0, 5).join('\n') || undefined,
           autoClose: false,
         });
@@ -442,6 +600,9 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     }
   }, [receipt, refreshPostingStatus, t, repostHandlers]);
 
+  
+  
+  
   const handleCopyReceipt = useCallback(() => {
     if (!receipt) return;
     const copyFrom: GoodsReceiptCopyFrom = {
@@ -459,6 +620,12 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     navigate(ROUTES.GOODS_RECEIPTS.NEW, { state: { copyFrom } });
   }, [receipt, navigate]);
 
+  
+  
+  
+  
+  
+  
   const handleSaveItemQuantity = useCallback(
     async (idx: number, newQty: number) => {
       if (!receipt) return;
@@ -480,7 +647,10 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
         });
         setReceipt(updated);
         invalidateCache();
-
+        
+        
+        
+        
         const inlineFields: GoodsReceiptInlineFields = {
           quantity: {
             itemType: current.itemType,
@@ -523,23 +693,43 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     [receipt, invalidateCache, t],
   );
 
+  
   const status = receipt ? findStatus(receipt.status) : null;
   const isDraft = receipt?.status === 'draft';
   const isReceived = receipt?.status === 'received';
   const isCancelled = receipt?.status === 'cancelled';
 
+  
+  
+  
+  
+  
+  
+  
   const stockPostedOnDraft = !!receipt && isDraft && receipt.extra?.inventoryPosted === true;
 
+  
+  
   const showConfirmCta = !!receipt && canConfirmReceived && isDraft;
-
+  
+  
+  
+  
+  
   const showCancelCta = !!receipt && canCancel && (isDraft || isReceived) && !isMobile;
-
+  
+  
+  
   const showEditCta = !!receipt && canEdit && isDraft && !isMobile && !stockPostedOnDraft;
-
+  
+  
   const showCopyCta = !!receipt && canCreate && !isMobile;
-
+  
+  
+  
   const canEditItems = !!receipt && canEdit && isDraft && !stockPostedOnDraft;
-
+  
+  
   const showRepostCta =
     !!receipt && isReceived && canConfirmReceived && (postingStatus?.missingCount ?? 0) > 0;
 

@@ -127,7 +127,7 @@ const storages = {
   accessKey: '',
   deviceId: '',
   clientCode: '',
-
+  
   authId: '',
   stage: '$default',
   baseUrl: urls['cCredoSme'] || '',
@@ -254,14 +254,15 @@ export const credoSmeConnector = {
   useLocal: () => {
     return credoSmeConnector.setBaseUrl(`http://localhost:${PORTS.CREDO_SME}/dev`);
   },
-
+  
   setTarget: (target: string) => {
     storages.target = target;
-
+    
+    
     registerStagePrefix(storages.baseUrl, target);
     return credoSmeConnector;
   },
-
+  
   setBaseUrl: (baseUrl: string) => {
     storages.baseUrl = baseUrl;
     registerStagePrefix(baseUrl, storages.target);
@@ -275,42 +276,60 @@ export const credoSmeConnector = {
     storages.clientCode = clientCode;
     return credoSmeConnector;
   },
-
+  
   setDeviceId: (deviceId: string) => {
     storages.deviceId = deviceId;
     return credoSmeConnector;
   },
-
+  
   setAuthId: (authId: string) => {
     storages.authId = authId;
     return credoSmeConnector;
   },
 
+  
+  
+  
+
+  
   provisionClient: <TExtra = Record<string, unknown>>(request: ProvisionClientRequest<TExtra>) =>
     adminClientApi<ProvisionClientResponse<TExtra>>(ADMIN_CLIENT_ROUTES.PROVISION, {
       body: request,
     }),
 
+  
   listClients: <TExtra = Record<string, unknown>>() =>
     adminClientApi<ListClientsResponse<TExtra>>(ADMIN_CLIENT_ROUTES.LIST),
 
+  
   removeClient: ({ clientServiceCode, ...body }: RemoveClientRequest) =>
     adminClientApi<RemoveClientResponse>(ADMIN_CLIENT_ROUTES.REMOVE, {
       params: { clientServiceCode },
       body,
     }),
 
+  
+  
+  
+
+  
   getAppConfigAdmin: ({ clientServiceCode }: { clientServiceCode: string }) =>
     adminConfigApi<GetAppConfigAdminResponse>(ADMIN_CONFIG_ROUTES.GET, {
       params: { clientServiceCode },
     }),
 
+  
   setAppConfig: ({ clientServiceCode, config }: SetAppConfigRequest) =>
     adminConfigApi<SetAppConfigResponse>(ADMIN_CONFIG_ROUTES.SET, {
       params: { clientServiceCode },
       body: { config },
     }),
 
+  
+  
+  
+
+  
   login: (body: LoginRequest) =>
     authApi<AuthMintResponse>(AUTH_ROUTES.LOGIN, {
       body,
@@ -323,31 +342,62 @@ export const credoSmeConnector = {
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
+  
   getMe: (knownHash?: string) =>
     authApi<GetMeResponse | GetMeNoChangeResponse>(AUTH_ROUTES.ME, {
       extraHeaders: sessionHeaders(),
       ...(knownHash ? { queryParams: { knownHash } } : {}),
     }),
 
+  
   reportPermissionMismatch: (body: ReportPermissionMismatchRequest) =>
     authApi<ReportPermissionMismatchResponse>(AUTH_ROUTES.PERMISSION_MISMATCH, {
       body,
       extraHeaders: sessionHeaders(),
     }),
 
+  
   adoptSession: (body: { refreshToken: string; serviceCode: string }) =>
     authApi<AuthMintResponse>(AUTH_ROUTES.ADOPT_SESSION, {
       body,
       extraHeaders: { 'x-client-code': storages.clientCode },
     }),
 
+  
+  
+  
+
+  
   logActivities: (body: LogActivitiesRequest) =>
     activityApi<LogActivitiesResponse>(ACTIVITY_ROUTES.LOG_ACTIVITIES, {
       body,
-
+      
+      
+      
       extraHeaders: sessionHeaders(),
     }),
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
   getAllLookups: (params?: GetAllLookupsRequest) =>
     lookupApi<GetAllLookupsResponse>(LOOKUP_ROUTES.GET_ALL, {
       ...(params?.hash !== undefined ? { queryParams: { hash: params.hash } } : {}),
@@ -374,12 +424,28 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   importBatchLookups: (request: ImportBatchLookupsRequest) =>
     lookupApi<ImportBatchLookupsResponse>(LOOKUP_ROUTES.IMPORT_BATCH, {
       body: request,
       extraHeaders: sessionHeaders(),
     }),
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
   getAllVendors: (params?: GetAllVendorsRequest) =>
     vendorApi<GetAllVendorsResponse>(VENDOR_ROUTES.GET_ALL, {
       ...(params?.hash !== undefined ? { queryParams: { hash: params.hash } } : {}),
@@ -399,12 +465,26 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   archiveVendor: ({ id, ...body }: { id: string } & ArchiveVendorRequest) =>
     vendorApi<ArchiveVendorResponse>(VENDOR_ROUTES.ARCHIVE, {
       params: { id },
       body,
       extraHeaders: sessionHeaders(),
     }),
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
 
   getAllEmployees: (params?: GetAllEmployeesRequest) =>
     employeeApi<GetAllEmployeesResponse>(EMPLOYEE_ROUTES.GET_ALL, {
@@ -431,6 +511,7 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   archiveEmployee: ({ id, ...body }: { id: string } & ArchiveEmployeeRequest) =>
     employeeApi<ArchiveEmployeeResponse>(EMPLOYEE_ROUTES.ARCHIVE, {
       params: { id },
@@ -438,6 +519,7 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   updateEmployeeLoginPassword: ({
     id,
     ...body
@@ -448,6 +530,7 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   generateEmployeeLoginToken: ({
     id,
     ...body
@@ -457,6 +540,10 @@ export const credoSmeConnector = {
       body,
       extraHeaders: sessionHeaders(),
     }),
+
+  
+  
+  
 
   getAllCustomers: (params?: GetAllCustomersRequest) =>
     customerApi<GetAllCustomersResponse>(CUSTOMER_ROUTES.GET_ALL, {
@@ -477,12 +564,17 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   archiveCustomer: ({ id, ...body }: { id: string } & ArchiveCustomerRequest) =>
     customerApi<ArchiveCustomerResponse>(CUSTOMER_ROUTES.ARCHIVE, {
       params: { id },
       body,
       extraHeaders: sessionHeaders(),
     }),
+
+  
+  
+  
 
   getAllProducts: (params?: GetAllProductsRequest) =>
     productApi<GetAllProductsResponse>(PRODUCT_ROUTES.GET_ALL, {
@@ -503,12 +595,17 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   archiveProduct: ({ id, ...body }: { id: string } & ArchiveProductRequest) =>
     productApi<ArchiveProductResponse>(PRODUCT_ROUTES.ARCHIVE, {
       params: { id },
       body,
       extraHeaders: sessionHeaders(),
     }),
+
+  
+  
+  
 
   getAllMaterials: (params?: GetAllMaterialsRequest) =>
     materialApi<GetAllMaterialsResponse>(MATERIAL_ROUTES.GET_ALL, {
@@ -529,6 +626,7 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   archiveMaterial: ({ id, ...body }: { id: string } & ArchiveMaterialRequest) =>
     materialApi<ArchiveMaterialResponse>(MATERIAL_ROUTES.ARCHIVE, {
       params: { id },
@@ -536,12 +634,17 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
+  
+  
+
   getAllProductInventory: (params?: GetAllProductInventoryRequest) =>
     productInventoryApi<GetAllProductInventoryResponse>(PRODUCT_INVENTORY_ROUTES.GET_ALL, {
       ...(params?.hash !== undefined ? { queryParams: { hash: params.hash } } : {}),
       extraHeaders: sessionHeaders(),
     }),
 
+  
   setProductInventory: ({ itemId, ...body }: { itemId: string } & SetProductInventoryRequest) =>
     productInventoryApi<SetProductInventoryResponse>(PRODUCT_INVENTORY_ROUTES.SET, {
       params: { itemId },
@@ -555,6 +658,7 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   setMaterialInventory: ({ itemId, ...body }: { itemId: string } & SetMaterialInventoryRequest) =>
     materialInventoryApi<SetMaterialInventoryResponse>(MATERIAL_INVENTORY_ROUTES.SET, {
       params: { itemId },
@@ -562,6 +666,11 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
+  
+  
+
+  
   querySyncGoodsReceipts: (body: QuerySyncGoodsReceiptsRequest) =>
     goodsReceiptApi<QuerySyncGoodsReceiptsResponse>(GOODS_RECEIPT_ROUTES.QUERY_SYNC, {
       body,
@@ -587,12 +696,18 @@ export const credoSmeConnector = {
       extraHeaders: sessionHeaders(),
     }),
 
+  
   transitionGoodsReceipt: ({ id, ...body }: { id: string } & TransitionGoodsReceiptRequest) =>
     goodsReceiptApi<TransitionGoodsReceiptResponse>(GOODS_RECEIPT_ROUTES.TRANSITION, {
       params: { id },
       body,
       extraHeaders: sessionHeaders(),
     }),
+
+  
+  
+  
+  
 
   querySyncSalesOrders: (body: QuerySyncSalesOrdersRequest) =>
     salesOrderApi<QuerySyncSalesOrdersResponse>(SALES_ORDER_ROUTES.QUERY_SYNC, {
@@ -639,6 +754,12 @@ export const credoSmeConnector = {
       body,
       extraHeaders: sessionHeaders(),
     }),
+
+  
+  
+  
+  
+  
 
   querySyncDeliveryNotes: (body: QuerySyncDeliveryNotesRequest) =>
     deliveryNoteApi<QuerySyncDeliveryNotesResponse>(DELIVERY_NOTE_ROUTES.QUERY_SYNC, {

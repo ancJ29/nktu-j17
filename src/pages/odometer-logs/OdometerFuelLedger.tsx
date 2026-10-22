@@ -100,20 +100,20 @@ export function OdometerFuelLedger({
   const [resetOpened, { open: openReset, close: closeReset }] = useDisclosure(false);
   const [striking, setStriking] = useState<OdometerFuelPayment | null>(null);
   const [strikeBusy, setStrikeBusy] = useState(false);
-
+  
   const [toggled, setToggled] = useState<Record<string, boolean>>({});
 
   const histories = useMemo(() => {
     if (!data) return [];
     const all = buildPaybackHistory({ roster, ...data, resets });
     const shown = driverFilter ? all.filter((h) => h.row.employeeId === driverFilter) : all;
-
+    
     return [...shown].sort((a, b) => Number(b.row.remaining > 0) - Number(a.row.remaining > 0));
   }, [data, roster, resets, driverFilter]);
 
   const owed = histories.filter((h) => h.row.remaining > 0);
   const owedTotal = owed.reduce((sum, h) => sum + h.row.remaining, 0);
-
+  
   const shown = useMemo(
     () => histories.map((full) => ({ full, visible: historyInRange(full, range) })),
     [histories, range],
@@ -291,7 +291,7 @@ function DriverStatement({
   onStrike,
 }: PeriodHandlers & {
   readonly history: PaybackHistory;
-
+  
   readonly periodsHidden: boolean;
   readonly canManage: boolean;
   readonly onPay: () => void;
@@ -888,6 +888,9 @@ function FuelPaymentForm({
   const today = todayInVnDateString();
   const [saving, setSaving] = useState(false);
 
+  
+  
+  
   const owed = (employeeId: string, date: string) =>
     employeeId ? owedThrough({ ...data, resets, employeeId, date }) : 0;
   const positive = (n: number) => (n > 0 ? n : undefined);
@@ -907,7 +910,9 @@ function FuelPaymentForm({
     },
   });
   const { employeeId, method, recordDate } = form.values;
-
+  
+  
+  
   const refill = (nextEmployee: string, nextDate: string) => {
     if (method === 'advance') return;
     form.setFieldValue('amount', positive(owed(nextEmployee, nextDate)));

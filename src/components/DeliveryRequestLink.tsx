@@ -5,10 +5,11 @@ import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type DeliveryRequestLinkProps = {
+  
   id: string | undefined | null;
   size?: LinkSize;
   color?: string;
-
+  
   fallbackLabel?: string | null;
 };
 

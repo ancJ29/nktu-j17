@@ -30,6 +30,9 @@ export function ProductV2Link({
     />
   );
 
+  
+  
+  
   if (!product || !featureFlags.productsV2.enabled) return chip;
 
   return (

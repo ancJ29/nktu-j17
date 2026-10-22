@@ -1,3 +1,5 @@
+
+
 import { Group, Text, Title } from '@mantine/core';
 import type { ReactNode } from 'react';
 
@@ -13,6 +15,7 @@ export function PanelHeader({
   actions?: ReactNode;
 }) {
   return (
+    
     <Group
       gap="xs"
       wrap="nowrap"

@@ -1,3 +1,5 @@
+
+
 import { Box, Stack, Text, Textarea, TextInput } from '@mantine/core';
 import { AppBrandName } from '@credo/base-ui/components';
 import { themeConfig } from '@/config';
@@ -12,10 +14,14 @@ export function AppIdentitySection({
   onChange,
 }: {
   value: AppIdentityForm;
-
+  
   palette: readonly string[] | undefined;
   onChange: (next: AppIdentityForm) => void;
 }) {
+  
+  
+  
+  
   const headerBg = palette?.[9] ?? `var(--mantine-color-${themeConfig.mainColor}-9)`;
 
   return (

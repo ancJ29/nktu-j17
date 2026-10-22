@@ -30,11 +30,11 @@ const MAX_DRAFT_CODES_IN_TOOLTIP = 5;
 
 type Props = {
   readonly product: Product;
-
+  
   readonly createOpened?: boolean;
   readonly onOpenCreate?: () => void;
   readonly onCloseCreate?: () => void;
-
+  
   readonly onToggleHiddenFromInventoryList?: (next: boolean) => Promise<void>;
 };
 
@@ -64,6 +64,7 @@ export function ProductInventorySection({
     create,
   } = section;
 
+  
   const goodsReceiptsInitialized = useGoodsReceiptStore((s) => s.initialized);
   const loadGoodsReceipts = useGoodsReceiptStore((s) => s.loadAll);
   const inboundEntry = useOpenInboundForProduct(product.code);
@@ -73,18 +74,30 @@ export function ProductInventorySection({
     if (!goodsReceiptsInitialized) loadGoodsReceipts();
   }, [goodsReceiptsInitialized, loadGoodsReceipts]);
 
+  
+  
+  
+  
   const isCreateControlled = controlledOpened !== undefined;
   const createOpened = isCreateControlled ? controlledOpened : create.opened;
   const openCreate = isCreateControlled ? (onOpenCreate ?? create.open) : create.open;
   const closeCreate = isCreateControlled ? (onCloseCreate ?? create.close) : create.close;
 
+  
   const noInventory = isNoInventoryProduct(product);
-
+  
+  
   const canShowAddButton = canCreateInventory && !noInventory && rows.length === 0;
   const canShowAddMoreRowButton = canCreateInventory && !noInventory && locationsEnabled;
 
+  
   const minInv = product.extra?.minimumInventory?.value;
 
+  
+  
+  
+  
+  
   const showHiddenToggle = !!onToggleHiddenFromInventoryList && !noInventory;
   const hiddenFromInventoryList = product.extra?.hiddenFromInventoryList === true;
   const [togglingHidden, setTogglingHidden] = useState(false);
@@ -104,6 +117,7 @@ export function ProductInventorySection({
     [onToggleHiddenFromInventoryList],
   );
 
+  
   const rowOnClickHandlers = useMemo(() => {
     if (!canEditInventory) return new Map<string, () => void>();
     const m = new Map<string, () => void>();
@@ -264,7 +278,9 @@ export function ProductInventorySection({
                 const isLow = typeof minInv === 'number' && row.onHand > 0 && row.onHand <= minInv;
                 const isNegative = row.onHand < 0;
                 const onHandColor = isNegative ? 'red' : isLow ? 'orange' : undefined;
-
+                
+                
+                
                 const needsRecheck = needsInventoryRecheck(row);
                 const drift = readDrift(row.extra);
                 return (

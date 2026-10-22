@@ -14,11 +14,11 @@ type ListDataTableProps<T extends Row> = {
   readonly onRowClick?: (item: T) => void;
   readonly withIndex?: boolean;
   readonly getRowBg?: (item: T) => string | undefined;
-
+  
   readonly maxHeight?: number | string;
-
+  
   readonly viewportRef?: Ref<HTMLDivElement>;
-
+  
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;

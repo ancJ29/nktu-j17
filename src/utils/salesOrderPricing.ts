@@ -9,12 +9,13 @@ export function orderNeedsShippingFee(extra: SalesOrderExtra | undefined): boole
 }
 
 export type SalesOrderTotals = {
+  
   subtotal: number;
-
+  
   vat: number;
-
+  
   shipping: number;
-
+  
   grandTotal: number;
 };
 
@@ -44,16 +45,17 @@ export function isSalesOrderMissingMoneyInfo(order: SalesOrder, fallbackRate: nu
 }
 
 export type SalesOrderFinanceSummary = {
+  
   count: number;
-
+  
   subtotal: number;
-
+  
   vat: number;
-
+  
   shipping: number;
-
+  
   grandTotal: number;
-
+  
   missingCount: number;
 };
 
@@ -85,9 +87,9 @@ export type SalesOrderPaymentState = 'paid' | 'partial' | 'unpaid';
 
 export type SalesOrderPayment = {
   state: SalesOrderPaymentState;
-
+  
   paidAmount: number;
-
+  
   remaining: number;
 };
 

@@ -1,3 +1,5 @@
+
+
 import type { Employee } from '@/types';
 
 export function formatYYMMDD_GMT7(date: Date): string {
@@ -25,7 +27,7 @@ export function buildStaffSegment(employee: Employee, codePrefix: string): strin
     const alnum = stripped.replace(/[^A-Za-z0-9]/g, '');
     if (alnum) return alnum;
   }
-
+  
   return employee.id.replace(/[^A-Za-z0-9]/g, '').slice(0, 6);
 }
 

@@ -88,7 +88,7 @@ type FormLine = {
   unit: string;
   quantity: number | '';
   unitPrice: number | '';
-
+  
   priceTiers: QuotationPriceTier[];
 };
 
@@ -97,7 +97,7 @@ type FormValues = {
   customerId: string;
   customerName: string;
   assignedStaff: string;
-
+  
   companyId: string;
   note: string;
   lines: FormLine[];
@@ -156,21 +156,27 @@ export function QuotationForm() {
     if (!customersInitialized) loadCustomers();
   }, [customersInitialized, loadCustomers]);
 
+  
   const employeesInitialized = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
   useEffect(() => {
     if (!employeesInitialized) loadEmployees();
   }, [employeesInitialized, loadEmployees]);
 
+  
   const products = useProductStore((s) => s.items);
   const productByCode = useMemo(() => {
     const m = new Map<string, (typeof products)[number]>();
     for (const p of products) m.set(p.code, p);
     return m;
   }, [products]);
-
+  
   const showProductPhoto = hasImagesForProducts();
 
+  
+  
+  
+  
   const companies = useMemo(() => getCompanyInfos(), []);
   const defaultCompanyId = companies[0]?.id ?? '';
   const companyOptions = useMemo(
@@ -181,11 +187,14 @@ export function QuotationForm() {
       })),
     [companies, t],
   );
-
+  
+  
+  
   const showCompanyPicker = companies.length > 1;
-
+  
   const unitLabels = useLookupV2Labels('product-unit');
 
+  
   const storeInitialized = useQuotationStore((s) => s.initialized);
   const loadQuotations = useQuotationStore((s) => s.loadAll);
   useEffect(() => {
@@ -193,9 +202,12 @@ export function QuotationForm() {
   }, [storeInitialized, loadQuotations]);
 
   const [loading, setLoading] = useState(false);
-
+  
+  
   const [seeded, setSeeded] = useState(false);
-
+  
+  
+  
   const [editCode, setEditCode] = useState('');
   const snapshotRef = useRef<Quotation | null>(null);
 
@@ -210,9 +222,14 @@ export function QuotationForm() {
     },
   });
 
+  
+  
+  
   const resolveCustomerId = (code: string | undefined): string | undefined =>
     code ? useCustomerStore.getState().items.find((c) => c.code === code)?.id : undefined;
 
+  
+  
   useEffect(() => {
     if (isMobile || (isEdit ? !perms.quotation.canEdit() : !perms.quotation.canCreate())) {
       navigate(ROUTES.QUOTATIONS.LIST, { replace: true });
@@ -220,6 +237,11 @@ export function QuotationForm() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- one-shot route guard
   }, [isEdit]);
 
+  
+  
+  
+  
+  
   const fetching = useInitFormFromFetch(
     form,
     id,
@@ -233,6 +255,9 @@ export function QuotationForm() {
         return null;
       }
       if (!isQuotationEditable(target.extra.status ?? 'draft')) {
+        
+        
+        
         navigate(detailRoute(target.id), { replace: true });
         return null;
       }
@@ -242,7 +267,9 @@ export function QuotationForm() {
         customerId: resolveCustomerId(target.extra.customerCode) ?? '',
         customerName: target.extra.customerName ?? '',
         assignedStaff: target.extra.assignedStaff ?? '',
-
+        
+        
+        
         companyId: target.extra.companyId ?? '',
         note: target.extra.note ?? '',
         lines: (target.extra.lines ?? []).map(toFormLine),
@@ -254,8 +281,11 @@ export function QuotationForm() {
     },
   );
 
+  
+  
+  
   useEffect(() => {
-    if (isEdit) return;
+    if (isEdit) return; 
     let cancelled = false;
     (async () => {
       if (copyFrom) {
@@ -289,13 +319,21 @@ export function QuotationForm() {
       form.values.lines.filter((_, i) => i !== idx),
     );
 
+  
+  
+  
+  
   const [tierEditor, setTierEditor] = useState<{ index: number; rows: TierDraft[] } | null>(null);
 
+  
   const applyTierPrice = (idx: number, tiers: QuotationPriceTier[], quantity: number) => {
     const price = resolveTierPrice(tiers, quantity);
     if (price !== undefined) form.setFieldValue(`lines.${idx}.unitPrice`, price);
   };
 
+  
+  
+  
   const handleQuantityChange = (idx: number, value: number | string) => {
     const next = value === '' ? '' : Number(value);
     form.setFieldValue(`lines.${idx}.quantity`, next);
@@ -345,6 +383,8 @@ export function QuotationForm() {
       const lines = values.lines
         .filter((l) => l.productCode)
         .map((l) => {
+          
+          
           const tiers = normalizePriceTiers(l.priceTiers);
           return {
             productCode: l.productCode,
@@ -384,7 +424,8 @@ export function QuotationForm() {
             note: values.note.trim() || undefined,
             lines,
           };
-
+          
+          
           const updated = (await quotationBundle.updateSafely({
             id,
             version: snapshot.version,
@@ -397,6 +438,8 @@ export function QuotationForm() {
           });
           navigate(detailRoute(id));
         } else {
+          
+          
           const attempted: string[] = [];
           let created: Quotation | null = null;
           for (let attempt = 0; attempt <= MAX_QUOTATION_CODE_RETRIES; attempt++) {
@@ -434,6 +477,9 @@ export function QuotationForm() {
         }
       } catch (err) {
         if (err instanceof EntityConflictError) {
+          
+          
+          
           if (err.latest) snapshotRef.current = err.latest as Quotation;
           notifications.show({
             color: 'yellow',
@@ -597,7 +643,8 @@ export function QuotationForm() {
                         : undefined;
                       const priceNum = line.unitPrice === '' ? undefined : Number(line.unitPrice);
                       const qtyNum = line.quantity === '' ? 0 : Number(line.quantity);
-
+                      
+                      
                       const productUnits = lineProduct?.extra?.units?.length
                         ? lineProduct.extra.units
                         : lineProduct?.unit
@@ -633,7 +680,8 @@ export function QuotationForm() {
                                     form.setFieldValue(`lines.${idx}.productCode`, sel?.code ?? '');
                                     form.setFieldValue(`lines.${idx}.productName`, sel?.name ?? '');
                                     form.setFieldValue(`lines.${idx}.unit`, sel?.units[0] ?? '');
-
+                                    
+                                    
                                     form.setFieldValue(`lines.${idx}.priceTiers`, []);
                                     if (sel) {
                                       form.setFieldValue(

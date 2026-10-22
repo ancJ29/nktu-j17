@@ -1,3 +1,4 @@
+
 export function yamlify(data: unknown, level = 0): string {
   if (data === null || data === undefined) {
     return String(data);

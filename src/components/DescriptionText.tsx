@@ -2,8 +2,9 @@ import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 
 type DescriptionTextProps = {
+  
   readonly text?: string | null;
-
+  
   readonly entityLabel: string;
 };
 

@@ -1,3 +1,5 @@
+
+
 import { Button, CopyButton, Group, Modal, PasswordInput, Stack, Tooltip } from '@mantine/core';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { DetailField } from '@/components/DetailField';
@@ -64,14 +66,15 @@ const hasViewPermsRight = permMngtEnabled && perms.permissionManagement.canView(
 const hasModifyPermsRight = hasViewPermsRight && perms.permissionManagement.canModify();
 
 export type EmployeeDetailParts =
+  
   | { ready: false; loading: boolean }
   | {
       ready: true;
       employee: Employee;
       canEdit: boolean;
-
+      
       header: ReactNode;
-
+      
       cards: {
         personal: ReactNode;
         contacts: ReactNode;
@@ -86,14 +89,14 @@ export type EmployeeDetailParts =
         showActivity: boolean;
         showPermissions: boolean;
       };
-
+      
       panels: {
         timesheet: ReactNode;
         driver: ReactNode;
         activity: ReactNode;
         permissions: ReactNode;
       };
-
+      
       modals: ReactNode;
     };
 
@@ -120,8 +123,10 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     return activityTabVisible;
   }, [isRootUser]);
 
+  
   useEffect(() => {
     if (dangerZone.updatedEmployee) {
+      
       setEmployee(dangerZone.updatedEmployee);
     }
   }, [dangerZone.updatedEmployee]);
@@ -136,6 +141,7 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     return employee?.extra?.allowLogin ?? true;
   }, [employee]);
 
+  
   const department = employee?.department;
   const resolvedDeptPerms = useMemo(() => {
     const clientPerms = (appConfig as CMngtAppConfig).permissions;
@@ -157,8 +163,16 @@ export function useEmployeeDetail(): EmployeeDetailParts {
 
   const patchEmployee = useEmployeePatch(id, employee, setEmployee);
 
+  
+  
+  
   const handleEmailSave = useCallback(
     async (next: string) => {
+      
+      
+      
+      
+      
       const patch = { email: next.trim() };
       await patchEmployee(patch, {
         verb: 'employee.update',
@@ -212,13 +226,14 @@ export function useEmployeeDetail(): EmployeeDetailParts {
         navigate(ROUTES.EMPLOYEES.LIST, { replace: true });
         return;
       }
-
+      
       setEmployee(cached);
       setLoading(false);
       return;
     }
     setLoading(true);
 
+    
     asyncDeduplicator.call(`employee:${id}`, async () => {
       await fetchEmployeeById(id)
         .then((employee) => {
@@ -239,8 +254,16 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     });
   }, [id, t, navigate]);
 
+  
+  
+  
+  
   if (loading || !employee) return { ready: false, loading };
 
+  
+  
+  
+  
   const profileImageUrl = hasAvatar ? employee.extra?.profileImage : undefined;
   const canEditProfileImage = hasAvatar && canEdit && !isMobile;
 
@@ -296,8 +319,18 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     />
   ) : null;
 
+  
+  
+  
   const isDriver = hasDriverProfileForEmployees() && isDriverDepartment(employee.department);
 
+  
+  
+  
+  
+  
+  
+  
   const tabIsGone =
     (activeTab === 'driver' && !isDriver) ||
     (activeTab === 'activity' && !isActivityTabVisible) ||
@@ -325,12 +358,14 @@ export function useEmployeeDetail(): EmployeeDetailParts {
       >
         {(() => {
           const rawLoginEmail = employee.email || '';
-
+          
+          
           const loginEmail = rawLoginEmail.endsWith(`@${AUTO_LOGIN_DOMAIN}`)
             ? rawLoginEmail.slice(0, -`@${AUTO_LOGIN_DOMAIN}`.length)
             : rawLoginEmail;
           const currentPassword = dangerZone.passwordForm.values.newPassword;
-
+          
+          
           const canCopyCredentials =
             !!loginEmail && !!currentPassword && currentPassword === dangerZone.savedPassword;
           const credentialsText = `${t('__new__.07-entities.employees.dangerZone.loginIdentifier')}: ${loginEmail}\n${t('__new__.07-entities.employees.dangerZone.newPassword')}: ${currentPassword}`;
@@ -465,7 +500,7 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     panels: {
       timesheet: <EmployeeTimesheetTab />,
       driver: <EmployeeDriverTab employee={employee} isVisible={visibleTab === 'driver'} />,
-
+      
       activity:
         visibleTab === 'activity' ? <EmployeeActivityPanel employeeId={employee.id} /> : null,
       permissions: permissionsContent,

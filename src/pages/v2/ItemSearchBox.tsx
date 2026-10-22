@@ -1,3 +1,5 @@
+
+
 import { Combobox, Group, Stack, Text, TextInput, useCombobox } from '@mantine/core';
 import { IconCheck, IconSearch } from '@tabler/icons-react';
 import { useMemo, useState, type ReactNode } from 'react';
@@ -22,11 +24,11 @@ export function ItemSearchBox({
   onPick,
 }: {
   readonly items: readonly SearchableItem[];
-
+  
   readonly alreadyAdded: ReadonlySet<string>;
   readonly placeholder: string;
   readonly emptyLabel: string;
-
+  
   readonly renderMeta?: ((item: SearchableItem) => ReactNode) | undefined;
   readonly onPick: (item: SearchableItem) => void;
 }) {
@@ -42,19 +44,21 @@ export function ItemSearchBox({
             (item) =>
               item.name.toLowerCase().includes(needle) || item.code.toLowerCase().includes(needle),
           );
-
+    
+    
     return hits.slice(0, 50);
   }, [items, search]);
 
   return (
     <Combobox
       store={combobox}
-
+      
       withinPortal
       onOptionSubmit={(value) => {
         const item = items.find((candidate) => optionValue(candidate) === value);
         if (item) onPick(item);
-
+        
+        
         setSearch('');
         combobox.updateSelectedOptionIndex();
       }}

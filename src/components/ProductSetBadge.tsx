@@ -11,7 +11,7 @@ export function ProductSetBadge({
 }: {
   readonly product: Product;
   readonly variant?: 'light' | 'filled';
-
+  
   readonly tt?: 'none';
 }) {
   const { t } = useTranslation();

@@ -30,7 +30,8 @@ export function IssueTruckDriverFields({
           const picked = options?.find((o) => o.value === value);
           form.setFieldValue('truckId', value ?? '');
           form.setFieldValue('truckCode', picked?.code ?? '');
-
+          
+          
           if (picked?.driverName) {
             form.setFieldValue('driverName', picked.driverName);
             form.setFieldValue('driverId', picked.driverId ?? '');
@@ -46,6 +47,9 @@ export function IssueTruckDriverFields({
         placeholder={t('oilTanks.logs.issue.form.driverPlaceholder')}
         {...form.getInputProps('driverName')}
         onChange={(event) => {
+          
+          
+          
           form.setFieldValue('driverName', event.currentTarget.value);
           form.setFieldValue('driverId', '');
         }}

@@ -132,9 +132,11 @@ export function QuotationDetail() {
   const [orientation, setOrientation] = useState<QuotationOrientation>(
     DEFAULT_QUOTATION_PRINT_OPTIONS.orientation,
   );
-
+  
+  
   const [includeVat, setIncludeVat] = useState(true);
 
+  
   const customers = useCustomerStore((s) => s.items);
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
@@ -143,8 +145,11 @@ export function QuotationDetail() {
     if (!customersInitialized) loadCustomers();
   }, [customersInitialized, loadCustomers]);
 
+  
+  
   const photoByCode = useProductPhotoByCode();
 
+  
   const employeesInitialized = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
   useEffect(() => {
@@ -168,6 +173,7 @@ export function QuotationDetail() {
   }, [id, t]);
 
   useEffect(() => {
+    
     load();
   }, [load]);
 
@@ -177,19 +183,28 @@ export function QuotationDetail() {
   const isCancelled = status === 'cancelled';
   const isConverted = status === 'converted';
   const isDraft = status === 'draft';
-
+  
   const isEditable = isQuotationEditable(status);
-
+  
+  
   const isIssued = isReady || isConfirmed;
   const lines = useMemo(() => quotation?.extra.lines ?? [], [quotation]);
 
+  
+  
+  
+  
+  
+  
+  
+  
   const flipStatus = useCallback(
     async (next: QuotationStatus): Promise<Quotation> => {
       const write = (target: Quotation) =>
         quotationBundle.updateSafely({
           id: target.id,
           version: target.version,
-
+          
           patch: {
             extra: {
               ...target.extra,
@@ -205,7 +220,7 @@ export function QuotationDetail() {
         if (err instanceof EntityConflictError && err.latest) {
           const latest = err.latest as Quotation;
           const from = latest.extra.status ?? 'draft';
-          if (from === next) return latest;
+          if (from === next) return latest; 
           if (canTransitionQuotation(from, next)) return await write(latest);
           setQuotation(latest);
         }
@@ -339,6 +354,10 @@ export function QuotationDetail() {
     }
   }, [quotation, t, navigate, closeDeleteModal]);
 
+  
+  
+  
+  
   const buildNoteData = useCallback((): QuotationPrintData => {
     const q = quotation!;
     const cust = q.extra.customerCode
@@ -395,6 +414,11 @@ export function QuotationDetail() {
     }
   }, [quotation, buildNoteData, paperSize, orientation, closePrintModal, t]);
 
+  
+  
+  
+  
+  
   const handleShare = useCallback(async () => {
     const st = quotation?.extra.status ?? 'draft';
     if (!quotation || (st !== 'sent' && st !== 'confirmed' && st !== 'converted')) return;
@@ -461,6 +485,7 @@ export function QuotationDetail() {
 
   const badge = quotationBadgeProps(status);
 
+  
   const generateSalesOrderButton = canCreateSalesOrder && (
     <Button
       color="blue"

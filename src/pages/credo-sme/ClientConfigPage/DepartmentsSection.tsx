@@ -1,3 +1,5 @@
+
+
 import { Alert, Collapse, Group, Paper, Stack, Text, UnstyledButton } from '@mantine/core';
 import { IconChevronDown, IconChevronRight } from '@tabler/icons-react';
 import { useState } from 'react';
@@ -21,9 +23,9 @@ export function DepartmentsSection({
 }: {
   options: DepartmentOption[];
   langCodes: string[];
-
+  
   orphaned: boolean;
-
+  
   clientPermissions: PermissionForm;
   onChange: (next: DepartmentOption[]) => void;
 }) {

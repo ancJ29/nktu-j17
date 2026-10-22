@@ -57,16 +57,17 @@ type Props = {
 };
 
 type Values = {
+  
   value: number | '';
   unit: string;
-
+  
   fromUnit: string;
   fromQty: number | '';
   toUnit: string;
   toQty: number | '';
   writeOffBaseQty: number | '';
   writeOffReason: string;
-
+  
   note: string;
 };
 
@@ -129,9 +130,10 @@ export function ProductInventoryUpdateModal({
     },
   });
 
+  
   useEffect(() => {
     if (!opened) return;
-
+    
     setMode(initialMode);
     form.setValues({
       value: '',
@@ -147,6 +149,9 @@ export function ProductInventoryUpdateModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, initialMode, baseUnit]);
 
+  
+  
+  
   useEffect(() => {
     if (!opened) return;
     form.setValues((current) => ({
@@ -161,6 +166,8 @@ export function ProductInventoryUpdateModal({
   }, [mode]);
 
   const currentOnHand = row?.onHand ?? 0;
+
+  
 
   const inputValue = typeof form.values.value === 'number' ? form.values.value : 0;
   const selectedUnit = form.values.unit || baseUnit;
@@ -179,6 +186,8 @@ export function ProductInventoryUpdateModal({
 
   const newOnHand = deltaSnapshotPreview?.ok ? deltaSnapshotPreview.onHand : currentOnHand;
   const variance = newOnHand - currentOnHand;
+
+  
 
   const repackOp = useMemo(() => {
     if (mode !== 'repack') return null;
@@ -206,6 +215,8 @@ export function ProductInventoryUpdateModal({
     if (!product || !repackOp || !repackValidation?.ok) return null;
     return applyRepack(product, breakdown, repackOp);
   }, [product, breakdown, repackOp, repackValidation]);
+
+  
 
   const handleSubmit = useCallback(
     async (values: Values) => {
@@ -270,6 +281,10 @@ export function ProductInventoryUpdateModal({
             ? `[repack] ${values.note.trim() || `${repackOp.from.qty} ${repackOp.from.unit} → ${repackOp.to.qty} ${repackOp.to.unit}`}`
             : values.note.trim();
 
+        
+        
+        
+        
         const updatedExtra: ProductInventoryExtra = markInventoryVerified({
           ...row.extra,
           onHandByUnit: nextBreakdown,
@@ -277,21 +292,39 @@ export function ProductInventoryUpdateModal({
           lastUpdatedBy: getCurrentActorId(),
         });
 
+        
+        
+        
+        
+        
+        
         await useProductInventoryStore.getState().revalidate();
 
+        
+        
+        
+        
+        
         await useProductInventoryStore.getState().updateSafely({
           id: row.id,
           version: row.version,
           patch: { onHand: nextOnHand, extra: updatedExtra },
         });
 
+        
+        
         const verb =
           mode === 'delta'
             ? 'productInventory.adjust'
             : mode === 'snapshot'
               ? 'productInventory.stockTake'
               : 'productInventory.repack';
-
+        
+        
+        
+        
+        
+        
         logActivity(verb, product.id, {
           locationCode: row.locationCode,
           prevOnHand: row.onHand,
@@ -313,6 +346,10 @@ export function ProductInventoryUpdateModal({
         onClose();
       } catch (err) {
         if (err instanceof EntityConflictError) {
+          
+          
+          
+          
           notifications.show({
             color: 'yellow',
             title: t('common.conflict.title'),
@@ -339,6 +376,12 @@ export function ProductInventoryUpdateModal({
     [row, product, breakdown, mode, repackOp, repackValidation, t, onClose],
   );
 
+  
+
+  
+  
+  
+  
   const handleConfirmMatches = useCallback(async () => {
     if (!row || !product) return;
     setSubmitting(true);
@@ -387,6 +430,8 @@ export function ProductInventoryUpdateModal({
   const drift = readDrift(row.extra);
   const lastVerifiedAt = row.extra?.lastInventoryUpdate;
 
+  
+  
   const repackNewOnHand = repackApplyPreview?.ok
     ? recomputeOnHand(product, repackApplyPreview.onHandByUnit) - (repackOp?.writeOff?.baseQty ?? 0)
     : currentOnHand;
@@ -434,7 +479,8 @@ export function ProductInventoryUpdateModal({
                 ? [{ value: 'repack', label: t('productInventory.mode.repack') }]
                 : []),
             ];
-
+            
+            
             return device.isMobile ? (
               <Select
                 value={mode}

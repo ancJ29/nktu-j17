@@ -8,16 +8,16 @@ export function transactionalListLink(
   scope: {
     fromDay: string;
     toDay: string;
-
+    
     widenBackDays: number;
-
+    
     statuses?: readonly string[];
     multi?: Record<string, readonly string[]>;
   },
 ): string {
   const periodDays = enumerateDates(scope.fromDay, scope.toDay).length;
   const widen = Math.max(0, Math.min(scope.widenBackDays, MAX_RANGE_DAYS - periodDays));
-
+  
   const instant = (day: string) => new Date(`${day}T12:00:00+07:00`).toISOString();
   const blob = {
     ...(scope.statuses ? { s: [...scope.statuses] } : {}),

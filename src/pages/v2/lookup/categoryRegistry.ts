@@ -1,3 +1,5 @@
+
+
 import { appConfig } from '@/config';
 
 export type LookupV2CategoryId =
@@ -18,9 +20,9 @@ export type LookupV2CategoryId =
 
 export type LookupV2Category = {
   id: LookupV2CategoryId;
-
+  
   labelKey: string;
-
+  
   defaultSortOrder: number;
 };
 
@@ -34,27 +36,46 @@ export const LOOKUP_V2_CATEGORIES: LookupV2Category[] = [
     defaultSortOrder: 1,
   },
   { id: 'product-category', labelKey: 'lookups.categories.productCategory', defaultSortOrder: 1 },
-
+  
+  
   { id: 'truck-type', labelKey: 'lookups.categories.truckType', defaultSortOrder: 1 },
-
+  
+  
   {
     id: 'truck-maintenance-type',
     labelKey: 'lookups.categories.maintenanceType',
     defaultSortOrder: 1,
   },
-
+  
+  
+  
+  
+  
+  
   { id: 'trucking-size', labelKey: 'lookups.categories.truckingSize', defaultSortOrder: 1 },
-
+  
+  
+  
   { id: 'shipment-type', labelKey: 'lookups.categories.shipmentType', defaultSortOrder: 1 },
-
+  
+  
+  
+  
   { id: 'fee-name', labelKey: 'lookups.categories.feeName', defaultSortOrder: 1 },
-
+  
+  
+  
   { id: 'transport-goods', labelKey: 'lookups.categories.transportGoods', defaultSortOrder: 1 },
-
+  
+  
   { id: 'truck-locations', labelKey: 'lookups.categories.truckLocations', defaultSortOrder: 1 },
-
+  
+  
+  
+  
   { id: 'vendor-type', labelKey: 'lookups.categories.vendorType', defaultSortOrder: 1 },
-
+  
+  
   { id: 'customer-type', labelKey: 'lookups.categories.customerType', defaultSortOrder: 1 },
   // No `product-type`: `product-category` and `product-unit` above already
   // serve both the v1 pages and products-v2. A third product category would
@@ -73,10 +94,15 @@ const TRANSPORT_ORDER_ONLY_CATEGORIES: LookupV2CategoryId[] = [
 
 export function getEnabledLookupV2Categories(): LookupV2Category[] {
   const cfg = appConfig.features?.lookupV2;
-
+  
+  
+  
   const trucksOn = appConfig.features?.trucks?.enabled ?? false;
   const transportOrdersOn = appConfig.features?.transportOrders?.enabled ?? false;
   const available = LOOKUP_V2_CATEGORIES.filter((c) => {
+    
+    
+    
     if (!trucksOn && FLEET_ONLY_CATEGORIES.includes(c.id)) return false;
     if (!transportOrdersOn && TRANSPORT_ORDER_ONLY_CATEGORIES.includes(c.id)) return false;
     return true;

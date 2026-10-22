@@ -1,5 +1,7 @@
+
+
 const DAY_RE = /^\d{4}-\d{2}-\d{2}$/;
-const VN_OFFSET_MS = 7 * 3_600_000;
+const VN_OFFSET_MS = 7 * 3_600_000; 
 
 export function dayOfUtc7(value: string | number | Date): string | undefined {
   const t = new Date(value).getTime();

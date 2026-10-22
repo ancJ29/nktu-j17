@@ -43,6 +43,7 @@ export function createPurchaseOrderModule(config: PurchaseOrderModuleConfig) {
   const { storage, serviceCode, keyPrefix = 'purchase-orders' } = config;
 
   return {
+    
     async getById(scope: string, id: string): Promise<PurchaseOrder | null> {
       const period = extractPeriodFromId(id);
       if (!period) return null;
@@ -57,6 +58,7 @@ export function createPurchaseOrderModule(config: PurchaseOrderModuleConfig) {
       return items.find((o) => o.id === id) ?? null;
     },
 
+    
     async create(scope: string, input: CreatePurchaseOrderInput): Promise<PurchaseOrder> {
       validateCreateInput(input);
       const period = getCurrentPeriod();
@@ -76,6 +78,7 @@ export function createPurchaseOrderModule(config: PurchaseOrderModuleConfig) {
       return order;
     },
 
+    
     async update(
       scope: string,
       id: string,
@@ -107,6 +110,7 @@ export function createPurchaseOrderModule(config: PurchaseOrderModuleConfig) {
       return updated;
     },
 
+    
     async close(scope: string, id: string): Promise<PurchaseOrder> {
       const period = extractPeriodFromId(id);
       if (!period) throw new NotFoundError('PurchaseOrder', id);
@@ -137,6 +141,7 @@ export function createPurchaseOrderModule(config: PurchaseOrderModuleConfig) {
       return closed;
     },
 
+    
     async query(scope: string, filter: PurchaseOrderFilter): Promise<PurchaseOrder[]> {
       let allOrders: PurchaseOrder[];
 

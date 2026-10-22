@@ -81,7 +81,8 @@ export const GREENHOUSE_MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
   buildExtra: (values): Partial<GreenhouseMaintenanceLogExtra> => ({
     ...(String(values.activity).trim() && { activity: String(values.activity).trim() }),
     ...(String(values.performedBy).trim() && { performedBy: String(values.performedBy).trim() }),
-
+    
+    
     ...(values.cost !== '' &&
       Number.isFinite(Number(values.cost)) && { cost: Number(values.cost) }),
     ...(String(values.note).trim() && { note: String(values.note).trim() }),

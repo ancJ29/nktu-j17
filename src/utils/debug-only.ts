@@ -11,6 +11,7 @@ if (enable) {
 const host = window.location.hostname.toLowerCase();
 
 if (isInternal && host.includes('-test.internal.cr3do.dev')) {
+  
   setAppApiGroup('49a092');
   const hostName = host.split('.')[0];
   localStorage.setItem('__CREDO_SERVICE_CODE__', hostName.replace('-test', ''));

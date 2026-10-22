@@ -26,7 +26,7 @@ export type BulkEmployee = {
   personalPhoneNumber?: string;
   position?: string;
   department?: string;
-
+  
   gender?: string;
 };
 
@@ -37,7 +37,7 @@ export type EmployeeTemplateOptions = {
   hasEmail?: boolean;
   hasPosition?: boolean;
   hasDepartment?: boolean;
-
+  
   departments?: string[];
   positions?: string[];
 };
@@ -72,6 +72,7 @@ export const parseEmployeeExcelFile = async (file: File): Promise<BulkEmployee[]
         const employees: BulkEmployee[] = [];
 
         const headerMapping: Record<string, keyof BulkEmployee> = {
+          
           name: 'name',
           code: 'code',
           email: 'email',
@@ -80,7 +81,7 @@ export const parseEmployeeExcelFile = async (file: File): Promise<BulkEmployee[]
           'personal phone': 'personalPhoneNumber',
           position: 'position',
           department: 'department',
-
+          
           tên: 'name',
           'họ tên': 'name',
           mã: 'code',
@@ -92,13 +93,17 @@ export const parseEmployeeExcelFile = async (file: File): Promise<BulkEmployee[]
           'chức vụ': 'position',
           'phòng ban': 'department',
           'bộ phận': 'department',
-
+          
           gender: 'gender',
           sex: 'gender',
           'giới tính': 'gender',
           giới: 'gender',
         };
 
+        
+        
+        
+        
         const presentFields = new Set<keyof BulkEmployee>();
         for (const h of headers) {
           const f = headerMapping[h];
@@ -224,26 +229,26 @@ const SAMPLE_ROWS_EN: SampleRow[] = [
 
 export type BulkProduct = {
   name: string;
-
+  
   code?: string;
-
+  
   unit?: string;
   sku?: string;
   barcode?: string;
   description?: string;
-
+  
   category?: string;
-
+  
   price?: number;
-
+  
   basePrice?: number;
-
+  
   minInventoryValue?: number;
-
+  
   minInventoryUnit?: string;
-
+  
   noInventory?: boolean;
-
+  
   hiddenFromInventoryList?: boolean;
 };
 
@@ -257,12 +262,13 @@ const FLAG_HEADERS: Record<
   string,
   { field: 'noInventory' | 'hiddenFromInventoryList'; truthySets: boolean }
 > = {
+  
   'inventory-managed': { field: 'noInventory', truthySets: false },
   'inventory managed': { field: 'noInventory', truthySets: false },
   'quản lý tồn kho': { field: 'noInventory', truthySets: false },
   'shown in inventory list': { field: 'hiddenFromInventoryList', truthySets: false },
   'hiển thị trong danh sách tồn kho': { field: 'hiddenFromInventoryList', truthySets: false },
-
+  
   'not inventory-managed': { field: 'noInventory', truthySets: true },
   'not inventory managed': { field: 'noInventory', truthySets: true },
   'no inventory': { field: 'noInventory', truthySets: true },
@@ -274,21 +280,21 @@ const FLAG_HEADERS: Record<
 
 export type ProductTemplateOptions = {
   language?: string;
-
+  
   hasPrice?: boolean;
-
+  
   hasBarcode?: boolean;
-
+  
   hasHideFromInventoryList?: boolean;
-
+  
   products?: ReadonlyArray<Product>;
-
+  
   categoryLabels?: Record<string, string>;
-
+  
   unitLabels?: Record<string, string>;
-
+  
   categories?: string[];
-
+  
   units?: string[];
 };
 
@@ -324,6 +330,7 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
         const products: BulkProduct[] = [];
 
         const headerMapping: Record<string, keyof BulkProduct> = {
+          
           name: 'name',
           code: 'code',
           unit: 'unit',
@@ -335,14 +342,20 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'selling price': 'price',
           'base price': 'basePrice',
           cost: 'basePrice',
-
+          
+          
+          
+          
+          
           'min stock': 'minInventoryValue',
           'minimum stock': 'minInventoryValue',
           'min inventory': 'minInventoryValue',
           'minimum inventory': 'minInventoryValue',
           'min stock unit': 'minInventoryUnit',
           'minimum stock unit': 'minInventoryUnit',
-
+          
+          
+          
           tên: 'name',
           'tên sản phẩm': 'name',
           mã: 'code',
@@ -359,6 +372,12 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           'đơn vị tồn kho tối thiểu': 'minInventoryUnit',
         };
 
+        
+        
+        
+        
+        
+        
         const presentFields = new Set<keyof BulkProduct>();
         for (const h of headers) {
           const f = headerMapping[h];
@@ -370,6 +389,7 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
           return;
         }
 
+        
         const numericFields = new Set<keyof BulkProduct>([
           'price',
           'basePrice',
@@ -387,6 +407,9 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
             const value = values[headerIndex];
             if (!value) continue;
 
+            
+            
+            
             const flag = FLAG_HEADERS[header];
             if (flag) {
               const setsFlag = flag.truthySets ? isTruthyCell(value) : isFalsyCell(value);
@@ -398,6 +421,10 @@ export const parseProductExcelFile = async (file: File): Promise<BulkProduct[]> 
             if (!fieldName) continue;
 
             if (numericFields.has(fieldName)) {
+              
+              
+              
+              
               if (fieldName === 'minInventoryValue') {
                 const m = value.match(/^([\d.,]+)\s*(.*)$/);
                 if (m) {
@@ -458,9 +485,9 @@ type ProductSampleRow = {
   basePrice: string;
   minInventoryValue: string;
   minInventoryUnit: string;
-
+  
   inventoryManaged: string;
-
+  
   shownInInventoryList: string;
 };
 
@@ -570,6 +597,8 @@ export const generateProductExcelTemplate = ({
   type ColumnKey = keyof ProductSampleRow;
   type Column = { key: ColumnKey; header: string; width: number };
 
+  
+  
   const labels: Record<ColumnKey, string> = isVietnamese
     ? {
         name: 'Tên sản phẩm',
@@ -603,7 +632,9 @@ export const generateProductExcelTemplate = ({
   const columns: Column[] = [
     { key: 'name', header: labels.name, width: 28 },
     { key: 'unit', header: labels.unit, width: 10 },
-
+    
+    
+    
     { key: 'sku', header: labels.sku, width: 18 },
     ...(hasBarcode ? [{ key: 'barcode' as const, header: labels.barcode, width: 16 }] : []),
     { key: 'description', header: labels.description, width: 36 },
@@ -630,11 +661,17 @@ export const generateProductExcelTemplate = ({
 
   const yes = isVietnamese ? 'Có' : 'Yes';
   const no = isVietnamese ? 'Không' : 'No';
-
+  
+  
+  
   const flagCell = (flagOn: boolean | undefined) => (flagOn ? no : yes);
   const resolveLabel = (val: string | undefined, map?: Record<string, string>) =>
     val ? (map?.[val] ?? val) : '';
 
+  
+  
+  
+  
   const realRows: ProductSampleRow[] = (products ?? [])
     .filter((p) => !p.extra?.isDeleted)
     .map((p) => {
@@ -656,6 +693,14 @@ export const generateProductExcelTemplate = ({
       };
     });
 
+  
+  
+  
+  
+  
+  
+  
+  
   const sampleSource = isVietnamese ? PRODUCT_SAMPLE_ROWS_VI : PRODUCT_SAMPLE_ROWS_EN;
   const sampleUnit = (i: number) => (units?.length ? units[i % units.length] : undefined);
   const fallbackRows = sampleSource.map((row, i) => ({
@@ -683,27 +728,27 @@ export const generateProductExcelTemplate = ({
 
 export type BulkMaterial = {
   name: string;
-
+  
   code?: string;
-
+  
   units?: string[];
-
+  
   category?: string;
-
+  
   costPrice?: number;
-
+  
   minimumStock?: number;
   specification?: string;
   description?: string;
   memo?: string;
   tags?: string[];
-
+  
   isActive?: boolean;
 };
 
 export type MaterialTemplateOptions = {
   language?: string;
-
+  
   hasCategory?: boolean;
   hasPricing?: boolean;
   hasMinimumStock?: boolean;
@@ -711,15 +756,15 @@ export type MaterialTemplateOptions = {
   hasDescription?: boolean;
   hasMemo?: boolean;
   hasTags?: boolean;
-
+  
   multiUnit?: boolean;
-
+  
   materials?: ReadonlyArray<Material>;
-
+  
   unitLabels?: Record<string, string>;
-
+  
   categoryLabels?: Record<string, string>;
-
+  
   categories?: string[];
   units?: string[];
 };
@@ -755,7 +800,11 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
         const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
         const materials: BulkMaterial[] = [];
 
+        
+        
+        
         const headerMapping: Record<string, keyof BulkMaterial> = {
+          
           name: 'name',
           'material name': 'name',
           code: 'code',
@@ -777,7 +826,7 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
           tags: 'tags',
           active: 'isActive',
           status: 'isActive',
-
+          
           tên: 'name',
           'tên vật tư': 'name',
           mã: 'code',
@@ -809,7 +858,8 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
         }
 
         const numericFields = new Set<keyof BulkMaterial>(['costPrice', 'minimumStock']);
-
+        
+        
         const splitList = (raw: string) =>
           raw
             .split(/[,;]/)
@@ -835,6 +885,8 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
               continue;
             }
 
+            
+            
             if (fieldName === 'isActive') {
               if (isTruthyCell(value)) material.isActive = true;
               else if (isFalsyCell(value)) material.isActive = false;
@@ -850,6 +902,8 @@ export const parseMaterialExcelFile = async (file: File): Promise<BulkMaterial[]
             material[fieldName] = value as never;
           }
 
+          
+          
           if (material.name) materials.push(material);
         }
 
@@ -987,6 +1041,8 @@ export const generateMaterialExcelTemplate = ({
   type ColumnKey = keyof MaterialSampleRow;
   type Column = { key: ColumnKey; header: string; width: number };
 
+  
+  
   const labels: Record<ColumnKey, string> = isVietnamese
     ? {
         name: 'Tên vật tư',
@@ -1015,6 +1071,11 @@ export const generateMaterialExcelTemplate = ({
         isActive: 'Active',
       };
 
+  
+  
+  
+  
+  
   const columns: Column[] = [
     { key: 'name', header: labels.name, width: 28 },
     { key: 'code', header: labels.code, width: 16 },
@@ -1041,6 +1102,9 @@ export const generateMaterialExcelTemplate = ({
     val ? (map?.[val] ?? val) : '';
   const num = (n: number | undefined) => (typeof n === 'number' && n > 0 ? String(n) : '');
 
+  
+  
+  
   const realRows: MaterialSampleRow[] = (materials ?? [])
     .filter((m) => !m.extra?.isDeleted)
     .map((m) => {
@@ -1063,6 +1127,11 @@ export const generateMaterialExcelTemplate = ({
       };
     });
 
+  
+  
+  
+  
+  
   const sampleSource = isVietnamese ? MATERIAL_SAMPLE_ROWS_VI : MATERIAL_SAMPLE_ROWS_EN;
   const sampleUnit = (i: number) => (units?.length ? units[i % units.length] : undefined);
   const fallbackRows = sampleSource.map((row, i) => ({
@@ -1089,15 +1158,15 @@ export const generateMaterialExcelTemplate = ({
 export type ProductExportOptions = {
   language?: string;
   hasPrice?: boolean;
-
+  
   categoryLabels?: Record<string, string>;
-
+  
   unitLabels?: Record<string, string>;
-
+  
   hasHideFromInventoryList?: boolean;
-
+  
   hasInventory?: boolean;
-
+  
   onHandByCode?: ReadonlyMap<string, number>;
 };
 
@@ -1135,6 +1204,11 @@ export const exportProductsToExcel = (
     | 'status';
   type Column = { key: ColumnKey; header: string; width: number };
 
+  
+  
+  
+  
+  
   const labels: Record<ColumnKey, string> = isVietnamese
     ? {
         name: 'Tên sản phẩm',
@@ -1185,7 +1259,10 @@ export const exportProductsToExcel = (
     { key: 'category', header: labels.category, width: 18 },
     { key: 'alternativeNames', header: labels.alternativeNames, width: 28 },
     { key: 'attributes', header: labels.attributes, width: 36 },
-
+    
+    
+    
+    
     ...(hasInventory ? [{ key: 'onHand' as const, header: labels.onHand, width: 14 }] : []),
     { key: 'minInventoryValue', header: labels.minInventoryValue, width: 14 },
     { key: 'minInventoryUnit', header: labels.minInventoryUnit, width: 16 },
@@ -1234,13 +1311,15 @@ export const exportProductsToExcel = (
           .filter((a) => a.key.trim() && a.value.trim())
           .map((a) => `${a.key.trim()}=${a.value.trim()}`)
           .join('; '),
-
+        
+        
         onHand: e.noInventory ? '' : (onHandByCode?.get(p.code) ?? 0),
         minInventoryValue: typeof min?.value === 'number' && min.value > 0 ? min.value : '',
         minInventoryUnit: resolveLabel(min?.unit, unitLabels),
         price: typeof p.price === 'number' && p.price > 0 ? p.price : '',
         basePrice: typeof e.basePrice === 'number' && e.basePrice > 0 ? e.basePrice : '',
-
+        
+        
         inventoryManaged: e.noInventory ? flagNo : flagYes,
         shownInInventoryList: e.hiddenFromInventoryList ? flagNo : flagYes,
         status: p.isActive ? statusActive : statusInactive,
@@ -1254,6 +1333,8 @@ export const exportProductsToExcel = (
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, isVietnamese ? 'Sản phẩm' : 'Products');
 
+  
+  
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, '0');
@@ -1301,6 +1382,7 @@ export const parseGoodsReceiptItemsExcelFile = async (
         const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
 
         const headerMapping: Record<string, keyof BulkGoodsReceiptItem> = {
+          
           sku: 'sku',
           quantity: 'quantity',
           qty: 'quantity',
@@ -1308,12 +1390,16 @@ export const parseGoodsReceiptItemsExcelFile = async (
           memo: 'memo',
           note: 'memo',
           notes: 'memo',
-
+          
           'số lượng': 'quantity',
           'đơn vị': 'unit',
           'ghi chú': 'memo',
         };
 
+        
+        
+        
+        
         const presentFields = new Set<keyof BulkGoodsReceiptItem>();
         for (const h of headers) {
           const f = headerMapping[h];
@@ -1394,15 +1480,15 @@ const GR_ITEM_SAMPLE_ROWS_EN: GRItemSampleRow[] = [
 
 export type GoodsReceiptItemsTemplateSample = {
   sku: string;
-
+  
   unit?: string;
-
+  
   name?: string;
 };
 
 export type GoodsReceiptItemsTemplateOptions = {
   language?: string;
-
+  
   sampleItems?: ReadonlyArray<GoodsReceiptItemsTemplateSample>;
 };
 
@@ -1436,7 +1522,8 @@ export const generateGoodsReceiptItemsTemplate = ({
       unit: it.unit?.trim() ?? '',
       memo: it.name?.trim() ?? '',
     }));
-
+  
+  
   const sampleSource: GRItemSampleRow[] =
     real.length >= 3 ? real : [...real, ...fallback.slice(real.length)];
   const headerRow = columns.map((c) => c.header);
@@ -1461,6 +1548,7 @@ export type BulkSalesOrderItem = {
 const REQUIRED_SO_ITEM_FIELDS: ReadonlyArray<keyof BulkSalesOrderItem> = ['sku', 'quantity'];
 
 export type ParseSalesOrderItemsOptions = {
+  
   pricingEnabled?: boolean;
 };
 
@@ -1496,11 +1584,12 @@ export const parseSalesOrderItemsExcelFile = async (
         const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
 
         const headerMapping: Record<string, keyof BulkSalesOrderItem> = {
+          
           sku: 'sku',
           quantity: 'quantity',
           qty: 'quantity',
           unit: 'unit',
-
+          
           'số lượng': 'quantity',
           'đơn vị': 'unit',
         };
@@ -1593,17 +1682,17 @@ const SO_ITEM_SAMPLE_ROWS_EN: SOItemSampleRow[] = [
 
 export type SalesOrderItemsTemplateSample = {
   sku: string;
-
+  
   unit?: string;
-
+  
   unitPrice?: number;
 };
 
 export type SalesOrderItemsTemplateOptions = {
   language?: string;
-
+  
   sampleItems?: ReadonlyArray<SalesOrderItemsTemplateSample>;
-
+  
   pricingEnabled?: boolean;
 };
 
@@ -1655,13 +1744,13 @@ export const generateSalesOrderItemsTemplate = ({
 export type BulkSalesOrderItemByName = {
   name: string;
   quantity: number;
-
+  
   unitPrice?: number;
 };
 
 export type ParsedSalesOrderByName = {
   items: BulkSalesOrderItemByName[];
-
+  
   customerPONumber?: string;
 };
 
@@ -1695,13 +1784,16 @@ const parseVietnameseNumber = (raw: string): number | undefined => {
   if (!s) return undefined;
   let normalized: string;
   if (s.includes('.') && s.includes(',')) {
+    
     normalized = s.replace(/\./g, '').replace(',', '.');
   } else if (s.includes(',')) {
+    
+    
     normalized = /,\d{1,2}$/.test(s) ? s.replace(',', '.') : s.replace(/,/g, '');
   } else {
     normalized = s;
   }
-
+  
   normalized = normalized.replace(/[^\d.-]/g, '');
   const n = Number(normalized);
   return Number.isFinite(n) ? n : undefined;
@@ -1719,13 +1811,13 @@ const extractCustomerPONumber = (sheetData: string[][]): string | undefined => {
       const lower = cell.toLowerCase();
       const prefix = SO_PO_LABEL_PREFIXES.find((p) => lower.startsWith(p));
       if (!prefix) continue;
-
+      
       const inline = cell
         .slice(prefix.length)
         .replace(/^[:\s]+/, '')
         .trim();
       if (inline) return inline;
-
+      
       for (let n = c + 1; n < row.length; n++) {
         const next = String(row[n] ?? '').trim();
         if (!next) continue;
@@ -1759,10 +1851,12 @@ export const parseSalesOrderItemsByNameExcelFile = async (
           defval: '',
         }) as string[][];
 
+        
+        
         let headerRowIdx = -1;
         let nameCol = -1;
         let qtyCol = -1;
-
+        
         let priceCol = -1;
         for (let r = 0; r < sheetData.length; r++) {
           const cells = sheetData[r].map((c) => String(c).trim().toLowerCase());
@@ -1778,6 +1872,8 @@ export const parseSalesOrderItemsByNameExcelFile = async (
         }
 
         if (headerRowIdx === -1) {
+          
+          
           reject(new ExcelParseError(['name', 'quantity']));
           return;
         }
@@ -1786,7 +1882,7 @@ export const parseSalesOrderItemsByNameExcelFile = async (
         for (let r = headerRowIdx + 1; r < sheetData.length; r++) {
           const name = String(sheetData[r][nameCol] ?? '').trim();
           const lowerName = name.toLowerCase();
-
+          
           if (SO_FOOTER_MARKERS.some((m) => lowerName.startsWith(m))) break;
           if (!name) continue;
           const quantity = parseVietnameseNumber(String(sheetData[r][qtyCol] ?? ''));
@@ -1827,7 +1923,7 @@ export type SalesOrderItemsByNameSample = { name: string };
 
 export type SalesOrderItemsByNameTemplateOptions = {
   language?: string;
-
+  
   sampleItems?: ReadonlyArray<SalesOrderItemsByNameSample>;
 };
 
@@ -1930,11 +2026,11 @@ export type RefuelExportEntry = { vehicleLabel?: string; log: OperationLog };
 
 export type RefuelExportOptions = {
   language?: string;
-
+  
   periodLabel: string;
-
+  
   fileTag: string;
-
+  
   vehicleLabel?: string;
 };
 
@@ -2000,7 +2096,9 @@ function buildRefuelSheet(
       numCell(e.unitPrice),
       numCell(e.totalAmount),
       cons == null ? '' : round1(cons),
-
+      
+      
+      
       e.fuelSource === 'tank'
         ? (e.oilTankCode ?? (isVietnamese ? 'Bồn dầu' : 'Tank'))
         : isVietnamese
@@ -2012,6 +2110,7 @@ function buildRefuelSheet(
     return withVehicle ? [vehicleLabel ?? '', ...base] : base;
   });
 
+  
   const { litres, cost, distance, avgConsumption } = computeRefuelTotals(entries.map((x) => x.log));
   const totalRow: (number | string)[] = new Array(columns.length).fill('');
   const off = withVehicle ? 1 : 0;
@@ -2105,6 +2204,8 @@ export const exportMaintenanceLogsToExcel = (
     totalGrand += grandTotal;
     totalOutstanding += outstanding;
 
+    
+    
     const lines = items.length > 0 ? items : [undefined];
     lines.forEach((item, index) => {
       const first = index === 0;
@@ -2117,7 +2218,8 @@ export const exportMaintenanceLogsToExcel = (
         item ? itemQuantity(item) : '',
         item ? maintenanceLineTotal(item) : '',
         item?.warrantyMonths ?? '',
-
+        
+        
         first ? (e.vatRate ? maintenanceVat(e) : '') : '',
         first ? grandTotal : '',
         first ? numCell(e.accountsReceived) : '',
@@ -2129,7 +2231,7 @@ export const exportMaintenanceLogsToExcel = (
 
   const totalRow: (number | string)[] = new Array(columns.length).fill('');
   totalRow[0] = isVietnamese ? 'Tổng' : 'Total';
-
+  
   totalRow[10] = totalGrand;
   totalRow[12] = totalOutstanding;
 

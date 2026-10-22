@@ -88,6 +88,7 @@ export function createEmployeeModule(config: EmployeeModuleConfig) {
       return employee;
     },
 
+    
     async createMany(
       scope: string,
       inputs: CreateEmployeeInput[],
@@ -95,6 +96,9 @@ export function createEmployeeModule(config: EmployeeModuleConfig) {
       created: Employee[];
       errors: Array<{ index: number; message: string }>;
     }> {
+      
+      
+      
       if (!Array.isArray(inputs)) {
         throw new ValidationError('Invalid employee batch', {
           items: 'Must be an array of employees',
@@ -129,6 +133,7 @@ export function createEmployeeModule(config: EmployeeModuleConfig) {
       return { created, errors };
     },
 
+    
     async applyLoginCredentials(
       scope: string,
       patches: Array<{ id: string; email: string; loginPassword: string; userUuid?: string }>,
@@ -156,7 +161,12 @@ export function createEmployeeModule(config: EmployeeModuleConfig) {
         const next: Employee = {
           ...current,
           email: p.email.trim(),
-
+          
+          
+          
+          
+          
+          
           ...(p.userUuid ? { userUuid: p.userUuid } : {}),
           extra: {
             ...((current.extra as Record<string, unknown> | undefined) ?? {}),

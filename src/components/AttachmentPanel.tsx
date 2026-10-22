@@ -57,9 +57,9 @@ type AttachmentPanelProps = {
   maxFileSizeMB?: number;
   currentUserId?: string;
   currentUserName?: string;
-
+  
   onClaimFiles?: (files: File[]) => File[];
-
+  
   claimHint?: string;
 };
 
@@ -98,7 +98,7 @@ export function AttachmentPanel({
   const [previewOpened, { open: openPreview, close: closePreview }] = useDisclosure(false);
   const [screenshotOpened, { open: openScreenshot, close: closeScreenshot }] = useDisclosure(false);
   const [isDragging, setIsDragging] = useState(false);
-
+  
   const dragCounterRef = useRef(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -108,6 +108,8 @@ export function AttachmentPanel({
     async (files: File[]) => {
       if (!files.length) return;
 
+      
+      
       const remaining = onClaimFiles ? onClaimFiles(files) : files;
       if (!remaining.length) return;
 
@@ -222,6 +224,10 @@ export function AttachmentPanel({
     [handleUpload, closeScreenshot],
   );
 
+  
+  
+  
+  
   const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -239,6 +245,7 @@ export function AttachmentPanel({
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    
     e.preventDefault();
     e.stopPropagation();
   }, []);
@@ -464,7 +471,7 @@ type ScreenshotCropModalProps = {
   onClose: () => void;
   onConfirm: (file: File) => Promise<void>;
   uploading: boolean;
-
+  
   t: (key: any, opts?: any) => string;
 };
 
@@ -491,7 +498,10 @@ function ScreenshotCropModal({
     setIsCapturing(false);
   }, []);
 
+  
+
   useEffect(() => {
+    
     if (!opened) resetState();
   }, [opened, resetState]);
 
@@ -499,6 +509,7 @@ function ScreenshotCropModal({
     setCroppedAreaPixels(pixels);
   }, []);
 
+  
   const handleCapture = useCallback(async () => {
     try {
       setIsCapturing(true);
@@ -513,6 +524,7 @@ function ScreenshotCropModal({
     }
   }, []);
 
+  
   useEffect(() => {
     if (!opened) return;
     const handlePaste = (e: ClipboardEvent) => {
@@ -541,6 +553,7 @@ function ScreenshotCropModal({
     return () => window.removeEventListener('paste', handlePaste);
   }, [opened]);
 
+  
   const handleApply = useCallback(async () => {
     if (!imageSrc || !croppedAreaPixels) return;
     setIsProcessing(true);

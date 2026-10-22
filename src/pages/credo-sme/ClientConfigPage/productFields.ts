@@ -1,3 +1,5 @@
+
+
 import { PRODUCT_V2_LIST_COLUMNS } from '@/pages/v2/products/listColumns';
 import type { CredoAppConfig } from '../schema';
 import { mergeFeature } from './featureMerge';
@@ -7,11 +9,11 @@ export type ProductsV2Form = {
   simpleMode: boolean;
   codePrefix: string;
   codePadLength: number;
-
+  
   priceManagement: boolean;
   productPhoto: boolean;
   inventory: boolean;
-
+  
   incomingColumn: boolean;
   incomingReceipts: boolean;
   outgoingOrders: boolean;

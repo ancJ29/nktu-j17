@@ -1,3 +1,4 @@
+
 import type {
   TransportOrder,
   TransportOrderFee,
@@ -11,7 +12,7 @@ type StoredFee = {
   amount: number;
   vatable?: boolean;
   kind?: TransportOrderFeeKind;
-
+  
   payer?: TransportOrderFeePayer | 'prepaid';
   invoiceNo?: string;
   memo?: string;
@@ -24,7 +25,8 @@ function normalizeFeeLine(fee: StoredFee): TransportOrderFee {
     label: fee.label,
     amount: fee.amount,
     invoiceNo: fee.invoiceNo ?? '',
-
+    
+    
     ...(fee.memo ? { memo: fee.memo } : {}),
   };
   if (kind === 'passthrough') {
@@ -42,7 +44,8 @@ export function readFeeLines(
   order: Pick<TransportOrder, 'fees' | 'disbursements'>,
 ): TransportOrderFee[] {
   const fees = ((order.fees ?? []) as StoredFee[]).map(normalizeFeeLine);
-
+  
+  
   const legacy = (order.disbursements ?? []).map((d) =>
     normalizeFeeLine({
       label: d.name,
@@ -63,10 +66,11 @@ export function isBillableFee(fee: Pick<TransportOrderFee, 'kind' | 'payer'>): b
 export const feeKey = (label: string) => label.trim().replace(/\s+/g, ' ').toLocaleLowerCase('vi');
 
 export type TransportOrderTotals = {
+  
   serviceSubtotal: number;
-
+  
   passthroughSubtotal: number;
-
+  
   subtotal: number;
   vatBase: number;
   vatAmount: number;
@@ -97,6 +101,8 @@ export function computeTransportOrderTotals(
       continue;
     }
     if (fee.kind === 'passthrough') {
+      
+      
       passthroughSubtotal += amount;
       continue;
     }
@@ -116,7 +122,9 @@ export function computeTransportOrderTotals(
     nonBillableTotal,
     grandTotal,
     advanceAmount: advance,
-
+    
+    
+    
     balanceDue: grandTotal - advance,
   };
 }

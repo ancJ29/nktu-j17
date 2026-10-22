@@ -76,19 +76,23 @@ type ShippingRow = {
 };
 
 type CustomerFormValues = {
+  
   name: string;
   code: string;
   shortName: string;
   taxCode: string;
   isActive: boolean;
 
+  
   phone: string;
   contactPerson: string;
 
+  
   address: string;
   addressGoogleMapUrl: string;
   shippingAddresses: ShippingRow[];
 
+  
   contacts: ContactRow[];
 };
 
@@ -137,6 +141,9 @@ export function CustomerFormPage() {
   const loadCustomers = useCustomerStore((s) => s.loadAll);
   const totalCustomers = useCustomerStore((s) => s.items.length);
 
+  
+  
+  
   const [codeOverridden, setCodeOverridden] = useState(false);
 
   const form = useForm<CustomerFormValues>({
@@ -146,12 +153,18 @@ export function CustomerFormPage() {
     },
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
-
+      
+      
+      
+      
       code: (v) => {
         const code = v.trim();
         if (!code) return t('common.validation.codeRequired');
         if (/\s/.test(code)) return t('common.validation.codeNoWhitespace');
-
+        
+        
+        
+        
         if (!isEdit && useCustomerStore.getState().items.some((c) => c.code === code)) {
           return t('customers.validation.codeDuplicate');
         }
@@ -160,10 +173,16 @@ export function CustomerFormPage() {
     },
   });
 
+  
+  
   useEffect(() => {
     if (!customersInitialized) loadCustomers();
   }, [customersInitialized, loadCustomers]);
 
+  
+  
+  
+  
   useEffect(() => {
     if (isEdit || !customersInitialized || codeOverridden) return;
     form.setFieldValue('code', buildNextCustomerCode());
@@ -235,6 +254,8 @@ export function CustomerFormPage() {
             ...(s.deliveryHours.trim() ? { deliveryHours: s.deliveryHours.trim() } : {}),
           }));
 
+        
+        
         const extra: CustomerExtra = {
           ...prevExtra,
           shortName: values.shortName.trim() || undefined,
@@ -281,6 +302,22 @@ export function CustomerFormPage() {
           });
           navigate(ROUTES.CUSTOMERS.DETAIL.replace(':id', id));
         } else {
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
+          
           const manualCode = codeOverridden ? values.code.trim() : null;
           const attempted: string[] = [];
           let created: Customer | null = null;
@@ -307,6 +344,7 @@ export function CustomerFormPage() {
           }
 
           if (codeTaken) {
+            
             form.setFieldError('code', t('customers.validation.codeDuplicate'));
             return;
           }
@@ -345,8 +383,11 @@ export function CustomerFormPage() {
 
   if (fetching) return null;
 
+  
+  
   const codeInputProps = form.getInputProps('code');
 
+  
   const topActions = (
     <Group gap="sm">
       <Button
@@ -360,6 +401,7 @@ export function CustomerFormPage() {
     </Group>
   );
 
+  
   const basicInfoCard = (
     <SectionCard
       icon={<IconInfoCircle size={14} />}
@@ -408,6 +450,9 @@ export function CustomerFormPage() {
             }}
             {...codeInputProps}
             onChange={(event) => {
+              
+              
+              
               setCodeOverridden(true);
               codeInputProps.onChange(event);
             }}
@@ -424,6 +469,9 @@ export function CustomerFormPage() {
     </SectionCard>
   );
 
+  
+  
+  
   const statusCard = (
     <SectionCard
       icon={<IconAdjustments size={14} />}
@@ -437,6 +485,7 @@ export function CustomerFormPage() {
     </SectionCard>
   );
 
+  
   const addressesCard = (
     <SectionCard
       icon={<IconMapPin size={14} />}
@@ -511,6 +560,7 @@ export function CustomerFormPage() {
     </SectionCard>
   );
 
+  
   const contactsCard = (
     <SectionCard
       icon={<IconAddressBook size={14} />}

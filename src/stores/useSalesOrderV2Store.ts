@@ -16,7 +16,7 @@ export const fetchSalesOrderV2Window = partition.fetchWindow;
 
 export async function createSalesOrderV2(input: {
   customerId?: string;
-
+  
   customerName?: string;
   customerPhone?: string;
   customerAddress?: string;
@@ -43,7 +43,7 @@ export async function updateSalesOrderV2(
     reference?: string;
     notes?: string;
     items?: SalesOrderV2LineInput[];
-
+    
     extra?: Record<string, unknown>;
   },
 ): Promise<SalesOrderV2> {

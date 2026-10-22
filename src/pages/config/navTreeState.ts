@@ -6,7 +6,7 @@ export type NavItemState = {
   icon: IconName;
   visible: boolean;
   navbar?: boolean;
-
+  
   customLabel?: string;
 };
 
@@ -39,7 +39,7 @@ export function newCustomGroupId(): string {
 
 type ConfigItem = {
   id: string;
-
+  
   label?: string;
   icon?: string;
   navbar?: boolean;
@@ -55,6 +55,7 @@ export function configToState(configItems: ConfigItem[], allIds: NavId[]): NavPl
     const entry = getRegistryEntry(item.id);
     const isCustom = !entry;
 
+    
     if (!isCustom && !allIds.includes(item.id as NavId)) continue;
     seen.add(item.id);
 
@@ -82,6 +83,7 @@ export function configToState(configItems: ConfigItem[], allIds: NavId[]): NavPl
         subs,
       });
     } else if (isCustom) {
+      
       result.push({
         id: item.id,
         icon: (item.icon as IconName) ?? defaultIcon,
@@ -144,6 +146,8 @@ export function stateToConfigItems(state: NavPlatformState) {
         subs: item.subs.map((s) => {
           const subEntry = getRegistryEntry(s.id);
           if (!subEntry) {
+            
+            
             return {
               id: s.id,
               label: s.customLabel ?? '',

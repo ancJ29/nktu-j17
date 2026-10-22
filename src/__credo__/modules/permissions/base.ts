@@ -1,6 +1,9 @@
+
+
 import type { Permissions } from './types.js';
 
 export const BASE_PERMISSIONS: Permissions = {
+  
   employee: {
     canView: false,
     canCreate: false,
@@ -56,17 +59,42 @@ export const BASE_PERMISSIONS: Permissions = {
       canCancel: false,
       canManualRelease: false,
       canExport: false,
-
+      
+      
+      
+      
       canViewPrice: false,
-
+      
+      
+      
+      
+      
       canViewSetComponentInventory: false,
-
+      
+      
+      
       canTakePhoto: false,
-
+      
+      
+      
+      
       canEditDeliveryPackageSize: false,
-
+      
+      
+      
+      
+      
+      
+      
+      
       canEditItemWarehouseFields: false,
-
+      
+      
+      
+      
+      
+      
+      
       canManagePayment: false,
     },
     query: {
@@ -82,7 +110,12 @@ export const BASE_PERMISSIONS: Permissions = {
     actions: {
       canManagePhotos: false,
       canReorder: false,
-
+      
+      
+      
+      
+      
+      
       canConfirmDelivered: false,
       canCancel: false,
     },
@@ -167,14 +200,29 @@ export const BASE_PERMISSIONS: Permissions = {
     canEdit: false,
     canDelete: false,
     actions: {
+      
+      
+      
       canExport: false,
     },
     query: {
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       canViewAll: false,
       canViewSelf: false,
     },
   },
-
+  
+  
   oilTank: {
     canView: false,
     canCreate: false,
@@ -205,45 +253,96 @@ export const BASE_PERMISSIONS: Permissions = {
     canEdit: false,
     canDelete: false,
   },
-
+  
+  
+  
+  
+  
+  
   transportRoute: {
     canView: false,
     canCreate: false,
     canEdit: false,
     canDelete: false,
   },
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
   costNorm: {
     canView: false,
     canCreate: false,
     canEdit: false,
     canDelete: false,
   },
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
   report: {
     canView: false,
     canCreate: false,
     canEdit: false,
     canDelete: false,
   },
-
+  
+  
+  
+  
+  
+  
+  
+  
   quotation: {
     canView: false,
     canCreate: false,
     canEdit: false,
     canDelete: false,
     query: {
+      
+      
+      
+      
+      
+      
       canViewAll: false,
       canViewSelf: false,
     },
   },
-
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   odometerLog: {
     canView: false,
     canCreate: false,
     canEdit: false,
     canDelete: false,
     actions: {
+      
+      
+      
+      
       canManagePayment: false,
     },
     query: {

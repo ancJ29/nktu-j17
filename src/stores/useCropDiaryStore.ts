@@ -28,6 +28,9 @@ export async function createCropDiaryEntry(input: {
   extra?: CropDiaryExtra;
 }): Promise<CropDiaryEntry> {
   const item: Record<string, unknown> = {
+    
+    
+    
     kind: 'event',
     cropId: input.cropId,
     cropCode: input.cropCode,

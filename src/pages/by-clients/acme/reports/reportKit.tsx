@@ -193,24 +193,24 @@ export function UnpricedFootnote({ count }: { count: number }) {
 export interface ReportMetric {
   label: string;
   value: ReactNode;
-
+  
   to?: string;
-
+  
   c?: string;
   strong?: boolean;
 }
 
 export interface ReportRowData {
   key: string;
-
+  
   title: ReactNode;
-
+  
   subtitle?: ReactNode;
   titleTo?: string;
   titleDimmed?: boolean;
-
+  
   barPct?: number;
-
+  
   metrics: ReportMetric[];
 }
 
@@ -271,6 +271,10 @@ export function ReportTable({
     return (
       <Stack gap="xs">
         {rows.map((row) => {
+          
+          
+          
+          
           const [primary, ...rest] = row.metrics;
           return (
             <Paper key={row.key} withBorder radius="md" p="sm">

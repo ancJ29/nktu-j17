@@ -1,3 +1,5 @@
+
+
 import { Alert, Button, Group, Modal, Select, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useMemo, useState } from 'react';
@@ -20,7 +22,7 @@ export function IssueDeliveryNoteModal({
   readonly salesOrderId: string;
   readonly salesOrderNumber: string;
   readonly onClose: () => void;
-
+  
   readonly onIssued?: () => void;
 }) {
   const { t } = useTranslation();
@@ -34,7 +36,7 @@ export function IssueDeliveryNoteModal({
   const [deliveryDate, setDeliveryDate] = useState('');
   const [reference, setReference] = useState('');
   const [notes, setNotes] = useState('');
-
+  
   const [completes, setCompletes] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -66,7 +68,8 @@ export function IssueDeliveryNoteModal({
       });
       onIssued?.();
       onClose();
-
+      
+      
       void navigate(ROUTES.DELIVERY_NOTES_V2.DETAIL.replace(':id', created.id));
     } catch {
       notifications.show({ color: 'red', message: t('deliveryNotesV2.notifications.writeError') });

@@ -60,6 +60,9 @@ export const PRODUCT_V2_SPEC: MasterDataSpec<ProductV2Row, ProductV2FormValues> 
   useStore: useProductV2Store,
 
   text: (t) => ({
+    
+    
+    
     navTitle: showInventory ? t('productsV2.titleWithInventory') : t('nav.productsV2'),
     statusLabels: {
       active: t('productsV2.status.active'),
@@ -133,7 +136,8 @@ export const PRODUCT_V2_SPEC: MasterDataSpec<ProductV2Row, ProductV2FormValues> 
       },
       ...(canEditPrice ? [priceSection] : []),
       ...(featureFlags.productsV2.inventory ? [stockSection] : []),
-
+      
+      
       {
         key: 'attributes',
         column: 'main',
@@ -151,6 +155,9 @@ export const PRODUCT_V2_SPEC: MasterDataSpec<ProductV2Row, ProductV2FormValues> 
     ],
   },
 
+  
+  
+  
   mobile: { Card: ProductV2MobileCard },
 
   useHeaderText: useProductV2HeaderText,

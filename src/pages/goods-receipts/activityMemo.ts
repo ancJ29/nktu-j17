@@ -1,3 +1,5 @@
+
+
 import type { GoodsReceipt, GoodsReceiptItem, GoodsReceiptItemType } from '@/types';
 
 export type GoodsReceiptMemoItem = {
@@ -5,7 +7,7 @@ export type GoodsReceiptMemoItem = {
   itemCode: string;
   quantity: number;
   unit: string;
-
+  
   note?: string;
 };
 
@@ -36,6 +38,7 @@ export type GoodsReceiptVendorDiff = {
 };
 
 export type GoodsReceiptInlineFields = {
+  
   quantity?: {
     itemType: GoodsReceiptItemType;
     itemCode: string;
@@ -57,6 +60,8 @@ export function toMemoItem(item: GoodsReceiptItem): GoodsReceiptMemoItem {
 }
 
 function lineIdentity(item: GoodsReceiptItem): string {
+  
+  
   return [item.itemType, item.itemCode, item.unit].join('|');
 }
 

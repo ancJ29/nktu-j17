@@ -1,11 +1,15 @@
+
+
 export const ROUTES = {
+  
   APP: {
     MAIN: '/',
   },
   EMPLOYEES: {
     LIST: '/employees',
     NEW: '/employees/new',
-
+    
+    
     ORG_SETTINGS: '/employees/organization',
     DETAIL: '/employees/:id',
     EDIT: '/employees/:id/edit',
@@ -13,7 +17,7 @@ export const ROUTES = {
   PROFILE: '/profile',
   MORE: '/more',
   REPORTS: '/reports',
-
+  
   AUTH: {
     LOGIN: '/login',
     LOGOUT: '/logout',
@@ -42,17 +46,22 @@ export const ROUTES = {
     NEW: '/transport-orders/new',
     DETAIL: '/transport-orders/:id',
     EDIT: '/transport-orders/:id/edit',
-
+    
+    
     NEW_MULTI_DROP: '/transport-orders/new-multi-drop',
     EDIT_MULTI_DROP: '/transport-orders/:id/edit-multi-drop',
   },
-
+  
+  
+  
+  
   TRANSPORT_ROUTES: {
     LIST: '/transport-routes',
     NEW: '/transport-routes/new',
     EDIT: '/transport-routes/:id/edit',
   },
-
+  
+  
   COST_NORMS: {
     LIST: '/cost-norms',
   },
@@ -60,7 +69,8 @@ export const ROUTES = {
     PRODUCTS: '/inventory/products',
     MATERIALS: '/inventory/materials',
   },
-
+  
+  
   QUOTATIONS: {
     LIST: '/quotations',
     NEW: '/quotations/new',
@@ -180,7 +190,9 @@ export const ROUTES = {
     DETAIL: '/sales-orders-v2/:id',
     EDIT: '/sales-orders-v2/:id/edit',
   },
-
+  
+  
+  
   DELIVERY_NOTES_V2: {
     LIST: '/delivery-notes-v2',
     DETAIL: '/delivery-notes-v2/:id',
@@ -196,7 +208,14 @@ export const ROUTES = {
   FORBIDDEN: '/403-forbidden',
   ERROR: '/error',
   SYSTEM_ADMIN: '/8dc52354/system-admin',
-
+  
+  
+  
+  
+  
+  
+  
+  
   CREDO_SME: {
     CLIENT_CONFIG: '/5fdb0520ef6/client-config',
   },

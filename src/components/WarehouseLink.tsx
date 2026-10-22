@@ -7,13 +7,14 @@ import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } f
 export type WarehouseDocLinkKind = 'receipt' | 'delivery-note';
 
 type WarehouseLinkProps = {
+  
   id: string | undefined | null;
-
+  
   kind: WarehouseDocLinkKind;
-
+  
   fallbackLabel?: string | null;
   size?: LinkSize;
-
+  
   color?: string;
 };
 
@@ -24,6 +25,10 @@ export function WarehouseLink({
   size = 'sm',
   color = 'blue',
 }: WarehouseLinkProps) {
+  
+  
+  
+  
   const receiptItems = warehouseDocBundles['warehouse-receipts'].useStore((s) => s.items);
   const deliveryItems = warehouseDocBundles['warehouse-delivery-notes'].useStore((s) => s.items);
   const items = kind === 'receipt' ? receiptItems : deliveryItems;

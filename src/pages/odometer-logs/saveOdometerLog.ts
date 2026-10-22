@@ -1,16 +1,19 @@
+
+
 import { isDuplicateUniqueFieldError } from '@/utils/code';
 import { odometerLogBundle } from '@/stores/useOdometerLogStore';
 import type { OdometerLog, OdometerLogExtra, OdometerOtherCost } from '@/types';
 
 export type SaveOdometerLogInput = {
+  
   recordDate: string;
   employeeId: string;
   employeeName: string;
-
+  
   km?: number | undefined;
   photos: OdometerLogExtra['photos'];
   fuelCost?: number | undefined;
-
+  
   otherCosts?: OdometerOtherCost[];
   note?: string;
 };
@@ -28,7 +31,9 @@ export async function saveOdometerLog(input: SaveOdometerLogInput): Promise<Odom
   const otherCosts = (input.otherCosts ?? [])
     .filter((line) => line.amount > 0)
     .map((line) => ({ amount: line.amount, content: line.content.trim() }));
-
+  
+  
+  
   const extra: OdometerLogExtra = {
     employeeId,
     employeeName,
@@ -48,6 +53,9 @@ export async function saveOdometerLog(input: SaveOdometerLogInput): Promise<Odom
       partitionKey: recordDate,
     });
   } catch (err) {
+    
+    
+    
     if (!isDuplicateUniqueFieldError(err, 'employeeId')) throw err;
     const raced = await findServerEntry(recordDate, employeeId);
     if (!raced) throw err;
@@ -63,7 +71,9 @@ function update(
   return odometerLogBundle.updateSafely({
     id: existing.id,
     version: existing.version,
-
+    
+    
+    
     patch: { recordDate, extra: { ...existing.extra, ...extra } },
     partitionKey: recordDate,
   });

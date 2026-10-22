@@ -9,7 +9,7 @@ const isMobile = device.isMobile;
 
 type CreateCtaBase = {
   label: string;
-
+  
   enabled?: boolean;
 };
 
@@ -22,7 +22,7 @@ type CreateCtaLink = CreateCtaBase & {
 type CreateCtaAction = CreateCtaBase & {
   onClick: () => void;
   to?: never;
-
+  
   mobileVariant?: 'icon' | 'hidden';
 };
 
@@ -50,7 +50,8 @@ export function ListPageHeader({
   createCta,
 }: ListPageHeaderProps) {
   const enabled = createCta?.enabled ?? true;
-
+  
+  
   const hiddenOnMobile = !!createCta?.to || (createCta?.mobileVariant ?? 'icon') === 'hidden';
   const showCta = !!createCta && enabled && !(isMobile && hiddenOnMobile);
 
@@ -94,13 +95,15 @@ export function ListPageHeader({
 
 function renderCta(cta: CreateCta) {
   if (isMobile) {
+    
+    
     return (
       <ActionIcon onClick={cta.onClick} variant="filled" size="md">
         <IconPlus size={16} />
       </ActionIcon>
     );
   }
-
+  
   if (cta.to) {
     return (
       <Button component={Link} to={cta.to} leftSection={<IconPlus size={16} />} size="sm">

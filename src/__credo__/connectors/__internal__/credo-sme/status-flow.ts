@@ -1,52 +1,56 @@
+
+
 export type StatusFlowStatus<Stage extends string = string> = {
+  
   value: string;
-
+  
   stage: Stage;
-
+  
   label?: string;
-
+  
   color?: string;
-
+  
   actionLabel?: string;
-
+  
   actionColor?: string;
-
+  
   capabilities?: string[];
 };
 
 export type StatusCapability<Stage extends string = string> = {
   id: string;
-
+  
   stages: readonly Stage[];
 };
 
 export type StatusFlowTransition = {
   from: string;
   to: string;
-
+  
   onlyDepartments?: string[];
 };
 
 export type StatusFlowConfig<Stage extends string = string> = {
   statuses: StatusFlowStatus<Stage>[];
-
+  
   initial: string;
   transitions: StatusFlowTransition[];
 };
 
 export type StageCatalogue<Stage extends string = string> = {
   stages: readonly Stage[];
-
+  
   initialStage: Stage;
-
+  
   stageEdges: Readonly<Record<Stage, readonly Stage[]>>;
-
+  
   capabilities?: readonly StatusCapability<Stage>[];
 };
 
 export type StatusFlowValidation = {
+  
   errors: string[];
-
+  
   warnings: string[];
 };
 
@@ -56,6 +60,7 @@ export type TransitionDenial =
 export type TransitionVerdict = { allowed: true } | { allowed: false; reason: TransitionDenial };
 
 export type TransitionContext = {
+  
   departmentId?: string;
 };
 
@@ -162,6 +167,9 @@ export function validateStatusFlow<Stage extends string>(
       `initial: "${flow.initial}" must be a ${catalogue.initialStage}-stage status, not ${String(initial.stage)}`,
     );
   } else if ((initial.capabilities ?? []).length > 0) {
+    
+    
+    
     errors.push(`initial: "${flow.initial}" cannot carry a capability — nothing ever enters it`);
   }
 
@@ -177,7 +185,9 @@ export function validateStatusFlow<Stage extends string>(
       errors.push(`${label}: a status cannot transition to itself`);
       continue;
     }
-
+    
+    
+    
     const key = `${t.from}\u001f${t.to}`;
     if (seenEdges.has(key)) errors.push(`${label}: duplicate edge`);
     seenEdges.add(key);
@@ -200,6 +210,8 @@ export function validateStatusFlow<Stage extends string>(
   }
 
   if (errors.length === 0) {
+    
+    
     const reachable = new Set([flow.initial]);
     let grew = true;
     while (grew) {
@@ -293,7 +305,7 @@ export const SALES_ORDER_STAGE_CATALOGUE: StageCatalogue<SalesOrderStage> = {
     fulfilled: [],
     cancelled: [],
   },
-
+  
   capabilities: [{ id: SALES_ORDER_LOCKS_STOCK, stages: ['draft'] }],
 };
 
@@ -333,7 +345,7 @@ export const DELIVERY_NOTE_STAGE_CATALOGUE: StageCatalogue<DeliveryNoteStage> = 
     delivered: [],
     cancelled: [],
   },
-
+  
   capabilities: [{ id: DELIVERY_NOTE_DEDUCTS_STOCK, stages: ['draft'] }],
 };
 

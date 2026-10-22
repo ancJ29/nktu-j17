@@ -1,3 +1,5 @@
+
+
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import { createListFilterCache } from '@/utils/listFilterCache';
@@ -20,16 +22,27 @@ export function useCachedListFilters<T extends object>(
   defaults: T,
 ): {
   state: T;
-
+  
   updateState: (next: Partial<T>) => void;
-
+  
   clearFilters: () => void;
-
+  
   hasActiveFilters: boolean;
 } {
   const cache = useMemo(() => createListFilterCache<Partial<T>>(cacheKey), [cacheKey]);
   const [params, setParams] = useSearchParams();
 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   const [resetCount, setResetCount] = useState(0);
 
   const state = useMemo<T>(() => {
@@ -44,6 +57,9 @@ export function useCachedListFilters<T extends object>(
   const compactState = compactAgainstDefaults(state, defaults);
   const hasActiveFilters = !isEmpty(compactState);
 
+  
+  
+  
   useEffect(() => {
     cache.write(compactState);
     // `compactState` is recomputed each render but the cache.write is cheap
@@ -54,6 +70,7 @@ export function useCachedListFilters<T extends object>(
 
   const updateState = useCallback(
     (next: Partial<T>) => {
+      
       const urlHadBlob = params.has(URL_KEY);
       let clearedToEmpty = false;
       setParams(
@@ -77,6 +94,15 @@ export function useCachedListFilters<T extends object>(
         { replace: true },
       );
       if (clearedToEmpty && !urlHadBlob) {
+        
+        
+        
+        
+        
+        
+        
+        
+        
         setResetCount((c) => c + 1);
       }
     },
@@ -84,10 +110,26 @@ export function useCachedListFilters<T extends object>(
   );
 
   const clearFilters = useCallback(() => {
+    
+    
     const urlHadBlob = params.has(URL_KEY);
     cache.clear();
     urlUpdate(setParams, (url) => url.delete(URL_KEY));
     if (!urlHadBlob) {
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
       setResetCount((c) => c + 1);
     }
   }, [setParams, cache, params]);

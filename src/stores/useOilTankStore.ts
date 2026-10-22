@@ -9,7 +9,7 @@ export const OIL_TANK_RECORD_TARGET = {
 
 export const useOilTankStore = createSingleRecordsStore<OilTankRow>({
   ...OIL_TANK_RECORD_TARGET,
-
+  
   cacheKey: 'otk.5c8e2b',
   cacheTTL: 10 * ONE_MINUTE,
 });

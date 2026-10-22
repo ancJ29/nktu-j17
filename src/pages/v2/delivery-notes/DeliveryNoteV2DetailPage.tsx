@@ -1,3 +1,5 @@
+
+
 import {
   Alert,
   Button,
@@ -89,13 +91,14 @@ export function DeliveryNoteV2DetailPage() {
 
   const [confirmTarget, setConfirmTarget] = useState<DeliveryNoteFlowStatus | null>(null);
   const [cancelTarget, setCancelTarget] = useState<DeliveryNoteFlowStatus | null>(null);
-
+  
   const [deductTarget, setDeductTarget] = useState<DeliveryNoteFlowStatus | null>(null);
   const [retrying, setRetrying] = useState(false);
   const [reducing, setReducing] = useState(false);
   const [amounts, setAmounts] = useState<Record<string, number>>({});
   const [capturing, setCapturing] = useState(false);
 
+  
   const [consequences, setConsequences] = useState<DeliveryNoteV2Consequence[]>([]);
   const [pendingHop, setPendingHop] = useState<string | null>(null);
 
@@ -113,6 +116,7 @@ export function DeliveryNoteV2DetailPage() {
     setPendingHop(null);
   }, []);
 
+  
   const runTransition = useCallback(
     async (to: string, options: { photoRefs?: string[]; acknowledge?: string[] } = {}) => {
       if (!note) return;
@@ -137,7 +141,9 @@ export function DeliveryNoteV2DetailPage() {
       } catch (error) {
         const fields = validationFieldsOf(error);
         const asked = Object.entries(fields ?? {}).map(([code, message]) => ({ code, message }));
-
+        
+        
+        
         if (asked.length > 0 && CONSENT_CODES.some(({ code }) => code in (fields ?? {}))) {
           setConsequences(asked);
           setPendingHop(to);
@@ -156,6 +162,7 @@ export function DeliveryNoteV2DetailPage() {
     [note, day, t, closeDialogs, setNote],
   );
 
+  
   const runReduce = useCallback(async () => {
     if (!note) return;
     const picked = note.items.flatMap((line) => {
@@ -182,6 +189,7 @@ export function DeliveryNoteV2DetailPage() {
     }
   }, [note, day, amounts, t, closeDialogs, setNote]);
 
+  
   const captureAndComplete = useCallback(
     async (base64: string, deliveredStatus: string): Promise<boolean> => {
       if (!note) return false;
@@ -211,6 +219,7 @@ export function DeliveryNoteV2DetailPage() {
     [note, t, runTransition],
   );
 
+  
   const photos = useMemo<PhotoEntry[]>(
     () =>
       (note?.photoRefs ?? []).map((url) => ({
@@ -244,6 +253,10 @@ export function DeliveryNoteV2DetailPage() {
     return value === undefined ? [] : [{ field, text: String(value) }];
   });
 
+  
+  
+  
+  
   const flagFor = (targetStage: string | undefined, deducts: boolean) =>
     targetStage === 'delivered' || deducts
       ? perms.deliveryRequest.canConfirmDelivered()
@@ -260,7 +273,9 @@ export function DeliveryNoteV2DetailPage() {
   const noNextStep = !pending && targets.length === 0;
   const deliveredTarget = targets.find((target) => target.stage === 'delivered');
   const nothingToReduce = Object.values(amounts).every((quantity) => quantity <= 0);
-
+  
+  
+  
   const showCapture =
     device.isMobile &&
     note.deliveryType === 'internal' &&
@@ -627,7 +642,8 @@ export function DeliveryNoteV2DetailPage() {
                 description={`${t('deliveryNotesV2.form.remaining')}: ${quantityText({ ...line, quantity: left })}`}
                 value={amounts[key] ?? 0}
                 min={0}
-
+                
+                
                 max={left}
                 disabled={left === 0}
                 onChange={(value) =>

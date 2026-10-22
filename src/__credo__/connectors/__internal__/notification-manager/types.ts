@@ -1,3 +1,5 @@
+
+
 export type NotificationEntity = {
   id: string;
   clientId: string;
@@ -6,9 +8,9 @@ export type NotificationEntity = {
   title: string;
   body: string | null;
   payload: Record<string, unknown>;
-
+  
   createdAt: Date | string;
-
+  
   readAt: string | null;
 };
 
@@ -23,7 +25,7 @@ export type CreateNotificationInput = {
   title: string;
   body?: string;
   payload?: Record<string, unknown>;
-
+  
   timestamp?: string;
 };
 
@@ -31,15 +33,16 @@ export type CreateNotificationsRequest = {
   notifications: CreateNotificationInput[];
 };
 export type CreateNotificationsResponse = {
+  
   ids: string[];
 };
 
 export type GetByRecipientRequest = {
   recipientId: string;
   clientId: string;
-
+  
   cursor?: string;
-
+  
   limit?: number;
 };
 export type GetByRecipientResponse = {
@@ -53,5 +56,6 @@ export type MarkReadRequest = {
   notificationIds: string[];
 };
 export type MarkReadResponse = {
+  
   marked: number;
 };

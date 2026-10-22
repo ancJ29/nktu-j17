@@ -11,7 +11,7 @@ import { AddressWithMapLink } from '@/components/AddressWithMapLink';
 type CustomerDataTableProps = {
   readonly customers: Customer[];
   readonly isLoading?: boolean;
-
+  
   readonly showAddress?: boolean;
   readonly viewportRef?: Ref<HTMLDivElement>;
 };

@@ -19,9 +19,10 @@ function AvatarLead({ size, imageUrl, name }: { size: LinkSize; imageUrl?: strin
 }
 
 type EmployeeLinkProps = {
+  
   code?: string | undefined | null;
   id?: string | undefined | null;
-
+  
   fallbackLabel?: string | null;
   size?: LinkSize;
   noAvatar?: boolean;
@@ -34,6 +35,12 @@ export function EmployeeLink({
   noAvatar = false,
   size = 'sm',
 }: EmployeeLinkProps) {
+  
+  
+  
+  
+  
+  
   const employee = useEmployeeStore((s) =>
     code
       ? s.getByCode(code)
@@ -43,7 +50,9 @@ export function EmployeeLink({
   );
 
   const name = employee?.name ?? fallbackLabel ?? '';
-
+  
+  
+  
   const detailId = employee?.id ?? (code ? undefined : (id ?? undefined));
 
   if (!name) return <EntityDash size={size} />;

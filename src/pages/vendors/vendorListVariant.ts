@@ -1,6 +1,9 @@
+
+
 import { VIETNAM_CHINA_ORIGIN_LABELS, type VendorOriginLabels } from './vendorOriginLabels';
 
 export type VendorListVariant = {
+  
   origin?: VendorOriginLabels;
 };
 

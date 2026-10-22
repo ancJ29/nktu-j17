@@ -35,7 +35,7 @@ const BOTTOM_NAV_HEIGHT = 64;
 
 type MobileAppLayoutLabels = {
   languageTooltip: string;
-
+  
   accountTooltip?: string;
   menuReloadPage?: string;
   menuRefreshConfig?: string;
@@ -46,7 +46,7 @@ type MobileAppLayoutProps = {
   navigation: CredoNavigationItem[];
   getNavLabel: (item: CredoNavigationItem) => string;
   appName: string;
-
+  
   appNameHtml?: string;
   logoSrc: string;
   mainColor: string;
@@ -61,15 +61,15 @@ type MobileAppLayoutProps = {
   loginPath: string;
   morePath: string;
   onMount?: () => void;
-
+  
   onRefresh?: () => void | Promise<void>;
   children: ReactNode;
   showLanguageSwitcher?: boolean;
-
+  
   showRefreshConfig?: boolean;
   onRefreshConfig?: () => void;
   onClearCache?: () => void;
-
+  
   headerVariant?: 'dark' | 'light';
 };
 
@@ -103,7 +103,7 @@ export function MobileAppLayout({
 
   useEffect(() => {
     onMount?.();
-  }, []);
+  }, []); 
 
   const getColor = useCallback(
     (color: MantineColor) => {
@@ -116,6 +116,10 @@ export function MobileAppLayout({
     return `linear-gradient(135deg, ${getColor(`${mainColor}.7`)} 0%, ${getColor(`${mainColor}.9`)} 100%)`;
   }, [getColor, mainColor]);
 
+  
+  
+  
+  
   const isLightHeader = headerVariant === 'light';
   const headerBackground = isLightHeader ? getColor('neutral.0') : headerGradient;
   const headerTextColor = isLightHeader ? getColor('neutral.8') : 'white';

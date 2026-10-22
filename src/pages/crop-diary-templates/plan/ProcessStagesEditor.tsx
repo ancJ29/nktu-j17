@@ -33,6 +33,8 @@ export const ProcessStagesEditor = memo(function ProcessStagesEditor({
   );
 
   const add = useCallback(() => {
+    
+    
     const last = stages[stages.length - 1];
     const from = last ? Math.min(last.toDay + 1, Math.max(1, totalDays)) : 1;
     onChange([...stages, { fromDay: from, toDay: Math.max(from, totalDays), name: '' }]);

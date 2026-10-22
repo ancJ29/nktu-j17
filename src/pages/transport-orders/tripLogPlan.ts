@@ -1,15 +1,17 @@
+
 import type { TransportOrder, TransportOrderTripLogRef, TripLogExtra } from '@/types';
 import { readTruckingSize } from './truckingSize';
 
 export const WHOLE_ORDER_TRIP_INDEX = -1;
 
 export type PlannedTripLog = {
+  
   tripIndex: number;
-
+  
   targetId: string;
-
+  
   targetCode: string;
-
+  
   logDate: string;
   extra: TripLogExtra;
 };
@@ -32,6 +34,10 @@ function routeLabel(from: string | undefined, to: string | undefined): string {
 export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
   if (order.extra?.isDeleted || order.extra?.cancellation) return [];
 
+  
+  
+  
+  
   const orderFacts = {
     ...(order.customerName?.trim() ? { customerName: order.customerName.trim() } : {}),
     ...(readTruckingSize(order) ? { truckingSize: readTruckingSize(order) } : {}),
@@ -45,12 +51,16 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
     tripIndex,
   });
 
+  
   const schedule = (loadingAt: unknown, unloadingAt: unknown) => ({
     ...(loadingAt ? { loadingAt: String(loadingAt) } : {}),
     ...(unloadingAt ? { unloadingAt: String(unloadingAt) } : {}),
   });
 
   if (order.isMultiTrip) {
+    
+    
+    
     return (order.trips ?? [])
       .map((leg, i) => ({ leg, i }))
       .filter(({ leg }) => Boolean(leg.truckId))
@@ -64,7 +74,8 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
           destination: routeLabel(leg.departure, leg.destination),
           ...(leg.driverId ? { driverId: leg.driverId } : {}),
           ...(leg.driverName ? { driverName: leg.driverName } : {}),
-
+          
+          
           ...schedule(leg.loadingAt, leg.unloadingAt),
           ...orderFacts,
         },
@@ -83,7 +94,8 @@ export function planTripLogs(order: TransportOrder): PlannedTripLog[] {
         destination: routeLabel(order.route?.pickup, order.route?.dropoff),
         ...(order.driverId ? { driverId: order.driverId } : {}),
         ...(order.driverName ? { driverName: order.driverName } : {}),
-
+        
+        
         ...schedule(order.route?.pickupAt, order.route?.dropoffAt),
         ...orderFacts,
       },
@@ -134,7 +146,8 @@ export function diffTripLogs(
       ops.push({ kind: 'update', plan, ref });
     }
   }
-
+  
+  
   for (const ref of byIndex.values()) ops.push({ kind: 'delete', ref });
   return ops;
 }

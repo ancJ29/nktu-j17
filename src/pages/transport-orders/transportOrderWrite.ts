@@ -1,3 +1,4 @@
+
 import { isDuplicateUniqueFieldError } from '@/utils/code';
 import type {
   TransportOrderExtra,
@@ -20,31 +21,31 @@ export type TransportOrderWriteFields = {
   truckPlate: string;
   driverId: string;
   driverName: string;
-
+  
   truckType: string;
-
+  
   customerOrderNumber: string;
-
+  
   type5Specific: {
     requestedPickupDate: string;
     dropoffDate: string;
     moocStorageDays: number | null;
   };
   billNumber: string;
-
+  
   declarationNumber: string;
   containerNumber: string;
   truckingSize: TransportOrderTruckingSize;
   shipmentType: TransportOrderShipmentType;
   route: TransportOrderRoute;
-
+  
   fees: TransportOrderFee[];
-
+  
   advanceAmount: number;
-
+  
   laborCost: number;
   vatRate: number;
-
+  
   roundDown: boolean;
   transportContractNo: string;
   customerCode?: string | undefined;
@@ -52,7 +53,7 @@ export type TransportOrderWriteFields = {
   status: string;
   notes: string;
   extra: TransportOrderExtra;
-
+  
   multiDrop?: TransportOrderMultiDrop | undefined;
 };
 
@@ -95,7 +96,9 @@ function deriveFromTrips(trips: TransportOrderTrip[]): Partial<MirroredTripField
       pickup: first.departure,
       stuffing: '',
       dropoff: last.destination,
-
+      
+      
+      
       ...(first.loadingAt ? { pickupAt: first.loadingAt } : {}),
       ...(last.unloadingAt ? { dropoffAt: last.unloadingAt } : {}),
     },
@@ -105,12 +108,27 @@ function deriveFromTrips(trips: TransportOrderTrip[]): Partial<MirroredTripField
 export function buildTransportOrderWrite(
   fields: TransportOrderWriteFields,
 ): Record<string, unknown> {
+  
+  
+  
+  
   const fees = readFeeLines({ fees: fields.fees });
-
+  
+  
+  
+  
   const { subtotal } = computeTransportOrderTotals(fees, fields.vatRate);
-
+  
+  
+  
   const trips = fields.isMultiTrip ? fields.trips : [];
-
+  
+  
+  
+  
+  
+  
+  
   const { truckType, customerOrderNumber, type5Specific, multiDrop, extra, ...rest } = fields;
   const carried = Object.fromEntries(
     Object.entries(extra).filter(([key]) => !OWNED_EXTRA_KEYS.has(key)),
@@ -129,9 +147,15 @@ export function buildTransportOrderWrite(
     ...(multiDrop ? { route: routeFromMultiDrop(multiDrop) } : {}),
     fees,
     trips,
-
+    
+    
+    
+    
     laborCost: fields.isMultiTrip ? 0 : fields.laborCost,
-
+    
+    
+    
+    
     disbursements: [],
     totalAmount: subtotal,
   };

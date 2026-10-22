@@ -86,7 +86,7 @@ export default function DeliveriesReport({ param, onParamChange }: ReportViewPro
               key: r.key || '__none__',
               title: r.key ? r.label || r.key : 'Chưa phân công',
               titleDimmed: !r.key,
-
+              
               ...(r.key ? { titleTo: deliveryNotesLink({ fromDay, toDay }, r.key) } : {}),
               metrics: [
                 { label: 'Đã giao', value: r.delivered },

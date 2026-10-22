@@ -1,3 +1,5 @@
+
+
 import type { ReactNode } from 'react';
 import { Group, Progress, Stack, Text } from '@mantine/core';
 import { IconBucketDroplet } from '@tabler/icons-react';
@@ -12,7 +14,7 @@ type T = (key: string, options?: Record<string, unknown>) => string;
 
 export type OilTankColumnsContext = {
   t: T;
-
+  
   formatLitres: (value: number | undefined) => string;
 };
 

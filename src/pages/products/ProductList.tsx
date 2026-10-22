@@ -1,3 +1,5 @@
+
+
 import { Button, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconDownload } from '@tabler/icons-react';
@@ -60,7 +62,7 @@ type ProductFilters = {
   inventoryDisplay: FilterInventoryDisplay;
   search: string;
   page: number;
-
+  
   columnFilters: string;
 };
 
@@ -107,7 +109,9 @@ export function ProductList({ variant }: ProductListProps) {
   } = useCachedListFilters('cmngt:product-list-filters', FILTER_DEFAULTS);
   const filter = filterState.status;
   const categoryFilter = filterState.category;
-
+  
+  
+  
   const inventoryDisplayFilter = filterState.inventoryDisplay;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
   const setCategoryFilter = useCallback(
@@ -121,17 +125,27 @@ export function ProductList({ variant }: ProductListProps) {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
+  
+  
+  
+  
+  
+  
   const filters = useMemo(
     () => ({
       status: filter,
       category: categoryFilter,
       inventoryDisplay: inventoryDisplayFilter,
-
+      
+      
       columnFilters: filterState.columnFilters,
     }),
     [filter, categoryFilter, inventoryDisplayFilter, filterState.columnFilters],
   );
 
+  
+  
+  
   const onHandByCode = useMemo(() => {
     const m = new Map<string, number>();
     if (!inventoryEnabled) return m;
@@ -142,6 +156,11 @@ export function ProductList({ variant }: ProductListProps) {
     return m;
   }, [inventoryItems]);
 
+  
+  
+  
+  
+  
   const columnFilterValues = useMemo(
     () => parseColumnFilters(filterState.columnFilters),
     [filterState.columnFilters],
@@ -151,7 +170,9 @@ export function ProductList({ variant }: ProductListProps) {
     [updateState],
   );
   const columnFilterLabels = useColumnFilterLabels();
-
+  
+  
+  
   const columnFilterDefs: ColumnFilterDef<(typeof allProducts)[number]>[] = useMemo(
     () =>
       variant.showColumnHeaderFilters
@@ -164,7 +185,10 @@ export function ProductList({ variant }: ProductListProps) {
         : [],
     [variant.showColumnHeaderFilters, onHandByCode, columnFilterLabels],
   );
-
+  
+  
+  
+  
   const listedProducts = useMemo(
     () => allProducts.filter((p) => !p.extra?.isDeleted),
     [allProducts],
@@ -181,15 +205,21 @@ export function ProductList({ variant }: ProductListProps) {
       if (f.status === 'active' && !item.isActive) return false;
       if (f.status === 'inactive' && item.isActive) return false;
       if (f.category && item.extra?.category !== f.category) return false;
-
+      
+      
+      
       if (hideFromInventoryListEnabled && f.inventoryDisplay) {
         const hidden = isHiddenFromInventoryListProduct(item);
         if (f.inventoryDisplay === 'shown' ? hidden : !hidden) return false;
       }
-
+      
+      
       return columnFilterPredicate(item);
     },
-
+    
+    
+    
+    
     [columnFilterPredicate],
   );
 
@@ -224,7 +254,9 @@ export function ProductList({ variant }: ProductListProps) {
     onSearchChange,
     page: filterState.page,
     onPageChange,
-
+    
+    
+    
     lazyKey: ROUTES.PRODUCTS.LIST,
   });
 
@@ -233,6 +265,9 @@ export function ProductList({ variant }: ProductListProps) {
     total: totalItems,
   });
 
+  
+  
+  
   const categoryLookups = useLookupV2Options('product-category');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
@@ -263,6 +298,11 @@ export function ProductList({ variant }: ProductListProps) {
     forceRefresh();
   }, [forceRefresh]);
 
+  
+  
+  
+  
+  
   const inventoryDisplayOptions = useMemo(
     () =>
       hideFromInventoryListEnabled
@@ -316,6 +356,9 @@ export function ProductList({ variant }: ProductListProps) {
     () => [
       ...(categoryOptions.length > 0
         ? [
+            
+            
+            
             allOptionFilter({
               title: t('common.labels.category'),
               value: categoryFilter,
@@ -350,6 +393,10 @@ export function ProductList({ variant }: ProductListProps) {
     ],
   );
 
+  
+  
+  
+  
   const [isExporting, setIsExporting] = useState(false);
   const handleExport = useCallback(() => {
     setIsExporting(true);
@@ -420,7 +467,10 @@ export function ProductList({ variant }: ProductListProps) {
               }}
               filters={mobileFilters.length > 0 ? mobileFilters : undefined}
               onClear={clearFilters}
-
+              
+              
+              
+              
               labelChips
             />
           ) : (
@@ -437,7 +487,8 @@ export function ProductList({ variant }: ProductListProps) {
               }}
               filters={desktopFilters.length > 0 ? desktopFilters : undefined}
               onClear={clearFilters}
-
+              
+              
               hasActiveFilters={
                 !!search ||
                 filter !== 'all' ||

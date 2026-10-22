@@ -47,6 +47,7 @@ function periodLabel(grouping: RevenueGrouping, periodKey: string): string {
 export default function RevenueReport({ param, onParamChange }: ReportViewProps) {
   const grouping: RevenueGrouping = param === 'week' || param === 'month' ? param : 'day';
 
+  
   const { fromDay, toDay } = useMemo(() => {
     const preset = GROUPINGS.find((g) => g.value === grouping)!;
     return presetRange(preset.days);
@@ -126,13 +127,14 @@ export default function RevenueReport({ param, onParamChange }: ReportViewProps)
               metrics: [
                 {
                   label: 'Doanh thu',
-
+                  
                   value: r.pricedOrders > 0 ? formatVnd(r.revenue) : '—',
                 },
                 {
                   label: 'Số đơn',
                   value: r.orders,
-
+                  
+                  
                   ...(r.orders > 0
                     ? { to: salesOrdersLink(periodRangeOf(grouping, r.periodKey)) }
                     : { c: 'dimmed' }),

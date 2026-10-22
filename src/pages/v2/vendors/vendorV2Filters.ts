@@ -1,3 +1,5 @@
+
+
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SelectFilter } from '@/components/DesktopFilterBar';
@@ -8,6 +10,8 @@ import { VENDOR_TYPE_CATEGORY } from './vendorV2Form';
 const vendorTypeOf = (row: VendorV2Row) => row.extra?.vendorType;
 
 export function useVendorV2ListFilters(
+  
+  
   _rows: readonly VendorV2Row[],
   values: Readonly<Record<string, string>>,
   setValue: (key: string, value: string | null) => void,

@@ -1,3 +1,5 @@
+
+
 import { Grid, Stack } from '@mantine/core';
 import { IconAddressBook, IconInfoCircle, IconMapPin } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';

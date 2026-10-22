@@ -44,6 +44,7 @@ export function createSalesOrderModule(config: SalesOrderModuleConfig) {
   const { storage, serviceCode, keyPrefix = 'sales-orders' } = config;
 
   return {
+    
     async getById(scope: string, id: string): Promise<SalesOrder | null> {
       const period = extractPeriodFromId(id);
       if (!period) return null;
@@ -52,6 +53,7 @@ export function createSalesOrderModule(config: SalesOrderModuleConfig) {
       return items.find((o) => o.id === id) ?? null;
     },
 
+    
     async create(scope: string, input: CreateSalesOrderInput): Promise<SalesOrder> {
       validateCreateInput(input);
       const period = getCurrentPeriod();
@@ -65,6 +67,7 @@ export function createSalesOrderModule(config: SalesOrderModuleConfig) {
       return order;
     },
 
+    
     async update(scope: string, id: string, input: UpdateSalesOrderInput): Promise<SalesOrder> {
       const period = extractPeriodFromId(id);
       if (!period) throw new NotFoundError('SalesOrder', id);
@@ -88,6 +91,7 @@ export function createSalesOrderModule(config: SalesOrderModuleConfig) {
       return updated;
     },
 
+    
     async query(scope: string, filter: SalesOrderFilter): Promise<SalesOrder[]> {
       let allOrders: SalesOrder[];
 
@@ -108,6 +112,7 @@ export function createSalesOrderModule(config: SalesOrderModuleConfig) {
       return filterOrders(allOrders, filter);
     },
 
+    
     async querySync(
       scope: string,
       params: { fromPeriod: string; toPeriod: string; partitionHashes?: Record<string, string> },

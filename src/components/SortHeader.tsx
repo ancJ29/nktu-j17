@@ -12,7 +12,7 @@ export function SortHeader({
   readonly field: string;
   readonly current?: string;
   readonly onChange?: (field: string) => void;
-
+  
   readonly firstDir?: 'asc' | 'desc';
 }) {
   if (!onChange) return <>{label}</>;

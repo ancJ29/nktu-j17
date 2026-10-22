@@ -9,7 +9,7 @@ export const TRANSPORT_ROUTE_RECORD_TARGET = {
 
 export const useTransportRouteStore = createSingleRecordsStore<TransportRouteRow>({
   ...TRANSPORT_ROUTE_RECORD_TARGET,
-
+  
   cacheKey: 'trt.4b7e21',
   cacheTTL: 10 * ONE_MINUTE,
 });

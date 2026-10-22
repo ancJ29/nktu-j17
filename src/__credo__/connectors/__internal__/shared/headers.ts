@@ -12,12 +12,12 @@ export type StoragesShape = {
   internalAccessKey?: string | undefined;
   accessKey?: string | undefined;
   authToken?: string | undefined;
-
+  
   deviceId?: string | undefined;
   adminKey?: string | undefined;
   superAdminAccessKey?: string | undefined;
   trustedServiceKey?: string | undefined;
-
+  
   beforeRequest?: (() => Promise<unknown>) | undefined;
 };
 
@@ -52,6 +52,10 @@ export function buildHeaders({
   nonceMethod = '',
   noncePath = '',
 }: BuildHeadersOptions = {}): Record<string, string> {
+  
+  
+  
+  
   const headers: Record<string, string> = {
     'x-connector-version': CONNECTOR_VERSION,
   };
@@ -72,6 +76,9 @@ export function buildHeaders({
     headers['x-timestamp'] = timestamp;
   }
 
+  
+  
+  
   if (storages?.deviceId) {
     headers['x-device-id'] = storages.deviceId;
   }
@@ -87,6 +94,11 @@ export function buildHeaders({
     }
   }
 
+  
+  
+  
+  
+  
   if (storages?.target) {
     headers['x-target'] = storages.target;
   }
@@ -103,6 +115,9 @@ export function buildHeaders({
     headers['x-access-key'] = accessKey ?? storages?.accessKey ?? '';
   }
 
+  
+  
+  
   if (adminKey || storages?.adminKey) {
     headers['x-admin-key'] = adminKey ?? storages?.adminKey ?? '';
   }

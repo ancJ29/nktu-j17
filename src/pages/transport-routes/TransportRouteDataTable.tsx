@@ -29,9 +29,12 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
   const { t } = useTranslation();
   const truckTypeLabel = useTruckTypeLabel();
   const truckingSizeLabel = useTruckingSizeLabel();
-
+  
+  
+  
   const { costOf } = useRouteCosting();
 
+  
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
   const toggleExpanded = useCallback((id: string) => {
     setExpandedIds((prev) => {
@@ -45,7 +48,9 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
     () => [
       {
         key: 'code',
-
+        
+        
+        
         width: '170px',
         header: (
           <Stack gap={0}>
@@ -55,7 +60,10 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
             </Text>
           </Stack>
         ),
-
+        
+        
+        
+        
         render: (r: TransportRouteRow) => (
           <Stack gap={0}>
             <Text ff="monospace" fz="sm" fw={600}>
@@ -85,9 +93,19 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
           ),
       },
       {
+        
+        
+        
+        
         key: 'route',
         header: t('transportRoutes.columns.route'),
-
+        
+        
+        
+        
+        
+        
+        
         onCellClick: (r: TransportRouteRow, event: MouseEvent) => {
           if (!r.isMultiTrip) return;
           event.stopPropagation();
@@ -98,7 +116,10 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
             legs={routeJourneyLegs(r)}
             expanded={expandedIds.has(r.id)}
             onToggle={() => toggleExpanded(r.id)}
-
+            
+            
+            
+            
             lines={2}
           />
         ),
@@ -115,7 +136,9 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         key: 'truckingSize',
         width: '105px',
         header: t('transportRoutes.columns.truckingSize'),
-
+        
+        
+        
         render: (r: TransportRouteRow) =>
           routeTruckingSizeMissing(r) ? (
             <Text size="sm" c="orange" title={t('transportRoutes.form.truckingSizeMissingHint')}>
@@ -139,7 +162,8 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         key: 'laborCost',
         width: '130px',
         header: t('transportRoutes.columns.laborCost'),
-
+        
+        
         render: (r: TransportRouteRow) => (
           <Text size="sm" ta="right">
             {formatMoney(routeLaborTotal(r))}
@@ -156,7 +180,9 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
             <Text
               size="sm"
               ta="right"
-
+              
+              
+              
               c={costing.missing.length > 0 ? 'orange' : undefined}
               title={
                 costing.missing.length > 0
@@ -177,7 +203,9 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
         key: 'suggestedPrice',
         width: '130px',
         header: t('transportRoutes.costing.suggestedPriceShort'),
-
+        
+        
+        
         render: (r: TransportRouteRow) => {
           const costing = costOf(r);
           if (costing.markupPercent <= 0) {
@@ -226,7 +254,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
       columns={columns}
       isLoading={isLoading}
       emptyMessage={t('transportRoutes.noResults')}
-
+      
       detailRoute={ROUTES.TRANSPORT_ROUTES.EDIT}
       maxHeight="calc(100vh - 250px)"
       viewportRef={viewportRef}

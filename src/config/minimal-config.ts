@@ -1,3 +1,5 @@
+
+
 import type { CMngtAppConfig as AppConfig } from '@credo/kits/types';
 import { CMngtAppConfigSchema } from './schema';
 
@@ -22,7 +24,7 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
   languages: [
     {
       code: 'vi',
-
+      
       label: 'Tiếng Việt',
       flag: '🇻🇳',
     },
@@ -63,7 +65,11 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
       },
     ],
   },
-
+  
+  
+  
+  
+  
   features: {
     common: {
       darkMode: false,
@@ -74,7 +80,12 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
       allowLogin: true,
     },
   },
-
+  
+  
+  
+  
+  
+  
   permissions: {
     employee: {
       canView: true,

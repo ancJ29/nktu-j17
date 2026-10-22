@@ -10,6 +10,7 @@ type BeforeInstallPromptEvent = {
 } & Event;
 
 export type PWAInstallPromptProps = {
+  
   color?: string;
   labels?: {
     installTitle: string;
@@ -44,6 +45,7 @@ export function PWAInstallPrompt({ color, labels }: PWAInstallPromptProps) {
     return () => globalThis.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
+  
   useEffect(() => {
     const handleToggle = () => {
       if (deferredPrompt) {

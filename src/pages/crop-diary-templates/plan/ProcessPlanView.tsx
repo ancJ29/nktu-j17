@@ -21,7 +21,8 @@ export function ProcessPlanView({ plan }: Props) {
   const { t } = useTranslation();
 
   const totals = useMemo(() => seasonTotals(makeCropSheetExtra(plan)), [plan]);
-
+  
+  
   const stageSpans = useMemo(
     () => sheetStageSpans(plan.days.map((d) => ({ stage: stageOf(d.day, plan.stages)?.name }))),
     [plan],

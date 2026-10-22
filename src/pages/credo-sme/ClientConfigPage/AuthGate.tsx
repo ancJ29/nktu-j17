@@ -1,3 +1,5 @@
+
+
 import { Alert, Button, Card, Group, PasswordInput, Stack, Text, Title } from '@mantine/core';
 import { IconKey, IconShieldLock } from '@tabler/icons-react';
 import { useCallback, useState } from 'react';
@@ -18,6 +20,9 @@ export function AuthGate({ onAuthed }: { onAuthed: (accessKey: string) => void }
 
     const trimmed = value.trim();
 
+    
+    
+    
     credoSmeConnector.setAccessKey(trimmed);
     try {
       const res = await credoSmeConnector.listClients();

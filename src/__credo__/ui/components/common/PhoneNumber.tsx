@@ -6,10 +6,11 @@ import { formatPhoneNumber } from '@credo/kits/formatted';
 import { Tooltip } from '../common/Tooltip';
 
 type PhoneNumberProps = {
+  
   readonly value: string;
-
+  
   readonly copyTooltip: string;
-
+  
   readonly copiedTooltip: string;
 } & Omit<TextProps, 'children'>;
 

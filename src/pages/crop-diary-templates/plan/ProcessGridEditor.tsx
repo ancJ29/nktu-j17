@@ -18,14 +18,20 @@ export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
   const { t } = useTranslation();
   const dayLabel = t('cropDiaryTemplates.plan.day');
 
+  
+  
+  
   const stageNameFor = useMemo(() => {
     const map = new Map<number, string>();
     for (const stage of stages) {
+      
+      
       if (stageOf(stage.fromDay, stages) === stage) map.set(stage.fromDay, stage.name);
     }
     return map;
   }, [stages]);
 
+  
   const latest = useRef({ days, onChange });
   useEffect(() => {
     latest.current = { days, onChange };
@@ -37,7 +43,8 @@ export function ProcessGridEditor({ columns, days, stages, onChange }: Props) {
       days.map((d) => {
         if (d.day !== day) return d;
         const values = { ...d.values };
-
+        
+        
         const next = sheetCellValue(raw);
         if (next === undefined) delete values[key];
         else values[key] = next;
@@ -126,7 +133,7 @@ const GridRow = memo(function GridRow({
   readonly day: SheetDay;
   readonly columns: SheetColumn[];
   readonly stageName?: string;
-
+  
   readonly dayLabel: string;
   readonly onCellChange: (day: number, key: string, raw: string) => void;
 }) {

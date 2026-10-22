@@ -9,11 +9,12 @@ import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } f
 import { PRODUCT_LINK_HIDES_SKU } from '@/config/productDisplayDefaults';
 
 type ProductLinkProps = {
+  
   code: string | undefined | null;
-
+  
   name?: string | undefined | null;
   size?: LinkSize;
-
+  
   photoOnHover?: boolean;
 };
 
@@ -46,6 +47,10 @@ export function ProductLink({ code, name, size = 'sm', photoOnHover = false }: P
     chip
   );
 
+  
+  
+  
+  
   if (!photoOnHover || !productImagesEnabled || !product) return content;
 
   const photoUrl = product.extra?.images?.[0]?.url?.trim();

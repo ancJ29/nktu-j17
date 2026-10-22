@@ -10,6 +10,8 @@ const LEGACY_MANAGER_DEPARTMENT_CODE = 'manager';
 const canViewReport = perms.report.canView();
 
 export function useCanAccessReports(): boolean {
+  
+  
   const isRootUser = useIsRoot();
 
   const currentEmployee = useMyEmployee();

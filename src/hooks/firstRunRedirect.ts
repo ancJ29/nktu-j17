@@ -1,14 +1,17 @@
+
+
 import { ROUTES } from '@/constants/routes';
 
 export type FirstRunRedirectInput = {
+  
   isRoot: boolean;
-
+  
   initialized: boolean;
-
+  
   employeeCount: number;
-
+  
   employeesEnabled: boolean;
-
+  
   canCreateEmployee: boolean;
 };
 

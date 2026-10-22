@@ -1,3 +1,5 @@
+
+
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -32,7 +34,7 @@ type FooterAmount = 'service' | 'chiHo' | 'moor' | 'manual' | 'sum';
 type PaymentFooter = {
   notes: ReadonlyArray<FooterNote>;
   box: ReadonlyArray<{ label: string; amount: FooterAmount }>;
-
+  
   boxedAmounts: boolean;
 };
 
@@ -70,7 +72,7 @@ const FULL_FOOTER: PaymentFooter = {
   box: [
     { label: 'Số tiền cước vận chuyển:', amount: 'service' },
     { label: 'Số tiền chi hộ: Dũng Uy xuất lại', amount: 'manual' },
-
+    
     { label: 'Phí neo', amount: 'moor' },
     { label: 'Số tiền chi hộ đã xuất cho Cát Hải', amount: 'chiHo' },
     { label: 'Tổng cộng thanh toán', amount: 'sum' },
@@ -98,18 +100,19 @@ const FEE_NAMES: Record<Type5FeeColumn, string> = {
 type FeeHeader = { column: Type5FeeColumn; header: string };
 
 type SheetLayout = {
+  
   moorDates: boolean;
   orderNoHeader: string;
-
+  
   service: ReadonlyArray<FeeHeader>;
-
+  
   moorFee: boolean;
   chiHoTitle: string;
-
+  
   chiHo: ReadonlyArray<FeeHeader>;
-
+  
   chiHoNote?: string;
-
+  
   trailing: ReadonlyArray<{ header: string; manual: boolean }>;
 };
 
@@ -123,7 +126,7 @@ const IMPORT_LAYOUT: SheetLayout = {
     { column: 'power', header: 'PHÍ ĐIỆN' },
   ],
   moorFee: false,
-
+  
   chiHoTitle: 'DŨNG UY CHI HỘ (HD KHÁCH)',
   chiHo: [
     { column: 'lift', header: 'PHÍ NÂNG' },
@@ -146,7 +149,7 @@ const EXPORT_LAYOUT: SheetLayout = {
     { column: 'xlhn', header: 'Phí XLHN' },
   ],
   moorFee: true,
-
+  
   chiHoTitle: '',
   chiHo: [
     { column: 'lift', header: 'PHÍ NÂNG' },
@@ -197,9 +200,9 @@ function readOrderMoney(
   let vatBase = 0;
 
   for (const fee of readFeeLines(order)) {
-    if (!isBillableFee(fee)) continue;
+    if (!isBillableFee(fee)) continue; 
     const column = columnOf(fee.label);
-    if (!column) continue;
+    if (!column) continue; 
     const amount = (fee as TransportOrderFee).amount || 0;
     amounts[column] += amount;
     if (service.has(column)) {
@@ -212,6 +215,9 @@ function readOrderMoney(
   const vat = roundVat(vatBase * (order.vatRate || 0), !!order.roundDown);
   const invoices = {} as Record<Type5FeeColumn, string>;
   for (const column of Object.keys(FEE_NAMES) as Type5FeeColumn[]) {
+    
+    
+    
     invoices[column] = (invoiceNos[column] ?? []).join(', ');
   }
 
@@ -304,7 +310,7 @@ const SHEETS: ReadonlyArray<{
   titleSuffix: string;
   includes: (order: TransportOrder) => boolean;
   layout: SheetLayout;
-
+  
   footer: PaymentFooter;
 }> = [
   {
@@ -335,11 +341,13 @@ export const buildCustomerReportType5: CustomerReportBuilder = (orders, input) =
 
   const sheets = SHEETS.map((sheet) => ({ ...sheet, rows: rows.filter(sheet.includes) }));
   const printed = rows.filter((o) => sheets.some((s) => s.rows.includes(o)));
-
+  
   const periodLabel = bangKePeriodLabel(printed);
 
   const workbook = XLSX.utils.book_new();
   for (const sheet of sheets) {
+    
+    
     XLSX.utils.book_append_sheet(
       workbook,
       buildSheet(
@@ -353,6 +361,8 @@ export const buildCustomerReportType5: CustomerReportBuilder = (orders, input) =
     );
   }
 
+  
+  
   return { workbook, rowCount: printed.length };
 };
 
@@ -362,7 +372,8 @@ function buildSheet(
     seller,
     customer,
     resolveShipmentType,
-
+    
+    
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -374,6 +385,8 @@ function buildSheet(
   const columnOf = feeColumnReader(resolveFeeName, layoutColumns(layout));
   const truckLabel = truckLabeler(getTruckPlate);
 
+  
+  
   let cursor = 0;
   const take = (width = 1) => {
     const c = cursor;
@@ -397,7 +410,7 @@ function buildSheet(
   const C_VAT = take();
   const C_TOTAL = take();
   const C_MOOR = layout.moorFee ? take() : -1;
-
+  
   const C_CHI_HO0 = take(layout.chiHo.length * 2);
   const C_CHI_HO_NOTE = layout.chiHoNote ? take() : -1;
   const C_TRAILING0 = take(layout.trailing.length);
@@ -405,6 +418,7 @@ function buildSheet(
   const lastCol = colCount - 1;
   const chiHoMoneyCol = (i: number) => C_CHI_HO0 + i * 2;
 
+  
   const MANUAL_COLS = layout.trailing.flatMap((col, i) => (col.manual ? [C_TRAILING0 + i] : []));
   const moneyCols = [
     ...layout.service.map((_s, i) => C_SERVICE0 + i),
@@ -417,6 +431,9 @@ function buildSheet(
     (c) => c >= 0,
   );
 
+  
+  
+  
   const C_BOX_LABEL0 = layout.moorFee ? C_TOTAL : C_VAT - 1;
   const C_BOX_LABEL1 = C_BOX_LABEL0 + 1;
   const C_BOX_AMOUNT = C_BOX_LABEL1 + 1;
@@ -426,8 +443,10 @@ function buildSheet(
   const sheet = createSheetWriter(colCount);
   const { aoa, merges, blankRow } = sheet;
 
+  
   const letterheadRows = sheet.letterhead(seller, customer, bangKeTitle(titleSuffix, periodLabel));
 
+  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
 
   leaf(C_STT, 'STT');
@@ -460,6 +479,7 @@ function buildSheet(
   );
   layout.trailing.forEach((col, i) => leaf(C_TRAILING0 + i, col.header));
 
+  
   const sums = new Map<number, number>();
   const addSum = (col: number, amount: number) => sums.set(col, (sums.get(col) ?? 0) + amount);
   const sizeCounts = SIZE_BUCKETS.map(() => 0);
@@ -483,7 +503,7 @@ function buildSheet(
         if (typeof dropoffDate === 'string' && dropoffDate) {
           row[C_DROP_DATE] = formatDate(dropoffDate);
         }
-
+        
         if (typeof moocStorageDays === 'number') row[C_MOOR_DAYS] = moocStorageDays;
       }
       row[C_TRUCK] = plateOf(order, truckLabel);
@@ -499,6 +519,8 @@ function buildSheet(
       row[C_STUFFING] = route.stuffing;
       row[C_TO] = route.dropoff;
 
+      
+      
       const putMoney = (c: number, amount: number) => {
         if (amount !== 0) row[c] = amount;
         addSum(c, amount);
@@ -516,6 +538,9 @@ function buildSheet(
       aoa.push(row);
     }
 
+    
+    
+    
     aoa[rBlockStart]![C_ORDER_NO] = group[0]!.extra?.customerOrderNumber ?? '';
     if (group.length > 1) {
       merges.push({
@@ -526,6 +551,7 @@ function buildSheet(
   }
   const rLastData = aoa.length - 1;
 
+  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -537,13 +563,14 @@ function buildSheet(
     aoa.push(row);
   }
 
+  
   blankRow();
   const rFooter = aoa.length;
   {
     const service = sums.get(C_TOTAL) ?? 0;
     const chiHo = layout.chiHo.reduce((s, _c, i) => s + (sums.get(chiHoMoneyCol(i)) ?? 0), 0);
     const moor = C_MOOR >= 0 ? (sums.get(C_MOOR) ?? 0) : 0;
-
+    
     const cached: Record<FooterAmount, number> = {
       service,
       chiHo,
@@ -575,8 +602,10 @@ function buildSheet(
     }
   }
 
+  
   const signature = sheet.signatureRow(customer.name, seller.name);
 
+  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -598,7 +627,8 @@ function buildSheet(
     makeStyler(ws);
 
   styleLetterhead(letterheadRows);
-
+  
+  
   styleHeaderBand([rHead1, rHead2], lastCol, (c) =>
     MANUAL_COLS.includes(c) ? MANUAL_FILL : HEADER_FILL,
   );
@@ -625,6 +655,9 @@ function buildSheet(
       if (note.value !== undefined) setStyle(rFooter + i, C_NOTE_VALUE, red);
     });
 
+    
+    
+    
     const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
     const lastBoxCol = footer.boxedAmounts ? C_BOX_AMOUNT : C_BOX_LABEL1;
     footer.box.forEach((line, i) => {
