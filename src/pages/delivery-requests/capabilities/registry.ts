@@ -1,5 +1,3 @@
-
-
 import { z } from 'zod';
 import type { CapabilityDefinition, CapabilityId } from './types';
 
@@ -78,4 +76,3 @@ export const CAPABILITY_REGISTRY: Record<CapabilityId, CapabilityDefinition> = {
     configSchema: lockLineEditsConfigSchema,
   },
 };
-

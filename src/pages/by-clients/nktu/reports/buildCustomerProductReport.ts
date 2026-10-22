@@ -1,5 +1,3 @@
-
-
 import type { ResolvedStatusOption } from '@/utils/permission';
 import type { SalesOrder } from '@/types';
 import type { ResolvedPeriod } from './reportPeriods';
@@ -15,7 +13,6 @@ import type {
 const viNum = new Intl.NumberFormat('vi-VN');
 
 export interface CustomerProductBuildDeps {
-  
   statusOptions: ResolvedStatusOption[];
   customerOf: (order: SalesOrder) => CustomerIdentity;
 }
@@ -40,7 +37,7 @@ export function buildCustomerProductReport(
   const customers = new Map<string, CustomerEntry>();
   const products = new Map<string, ProductEntry>();
   const cells = new Map<string, SalesMatrixCell>();
-  
+
   const productCustomers = new Map<string, Set<string>>();
 
   for (const o of orders) {
@@ -64,7 +61,6 @@ export function buildCustomerProductReport(
     const completed = isCompleted(o);
     if (completed) customer.completedOrders += 1;
 
-    
     const seenInOrder = new Set<string>();
 
     for (const it of o.items) {
@@ -93,8 +89,6 @@ export function buildCustomerProductReport(
       if (first) product.orders += 1;
       products.set(pKey, product);
 
-      
-      
       const cKey = `${who.key}\u0000${pKey}`;
       const cell = cells.get(cKey) ?? { c: who.key, p: pKey, qty: 0, amount: 0, orders: 0 };
       cell.qty += qty;
@@ -106,8 +100,6 @@ export function buildCustomerProductReport(
       buyers.add(who.key);
       productCustomers.set(pKey, buyers);
 
-      
-      
       customer.amount += amount;
       if (completed) customer.completedAmount += amount;
     }

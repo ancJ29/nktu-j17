@@ -51,12 +51,9 @@ export function CustomerListPage() {
   const filter = filterState.status;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
-  
-  
-  
+
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  
   const showAddress = useMemo(
     () => allCustomers.some((c) => !!(c.address || c.extra?.addressGoogleMapUrl)),
     [allCustomers],

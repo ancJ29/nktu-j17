@@ -1,4 +1,3 @@
-
 export function randomString(length: number = 10, timeBased: boolean = false) {
   const rnd = Math.random()
     .toString(36)
@@ -17,7 +16,7 @@ export function generateId(mark = 0) {
   const ts = (Date.now() - mark).toString(36);
 
   const randomBuffer = new Uint8Array(10);
-  
+
   crypto.getRandomValues(randomBuffer);
 
   let rand = '';
@@ -68,7 +67,6 @@ function pickRandom(chars: string): string {
 export function generatePassword(length: number = 16): string {
   const len = Math.max(length, 8);
 
-  
   const required = [
     pickRandom(LOWERCASE),
     pickRandom(UPPERCASE),
@@ -76,13 +74,10 @@ export function generatePassword(length: number = 16): string {
     pickRandom(SPECIALS),
   ];
 
-  
   for (let i = required.length; i < len; i++) {
     required.push(pickRandom(ALL_CHARS));
   }
 
-  
-  
   for (let i = required.length - 1; i > 0; i--) {
     const j = randomInt(i + 1);
     [required[i], required[j]] = [required[j]!, required[i]!];

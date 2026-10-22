@@ -28,7 +28,7 @@ function tickLabel(date: string): string {
 type Props = {
   readonly greenhouses: Greenhouse[];
   readonly crops: Crop[];
-  
+
   readonly today: string;
 };
 
@@ -36,8 +36,6 @@ export function GreenhouseTimeline({ greenhouses, crops, today }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  
-  
   const [start, setStart] = useState(() => addDays(today, -7) ?? today);
 
   const chart = useMemo(() => buildTimelineWindow(start, WINDOW_WEEKS), [start]);
@@ -164,8 +162,7 @@ export function GreenhouseTimeline({ greenhouses, crops, today }: Props) {
                             height: ROW_HEIGHT - 14,
                             background: tone,
                             cursor: 'pointer',
-                            
-                            
+
                             borderRadius: 4,
                             borderTopLeftRadius: bar.clippedStart ? 0 : 4,
                             borderBottomLeftRadius: bar.clippedStart ? 0 : 4,

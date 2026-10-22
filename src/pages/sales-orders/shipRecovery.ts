@@ -1,5 +1,3 @@
-
-
 import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { EntityConflictError } from '@/stores/createEntityStore';
@@ -36,7 +34,6 @@ export type AmbiguousShipLine = {
 };
 
 export type PendingShipVerdict =
-  
   | { kind: 'none' }
   /** Rows still hold what the marker promised: the deduction is owed. */
   | { kind: 'owed'; owed: InventoryLinkageSnapshotEntry[]; alreadyAppliedCount: number }
@@ -71,8 +68,6 @@ export function classifyPendingShip(params: {
   for (const entry of pending.snapshot) {
     const row = resolveSnapshotRow(rowsByItem.get(entry.itemCode) ?? [], entry);
     if (!row) {
-      
-      
       ambiguous.push({
         itemCode: entry.itemCode,
         locationCode: entry.locationCode,
@@ -105,9 +100,6 @@ export function classifyPendingShip(params: {
       }
     }
 
-    
-    
-    
     if (held > 0 && consumed > 0) {
       ambiguous.push({
         itemCode: entry.itemCode,
@@ -167,15 +159,12 @@ export async function recoverPendingShip(params: {
     if (plan.plan.ops.length > 0) {
       const exec = await executeReservationPlan(plan.plan.ops);
       if (!exec.ok) {
-        
-        
         useProductInventoryStore.getState().forceRefresh();
         return { kind: 'failed', error: exec.error };
       }
       shippedRowCount = exec.applied.length;
       useProductInventoryStore.getState().forceRefresh();
-      
-      
+
       emitInventoryActivityForApplied(exec.applied, {
         kind: 'SO',
         id: so.id,
@@ -185,9 +174,6 @@ export async function recoverPendingShip(params: {
     }
   }
 
-  
-  
-  
   try {
     await patchShippedLinkage(so, actor);
   } catch (err) {
@@ -214,10 +200,6 @@ export async function recoverPendingShip(params: {
       ? { kind: 'applied', rowCount: shippedRowCount }
       : { kind: 'confirmed' };
 
-  
-  
-  
-  
   logActivity('salesOrder.shipRecovery', so.id, {
     orderNumber: so.orderNumber,
     outcome: outcome.kind,
@@ -243,8 +225,7 @@ async function patchShippedLinkage(
     patch: {
       extra: {
         ...extra,
-        
-        
+
         inventoryLinkage: buildShippedLinkage(
           pending.snapshot,
           pending.at,

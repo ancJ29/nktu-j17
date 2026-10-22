@@ -5,9 +5,9 @@ export type PendingPhoto = {
   id: string;
   blob: Blob;
   contentType: string;
-  
+
   fileName: string;
-  
+
   displayName: string;
   imageDirectory: string;
   target: { kind: PendingPhotoTargetKind; id: string };
@@ -22,9 +22,9 @@ export type PendingPhoto = {
   };
   createdAt: number;
   attempts: number;
-  
+
   attached: boolean;
-  
+
   uploadedUrl?: string;
 };
 

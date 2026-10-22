@@ -175,9 +175,6 @@ export function ProductDetailPage() {
     [t],
   );
 
-  
-  
-  
   const [searchParams] = useSearchParams();
   const initialTab =
     isMobile && inventoryEnabled && searchParams.get('tab') === 'inventory'
@@ -187,14 +184,9 @@ export function ProductDetailPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string | null>(initialTab);
-  
-  
-  
+
   const salesTabVisible = useCanAccessReports();
 
-  
-  
-  
   const descEdit = useCardEdit<string>();
   const specsEdit = useCardEdit<Array<{ key: string; value: string }>>();
   const warehouseMemoEdit = useCardEdit<string>();
@@ -218,14 +210,13 @@ export function ProductDetailPage() {
         navigate(ROUTES.PRODUCTS.LIST, { replace: true });
         return;
       }
-      
+
       setProduct(cached);
       setLoading(false);
       return;
     }
     setLoading(true);
 
-    
     asyncDeduplicator.call(`product:${id}`, async () => {
       await cMngtConnector
         .getProductById<ProductExtra>({ id })
@@ -247,25 +238,13 @@ export function ProductDetailPage() {
     });
   }, [id, t, navigate]);
 
-  
-  
-  
-  
   useEffect(() => {
     void useProductInventoryStore.getState().revalidate();
   }, []);
 
-  
-  
-  
-  
   const handleDelete = useCallback(async () => {
     if (!id || !product) return;
-    
-    
-    
-    
-    
+
     if (inventoryEnabled) {
       const liveItems = useProductInventoryStore.getState().items;
       let liveTotal = 0;
@@ -377,11 +356,7 @@ export function ProductDetailPage() {
           patch: { extra: nextExtra },
         });
         setProduct(updated);
-        
-        
-        
-        
-        
+
         logActivity('product.updateImages', product.id);
       } catch (err) {
         if (err instanceof EntityConflictError) {
@@ -400,10 +375,6 @@ export function ProductDetailPage() {
     [product, t],
   );
 
-  
-  
-  
-  
   const patchProduct = useCallback(
     async (patch: Partial<Product>, auditVerb?: string) => {
       if (!product) return;
@@ -414,12 +385,7 @@ export function ProductDetailPage() {
           patch,
         });
         setProduct(updated);
-        
-        
-        
-        
-        
-        
+
         if (auditVerb) {
           const before: Record<string, unknown> = {};
           for (const k of Object.keys(patch)) {
@@ -453,10 +419,6 @@ export function ProductDetailPage() {
     [product, patchProduct],
   );
 
-  
-  
-  
-  
   const handleToggleHiddenFromInventoryList = useCallback(
     async (next: boolean) => {
       await patchExtra(
@@ -467,29 +429,18 @@ export function ProductDetailPage() {
     [patchExtra],
   );
 
-  
-  
   const employees = useEmployeeStore((s) => s.items);
 
-  
   const inventoryItems = useProductInventoryStore((s) => s.items);
   const inventoryInitialized = useProductInventoryStore((s) => s.initialized);
   const loadInventory = useProductInventoryStore((s) => s.loadAll);
 
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!inventoryEnabled || inventoryInitialized) return;
     if (isMobile && activeTab !== 'inventory') return;
     loadInventory();
   }, [inventoryInitialized, loadInventory, activeTab]);
 
-  
-  
   const totalOnHand = useMemo(() => {
     if (!inventoryEnabled || !product) return 0;
     let sum = 0;
@@ -500,18 +451,8 @@ export function ProductDetailPage() {
     return sum;
   }, [inventoryItems, product]);
 
-  
-  
-  
-  
   const isDeleteBlocked = inventoryEnabled && totalOnHand > 0;
 
-  
-  
-  
-  
-  
-  
   const productRowCount = useMemo(() => {
     if (!inventoryEnabled || !product) return 0;
     let n = 0;
@@ -526,20 +467,15 @@ export function ProductDetailPage() {
     useDisclosure(false);
   const handleEnterInventory = useCallback(() => {
     if (!canShowEnterInventory) return;
-    
-    
+
     if (isMobile) setActiveTab('inventory');
     openEnterInventory();
   }, [canShowEnterInventory, openEnterInventory]);
 
-  
-  
-  
-  
   const location = useLocation();
   const navigationState = location.state as {
     promptInventory?: boolean;
-    
+
     backTo?: string;
   } | null;
   const backTo = navigationState?.backTo ?? ROUTES.PRODUCTS.LIST;
@@ -548,7 +484,7 @@ export function ProductDetailPage() {
   useEffect(() => {
     if (navigationState?.promptInventory && canShowEnterInventory) {
       openInventoryPrompt();
-      
+
       navigate(location.pathname + location.search, { replace: true, state: null });
     }
   }, [navigationState, canShowEnterInventory, openInventoryPrompt, navigate, location]);
@@ -561,12 +497,6 @@ export function ProductDetailPage() {
   const extra: ProductExtra = product?.extra ?? {};
   const altNames = extra.alternativeNames ?? [];
 
-  
-  
-  
-  
-  
-  
   const altNamesLine =
     !isMobile && altNames.length > 0 ? (
       <Text size="sm" lh={1.35}>
@@ -610,8 +540,6 @@ export function ProductDetailPage() {
 
   const barcodeClipboard = useClipboard({ timeout: 1500 });
 
-  
-  
   const me = useMyEmployee();
 
   if (loading) return null;
@@ -630,8 +558,7 @@ export function ProductDetailPage() {
   const allUnits =
     extra.units && extra.units.length > 0 ? extra.units : product.unit ? [product.unit] : [];
   const conversions = extra.unitConversions ?? [];
-  
-  
+
   const images: ProductImageEntry[] = imagesEnabled ? (extra.images ?? []) : [];
 
   const baseUnit = getItemBaseUnit(product);
@@ -641,10 +568,6 @@ export function ProductDetailPage() {
   const isBelowMin = typeof lowThreshold === 'number' && totalOnHand < lowThreshold;
   const stockColor = totalOnHand < 0 || isBelowMin ? 'red' : isLow ? 'orange' : undefined;
 
-  
-  
-  
-  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button
@@ -682,7 +605,6 @@ export function ProductDetailPage() {
     </Group>
   );
 
-  
   const badgesRow = (
     <Group gap={6} wrap="wrap">
       <ActiveBadge
@@ -718,21 +640,10 @@ export function ProductDetailPage() {
       </Stack>
     ) : null;
 
-  
-  
-  
-
   const timestampsLine = isMobile ? null : (
     <TimestampLine updatedAt={product.updatedAt} createdAt={product.createdAt} />
   );
 
-  
-  
-  
-  
-  
-  
-  
   const sku = extra.sku?.trim();
   const skuLine = !sku ? null : isMobile ? (
     <Group gap={4} wrap="nowrap">
@@ -743,9 +654,6 @@ export function ProductDetailPage() {
     <CodeLabel code={sku} />
   );
 
-  
-  
-  
   const headerRow = isMobile ? (
     <Stack gap="sm">
       <Group gap="md" wrap="nowrap" align="flex-start">
@@ -795,10 +703,6 @@ export function ProductDetailPage() {
     </Group>
   );
 
-  
-  
-  
-  
   const descriptionBody = descEdit.editing ? (
     <Textarea
       value={descEdit.draft ?? ''}
@@ -880,11 +784,6 @@ export function ProductDetailPage() {
     </SectionCard>
   );
 
-  
-  
-  
-  
-  
   const storedSpecs: Array<{ key: string; value: string }> = Array.isArray(extra.techSpecs)
     ? extra.techSpecs
     : [];
@@ -978,10 +877,6 @@ export function ProductDetailPage() {
     </SectionCard>
   ) : null;
 
-  
-  
-  
-  
   const cDraft = classEdit.draft;
   const emptyDash = (
     <Text size="sm" c="dimmed" fs="italic">
@@ -1131,7 +1026,6 @@ export function ProductDetailPage() {
     </SectionCard>
   );
 
-  
   const barcodeSvg = (
     <Box
       style={{
@@ -1169,8 +1063,6 @@ export function ProductDetailPage() {
     </Button>
   );
 
-  
-  
   const barcodeControls = isMobile ? (
     <Group justify="space-between" align="center" gap="sm" wrap="nowrap">
       {barcodeFormatLabel}
@@ -1183,10 +1075,6 @@ export function ProductDetailPage() {
     </Stack>
   );
 
-  
-  
-  
-  
   const setItems = extra.setItems ?? [];
   const setCompositionCard = isProductSet(product) ? (
     <SectionCard
@@ -1240,23 +1128,10 @@ export function ProductDetailPage() {
       </SectionCard>
     ) : null;
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const minInvUpdatedByEmp = minInv
     ? findEmployeeByLoginEmail(employees, minInv.updatedBy)
     : undefined;
-  
-  
-  
-  
-  
+
   const warehouseMemoCard = (
     <SectionCard
       icon={<IconBuildingWarehouse size={14} />}
@@ -1331,17 +1206,13 @@ export function ProductDetailPage() {
     </SectionCard>
   ) : null;
 
-  
-  
-  
   const currentInventoryCard = inventoryEnabled ? (
     <ProductInventorySection
       product={product}
       createOpened={enterInventoryOpened}
       onOpenCreate={openEnterInventory}
       onCloseCreate={closeEnterInventory}
-      
-      
+
       onToggleHiddenFromInventoryList={
         hideFromInventoryListEnabled && canEdit ? handleToggleHiddenFromInventoryList : undefined
       }
@@ -1440,11 +1311,6 @@ export function ProductDetailPage() {
       </Card>
     ) : null;
 
-  
-  
-  
-  
-  
   const desktopDetailsContent = (
     <Grid gutter="md">
       <Grid.Col span={{ base: 12, md: 7 }}>
@@ -1485,7 +1351,6 @@ export function ProductDetailPage() {
     </Stack>
   );
 
-  
   const imageEntries: PhotoEntry[] = images.map((img) => ({ url: img.url, timestamp: '' }));
 
   const uploadCard =

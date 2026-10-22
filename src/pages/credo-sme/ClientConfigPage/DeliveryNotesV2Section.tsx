@@ -1,5 +1,3 @@
-
-
 import { MultiSelect, SimpleGrid, Stack, Switch, Text, TextInput } from '@mantine/core';
 import { NumberField } from '@/components/NumberField';
 import { StatusFlowEditor } from './StatusFlowEditor';

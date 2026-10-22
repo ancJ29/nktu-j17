@@ -1,5 +1,3 @@
-
-
 import { Badge, Code, Group, Stack, Text } from '@mantine/core';
 import { CredoAppConfigSchema, type CredoAppConfig } from '../schema';
 

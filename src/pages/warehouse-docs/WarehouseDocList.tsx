@@ -72,8 +72,6 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
     }
   }, [error, t]);
 
-  
-  
   const applyDateRange = useCallback(
     (next: DateRangeValue) => {
       const effective = next.from && next.to ? next : defaultLastNDaysRange(RANGE_DAYS);
@@ -139,8 +137,6 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
 
   const allLabel = t('common.filters.all');
 
-  
-  
   const mobileFilters: MobileFilterDef[] = [
     ...(postEnabled
       ? [
@@ -184,10 +180,6 @@ export function WarehouseDocList({ kind }: { kind: WarehouseDocKind }) {
 
   const hasActiveFilters = !!search || !!statusFilter || !!picFilter || !dateIsDefault;
 
-  
-  
-  
-  
   const showSelectPills = !isMobile;
   const hasPills = (showSelectPills && (!!statusFilter || !!picFilter)) || !dateIsDefault;
 

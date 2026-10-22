@@ -1,5 +1,3 @@
-
-
 export const OIL_TANK_PREFIX = 'BON';
 
 export const OIL_TANK_PAD = 3;

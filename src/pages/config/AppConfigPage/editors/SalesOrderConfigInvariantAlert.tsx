@@ -11,7 +11,7 @@ export function SalesOrderConfigInvariantAlert({
   knownDepartments,
 }: {
   features: CMngtSalesOrderFeatures;
-  
+
   knownDepartments?: ReadonlySet<string>;
 }) {
   const result = validateSalesOrderConfig(features, knownDepartments);

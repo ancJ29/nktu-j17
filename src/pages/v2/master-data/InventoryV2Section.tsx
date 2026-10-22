@@ -24,29 +24,24 @@ export function InventoryV2Section({
 }: {
   readonly row: { readonly id: string; readonly name: string };
   readonly useStore: InventoryV2Store;
-  
+
   readonly canManage: boolean;
-  
+
   readonly unit?: string | undefined;
-  
+
   readonly minStock?: number | undefined;
-  
+
   readonly alertsOff?: boolean;
 }) {
   const { t } = useTranslation();
   const [opened, { open, close }] = useDisclosure(false);
-  
-  
+
   const canWrite = canManage && !isMobile;
-  
-  
+
   const { byItemId, loading } = useInventoryV2(useStore, true);
   const forceRefresh = useStore((s) => s.forceRefresh);
   const stock = byItemId.get(row.id);
 
-  
-  
-  
   const level = stock ? stockLevelOf({ stock, min: minStock, alertsOff }) : undefined;
 
   return (
@@ -139,9 +134,6 @@ export function InventoryV2Section({
           ) : (
             <Stack gap="xs">
               <InventoryRowCard
-                
-                
-                
                 locationCode={DEFAULT_LOCATION_CODE}
                 onHand={stock.onHand}
                 baseUnit=""

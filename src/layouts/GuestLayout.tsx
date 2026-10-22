@@ -5,9 +5,6 @@ import { Suspense } from 'react';
 import { Navigate, Outlet } from 'react-router';
 
 export function GuestLayout() {
-  
-  
-  
   if (isSignedIn()) {
     return <Navigate to={ROUTES.APP.MAIN} replace />;
   }

@@ -1,4 +1,3 @@
-
 import type { TransportOrder, TransportOrderExtra } from '@/types';
 import { orderTotals, orderTripLaborTotal, readFeeLines } from './transportOrderPricing';
 import { isExternalTruck } from './externalTruck';
@@ -13,11 +12,11 @@ export type TransportOrderFields = {
   entryDate?: TransportOrderFieldDelta;
   truckId?: TransportOrderFieldDelta;
   driverId?: TransportOrderFieldDelta;
-  
+
   truckType?: TransportOrderFieldDelta;
-  
+
   customerOrderNumber?: TransportOrderFieldDelta;
-  
+
   requestedPickupDate?: TransportOrderFieldDelta;
   dropoffDate?: TransportOrderFieldDelta;
   moocStorageDays?: TransportOrderFieldDelta;
@@ -33,11 +32,11 @@ export type TransportOrderFields = {
   feeCount?: TransportOrderFieldDelta;
   advanceAmount?: TransportOrderFieldDelta;
   transportContractNo?: TransportOrderFieldDelta;
-  
+
   tripCount?: TransportOrderFieldDelta;
   tripLaborTotal?: TransportOrderFieldDelta;
   notes?: { changed: true };
-  
+
   scheduleChanged?: { changed: true };
 };
 
@@ -45,7 +44,7 @@ export type TransportOrderCreateMemo = {
   orderNumber: string;
   truckId: string;
   driverId: string;
-  
+
   externalTruck?: string;
   externalDriver?: string;
   customerCode?: string;
@@ -53,13 +52,13 @@ export type TransportOrderCreateMemo = {
   containerNumber?: string;
   truckingSize: string;
   shipmentType: string;
-  
+
   feeCount: number;
   totalAmount: number;
   grandTotal: number;
-  
+
   advanceAmount?: number;
-  
+
   tripCount?: number;
   tripLaborTotal?: number;
 };
@@ -87,8 +86,7 @@ export function createMemo(order: TransportOrder): TransportOrderCreateMemo {
     orderNumber: order.orderNumber,
     truckId: order.truckId,
     driverId: order.driverId,
-    
-    
+
     ...(isExternalTruck(order)
       ? {
           ...(order.truckPlate?.trim() ? { externalTruck: order.truckPlate.trim() } : {}),
@@ -147,16 +145,10 @@ export function diffTransportOrder(
   };
 
   set('entryDate', delta(String(before.entryDate ?? ''), String(after.entryDate ?? '')));
-  
-  
-  
-  
-  
+
   set('truckId', delta(vehicleKey(before), vehicleKey(after)));
   set('driverId', delta(driverKey(before), driverKey(after)));
-  
-  
-  
+
   set('truckType', delta(before.extra?.truckType, after.extra?.truckType));
   set(
     'customerOrderNumber',
@@ -178,22 +170,14 @@ export function diffTransportOrder(
   set('shipmentType', delta(before.shipmentType, after.shipmentType));
   set('route', delta(routeMemo(before), routeMemo(after)));
   set('vatRate', delta(before.vatRate, after.vatRate));
-  
-  
-  
-  
-  
-  
+
   const beforeTotals = orderTotals(before);
   const afterTotals = orderTotals(after);
   set('totalAmount', delta(beforeTotals.subtotal, afterTotals.subtotal));
   set('feeCount', delta(readFeeLines(before).length, readFeeLines(after).length));
   set('advanceAmount', delta(beforeTotals.advanceAmount, afterTotals.advanceAmount));
   set('transportContractNo', delta(before.transportContractNo, after.transportContractNo));
-  
-  
-  
-  
+
   set('tripCount', delta((before.trips ?? []).length, (after.trips ?? []).length));
   set('tripLaborTotal', delta(orderTripLaborTotal(before), orderTripLaborTotal(after)));
 

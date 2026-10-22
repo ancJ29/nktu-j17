@@ -1,5 +1,3 @@
-
-
 import { notifications } from '@mantine/notifications';
 import { useForm, type UseFormReturnType } from '@mantine/form';
 import { useCallback, useMemo, useState } from 'react';
@@ -30,7 +28,6 @@ export function useMasterDataWrites<Row extends MasterDataRow, Values extends Ma
     [text],
   );
 
-  
   const save = useCallback(
     async (
       values: Values,
@@ -38,9 +35,7 @@ export function useMasterDataWrites<Row extends MasterDataRow, Values extends Ma
       form: UseFormReturnType<Values>,
     ): Promise<Row | null> => {
       const code = values.code.trim().toUpperCase();
-      
-      
-      
+
       if (code) {
         const taken = spec.useStore
           .getState()
@@ -71,9 +66,6 @@ export function useMasterDataWrites<Row extends MasterDataRow, Values extends Ma
         if (err instanceof EntityConflictError) {
           conflict();
         } else if (validationFieldsOf(err)) {
-          
-          
-          
           form.setFieldError('code', text.duplicate.archived);
         } else {
           failed();
@@ -86,7 +78,6 @@ export function useMasterDataWrites<Row extends MasterDataRow, Values extends Ma
     [spec, text, conflict, failed],
   );
 
-  
   const setActive = useCallback(
     async (target: Row, isActive: boolean): Promise<boolean> => {
       setBusy(true);
@@ -134,7 +125,7 @@ export function useMasterDataWrites<Row extends MasterDataRow, Values extends Ma
 export function useMasterDataForm<Row extends MasterDataRow, Values extends MasterDataFormValues>(
   spec: MasterDataSpec<Row, Values>,
   editing: Row | null,
-  
+
   initialName?: string,
 ): UseFormReturnType<Values> {
   const { t } = useTranslation();

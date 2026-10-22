@@ -1,4 +1,3 @@
-
 import type { z } from 'zod';
 import type { EnvConfig } from '../types/env';
 import { logger } from './logger';
@@ -39,7 +38,7 @@ export function mergeConfigs<T extends Record<string, unknown>>(
       if (value === undefined) continue;
 
       const defaultValue = result[key];
-      
+
       if (
         defaultValue &&
         typeof defaultValue === 'object' &&
@@ -118,15 +117,12 @@ export function getEnvVar(key: string, defaultValue?: string, ignoreMissing = tr
 export function baseEnvConfig(): EnvConfig {
   const meta = typeof import.meta !== 'undefined' ? (import.meta as any).env : undefined;
   return {
-    
     APP_NAME: getEnvVar('VITE_APP_NAME', 'Credo Admin'),
     APP_VERSION: getEnvVar('VITE_APP_VERSION', '0.0.0'),
     APP_BUILD: getEnvVar('VITE_APP_BUILD', 'dev'),
 
-    
     CREDO_SSO_API_SERVICE_CODE: getEnvVar('VITE_CREDO_CLIENT_CODE'),
 
-    
     IS_DEV: meta?.DEV ?? (globalThis as any).process?.env?.NODE_ENV === 'development',
     IS_PROD: meta?.PROD ?? (globalThis as any).process?.env?.NODE_ENV === 'production',
     IS_LOCAL: window.location.hostname === 'localhost',

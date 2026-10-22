@@ -3,11 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '@/utils/dateFormat';
 
 type Props = {
-  
   readonly counter: number;
-  
+
   readonly diff: number;
-  
+
   readonly lastVerifiedAt?: number | null;
   readonly size?: 'xs' | 'sm';
 };

@@ -56,8 +56,7 @@ export function ProductCardList({
 }: ProductCardListProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  
+
   const categoryLabels = useLookupV2Labels('product-category');
 
   if (isLoading) {
@@ -101,11 +100,6 @@ export function ProductCardList({
           onHand !== null && typeof minValue === 'number' && onHand > 0 && onHand <= minValue;
         const isNegative = onHand !== null && onHand < 0;
 
-        
-        
-        
-        
-        
         const accent = isNegative
           ? 'var(--mantine-color-red-6)'
           : isLow
@@ -124,7 +118,7 @@ export function ProductCardList({
               ...(accent && {
                 borderLeftWidth: 3,
                 borderLeftColor: accent,
-                
+
                 paddingLeft: 'calc(var(--mantine-spacing-md) - 2px)',
               }),
             }}

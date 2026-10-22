@@ -108,7 +108,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
 
   const [tab, setTab] = useState<CropTab>('active');
 
-  
   const allCrops = useCropStore((s) => s.items);
   const cropsInitialized = useCropStore((s) => s.initialized);
   const cropsLoading = useCropStore((s) => s.loading);
@@ -124,7 +123,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     if (!cropsInitialized) loadCrops();
   }, [cropsInitialized, loadCrops]);
 
-  
   const [monthRange, setMonthRange] = useState<[string | null, string | null]>(defaultMonthRange);
   const [harvested, setHarvested] = useState<Crop[]>([]);
   const [harvestedLoading, setHarvestedLoading] = useState(false);
@@ -164,7 +162,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     };
   }, [tab, from, to, greenhouse.code, t]);
 
-  
   const codePreview = useMemo(
     () =>
       buildDailySequentialCode(
@@ -174,7 +171,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     [allCrops],
   );
 
-  
   const templates = useCropDiaryTemplateStore((s) => s.items);
   const templatesInit = useCropDiaryTemplateStore((s) => s.initialized);
   const loadTemplates = useCropDiaryTemplateStore((s) => s.loadAll);
@@ -186,7 +182,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     [templates],
   );
 
-  
   const [formOpened, formHandlers] = useDisclosure(false);
   const [saving, setSaving] = useState(false);
 
@@ -197,12 +192,7 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
       numberOfSeeds: (v) =>
         v !== '' && Number(v) > 0 ? null : t('crops.validation.numberOfSeedsRequired'),
       fromDate: (v) => (v ? null : t('crops.validation.fromRequired')),
-      
-      
-      
-      
-      
-      
+
       diaryTemplateCode: (v) => (v ? null : t('crops.validation.diaryTemplateRequired')),
       totalDates: (v, values) => {
         const n = Number(v);
@@ -233,10 +223,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- form identity is stable across renders
   }, [formHandlers]);
 
-  
-  
-  
-  
   const location = useLocation();
   const addCropRequested = (location.state as { addCrop?: boolean } | null)?.addCrop === true;
   useEffect(() => {
@@ -249,7 +235,6 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
     async (values: CropFormValues) => {
       setSaving(true);
       try {
-        
         if (values.status === 'growing') {
           const occupant = findGrowingCropInGreenhouse(
             useCropStore.getState().items as Crop[],
@@ -287,8 +272,7 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
           },
         });
         notifications.show({ color: 'green', message: t('crops.notifications.createSuccess') });
-        
-        
+
         try {
           await seedCropSheetIfMissing({
             cropId: created.id,
@@ -305,7 +289,7 @@ export function GreenhouseCropsSection({ greenhouse }: Props) {
           });
         }
         formHandlers.close();
-        
+
         setTab('active');
       } catch {
         notifications.show({

@@ -2,13 +2,12 @@ import { getDeterministicColor } from '@credo/base-ui/utils';
 import { Avatar, Text, type AvatarProps } from '@mantine/core';
 
 export type EmployeeAvatarProps = Omit<AvatarProps, 'src' | 'name' | 'color' | 'children'> & {
-  
   readonly name: string | undefined | null;
-  
+
   readonly imageUrl?: string | undefined | null;
-  
+
   readonly initialSize?: string;
-  
+
   readonly initialWeight?: number;
 };
 
@@ -37,9 +36,7 @@ export function EmployeeAvatar({
   ...rest
 }: EmployeeAvatarProps) {
   const safe = name?.trim() ?? '';
-  
-  
-  
+
   if (!map.has(safe)) {
     const color = safe ? getDeterministicColor(safe) : 'gray';
     const initial = getInitial(safe);

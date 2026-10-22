@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import { cacheGet, cacheSet } from '@/utils/appCache';
 import { resolveClientCode } from '@/config/client-code';
@@ -25,8 +23,7 @@ export function loadAllMasterData(): Promise<void> {
 
 function readCachedHashes(clientCode: string): CMngtMasterDataHashes {
   const entry = cacheGet('mdh');
-  
-  
+
   if (!entry || entry.c !== clientCode) return {};
   return entry.h;
 }
@@ -67,10 +64,6 @@ const HASH_KEY_TO_STORE: ReadonlyArray<
 
 function applyListHashes(hashes: CMngtMasterDataHashes): void {
   for (const [key, store] of HASH_KEY_TO_STORE) {
-    
-    
-    
-    
     if (key === 'employees' && employeesOnOwnRegister) continue;
     const h = hashes[key];
     if (h) store.getState().setListHash(h);
@@ -78,16 +71,9 @@ function applyListHashes(hashes: CMngtMasterDataHashes): void {
 }
 
 async function doLoad(): Promise<void> {
-  
-  
-  
-  
-  
   const vendorsReady = useVendorStore.getState().loadAll();
   const customersReady = useCustomerStore.getState().loadAll();
-  
-  
-  
+
   const employeesReady = employeesOnOwnRegister
     ? useEmployeeStore.getState().loadAll()
     : Promise.resolve();
@@ -99,9 +85,6 @@ async function doLoad(): Promise<void> {
   const toSend = buildHashesToSend(cachedHashes);
 
   try {
-    
-    
-    
     const res = await cMngtConnector.getAllMasterData({
       ...(toSend.employees && { employeesHash: toSend.employees }),
       ...(toSend.products && { productsHash: toSend.products }),
@@ -110,24 +93,15 @@ async function doLoad(): Promise<void> {
 
     if (res.changed) {
       const u = res.updated;
-      
-      
-      
+
       if (u.employees && !employeesOnOwnRegister)
         useEmployeeStore.getState().setItems(u.employees as never[]);
       if (u.products) useProductStore.getState().setItems(u.products as never[]);
       if (u.locations) useLocationStore.getState().setItems(u.locations as never[]);
     }
 
-    
-    
-    
-    
-    
     applyListHashes(res.hashes);
 
-    
-    
     saveHashes(clientCode, res.hashes);
 
     logger.debug('Master data: synced', {
@@ -139,44 +113,13 @@ async function doLoad(): Promise<void> {
     // Hydrated-from-cache state remains in place; individual list pages can
     // retry via their own `loadAll` / `forceRefresh`.
   } finally {
-    
-    
-    
     await employeesReady;
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     ensureStoresInitialized();
   }
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   void ensureDefaultLocation();
 
-  
-  
-  
   await Promise.all([vendorsReady, customersReady]);
 }
 

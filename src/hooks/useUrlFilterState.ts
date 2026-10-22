@@ -1,5 +1,3 @@
-
-
 import type { SetURLSearchParams } from 'react-router';
 
 export const URL_KEY = 'f';

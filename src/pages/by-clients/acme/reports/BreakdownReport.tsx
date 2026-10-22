@@ -36,11 +36,11 @@ const isMobile = device.isMobile;
 export interface BreakdownReportProps extends ReportViewProps {
   title: string;
   subtitle: string;
-  
+
   dimensionHeader: string;
-  
+
   dimensionOf: (order: SalesOrderV2) => { key: string; label: string };
-  
+
   links?: {
     entry?: (entry: BreakdownEntry) => string | undefined;
     orders?: (
@@ -133,7 +133,7 @@ export default function BreakdownReport({
               metrics: [
                 {
                   label: 'Doanh thu',
-                  
+
                   value: e.pricedOrders > 0 ? formatVnd(e.revenue) : '—',
                 },
                 {

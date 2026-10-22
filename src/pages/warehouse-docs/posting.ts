@@ -17,11 +17,10 @@ export async function postWarehouseDocInventory(
 ): Promise<void> {
   const sign = direction === 'in' ? 1 : -1;
 
-  
   const deltaByMaterial = new Map<string, Map<string, number>>();
   for (const l of doc.extra.lines ?? []) {
     const material = materialByCode.get(l.itemCode);
-    if (!material) continue; 
+    if (!material) continue;
     const unit = l.unit || material.extra?.units?.[0] || '';
     const qty = Number(l.quantity) || 0;
     if (!unit || qty === 0) continue;
@@ -40,10 +39,6 @@ export async function postWarehouseDocInventory(
     const row = invByCode.get(itemCode);
     const prevOnHand = row?.onHand ?? 0;
 
-    
-    
-    
-    
     let next = row ? readRowBreakdown(row, baseUnit) : {};
     let unpacked: UnpackLeg[] = [];
     if (direction === 'in') {
@@ -53,7 +48,6 @@ export async function postWarehouseDocInventory(
         else next[unit] = q;
       }
     } else {
-      
       const outflows: Record<string, number> = {};
       for (const [unit, delta] of unitDeltas) outflows[unit] = -delta;
       const result = applyOutflowWithUnpack(packagingItem, next, outflows);
@@ -74,12 +68,6 @@ export async function postWarehouseDocInventory(
       });
     }
 
-    
-    
-    
-    
-    
-    
     const unpackNote = unpacked
       .map((u) => `[unpack] ${u.qty} ${u.from} → ${u.produced} ${u.to}`)
       .join(' · ');

@@ -5,15 +5,12 @@ export function entryDatePart(value: CropDiaryEntry['entryDate']): string {
 }
 
 export type DiaryEntryGroups = {
-  
   prep: CropDiaryEntry[];
-  
+
   events: CropDiaryEntry[];
 };
 
 export function splitDiaryEntries(entries: CropDiaryEntry[], startDate?: string): DiaryEntryGroups {
-  
-  
   if (!startDate) return { prep: [], events: entries };
 
   const prep: CropDiaryEntry[] = [];

@@ -27,17 +27,17 @@ const minStockEnabled = hasMaterialMinimumStock();
 type MaterialDataTableProps = {
   readonly materials: Material[];
   readonly isLoading?: boolean;
-  
+
   readonly invByCode?: ReadonlyMap<string, MaterialInventoryRow>;
-  
+
   readonly selectionMode?: boolean;
   readonly isSelected?: (code: string) => boolean;
   readonly onToggleRow?: (code: string) => void;
   readonly onToggleAll?: () => void;
-  
+
   readonly allSelected?: boolean;
   readonly someSelected?: boolean;
-  
+
   readonly onCreateReceipt?: (material: Material) => void;
   readonly onCreateDeliveryNote?: (material: Material) => void;
 };
@@ -147,7 +147,7 @@ export function MaterialDataTable({
   const showRowActions = !selectionMode && !!(onCreateReceipt || onCreateDeliveryNote);
   const unitLabels = useLookupV2Labels(getMaterialUnitCategory());
   const categoryLabels = useLookupV2Labels(MATERIAL_CATEGORY_LOOKUP);
-  
+
   const showCategory = useMemo(() => materials.some((m) => !!m.extra?.category), [materials]);
 
   const columns = useMemo(
@@ -247,10 +247,7 @@ export function MaterialDataTable({
           </Group>
         ),
       },
-      
-      
-      
-      
+
       ...(showRowActions
         ? [
             {
@@ -309,8 +306,6 @@ export function MaterialDataTable({
     ],
   );
 
-  
-  
   const getRowBg = useMemo(
     () =>
       invByCode
@@ -325,8 +320,7 @@ export function MaterialDataTable({
       columns={columns}
       isLoading={isLoading}
       emptyMessage={t('materials.noItems')}
-      
-      
+
       {...(selectionMode
         ? { onRowClick: (item: Material) => onToggleRow?.(item.code) }
         : { detailRoute: ROUTES.MATERIALS.DETAIL })}

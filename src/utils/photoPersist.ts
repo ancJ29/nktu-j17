@@ -28,7 +28,7 @@ export async function writePhotosWithConflictRetry<TRecord, TPhoto extends Photo
   maxAttempts = 3,
 }: {
   record: TRecord;
-  
+
   next: TPhoto[];
   getPhotos: (record: TRecord) => TPhoto[];
   save: (record: TRecord, photos: TPhoto[]) => Promise<TRecord>;
@@ -53,6 +53,5 @@ export async function writePhotosWithConflictRetry<TRecord, TPhoto extends Photo
     }
   }
 
-  
   throw new Error('writePhotosWithConflictRetry: attempts exhausted');
 }

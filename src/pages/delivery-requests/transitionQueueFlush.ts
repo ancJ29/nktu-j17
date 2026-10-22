@@ -18,7 +18,7 @@ export type TransitionFlushResult = {
   applied: number;
   failed: number;
   blocked: number;
-  
+
   updated: DeliveryRequest[];
 };
 
@@ -39,7 +39,7 @@ async function runFlush(t: TFunction, drId?: string): Promise<TransitionFlushRes
 
   const all = await listQueuedTransitions();
   const queued = drId ? all.filter((entry) => entry.id === drId) : all;
-  
+
   const actionable = queued.filter((entry) => !entry.blocked);
   if (!actionable.length) return EMPTY;
 
@@ -48,8 +48,6 @@ async function runFlush(t: TFunction, drId?: string): Promise<TransitionFlushRes
   for (const entry of actionable) {
     const request = await loadDeliveryRequest(entry.id);
     if (!request) {
-      
-      
       if (typeof navigator !== 'undefined' && navigator.onLine === false) break;
       await removeQueuedTransition(entry.id);
       continue;
@@ -64,9 +62,6 @@ async function runFlush(t: TFunction, drId?: string): Promise<TransitionFlushRes
     }
 
     try {
-      
-      
-      
       const proof = await listPendingPhotos({ kind: 'delivery-request', id: entry.id });
 
       const outcome = await runTransition({
@@ -94,8 +89,6 @@ async function runFlush(t: TFunction, drId?: string): Promise<TransitionFlushRes
         continue;
       }
 
-      
-      
       if (outcome.failure.kind === 'patch-conflict') {
         await bumpTransitionAttempts(entry.id);
         result.failed += 1;
@@ -105,14 +98,11 @@ async function runFlush(t: TFunction, drId?: string): Promise<TransitionFlushRes
       if (outcome.failure.kind === 'patch-error') {
         await bumpTransitionAttempts(entry.id);
         result.failed += 1;
-        
-        
+
         if (isNetworkFailure(outcome.failure.error)) break;
         continue;
       }
 
-      
-      
       await markTransitionBlocked(entry.id, outcome.failure.kind);
       result.blocked += 1;
     } catch (err) {
@@ -127,9 +117,6 @@ async function runFlush(t: TFunction, drId?: string): Promise<TransitionFlushRes
 }
 
 async function loadDeliveryRequest(id: string): Promise<DeliveryRequest | null> {
-  
-  
-  
   try {
     const fresh = await cMngtConnector.getDeliveryRequestById<DeliveryRequestExtra>({ id });
     const record = (fresh.deliveryRequest as DeliveryRequest) ?? null;

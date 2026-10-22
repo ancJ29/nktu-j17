@@ -81,7 +81,7 @@ type PlanDraft = {
   stages: SheetStage[];
   days: SheetDay[];
   preparation: PlanPreparation[];
-  
+
   memos: PlanMemo[];
 };
 
@@ -120,8 +120,6 @@ export function CropDiaryTemplateFormPage() {
   const resetFileRef = useRef<() => void>(null);
   const snapshotRef = useRef<CropDiaryTemplate | null>(null);
 
-  
-  
   const materials = useMaterialStore((s) => s.items);
   const materialsInitialized = useMaterialStore((s) => s.initialized);
   const loadMaterials = useMaterialStore((s) => s.loadAll);
@@ -138,7 +136,6 @@ export function CropDiaryTemplateFormPage() {
     return (label: string) => byName.get(label.trim().toLowerCase());
   }, [materials]);
 
-  
   const copyFrom = !isEdit
     ? (location.state as { copyFrom?: CropDiaryTemplateCopyFrom } | null)?.copyFrom
     : undefined;
@@ -154,16 +151,10 @@ export function CropDiaryTemplateFormPage() {
         }
       : EMPTY_PLAN,
   );
-  
-  
+
   const [columnsError, setColumnsError] = useState<string | null>(null);
 
   const form = useForm<FormValues>({
-    
-    
-    
-    
-    
     initialValues: {
       code: '',
       name: copyFrom?.name ?? '',
@@ -192,8 +183,7 @@ export function CropDiaryTemplateFormPage() {
       const tpl = res.item as CropDiaryTemplate;
       snapshotRef.current = tpl;
       const loaded = planOf(tpl);
-      
-      
+
       setPlan({
         columns: loaded.columns,
         stages: loaded.stages,
@@ -221,13 +211,11 @@ export function CropDiaryTemplateFormPage() {
     },
   );
 
-  
   const formRef = useRef(form);
   useEffect(() => {
     formRef.current = form;
   });
 
-  
   const handleTotalDaysChange = useCallback((v: number | string) => {
     const n = v === '' ? 0 : Math.floor(Number(v));
     formRef.current.setFieldValue('totalDays', v);
@@ -300,8 +288,6 @@ export function CropDiaryTemplateFormPage() {
           }),
         });
 
-        
-        
         const unlinked = parsed.plan.columns
           .filter((c) => c.kind === 'ratio' && !c.materialCode)
           .map((c) => c.label);
@@ -337,8 +323,6 @@ export function CropDiaryTemplateFormPage() {
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
-      
-      
       if (!plan.columns.some((c) => c.label.trim())) {
         setColumnsError(t('cropDiaryTemplates.validation.activityRequired'));
         return;
@@ -377,13 +361,9 @@ export function CropDiaryTemplateFormPage() {
             patch: {
               code: values.code.trim(),
               name: values.name.trim(),
-              
-              
-              
+
               steps: [],
-              
-              
-              
+
               extra: buildExtra(copyFrom ? { copyFromId: copyFrom.sourceId } : undefined),
             },
           });

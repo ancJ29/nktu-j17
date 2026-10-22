@@ -1,5 +1,3 @@
-
-
 export function summarizeSelection(
   selected: readonly string[],
   options: ReadonlyArray<{ value: string; label: string }>,

@@ -1,24 +1,20 @@
-
-
 import { useCallback, useMemo } from 'react';
 import type { SelectFilter } from '@/components/DesktopFilterBar';
 import { useLookupV2Options } from '@/hooks/useLookupV2Options';
 
 export function useLookupDimension<Row>(config: {
-  
   readonly key: string;
-  
+
   readonly category: string;
-  
+
   readonly valueOf: (row: Row) => string | undefined;
-  
+
   readonly title: string;
   readonly placeholder: string;
   readonly values: Readonly<Record<string, string>>;
   readonly setValue: (key: string, value: string | null) => void;
   readonly w?: number;
 }): {
-  
   readonly filter: SelectFilter | null;
   readonly predicate: (row: Row) => boolean;
 } {
@@ -42,8 +38,6 @@ export function useLookupDimension<Row>(config: {
     [options, value, key, setValue, placeholder, title, w],
   );
 
-  
-  
   const predicate = useCallback(
     (row: Row) => value === null || (valueOf(row) ?? '') === value,
     [value, valueOf],

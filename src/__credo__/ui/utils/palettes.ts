@@ -79,28 +79,28 @@ const emerald: MantineColorsTuple = [
 ];
 
 const steel: MantineColorsTuple = [
-  '#eaf3fb', 
-  '#d6e6f7', 
-  '#bcd6f0', 
-  '#9bc1e7', 
-  '#79aadb', 
-  '#5f91c6', 
-  '#4a76a9', 
-  '#3e618c', 
-  '#324e71', 
+  '#eaf3fb',
+  '#d6e6f7',
+  '#bcd6f0',
+  '#9bc1e7',
+  '#79aadb',
+  '#5f91c6',
+  '#4a76a9',
+  '#3e618c',
+  '#324e71',
   '#273c59', // 9 - ACCENT - Dark emphasis
 ];
 
 const ocean: MantineColorsTuple = [
-  '#e4faff', 
-  '#d4f0f9', 
-  '#acddef', 
-  '#80cae5', 
-  '#5dbadc', 
-  '#46b0d7', 
-  '#37abd6', 
-  '#2596be', 
-  '#1186ab', 
+  '#e4faff',
+  '#d4f0f9',
+  '#acddef',
+  '#80cae5',
+  '#5dbadc',
+  '#46b0d7',
+  '#37abd6',
+  '#2596be',
+  '#1186ab',
   '#007497', // 9 - ACCENT - Dark emphasis
 ];
 
@@ -131,15 +131,15 @@ const success: MantineColorsTuple = [
 ];
 
 const neutral: MantineColorsTuple = [
-  '#fafafa', 
-  '#f5f5f5', 
-  '#e5e5e5', 
-  '#d4d4d4', 
-  '#9ca3af', 
-  '#6b7280', 
-  '#4b5563', 
-  '#374151', 
-  '#1f2937', 
+  '#fafafa',
+  '#f5f5f5',
+  '#e5e5e5',
+  '#d4d4d4',
+  '#9ca3af',
+  '#6b7280',
+  '#4b5563',
+  '#374151',
+  '#1f2937',
   '#111827', // 9 - Headings (Tailwind gray-900)
 ];
 
@@ -157,28 +157,28 @@ const danger: MantineColorsTuple = [
 ];
 
 const gray: MantineColorsTuple = [
-  '#f9fafb', 
-  '#f3f4f6', 
-  '#e5e7eb', 
-  '#d1d5db', 
-  '#9ca3af', 
-  '#6b7280', 
-  '#4b5563', 
-  '#374151', 
-  '#1f2937', 
+  '#f9fafb',
+  '#f3f4f6',
+  '#e5e7eb',
+  '#d1d5db',
+  '#9ca3af',
+  '#6b7280',
+  '#4b5563',
+  '#374151',
+  '#1f2937',
   '#111827', // 9 - gray-900
 ];
 
 const dark: MantineColorsTuple = [
-  '#c9c9c9', 
-  '#b8b8b8', 
-  '#828282', 
-  '#696969', 
-  '#424242', 
-  '#3b3b3b', 
-  '#2e2e2e', 
-  '#242424', 
-  '#1a1a1a', 
+  '#c9c9c9',
+  '#b8b8b8',
+  '#828282',
+  '#696969',
+  '#424242',
+  '#3b3b3b',
+  '#2e2e2e',
+  '#242424',
+  '#1a1a1a',
   '#141414', // 9 - Darkest
 ];
 
@@ -194,7 +194,7 @@ export const colorPalettes: Record<string, MantineColorsTuple> = {
   sandstone,
   forest,
   autumn,
-  
+
   olive,
   emerald,
   steel,
@@ -214,7 +214,7 @@ export const brandPalettes: Record<string, MantineColorsTuple> = {
   sandstone,
   forest,
   autumn,
-  
+
   olive,
   emerald,
   steel,

@@ -1,5 +1,3 @@
-
-
 import type { VendorV2Row } from '@/types';
 
 export const VENDOR_TYPE_CATEGORY = 'vendor-type';

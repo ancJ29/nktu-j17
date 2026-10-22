@@ -1,5 +1,3 @@
-
-
 const ALLOWED_TAGS = new Set([
   'DIV',
   'SPAN',
@@ -44,7 +42,6 @@ function sanitizeElement(el: Element): void {
   for (const attr of [...el.attributes]) {
     const name = attr.name.toLowerCase();
     if (!ALLOWED_ATTRS.has(name)) {
-      
       el.removeAttribute(attr.name);
       continue;
     }
@@ -71,7 +68,6 @@ function sanitizeNode(node: Node): void {
     }
 
     if (!ALLOWED_TAGS.has(tag)) {
-      
       sanitizeNode(el);
       el.replaceWith(...el.childNodes);
       continue;

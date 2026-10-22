@@ -3,14 +3,13 @@ import React, { useEffect, useRef } from 'react';
 import { Center, Group, Loader, Text } from '@mantine/core';
 
 type InfiniteScrollSentinelProps = {
-  
   readonly hasMore: boolean;
-  
+
   readonly onLoadMore: () => void;
-  
+
   readonly renderedCount: number;
   readonly label?: string;
-  
+
   readonly rootRef?: React.RefObject<HTMLElement | null>;
 };
 
@@ -22,8 +21,7 @@ export function InfiniteScrollSentinel({
   rootRef,
 }: InfiniteScrollSentinelProps) {
   const ref = useRef<HTMLDivElement>(null);
-  
-  
+
   const onLoadMoreRef = useRef(onLoadMore);
   useEffect(() => {
     onLoadMoreRef.current = onLoadMore;
@@ -37,8 +35,7 @@ export function InfiniteScrollSentinel({
       (entries) => {
         if (entries.some((entry) => entry.isIntersecting)) onLoadMoreRef.current();
       },
-      
-      
+
       { root: rootRef?.current ?? null, rootMargin: '400px' },
     );
     observer.observe(el);

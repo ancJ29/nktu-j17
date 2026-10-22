@@ -87,24 +87,15 @@ export default function HomePage() {
   const empStore = useEmployeeStore();
   const custStore = useCustomerStore();
 
-  
-  
-  
   const booted = useRef(false);
   useEffect(() => {
     if (booted.current) return;
     booted.current = true;
-    
-    
-    
-    
-    
+
     const { from, to } = defaultLastNDaysRange(WINDOW_DAYS);
     setSalesOrderQueryRange(from, to);
     setDeliveryRequestQueryRange(from, to);
 
-    
-    
     void Promise.all([soStore.forceRefresh(), drStore.forceRefresh()]).then(() => {
       void sweepLoadedSalesOrdersPlatformLog();
     });
@@ -112,21 +103,14 @@ export default function HomePage() {
     void custStore.loadAll();
   }, [soStore, drStore, empStore, custStore]);
 
-  
-  
-  
-  
   const salesDeptScoped = useMemo(() => {
     const me = getCurrentEmployeeId();
     if (!me) return false;
     return empStore.items.find((e) => e.id === me)?.department === SALES_DEPARTMENT_CODE;
   }, [empStore.items]);
 
-  
-  
   const canSeeRequests = salesDeptScoped || canViewAllRequests || canViewSelfRequests;
 
-  
   const employeeName = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of empStore.items) m.set(e.id, e.name);
@@ -138,11 +122,7 @@ export default function HomePage() {
     [custStore],
   );
 
-  
-  
-  
   const visibleOrders = useMemo(() => {
-    
     const live = soStore.items.filter((o) => !o.extra?.isDeleted);
     if (canViewAllOrders) return live;
     if (!canViewSelfOrders) return [];
@@ -167,20 +147,7 @@ export default function HomePage() {
     [visibleOrders],
   );
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const visibleRequests = useMemo(() => {
-    
     const liveRequests = drStore.items.filter((d) => !d.extra?.isDeleted);
     if (salesDeptScoped) {
       const myOrderIds = new Set(visibleOrders.map((o) => o.id));

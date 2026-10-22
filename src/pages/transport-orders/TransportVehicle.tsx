@@ -1,4 +1,3 @@
-
 import { IconTruck } from '@tabler/icons-react';
 import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';

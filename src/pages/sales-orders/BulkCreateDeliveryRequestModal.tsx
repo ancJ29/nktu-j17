@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
@@ -35,7 +33,7 @@ type StatusMeta = { label: string; color: string };
 type BulkCreateDeliveryRequestModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   salesOrders: SalesOrder[];
   getCustomerByCode: (code: string) => Customer | undefined;
   resolveStatus: (value: string) => StatusMeta;
@@ -77,7 +75,7 @@ function BulkForm({ onClose, salesOrders, getCustomerByCode, resolveStatus, t }:
 
   const [driverId, setDriverId] = useState<string | null>(null);
   const [date, setDate] = useState<Date | null>(null);
-  
+
   const selection = useRowSelection();
   const { selectedKeys: selectedIds, toggle: toggleOne } = selection;
   const [saving, setSaving] = useState(false);

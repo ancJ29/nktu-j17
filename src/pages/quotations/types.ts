@@ -19,7 +19,6 @@ export function isQuotationEditable(status: QuotationStatus): boolean {
 }
 
 export type QuotationPriceTier = {
-  
   minQuantity: number;
   unitPrice: number;
 };
@@ -27,11 +26,11 @@ export type QuotationPriceTier = {
 export type QuotationLine = {
   productCode: string;
   productName: string;
-  
+
   unit?: string;
   quantity: number;
   unitPrice: number;
-  
+
   priceTiers?: QuotationPriceTier[];
 };
 
@@ -63,28 +62,27 @@ export function resolveTierPrice(
 }
 
 export type QuotationExtra = {
-  
   code: string;
-  
+
   status: QuotationStatus;
-  
+
   customerCode?: string;
-  
+
   customerName?: string;
-  
+
   assignedStaff?: string;
-  
+
   companyId?: string;
   note?: string;
   lines: QuotationLine[];
   isDeleted?: boolean;
-  
+
   sentAt?: number;
-  
+
   confirmedAt?: number;
-  
+
   convertedAt?: number;
-  
+
   generatedSalesOrderId?: string;
   generatedSalesOrderNumber?: string;
   [key: string]: unknown;

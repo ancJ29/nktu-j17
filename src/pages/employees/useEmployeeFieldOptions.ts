@@ -1,5 +1,3 @@
-
-
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,9 +10,7 @@ import {
 
 export function useEmployeeFieldOptions() {
   const { i18n } = useTranslation();
-  
-  
-  
+
   const lang = i18n.language;
   return useMemo(() => {
     void lang;

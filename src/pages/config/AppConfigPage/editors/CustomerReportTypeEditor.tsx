@@ -11,9 +11,6 @@ export function CustomerReportTypeEditor({
   assignments: Record<string, number>;
   onChange: (assignments: Record<string, number>) => void;
 }) {
-  
-  
-  
   const customers = useCustomerStore((s) => s.items);
   const customersInit = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
@@ -27,8 +24,6 @@ export function CustomerReportTypeEditor({
     .filter((c) => c.isActive && !c.extra?.isDeleted)
     .map((c) => ({ value: c.code, label: `${c.extra?.shortName || c.name} (${c.code})` }));
 
-  
-  
   const typeData = customerReportTypeOptions().map((t) => ({
     value: String(t.id),
     label: `${t.id}. ${t.label}`,
@@ -37,7 +32,7 @@ export function CustomerReportTypeEditor({
   const setCode = (oldCode: string, newCode: string | null) => {
     if (!newCode || newCode === oldCode) return;
     const next: Record<string, number> = {};
-    
+
     for (const [code, type] of rows) next[code === oldCode ? newCode : code] = type;
     onChange(next);
   };
@@ -53,8 +48,6 @@ export function CustomerReportTypeEditor({
     onChange(next);
   };
 
-  
-  
   const addRow = () => {
     const free = customerData.find((c) => !(c.value in assignments));
     if (!free) return;
@@ -85,9 +78,6 @@ export function CustomerReportTypeEditor({
             flex={1}
             size="xs"
             data={
-              
-              
-              
               customerData.some((c) => c.value === code)
                 ? customerData
                 : [...customerData, { value: code, label: code }]

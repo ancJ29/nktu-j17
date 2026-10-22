@@ -78,17 +78,12 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   const isEdit = !!id;
   const bundle = bundleFor(kind);
 
-  
-  
   const navState = location.state as {
     copyFrom?: WarehouseDocRow;
     seedMaterialCodes?: string[];
   } | null;
   const copyFrom = navState?.copyFrom ?? null;
-  
-  
-  
-  
+
   const seedMaterialCodes = navState?.seedMaterialCodes ?? null;
 
   useEffect(() => {
@@ -117,11 +112,10 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
   const seededRef = useRef(false);
   const copySeededRef = useRef(false);
   const materialSeededRef = useRef(false);
-  
+
   const materialSelectRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const focusNewLineRef = useRef(false);
-  
-  
+
   const quantityInputRefs = useRef<Record<number, HTMLInputElement | null>>({});
   const focusFirstQuantityRef = useRef(false);
 
@@ -152,8 +146,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     if (!employeesInitialized) loadEmployees();
   }, [employeesInitialized, loadEmployees]);
 
-  
-  
   const currentEmployeeId = useMyEmployee()?.id ?? '';
   useEffect(() => {
     if (isEdit || !currentEmployeeId || form.getValues().assignedTo) return;
@@ -179,7 +171,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     [inventory],
   );
 
-  
   const docsOnDay = useCallback(
     (date: string, excludeId?: string) =>
       docs.filter((d) => d.recordDate === date && d.id !== excludeId && !d.extra?.isDeleted).length,
@@ -194,8 +185,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, form.values.recordDate, docs.length]);
 
-  
-  
   const existing = useMemo(
     () => (isEdit ? (docs.find((d) => d.id === id) ?? null) : null),
     [isEdit, docs, id],
@@ -221,11 +210,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, existing]);
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isEdit || !copyFrom || copySeededRef.current) return;
     copySeededRef.current = true;
@@ -244,11 +228,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, copyFrom]);
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isEdit || !seedMaterialCodes?.length || materialSeededRef.current) return;
     if (!materialsInitialized) return;
@@ -268,14 +247,12 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, seedMaterialCodes, materialsInitialized, materialByCode]);
 
-  
   useEffect(() => {
     if (isEdit && initialized && !existing && !seededRef.current) {
       navigate(kind.routes.LIST, { replace: true });
     }
   }, [isEdit, initialized, existing, navigate, kind]);
 
-  
   useEffect(() => {
     if (
       isEdit &&
@@ -295,9 +272,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
     ]);
   };
 
-  
-  
-  
   useEffect(() => {
     if (focusNewLineRef.current) {
       focusNewLineRef.current = false;
@@ -354,10 +328,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
           });
           navigate(kind.routes.DETAIL.replace(':id', id));
         } else {
-          
-          
-          
-          
           const baseSeq = docsOnDay(values.recordDate);
           let created: WarehouseDocRow | null = null;
           for (let attempt = 0; attempt <= MAX_DOC_CODE_RETRIES; attempt++) {
@@ -400,9 +370,6 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
             autoClose: 8000,
           });
         } else if (isDuplicateDocCodeError(err)) {
-          
-          
-          
           notifications.show({
             color: 'red',
             title: t('warehouseDoc.notifications.duplicateCode'),
@@ -573,7 +540,7 @@ export function WarehouseDocForm({ kind }: { kind: WarehouseDocKind }) {
                               const m = v ? materialByCode.get(v) : undefined;
                               form.setFieldValue(`lines.${idx}.itemCode`, v ?? '');
                               form.setFieldValue(`lines.${idx}.itemName`, m?.name ?? '');
-                              
+
                               form.setFieldValue(`lines.${idx}.unit`, m?.extra?.units?.[0] ?? '');
                             }}
                           />

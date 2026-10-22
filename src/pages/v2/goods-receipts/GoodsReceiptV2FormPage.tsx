@@ -1,5 +1,3 @@
-
-
 import {
   ActionIcon,
   Alert,
@@ -101,7 +99,6 @@ export function GoodsReceiptV2FormPage() {
   const { id } = useParams<{ id: string }>();
   const editing = Boolean(id);
 
-  
   const location = useLocation();
   const copyFrom = editing
     ? undefined
@@ -116,28 +113,21 @@ export function GoodsReceiptV2FormPage() {
 
   const [receipt, setReceipt] = useState<GoodsReceiptV2 | null>(null);
   const [day, setDay] = useState('');
-  
-  
-  
-  
-  
+
   const [vendorId, setVendorId] = useState<string | null>(copyFrom?.vendorId ?? null);
   const [receivedDate, setReceivedDate] = useState('');
   const [reference, setReference] = useState(copyFrom?.reference ?? '');
   const [notes, setNotes] = useState(copyFrom?.notes ?? '');
-  
-  
+
   const [lines, setLines] = useState<LineDraft[]>(() =>
     copyFrom ? copyFrom.items.map(toLineDraft) : [],
   );
   const [highlightKey, setHighlightKey] = useState<string | null>(null);
-  
+
   const pendingFocus = useRef<string | null>(null);
   const quantityRefs = useRef(new Map<string, HTMLInputElement>());
   const rowRefs = useRef(new Map<string, HTMLTableRowElement>());
-  
-  
-  
+
   const [customDraft, setCustomDraft] = useState<Record<string, string>>(() =>
     customDraftOf(copyFrom?.extra),
   );
@@ -150,10 +140,6 @@ export function GoodsReceiptV2FormPage() {
   );
   const [fieldErrors, setFieldErrors] = useState<Record<string, 'number' | 'date' | 'option'>>({});
 
-  
-  
-  
-  
   const form = useForm({ initialValues: {} });
 
   useEffect(() => {
@@ -168,8 +154,7 @@ export function GoodsReceiptV2FormPage() {
     getGoodsReceiptV2ById(id)
       .then(({ item, day: onDay }) => {
         if (!live) return;
-        
-        
+
         if (goodsReceiptStageOf(item.status) !== 'draft') {
           void navigate(ROUTES.GOODS_RECEIPTS_V2.DETAIL.replace(':id', item.id), { replace: true });
           return;
@@ -180,9 +165,7 @@ export function GoodsReceiptV2FormPage() {
         setReceivedDate(item.receivedDate ?? '');
         setReference(item.reference ?? '');
         setNotes(item.notes ?? '');
-        
-        
-        
+
         setLines(item.items.map(toLineDraft));
         setCustomDraft(customDraftOf(item.extra));
       })
@@ -194,9 +177,6 @@ export function GoodsReceiptV2FormPage() {
     };
   }, [id, navigate]);
 
-  
-  
-  
   const searchableItems = useMemo<SearchableItem[]>(() => {
     const fromProducts = products.filter(isLiveRow).map((row) => ({
       id: row.id,
@@ -228,7 +208,6 @@ export function GoodsReceiptV2FormPage() {
     [lines],
   );
 
-  
   const addItem = useCallback((item: SearchableItem) => {
     const key = `${item.itemType}:${item.id}`;
     setLines((prev) => {
@@ -253,10 +232,6 @@ export function GoodsReceiptV2FormPage() {
     pendingFocus.current = key;
   }, []);
 
-  
-  
-  
-  
   useEffect(() => {
     const key = pendingFocus.current;
     if (!key) return;
@@ -267,8 +242,6 @@ export function GoodsReceiptV2FormPage() {
     rowRefs.current.get(key)?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
   }, [lines]);
 
-  
-  
   useEffect(() => {
     if (!highlightKey) return;
     const timer = setTimeout(() => setHighlightKey(null), 1400);
@@ -299,8 +272,6 @@ export function GoodsReceiptV2FormPage() {
       notifications.show({ color: 'red', message });
     };
 
-    
-    
     if (payload.length === 0) {
       refuse(t('goodsReceiptsV2.validation.itemsRequired'));
       return;
@@ -317,9 +288,6 @@ export function GoodsReceiptV2FormPage() {
       return;
     }
 
-    
-    
-    
     const extra = mergeCustomFieldExtra(
       receipt?.extra ?? copyFrom?.extra,
       editableFields,

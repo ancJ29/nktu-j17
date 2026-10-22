@@ -1,5 +1,3 @@
-
-
 import { Stack, Switch, Text } from '@mantine/core';
 
 export function ActivityLogSection({

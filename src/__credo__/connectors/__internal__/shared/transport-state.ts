@@ -1,5 +1,3 @@
-
-
 function stateKey(origin: string, target?: string | undefined): string {
   return target ? `${origin}|${target}` : origin;
 }

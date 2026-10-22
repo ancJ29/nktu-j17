@@ -91,7 +91,6 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
-  
   const fromSalesOrderId = (() => {
     if (isEdit) return undefined;
     const state = location.state as { fromSalesOrderId?: unknown } | null;
@@ -99,26 +98,21 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
     return typeof v === 'string' ? v : undefined;
   })();
 
-  
   const {
     items: salesOrders,
     initialized: soInitialized,
     loadAll: loadSalesOrders,
   } = useSalesOrderStore();
-  
-  
+
   const allDRs = useDeliveryRequestStore((s) => s.items);
   const drsInit = useDeliveryRequestStore((s) => s.initialized);
   const loadDRs = useDeliveryRequestStore((s) => s.loadAll);
-  
+
   const employees = useEmployeeStore((s) => s.items);
   const currentEmployee = useMyEmployee();
 
-  
   const products = useProductStore((s) => s.items);
-  
-  
-  
+
   const vendorsInit = useVendorStore((s) => s.initialized);
   const loadVendors = useVendorStore((s) => s.loadAll);
 
@@ -128,9 +122,6 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
     if (!vendorsInit) loadVendors();
   }, [soInitialized, drsInit, vendorsInit, loadSalesOrders, loadDRs, loadVendors]);
 
-  
-  
-  
   const ordersWithDR = useMemo(() => {
     const s = new Set<string>();
     for (const dr of allDRs) {
@@ -146,9 +137,6 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
           (so) =>
             !so.isClosed &&
             !so.extra?.isDeleted &&
-            
-            
-            
             (!ordersWithDR.has(so.id) || so.id === fromSalesOrderId),
         )
         .map((so) => ({
@@ -187,14 +175,8 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
     return m;
   }, [productSelectData]);
 
-  
   const defaultStatus = getInitialStatusValue() ?? '';
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isMobile) {
       notifications.show({
@@ -214,26 +196,13 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
 
   const [loading, setLoading] = useState(false);
   const snapshotRef = useRef<DeliveryRequest | null>(null);
-  
-  
-  
-  
+
   const [editInboundKind, setEditInboundKind] = useState<string | undefined>(undefined);
-  
-  
-  
+
   const [editVendorCode, setEditVendorCode] = useState('');
-  
-  
+
   const [oneOffVendor, setOneOffVendor] = useState(false);
 
-  
-  
-  
-  
-  
-  
-  
   const registeredVendorFilter = useCallback(
     (v: Vendor) => !v.extra?.isDeleted && (v.isActive || v.code === editVendorCode),
     [editVendorCode],
@@ -241,9 +210,6 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
 
   const form = useForm<DeliveryRequestFormValues>({
     initialValues: {
-      
-      
-      
       requestNumber: '',
       direction: 'outbound',
       salesOrderId: '',
@@ -255,17 +221,14 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
       googleMapUrl: '',
       scheduledDate: null,
       notes: '',
-      
-      
+
       items: [],
       assignedDriverId: '',
       isUrgent: false,
     },
     validate: {
-      
       requestNumber: () => null,
-      
-      
+
       items: {
         productCode: (v) =>
           v.trim() ? null : t('deliveryRequests.validation.productCodeRequired'),
@@ -278,20 +241,12 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
     },
   });
 
-  
-  
-  
-  
-  
-  
   const handleSalesOrderSelect = useCallback(
     (soId: string | null) => {
       if (!soId) {
         form.setFieldValue('salesOrderId', '');
         form.setFieldValue('salesOrderNumber', '');
-        
-        
-        
+
         return;
       }
       const so = salesOrderMap.get(soId);
@@ -299,10 +254,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         form.setFieldValue('salesOrderId', so.value);
         form.setFieldValue('salesOrderNumber', so.orderNumber);
         form.setFieldValue('customerName', so.customerName);
-        
-        
-        
-        
+
         const soRecord = useSalesOrderStore.getState().getById(so.value) as SalesOrder | undefined;
         const soExtra = (soRecord?.extra ?? {}) as SalesOrderExtra;
         const customer = soExtra.customerCode
@@ -313,27 +265,17 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
           'googleMapUrl',
           fillMapUrlFromCustomer(customer, soExtra.deliveryAddress, soExtra.googleMapUrl),
         );
-        
-        
-        
-        
-        
+
         const remaining = buildRemainingItemsFromSalesOrder(so.items, so.value, allDRs);
         if (remaining.length > 0) {
           form.setFieldValue('items', remaining);
         }
       }
     },
-    
+
     [salesOrderMap, allDRs],
   );
 
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!fromSalesOrderId) return;
     if (!soInitialized) return;
@@ -342,8 +284,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
     const so = salesOrders.find((o) => o.id === fromSalesOrderId);
     if (so) {
       const soExtra = so.extra as { deliveryDate?: DateTimeInput | null };
-      
-      
+
       form.setFieldValue(
         'scheduledDate',
         resolveInitialScheduledDateFromSalesOrder(soExtra.deliveryDate),
@@ -352,7 +293,6 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fromSalesOrderId, soInitialized, handleSalesOrderSelect]);
 
-  
   const handleProductSelect = useCallback(
     (idx: number, code: string | null) => {
       if (!code) {
@@ -367,7 +307,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         form.setFieldValue(`items.${idx}.unitPrice`, prod.price);
       }
     },
-    
+
     [productMap],
   );
 
@@ -388,17 +328,14 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
       setOneOffVendor(!r.vendorCode && !!r.vendorName);
       return {
         requestNumber: r.requestNumber,
-        
-        
+
         direction: (r.direction ?? 'outbound') as CMngtDeliveryRequestDirection,
         salesOrderId: r.salesOrderId ?? '',
         salesOrderNumber: r.salesOrderNumber ?? '',
         customerName: r.customerName ?? '',
         vendorCode: r.vendorCode ?? '',
         vendorName: r.vendorName ?? '',
-        
-        
-        
+
         deliveryAddress: drExtra.deliveryAddress ?? '',
         googleMapUrl: drExtra.googleMapUrl ?? '',
         scheduledDate: r.scheduledDate ? new Date(r.scheduledDate) : null,
@@ -426,10 +363,6 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
 
   const handleSubmit = useCallback(
     async (values: DeliveryRequestFormValues) => {
-      
-      
-      
-
       setLoading(true);
       const items: DeliveryRequestItem[] = values.items.map((item) => ({
         productCode: item.productCode.trim(),
@@ -440,24 +373,14 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         ...(item.fromLocationCode && { fromLocationCode: item.fromLocationCode }),
       }));
 
-      
-      
-      
-      
       const isInbound = values.direction === 'inbound';
-      
-      
-      
-      
-      
+
       const partyIsCustomer =
         !isInbound || (editInboundKind != null && editInboundKind !== 'vendor');
       const customerName = partyIsCustomer ? values.customerName.trim() : '';
       const vendorCode = partyIsCustomer ? '' : values.vendorCode.trim();
       const vendorName = partyIsCustomer ? '' : values.vendorName.trim();
-      
-      
-      
+
       const deliveryAddress = values.deliveryAddress.trim();
       const googleMapUrl = values.googleMapUrl.trim();
 
@@ -499,10 +422,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
             salesOrderId: values.salesOrderId,
             salesOrderNumber: values.salesOrderNumber,
             customerName,
-            
-            
-            
-            
+
             vendorCode,
             vendorName,
             deliveryAddress,
@@ -516,12 +436,10 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
             currentEmployee: currentEmployee
               ? { id: currentEmployee.id, name: currentEmployee.name }
               : undefined,
-            
+
             initialStatus: variant.inboundStartsPending && isInbound ? 'pending' : defaultStatus,
           });
-          
-          
-          
+
           if (linkFailed) {
             notifications.show({
               color: 'yellow',
@@ -571,19 +489,13 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
   );
 
   if (fetching) return null;
-  
-  
+
   if (isMobile) return null;
 
   const pageTitle = isEdit ? t('deliveryRequests.editItem') : t('deliveryRequests.addItem');
-  
-  
-  
+
   const isInboundForm = form.getValues().direction === 'inbound';
-  
-  
-  
-  
+
   const partyIsCustomerForm =
     !isInboundForm || (editInboundKind != null && editInboundKind !== 'vendor');
   const addressLabel = isInboundForm
@@ -641,10 +553,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
                 onChange={(next) => {
                   if (isEdit) return;
                   if (next === form.getValues().direction) return;
-                  
-                  
-                  
-                  
+
                   form.setFieldValue('direction', next);
                   if (next === 'inbound') {
                     form.setFieldValue('salesOrderId', '');
@@ -698,8 +607,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
                 <TextInput
                   label={t('deliveryRequests.form.customerNameLabel')}
                   placeholder={t('deliveryRequests.form.customerNamePlaceholder')}
-                  
-                  
+
                   readOnly={!!form.getValues().salesOrderId}
                   {...form.getInputProps('customerName')}
                 />
@@ -712,8 +620,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
                   checked={oneOffVendor}
                   onChange={(e) => {
                     setOneOffVendor(e.currentTarget.checked);
-                    
-                    
+
                     form.setFieldValue('vendorName', '');
                     form.setFieldValue('vendorCode', '');
                   }}
@@ -739,12 +646,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
                       const prevCode = form.getValues().vendorCode;
                       form.setFieldValue('vendorName', sel?.name ?? '');
                       form.setFieldValue('vendorCode', sel?.code ?? '');
-                      
-                      
-                      
-                      
-                      
-                      
+
                       if (sel && sel.code !== prevCode) {
                         const { deliveryAddress, googleMapUrl } = resolveVendorInboundAddress(
                           sel.vendor,
@@ -858,7 +760,7 @@ type ItemEditorProps = {
   form: ReturnType<typeof useForm<DeliveryRequestFormValues>>;
   productSelectData: { value: string; label: string; name: string; unit: string; price: number }[];
   onProductSelect: (idx: number, code: string | null) => void;
-  
+
   t: (key: any) => string;
 };
 

@@ -2,9 +2,8 @@ import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
 import type { CostNormAuditStamp } from '@/pages/cost-norms/updatedBy';
 
 export type FuelNormRow = SingleRecordRow & {
-  
   truckType: string;
-  
+
   litersPer100km: number;
   createdAt: number;
   updatedAt: number;
@@ -12,15 +11,13 @@ export type FuelNormRow = SingleRecordRow & {
 };
 
 export type FuelNormExtra = CostNormAuditStamp & {
-  
   isDeleted?: boolean;
   [key: string]: unknown;
 };
 
 export type FuelPriceRow = SingleRecordRow & {
-  
   price: number;
-  
+
   effectiveDate: string;
   createdAt: number;
   updatedAt: number;
@@ -28,11 +25,10 @@ export type FuelPriceRow = SingleRecordRow & {
 };
 
 export type FuelPriceExtra = CostNormAuditStamp & {
-  
   isDeleted?: boolean;
-  
+
   notes?: string;
-  
+
   affectedRouteCodes?: string[];
   [key: string]: unknown;
 };

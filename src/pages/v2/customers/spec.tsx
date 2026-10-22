@@ -105,7 +105,6 @@ export const CUSTOMER_V2_SPEC: MasterDataSpec<CustomerV2Row, CustomerV2FormValue
     ],
   },
 
-  
   mobile: { Card: CustomerV2MobileCard },
 
   useHeaderText: useCustomerV2HeaderText,

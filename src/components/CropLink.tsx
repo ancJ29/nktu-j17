@@ -10,7 +10,6 @@ function leaf(size: LinkSize) {
 }
 
 type CropLinkProps = {
-  
   code?: string | undefined | null;
   size?: LinkSize;
   noIcon?: boolean;

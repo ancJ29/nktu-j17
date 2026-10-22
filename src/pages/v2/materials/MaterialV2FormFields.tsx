@@ -1,5 +1,3 @@
-
-
 import { Grid, Switch, TextInput } from '@mantine/core';
 import type { UseFormReturnType } from '@mantine/form';
 import { useTranslation } from 'react-i18next';
@@ -25,8 +23,7 @@ export function MaterialV2IdentityFields({ form, isEditing }: FieldsProps) {
           description={t('materialsV2.form.codeHelp')}
           placeholder={t('materialsV2.form.codeAuto')}
           autoFocus={!isEditing}
-          
-          
+
           disabled={isEditing}
           {...form.getInputProps('code')}
         />

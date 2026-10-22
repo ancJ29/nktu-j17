@@ -1,12 +1,10 @@
-
 export const LITRE_DECIMAL_SCALE = 3;
 
 const MARKS = ((): { group: string; decimal: string } => {
   const parts = new Intl.NumberFormat().formatToParts(12345.6);
   const group = parts.find((part) => part.type === 'group')?.value ?? ',';
   const decimal = parts.find((part) => part.type === 'decimal')?.value ?? '.';
-  
-  
+
   return { group: group === decimal ? '' : group, decimal };
 })();
 

@@ -20,7 +20,7 @@ import type { SalesOrder, SalesOrderExtra, SalesOrderPhoto } from '@/types';
 export type PhotoQueueFlushResult = {
   uploaded: number;
   failed: number;
-  
+
   updated: Array<{ kind: PendingPhotoTargetKind; record: DeliveryRequest | SalesOrder }>;
 };
 
@@ -51,8 +51,6 @@ async function runFlush(target?: {
   const result: PhotoQueueFlushResult = { uploaded: 0, failed: 0, updated: [] };
 
   for (const entry of pending) {
-    
-    
     let url = entry.uploadedUrl;
 
     if (!url) {
@@ -60,21 +58,19 @@ async function runFlush(target?: {
         file: new File([entry.blob], entry.fileName, { type: entry.contentType }),
         imageDirectory: entry.imageDirectory,
         fileName: entry.fileName,
-        
+
         budget: 'background',
       });
 
       if (!uploaded.ok) {
         result.failed += 1;
         await bumpPendingAttempts(entry.id);
-        
-        
+
         if (uploaded.reason === 'offline' || uploaded.reason === 'timeout') break;
         continue;
       }
       url = uploaded.url;
-      
-      
+
       await markPendingUploaded(entry.id, url);
     }
 
@@ -84,14 +80,10 @@ async function runFlush(target?: {
         result.updated.push({ kind: entry.target.kind, record: outcome.record });
         result.uploaded += 1;
       } else if (outcome.reason === 'withdrawn') {
-        
-        
         deleteMedia(url);
       }
       // 'already-attached' → nothing to do, just drop the queue entry.
     } catch (err) {
-      
-      
       logger.error('[PHOTO-QUEUE] attach failed', err);
       result.failed += 1;
       await bumpPendingAttempts(entry.id);

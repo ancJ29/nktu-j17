@@ -1,10 +1,6 @@
-
-
 export type ProductFormVariant = {
-  
   showNoInventoryToggle: boolean;
 
-  
   seedInventoryRowOnCreate: boolean;
 };
 

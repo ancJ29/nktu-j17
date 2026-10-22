@@ -45,8 +45,6 @@ function defaultMonthRange(): [string, string] {
 export function CropListPage() {
   const { t } = useTranslation();
 
-  
-  
   const [tab, setTab] = useState<CropTab>('active');
 
   const {
@@ -59,21 +57,15 @@ export function CropListPage() {
     forceRefresh,
   } = useCropStore();
 
-  
-  
   const [monthRange, setMonthRange] = useState<[string | null, string | null]>(defaultMonthRange);
   const [harvested, setHarvested] = useState<Crop[]>([]);
   const [harvestedLoading, setHarvestedLoading] = useState(false);
   const [harvestedLoaded, setHarvestedLoaded] = useState(false);
-  
+
   const [harvestedNonce, setHarvestedNonce] = useState(0);
 
   const [from, to] = monthRange;
 
-  
-  
-  
-  
   useEffect(() => {
     const fromPeriod = toPeriod(from);
     const toPeriodStr = toPeriod(to);
@@ -114,9 +106,6 @@ export function CropListPage() {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  
-  
-  
   const listSource = tab === 'harvested' ? harvested : allCrops;
 
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
@@ -153,8 +142,6 @@ export function CropListPage() {
     else forceRefresh();
   }, [tab, forceRefresh]);
 
-  
-  
   const statusOptions = [
     { value: 'planned', label: t('crops.status.planned') },
     { value: 'growing', label: t('crops.status.growing') },

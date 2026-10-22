@@ -1,5 +1,3 @@
-
-
 import type { OperationLog } from '@/types';
 
 export const OIL_TANK_REFILL_LOG_TYPE = 'oil-tank-refill';
@@ -35,15 +33,14 @@ export function issueHeadroom(
 ): number | null {
   if (typeof currentLevel !== 'number' || !Number.isFinite(currentLevel)) return null;
   const previous = Number.isFinite(previousLitres) ? previousLitres : 0;
-  
-  
+
   return Math.round((currentLevel + previous) * 100) / 100;
 }
 
 export function issueExceedsStock(args: {
   litres: unknown;
   currentLevel: number | undefined | null;
-  
+
   previousLitres?: number;
 }): { refused: boolean; available: number | null } {
   const previous = Number.isFinite(args.previousLitres) ? (args.previousLitres as number) : 0;
@@ -71,8 +68,6 @@ export function replayBalance(
   logs: readonly Pick<OperationLog, 'logType' | 'extra'>[],
 ): number {
   const opening = Number.isFinite(openingLevel) ? openingLevel : 0;
-  
-  
-  
+
   return Math.round((opening + sumMovements(logs)) * 100) / 100;
 }

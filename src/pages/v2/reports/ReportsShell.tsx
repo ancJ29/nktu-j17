@@ -20,7 +20,6 @@ import type { ClientReportEntry } from './registry';
 const isMobile = device.isMobile;
 
 interface ReportRoute {
-  
   key?: string;
   param?: string;
 }
@@ -43,13 +42,11 @@ function useReportRoute(entries: ClientReportEntry[]): [ReportRoute, (r: ReportR
 
   const go = useCallback((next: ReportRoute) => {
     if (!next.key) {
-      
-      
       window.history.pushState(null, '', window.location.pathname + window.location.search);
       setRoute({});
       return;
     }
-    
+
     window.location.hash = next.param ? `${next.key}/${next.param}` : next.key;
   }, []);
 

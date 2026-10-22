@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate, useParams } from 'react-router';
@@ -64,7 +62,6 @@ import type {
 } from '@/types';
 
 type UseDeliveryRequestDetailOptions = {
-  
   skipViewScopeGuard?: boolean;
 };
 
@@ -99,7 +96,7 @@ export type UseDeliveryRequestDetailReturn = {
   setDeliveredQty: (next: Map<string, number>) => void;
   setLineDeliveredQty: (key: string, value: number) => void;
   pending: PendingTransition | null;
-  
+
   pendingIsCompletion: boolean;
   note: string;
   setNote: (v: string) => void;
@@ -107,35 +104,35 @@ export type UseDeliveryRequestDetailReturn = {
   cancelStatusChange: () => void;
   confirmStatusChange: () => Promise<void>;
   handleMetaPatch: (patch: DeliveryRequestMetaPatch) => Promise<void>;
-  
+
   applyUpdatedRequest: (updated: DeliveryRequest) => void;
-  
+
   showDelete: boolean;
   deleteOpened: boolean;
   openDelete: () => void;
   closeDelete: () => void;
   handleDelete: () => Promise<void>;
-  
+
   imageDirectory: string;
   handlePhotosChange: (photos: DeliveryRequestPhoto[]) => Promise<void>;
   cameraOpened: boolean;
   openCamera: () => void;
-  
+
   openCompletionCamera: () => void;
   closeCamera: () => void;
   cameraUploading: boolean;
-  
+
   handleMobileCameraCapture: (result: CaptureResult) => Promise<boolean>;
-  
+
   completionPhotos: DeliveryRequestPhoto[];
-  
+
   retryPendingPhotos: () => Promise<void>;
-  
+
   pendingSync: QueuedTransition | null;
-  
+
   syncPendingCompletion: () => Promise<void>;
   syncingCompletion: boolean;
-  
+
   discardPendingSync: () => Promise<void>;
 };
 
@@ -161,17 +158,10 @@ export function useDeliveryRequestDetail(
   const [cameraUploading, setCameraUploading] = useState(false);
   const [deleteOpened, { open: openDelete, close: closeDelete }] = useDisclosure(false);
 
-  
-  
-  
   const [completionPhotos, setCompletionPhotos] = useState<DeliveryRequestPhoto[]>([]);
-  
-  
+
   const [pendingSync, setPendingSync] = useState<QueuedTransition | null>(null);
-  
-  
-  
-  
+
   const captureModeRef = useRef<'fab' | 'completion'>('fab');
 
   const openCamera = useCallback(() => {
@@ -183,17 +173,10 @@ export function useDeliveryRequestDetail(
     openCameraRaw();
   }, [openCameraRaw]);
 
-  
-  
   useEffect(() => {
     if (!soInit) loadSOs();
   }, [soInit, loadSOs]);
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!productsInit) loadProducts();
   }, [productsInit, loadProducts]);
@@ -203,7 +186,6 @@ export function useDeliveryRequestDetail(
 
   const currentEmployee = useMyEmployee();
 
-  
   const [deliveredQty, setDeliveredQty] = useState<Map<string, number>>(new Map());
   useEffect(() => {
     if (!request) return;
@@ -215,7 +197,7 @@ export function useDeliveryRequestDetail(
       const found = persisted.find((p) => p.productCode === it.productCode && p.unit === it.unit);
       m.set(key, found?.quantity ?? it.quantity);
     }
-    
+
     setDeliveredQty(m);
   }, [request]);
 
@@ -227,17 +209,15 @@ export function useDeliveryRequestDetail(
     });
   }, []);
 
-  
   useEffect(() => {
     if (!id) return;
     const cached = useDeliveryRequestStore.getState().getById(id) as DeliveryRequest | undefined;
     if (cached) {
-      
       if (cached.extra?.isDeleted) {
         navigate(ROUTES.DELIVERY.LIST, { replace: true });
         return;
       }
-      
+
       setRequest(cached);
       setLoading(false);
       return;
@@ -264,13 +244,6 @@ export function useDeliveryRequestDetail(
     });
   }, [id, t, navigate]);
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (opts.skipViewScopeGuard) return;
     if (!request) return;
@@ -284,7 +257,7 @@ export function useDeliveryRequestDetail(
       return;
     }
     const me = getCurrentEmployeeId();
-    if (!me) return; 
+    if (!me) return;
     const assignedDriverId = (request.extra as { assignedDriverId?: string } | undefined)
       ?.assignedDriverId;
     if (assignedDriverId !== me) {
@@ -295,8 +268,6 @@ export function useDeliveryRequestDetail(
       navigate(ROUTES.DELIVERY.LIST);
     }
   }, [request, employees, t, navigate, opts.skipViewScopeGuard]);
-
-  
 
   const currentStatus = useMemo(
     () => resolveStatus((request?.extra as { status?: string } | undefined)?.status),
@@ -319,15 +290,9 @@ export function useDeliveryRequestDetail(
       .filter((opt) => opt.value);
   }, [request, currentStatus.value]);
 
-  
-
   const [pending, setPending] = useState<PendingTransition | null>(null);
   const [note, setNote] = useState('');
 
-  
-  
-  
-  
   const pendingIsCompletion = useMemo(
     () => (pending ? resolveStatus(pending.toValue).stage === 'COMPLETED' : false),
     [pending],
@@ -367,10 +332,6 @@ export function useDeliveryRequestDetail(
         return;
       }
       if (failure.kind === 'photos-required') {
-        
-        
-        
-        
         const isInbound = request?.direction === 'inbound';
         notifications.show({
           color: 'red',
@@ -395,20 +356,12 @@ export function useDeliveryRequestDetail(
     if (!pending || !request) return;
     setActionLoading(true);
     try {
-      
-      
       const deliveredItems: DeliveryRequestDeliveredItem[] = request.items.map((it) => ({
         productCode: it.productCode,
         unit: it.unit,
         quantity: deliveredQty.get(`${it.productCode}::${it.unit}`) ?? 0,
       }));
 
-      
-      
-      
-      
-      
-      
       const queuedProof = await listPendingPhotos({
         kind: 'delivery-request',
         id: request.id,
@@ -424,16 +377,6 @@ export function useDeliveryRequestDetail(
       });
 
       if (!result.ok) {
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         if (result.failure.kind === 'patch-error' && isNetworkFailure(result.failure.error)) {
           const queued = await queueTransition({
             id: request.id,
@@ -473,9 +416,6 @@ export function useDeliveryRequestDetail(
       });
       invalidateCache();
 
-      
-      
-      
       const priorStatus = (request.extra as DeliveryRequestExtra | undefined)?.status ?? '';
       setPending(null);
       setNote('');
@@ -506,12 +446,6 @@ export function useDeliveryRequestDetail(
     handleTransitionFailure,
   ]);
 
-  
-  
-  
-  
-  
-  
   const handleMetaPatch = useCallback(
     async (patch: DeliveryRequestMetaPatch) => {
       const { id: drId } = request ?? {};
@@ -530,11 +464,6 @@ export function useDeliveryRequestDetail(
         });
         setRequest(updated as DeliveryRequest);
 
-        
-        
-        
-        
-        
         const fields: DeliveryRequestInlineFields = {};
         if (patch.extra) {
           const before = currentExtra as DeliveryRequestExtra;
@@ -598,10 +527,6 @@ export function useDeliveryRequestDetail(
     [request, t],
   );
 
-  
-  
-  
-  
   const showDelete = canDeletePerm && request != null;
 
   const handleDelete = useCallback(async () => {
@@ -621,10 +546,7 @@ export function useDeliveryRequestDetail(
       });
       invalidateCache();
       logActivity('deliveryRequest.delete', drId, { requestNumber: request.requestNumber });
-      
-      
-      
-      
+
       if (request.salesOrderId) {
         try {
           await unlinkDRFromSalesOrder(request.salesOrderId, drId);
@@ -654,18 +576,11 @@ export function useDeliveryRequestDetail(
     }
   }, [request, t, invalidateCache, navigate, closeDelete]);
 
-  
-  
-  
-  
-  
-  
   const imageDirectory = useMemo(
     () => buildExpiringUploadDirectory({ type: 'delivery-request', id: request?.id ?? '' }),
     [request?.id],
   );
 
-  
   const handlePhotosChange = useCallback(
     async (photos: DeliveryRequestPhoto[]) => {
       if (!request) return;
@@ -686,13 +601,9 @@ export function useDeliveryRequestDetail(
         });
         setRequest(record);
         if (rebased) {
-          
-          
           notifications.show({ color: 'blue', message: t('photos.updatedElsewhere') });
         }
       } catch (err) {
-        
-        
         if (err instanceof EntityConflictError && err.latest) {
           setRequest(err.latest as DeliveryRequest);
         }
@@ -719,12 +630,6 @@ export function useDeliveryRequestDetail(
           fileName: storedName,
         });
 
-        
-        
-        
-        
-        
-        
         let photoUrl: string;
         let queuedId: string | null = null;
 
@@ -753,10 +658,6 @@ export function useDeliveryRequestDetail(
         } else {
           const queued = await enqueuePhoto(queuePayload);
 
-          
-          
-          
-          
           if (!queued) {
             notifications.show({
               color: 'red',
@@ -771,9 +672,6 @@ export function useDeliveryRequestDetail(
           photoUrl = pendingPhotoUrl(queued.id);
         }
 
-        
-        
-        
         const newPhoto: DeliveryRequestPhoto = {
           url: photoUrl,
           timestamp: result.timestamp,
@@ -785,29 +683,12 @@ export function useDeliveryRequestDetail(
           ...(isCompletionCapture && { takenAtDelivery: true }),
         };
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         if (isCompletionCapture) setCompletionPhotos((prev) => [...prev, newPhoto]);
 
         const currentPhotos: DeliveryRequestPhoto[] =
           (request.extra as DeliveryRequestExtra | undefined)?.photos ?? [];
         let attachFailed = false;
         try {
-          
-          
-          
-          
-          
           await withTimeout(
             handlePhotosChange([...currentPhotos, newPhoto]),
             RECORD_WRITE_TIMEOUT_MS,
@@ -815,21 +696,13 @@ export function useDeliveryRequestDetail(
           if (queuedId) void markPendingAttached(queuedId);
         } catch {
           attachFailed = true;
-          
-          
-          
-          
-          
+
           if (!queuedId && uploaded.ok) {
             const salvaged = await enqueuePhoto({ ...queuePayload, uploadedUrl: uploaded.url });
             if (salvaged) queuedId = salvaged.id;
           }
         }
 
-        
-        
-        
-        
         if (queuedId || attachFailed) {
           notifications.show({
             color: 'yellow',
@@ -851,11 +724,6 @@ export function useDeliveryRequestDetail(
     [request, imageDirectory, currentEmployee, handlePhotosChange, closeCamera, t],
   );
 
-  
-  
-  
-  
-  
   const requestId = request?.id;
   useEffect(() => {
     if (!requestId) return;
@@ -867,9 +735,6 @@ export function useDeliveryRequestDetail(
 
   const [syncingCompletion, setSyncingCompletion] = useState(false);
 
-  
-  
-  
   useEffect(() => {
     if (!requestId) return;
     let cancelled = false;
@@ -918,8 +783,6 @@ export function useDeliveryRequestDetail(
     }
   }, [requestId, t]);
 
-  
-  
   const discardPendingSync = useCallback(async () => {
     if (!requestId) return;
     await removeQueuedTransition(requestId);
@@ -941,7 +804,6 @@ export function useDeliveryRequestDetail(
     }
   }, [requestId, t]);
 
-  
   const statusFlowOrder = useMemo(() => getStatusFlowOrder(), []);
   const currentFlowIndex = useMemo(
     () => statusFlowOrder.indexOf(currentStatus.value),

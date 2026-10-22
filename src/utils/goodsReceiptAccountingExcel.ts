@@ -1,5 +1,3 @@
-
-
 import type { GoodsReceipt } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
 import {
@@ -11,9 +9,8 @@ import {
 } from '@/utils/accountingExcelSheet';
 
 export type GoodsReceiptAccountingExportOptions = {
-  
   employeeCodes: ReadonlyMap<string, string>;
-  
+
   resolveStatusLabel: (status: GoodsReceipt['status']) => string;
 };
 
@@ -44,12 +41,9 @@ export const exportGoodsReceiptsToAccountingExcel = (
 ): void => {
   const dataRows: (string | number)[][] = [];
   for (const r of receipts) {
-    
-    
     const receivedDate = formatDate(r.receivedDate ?? r.createdAt);
     const staffCode = r.extra?.assignedTo ? (employeeCodes.get(r.extra.assignedTo) ?? '') : '';
-    
-    
+
     const statusLabel = resolveStatusLabel(r.status);
 
     for (const item of r.items ?? []) {

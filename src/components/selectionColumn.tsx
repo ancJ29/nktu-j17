@@ -4,19 +4,18 @@ import type { ReactNode } from 'react';
 export const SELECTION_COLUMN_KEY = '__select';
 
 type SelectionColumnArgs<T> = {
-  
   readonly keyOf: (item: T) => string;
   readonly isSelected: (key: string) => boolean;
   readonly onToggleRow: (key: string) => void;
   readonly onToggleAll: () => void;
   readonly allSelected: boolean;
   readonly someSelected: boolean;
-  
+
   readonly selectAllLabel: string;
-  
+
   readonly rowLabel?: (item: T) => string;
   readonly isDisabled?: (item: T) => boolean;
-  
+
   readonly disabledTooltip?: string;
 };
 
@@ -36,7 +35,7 @@ export function selectionColumn<T>({
   width: string;
   header: ReactNode;
   render: (item: T) => ReactNode;
-  
+
   hidden?: boolean;
 } {
   return {

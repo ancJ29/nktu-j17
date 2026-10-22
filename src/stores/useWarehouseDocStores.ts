@@ -8,9 +8,8 @@ const warehouseReceipt: Bundle = createPartitionedRecordsStore<WarehouseDocRow>(
   entity: 'warehouse-receipts',
   partitionLocate: 'explicit',
   uniqueField: 'extra.code',
-  
-  
-  cacheKey: 'whr2.e421aa', 
+
+  cacheKey: 'whr2.e421aa',
   cacheTTL: ONE_MINUTE,
   staleTime: ONE_MINUTE,
 });
@@ -19,9 +18,8 @@ const warehouseDeliveryNote: Bundle = createPartitionedRecordsStore<WarehouseDoc
   entity: 'warehouse-delivery-notes',
   partitionLocate: 'explicit',
   uniqueField: 'extra.code',
-  
-  
-  cacheKey: 'whdn2.5b9d41', 
+
+  cacheKey: 'whdn2.5b9d41',
   cacheTTL: ONE_MINUTE,
   staleTime: ONE_MINUTE,
 });

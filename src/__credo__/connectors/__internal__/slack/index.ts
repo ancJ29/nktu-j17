@@ -98,9 +98,6 @@ export const slackConnector = {
       }
     }
 
-    
-    
-    
     await push({
       channel: resolvedChannel,
       title,
@@ -109,7 +106,6 @@ export const slackConnector = {
     });
   },
 
-  
   verifyConnection: async ({
     channel,
     send = false,
@@ -117,9 +113,8 @@ export const slackConnector = {
     title = 'Slack connection check',
     content,
   }: {
-    
     channel?: string;
-    
+
     send?: boolean;
     timeoutMs?: number;
     title?: string;
@@ -197,13 +192,7 @@ export const slackConnector = {
       },
     });
 
-    
-    
-    
-    
-    
     if (!result.ok) {
-      
       console.error(`Failed to send message to Slack: ${result.reason} ${result.detail ?? ''}`);
     }
   },
@@ -219,7 +208,6 @@ export const slackConnector = {
     channel?: string;
     memo?: Record<string, unknown> | undefined;
   }) => {
-    
     if (uniqueId) {
       const dedupeKey = `error-${uniqueId}`;
       const next = storage.nextPushByKey[dedupeKey] || 0;
@@ -352,7 +340,6 @@ async function push({
 
   const resolvedChannel = channel ?? storage.defaultChannel;
   if (!resolvedChannel) {
-    
     return { ok: false, reason: 'no-channel' };
   }
 
@@ -385,13 +372,6 @@ async function push({
     data['text'] = 'no message';
   }
 
-  
-  
-  
-  
-  
-  
-  
   try {
     const response = await fetch(SLACK_API_URL, {
       method: 'POST',

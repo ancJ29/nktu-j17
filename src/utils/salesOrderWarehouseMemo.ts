@@ -21,8 +21,6 @@ export function buildSalesOrderWarehouseMemo(
     const memo = product?.extra?.warehouseMemo?.trim();
     if (!memo) continue;
 
-    
-    
     const name = item.productName?.trim() || product?.name?.trim() || code;
     lines.push(`${name}: ${memo}`);
   }

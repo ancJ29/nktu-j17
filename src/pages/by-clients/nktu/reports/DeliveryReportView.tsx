@@ -25,7 +25,7 @@ const WEEK_COUNT = 12;
 
 interface Props {
   title: string;
-  
+
   period?: string;
   onPeriodChange: (period: string) => void;
 }

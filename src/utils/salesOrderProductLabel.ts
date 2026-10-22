@@ -1,5 +1,3 @@
-
-
 import type { SalesOrderItem } from '@/types';
 
 export type ProductLabelSize = 'small' | 'A7';
@@ -22,7 +20,6 @@ export function formatProductLabelPaperSize(size: ProductLabelSize): string {
 }
 
 export type ProductLabelFields = {
-  
   lineNo: number;
   date: string;
   header: string;
@@ -30,9 +27,9 @@ export type ProductLabelFields = {
   productName: string;
   color: string;
   dimensions: string;
-  
+
   quantity: string;
-  
+
   packageCount: number;
   weight: string;
   customerPONumber: string;
@@ -103,9 +100,9 @@ export type ProductLabelOffset = { xMm: number; yMm: number };
 export type ProductLabelPrintOptions = {
   size: ProductLabelSize;
   template: ProductLabelTemplate;
-  
+
   paper?: ProductLabelSize;
-  
+
   offset?: ProductLabelOffset;
 };
 
@@ -184,13 +181,10 @@ export function buildProductLabelHtml(
 ): string {
   const { widthIn, heightIn } = PRODUCT_LABEL_SIZES[options.size];
   const page = PRODUCT_LABEL_SIZES[options.paper ?? options.size];
-  
-  
-  
+
   const baseLeftIn = page.widthIn - widthIn;
   const baseTopIn = (page.heightIn - heightIn) / 2;
-  
-  
+
   const basePx = options.size === 'A7' ? 12 : 9;
 
   const sheet = (k: number, offset: ProductLabelOffset, tag?: string) => {

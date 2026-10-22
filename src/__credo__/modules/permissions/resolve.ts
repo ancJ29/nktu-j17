@@ -1,5 +1,3 @@
-
-
 import type { PartialPermissions, Permissions } from './types.js';
 
 export function deepMergePermissions(

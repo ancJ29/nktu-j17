@@ -1,5 +1,3 @@
-
-
 import type { MobileFilterDef, MobileMultiFilterDef } from './MobileFilterBar';
 
 const ALL = 'all';
@@ -7,14 +5,13 @@ const ALL = 'all';
 type Option = { value: string; label: string };
 
 type AllOptionFilterArgs<T extends string | null> = {
-  
   title: string;
   value: T;
   options: readonly Option[];
   onChange: (value: T) => void;
-  
+
   allLabel: string;
-  
+
   emptyValue: T;
   visible?: boolean;
 };
@@ -43,7 +40,7 @@ type MultiOptionFilterArgs = {
   options: readonly Option[];
   onChange: (value: string[]) => void;
   allLabel: string;
-  
+
   displayValue: string;
   visible?: boolean;
 };

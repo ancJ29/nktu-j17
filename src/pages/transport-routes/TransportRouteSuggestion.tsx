@@ -9,7 +9,7 @@ import { readTruckingSize } from '../transport-orders/truckingSize';
 type Props = {
   readonly matches: readonly TransportRouteRow[];
   readonly onApply: (route: TransportRouteRow) => void;
-  
+
   readonly appliedCode?: string | undefined;
 };
 

@@ -1,5 +1,3 @@
-
-
 import type { CredoAppConfig } from '../schema';
 
 type Features = NonNullable<CredoAppConfig['features']>;

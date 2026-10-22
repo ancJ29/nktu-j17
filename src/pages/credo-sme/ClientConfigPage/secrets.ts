@@ -1,5 +1,3 @@
-
-
 import { isLocalhost } from '@/config/env';
 
 export const ADMIN_KEY_STORAGE = '__credo_sme_admin_key__';

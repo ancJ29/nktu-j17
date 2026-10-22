@@ -2,7 +2,6 @@ import { findGrowingCropInGreenhouse, windowDayCount } from './cropSchedule';
 import type { Crop } from '@/types';
 
 export type GreenhouseOccupancyState =
-  
   | 'free'
   /** No crop growing yet, but one is scheduled. */
   | 'planned'
@@ -11,15 +10,15 @@ export type GreenhouseOccupancyState =
 
 export type GreenhouseOccupancy = {
   state: GreenhouseOccupancyState;
-  
+
   crop?: Crop;
-  
+
   dayOfCycle: number | null;
-  
+
   totalDays: number | null;
-  
+
   isOverdue: boolean;
-  
+
   daysUntilStart: number | null;
 };
 

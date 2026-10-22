@@ -2,18 +2,17 @@ import { createIdbStore } from '@/utils/idbStore';
 import type { DeliveryRequestDeliveredItem } from '@/types';
 
 export type QueuedTransition = {
-  
   id: string;
   drNumber?: string;
   toStatusValue: string;
-  
+
   toStatusLabel?: string;
   note?: string;
   deliveredItems?: DeliveryRequestDeliveredItem[];
   actor?: { id: string; name: string };
   createdAt: number;
   attempts: number;
-  
+
   blocked?: { reason: string; at: number };
 };
 

@@ -47,10 +47,6 @@ export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
   );
 
   const add = useCallback(() => {
-    
-    
-    
-    
     const used = new Set(columns.map((c) => c.key));
     let n = columns.length + 1;
     while (used.has(`c${n}`)) n++;
@@ -94,12 +90,7 @@ export const ProcessColumnsEditor = memo(function ProcessColumnsEditor({
                       value &&
                       patch(index, {
                         kind: value as SheetColumnKind,
-                        
-                        
-                        
-                        
-                        
-                        
+
                         ...(value !== 'ratio' && { materialCode: undefined }),
                       })
                     }

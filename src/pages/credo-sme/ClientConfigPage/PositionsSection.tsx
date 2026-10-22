@@ -1,5 +1,3 @@
-
-
 import { Alert, Stack, Text } from '@mantine/core';
 import { OptionListEditor } from './OptionListEditor';
 import type { PositionOption } from './optionFields';
@@ -12,7 +10,7 @@ export function PositionsSection({
 }: {
   options: PositionOption[];
   langCodes: string[];
-  
+
   orphaned: boolean;
   onChange: (next: PositionOption[]) => void;
 }) {

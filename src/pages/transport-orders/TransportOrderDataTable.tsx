@@ -43,19 +43,17 @@ export function TransportOrderDataTable({
   readonly orders: TransportOrder[];
   readonly isLoading?: boolean;
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly sortField?: string;
   readonly onSortChange?: (field: string) => void;
 }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const shipmentTypeLabel = useShipmentTypeLabel();
-  
-  
+
   const density = tableDensity();
   const widths = COLUMN_WIDTHS[density];
 
-  
   const [expandedIds, setExpandedIds] = useState<ReadonlySet<string>>(new Set());
   const toggleExpanded = useCallback((id: string) => {
     setExpandedIds((prev) => {
@@ -113,9 +111,7 @@ export function TransportOrderDataTable({
         key: 'shipmentType',
         header: t('transportOrders.form.shipmentType'),
         width: widths.shipmentType,
-        
-        
-        
+
         render: (item: TransportOrder) =>
           item.shipmentType ? (
             <ColorBadge size="sm" label={shipmentTypeLabel(item.shipmentType)} />
@@ -147,15 +143,7 @@ export function TransportOrderDataTable({
       {
         key: 'route',
         header: t('transportOrders.columns.route'),
-        
-        
-        
-        
-        
-        
-        
-        
-        
+
         onCellClick: (item: TransportOrder, event: MouseEvent) => {
           if (!item.isMultiTrip) return;
           event.stopPropagation();
@@ -173,9 +161,7 @@ export function TransportOrderDataTable({
         key: 'status',
         header: t('__new__.01-common.labels.status'),
         ta: 'center' as const,
-        
-        
-        
+
         width: widths.status,
         render: (item: TransportOrder) => {
           const status = findStatus(item.status);
@@ -195,7 +181,7 @@ export function TransportOrderDataTable({
         },
       },
     ],
-    
+
     [
       t,
       i18n.language,

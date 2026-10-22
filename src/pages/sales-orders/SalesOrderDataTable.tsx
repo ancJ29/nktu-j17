@@ -35,10 +35,6 @@ const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice(
 const vatRate = getPricingVatRate();
 
 function getDeliveryDateColor(order: SalesOrder): string | undefined {
-  
-  
-  
-  
   if (order.isClosed || order.extra?.cancellation != null) return undefined;
   const deliveryDate = order.extra?.deliveryDate;
   if (!deliveryDate) return undefined;
@@ -70,34 +66,34 @@ type SalesOrderDataTableProps = {
   readonly tagOptions: ResolvedTagOption[];
   readonly sortField?: string;
   readonly onSortChange?: (field: string) => void;
-  
+
   readonly selectable?: boolean;
   readonly selectedIds?: ReadonlySet<string>;
   readonly onToggleRow?: (id: string) => void;
   readonly onToggleAll?: () => void;
-  
+
   readonly allSelected?: boolean;
   readonly someSelected?: boolean;
-  
+
   readonly disabledIds?: ReadonlySet<string>;
-  
+
   readonly onShowItems?: (order: SalesOrder) => void;
-  
+
   readonly view: SalesOrderListView;
-  
+
   readonly showCheatMarker?: boolean;
-  
+
   readonly vacuousCompletionIds?: ReadonlySet<string>;
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly dateColumns: SalesOrderListVariant['dateColumns'];
-  
+
   readonly showPaymentColumns: boolean;
-  
+
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
-  
+
   readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
-  
+
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;
@@ -268,7 +264,7 @@ export function SalesOrderDataTable({
     };
     const labelsColumn: DataTableColumn<SalesOrder> = {
       key: 'labels',
-      
+
       header: (
         <SortHeader
           label={t('salesOrders.columns.labels')}
@@ -290,7 +286,6 @@ export function SalesOrderDataTable({
       ),
     };
     const subtotalColumn: DataTableColumn<SalesOrder> = {
-      
       key: 'financeSubtotal',
       header: t('salesOrders.finance.subtotalLabel'),
       ta: 'right',
@@ -303,7 +298,6 @@ export function SalesOrderDataTable({
       ),
     };
     const vatColumn: DataTableColumn<SalesOrder> = {
-      
       key: 'financeVat',
       header: t('salesOrders.finance.vatLabel'),
       ta: 'right',
@@ -315,8 +309,7 @@ export function SalesOrderDataTable({
         </Text>
       ),
     };
-    
-    
+
     const itemsColumns: DataTableColumn<SalesOrder>[] = onShowItems
       ? [
           {
@@ -349,7 +342,6 @@ export function SalesOrderDataTable({
           key: 'financeDate',
           header: (
             <SortHeader
-              
               label={t('__new__.01-common.labels.orderDate')}
               field="createdAt"
               current={sortField}
@@ -364,7 +356,6 @@ export function SalesOrderDataTable({
         subtotalColumn,
         vatColumn,
         {
-          
           key: 'financeGrandTotal',
           header: t('salesOrders.finance.grandTotalLabel'),
           ta: 'right',
@@ -376,7 +367,6 @@ export function SalesOrderDataTable({
           ),
         },
         {
-          
           key: 'financeInvoice',
           header: t('salesOrders.billing.invoiceLabel'),
           width: '120px',
@@ -394,7 +384,6 @@ export function SalesOrderDataTable({
       ];
     }
 
-    
     if (view === 'warehouse') {
       return [
         ...selectionColumns,
@@ -417,7 +406,6 @@ export function SalesOrderDataTable({
               subtotalColumn,
               vatColumn,
               {
-                
                 key: 'afterTax',
                 header: t('salesOrders.finance.afterTaxLabel'),
                 ta: 'right' as const,
@@ -458,11 +446,10 @@ export function SalesOrderDataTable({
         ? [
             {
               key: 'dates',
-              
+
               header: (
                 <Stack gap={2}>
                   <SortHeader
-                    
                     label={t('__new__.01-common.labels.orderDate')}
                     field="createdAt"
                     current={sortField}
@@ -525,13 +512,10 @@ export function SalesOrderDataTable({
               render: renderDeliveryDate,
             },
           ]),
-      
-      
+
       ...(showPrice
         ? [
             {
-              
-              
               key: 'totalIncl',
               header: (
                 <SortHeader
@@ -641,11 +625,8 @@ export function SalesOrderDataTable({
     getColumnFilter,
   ]);
 
-  
-  
   const handleRowClick = (item: SalesOrder) => {
     if (selectable) {
-      
       if (disabledIds?.has(item.id)) return;
       onToggleRow?.(item.id);
       return;
@@ -656,7 +637,6 @@ export function SalesOrderDataTable({
 
   const getRowBg = useCallback(
     (item: SalesOrder & Record<string, unknown>) =>
-      
       financeMode
         ? undefined
         : resolveSalesOrderRowBg(

@@ -1,5 +1,3 @@
-
-
 import { AppBrandName } from '@credo/base-ui/components';
 import { Anchor, Badge, Box, Button, Container, Group } from '@mantine/core';
 import { IconLogout } from '@tabler/icons-react';

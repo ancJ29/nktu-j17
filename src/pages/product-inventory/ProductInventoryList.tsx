@@ -1,5 +1,3 @@
-
-
 import { Badge, Button, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconBoxMultiple, IconBuildingWarehouse, IconCalendar } from '@tabler/icons-react';
@@ -83,11 +81,11 @@ type ProductInventoryFilters = {
   location: string | null;
   category: string | null;
   stock: StockFilter;
-  
+
   secondary: SecondaryFilter;
   search: string;
   page: number;
-  
+
   columnFilters: string;
 };
 const FILTER_DEFAULTS: ProductInventoryFilters = {
@@ -109,32 +107,18 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const navigate = useNavigate();
   const scrollViewportRef = useListScrollRestoration(ROUTES.INVENTORY.PRODUCTS);
 
-  
   const showBeginOfPeriod = variant.showBeginOfPeriod && canEditInventory;
   const shouldDisplayHeaderBadges = variant.showStockKpiBadges;
   const shouldDisplaySecondaryHeaderBadges = variant.showSecondaryKpiBadges;
-  
-  
-  
-  
-  
+
   const secondaryFilterEnabled =
     variant.showSecondaryFilter ||
     variant.quickChipMode === 'secondary' ||
     variant.showSecondaryKpiBadges;
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
   const stockLevelFilterEnabled =
     variant.showStockFilter || variant.quickChipMode === 'stock' || variant.showStockKpiBadges;
 
-  
   const {
     items: allRows,
     loading,
@@ -152,16 +136,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const loadProducts = useProductStore((s) => s.loadAll);
   const loadLocations = useLocationStore((s) => s.loadAll);
 
-  
-  
   const goodsReceiptsInitialized = useGoodsReceiptStore((s) => s.initialized);
   const loadGoodsReceipts = useGoodsReceiptStore((s) => s.loadAll);
   const inboundIndex = useOpenInboundByProduct();
 
-  
-  
-  
-  
   const customers = useCustomerStore((s) => s.items);
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
@@ -170,22 +148,14 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [customers],
   );
 
-  
-  
-  
-  
   const orderStatus = useReservationOrderStatus();
 
-  
-  
-  
   const [outgoingFor, setOutgoingFor] = useState<ProductInventorySummary | null>(null);
   const outgoingReservations = useMemo(
     () => (outgoingFor ? rollupReservationsBySO(outgoingFor) : []),
     [outgoingFor],
   );
 
-  
   const {
     state: filterState,
     updateState,
@@ -208,7 +178,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     (v: SecondaryFilter) => updateState({ secondary: v }),
     [updateState],
   );
-  
+
   const toggleStockFilter = useCallback(
     (v: StockFilter) => updateState({ stock: filterState.stock === v ? null : v }),
     [updateState, filterState.stock],
@@ -216,21 +186,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const summaries: ProductInventorySummary[] = useMemo(
     () =>
       buildProductInventorySummaries(
@@ -245,11 +200,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [products, allRows, locationFilter, inboundIndex],
   );
 
-  
-  
-  
-  
-  
   const columnFilterValues = useMemo(
     () => parseColumnFilters(filterState.columnFilters),
     [filterState.columnFilters],
@@ -267,9 +217,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     }),
     [t],
   );
-  
-  
-  
+
   const columnFilterDefs: ColumnFilterDef<ProductInventorySummary>[] = useMemo(
     () =>
       variant.showColumnHeaderFilters
@@ -277,9 +225,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
         : [],
     [variant.showColumnHeaderFilters, inboundIndex, columnFilterLabels],
   );
-  
-  
-  
+
   const columnFilters = useColumnFilters(summaries, columnFilterDefs, {
     value: columnFilterValues,
     onChange: setColumnFilterValues,
@@ -290,8 +236,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     category: categoryFilter,
     stock: stockFilter,
     secondary: secondaryFilter,
-    
-    
+
     columnFilters: filterState.columnFilters,
   };
 
@@ -301,10 +246,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       filterFn: (s, f) => {
         if (!s.product.isActive) return false;
         if (f.category && s.product.extra?.category !== f.category) return false;
-        
-        
-        
-        
+
         const stock = f.stock === 'needsRecheck' || stockLevelFilterEnabled ? f.stock : null;
         if (f.locationCode && s.rows.length === 0 && stock !== 'noStock') return false;
         if (stock === 'noStock' && s.rows.length > 0) return false;
@@ -317,8 +259,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
         }
         if (secondaryFilterEnabled && f.secondary && s.secondaryStatus !== f.secondary)
           return false;
-        
-        
+
         if (!columnFilters.predicate(s)) return false;
         return true;
       },
@@ -329,7 +270,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       onPageChange,
     });
 
-  
   const {
     totalCount,
     outOfStockCount,
@@ -372,14 +312,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     };
   }, [summaries]);
 
-  
   useEffect(() => {
     if (!initialized && !error) loadAll();
   }, [initialized, error, loadAll]);
 
-  
-  
-  
   useEffect(() => {
     if (!initialized || loading) return;
     void seedCurrentPeriodForProductInventory();
@@ -412,13 +348,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
 
-  
-  
-  
-  
-  
-  
-  
   const [composeOpen, setComposeOpen] = useState(false);
   const [decomposeOpen, setDecomposeOpen] = useState(false);
   const hasActiveSetProduct = useMemo(
@@ -442,10 +371,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const handleRowClick = useCallback(
     (product: Product) => {
-      
-      
-      
-      
       navigate(`${ROUTES.PRODUCTS.DETAIL.replace(':id', product.id)}?tab=inventory`, {
         state: { backTo: ROUTES.INVENTORY.PRODUCTS },
       });
@@ -453,7 +378,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [navigate],
   );
 
-  
   const locationOptions = useMemo(
     () =>
       locations
@@ -462,35 +386,26 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [locations],
   );
 
-  
-  
-  
   const categoryLookups = useLookupV2Options('product-category');
-  
-  
+
   const unitLabels = useLookupV2Labels('product-unit');
   const categoryOptions = useMemo(
     () => categoryLookups.map((o) => ({ value: o.value, label: o.label })),
     [categoryLookups],
   );
 
-  
-  
   const stockOptions = useMemo(
     () => [
       { value: 'noStock', label: t('productInventory.filterStock.noStock') },
       { value: 'outOfStock', label: t('productInventory.filterStock.outOfStock') },
       { value: 'lowStock', label: t('productInventory.filterStock.lowStock') },
       { value: 'negative', label: t('productInventory.filterStock.negative') },
-      
-      
+
       { value: 'needsRecheck', label: t('productInventory.filterStock.needsRecheck') },
     ],
     [t],
   );
 
-  
-  
   const secondaryOptions = useMemo(
     () => [
       { value: 'outOfStock', label: secondaryStatusLabels.outOfStock },
@@ -574,7 +489,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     () => [
       ...(categoryOptions.length > 0
         ? [
-            
             allOptionFilter({
               title: t('common.labels.category'),
               value: categoryFilter,
@@ -585,10 +499,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             }),
           ]
         : []),
-      
-      
-      
-      
+
       ...(variant.showStockFilter && !(isMobile && variant.quickChipMode === 'stock')
         ? [
             allOptionFilter<StockFilter>({
@@ -601,11 +512,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             }),
           ]
         : []),
-      
-      
-      
-      
-      
+
       ...(variant.showSecondaryFilter && !(isMobile && variant.quickChipMode === 'secondary')
         ? [
             allOptionFilter<SecondaryFilter>({
@@ -636,10 +543,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     ],
   );
 
-  
-  
-  
-  
   const mobileQuickChips: QuickFilterChip[] = useMemo(
     () =>
       variant.quickChipMode === 'none'
@@ -764,8 +667,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
               {shouldDisplayHeaderBadges ? (
                 <>
                   {outOfStockCount > 0 && (
-                    
-                    
                     <Badge
                       size="xs"
                       variant="light"
@@ -779,9 +680,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                     </Badge>
                   )}
                   {lowCount > 0 && (
-                    
-                    
-                    
                     <Badge
                       size="xs"
                       variant="light"
@@ -795,8 +693,6 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                     </Badge>
                   )}
                   {negativeCount > 0 && (
-                    
-                    
                     <Badge
                       size="xs"
                       variant="light"
@@ -935,10 +831,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             hideStatus
             filters={mobileFilters}
             onClear={clearFilters}
-            
-            
-            
-            
+
             hasActiveFilters={
               !!search ||
               mobileFilters.some((f) => (f.multi ? f.value.length > 0 : f.value !== 'all')) ||
@@ -955,16 +848,12 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             hideStatus
             filters={desktopFilters}
             onClear={clearFilters}
-            
-            
-            
+
             hasActiveFilters={
               !!search ||
               desktopFilters.some((f) => f.value !== null) ||
               columnFilters.hasActiveFilters ||
               (secondaryFilterEnabled && secondaryFilter !== null) ||
-              
-              
               stockFilter === 'needsRecheck'
             }
           />

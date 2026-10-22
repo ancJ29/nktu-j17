@@ -1,7 +1,4 @@
-
-
 export type ProductListVariant = {
-  
   showColumnHeaderFilters: boolean;
 };
 

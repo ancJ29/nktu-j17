@@ -1,5 +1,3 @@
-
-
 import type { ResolvedStatusOption } from '@/utils/permission';
 import type { Customer, SalesOrder } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -15,13 +13,12 @@ import {
 } from '@/utils/accountingExcelSheet';
 
 export type SalesOrderAccountingExportOptions = {
-  
   getCustomerByCode: (code: string) => Customer | undefined;
-  
+
   employeeCodes: ReadonlyMap<string, string>;
-  
+
   fallbackVatRate: number;
-  
+
   resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
 };
 
@@ -43,8 +40,7 @@ const HEADERS = [
   'Mã nhân viên bán hàng',
   'po',
   'thanh toán',
-  
-  
+
   'Trạng thái',
 ] as const;
 
@@ -80,13 +76,10 @@ export const exportSalesOrdersToAccountingExcel = (
     const staffCode = e.assignedStaff ? (employeeCodes.get(e.assignedStaff) ?? '') : '';
     const poNumber = e.customerPONumber ?? '';
     const vatRate = orderNeedsVAT(e) ? resolveOrderVatRate(e, fallbackVatRate) : 0;
-    
-    
+
     const statusLabel = resolveStatus(e.status).label;
 
     for (const item of o.items ?? []) {
-      
-      
       if (item.role === 'set-component') continue;
       const lineSubtotal = (item.quantity ?? 0) * (item.unitPrice ?? 0);
       const vatAmount = lineSubtotal * vatRate;
@@ -94,8 +87,8 @@ export const exportSalesOrdersToAccountingExcel = (
         orderDate,
         deliveryDate,
         o.orderNumber,
-        '', 
-        '', 
+        '',
+        '',
         item.productName ?? '',
         customerName,
         taxCode,
@@ -106,7 +99,7 @@ export const exportSalesOrdersToAccountingExcel = (
         lineSubtotal + vatAmount,
         staffCode,
         poNumber,
-        '', 
+        '',
         statusLabel,
       ]);
     }

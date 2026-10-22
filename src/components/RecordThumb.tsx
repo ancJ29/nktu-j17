@@ -3,12 +3,11 @@ import { IconPackage } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 
 type RecordThumbProps = {
-  
   readonly url?: string;
   readonly alt: string;
   readonly size?: number;
   readonly radius?: number | string;
-  
+
   readonly icon?: ReactNode;
 };
 

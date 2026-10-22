@@ -1,5 +1,3 @@
-
-
 import { SalesOrderList } from './SalesOrderList';
 import { DEFAULT_SALES_ORDER_LIST_VARIANT } from './salesOrderListVariant';
 

@@ -5,7 +5,6 @@ import { ResponsiveModal } from '@/components/ResponsiveModal';
 import type { MaterialLine } from '@/types';
 
 type Props = {
-  
   readonly cell: { day: number; columnKey: string; columnLabel: string } | null;
   readonly totalDays: number;
   readonly lines: MaterialLine[];

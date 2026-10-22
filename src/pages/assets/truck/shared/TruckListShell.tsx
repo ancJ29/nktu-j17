@@ -41,10 +41,10 @@ const scopeConfigured = isScopeConfigured(TRUCK_SCOPE);
 type FilterStatus = 'all' | 'active' | 'inactive';
 type TruckFilters = {
   status: FilterStatus;
-  
+
   truckType: string;
   urgency: ExpiryUrgency;
-  
+
   sort: string;
   search: string;
   page: number;
@@ -76,10 +76,6 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
       })),
     );
 
-  
-  
-  
-  
   const employees = useEmployeeStore((s) => s.items);
   const employeesInit = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
@@ -87,11 +83,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
     if (scopeConfigured && !TRUCK_SCOPE.canViewAll && !employeesInit) loadEmployees();
   }, [employeesInit, loadEmployees]);
 
-  
-  
-  
   const trucks = useMemo(() => {
-    
     const live = (items as TruckAssetRow[]).filter((a) => !a.extra?.isDeleted);
     return scopeTrucksToViewer(live, getCurrentEmployeeId(), TRUCK_SCOPE);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `employees` is the hydration trigger for `getCurrentEmployeeId()`, not a value read here.
@@ -117,13 +109,8 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  
-  
-  
   const todayIso = todayInVnDateString();
 
-  
-  
   const ordered = useMemo(() => {
     if (!sort) return trucks;
     const [field, dir] = sort.split('_');
@@ -151,12 +138,6 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
       onPageChange,
     });
 
-  
-  
-  
-  
-  
-  
   const hasActiveFilters =
     !!search ||
     filter !== FILTER_DEFAULTS.status ||
@@ -179,11 +160,9 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
 
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
   const typeLabels = useLookupV2Labels('truck-type');
-  
-  
+
   const typeOptions = useLookupV2Options('truck-type');
 
-  
   const urgencyChips: QuickFilterChip[] = useMemo(
     () =>
       (['all', 'within7', 'within30', 'expired'] as const).map((key) => ({
@@ -192,7 +171,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
         active: urgency === key,
         onClick: () => setUrgency(key),
       })),
-    
+
     [t, i18nKey, urgency, setUrgency],
   );
   const columns = useMemo(
@@ -273,8 +252,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
                 onChange: setTruckType,
                 data: typeOptions,
                 placeholder: tk(`${i18nKey}.filters.truckType`),
-                
-                
+
                 searchable: typeOptions.length > 8,
                 w: 170,
               },

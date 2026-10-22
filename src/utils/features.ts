@@ -6,7 +6,7 @@ export const featureFlags = {
   employees: {
     enabled: features?.employees?.enabled ?? true,
     selfManage: features?.employees?.selfManage ?? false,
-    
+
     v2: features?.employees?.v2 ?? false,
   },
   products: {
@@ -23,7 +23,7 @@ export const featureFlags = {
   },
   vendorsV2: {
     enabled: features?.vendorsV2?.enabled ?? false,
-    
+
     simpleMode: features?.vendorsV2?.simpleMode ?? true,
   },
   customersV2: {
@@ -33,7 +33,7 @@ export const featureFlags = {
   productsV2: {
     enabled: features?.productsV2?.enabled ?? false,
     simpleMode: features?.productsV2?.simpleMode ?? true,
-    
+
     priceManagement: features?.productsV2?.priceManagement ?? false,
     productPhoto: features?.productsV2?.productPhoto ?? false,
     inventory: features?.productsV2?.inventory ?? false,
@@ -100,7 +100,7 @@ export const featureFlags = {
   farm: {
     enabled: features?.farm?.enabled ?? false,
   },
-  
+
   nktuOdometerLog: {
     enabled: features?.nktuOdometerLog?.enabled ?? false,
   },

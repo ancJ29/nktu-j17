@@ -39,15 +39,15 @@ interface Row {
 
 interface Resolved {
   rows: Row[];
-  
+
   orders: number;
   amount: number;
-  
+
   qty?: number;
   unit?: string;
-  
+
   chips: { key: 'completed' | 'buyers'; value: string }[];
-  
+
   matched: boolean;
 }
 
@@ -88,8 +88,6 @@ function resolveProduct(
   data: CustomerProductReportData,
   target: Extract<EntitySalesTarget, { kind: 'product' }>,
 ): Resolved {
-  
-  
   const entries = data.products.filter((p) =>
     target.code ? p.code === target.code : !p.code && p.name === target.name,
   );
@@ -102,8 +100,7 @@ function resolveProduct(
     .filter((c) => keys.has(c.p))
     .map((c) => {
       const customer = customers.get(c.c);
-      
-      
+
       const unit = multiUnit ? unitOf.get(c.p) : undefined;
       return {
         key: `${c.c}-${c.p}`,
@@ -120,13 +117,10 @@ function resolveProduct(
   const buyers = new Set(data.cells.filter((c) => keys.has(c.p)).map((c) => c.c)).size;
   return {
     rows,
-    
-    
-    
+
     orders: entries.reduce((a, p) => a + p.orders, 0),
     amount: entries.reduce((a, p) => a + p.amount, 0),
-    
-    
+
     ...(multiUnit
       ? {}
       : { qty: entries[0]?.qty ?? 0, ...(entries[0]?.unit ? { unit: entries[0].unit } : {}) }),

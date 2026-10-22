@@ -8,7 +8,7 @@ const FUEL_PRICE_RECORD_TARGET = {
 
 export const useFuelPriceStore = createSingleRecordsStore<FuelPriceRow>({
   ...FUEL_PRICE_RECORD_TARGET,
-  
+
   cacheKey: 'fpr.2e77b0',
   cacheTTL: 10 * ONE_MINUTE,
 });

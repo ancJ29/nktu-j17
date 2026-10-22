@@ -12,9 +12,9 @@ import { NumberField } from '@/components/NumberField';
 type Props = {
   readonly value: MaterialLine[];
   readonly onChange: (lines: MaterialLine[]) => void;
-  
+
   readonly disabled?: boolean;
-  
+
   readonly disabledHint?: string;
 };
 

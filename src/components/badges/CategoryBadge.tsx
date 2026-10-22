@@ -3,7 +3,7 @@ import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 
 type CategoryBadgeProps = {
   readonly category: string | undefined;
-  
+
   readonly lookup?: string;
   readonly color?: string;
 };

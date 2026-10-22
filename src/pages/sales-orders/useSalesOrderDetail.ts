@@ -201,11 +201,10 @@ function notifyTransitionFailure(
 type UseSalesOrderDetailOptions = {
   clientSpecific?: {
     NKTU?: {
-      
       deliveryToggleEnabled?: boolean;
-      
+
       internalDeliveryMethodCode?: string;
-      
+
       externalDeliveryMethodCode?: string;
     };
   };
@@ -271,10 +270,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     loadDRs,
   ]);
 
-  
-  
-  
-  
   useEffect(() => {
     void useProductInventoryStore.getState().revalidate();
   }, []);
@@ -283,12 +278,11 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     if (!id) return;
     const cached = useSalesOrderStore.getState().getById(id) as SalesOrder | undefined;
     if (cached) {
-      
       if (cached.extra?.isDeleted) {
         navigate(ROUTES.SALES_ORDERS.LIST, { replace: true });
         return;
       }
-      
+
       setOrder(cached);
       setLoading(false);
       return;
@@ -311,14 +305,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       .finally(() => setLoading(false));
   }, [id, t, navigate]);
 
-  
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!order) return;
     if (canViewAll) return;
@@ -328,30 +314,17 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       return;
     }
     const me = getCurrentEmployeeId();
-    if (!me) return; 
+    if (!me) return;
     if (order.extra?.assignedStaff !== me) {
       notifications.show({ color: 'yellow', message: t('salesOrders.notifications.accessDenied') });
       navigate(ROUTES.SALES_ORDERS.LIST);
     }
   }, [order, employees, t, navigate]);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const autoAdvancedRef = useRef<string | null>(null);
   useEffect(() => {
     if (!order) return;
-    
-    
-    
-    
-    
+
     const hasPendingShip =
       (order.extra as SalesOrderExtra | undefined)?.inventoryLinkage?.pendingShip != null;
     if (order.isClosed && !hasPendingShip) return;
@@ -360,17 +333,11 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     if (autoAdvancedRef.current === order.id) return;
     autoAdvancedRef.current = order.id;
     void advanceSoIfFullyDelivered({ so: order, actor: currentEmployee, t }).then(() => {
-      
-      
-      
       const fresh = useSalesOrderStore.getState().getById(order.id) as SalesOrder | undefined;
       if (fresh && fresh.version !== order.version) setOrder(fresh);
     });
   }, [order, drsInit, productsInit, inventoryInit, currentEmployee, t]);
 
-  
-  
-  
   const platformLogSweptRef = useRef<string | null>(null);
   useEffect(() => {
     if (!order || platformLogSweptRef.current === order.id) return;
@@ -383,23 +350,11 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
   const productByCode = useMemo(() => indexProductsByCode(products), [products]);
 
-  
-  
-  
-  
-  
-
-  
-
   const handleStatusChange = useCallback(
     async (newStatus: string, note?: string) => {
       if (!id || !order) return;
       setActionLoading(true);
-      
-      
-      
-      
-      
+
       await useProductInventoryStore.getState().revalidate();
       const freshInventoryByProduct = indexInventoryByProduct(
         useProductInventoryStore.getState().items,
@@ -419,12 +374,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           message: t('salesOrders.notifications.statusChangeSuccess'),
         });
         forceRefresh();
-        
-        
-        
-        
-        
-        
+
         const fromStatusValue = (order.extra as SalesOrderExtra | undefined)?.status ?? '';
         logActivity(
           'salesOrder.statusChange',
@@ -437,10 +387,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             shipPending: result.pendingShip != null,
           }),
         );
-        
-        
-        
-        
+
         const actor = currentEmployee
           ? { id: currentEmployee.id, name: currentEmployee.name }
           : undefined;
@@ -448,9 +395,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           await dispatchSoFollowUp(followUp, result.updated, actor, t);
         }
 
-        
-        
-        
         if (result.pendingShip) {
           const recovery = await runShipRecovery({
             so: result.updated,
@@ -466,7 +410,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       } else {
         notifyTransitionFailure(result.failure, t, productByCode);
         if (result.failure.kind === 'patch-conflict') {
-          
           const fresh = useSalesOrderStore.getState().getById(id) as SalesOrder | undefined;
           if (fresh) setOrder(fresh);
         }
@@ -478,8 +421,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     },
     [id, order, t, currentEmployee, productByCode, forceRefresh, closeStatusChange],
   );
-
-  
 
   const handleCancel = useCallback(
     async (reason?: string) => {
@@ -497,7 +438,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       };
       const log: SalesOrderActivityEntry[] = currentExtra.activityLog ?? [];
 
-      
       const linkage = currentExtra.inventoryLinkage;
       const shouldAutoRelease =
         linkage?.state === 'reserved' &&
@@ -508,20 +448,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       let autoReleaseFailed = false;
       let appliedInventoryOps: readonly AppliedOp[] = [];
 
-      
-      
-      
-      
-      
-      
-      
-      
-      
       if (shouldAutoRelease) {
-        
-        
-        
-        
         await useProductInventoryStore.getState().revalidate();
         const freshInventoryByProduct = indexInventoryByProduct(
           useProductInventoryStore.getState().items,
@@ -557,11 +484,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         ...(reason ? { note: reason } : {}),
       };
 
-      
-      
-      
-      
-      
       const cancellationTargetStatus = getCancellationTargetStatusValue();
       const statusChangeEntry: SalesOrderActivityEntry | null =
         cancellationTargetStatus && cancellationTargetStatus !== fromStatus
@@ -613,10 +535,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           });
         }
         forceRefresh();
-        
-        
-        
-        
+
         if (appliedInventoryOps.length > 0) {
           emitInventoryActivityForApplied(appliedInventoryOps, {
             kind: 'SO',
@@ -625,11 +544,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             suffix: '(cancel)',
           });
         }
-        
-        
-        
-        
-        
+
         logActivity('salesOrder.cancel', id, {
           orderNumber: order.orderNumber,
           fromStatus,
@@ -661,14 +576,11 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, currentEmployee, resolveStatus, productByCode, t, forceRefresh, closeCancel],
   );
 
-  
-
   const [manualReleaseOpened, { open: openManualRelease, close: closeManualRelease }] =
     useDisclosure(false);
 
   const [deleteOpened, { open: openDelete, close: closeDelete }] = useDisclosure(false);
 
-  
   const [createDROpened, { open: openCreateDR, close: closeCreateDR }] = useDisclosure(false);
   const [createReturnOpened, { open: openCreateReturn, close: closeCreateReturn }] =
     useDisclosure(false);
@@ -690,11 +602,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     }
     setActionLoading(true);
     const at = Date.now();
-    
-    
-    
-    
-    
+
     await useProductInventoryStore.getState().revalidate();
     const freshInventoryByProduct = indexInventoryByProduct(
       useProductInventoryStore.getState().items,
@@ -740,13 +648,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       { kind: 'manual-release' },
     );
 
-    
-    
-    
-    
-    
-    
-
     try {
       const updated = await useSalesOrderStore.getState().updateSafely({
         id,
@@ -764,9 +665,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         message: t('salesOrders.notifications.manualReleaseSuccess'),
       });
       forceRefresh();
-      
-      
-      
+
       if (manualReleaseApplied.length > 0) {
         emitInventoryActivityForApplied(manualReleaseApplied, {
           kind: 'SO',
@@ -775,13 +674,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           suffix: '(manual release)',
         });
       }
-      
-      
-      
-      
-      
-      
-      
+
       const releasedRows: SalesOrderReleasedRow[] = planResult.plan.ops.map((op) => ({
         productCode: op.itemCode,
         locationCode: op.locationCode,
@@ -812,12 +705,10 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     }
   }, [id, order, t, currentEmployee, productByCode, forceRefresh, closeManualRelease]);
 
-  
-
   const handleDelete = useCallback(async () => {
     if (!id || !order) return;
     const currentExtra = (order.extra ?? {}) as SalesOrderExtra;
-    
+
     const stage = resolveStatus(currentExtra.status).stage as Stage;
     if (stage === 'COMPLETED') {
       notifications.show({
@@ -830,23 +721,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     setActionLoading(true);
     const at = Date.now();
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     const linkage = currentExtra.inventoryLinkage;
 
     let nextLinkage: InventoryLinkage | undefined = linkage;
@@ -858,10 +732,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       const freshRows = useProductInventoryStore.getState().items;
       const freshInventoryByProduct = indexInventoryByProduct(freshRows);
       const heldSnapshot = buildHoldSnapshotForSalesOrder(freshRows, order.id);
-      
-      
-      
-      
+
       const shippedSnapshot = linkage?.state === 'shipped' ? (linkage.shippedSnapshot ?? []) : [];
       rollbackKind =
         heldSnapshot.length > 0 ? 'release' : shippedSnapshot.length > 0 ? 'unship' : null;
@@ -937,8 +808,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         message: t('salesOrders.notifications.deleteSuccess'),
       });
       forceRefresh();
-      
-      
+
       if (appliedInventoryOps.length > 0) {
         emitInventoryActivityForApplied(appliedInventoryOps, {
           kind: 'SO',
@@ -953,9 +823,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         ...(rollbackKind === 'release' ? { inventoryReleased: true } : {}),
         ...(rollbackKind === 'unship' ? { inventoryUnshipped: true } : {}),
       });
-      
-      
-      
+
       const cascade = await softDeleteLinkedDeliveryRequests(order.id);
       if (cascade.failed > 0) {
         notifications.show({
@@ -997,8 +865,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     closeDelete,
   ]);
 
-  
-
   const handleSendChat = useCallback(
     async (message: string) => {
       if (!id || !order) return;
@@ -1033,16 +899,11 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, currentEmployee, t],
   );
 
-  
-  
-  
-  
   const imageDirectory = useMemo(
     () => buildExpiringUploadDirectory({ type: 'sales-order', id: id ?? '' }),
     [id],
   );
 
-  
   const handlePhotosChange = useCallback(
     async (photos: SalesOrderPhoto[]) => {
       if (!id || !order) return;
@@ -1102,13 +963,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, t],
   );
 
-  
-  
-  
-  
-  
-  
-  
   const handleMetaPatch = useCallback(
     async (patch: { extra?: Partial<SalesOrderExtra>; notes?: string }) => {
       if (!id || !order) return;
@@ -1123,13 +977,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           },
         });
         setOrder(updated as SalesOrder);
-        
-        
-        
-        
-        
-        
-        
+
         const fields: SalesOrderInlineFields = {};
         if (patch.extra) {
           const before = currentExtra as SalesOrderExtra;
@@ -1169,7 +1017,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
               ...(toMs !== undefined && { to: toMs }),
             };
           }
-          
+
           if ('clientSpecific' in patch.extra) {
             const beforeNktu = before.clientSpecific?.NKTU;
             const afterNktu = patch.extra.clientSpecific?.NKTU;
@@ -1207,12 +1055,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, t],
   );
 
-  
-  
-  
-  
-  
-  
   const handleItemMemoPatch = useCallback(
     async (itemIndex: number, memo: string) => {
       if (!id || !order) return;
@@ -1255,12 +1097,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, t],
   );
 
-  
-  
-  
-  
-  
-  
   const handleItemReadyPatch = useCallback(
     async (itemIndex: number, isReady: boolean) => {
       if (!id || !order) return;
@@ -1301,11 +1137,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, t],
   );
 
-  
-  
-  
-  
-  
   const handleItemWarehouseMemoPatch = useCallback(
     async (itemIndex: number, warehouseMemo: string) => {
       if (!id || !order) return;
@@ -1353,19 +1184,10 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, t],
   );
 
-  
-  
-  
-  
-  
-  
-  
-  
   const handleToggleDeliveryMethod = useCallback(async () => {
     if (!order) return;
     if (!opts.clientSpecific?.NKTU?.deliveryToggleEnabled) return;
-    
-    
+
     const goExternal = (order.extra as SalesOrderExtra | undefined)?.isInternalDelivery !== false;
     await handleMetaPatch({
       extra: {
@@ -1393,10 +1215,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           fileName: storedName,
         });
 
-        
-        
-        
-        
         let photoUrl: string;
         let queuedId: string | null = null;
 
@@ -1450,16 +1268,12 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
         const currentPhotos: SalesOrderPhoto[] = order.extra?.photos ?? [];
         try {
-          
           await withTimeout(
             handlePhotosChange([...currentPhotos, newPhoto]),
             RECORD_WRITE_TIMEOUT_MS,
           );
           if (queuedId) void markPendingAttached(queuedId);
         } catch {
-          
-          
-          
           if (!queuedId && uploaded.ok) {
             const salvaged = await enqueuePhoto({ ...queuePayload, uploadedUrl: uploaded.url });
             if (salvaged) queuedId = salvaged.id;
@@ -1494,9 +1308,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     [id, order, imageDirectory, currentEmployee, handlePhotosChange, closeCamera, t],
   );
 
-  
-  
-  
   useEffect(() => {
     if (!id) return;
     void flushPhotoQueue({ kind: 'sales-order', id }).then((res) => {
@@ -1520,17 +1331,10 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     }
   }, [id, t]);
 
-  
-
   const extra = (order?.extra ?? {}) as SalesOrderExtra;
   const currentStatusValue = extra.status ?? '';
   const isCancelled = extra.cancellation != null;
 
-  
-  
-  
-  
-  
   const cancelTargetStatusValue = getCancellationTargetStatusValue();
   const allowedNextStatuses = useMemo(() => {
     if (isCancelled) return [];
@@ -1546,10 +1350,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     for (const entry of log) {
       if (entry.toStatus) map.set(entry.toStatus, entry);
     }
-    
-    
-    
-    
+
     const createdEntry = log.find((e) => e.action === 'created');
     if (createdEntry) {
       const initialStatus = createdEntry.toStatus || getInitialStatusValue() || statusFlowOrder[0];
@@ -1560,8 +1361,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
   const currentStatus = order ? resolveStatus(extra.status) : null;
   const isUrgent = extra.isUrgent === true;
-  
-  
+
   const isExternalDelivery = extra.isInternalDelivery === false;
 
   const handleCopyOrder = useCallback(() => {
@@ -1571,11 +1371,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       state: {
         copyFrom: {
           customerCode: e.customerCode,
-          
-          
-          
-          
-          
+
           customerName: order.customerName,
           isIndividualCustomer: e.isIndividualCustomer,
           isInternalDelivery: e.isInternalDelivery,
@@ -1592,13 +1388,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     });
   }, [order, navigate]);
 
-  
-  
-  
-  
-  
-  
-  
   const canCreateDR = useMemo(() => {
     if (isMobile) return false;
     if (!order || isCancelled) return false;
@@ -1606,13 +1395,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     return statusHasCapability(currentStatusValue, 'canCreateDR');
   }, [order, isCancelled, currentStatusValue]);
 
-  
-  
-  
-  
-  
-  
-  
   const cancelReachableViaTransition = useMemo(
     () =>
       cancelTargetStatusValue != null &&
@@ -1623,9 +1405,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     return order != null && !isCancelled && !cancelReachableViaTransition;
   }, [order, isCancelled, cancelReachableViaTransition]);
 
-  
-  
-  
   const canManualRelease = useMemo(() => {
     if (!order || !isCancelled) return false;
     const linkage = extra.inventoryLinkage;
@@ -1636,10 +1415,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     );
   }, [order, isCancelled, extra.inventoryLinkage]);
 
-  
-  
-  
-  
   const showDelete = useMemo(() => {
     if (!order || !canDeletePerm) return false;
     return currentStatus?.stage !== 'COMPLETED';
@@ -1650,40 +1425,18 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     openCreateDR();
   }, [order, openCreateDR]);
 
-  
-  
-  
   const refreshLinkedDRs = useCallback(() => {
     void useDeliveryRequestStore.getState().forceRefresh();
   }, []);
 
   const linkedDRs: DeliveryRequest[] = useMemo(() => {
     if (!order) return [];
-    
-    
-    
+
     return drs.filter(
       (d) => d.salesOrderId === order.id && !d.extra?.isDeleted,
     ) as DeliveryRequest[];
   }, [drs, order]);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const deliveryDateRecheckRef = useRef<string | null>(null);
   useEffect(() => {
     if (!order || !drsInit) return;
@@ -1711,9 +1464,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       })
       .then((updated) => {
         setOrder(updated as SalesOrder);
-        
-        
-        
+
         logActivity('salesOrder.update', order.id, {
           orderNumber: order.orderNumber,
           autoRepair: 'delivery-date',
@@ -1728,13 +1479,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       .catch(() => undefined);
   }, [order, linkedDRs, drsInit, resolveStatus]);
 
-  
-  
-  
-  
-  
-  
-  
   const reconcileIssues: SoDeliveryIssue[] = useMemo(() => {
     if (!order || !drsInit || !inventoryInit || !productsInit) return [];
     const status = (order.extra as SalesOrderExtra | undefined)?.status ?? '';
@@ -1763,7 +1507,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
   const [reconcileOpened, { open: openReconcile, close: closeReconcile }] = useDisclosure(false);
 
-  
   const handleReconcileRepair = useCallback(async () => {
     if (!id || !order) return;
     setActionLoading(true);
@@ -1775,7 +1518,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         autoClose: 12000,
       });
     try {
-      
       await useProductInventoryStore.getState().revalidate();
       let inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
       let workingOrder = order;
@@ -1803,7 +1545,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
 
       let issues = derive();
 
-      
       const extra0 = (workingOrder.extra ?? {}) as SalesOrderExtra;
       const linkage0 = extra0.inventoryLinkage;
       if (
@@ -1856,16 +1597,10 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         issues = derive();
       }
 
-      
       const behind = issues.find((i) => i.kind === 'so-behind-deliveries');
       if (behind && behind.kind === 'so-behind-deliveries' && !behind.blockedByMatrix) {
         const target = getAutoCompletionTargetValue();
         if (target) {
-          
-          
-          
-          
-          
           const extraNow = (workingOrder.extra ?? {}) as SalesOrderExtra;
           const linkNow = extraNow.inventoryLinkage;
           const holdsLive =
@@ -1915,8 +1650,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             actor,
             productsByCode: productByCode,
             inventoryByProduct,
-            
-            
+
             actualDeliveryDate: resolveActualDeliveryDate(linkedDRs),
           });
           if (!result.ok) {
@@ -1930,8 +1664,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             );
             return;
           }
-          
-          
+
           logActivity(
             'salesOrder.statusChange',
             workingOrder.id,
@@ -1952,7 +1685,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         }
       }
 
-      
       const notDeducted = issues.find((i) => i.kind === 'completed-not-deducted');
       if (notDeducted && notDeducted.kind === 'completed-not-deducted') {
         let linkNow = ((workingOrder.extra ?? {}) as SalesOrderExtra).inventoryLinkage;
@@ -2047,7 +1779,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
         }
       }
 
-      
       const orphaned = issues.find((i) => i.kind === 'orphaned-holds');
       if (orphaned && orphaned.kind === 'orphaned-holds') {
         const entries = buildHoldSnapshotForSalesOrder(
@@ -2087,8 +1818,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             actions: repaired.join(', '),
           }),
         });
-        
-        
+
         logActivity('salesOrder.reconcileRepair', workingOrder.id, {
           orderNumber: workingOrder.orderNumber,
           actions: repaired,
@@ -2124,23 +1854,12 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     closeReconcile,
   ]);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const canCreateAdditionalDR = useMemo(() => {
     if (isMobile) return false;
     if (!additionalDRAllowed) return false;
     if (!order || isCancelled) return false;
     if (order.extra.isInternalDelivery === false) return false;
-    
-    
+
     return linkedDRs.some((d) => d.direction !== 'inbound');
   }, [order, isCancelled, linkedDRs]);
 
@@ -2149,12 +1868,6 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     openCreateReturn();
   }, [order, openCreateReturn]);
 
-  
-  
-  
-  
-  
-  
   const canCreateReturnShipment = useMemo(() => {
     if (isMobile) return false;
     if (!returnShipmentEnabled) return false;
@@ -2196,7 +1909,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     setCancelReason,
     canCancel,
     handleCancel,
-    
+
     cancelTargetStatusValue,
 
     canManualRelease,
@@ -2229,9 +1942,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     closeCreateReturn,
     refreshLinkedDRs,
     linkedDRs,
-    
-    
-    
+
     drsInit,
 
     handleSendChat,
@@ -2249,7 +1960,7 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
     handleToggleDeliveryMethod,
     isExternalDelivery,
     employees,
-    
+
     productByCode,
 
     cameraOpened,

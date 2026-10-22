@@ -110,8 +110,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     distanceKm: '',
     driverName: '',
     driverId: '',
-    
-    
+
     fuelSource: '',
     oilTankId: '',
     oilTankCode: '',
@@ -136,10 +135,6 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       render: (log) => formatNumber(log.extra?.totalAmount),
     },
     {
-      
-      
-      
-      
       header: 'operationLogs.refuel.columns.source',
       render: (log) => <FuelSourceCell extra={log.extra as RefuelLogExtra | undefined} />,
     },
@@ -172,9 +167,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
-  
-  
-  
+
   entityFilter: {
     labelKey: 'operationLogs.refuel.columns.driver',
     valueOf: (log) => log.extra?.driverName,
@@ -185,21 +178,18 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       v === '' || Number(v) >= 0 ? null : t('operationLogs.validation.litresInvalid'),
     unitPrice: (v) =>
       v === '' || Number(v) >= 0 ? null : t('operationLogs.validation.unitPriceInvalid'),
-    
-    
+
     oilTankId: (v, values) =>
       values.fuelSource !== 'tank' || String(v ?? '').trim()
         ? null
         : t('operationLogs.refuel.validation.tankRequired'),
   }),
-  
+
   validateOnSubmit: ({ values, previous, context, t }) => {
     if (values.fuelSource !== 'tank') return null;
     const tankId = String(values.oilTankId ?? '').trim();
     const tank = context?.oilTankOptions?.find((o) => o.value === tankId);
-    
-    
-    
+
     if (!tank) return null;
     const prev = previous?.extra;
     const sameTank = prev?.fuelSource === 'tank' && prev?.oilTankId === tankId;
@@ -224,11 +214,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
     ...(values.distanceKm !== '' && { distanceKm: Number(values.distanceKm) }),
     ...(String(values.driverName).trim() && { driverName: String(values.driverName).trim() }),
     ...(String(values.driverId).trim() && { driverId: String(values.driverId).trim() }),
-    
-    
-    
-    
-    
+
     ...(values.fuelSource === 'tank' && String(values.oilTankId).trim()
       ? {
           fuelSource: 'tank' as const,
@@ -260,8 +246,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
   },
   renderFields: (form, t, ctx) => {
     const tankOptions = ctx?.oilTankOptions ?? [];
-    
-    
+
     const syncTotal = (litres: LogFormValue, unitPrice: LogFormValue) => {
       const lit = Number(litres);
       const price = Number(unitPrice);
@@ -269,8 +254,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
         form.setFieldValue('totalAmount', Math.round(lit * price));
       }
     };
-    
-    
+
     const syncDistance = (before: LogFormValue, after: LogFormValue) => {
       const b = Number(before);
       const a = Number(after);
@@ -314,10 +298,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
               value={form.values.fuelSource === 'tank' ? 'tank' : 'external'}
               onChange={(v) => {
                 form.setFieldValue('fuelSource', v === 'tank' ? 'tank' : '');
-                
-                
-                
-                
+
                 if (v !== 'tank') {
                   form.setFieldValue('oilTankId', '');
                   form.setFieldValue('oilTankCode', '');
@@ -334,8 +315,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
                 value={String(form.values.oilTankId) || null}
                 onChange={(v) => {
                   form.setFieldValue('oilTankId', v ?? '');
-                  
-                  
+
                   form.setFieldValue(
                     'oilTankCode',
                     tankOptions.find((o) => o.value === v)?.code ?? '',
@@ -429,8 +409,7 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       </Card>
     );
   },
-  
-  
+
   rowTone: (log, visibleLogs) => {
     const c = refuelConsumption(log);
     if (c == null) return undefined;
@@ -440,12 +419,11 @@ export const REFUEL_LOG_CONFIG: OperationLogConfig = {
       ? { danger: true, tooltipKey: 'operationLogs.refuel.abnormalTooltip' }
       : undefined;
   },
-  
-  
+
   photos: { directoryType: 'truck-refuel-log', labelKey: 'operationLogs.refuel.columns.photos' },
-  
+
   rowLocked: (log) => Boolean(log.extra?.sourceIssueLogId),
-  
+
   afterWrite: syncTankIssue,
   afterWriteErrorKey: 'operationLogs.refuel.notifications.tankSyncError',
   export: (logs, meta) => {
@@ -503,7 +481,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
   addTitleKey: 'operationLogs.maintenance.addItem',
   editTitleKey: 'operationLogs.maintenance.editItem',
   emptyKey: 'operationLogs.maintenance.empty',
-  
+
   modalSize: 'xl',
   emptyForm: {
     logDate: todayString(),
@@ -513,24 +491,19 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     condition: '',
     odometer: '',
     laborCost: '',
-    
-    
-    
-    
+
     vatPercent: '',
     accountsReceived: '',
     note: '',
-    
-    
+
     items: [blankMaintenanceItem()],
   },
-  
-  
+
   columns: [
     dateColumn('operationLogs.maintenance.columns.date'),
     {
       header: 'operationLogs.maintenance.columns.type',
-      
+
       render: (log) => textCell(log.extra?.maintenanceTypeLabel ?? log.extra?.maintenanceType),
     },
     {
@@ -545,11 +518,9 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       header: 'operationLogs.maintenance.columns.total',
       align: 'right',
       emphasize: true,
-      
+
       render: (log) => formatNumber(log.extra?.grandTotal ?? log.extra?.cost),
-      
-      
-      
+
       sortField: 'total',
       sortValue: (log) => Number(log.extra?.grandTotal ?? log.extra?.cost) || 0,
     },
@@ -562,7 +533,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       sortValue: (log) => maintenanceOutstanding(log.extra) ?? 0,
     },
   ],
-  
+
   quickFilters: {
     options: [
       { value: 'all', labelKey: 'operationLogs.maintenance.filters.all' },
@@ -596,9 +567,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     });
   },
   exportLabelKey: 'operationLogs.exportExcel',
-  
-  
-  
+
   photos: {
     directoryType: 'truck-maintenance-log',
     labelKey: 'operationLogs.maintenance.columns.photos',
@@ -607,37 +576,27 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
   }),
   buildExtra: (values): Partial<MaintenanceLogExtra> => {
-    
-    
     const items: MaintenanceItem[] = (Array.isArray(values.items) ? values.items : [])
       .map((r) => r as LogFormLine)
       .filter((r) => String(r.name).trim() !== '' || r.unitPrice !== '')
       .map((r) => ({
         name: String(r.name).trim(),
         unitPrice: r.unitPrice === '' ? 0 : Number(r.unitPrice),
-        
-        
-        
+
         ...(r.quantity !== '' && Number(r.quantity) > 1 && { quantity: Number(r.quantity) }),
         ...(r.warrantyMonths !== '' &&
           Number(r.warrantyMonths) > 0 && { warrantyMonths: Number(r.warrantyMonths) }),
       }));
-    
-    
-    
+
     const totalAmount = maintenanceItemsTotal(items);
     const laborCost = values.laborCost === '' ? 0 : Number(values.laborCost);
-    
-    
-    
-    
-    
+
     const vatRate = values.vatPercent === '' ? 0 : Number(values.vatPercent) / 100;
     const vatAmount = maintenanceVatAmount(totalAmount + laborCost, vatRate);
     return {
       ...(String(values.maintenanceType).trim() && {
         maintenanceType: String(values.maintenanceType).trim(),
-        
+
         ...(String(values.maintenanceTypeLabel).trim() && {
           maintenanceTypeLabel: String(values.maintenanceTypeLabel).trim(),
         }),
@@ -670,25 +629,19 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       condition: e.condition ?? '',
       odometer: e.odometer ?? '',
       laborCost: e.laborCost ?? '',
-      
-      
+
       vatPercent: e.vatRate ? e.vatRate * 100 : '',
       accountsReceived: e.accountsReceived ?? '',
       note: e.note ?? '',
-      
-      
+
       items: items.length > 0 ? items : [blankMaintenanceItem()],
     };
   },
   renderFields: (form, t, ctx) => {
-    
-    
     const rows = itemRows(form);
     const totalAmount = draftItemsTotal(rows);
     const laborCost = form.values.laborCost === '' ? 0 : Number(form.values.laborCost);
-    
-    
-    
+
     const vatOn = form.values.vatPercent !== '';
     const vatAmount = maintenanceVatAmount(
       totalAmount + laborCost,
@@ -697,8 +650,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
     const grandTotal = totalAmount + laborCost + vatAmount;
     const outstanding =
       grandTotal - (form.values.accountsReceived === '' ? 0 : Number(form.values.accountsReceived));
-    
-    
+
     const typeOptions = ctx?.maintenanceTypeOptions ?? [];
     const currentType = String(form.values.maintenanceType);
     const typeData =
@@ -877,10 +829,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
               size="xs"
               label={t('operationLogs.maintenance.form.vatEnabled')}
               checked={vatOn}
-              
-              
-              
-              
+
               onChange={(ev) =>
                 form.setFieldValue(
                   'vatPercent',
@@ -920,9 +869,7 @@ export const MAINTENANCE_LOG_CONFIG: OperationLogConfig = {
       </>
     );
   },
-  
-  
-  
+
   renderExpanded: (log, t) => {
     const e = log.extra ?? {};
     const items = readMaintenanceItems(e);
@@ -1045,10 +992,7 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
   },
   columns: [
     dateColumn('operationLogs.trip.columns.date'),
-    
-    
-    
-    
+
     {
       header: 'operationLogs.trip.columns.schedule',
       render: (log) => scheduleCell(log.extra?.loadingAt, log.extra?.unloadingAt),
@@ -1076,10 +1020,6 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
       render: (log) => textCell(log.extra?.driverName),
     },
     {
-      
-      
-      
-      
       header: 'operationLogs.trip.columns.transportOrder',
       nowrap: true,
       render: (log) =>
@@ -1094,18 +1034,12 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
     },
     { header: '__new__.01-common.labels.note', render: (log) => noteCell(log.extra?.note) },
   ],
-  
-  
-  
-  
+
   group: {
     keyOf: (log) => log.extra?.transportOrderId || undefined,
     compare: (a, b) => Number(a.extra?.tripIndex ?? 0) - Number(b.extra?.tripIndex ?? 0),
   },
-  
-  
-  
-  
+
   summary: (logs, t) => {
     const distance = logs.reduce((sum, log) => {
       const km = Number(log.extra?.odometer);
@@ -1123,8 +1057,7 @@ export const TRIP_LOG_CONFIG: OperationLogConfig = {
       </Card>
     );
   },
-  
-  
+
   rowLocked: (log) => Boolean(log.extra?.transportOrderId),
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),

@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx';
 import { ExcelParseError } from './excelParser';
 
@@ -14,7 +12,7 @@ export type InventoryExportRow = {
   readonly onHand: number;
   readonly extra?: {
     readonly unit?: string;
-    
+
     readonly beginOfPeriod?: Readonly<Record<string, number>>;
   };
 };
@@ -29,9 +27,9 @@ export type InventoryExportItem = {
 
 export type InventoryExportOptions = {
   language?: string;
-  
+
   entityType: 'product' | 'material';
-  
+
   unitLabels?: ReadonlyMap<string, string>;
 };
 
@@ -47,19 +45,14 @@ export const exportInventoryToExcel = (
 
   const itemLabel = isVietnamese
     ? entityType === 'product'
-      ? 
-        'Tên sản phẩm'
-      : 
-        'Tên nguyên vật liệu'
+      ? 'Tên sản phẩm'
+      : 'Tên nguyên vật liệu'
     : entityType === 'product'
       ? 'Product Name'
       : 'Material Name';
 
   const periodKey = getCurrentPeriodKey();
-  
-  
-  
-  
+
   const periodDisplay = `${periodKey.slice(0, 4)}-${periodKey.slice(4)}`;
 
   const labels: Record<ColumnKey, string> = isVietnamese
@@ -68,7 +61,7 @@ export const exportInventoryToExcel = (
         sku: 'SKU',
         unit: 'Đơn vị',
         onHand: 'Tồn kho',
-        
+
         beginOfPeriod: `Tồn đầu kỳ (${periodDisplay})`,
       }
     : {
@@ -87,13 +80,8 @@ export const exportInventoryToExcel = (
     { key: 'beginOfPeriod', header: labels.beginOfPeriod, width: 18 },
   ];
 
-  
-  
   const totalsByCode = new Map<string, number>();
-  
-  
-  
-  
+
   const beginByCode = new Map<string, number>();
   const beginSeenByCode = new Set<string>();
   for (const row of rows) {
@@ -107,17 +95,13 @@ export const exportInventoryToExcel = (
 
   const dataRows: Array<Array<string | number>> = [];
   for (const item of items) {
-    
-    
     if (!item.isActive || item.extra?.isDeleted) continue;
     const cells: Record<ColumnKey, string | number> = {
       itemName: item.name,
       sku: item.extra?.sku ?? '',
       unit: (item.unit && unitLabels?.get(item.unit)) || item.unit,
       onHand: totalsByCode.get(item.code) ?? 0,
-      
-      
-      
+
       beginOfPeriod: beginSeenByCode.has(item.code) ? (beginByCode.get(item.code) ?? 0) : '',
     };
     dataRows.push(columns.map((c) => cells[c.key]));
@@ -130,24 +114,19 @@ export const exportInventoryToExcel = (
 
   const sheetName = isVietnamese
     ? entityType === 'product'
-      ? 
-        'Tồn kho sản phẩm'
-      : 
-        'Tồn kho nguyên vật liệu'
+      ? 'Tồn kho sản phẩm'
+      : 'Tồn kho nguyên vật liệu'
     : entityType === 'product'
       ? 'Product Inventory'
       : 'Material Inventory';
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
-  
-  
   const now = new Date();
   const yyyy = now.getFullYear();
   const mm = String(now.getMonth() + 1).padStart(2, '0');
   const dd = String(now.getDate()).padStart(2, '0');
-  
-  
+
   let prefix = entityType === 'product' ? 'tồn_kho_sản_phẩm' : 'tồn_kho_nguyên_vật_liệu';
   if (!isVietnamese) {
     prefix = entityType === 'product' ? 'product_inventory' : 'material_inventory';
@@ -156,14 +135,13 @@ export const exportInventoryToExcel = (
 };
 
 export type ParsedInventoryRow = {
-  
   readonly rowNumber: number;
   readonly sku?: string;
   readonly itemCode?: string;
   readonly locationCode?: string;
   readonly onHand: number;
   readonly unit?: string;
-  
+
   readonly beginOfPeriod?: number;
 };
 
@@ -198,9 +176,7 @@ export const parseInventoryExcelFile = async (file: File): Promise<ParsedInvento
         const headers = sheetData[0].map((h) => String(h).trim().toLowerCase());
 
         type FieldKey = 'sku' | 'itemCode' | 'locationCode' | 'onHand' | 'unit' | 'beginOfPeriod';
-        
-        
-        
+
         const headerPrefixMapping: Record<string, FieldKey> = {
           'begin of period': 'beginOfPeriod',
           'beginning of period': 'beginOfPeriod',
@@ -209,7 +185,6 @@ export const parseInventoryExcelFile = async (file: File): Promise<ParsedInvento
           'đầu kỳ': 'beginOfPeriod',
         };
         const headerMapping: Record<string, FieldKey> = {
-          
           sku: 'sku',
           'item code': 'itemCode',
           'product code': 'itemCode',
@@ -223,7 +198,7 @@ export const parseInventoryExcelFile = async (file: File): Promise<ParsedInvento
           quantity: 'onHand',
           qty: 'onHand',
           unit: 'unit',
-          
+
           'mã sản phẩm': 'itemCode',
           'mã nguyên vật liệu': 'itemCode',
           mã: 'itemCode',
@@ -242,17 +217,13 @@ export const parseInventoryExcelFile = async (file: File): Promise<ParsedInvento
           return undefined;
         };
 
-        
-        
-        
         const presentFields = new Set<FieldKey>();
         for (const h of headers) {
           const f = resolveField(h);
           if (f) presentFields.add(f);
         }
         const missing = REQUIRED_INVENTORY_FIELDS.filter((f) => !presentFields.has(f));
-        
-        
+
         if (!presentFields.has('sku') && !presentFields.has('itemCode')) {
           reject(new ExcelParseError(['identity']));
           return;
@@ -284,10 +255,6 @@ export const parseInventoryExcelFile = async (file: File): Promise<ParsedInvento
               const n = Number(value.replace(/,/g, ''));
               if (Number.isFinite(n) && n >= 0) onHand = n;
             } else if (fieldName === 'beginOfPeriod') {
-              
-              
-              
-              
               const n = Number(value.replace(/,/g, ''));
               if (Number.isFinite(n) && n >= 0) beginOfPeriod = n;
             } else if (fieldName === 'sku') {
@@ -346,21 +313,20 @@ export type ReconciledInventoryRow = {
   readonly locationCode: string;
   readonly onHand: number;
   readonly unit: string;
-  
+
   readonly beginOfPeriod?: number;
 };
 
 export type ReconciliationResult = {
-  
   readonly matched: ReconciledInventoryRow[];
-  
+
   readonly unmatched: ParsedInventoryRow[];
 };
 
 export const reconcileInventoryRows = (
   parsed: ReadonlyArray<ParsedInventoryRow>,
   items: ReadonlyArray<InventoryReconcileItem>,
-  
+
   unitLabels?: ReadonlyMap<string, string>,
 ): ReconciliationResult => {
   const byCode = new Map<string, InventoryReconcileItem>();
@@ -382,10 +348,7 @@ export const reconcileInventoryRows = (
       continue;
     }
     const units = hit.extra?.units?.length ? hit.extra.units : hit.unit ? [hit.unit] : [];
-    
-    
-    
-    
+
     const typedUnit = row.unit?.trim().toLowerCase();
     const unit =
       (typedUnit &&

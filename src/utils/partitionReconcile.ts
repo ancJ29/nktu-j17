@@ -1,5 +1,3 @@
-
-
 export type CachedPartition<T> = { items: T[]; hash: string };
 
 export type PartitionSyncResponse<T> = {
@@ -10,13 +8,12 @@ export type PartitionSyncResponse<T> = {
 };
 
 export type PartitionReconcileResult<T> = {
-  
   merged: T[];
-  
+
   writes: Array<[string, CachedPartition<T>]>;
-  
+
   clears: string[];
-  
+
   missing: string[];
 };
 

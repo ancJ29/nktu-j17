@@ -1,5 +1,3 @@
-
-
 import {
   ActionIcon,
   Button,
@@ -76,7 +74,6 @@ export function CustomFieldsEditor({
           No custom fields — receipts carry the standard fields only.
         </Text>
       ) : (
-        
         <Stack gap="sm">
           {value.map((field, index) => (
             <Card withBorder padding="sm" key={index}>
@@ -146,8 +143,6 @@ export function CustomFieldsEditor({
                 {/* Only a choice list has choices — a stale list left behind by
                     a type change never travels, so the control goes with it. */}
                 {field.type === 'select' && (
-                  
-                  
                   <TagsInput
                     label="Choices"
                     value={field.options ?? []}

@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder } from '@/types';
 import { buildCustomerReportType1 } from './type1BangKe';
@@ -25,10 +23,7 @@ export const CUSTOMER_REPORT_TYPES: Record<number, CustomerReportType> = {
     fileStem: 'bang_ke',
     build: buildCustomerReportType1,
   },
-  
-  
-  
-  
+
   2: {
     id: 2,
     label: 'Bảng kê vận chuyển (GIA AN)',

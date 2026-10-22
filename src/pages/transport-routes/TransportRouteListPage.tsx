@@ -99,17 +99,13 @@ export function TransportRouteListPage() {
         if (f.status === 'active' && !item.isActive) return false;
         if (f.status === 'inactive' && item.isActive) return false;
         if (f.truckType && item.truckType !== f.truckType) return false;
-        
-        
-        
+
         if (f.truckingSize && readTruckingSize(item) !== f.truckingSize) return false;
         if (f.kind === 'single' && item.isMultiTrip) return false;
         if (f.kind === 'multi' && !item.isMultiTrip) return false;
         return true;
       },
-      
-      
-      
+
       searchFields: (item) => [item.code, item.name ?? '', ...routePlaces(item)],
       search: filterState.search,
       onSearchChange,
@@ -133,9 +129,6 @@ export function TransportRouteListPage() {
     }
   }, [error, t]);
 
-  
-  
-  
   const { activeCount, inactiveCount } = useMemo(() => {
     let active = 0;
     let inactive = 0;
@@ -200,7 +193,6 @@ export function TransportRouteListPage() {
     ],
   );
 
-  
   const mobileFilters: MobileFilterDef[] = useMemo(
     () =>
       truckTypeOptions.length > 0

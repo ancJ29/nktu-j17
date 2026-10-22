@@ -1,5 +1,3 @@
-
-
 import { Group, Stack, Text } from '@mantine/core';
 import type { DataTableColumn } from '@credo/base-ui/components';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -60,11 +58,6 @@ export function GoodsReceiptsV2Page() {
 
   const scrollViewportRef = useListScrollRestoration(ROUTES.GOODS_RECEIPTS_V2.LIST);
 
-  
-  
-  
-  
-  
   const filters = useTransactionalV2ListFilters({
     cacheKey: 'cmngt:goods-receipt-v2-filters',
     defaultStatuses: goodsReceiptDefaultListStatuses,
@@ -83,7 +76,6 @@ export function GoodsReceiptsV2Page() {
     void loadVendors();
   }, [loadVendors]);
 
-  
   const matches = useCallback(
     (receipt: GoodsReceiptV2, needle: string) =>
       [receipt.receiptNumber, receipt.vendorName, receipt.reference, receipt.notes]
@@ -92,37 +84,25 @@ export function GoodsReceiptsV2Page() {
     [],
   );
 
-  
-  
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return receipts.filter(
       (receipt) =>
-        
-        
-        
         (receipt.derivativesPending === true ||
           statuses.length === 0 ||
           statuses.includes(receipt.status)) &&
         (vendorIds.length === 0 ||
           (receipt.vendorId !== undefined && vendorIds.includes(receipt.vendorId))) &&
-        
         inDayRange(anchorDayOf(receipt.receivedDate, receipt.createdAt), anchorRange) &&
         (needle === '' || matches(receipt, needle)),
     );
   }, [receipts, statuses, vendorIds, anchorRange, search, matches]);
 
-  
-  
-  
-  
   const { paginated, totalItems, hasMore, loadMore } = useListFilter(filtered, {
     shouldPagination: false,
     lazyKey: ROUTES.GOODS_RECEIPTS_V2.LIST,
   });
 
-  
-  
   const customFields = useGoodsReceiptCustomFields();
   const listFields = useMemo(
     () => customFields.filter((field) => field.showInList === true),
@@ -171,9 +151,7 @@ export function GoodsReceiptsV2Page() {
           </Group>
         ),
       },
-      
-      
-      
+
       ...listFields.map((field) => ({
         key: customFieldColumnKey(field.key),
         header: field.label,
@@ -188,8 +166,6 @@ export function GoodsReceiptsV2Page() {
     [navigate],
   );
 
-  
-  
   const vendorOptions = useMemo(
     () => vendors.map((vendor) => ({ value: vendor.id, label: vendor.name })),
     [vendors],
@@ -229,8 +205,7 @@ export function GoodsReceiptsV2Page() {
         t('goodsReceiptsV2.columns.vendor'),
         t('common.filters.vendorCount', { count: vendorIds.length }),
       ),
-      
-      
+
       visible: vendorOptions.length > 0 || vendorIds.length > 0,
       searchable: true,
       w: 220,
@@ -251,7 +226,7 @@ export function GoodsReceiptsV2Page() {
 
   const dateIsDefault = filters.dateRangeIsDefault;
   const statusIsDefault = filters.statusesAreDefault;
-  
+
   const hasPills =
     (!statusIsDefault && statuses.length > 0) ||
     vendorIds.length > 0 ||

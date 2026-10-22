@@ -1,5 +1,3 @@
-
-
 export const AUTO_LOGIN_DOMAIN = 'auto.local';
 
 export function codeToLoginEmail(code: string): string {

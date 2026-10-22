@@ -1,20 +1,18 @@
-
-
 export type AppInfo = {
   name: string;
-  
+
   nameHtml?: string;
   description?: string;
   logoUrl?: string;
-  
+
   logoDarkBgUrl?: string;
-  
+
   faviconUrl?: string;
-  
+
   pwaIcon192Url?: string;
-  
+
   pwaIcon512Url?: string;
-  
+
   pwaIconMaskableUrl?: string;
 };
 
@@ -24,7 +22,7 @@ export type AuthFeatures = {
 
 export type ThemeConfig = {
   mainColor: string;
-  
+
   customPalette?: string[];
 };
 
@@ -37,7 +35,7 @@ export type Language = {
 export type NavigationItem = {
   id: string;
   path?: string;
-  
+
   labelKey?: string;
   label: string;
   icon: string;

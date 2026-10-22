@@ -1,5 +1,3 @@
-
-
 export const ACTION_BAR_HEIGHT = 56;
 
 const APP_HEADER = 'var(--app-shell-header-offset, 0rem)';

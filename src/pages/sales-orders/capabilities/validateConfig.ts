@@ -1,5 +1,3 @@
-
-
 import type { CMngtSalesOrderFeatures, CMngtSalesOrderStatusOption } from '@credo/kits/types';
 import { CAPABILITY_REGISTRY } from './registry';
 import type { ConfigInvariantError, Stage } from './types';
@@ -15,10 +13,9 @@ export type ValidationResult = { ok: true } | { ok: false; errors: ConfigInvaria
 
 export function validateSalesOrderConfig(
   features: CMngtSalesOrderFeatures,
-  
+
   knownDepartments?: ReadonlySet<string>,
 ): ValidationResult {
-  
   if (!features.enabled) return { ok: true };
 
   const errors: ConfigInvariantError[] = [];
@@ -27,8 +24,6 @@ export function validateSalesOrderConfig(
   const statusByValue = new Map<string, CMngtSalesOrderStatusOption>();
   for (const opt of statusOptions) statusByValue.set(opt.value, opt);
 
-  
-  
   if (knownDepartments) {
     for (const opt of statusOptions) {
       const deps = opt.allowedDepartments ?? [];
@@ -44,7 +39,6 @@ export function validateSalesOrderConfig(
     }
   }
 
-  
   for (const opt of statusOptions) {
     const seen = new Set<string>();
     for (const binding of opt.capabilities ?? []) {
@@ -78,16 +72,12 @@ export function validateSalesOrderConfig(
     }
   }
 
-  
   for (const def of Object.values(CAPABILITY_REGISTRY)) {
     if (!def.singleton) continue;
     const carriers = statusOptions.filter((opt) =>
       (opt.capabilities ?? []).some((b) => b.id === def.id),
     );
     if (carriers.length === 0) {
-      
-      
-      
       if (def.optional) continue;
       errors.push({ kind: 'singleton-missing', capabilityId: def.id });
     } else if (carriers.length > 1) {
@@ -99,8 +89,6 @@ export function validateSalesOrderConfig(
     }
   }
 
-  
-  
   for (const [from, tos] of Object.entries(transitions)) {
     const fromOpt = statusByValue.get(from);
     if (!fromOpt) {
@@ -117,15 +105,12 @@ export function validateSalesOrderConfig(
       }
       const fromStage = fromOpt.stage as Stage;
       const toStage = toOpt.stage as Stage;
-      if (toStage === 'EXCEPTIONAL') continue; 
+      if (toStage === 'EXCEPTIONAL') continue;
       if (fromStage === 'EXCEPTIONAL') {
         errors.push({ kind: 'transition-stage-backward', from, to });
         continue;
       }
-      
-      
-      
-      
+
       if (toStage === 'DRAFT' && fromStage !== 'COMPLETED') continue;
       if (STAGE_ORDER[toStage] < STAGE_ORDER[fromStage]) {
         errors.push({ kind: 'transition-stage-backward', from, to });

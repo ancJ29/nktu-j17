@@ -1,5 +1,3 @@
-
-
 import { logger } from '@credo/base-ui/utils';
 import { useProductStore } from '@/stores/useProductStore';
 import { logActivity } from './activityLogger';
@@ -11,7 +9,7 @@ export type InventoryActivitySource = {
   id: string;
   label: string;
   suffix?: string;
-  
+
   at?: number;
 };
 
@@ -26,20 +24,12 @@ export function emitInventoryActivityForApplied(
     if (op.prevOnHand === op.nextOnHand) continue;
     const productId = productsByCode.get(op.itemCode)?.id;
     if (productId === undefined) {
-      
-      
-      
-      
-      
-      
       logger.warn('[inventoryActivityEmit] unresolved product code — logging without target', {
         itemCode: op.itemCode,
         productCount: allProducts.length,
       });
     }
     logActivity('productInventory.adjust', productId, {
-      
-      
       itemCode: op.itemCode,
       locationCode: op.locationCode,
       prevOnHand: op.prevOnHand,

@@ -115,7 +115,7 @@ export default function TopProductsReport({ param, onParamChange }: ReportViewPr
                 },
                 {
                   label: 'Doanh thu',
-                  
+
                   value: e.pricedLines > 0 ? formatVnd(e.revenue) : '—',
                 },
                 {

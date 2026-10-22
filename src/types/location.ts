@@ -10,12 +10,12 @@ export function isDefaultLocation(code: string | undefined | null): boolean {
 
 export type LocationExtra = {
   isDeleted?: boolean;
-  
+
   kind?: string;
-  
+
   contactName?: string;
   contactPhone?: string;
-  
+
   notes?: string;
   [key: string]: unknown;
 };

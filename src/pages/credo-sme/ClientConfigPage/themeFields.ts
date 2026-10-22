@@ -1,12 +1,9 @@
-
-
 import { brandPalettes, parsePalette, PALETTE_SHADE_COUNT } from '@credo/base-ui/utils';
 import type { CredoAppConfig } from '../schema';
 
 export type ThemeForm = {
-  
   mainColor: string;
-  
+
   palette: string;
 };
 
@@ -70,7 +67,6 @@ export const applyTheme = (
 };
 
 export const themeRejection = (form: ThemeForm): string | null => {
-  
   if (!form.mainColor) return null;
   if (!brandPalettes[form.mainColor]) {
     return `"${form.mainColor}" is not one of the app's palettes.`;

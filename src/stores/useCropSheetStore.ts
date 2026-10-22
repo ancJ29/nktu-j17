@@ -24,9 +24,6 @@ export async function queryCropPartition(cropId: string): Promise<CropPartition>
   const sheets = records.filter(isCropSheet);
   const events = records.filter((r): r is CropDiaryEvent => !isCropSheet(r));
   return {
-    
-    
-    
     ...(sheets.length && {
       sheet: sheets.reduce((newest, s) => (s.updatedAt > newest.updatedAt ? s : newest)),
     }),

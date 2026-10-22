@@ -24,7 +24,7 @@ export function useCustomerV2Columns(
               key: 'customerType',
               width: '160px',
               header: t('customersV2.form.customerType'),
-              
+
               render: (item: CustomerV2Row) => (
                 <ColorBadge label={lookupLabelOf(typeLabels, item.extra?.customerType)} size="sm" />
               ),

@@ -1,5 +1,3 @@
-
-
 import { Box, Button, Divider, Grid, Group, Stack } from '@mantine/core';
 import {
   IconArrowLeft,
@@ -27,7 +25,6 @@ export function EmployeeV2DetailPage() {
   const { id } = useParams<{ id: string }>();
   const parts = useEmployeeDetail();
 
-  
   if (!parts.ready) {
     return parts.loading || !id ? null : (
       <RecordNotFound
@@ -41,8 +38,6 @@ export function EmployeeV2DetailPage() {
 
   const { employee, canEdit, header, cards, tabs, panels, modals } = parts;
 
-  
-  
   const rail = (
     <Stack gap="md">
       {cards.quickActions}

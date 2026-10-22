@@ -68,8 +68,6 @@ export function CropFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
-  
-  
   const allCrops = useCropStore((s) => s.items);
   const cropsInitialized = useCropStore((s) => s.initialized);
   const loadCrops = useCropStore((s) => s.loadAll);
@@ -77,8 +75,6 @@ export function CropFormPage() {
     if (!cropsInitialized) loadCrops();
   }, [cropsInitialized, loadCrops]);
 
-  
-  
   const codePreview = useMemo(
     () =>
       buildDailySequentialCode(
@@ -112,8 +108,6 @@ export function CropFormPage() {
     [greenhouses],
   );
 
-  
-  
   const templates = useCropDiaryTemplateStore((s) => s.items);
   const templatesInitialized = useCropDiaryTemplateStore((s) => s.initialized);
   const loadTemplates = useCropDiaryTemplateStore((s) => s.loadAll);
@@ -143,8 +137,7 @@ export function CropFormPage() {
     validate: {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       greenhouseCode: (v) => (v.trim() ? null : t('crops.validation.greenhouseRequired')),
-      
-      
+
       diaryTemplateCode: (v) => (isEdit || v ? null : t('crops.validation.diaryTemplateRequired')),
       numberOfSeeds: (v) =>
         v !== '' && Number(v) > 0 ? null : t('crops.validation.numberOfSeedsRequired'),
@@ -154,9 +147,7 @@ export function CropFormPage() {
         if (v === '' || !Number.isFinite(n) || n < 1) {
           return t('crops.validation.totalDatesRequired');
         }
-        
-        
-        
+
         if (values.fromDate && values.greenhouseCode) {
           const end = windowEndDate(values.fromDate, n);
           if (end) {
@@ -207,10 +198,6 @@ export function CropFormPage() {
     async (values: CropFormValues) => {
       setLoading(true);
       try {
-        
-        
-        
-        
         const toDate = windowEndDate(values.fromDate, Number(values.totalDates));
         const buildExtra = (base?: CropExtra): CropExtra => {
           const extra: CropExtra = { ...(base ?? {}) };
@@ -235,7 +222,7 @@ export function CropFormPage() {
         if (isEdit && id) {
           const snapshot = snapshotRef.current;
           if (!snapshot) throw new Error('Crop snapshot missing');
-          
+
           const updated = await useCropStore.getState().updateSafely({
             id,
             version: snapshot.version,
@@ -250,8 +237,6 @@ export function CropFormPage() {
           notifications.show({ color: 'green', message: t('crops.notifications.updateSuccess') });
           navigate(ROUTES.CROPS.DETAIL.replace(':id', id));
         } else {
-          
-          
           if (values.status === 'growing') {
             const occupant = findGrowingCropInGreenhouse(
               useCropStore.getState().items as Crop[],
@@ -278,9 +263,7 @@ export function CropFormPage() {
             },
           });
           notifications.show({ color: 'green', message: t('crops.notifications.createSuccess') });
-          
-          
-          
+
           try {
             await seedCropSheetIfMissing({
               cropId: created.id,
@@ -455,7 +438,7 @@ export function CropFormPage() {
                 error={form.errors.diaryTemplateCode}
                 onChange={(value) => {
                   form.setFieldValue('diaryTemplateCode', value);
-                  
+
                   if (value) {
                     const tpl = templates.find((tp) => tp.code === value);
                     if (tpl) form.setFieldValue('totalDates', templateDayCount(tpl));

@@ -1,5 +1,3 @@
-
-
 export type PickableRow = {
   readonly id: string;
   readonly code: string;

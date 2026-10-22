@@ -1,5 +1,3 @@
-
-
 import {
   DELIVERY_NOTE_DEDUCTS_STOCK,
   DELIVERY_NOTE_DEFAULT_STATUS_FLOW,
@@ -29,8 +27,7 @@ const reader = createStatusFlowReader({
     const key = DEFAULT_LABEL_KEYS[value as keyof typeof DEFAULT_LABEL_KEYS];
     return key ? t(key) : undefined;
   },
-  
-  
+
   stageColors: DELIVERY_NOTE_STAGE_COLORS,
   storedDefaultListStatuses: features?.defaultListStatuses,
 });

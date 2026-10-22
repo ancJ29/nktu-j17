@@ -3,16 +3,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export type ReportReloadMode = 'update' | 'regenerate';
 
 export function useWindowRows<T>(
-  
   fetchWindow: (fromDay: string, toDay: string, options?: { fresh?: boolean }) => Promise<T[]>,
   fromDay: string,
   toDay: string,
 ): {
   rows?: T[];
   error?: boolean;
-  
+
   loadedAt?: number;
-  
+
   refreshing: boolean;
   reload: (mode: ReportReloadMode) => void;
 } {
@@ -24,8 +23,7 @@ export function useWindowRows<T>(
     loadedAt: number;
   } | null>(null);
   const [run, setRun] = useState(0);
-  
-  
+
   const freshRef = useRef(false);
 
   const reload = useCallback((mode: ReportReloadMode) => {

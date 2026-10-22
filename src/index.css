@@ -51,7 +51,6 @@ select {
 
 /* Prevent zoom on input focus on iOS */
 @media screen and (max-width: 768px) {
-
   input[type='text'],
   input[type='email'],
   input[type='password'],
@@ -66,7 +65,6 @@ select {
 
 /* PWA specific styles */
 @media (display-mode: standalone) {
-
   /* Styles specific to PWA mode */
   body {
     /* Prevent pull-to-refresh on PWA */

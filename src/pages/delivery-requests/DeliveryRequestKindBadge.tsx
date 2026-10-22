@@ -1,5 +1,3 @@
-
-
 import { Badge } from '@mantine/core';
 import type { MantineSize } from '@mantine/core';
 import { useTranslation } from 'react-i18next';

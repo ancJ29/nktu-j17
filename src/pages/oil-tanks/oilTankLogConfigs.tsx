@@ -1,5 +1,3 @@
-
-
 import { NumberInput, SimpleGrid, Stack, Text, Textarea, TextInput } from '@mantine/core';
 import { IconDroplet, IconTruckLoading } from '@tabler/icons-react';
 import type { ReactNode } from 'react';
@@ -108,9 +106,7 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
   ],
   validate: (t) => ({
     logDate: (v) => (v ? null : t('operationLogs.validation.dateRequired')),
-    
-    
-    
+
     litres: (v) =>
       v !== '' && Number(v) > 0 ? null : t('oilTanks.logs.validation.litresRequired'),
     unitPrice: (v) =>
@@ -186,9 +182,7 @@ export const OIL_TANK_REFILL_LOG_CONFIG: OperationLogConfig = {
       />
     </>
   ),
-  
-  
-  
+
   photos: {
     directoryType: 'oil-tank-refill',
     labelKey: 'oilTanks.logs.refill.photosLabel',
@@ -244,14 +238,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     dateColumn('oilTanks.logs.issue.columns.date'),
     {
       header: 'oilTanks.logs.issue.columns.truck',
-      
-      
-      
-      
-      
-      
-      
-      
+
       render: (log) =>
         log.extra?.truckId ? (
           <TruckLink id={log.extra.truckId} fallbackLabel={log.extra.truckCode} showPlate />
@@ -262,11 +249,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     ...moneyColumns('oilTanks.logs.issue'),
     {
       header: 'oilTanks.logs.issue.columns.driver',
-      
-      
-      
-      
-      
+
       render: (log) =>
         log.extra?.driverId ? (
           <EmployeeLink id={log.extra.driverId} fallbackLabel={log.extra.driverName} />
@@ -281,7 +264,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     litres: (v) =>
       v !== '' && Number(v) > 0 ? null : t('oilTanks.logs.validation.litresRequired'),
   }),
-  
+
   validateOnSubmit: ({ values, previous, context, t }) => {
     const { refused, available } = issueExceedsStock({
       litres: values.litres,
@@ -299,9 +282,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
     ...(values.litres !== '' && { litres: Number(values.litres) }),
     ...(values.unitPrice !== '' && { unitPrice: Number(values.unitPrice) }),
     ...(values.totalAmount !== '' && { totalAmount: Number(values.totalAmount) }),
-    
-    
-    
+
     ...(String(values.truckId).trim() && { truckId: String(values.truckId).trim() }),
     ...(String(values.truckCode).trim() && { truckCode: String(values.truckCode).trim() }),
     ...(String(values.driverName).trim() && { driverName: String(values.driverName).trim() }),
@@ -363,7 +344,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
       />
     </>
   ),
-  
+
   rowLocked: (log) => Boolean(log.extra?.sourceRefuelLogId),
   summary: (logs, t) => {
     const litres = logs.reduce((sum, l) => sum + (Number(l.extra?.litres) || 0), 0);
@@ -380,7 +361,7 @@ export const OIL_TANK_ISSUE_LOG_CONFIG: OperationLogConfig = {
       </SimpleGrid>
     );
   },
-  
+
   afterWrite: async (event, t) => {
     await applyMovementToTankLevel(event);
     await syncTruckRefuelMirror(event, t);

@@ -11,9 +11,9 @@ type ConfirmModalProps = {
   confirmLabel?: string;
   confirmColor?: string;
   loading?: boolean;
-  
+
   children?: ReactNode;
-  
+
   confirmDisabled?: boolean;
 };
 

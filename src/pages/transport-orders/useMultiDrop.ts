@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { appConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
@@ -41,7 +40,6 @@ function loadLocations(): Promise<LocationProvince[]> {
     })
     .then(parseLocations)
     .catch((err: unknown) => {
-      
       locationsPromise = null;
       throw err;
     });

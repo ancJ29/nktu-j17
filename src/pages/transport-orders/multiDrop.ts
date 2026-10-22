@@ -1,4 +1,3 @@
-
 import type { TransportOrderDropStop, TransportOrderMultiDrop, TransportOrderRoute } from '@/types';
 
 export const MULTI_DROP_MAX_STOPS = 7;
@@ -59,7 +58,7 @@ export function multiDropPickup(
 
 export function routeFromMultiDrop(
   md: TransportOrderMultiDrop,
-  
+
   pickupLabel?: string,
 ): TransportOrderRoute {
   const labels = md.stops.map(stopLabel);

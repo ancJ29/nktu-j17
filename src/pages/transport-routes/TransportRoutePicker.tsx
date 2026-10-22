@@ -13,16 +13,13 @@ import {
 type Props = {
   readonly routes: readonly TransportRouteRow[];
   readonly onPick: (route: TransportRouteRow) => void;
-  
+
   readonly appliedId?: string | undefined;
 };
 
 export function TransportRoutePicker({ routes, onPick, appliedId }: Props) {
   const { t } = useTranslation();
 
-  
-  
-  
   const options = useMemo(
     () =>
       routes
@@ -33,21 +30,13 @@ export function TransportRoutePicker({ routes, onPick, appliedId }: Props) {
           const legs = routeLegCount(route);
           return {
             value: route.id,
-            
-            
-            
-            
+
             label: [
               route.code,
               route.name,
               journey,
               legs > 1 ? t('transportOrders.trips.badge', { n: legs }) : '',
-              
-              
-              
-              
-              
-              
+
               routeTruckingSizeMissing(route) ? t('transportRoutes.picker.incomplete') : '',
             ]
               .filter(Boolean)
@@ -58,8 +47,6 @@ export function TransportRoutePicker({ routes, onPick, appliedId }: Props) {
     [routes, t],
   );
 
-  
-  
   if (options.length === 0) return null;
 
   return (
@@ -73,10 +60,7 @@ export function TransportRoutePicker({ routes, onPick, appliedId }: Props) {
         if (route) onPick(route);
       }}
       searchable
-      
-      
-      
-      
+
       allowDeselect={false}
       nothingFoundMessage={
         <Text size="sm" c="dimmed">

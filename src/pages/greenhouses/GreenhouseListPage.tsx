@@ -41,7 +41,7 @@ type FilterStatus = 'all' | 'active' | 'inactive';
 
 type GreenhouseFilters = {
   status: FilterStatus;
-  
+
   occupancy: GreenhouseOccupancyFilter;
   search: string;
   page: number;
@@ -74,8 +74,7 @@ export function GreenhouseListPage() {
   } = useCachedListFilters('cmngt:greenhouse-list-filters', FILTER_DEFAULTS);
   const filter = filterState.status;
   const occupancyFilter = filterState.occupancy;
-  
-  
+
   const setFilter = useCallback(
     (v: FilterStatus) => updateState({ status: v, page: 1 }),
     [updateState],
@@ -87,9 +86,6 @@ export function GreenhouseListPage() {
   const onSearchChange = useCallback((v: string) => updateState({ search: v }), [updateState]);
   const onPageChange = useCallback((p: number) => updateState({ page: p }), [updateState]);
 
-  
-  
-  
   const allCrops = useCropStore((s) => s.items);
   const cropsInitialized = useCropStore((s) => s.initialized);
   const loadCrops = useCropStore((s) => s.loadAll);
@@ -97,8 +93,6 @@ export function GreenhouseListPage() {
     if (canViewCrops && !cropsInitialized) loadCrops();
   }, [cropsInitialized, loadCrops]);
 
-  
-  
   const today = todayInVnDateString();
   const occupancyByGreenhouse = useMemo(
     () => (canViewCrops ? buildOccupancyMap(allCrops as Crop[], today) : new Map()),
@@ -122,8 +116,7 @@ export function GreenhouseListPage() {
     (item: (typeof allGreenhouses)[number], f: typeof listFilters) => {
       if (f.status === 'active' && !item.isActive) return false;
       if (f.status === 'inactive' && item.isActive) return false;
-      
-      
+
       if (canViewCrops && f.occupancy !== 'all') {
         const occupancy = occupancyByGreenhouse.get(item.code) ?? FREE_OCCUPANCY;
         if (!matchesOccupancyFilter(occupancy, f.occupancy)) return false;
@@ -144,17 +137,9 @@ export function GreenhouseListPage() {
       onPageChange,
     });
 
-  
-  
-  
-  
-  
-  
   const hasActiveFilters =
     !!search || filter !== FILTER_DEFAULTS.status || occupancyFilter !== FILTER_DEFAULTS.occupancy;
 
-  
-  
   const occupancyOptions = useMemo(
     () => [
       { value: 'free', label: t('greenhouses.occupancy.free') },
@@ -190,7 +175,7 @@ export function GreenhouseListPage() {
               options: occupancyOptions,
               onChange: setOccupancyFilter,
               allLabel: t('common.filters.all'),
-              
+
               emptyValue: 'all',
             }),
           ]
@@ -214,11 +199,6 @@ export function GreenhouseListPage() {
 
   const handleForceRefresh = useCallback(() => forceRefresh(), [forceRefresh]);
 
-  
-  
-  
-  
-  
   const handleAddCrop = useCallback(
     (greenhouse: (typeof allGreenhouses)[number]) => {
       navigate(ROUTES.GREENHOUSES.DETAIL.replace(':id', greenhouse.id), {
@@ -228,9 +208,6 @@ export function GreenhouseListPage() {
     [navigate],
   );
 
-  
-  
-  
   const [view, setView] = useState<GreenhouseView>('list');
   const showTimelineToggle = !isMobile && canViewCrops;
   const showTimeline = showTimelineToggle && view === 'timeline';

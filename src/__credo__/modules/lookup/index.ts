@@ -70,7 +70,6 @@ export function createLookupModule(config: LookupModuleConfig) {
       return filterItems(items, { category });
     },
 
-    
     async getCategories(
       scope: string,
       categories: string[],
@@ -79,7 +78,7 @@ export function createLookupModule(config: LookupModuleConfig) {
       const wanted = new Set(categories);
       const filtered = items.filter((i) => wanted.has(i.category));
       const grouped = groupByCategory(filtered);
-      
+
       for (const category of categories) {
         grouped[category] ??= [];
       }
@@ -99,7 +98,6 @@ export function createLookupModule(config: LookupModuleConfig) {
       return item;
     },
 
-    
     async createMany(
       scope: string,
       inputs: CreateLookupInput[],
@@ -146,7 +144,6 @@ export function createLookupModule(config: LookupModuleConfig) {
         'LookupItem',
       );
 
-      
       const nextValue = input.value !== undefined ? input.value.trim() : current.value;
       const nextActive = input.isActive !== undefined ? input.isActive : current.isActive;
       if (nextActive && (input.value !== undefined || input.isActive === true)) {
@@ -160,7 +157,6 @@ export function createLookupModule(config: LookupModuleConfig) {
       return updated;
     },
 
-    
     async remove(
       scope: string,
       id: string,

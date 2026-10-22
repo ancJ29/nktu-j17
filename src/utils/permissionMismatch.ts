@@ -1,5 +1,3 @@
-
-
 import type {
   CredoSmeEffectivePermissions,
   CredoSmePermissionMismatchEntry as MismatchEntry,
@@ -37,8 +35,6 @@ export function comparePermissions(
     const b = browser?.[mod];
     const s = server?.[mod];
 
-    
-    
     if (!b || !s) {
       all.push({ path: mod, browser: b ? true : null, server: s ? true : null });
       continue;

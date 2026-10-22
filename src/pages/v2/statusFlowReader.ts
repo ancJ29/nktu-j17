@@ -1,5 +1,3 @@
-
-
 import {
   canTransition,
   resolveStatusFlow,
@@ -17,39 +15,38 @@ export const useCurrentDepartment = (): string =>
 
 export type StatusFlowReader<Stage extends string> = {
   flow: StatusFlowConfig<Stage>;
-  
+
   errors: string[];
-  
+
   stageOf: (status: string) => Stage | undefined;
-  
+
   display: (t: Translate, value: string) => { label: string; color: string };
-  
+
   action: (t: Translate, value: string) => { label: string; color: string };
-  
+
   targetsFrom: (from: string, departmentId: string) => Array<StatusFlowStatus<Stage>>;
-  
+
   departmentsOwningNext: (from: string, departmentId: string) => string[];
-  
+
   isTerminalStage: (status: string) => boolean;
-  
+
   defaultListStatuses: string[];
 };
 
 export function createStatusFlowReader<Stage extends string>(spec: {
   catalogue: StageCatalogue<Stage>;
   defaultFlow: StatusFlowConfig<Stage>;
-  
+
   raw: unknown;
-  
+
   defaultLabelOf: (t: Translate, value: string) => string | undefined;
-  
+
   stageColors: Readonly<Record<Stage, string>>;
-  
+
   storedDefaultListStatuses?: readonly string[] | undefined;
 }): StatusFlowReader<Stage> {
   const { flow, errors } = resolveStatusFlow(spec.catalogue, spec.defaultFlow, spec.raw);
 
-  
   const display = (t: Translate, value: string) => {
     const status = statusOf(flow, value);
     return {
@@ -64,7 +61,6 @@ export function createStatusFlowReader<Stage extends string>(spec: {
     stageOf: (status) => statusOf(flow, status)?.stage,
     display,
 
-    
     action: (t, value) => {
       const status = statusOf(flow, value);
       const badge = display(t, value);
@@ -91,8 +87,7 @@ export function createStatusFlowReader<Stage extends string>(spec: {
           edge.to,
           departmentId ? { departmentId } : {},
         );
-        
-        
+
         if (verdict.allowed) return [];
         if (verdict.reason !== 'department') continue;
         for (const department of edge.onlyDepartments ?? []) owners.add(department);
@@ -102,13 +97,10 @@ export function createStatusFlowReader<Stage extends string>(spec: {
 
     isTerminalStage: (status) => {
       const stage = statusOf(flow, status)?.stage;
-      
-      
-      
+
       return stage === undefined ? false : (spec.catalogue.stageEdges[stage] ?? []).length === 0;
     },
 
-    
     defaultListStatuses: (spec.storedDefaultListStatuses ?? []).filter((value) =>
       flow.statuses.some((status) => status.value === value),
     ),

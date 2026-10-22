@@ -25,9 +25,7 @@ const TRUCK_SCOPE: TruckViewScope = {
 function FleetRefuelExport() {
   const { t, i18n } = useTranslation();
   const items = useTruckAssetStore((s) => s.items);
-  
-  
-  
+
   const employees = useEmployeeStore((s) => s.items);
   const trucks = useMemo(() => {
     const live = (items as TruckAssetRow[]).filter((a) => !a.extra?.isDeleted);
@@ -60,8 +58,6 @@ function FleetRefuelExport() {
   const handleExport = useCallback(async () => {
     setExporting(true);
     try {
-      
-      
       const entries: RefuelExportEntry[] = [];
       for (const truck of trucks) {
         const res = await cMngtConnector.getOperationLogsByTarget<OperationLogExtra>({

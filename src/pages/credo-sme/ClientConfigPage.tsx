@@ -1,5 +1,3 @@
-
-
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect, useState } from 'react';
 import { credoSmeConnector } from '@credo/connectors/connector';
@@ -14,7 +12,6 @@ import {
 } from './ClientConfigPage/secrets';
 
 export function ClientConfigPage() {
-  
   const [authed, setAuthed] = useState<boolean>(() => readSecret(ADMIN_KEY_STORAGE).length > 0);
 
   useEffect(() => {

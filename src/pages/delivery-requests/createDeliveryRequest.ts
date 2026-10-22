@@ -1,5 +1,3 @@
-
-
 import { appConfig } from '@/config';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { cMngtConnector } from '@credo/connectors/connector';
@@ -39,7 +37,7 @@ export type DeliveryRequestItemDraft = {
   quantity: number;
   unit: string;
   unitPrice: number;
-  
+
   fromLocationCode?: string;
 };
 
@@ -48,9 +46,6 @@ export function buildRemainingItemsFromSalesOrder(
   salesOrderId: string,
   allDRs: DeliveryRequest[],
 ): DeliveryRequestItemDraft[] {
-  
-  
-  
   const deliveredSoFar = new Map<string, number>();
   for (const dr of allDRs) {
     if (dr.salesOrderId !== salesOrderId) continue;
@@ -102,9 +97,8 @@ export function buildReturnableItemsFromSalesOrder(
     const extra = dr.extra as DeliveryRequestExtra | undefined;
     if (extra?.isDeleted) continue;
     const isReturn = extra?.inboundKind === 'customer-return';
-    if (!isReturn && dr.direction === 'inbound') continue; 
+    if (!isReturn && dr.direction === 'inbound') continue;
     if (isReturn) {
-      
       const lines = dr.isClosed
         ? (extra?.deliveredItems ?? [])
         : dr.items.map((i) => ({ productCode: i.productCode, unit: i.unit, quantity: i.quantity }));
@@ -116,12 +110,6 @@ export function buildReturnableItemsFromSalesOrder(
     }
   }
 
-  
-  
-  
-  
-  
-  
   const useSOFallback = hasClosedOutboundDR && delivered.size === 0;
 
   return soItems
@@ -156,36 +144,36 @@ export function salesOrderHasLinkedDeliveryRequest(salesOrderId: string): boolea
 
 export type CreateDeliveryRequestParams = {
   direction: CMngtDeliveryRequestDirection;
-  
+
   inboundKind?: DeliveryRequestInboundKind;
-  
+
   returnRestock?: boolean;
-  
+
   salesOrderId: string;
   salesOrderNumber: string;
   customerName: string;
-  
+
   customerCode?: string;
-  
+
   vendorCode: string;
   vendorName: string;
-  
+
   deliveryAddress: string;
   googleMapUrl: string;
-  
+
   scheduledDate: string | undefined;
   notes: string;
   items: DeliveryRequestItem[];
   assignedDriverId: string;
   assignedDriverName?: string;
   isUrgent: boolean;
-  
+
   currentEmployee?: { id: string; name: string };
-  
+
   initialStatus?: string;
-  
+
   defaultStatus?: string;
-  
+
   status?: string;
 };
 
@@ -193,33 +181,21 @@ export async function createDeliveryRequestRecord(
   p: CreateDeliveryRequestParams,
 ): Promise<{ deliveryRequest: DeliveryRequest; linkFailed: boolean }> {
   const isInbound = p.direction === 'inbound';
-  
-  
-  
+
   const isReturn = isInbound && p.inboundKind === 'customer-return';
   const carriesSalesOrder = !isInbound || isReturn;
 
-  
-  
   const sourceSalesOrder =
     carriesSalesOrder && p.salesOrderId
       ? (useSalesOrderStore.getState().getById(p.salesOrderId) as SalesOrder | undefined)
       : undefined;
 
-  
-  
-  
-  
-  
-  
   let soStatusCarriesReleasesDR = false;
   if (sourceSalesOrder && !isInbound) {
     const soStatus = ((sourceSalesOrder.extra ?? {}) as SalesOrderExtra).status ?? '';
     soStatusCarriesReleasesDR = !!soStatus && soStatusHasCapability(soStatus, 'releasesDR');
   }
 
-  
-  
   const notes = mergeSalesOrderDriverNote(p.notes, sourceSalesOrder);
   const initialStatus =
     p.status ||
@@ -227,8 +203,6 @@ export async function createDeliveryRequestRecord(
     getInitialStatusValueForCreate({ soStatusCarriesReleasesDR }) ||
     p.defaultStatus;
 
-  
-  
   const createdEntry: DeliveryRequestActivityEntry = {
     timestamp: new Date().toISOString(),
     action: 'created',
@@ -239,13 +213,8 @@ export async function createDeliveryRequestRecord(
     }),
   };
 
-  
   const isAdditional = !isInbound && salesOrderHasLinkedDeliveryRequest(p.salesOrderId);
 
-  
-  
-  
-  
   const customerCode = (
     p.customerCode ||
     (carriesSalesOrder
@@ -256,7 +225,7 @@ export async function createDeliveryRequestRecord(
   const extra: DeliveryRequestExtra = {
     status: initialStatus,
     activityLog: [createdEntry],
-    
+
     deliveryAddress: p.deliveryAddress,
     ...(p.googleMapUrl && { googleMapUrl: p.googleMapUrl }),
     ...(p.assignedDriverId && {
@@ -265,19 +234,14 @@ export async function createDeliveryRequestRecord(
     }),
     ...(p.isUrgent && { isUrgent: true }),
     ...(isAdditional && { isAdditional: true }),
-    
-    
+
     ...(customerCode && { customerCode }),
-    
-    
+
     ...(isInbound && p.inboundKind && p.inboundKind !== 'vendor' && { inboundKind: p.inboundKind }),
-    
+
     ...(isReturn && { returnRestock: p.returnRestock ?? false }),
   };
 
-  
-  
-  
   const today = businessDateString();
   const todaysRequests = await cMngtConnector.queryDeliveryRequests<DeliveryRequestExtra>({
     fromPeriod: today,
@@ -291,8 +255,7 @@ export async function createDeliveryRequestRecord(
   const res = await cMngtConnector.createDeliveryRequest<DeliveryRequestExtra>({
     requestNumber,
     direction: p.direction,
-    
-    
+
     ...(carriesSalesOrder
       ? {
           salesOrderId: p.salesOrderId || undefined,
@@ -309,8 +272,6 @@ export async function createDeliveryRequestRecord(
   });
   useDeliveryRequestStore.getState().invalidate();
 
-  
-  
   logActivity('deliveryRequest.create', res.deliveryRequest.id, {
     requestNumber: res.deliveryRequest.requestNumber,
     ...partyMemo({
@@ -342,20 +303,20 @@ export async function createDeliveryRequestRecord(
 
 export type UpdateDeliveryRequestParams = {
   id: string;
-  
+
   snapshot: DeliveryRequest;
-  
+
   customerName: string;
-  
+
   customerCode?: string;
   vendorCode: string;
   vendorName: string;
-  
+
   deliveryAddress: string;
   googleMapUrl: string;
-  
+
   scheduledDate: string | undefined;
-  
+
   notes: string;
   items: DeliveryRequestItem[];
   assignedDriverId: string;
@@ -369,8 +330,7 @@ export async function updateDeliveryRequestRecord(
   const prevExtra = (p.snapshot.extra ?? {}) as DeliveryRequestExtra;
   const nextExtra: DeliveryRequestExtra = {
     ...prevExtra,
-    
-    
+
     deliveryAddress: p.deliveryAddress,
     ...(p.googleMapUrl ? { googleMapUrl: p.googleMapUrl } : { googleMapUrl: undefined }),
     ...(p.assignedDriverId
@@ -379,11 +339,9 @@ export async function updateDeliveryRequestRecord(
           ...(p.assignedDriverName && { assignedDriverName: p.assignedDriverName }),
         }
       : { assignedDriverId: undefined, assignedDriverName: undefined }),
-    
+
     isUrgent: p.isUrgent ? true : undefined,
-    
-    
-    
+
     ...(p.customerCode !== undefined && { customerCode: p.customerCode.trim() || undefined }),
   };
 
@@ -401,9 +359,6 @@ export async function updateDeliveryRequestRecord(
     },
   })) as DeliveryRequest;
 
-  
-  
-  
   const itemDiff = diffItems(p.snapshot.items, p.items);
   logActivity('deliveryRequest.update', p.id, {
     requestNumber: updated.requestNumber,

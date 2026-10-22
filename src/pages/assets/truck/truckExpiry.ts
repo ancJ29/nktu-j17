@@ -1,4 +1,3 @@
-
 import type { TruckAssetExtra } from '@/types';
 
 export const URGENT_WINDOW_DAYS = 30;
@@ -6,23 +5,21 @@ export const URGENT_WINDOW_DAYS = 30;
 export const MAX_VISIBLE_URGENT = 3;
 
 export type ExpiryEntry = {
-  
   date: string;
-  
+
   kindKey: string;
-  
+
   detail?: string;
-  
+
   daysLeft: number;
   expired: boolean;
 };
 
 export type ExpirySummary = {
-  
   visible: ExpiryEntry[];
-  
+
   hiddenCount: number;
-  
+
   urgent: boolean;
 };
 
@@ -36,17 +33,14 @@ function allEntries(extra: TruckAssetExtra, todayIso: string): ExpiryEntry[] {
   const candidates: { date?: string; kindKey: string; detail?: string }[] = [
     { date: extra.inspectionExpiry, kindKey: 'assets.truck.expiry.inspection' },
     { date: extra.badgeExpiry, kindKey: 'assets.truck.expiry.badge' },
-    
-    
+
     ...(extra.registrationType === 'copy'
       ? [{ date: extra.registrationCopyExpiry, kindKey: 'assets.truck.expiry.registration' }]
       : []),
     ...(extra.insurances ?? []).map((policy) => ({
       date: policy.expiry,
       kindKey: 'assets.truck.expiry.insurance',
-      
-      
-      
+
       detail: policy.type?.trim() || policy.company?.trim() || undefined,
     })),
   ];
@@ -82,8 +76,7 @@ export function matchesUrgency(
 ): boolean {
   if (urgency === 'all') return true;
   const days = daysToNearestExpiry(extra, todayIso);
-  
-  
+
   if (days === null) return false;
   if (urgency === 'expired') return days < 0;
   return days <= (urgency === 'within7' ? 7 : URGENT_WINDOW_DAYS);
@@ -98,8 +91,6 @@ export function expirySummary(
   const entries = allEntries(extra, todayIso);
   if (entries.length === 0) return null;
 
-  
-  
   const urgent = entries.filter((e) => e.daysLeft <= URGENT_WINDOW_DAYS);
   if (urgent.length === 0) return { visible: [entries[0]], hiddenCount: 0, urgent: false };
 

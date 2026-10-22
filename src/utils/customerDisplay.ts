@@ -40,8 +40,7 @@ export function createCustomerShortNameResolver(
     const code = customerCode?.trim();
     if (code) {
       const byCodeMatch = byCode.get(code);
-      
-      
+
       if (byCodeMatch) return display(byCodeMatch);
     }
     const trimmed = storedName?.trim();

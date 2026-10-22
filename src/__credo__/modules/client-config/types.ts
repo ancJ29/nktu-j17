@@ -7,14 +7,13 @@ export interface RegisterClientInput<TExtra = Record<string, unknown>> {
   contactEmail?: string;
   domains: string[];
   extra?: TExtra;
-  
+
   expectedListHash?: string;
 }
 
 export interface UpdateClientInput<TExtra = Record<string, unknown>> {
-  
   version?: string;
-  
+
   expectedListHash?: string;
   clientName?: string;
   description?: string;

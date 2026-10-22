@@ -5,22 +5,21 @@ export type OdometerFuelPaymentMethod = 'payment' | 'advance';
 
 export type OdometerFuelPaymentExtra = {
   employeeId: string;
-  
+
   employeeName: string;
-  
+
   amount: number;
-  
+
   method?: OdometerFuelPaymentMethod;
   note?: string;
-  
+
   recordedByName?: string;
-  
+
   isDeleted?: boolean;
   [key: string]: unknown;
 };
 
 export type OdometerFuelPayment = PartitionedRecordRow & {
-  
   recordDate: string;
   createdAt: number;
   updatedAt: number;
@@ -28,9 +27,8 @@ export type OdometerFuelPayment = PartitionedRecordRow & {
 };
 
 export type OdometerFuelResetExtra = {
-  
   fromDate: string;
-  
+
   employeeId?: string;
   employeeName?: string;
   recordedByName?: string;

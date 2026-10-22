@@ -1,27 +1,24 @@
-
-
 import type { DeliveryNoteStage } from '@credo/connectors/status-flow';
 import type { DeliveryNoteV2 } from '@/types/delivery-note-v2';
 import { anchorDayOf } from '../anchorDay';
 
 export interface DeliveryCounts {
   delivered: number;
-  
+
   inProgress: number;
   cancelled: number;
   total: number;
 }
 
 export interface DeliveryAssigneeRow extends DeliveryCounts {
-  
   key: string;
-  
+
   label: string;
 }
 
 export interface DeliveryReport {
   totals: DeliveryCounts;
-  
+
   byAssignee: DeliveryAssigneeRow[];
   unknownStatusNotes: number;
 }
@@ -31,7 +28,7 @@ export function buildDeliveryReport(
   input: {
     fromDay: string;
     toDay: string;
-    
+
     resolveStage: (status: string) => DeliveryNoteStage | undefined;
   },
 ): DeliveryReport {

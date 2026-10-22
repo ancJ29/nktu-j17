@@ -6,7 +6,7 @@ export const GREENHOUSE_RECORD_TARGET = { entity: 'greenhouse', uniqueField: 'co
 
 export const useGreenhouseStore = createSingleRecordsStore<Greenhouse>({
   ...GREENHOUSE_RECORD_TARGET,
-  
+
   cacheKey: 'grnh.a7f3c1',
   cacheTTL: 10 * ONE_MINUTE,
 });

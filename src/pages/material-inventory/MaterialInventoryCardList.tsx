@@ -9,7 +9,7 @@ import type { MaterialInventoryRow } from '@/types';
 type Props = {
   readonly rows: MaterialInventoryRow[];
   readonly names: ReadonlyMap<string, string>;
-  
+
   readonly lowStockCodes?: ReadonlySet<string>;
   readonly isLoading?: boolean;
   readonly onRowClick: (row: MaterialInventoryRow) => void;

@@ -1,5 +1,3 @@
-
-
 import type { DeliveryRequest } from '@/types';
 import { businessDateString } from '@/utils/code';
 import { WEEKDAY_LABELS, weekdayIndex, type ResolvedWeek } from './reportPeriods';
@@ -89,8 +87,6 @@ export function buildDeliveryWeeklyReport(
 
   const statusBreakdown = statusBreakdownOf(requests, statusOptions);
 
-  
-  
   const perDay = new Array<number>(WEEKDAY_LABELS.length).fill(0);
   for (const dr of requests) {
     const idx = weekdayIndex(effectiveDate(dr));

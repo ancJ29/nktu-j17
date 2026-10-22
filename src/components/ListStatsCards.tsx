@@ -38,9 +38,9 @@ export type ListStatCell = {
 
 type ListStatsCardsProps = {
   readonly cells: readonly ListStatCell[];
-  
+
   readonly visible?: boolean;
-  
+
   readonly cols?: { base: number; sm: number };
 };
 
@@ -52,9 +52,6 @@ export function ListStatsCards({
   const { t } = useTranslation();
   const [hidden, setHidden] = useState(readStatsHidden);
 
-  
-  
-  
   if (!statsEnabled || isMobile || !visible || cells.length === 0) return null;
 
   const toggle = () => {
@@ -62,12 +59,6 @@ export function ListStatsCards({
     setHidden(!hidden);
   };
 
-  
-  
-  
-  
-  
-  
   return (
     <Box>
       <Button

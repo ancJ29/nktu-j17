@@ -70,11 +70,11 @@ function cleanMaterialLines(lines: MaterialLine[]): MaterialLine[] {
 type Props = {
   readonly cropId: string;
   readonly cropCode: string;
-  
+
   readonly startDate?: string;
-  
+
   readonly onSummaryChange?: (summary: CropMaterialTotal[]) => void;
-  
+
   readonly children?: ReactNode;
 };
 
@@ -88,7 +88,7 @@ type EntryFormValues = {
   activity: string;
   notes: string;
   materials: MaterialLine[];
-  
+
   usesMaterial: boolean;
 };
 
@@ -104,19 +104,15 @@ export function CropDiarySection({
   const [entries, setEntries] = useState<CropDiaryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
-  
   const [formOpened, formHandlers] = useDisclosure(false);
   const [editing, setEditing] = useState<CropDiaryEntry | null>(null);
   const [saving, setSaving] = useState(false);
 
-  
   const [completing, setCompleting] = useState<string | null>(null);
 
-  
   const [deleteTarget, setDeleteTarget] = useState<CropDiaryEntry | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  
   const materials = useMaterialStore((s) => s.items);
   const materialsInit = useMaterialStore((s) => s.initialized);
   const loadMaterials = useMaterialStore((s) => s.loadAll);
@@ -153,30 +149,21 @@ export function CropDiarySection({
 
   useEffect(() => {
     if (!canView) return;
-    
+
     load();
     if (!materialsInit) loadMaterials();
   }, [load, materialsInit, loadMaterials]);
 
-  
-  
-  
-  
-  
   const { prep, events } = useMemo(
     () => splitDiaryEntries(entries, startDate),
     [entries, startDate],
   );
 
-  
-  
-  
   const materialSummary = useMemo(() => aggregateCropMaterials(entries), [entries]);
   useEffect(() => {
     if (!loading) onSummaryChange?.(materialSummary);
   }, [loading, materialSummary, onSummaryChange]);
 
-  
   const openAdd = useCallback(
     (half: 'event' | 'preparation' = 'event') => {
       const today = todayInVnDateString();
@@ -187,15 +174,13 @@ export function CropDiarySection({
         activity: '',
         notes: '',
         materials: [],
-        
-        
-        
+
         usesMaterial: false,
       });
       form.resetDirty();
       formHandlers.open();
     },
-    
+
     [formHandlers, startDate],
   );
 
@@ -206,14 +191,14 @@ export function CropDiarySection({
         entryDate: entryDatePart(entry.entryDate),
         activity: entry.activity,
         notes: entry.extra?.notes ?? '',
-        
+
         materials: (entry.extra?.materials ?? []).map((m) => ({ ...m })),
         usesMaterial: expectsMaterial(entry),
       });
       form.resetDirty();
       formHandlers.open();
     },
-    
+
     [formHandlers],
   );
 
@@ -221,19 +206,11 @@ export function CropDiarySection({
     async (values: EntryFormValues) => {
       setSaving(true);
       try {
-        
-        
-        
-        
         const isPrep = !!startDate && values.entryDate < startDate;
         const usesMaterial = isPrep && values.usesMaterial;
-        
-        
-        
+
         const materials = usesMaterial || !isPrep ? cleanMaterialLines(values.materials) : [];
         if (editing) {
-          
-          
           const extra: CropDiaryExtra = { ...(editing.extra ?? {}) };
           if (values.notes.trim()) extra.notes = values.notes.trim();
           else delete extra.notes;
@@ -289,7 +266,6 @@ export function CropDiarySection({
     [editing, cropId, cropCode, startDate, t, load, formHandlers],
   );
 
-  
   const handleToggleComplete = useCallback(
     async (entry: CropDiaryEntry) => {
       setCompleting(entry.id);
@@ -338,10 +314,6 @@ export function CropDiarySection({
     }
   }, [deleteTarget, cropId, t, load]);
 
-  
-  
-  
-  
   const isPrepEntry = !!startDate && !!form.values.entryDate && form.values.entryDate < startDate;
 
   if (!canView) return <>{children}</>;
@@ -469,11 +441,7 @@ export function CropDiarySection({
                 withAsterisk
                 clearable={false}
                 {...form.getInputProps('entryDate')}
-                
-                
-                
-                
-                
+
                 description={
                   isPrepEntry
                     ? t('cropDiaries.form.isPrepHint', { date: formatDate(startDate) })
@@ -557,11 +525,11 @@ function EntryGroup({
   readonly materialName: (code: string) => string;
   readonly onEdit: (entry: CropDiaryEntry) => void;
   readonly onDelete: (entry: CropDiaryEntry) => void;
-  
+
   readonly onLogMaterial?: (entry: CropDiaryEntry) => void;
-  
+
   readonly onToggleComplete?: (entry: CropDiaryEntry) => void;
-  
+
   readonly completingId?: string | null;
 }) {
   const { t } = useTranslation();
@@ -574,10 +542,6 @@ function EntryGroup({
         </Text>
       )}
       {entries.map((entry, i) => {
-        
-        
-        
-        
         const pendingMaterial = isMaterialPending(entry);
         const doneOn = completedOn(entry);
         return (

@@ -36,7 +36,7 @@ i18n
   .use(initReactI18next)
   .init({
     resources,
-    
+
     supportedLngs,
     fallbackLng,
     load: 'languageOnly',
@@ -54,7 +54,7 @@ if (appConfig?.translations) {
   for (const [lang, overrides] of Object.entries(appConfig.translations)) {
     const bundled = (resources as Record<string, { translation: TranslationTree }>)[lang]
       ?.translation;
-    
+
     const { pruned, dropped } = bundled
       ? pruneShapeChangingOverrides(bundled, overrides)
       : { pruned: overrides, dropped: [] as string[] };

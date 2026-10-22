@@ -5,7 +5,7 @@ import BreakdownReport from './BreakdownReport';
 const dimensionOf = (o: SalesOrderV2): { key: string; label: string } => {
   const v = o.extra?.['channel'];
   const s = typeof v === 'string' && v.trim() ? v.trim() : '';
-  
+
   return s ? { key: s, label: s } : { key: '__none__', label: 'Chưa chọn kênh' };
 };
 

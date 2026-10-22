@@ -1,5 +1,3 @@
-
-
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, Group, Loader, Stack, Text } from '@mantine/core';
@@ -46,7 +44,7 @@ export function ActivityByTargetPanel({ targetId, i18nNamespace }: Props) {
           limit: PAGE_SIZE,
           ...(cursor ? { cursor } : {}),
         }),
-      
+
       ...(appActivityLoggerV1InternalAccessKey
         ? [
             ((cursor) =>

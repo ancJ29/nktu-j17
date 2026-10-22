@@ -38,7 +38,7 @@ type ReportKind = Exclude<ReportView, 'menu'>;
 
 interface ReportRoute {
   view: ReportView;
-  
+
   period?: string;
 }
 
@@ -85,13 +85,11 @@ function useReportRoute(): [ReportRoute, (route: ReportRoute) => void] {
 
   const go = useCallback((next: ReportRoute) => {
     if (next.view === 'menu') {
-      
-      
       window.history.pushState(null, '', window.location.pathname + window.location.search);
       setRoute({ view: 'menu' });
       return;
     }
-    
+
     window.location.hash = next.period ? `${next.view}/${next.period}` : next.view;
   }, []);
 
@@ -108,7 +106,7 @@ const MENU: MenuEntry[] = [
   { view: 'sales-monthly', icon: IconCalendarStats, color: 'primary' },
   { view: 'sales-weekly', icon: IconCalendarWeek, color: 'teal' },
   { view: 'sales-customer', icon: IconUsers, color: 'indigo' },
-  
+
   { view: 'delivery', icon: IconTruckDelivery, color: 'grape' },
 ];
 
@@ -251,7 +249,6 @@ export default function ReportPage() {
       />
     );
   } else {
-    
     body = <ReportComingSoon kind={kind} />;
   }
 

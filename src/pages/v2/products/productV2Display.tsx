@@ -30,17 +30,14 @@ export function useProductV2Columns(
   const { t } = useTranslation();
   const categoryOptions = useLookupV2Options(PRODUCT_CATEGORY_CATEGORY);
   const categoryLabels = useLookupV2Labels(PRODUCT_CATEGORY_CATEGORY);
-  
-  
+
   const unitLabels = useLookupV2Labels(PRODUCT_UNIT_CATEGORY);
   const showCategory = categoryOptions.length > 0 || rows.some((p) => Boolean(p.extra?.category));
-  
-  
+
   const showMinStock =
     showInventory && rows.some((p) => p.extra?.minimumInventory?.value !== undefined);
   const { byItemId } = useInventoryV2(useProductInventoryV2Store, showInventory);
-  
-  
+
   const unitOf = useCallback(
     (p: ProductV2Row) => (p.unit ? lookupLabelOf(unitLabels, p.unit) : undefined),
     [unitLabels],
@@ -61,8 +58,7 @@ export function useProductV2Columns(
               <CodeLabel code={p.code} size="sm" fw={600} />
             </Stack>
           );
-          
-          
+
           if (!showPhotos) return named;
           return (
             <Group gap="sm" wrap="nowrap">
@@ -78,15 +74,14 @@ export function useProductV2Columns(
               key: 'category',
               width: '160px',
               header: t('productsV2.form.category'),
-              
+
               render: (item: ProductV2Row) => (
                 <ColorBadge label={lookupLabelOf(categoryLabels, item.extra?.category)} size="sm" />
               ),
             },
           ]
         : []),
-      
-      
+
       ...(canSeePrice
         ? [
             {
@@ -110,8 +105,7 @@ export function useProductV2Columns(
               forecastLabel: t('inventoryV2.forecastTooltip'),
               minOf: (p) => p.extra?.minimumInventory?.value,
               alertsOffOf: (p) => p.extra?.ignoreStockAlert === true,
-              
-              
+
               alertsOffTooltip: t('productsV2.form.ignoreStockAlertHelp'),
               unitOf,
             }),
@@ -124,9 +118,7 @@ export function useProductV2Columns(
               width: '120px',
               ta: 'right' as const,
               header: t('productsV2.columns.minStock'),
-              
-              
-              
+
               render: (item: ProductV2Row) => {
                 const min = item.extra?.minimumInventory?.value;
                 if (min === undefined) {
@@ -136,9 +128,7 @@ export function useProductV2Columns(
                     </Text>
                   );
                 }
-                
-                
-                
+
                 return (
                   <QuantityWithUnit
                     value={formatNumber(min)}
@@ -153,8 +143,7 @@ export function useProductV2Columns(
       ...(showIncomingColumn
         ? [incomingV2Column<ProductV2Row>({ byItemId, header: t('inventoryV2.incoming'), unitOf })]
         : []),
-      
-      
+
       ...(showInventory && [...byItemId.values()].some((r) => (r.outgoing ?? 0) > 0)
         ? [outgoingV2Column<ProductV2Row>({ byItemId, header: t('inventoryV2.outgoing'), unitOf })]
         : []),

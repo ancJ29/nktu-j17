@@ -9,7 +9,7 @@ export type Employee<TExtra = Record<string, unknown>> = {
   position: string;
   department: string;
   isActive: boolean;
-  
+
   userUuid?: string;
   extra: TExtra;
   createdAt: DateTimeInput;
@@ -18,19 +18,18 @@ export type Employee<TExtra = Record<string, unknown>> = {
 };
 
 type BaseMutationRequest = {
-  
   expectedListHash?: string;
 };
 
 type BaseMutationResponse = {
   success: boolean;
-  
+
   listHash?: string;
 };
 
 type BaseItemMutationRequest = BaseMutationRequest & {
   id: string;
-  
+
   version: string;
 };
 
@@ -86,7 +85,7 @@ export type CreateEmployeeRequest<TExtra = Record<string, unknown>> = BaseMutati
 };
 export type CreateEmployeeResponse<TExtra = Record<string, unknown>> = BaseMutationResponse & {
   employee: Employee<TExtra>;
-  
+
   ssoWarning?: string;
   ssoError?: unknown;
 };
@@ -104,10 +103,10 @@ export type UpdateEmployeeRequest<TExtra = Record<string, unknown>> = BaseItemMu
 
 export type UpdateEmployeeResponse<TExtra = Record<string, unknown>> = BaseMutationResponse & {
   employee: Employee<TExtra>;
-  
+
   ssoWarning?: string;
   ssoError?: unknown;
-  
+
   loginPassword?: string;
 };
 
@@ -117,33 +116,32 @@ export type ImportBatchEmployeesRequest<TExtra = Record<string, unknown>> = Base
 
 export type ImportBatchEmployeesResponse<TExtra = Record<string, unknown>> =
   BaseImportBatchResponse<Employee<TExtra>> & {
-    
     ssoFailed?: number;
-    
+
     ssoWarning?: string;
   };
 
 export type GenerateEmployeeLoginTokenRequest = {
   id: string;
-  
+
   expiration?: number;
 };
 export type GenerateEmployeeLoginTokenResponse = {
   success: boolean;
   token?: string;
-  
+
   message?: string;
 };
 
 export type UpdateEmployeeLoginPasswordRequest = {
   id: string;
-  
+
   password?: string;
 };
 export type UpdateEmployeeLoginPasswordResponse = {
   success: boolean;
   loginPassword?: string;
-  
+
   ssoWarning?: string;
   message?: string;
 };
@@ -254,9 +252,9 @@ export type ProvisionClientRequest<TExtra = Record<string, unknown>> = BaseMutat
   contactEmail?: string;
   domains: string[];
   rootEmail: string;
-  
+
   rootPassword?: string;
-  
+
   ssoAdminAccessKey: string;
   extra?: TExtra;
 };
@@ -292,11 +290,10 @@ export type DisableClientResponse<TExtra = Record<string, unknown>> = BaseMutati
 export type RemoveClientRequest = BaseMutationRequest & {
   clientServiceCode: string;
   version: string;
-  
+
   ssoAdminAccessKey?: string;
 };
 export type RemoveClientResponse = BaseDeleteResponse & {
-  
   ssoIssues?: string[];
 };
 
@@ -395,13 +392,13 @@ export type DeleteLocationResponse = BaseDeleteResponse;
 
 export type OperationLog<TExtra = Record<string, unknown>> = {
   id: string;
-  
+
   targetId: string;
-  
+
   targetCode: string;
-  
+
   logType: string;
-  
+
   logDate: DateTimeInput;
   extra: TExtra;
   createdAt: DateTimeInput;
@@ -411,7 +408,7 @@ export type OperationLog<TExtra = Record<string, unknown>> = {
 
 export type GetOperationLogsByTargetRequest = {
   targetId: string;
-  
+
   period: string;
 };
 export type GetOperationLogsByTargetResponse<TExtra = Record<string, unknown>> = {
@@ -420,9 +417,8 @@ export type GetOperationLogsByTargetResponse<TExtra = Record<string, unknown>> =
 };
 
 export type CreateOperationLogRequest<TExtra = Record<string, unknown>> = {
-  
   targetId: string;
-  
+
   targetCode: string;
   logType: string;
   logDate: DateTimeInput;
@@ -435,13 +431,13 @@ export type CreateOperationLogResponse<TExtra = Record<string, unknown>> = {
 
 export type UpdateOperationLogRequest<TExtra = Record<string, unknown>> = {
   id: string;
-  
+
   targetId: string;
-  
+
   period: string;
   version: string;
   logType?: string;
-  
+
   logDate?: DateTimeInput;
   extra?: TExtra;
 };
@@ -452,9 +448,9 @@ export type UpdateOperationLogResponse<TExtra = Record<string, unknown>> = {
 
 export type DeleteOperationLogRequest = {
   id: string;
-  
+
   targetId: string;
-  
+
   period: string;
   version: string;
 };
@@ -465,13 +461,13 @@ export type DeleteOperationLogResponse = {
 
 export type GenericRecord<TExtra = Record<string, unknown>> = {
   id: string;
-  
+
   recordType: string;
-  
+
   targetId?: string;
-  
+
   targetCode?: string;
-  
+
   recordDate: DateTimeInput;
   extra: TExtra;
   createdAt: DateTimeInput;
@@ -480,7 +476,6 @@ export type GenericRecord<TExtra = Record<string, unknown>> = {
 };
 
 export type QueryGenericRecordsRequest = {
-  
   recordType: string;
   fromPeriod?: string;
   toPeriod?: string;
@@ -491,7 +486,6 @@ export type QueryGenericRecordsResponse<TExtra = Record<string, unknown>> = {
 };
 
 export type QueryGenericRecordsSyncRequest = PartitionedQuerySyncRequest & {
-  
   recordType: string;
 };
 export type QueryGenericRecordsSyncResponse<TExtra = Record<string, unknown>> =
@@ -511,7 +505,7 @@ export type CreateGenericRecordResponse<TExtra = Record<string, unknown>> = {
 
 export type UpdateGenericRecordRequest<TExtra = Record<string, unknown>> = {
   id: string;
-  
+
   recordType: string;
   period: string;
   version: string;
@@ -526,7 +520,7 @@ export type UpdateGenericRecordResponse<TExtra = Record<string, unknown>> = {
 
 export type DeleteGenericRecordRequest = {
   id: string;
-  
+
   recordType: string;
   period: string;
   version: string;
@@ -737,7 +731,7 @@ export type SetEmployeeConfigRequest = {
 };
 export type SetEmployeeConfigResponse = {
   success: boolean;
-  
+
   config: CMngtAppConfig;
 };
 
@@ -747,14 +741,14 @@ export type SalesOrderItem = {
   quantity: number;
   unit: string;
   unitPrice: number;
-  
+
   fromLocationCode?: string;
 };
 
 export type SalesOrder<TExtra = Record<string, unknown>> = {
   id: string;
   orderNumber: string;
-  
+
   customerName: string;
   items: SalesOrderItem[];
   isClosed: boolean;
@@ -772,7 +766,7 @@ export type PartitionHashMap = Record<string, string>;
 export type PartitionedQuerySyncRequest = {
   fromPeriod: string;
   toPeriod: string;
-  
+
   partitionHashes?: PartitionHashMap;
 };
 
@@ -846,7 +840,7 @@ export type DeliveryRequestItem = {
   quantity: number;
   unit: string;
   unitPrice: number;
-  
+
   fromLocationCode?: string;
 };
 
@@ -855,14 +849,14 @@ export type DeliveryRequestDirection = 'outbound' | 'inbound';
 export type DeliveryRequest<TExtra = Record<string, unknown>> = {
   id: string;
   requestNumber: string;
-  
+
   direction?: DeliveryRequestDirection;
-  
+
   salesOrderId?: string;
   salesOrderNumber?: string;
-  
+
   customerName?: string;
-  
+
   vendorCode?: string;
   vendorName?: string;
   items: DeliveryRequestItem[];
@@ -908,13 +902,13 @@ export type GetDeliveryRequestsByIdsResponse<TExtra = Record<string, unknown>> =
 
 export type CreateDeliveryRequestRequest<TExtra = Record<string, unknown>> = {
   requestNumber: string;
-  
+
   direction?: DeliveryRequestDirection;
-  
+
   salesOrderId?: string;
   salesOrderNumber?: string;
   customerName?: string;
-  
+
   vendorCode?: string;
   vendorName?: string;
   items: DeliveryRequestItem[];
@@ -931,7 +925,7 @@ export type UpdateDeliveryRequestRequest<TExtra = Record<string, unknown>> = {
   id: string;
   version: string;
   customerName?: string;
-  
+
   vendorCode?: string;
   vendorName?: string;
   items?: DeliveryRequestItem[];
@@ -1115,7 +1109,7 @@ export type ModeRecordItem = {
   id: string;
   createdAt: DateTimeInput;
   updatedAt: DateTimeInput;
-  
+
   version: string;
 } & Record<string, unknown>;
 
@@ -1123,12 +1117,10 @@ export type RecordPartitionLocate =
   'creation:day' | 'creation:month' | 'creation:year' | 'explicit';
 
 export type SingleRecordDescriptorHeader = {
-  
   uniqueField?: string | string[];
 };
 
 export type PartitionedRecordDescriptorHeader = {
-  
   partitionLocate: RecordPartitionLocate;
   uniqueField?: string | string[];
 };
@@ -1138,13 +1130,12 @@ export type SingleRecordTarget = { entity: string } & SingleRecordDescriptorHead
 export type PartitionedRecordTarget = { entity: string } & PartitionedRecordDescriptorHeader;
 
 export type GetAllSingleRecordsRequest = {
-  
   hash?: string;
 };
 export type GetAllSingleRecordsResponse = {
   success: boolean;
   changed: boolean;
-  
+
   items?: ModeRecordItem[];
   hash?: string;
 };
@@ -1158,23 +1149,22 @@ export type GetSingleRecordByIdResponse = {
 };
 
 export type CreateSingleRecordRequest = {
-  
   item: Record<string, unknown>;
-  
+
   expectedListHash?: string;
 };
 export type CreateSingleRecordResponse = {
   success: boolean;
   item: ModeRecordItem;
-  
+
   listHash?: string;
 };
 
 export type UpdateSingleRecordRequest = {
   id: string;
-  
+
   version: string;
-  
+
   patch: Record<string, unknown>;
   expectedListHash?: string;
 };
@@ -1196,7 +1186,6 @@ export type DeleteSingleRecordResponse = {
 };
 
 export type ImportBatchSingleRecordsRequest = {
-  
   items: Array<Record<string, unknown>>;
 };
 export type ImportBatchSingleRecordsResponse = {
@@ -1205,12 +1194,11 @@ export type ImportBatchSingleRecordsResponse = {
   created: ModeRecordItem[];
   updated: ModeRecordItem[];
   errors: Array<{ index: number; message: string }>;
-  
+
   listHash?: string;
 };
 
 export type QueryPartitionedRecordsRequest = {
-  
   partitionKeys: string[];
 };
 export type QueryPartitionedRecordsResponse = {
@@ -1220,7 +1208,7 @@ export type QueryPartitionedRecordsResponse = {
 
 export type QueryPartitionedRecordsSyncRequest = {
   partitionKeys: string[];
-  
+
   partitionHashes?: PartitionHashMap;
 };
 
@@ -1241,7 +1229,7 @@ export type QueryPartitionedRecordsSyncResponse =
 
 export type GetPartitionedRecordByIdRequest = {
   id: string;
-  
+
   partitionKey?: string;
 };
 export type GetPartitionedRecordByIdResponse = {
@@ -1252,16 +1240,16 @@ export type GetPartitionedRecordByIdResponse = {
 
 export type CreatePartitionedRecordRequest = {
   item: Record<string, unknown>;
-  
+
   partitionKey?: string;
   expectedListHash?: string;
 };
 export type CreatePartitionedRecordResponse = {
   success: boolean;
   item: ModeRecordItem;
-  
+
   partitionKey: string;
-  
+
   listHash?: string;
 };
 
@@ -1269,16 +1257,16 @@ export type UpdatePartitionedRecordRequest = {
   id: string;
   version: string;
   patch: Record<string, unknown>;
-  
+
   partitionKey?: string;
-  
+
   newPartitionKey?: string;
   expectedListHash?: string;
 };
 export type UpdatePartitionedRecordResponse = {
   success: boolean;
   item: ModeRecordItem;
-  
+
   partitionKey: string;
   listHash?: string;
 };
@@ -1292,7 +1280,7 @@ export type DeletePartitionedRecordRequest = {
 export type DeletePartitionedRecordResponse = {
   success: boolean;
   message: string;
-  
+
   partitionKey?: string;
   listHash?: string;
 };
@@ -1304,12 +1292,12 @@ export type LogActivitiesRequest = {
     action: string;
     targetId?: string;
     memo?: Record<string, unknown>;
-    
+
     timestamp?: string;
   }[];
 };
 export type LogActivitiesResponse = {
   success: boolean;
-  
+
   ids: string[];
 };

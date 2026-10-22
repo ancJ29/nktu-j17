@@ -41,14 +41,6 @@ export function validateCreateInput(input: CreateSalesOrderInput): void {
     fields['customerName'] = 'Customer name is required';
   }
 
-  
-  
-  
-  
-  
-  
-  
-
   if (Object.keys(fields).length > 0) {
     throw new ValidationError('Invalid sales order input', fields);
   }

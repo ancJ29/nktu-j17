@@ -1,53 +1,47 @@
-
-
 import type { ProductLabelSize } from '@/utils/salesOrderProductLabel';
 
 export type SalesOrderDetailVariant = {
-  
   showDeliveryNotePrint: boolean;
-  
+
   productLabelPrint?: {
     defaultHeader: string;
     printerPaper?: ProductLabelSize;
   };
-  
+
   showShippingFee: boolean;
-  
+
   showVatTag: boolean;
-  
+
   notesAlwaysEditable: boolean;
-  
+
   itemMemoEditable: boolean;
-  
+
   itemReadyCheckbox: boolean;
-  
+
   itemWarehouseMemo: boolean;
-  
+
   showShortageAlert: boolean;
-  
+
   itemProductPhotoOnHover: boolean;
-  
+
   warehouseMobileView?: {
-    
     departmentCode: string;
   };
-  
+
   clientSpecific?: {
-    
     NKTU?: {
-      
       deliveryMethodDrivesInternalDelivery?: boolean;
-      
+
       internalDeliveryMethodCode?: string;
-      
+
       externalDeliveryMethodCode?: string;
-      
+
       hideDeliveredActionForWarehouse?: {
         deliveredStatusValue: string;
         warehouseDepartmentCode: string;
         deliveryMethods: string[];
       };
-      
+
       splitNotes?: {
         warehouseDepartmentCode: string;
       };
@@ -69,8 +63,7 @@ export const DEFAULT_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
 
 export const NKTU_SALES_ORDER_DETAIL_VARIANT: SalesOrderDetailVariant = {
   showDeliveryNotePrint: true,
-  
-  
+
   productLabelPrint: { defaultHeader: 'TÂN UYÊN', printerPaper: 'A7' },
   showShortageAlert: false,
   showShippingFee: false,

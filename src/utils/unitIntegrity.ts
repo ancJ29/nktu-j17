@@ -1,13 +1,10 @@
-
-
 import type { Product } from '@/types';
 
 export type UnitIssue = {
-  
   readonly path: string;
-  
+
   readonly value: string;
-  
+
   readonly suggestedValue?: string;
 };
 
@@ -19,11 +16,10 @@ export type ProductUnitIssues = {
 };
 
 export type UnitIntegrityReport = {
-  
   readonly products: readonly ProductUnitIssues[];
-  
+
   readonly scanned: number;
-  
+
   readonly distinctValues: ReadonlyArray<{
     readonly value: string;
     readonly suggestedValue?: string;
@@ -35,9 +31,6 @@ export function findProductUnitIssues(
   products: ReadonlyArray<Product>,
   unitLabels: ReadonlyMap<string, string>,
 ): UnitIntegrityReport {
-  
-  
-  
   const labelToValue = new Map<string, string>();
   const ambiguous = new Set<string>();
   for (const [value, label] of unitLabels) {
@@ -61,8 +54,7 @@ export function findProductUnitIssues(
     const issues: UnitIssue[] = [];
     const check = (path: string, raw: string | undefined) => {
       const value = raw?.trim();
-      
-      
+
       if (!value) return;
       if (unitLabels.has(value)) return;
       const suggestedValue = suggest(value);
@@ -73,9 +65,7 @@ export function findProductUnitIssues(
     check('unit', p.unit);
     (e.units ?? []).forEach((u, i) => check(`extra.units[${i}]`, u));
     check('extra.minimumInventory.unit', e.minimumInventory?.unit);
-    
-    
-    
+
     (e.unitConversions ?? []).forEach((c, i) => {
       check(`extra.unitConversions[${i}].unit`, c.unit);
       check(`extra.unitConversions[${i}].baseUnit`, c.baseUnit);
@@ -87,7 +77,6 @@ export function findProductUnitIssues(
     }
   }
 
-  
   const byValue = new Map<string, { suggestedValue?: string; products: Set<string> }>();
   for (const p of out) {
     for (const i of p.issues) {

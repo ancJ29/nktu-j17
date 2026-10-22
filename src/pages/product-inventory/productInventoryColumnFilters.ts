@@ -1,12 +1,9 @@
-
-
 import type { ColumnFilterDef, DataTableColumnFilterLabels } from '@credo/base-ui/hooks';
 
 import type { InboundEntry } from '@/hooks';
 import type { ProductInventorySummary } from '@/types';
 
 type BuildArgs = {
-  
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
   readonly labels: DataTableColumnFilterLabels;
 };
@@ -29,9 +26,7 @@ export function buildProductInventoryColumnFilterDefs({
   return [
     {
       key: 'product',
-      
-      
-      
+
       getValue: (s) => s.product.name,
       labels,
     },
@@ -43,8 +38,7 @@ export function buildProductInventoryColumnFilterDefs({
     },
     {
       key: 'beginOfPeriod',
-      
-      
+
       getValue: (s) => (s.hasBeginOfPeriod ? numeric(s.totalBeginOfPeriod) : null),
       getLabel: formatNumber,
       labels,
@@ -57,8 +51,7 @@ export function buildProductInventoryColumnFilterDefs({
     },
     {
       key: 'incoming',
-      
-      
+
       getValue: (s) => (incomingOf(s) > 0 ? numeric(incomingOf(s)) : null),
       getLabel: formatNumber,
       labels,

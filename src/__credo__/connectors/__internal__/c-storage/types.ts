@@ -1,12 +1,10 @@
-
-
 export type RecordEntity<T = unknown> = {
   id: string;
   serviceCode: string;
   key: string;
   description: string;
   isPrivate: boolean;
-  
+
   version?: string;
   createdAt: Date | string;
   updatedAt: Date | string;
@@ -48,7 +46,7 @@ export type GetRecordByKeyResponse<T = unknown> = {
 
 export type RecordNoChangeResponse = {
   noChange: true;
-  
+
   version: string;
 };
 

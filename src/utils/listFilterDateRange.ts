@@ -1,5 +1,3 @@
-
-
 import type { DateTimeInput } from '@credo/kits/types';
 import { type DateRangePreset, type DateRangeValue, EMPTY_DATE_RANGE } from '@/types/date-range';
 import { formatDate } from '@/utils/dateFormat';
@@ -10,7 +8,7 @@ export const DEFAULT_RANGE_DAYS = 30;
 export function getPresetRange(preset: DateRangePreset): { from: Date; to: Date } {
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const day = today.getDay(); 
+  const day = today.getDay();
   const mondayOffset = day === 0 ? -6 : 1 - day;
 
   switch (preset) {
@@ -111,9 +109,8 @@ export function isInDateRange(
   datetime: DateTimeInput | undefined | null,
   range: DateRangeValue,
 ): boolean {
-  
   if (!range.preset) return true;
-  
+
   if (!datetime) return false;
   const d = new Date(datetime);
   d.setHours(0, 0, 0, 0);

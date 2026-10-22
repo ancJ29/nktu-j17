@@ -1,5 +1,3 @@
-
-
 const pad = (n: number) => String(n).padStart(2, '0');
 
 export type DateOrder = 'DMY' | 'MDY' | 'YMD';
@@ -12,11 +10,10 @@ export function dateOrderFromFormat(format: string | undefined): DateOrder {
 }
 
 export type ParseDateTimeOptions = {
-  
   order?: DateOrder;
-  
+
   now?: Date;
-  
+
   fallbackDate?: string | null;
 };
 
@@ -50,8 +47,6 @@ function parseDateToken(token: string, order: DateOrder, now: Date): Ymd | null 
   let monthRaw: string;
   let yearRaw: string | undefined;
   if (order === 'YMD') {
-    
-    
     if (c === undefined) {
       monthRaw = a;
       dayRaw = b;
@@ -89,7 +84,7 @@ function parseTimeToken(token: string): Hm | null {
   const bare = BARE_TIME_RE.exec(token);
   if (!bare) return null;
   const digits = bare[1]!;
-  
+
   if (digits.length <= 2) {
     const hour = Number(digits);
     return hour <= 23 ? { hour, minute: 0 } : null;
@@ -127,9 +122,6 @@ export function parseDateTimeInput(
   let time: Hm | null = null;
 
   if (tokens.length === 2) {
-    
-    
-    
     const [first, second] = tokens as [string, string];
     const firstDate = parseDateToken(first, order, now);
     if (firstDate) {
@@ -144,12 +136,8 @@ export function parseDateTimeInput(
     const only = tokens[0]!;
     date = parseDateToken(only, order, now);
     if (date) {
-      
-      
       time = { hour: 0, minute: 0 };
     } else {
-      
-      
       time = TIME_RE.test(only) ? parseTimeToken(only) : null;
       if (!time) return null;
       date = dateOf(fallbackDate) ?? {

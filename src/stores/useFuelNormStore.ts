@@ -9,7 +9,7 @@ const FUEL_NORM_RECORD_TARGET = {
 
 export const useFuelNormStore = createSingleRecordsStore<FuelNormRow>({
   ...FUEL_NORM_RECORD_TARGET,
-  
+
   cacheKey: 'fnm.9c1d43',
   cacheTTL: 10 * ONE_MINUTE,
 });

@@ -1,5 +1,3 @@
-
-
 import { ActionIcon, Button, Group, Stack, Text, TextInput } from '@mantine/core';
 import { IconPlus, IconTrash } from '@tabler/icons-react';
 
@@ -18,7 +16,7 @@ export function OptionListEditor<T extends Option>({
   addLabel: string;
   emptyHint: string;
   onChange: (next: T[]) => void;
-  
+
   renderExtra?: (option: T, index: number) => React.ReactNode;
 }) {
   const update = (index: number, patch: Partial<Option>) =>

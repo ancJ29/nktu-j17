@@ -1,5 +1,3 @@
-
-
 import {
   ActionIcon,
   Alert,
@@ -168,21 +166,18 @@ export function ClientAppConfigPanel({
   const code = client.clientServiceCode;
 
   const [stored, setStored] = useState<CredoAppConfig | null>(null);
-  
+
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  
-  
-  
   const [logos, setLogos] = useState<Record<LogoField, string>>(() => emptyLogos());
   const [identity, setIdentity] = useState<AppIdentityForm>(() => readAppIdentity(null));
   const [theme, setTheme] = useState<ThemeForm>(() => readTheme(null));
   const [navigation, setNavigation] = useState<NavigationForm>(() => readNavigation(null));
   const [layout, setLayout] = useState<LayoutForm>(() => readLayout(null));
-  
+
   const [legacyPc, setLegacyPc] = useState(() => readLegacyPc(null));
   const [vendorsV2, setVendorsV2] = useState<VendorsV2Form>(() => readVendorsV2(null));
   const [customersV2, setCustomersV2] = useState<CustomersV2Form>(() => readCustomersV2(null));
@@ -205,7 +200,7 @@ export function ClientAppConfigPanel({
   );
   const [departmentOptions, setDepartmentOptions] = useState<DepartmentOption[]>([]);
   const [positionOptions, setPositionOptions] = useState<PositionOption[]>([]);
-  
+
   const [langCodes, setLangCodes] = useState<string[]>(() => readLanguageCodes(null));
   const [activityLog, setActivityLog] = useState(false);
 
@@ -217,7 +212,7 @@ export function ClientAppConfigPanel({
       if (!res.success) {
         throw new Error((res as { message?: string }).message ?? 'getAppConfigAdmin failed');
       }
-      
+
       const parsed = res.config === null ? null : CredoAppConfigSchema.safeParse(res.config);
       if (parsed && !parsed.success) {
         throw new Error(
@@ -252,8 +247,6 @@ export function ClientAppConfigPanel({
       setActivityLog(readActivityLog(config));
       setLoaded(true);
     } catch (err) {
-      
-      
       setLoadError(err instanceof Error ? err.message : String(err));
     } finally {
       setLoading(false);
@@ -261,25 +254,21 @@ export function ClientAppConfigPanel({
   }, [code]);
 
   useEffect(() => {
-    
     void load();
   }, [load]);
 
-  
   const pending = useMemo<CredoAppConfig | null>(
     () =>
       loaded
         ? {
             ...(stored ?? {}),
             version: stored?.version ?? '',
-            
-            
+
             app: applyAppIdentity(applyLogos(stored?.app, logos, client.clientName), identity),
             themeConfig: applyTheme(stored?.themeConfig, theme),
             navigationV2: applyNavigation(stored?.navigationV2, navigation),
             layout: applyLayout(stored?.layout, layout),
-            
-            
+
             features: applyPermissionMode(
               applyActivityLog(
                 applyOptions(
@@ -344,18 +333,11 @@ export function ClientAppConfigPanel({
     ],
   );
 
-  
-  
-  
   const [openSections, setOpenSections] = useState<Set<SectionKey>>(() => new Set());
-  
-  
-  
+
   const showDepartments = employees.flags.department || departmentOptions.length > 0;
   const showPositions = employees.flags.position || positionOptions.length > 0;
 
-  
-  
   const visibleKeys = useMemo(
     () =>
       SECTION_KEYS.filter(
@@ -412,13 +394,8 @@ export function ClientAppConfigPanel({
   }, []);
 
   const handleSave = useCallback(async () => {
-    
     if (!pending) return;
 
-    
-    
-    
-    
     const identityErrors = appIdentityIssues(identity);
     if (identityErrors.length > 0) {
       notifications.show({
@@ -429,10 +406,6 @@ export function ClientAppConfigPanel({
       return;
     }
 
-    
-    
-    
-    
     const departmentValues = departmentOptions.map((option) => option.value);
     for (const [module, issues] of [
       ['Goods receipt', statusFlowIssues(goodsReceiptsV2, departmentValues)],
@@ -449,9 +422,6 @@ export function ClientAppConfigPanel({
       }
     }
 
-    
-    
-    
     for (const [module, issues] of [
       ['Goods receipt', customFieldIssues(goodsReceiptsV2, departmentValues)],
       ['Sales order', salesOrderFieldIssues(salesOrdersV2, departmentValues)],
@@ -467,7 +437,6 @@ export function ClientAppConfigPanel({
       }
     }
 
-    
     const clamped = clampDepartmentOverlays(pending.features?.employees?.departmentOptions ?? []);
     const safe: CredoAppConfig =
       clamped.dropped.length > 0
@@ -494,7 +463,6 @@ export function ClientAppConfigPanel({
       });
     }
 
-    
     const config: CredoAppConfig = { ...safe, version: `1.0.${Date.now().toString(36)}` };
 
     setSaving(true);

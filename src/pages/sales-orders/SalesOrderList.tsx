@@ -106,24 +106,13 @@ const { statusOptions, resolveStatus, resolveDeliveryMethod, tagOptions } = sale
 export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) {
   const { t, i18n } = useTranslation();
   const scrollViewportRef = useListScrollRestoration(ROUTES.SALES_ORDERS.LIST);
-  
-  
+
   const isRootUser = useIsRoot();
 
   const [bulkDrOpened, { open: openBulkDr, close: closeBulkDr }] = useDisclosure(false);
 
-  
-  
-  
-  
   const [itemsOrder, setItemsOrder] = useState<SalesOrder | null>(null);
 
-  
-  
-  
-  
-  
-  
   const selection = useSelectionMode();
   const {
     selectionMode,
@@ -154,22 +143,10 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     loadAll: loadEmployees,
     initialized: employeesInit,
   } = useEmployeeStore();
-  
-  
-  
-  
+
   const deliveryRequests = useDeliveryRequestStore((s) => s.items);
 
-  
-  
-  
-  
-  
-  
-  
-  
   const visibleStoreOrders = useMemo(() => {
-    
     const live = storeOrders.filter((o) => !o.extra?.isDeleted);
     if (canViewAll) return live;
     if (!canViewSelf) return [];
@@ -184,11 +161,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     variant.internalDeliveryFirstSort,
   );
 
-  
-  
-  
-  
-  
   const viewOptions = [
     { value: 'ops', label: t('salesOrders.finance.viewOps') },
     ...(showPrice ? [{ value: 'finance', label: t('salesOrders.finance.viewFinance') }] : []),
@@ -217,12 +189,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     }
   }, [error, t]);
 
-  
-  
-  
-  
-  
-  
   const fetchRange = useMemo(() => defaultLastNDaysRange(FETCH_WINDOW_DAYS), []);
   useTransactionalRangeRefetch({
     range: fetchRange,
@@ -230,19 +196,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     forceRefresh,
   });
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const needDeliveryRequests =
     canAutoCompleteOnList ||
     (canBulkCreateDeliveries && variant.bulkDrMode === 'selection') ||
@@ -254,26 +207,18 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     if (!needDeliveryRequests || drSyncStartedRef.current) return;
     drSyncStartedRef.current = true;
     setDeliveryRequestQueryRange(fetchRange.from, fetchRange.to);
-    
-    
-    
+
     void useDeliveryRequestStore
       .getState()
       .forceRefresh()
       .finally(() => setDrsReady(true));
   }, [needDeliveryRequests, fetchRange]);
 
-  
-  
-  
-  
-  
-  
   const currentEmployee = useMyEmployee();
   const autoCompleteStartedRef = useRef(false);
   useEffect(() => {
     if (!canAutoCompleteOnList || !drsReady || !initialized) return;
-    
+
     if (autoCompleteStartedRef.current || visibleStoreOrders.length === 0) return;
     autoCompleteStartedRef.current = true;
     void advanceDeliveredSalesOrders({
@@ -292,12 +237,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     });
   }, [drsReady, initialized, visibleStoreOrders, currentEmployee, t]);
 
-  
-  
-  
-  
-  
-  
   const columnFiltersShown = !isMobile && viewMode === 'warehouse';
   const columnFilterLabels = useColumnFilterLabels();
   const columnFilterDefs = useMemo(
@@ -319,16 +258,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     value: columnFilterValues,
     onChange: filters.setColumnFilters,
   });
-  
-  
-  
+
   const appliedColumnFilters = columnFilterDefs.some(
     (def) => (columnFilterValues[def.key]?.length ?? 0) > 0,
   )
     ? filters.columnFilters
     : '';
-
-  
 
   const {
     search,
@@ -356,16 +291,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       item.extra?.customerPONumber ?? '',
       resolveSalesOrderCustomerName(item, getCustomerByCode) ?? '',
     ],
-    
-    
-    
+
     search: filters.search,
     onSearchChange: filters.setSearch,
     page: filters.page,
     onPageChange: filters.setPage,
-    
-    
-    
+
     lazyKey: ROUTES.SALES_ORDERS.LIST,
   });
 
@@ -374,22 +305,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     total: totalItems,
   });
 
-  
-  
   const clearAll = filters.clearFilters;
 
-  
   const hasActiveFilters = filters.hasActiveFilters || !!search || appliedColumnFilters !== '';
 
-  
-  
   const financeSummary = useMemo(() => sumSalesOrderFinance(filtered, pricingVatRate), [filtered]);
 
-  
-  
-  
-  
-  
   const handleToggleBillingExempt = useCallback(
     async (order: SalesOrder) => {
       const nextExempt = !isSalesOrderBillingExempt(order.extra);
@@ -422,11 +343,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     [t, forceRefresh],
   );
 
-  
-  
-  
-  
-  
   const ordersWithDR = useMemo(() => {
     const s = new Set<string>();
     for (const dr of deliveryRequests) {
@@ -435,11 +351,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     return s;
   }, [deliveryRequests]);
 
-  
-  
-  
-  
-  
   const itemsOrderDRs = useMemo<DeliveryRequest[]>(() => {
     if (!itemsOrder) return [];
     return deliveryRequests.filter(
@@ -447,12 +358,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     ) as DeliveryRequest[];
   }, [itemsOrder, deliveryRequests]);
 
-  
-  
-  
-  
-  
-  
   const vacuousCompletionIds = useMemo(
     () =>
       isRootUser && drsReady
@@ -461,18 +366,11 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     [isRootUser, drsReady, paginated, ordersWithDR],
   );
 
-  
-  
-  
-  
   const selectedOrders = useMemo(
     () => filtered.filter((o) => selectedIds.has(o.id) && !ordersWithDR.has(o.id)),
     [filtered, selectedIds, ordersWithDR],
   );
-  
-  
-  
-  
+
   const pageOrders = hasMore ? filtered : paginated;
   const selectableOnPage = useMemo(
     () => pageOrders.filter((o) => !ordersWithDR.has(o.id)),
@@ -486,15 +384,11 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     [selection, selectableOnPageIds],
   );
 
-  
-
   const statusFilterData = useMemo(
     () => statusOptions.map((s) => ({ value: s.value, label: s.label })),
     [],
   );
 
-  
-  
   const customerFilterData = useMemo(
     () =>
       customers
@@ -503,9 +397,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     [customers],
   );
 
-  
-  
-  
   const staffFilterData = useMemo(
     () => employees.filter(picEmployeeFilter).map((e) => ({ value: e.id, label: e.name })),
     [employees],
@@ -517,10 +408,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     return m;
   }, [employees]);
 
-  
-  
-  
-  
   const employeeCodes = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.code);
@@ -565,9 +452,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     }
   }, [filtered, getCustomerByCode, employeeCodes, t]);
 
-  
-  
-  
   const handleExport = useCallback(() => {
     if (filtered.length === 0) {
       notifications.show({
@@ -577,10 +461,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       return;
     }
     try {
-      
-      
-      
-      
       const exportable = canViewSetComponentInventory
         ? filtered
         : filtered.map((o) => ({
@@ -611,11 +491,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     }
   }, [filtered, i18n.language, employeeNames, getCustomerByCode, t]);
 
-  
-  
-  
-  
-  
   const statsCells = useMemo<ListStatCell[]>(() => {
     const byCounts: Record<string, number> = {};
     for (const o of filtered) {
@@ -637,15 +512,11 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     ];
   }, [filtered, t]);
 
-  
-
   const statusPlaceholder = useMemo(() => {
     if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);
-
-  
 
   const presetLabels: Partial<Record<DateRangePreset, string>> = {
     today: t('common.datePreset.today'),
@@ -683,17 +554,13 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       onChange: filters.setStaffFilter,
       data: staffFilterData,
       placeholder: t('salesOrders.filterStaff'),
-      
-      
+
       visible: canViewAll && staffFilterData.length > 0,
       searchable: true,
       w: 250,
     },
   ];
 
-  
-  
-  
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
@@ -731,15 +598,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     },
   ];
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const mobileQuickChips: QuickFilterChip[] = useMemo(() => {
     const chips: QuickFilterChip[] = [
       {
@@ -780,7 +638,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       options: customerFilterData,
       onChange: filters.setCustomerFilter,
     },
-    
+
     ...(canViewAll
       ? ([
           {
@@ -794,33 +652,14 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
           },
         ] satisfies MoreFilterDef[])
       : []),
-    
-    
-    
-    
+
     ...dateAndUrgentFilters.filter((f) => f.key !== 'urgent'),
   ];
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
   const showUrgentPill = !isMobile;
-  
-  
-  
-  const showDeliveryKindPill = !isMobile || !deliveryKindFilterEnabled;
 
-  
+  const showDeliveryKindPill = !isMobile || !deliveryKindFilterEnabled;
 
   return (
     <Stack gap={isMobile ? 'md' : 'lg'}>
@@ -834,7 +673,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             <>
               {canBulkCreateDeliveries &&
                 (variant.bulkDrMode === 'selection' ? (
-                  
                   selectionMode ? (
                     <>
                       <Button variant="default" size="sm" onClick={exitSelectionMode}>
@@ -862,7 +700,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
                     </Button>
                   )
                 ) : (
-                  
                   <Button
                     variant="default"
                     size="sm"

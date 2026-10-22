@@ -1,4 +1,3 @@
-
 import type {
   TransportOrder,
   TransportOrderFee,
@@ -75,8 +74,7 @@ export function feeRowsToFees(rows: FeeRow[]): TransportOrderFee[] {
         label: f.label.trim(),
         amount: f.amount || 0,
         invoiceNo: f.invoiceNo.trim(),
-        
-        
+
         ...(f.memo.trim() ? { memo: f.memo.trim() } : {}),
       };
       return f.kind === 'passthrough'

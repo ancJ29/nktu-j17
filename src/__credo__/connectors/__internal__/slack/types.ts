@@ -25,16 +25,15 @@ export type SlackSimpleNotifyType = 'error' | 'warning' | 'info' | 'success';
 
 export type SlackPushResult = {
   ok: boolean;
-  
+
   reason?: 'no-token' | 'no-channel' | 'http' | 'slack' | 'network';
-  
+
   detail?: string;
-  
+
   channel?: string;
 };
 
 export type SlackConnectionCheck = {
-  
   configured: {
     tokenPresent: boolean;
     tokenPreview?: string;
@@ -43,7 +42,7 @@ export type SlackConnectionCheck = {
     warningChannel?: string;
     instanceName: string;
   };
-  
+
   auth: {
     ok: boolean;
     team?: string;
@@ -51,6 +50,6 @@ export type SlackConnectionCheck = {
     user?: string;
     error?: string;
   };
-  
+
   message?: SlackPushResult;
 };

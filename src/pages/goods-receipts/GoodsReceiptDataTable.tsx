@@ -17,7 +17,7 @@ type Props = {
   readonly receipts: GoodsReceipt[];
   readonly isLoading?: boolean;
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly onShowItems?: (receipt: GoodsReceipt) => void;
 };
 
@@ -93,10 +93,6 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
         header: t('goodsReceipts.columns.date'),
         width: '200px',
         render: (item: GoodsReceipt) => {
-          
-          
-          
-          
           const hasReceivedAt = !!item.receivedAt;
           return (
             <Stack gap={2}>
@@ -134,8 +130,7 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
           );
         },
       },
-      
-      
+
       ...(onShowItems
         ? [
             {

@@ -1,5 +1,3 @@
-
-
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
 import type {
   SalesOrder,
@@ -59,13 +57,13 @@ export type SalesOrderInlineFields = {
   deliveryMethod?: { from?: string; to?: string };
   deliveryDate?: { from?: number; to?: number };
   notes?: { changed: true };
-  
+
   itemMemo?: { product: string; from?: string; to?: string };
-  
+
   itemReady?: { product: string; to: boolean };
-  
+
   itemWarehouseMemo?: { product: string; from?: string; to?: string };
-  
+
   warehouseNote?: { changed: true };
   driverNote?: { changed: true };
 };
@@ -79,13 +77,13 @@ export type SalesOrderStatusChangeMemo = {
   note?: string;
   inventoryAction?: string;
   trigger?: SalesOrderStatusChangeTrigger;
-  
+
   shipPending?: boolean;
-  
+
   timelineAt?: number;
-  
+
   resent?: boolean;
-  
+
   performedBy?: { id?: string; name?: string };
 };
 
@@ -130,7 +128,7 @@ function statusChangeTimelineAt(updated: SalesOrder, toStatus: string): number |
 export type SalesOrderReleasedRow = {
   productCode: string;
   locationCode: string;
-  
+
   byUnit: Record<string, number>;
 };
 
@@ -151,9 +149,6 @@ export function toMemoItem(item: SalesOrderItem): SalesOrderMemoItem {
 }
 
 function lineIdentity(item: SalesOrderItem): string {
-  
-  
-  
   return [item.productCode, item.fromLocationCode ?? '', item.groupId ?? '', item.role ?? ''].join(
     '|',
   );

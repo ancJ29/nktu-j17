@@ -12,9 +12,9 @@ export type EmployeeSelectorChange = {
 export type EmployeeSelectorProps = Omit<SelectProps, 'data' | 'value' | 'onChange' | 'filter'> & {
   value: string | null;
   onChange: (selection: EmployeeSelectorChange | null) => void;
-  
+
   filter?: (e: Employee) => boolean;
-  
+
   optionLabel?: (e: Employee) => string;
 };
 
@@ -33,10 +33,7 @@ export function EmployeeSelector({
 
   const data = useMemo(() => {
     const filtered = employees.filter(filter);
-    
-    
-    
-    
+
     if (value && !filtered.some((e) => e.id === value)) {
       const current = employees.find((e) => e.id === value);
       if (current) filtered.push(current);

@@ -29,17 +29,8 @@ export function EmployeeOrgSettingsPage() {
   const navigate = useNavigate();
   const isRootUser = useIsRoot();
 
-  
-  
-  
-  
   const rootLocked = isPermissionManagementRootUserOnly() && !isRootUser;
 
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isMobile || rootLocked) {
       navigate(ROUTES.EMPLOYEES.LIST, { replace: true });
@@ -63,24 +54,17 @@ export function EmployeeOrgSettingsPage() {
   );
   const [saving, setSaving] = useState(false);
 
-  
-  
   const { items: employeeItems, initialized: employeesLoaded, loadAll } = useEmployeeStore();
   useEffect(() => {
     loadAll();
   }, [loadAll]);
 
-  
-  
-  
   const [lockedValues] = useState<ReadonlySet<string>>(
     () => new Set((employees.departmentOptions ?? []).map((d) => d.value)),
   );
 
   const employeeCounts = useMemo(() => countEmployeesByDepartment(employeeItems), [employeeItems]);
 
-  
-  
   const configRefs = useMemo(
     () =>
       collectDepartmentConfigRefs(appConfig, {
@@ -92,9 +76,6 @@ export function EmployeeOrgSettingsPage() {
     [t],
   );
 
-  
-  
-  
   const getRemovalBlockers = useCallback(
     (value: string): string[] => {
       const reasons: string[] = [];
@@ -110,8 +91,6 @@ export function EmployeeOrgSettingsPage() {
     [employeesLoaded, employeeCounts, driverDepartments, configRefs, t],
   );
 
-  
-  
   const departmentMultiSelectData = useMemo(
     () =>
       departmentOptions.map((d) => {
@@ -130,8 +109,7 @@ export function EmployeeOrgSettingsPage() {
       });
       if (res.success) {
         notifications.show({ color: 'green', message: t('employees.org.saved') });
-        
-        
+
         scheduleReload('employee org config saved');
       } else {
         notifications.show({ color: 'red', message: t('employees.org.saveFailed') });

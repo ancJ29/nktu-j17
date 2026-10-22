@@ -1,5 +1,3 @@
-
-
 import type { InventoryV2Row } from '@/types';
 
 export interface InventoryStatusItem {
@@ -10,14 +8,13 @@ export interface InventoryStatusItem {
   onHand: number;
   incoming: number;
   outgoing: number;
-  
+
   available: number;
 }
 
 export interface InventoryStatus {
-  
   items: InventoryStatusItem[];
-  
+
   uncountedProducts: number;
 }
 
@@ -34,8 +31,7 @@ export function buildInventoryStatus(
       const outgoing = row.outgoing ?? 0;
       return {
         itemId: row.itemId,
-        
-        
+
         code: product?.code ?? row.itemCode,
         name: product?.name ?? row.itemCode,
         ...(product?.unit ? { unit: product.unit } : {}),

@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { SelectFilter } from '@/components/DesktopFilterBar';
@@ -48,8 +46,6 @@ export function useProductV2ListFilters(
 
   const filters = useMemo<SelectFilter[]>(
     () => [
-      
-      
       ...(categoryOptions.length > 0
         ? [
             {
@@ -63,8 +59,7 @@ export function useProductV2ListFilters(
             },
           ]
         : []),
-      
-      
+
       ...(showInventory
         ? [
             {
@@ -85,9 +80,6 @@ export function useProductV2ListFilters(
     [t, categoryOptions, category, stockStatus, setValue],
   );
 
-  
-  
-  
   const counts = useMemo(() => {
     const tally = { outOfStock: 0, mustOrder: 0 };
     if (!showInventory) return tally;
@@ -102,9 +94,7 @@ export function useProductV2ListFilters(
 
   const chips = useMemo<QuickFilterChip[]>(() => {
     if (!showInventory) return [];
-    
-    
-    
+
     return ALERT_LEVELS.filter(
       ({ level }) => counts[level] > 0 || stockStatus === level,
     ).map<QuickFilterChip>(({ level, labelKey, color }) => ({

@@ -10,17 +10,11 @@ const MAX_RESTORE_FRAMES = 60;
 const maxScrollTop = (el: HTMLElement) => el.scrollHeight - el.clientHeight;
 
 export function useListScrollRestoration(key: string) {
-  
-  
-  
   const viewportRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
     const pageEl = document.scrollingElement as HTMLElement | null;
-    
-    
-    
-    
+
     const targets: Array<{ el: HTMLElement; evt: Window | HTMLElement }> = [];
     if (!isMobile && viewportRef.current) {
       targets.push({ el: viewportRef.current, evt: viewportRef.current });
@@ -30,7 +24,6 @@ export function useListScrollRestoration(key: string) {
 
     let captureFrame = 0;
     const capture = () => {
-      
       let top = 0;
       for (const { el } of targets) top = Math.max(top, el.scrollTop);
       scrollPositions.set(key, top);
@@ -56,18 +49,15 @@ export function useListScrollRestoration(key: string) {
       const tick = () => {
         const canHonor = targets.some(({ el }) => maxScrollTop(el) >= saved - 1);
         if (canHonor || attempts >= MAX_RESTORE_FRAMES) {
-          
           landOffset();
           restoreFrame = 0;
           return;
         }
-        
+
         attempts += 1;
         restoreFrame = requestAnimationFrame(tick);
       };
-      
-      
-      
+
       tick();
     }
 

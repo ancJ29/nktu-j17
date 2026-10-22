@@ -22,10 +22,7 @@ type RouteHandle = {
 export function MobileDetailLayout() {
   const { t } = useTranslation();
   const { user, loadProfile, isProfileLoaded } = useAuthStore();
-  
-  
-  
-  
+
   const signedIn = isSignedIn();
   const matches = useMatches();
 
@@ -38,18 +35,15 @@ export function MobileDetailLayout() {
     }
   }, [signedIn, isProfileLoaded, loadProfile]);
 
-  
   const handleRefresh = useCallback(() => {
     cacheFlush();
     reloadPage('manual refresh');
   }, []);
 
-  
   const navActions = (() => {
     for (let i = matches.length - 1; i >= 0; i--) {
       const handle = matches[i].handle as RouteHandle | undefined;
       if (handle?.detailNav) {
-        
         return handle.detailNav((key: string) => t(key as any));
       }
     }

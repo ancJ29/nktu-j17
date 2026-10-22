@@ -1,5 +1,3 @@
-
-
 import { useCallback, useEffect, useState } from 'react';
 import type { ActivityLoggerActivityEntity } from '@credo/connectors/types';
 
@@ -32,7 +30,7 @@ export function useActivityHistory(fetchers: ActivityPageFetcher[]) {
 
   useEffect(() => {
     let cancelled = false;
-    
+
     setLoading(true);
     setError(false);
     setEntries([]);
@@ -41,10 +39,7 @@ export function useActivityHistory(fetchers: ActivityPageFetcher[]) {
     (async () => {
       let pos: Position = { source: 0 };
       let acc: ActivityLoggerActivityEntity[] = [];
-      
-      
-      
-      
+
       while (pos.source < fetchers.length && acc.length === 0) {
         const fetch = fetchers[pos.source];
         if (!fetch) break;
@@ -85,8 +80,6 @@ export function useActivityHistory(fetchers: ActivityPageFetcher[]) {
         );
       })
       .catch(() => {
-        
-        
         setError(true);
       })
       .finally(() => setLoadingMore(false));

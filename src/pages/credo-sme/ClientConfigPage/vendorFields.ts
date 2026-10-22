@@ -1,5 +1,3 @@
-
-
 import { VENDOR_V2_LIST_COLUMNS } from '@/pages/v2/vendors/listColumns';
 import type { CredoAppConfig } from '../schema';
 import { mergeFeature } from './featureMerge';

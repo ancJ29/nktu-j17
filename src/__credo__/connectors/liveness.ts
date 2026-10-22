@@ -1,18 +1,14 @@
-
-
 import type { SeriesItem } from './__internal__/c-storage/types';
 
 export type LivenessValue = {
-  
   lastSeen: string;
-  
+
   [field: string]: unknown;
 };
 
 export type LivenessSink = {
-  
   observe: (identity: string, fields?: Record<string, unknown>) => void;
-  
+
   reset: () => void;
 };
 
@@ -37,15 +33,14 @@ export function cStorageSeriesPush(connector: SeriesPushConnector): LivenessPush
 }
 
 export type LivenessSinkOptions = {
-  
   serviceCode: string | (() => string);
-  
+
   seriesKey: string;
-  
+
   push: LivenessPush;
-  
+
   onError?: (error: unknown) => void;
-  
+
   now?: () => Date;
 };
 
@@ -57,13 +52,10 @@ export function createLivenessSink(options: LivenessSinkOptions): LivenessSink {
     typeof options.serviceCode === 'function' ? options.serviceCode() : options.serviceCode;
   const now = options.now ?? (() => new Date());
 
-  
   const seen = new Set<string>();
 
   return {
     observe(identity, fields) {
-      
-      
       const serviceCode = resolveServiceCode();
       if (!serviceCode || !identity) return;
 
@@ -81,10 +73,7 @@ export function createLivenessSink(options: LivenessSinkOptions): LivenessSink {
           items: [{ key: identity, value }],
         });
 
-        
         void Promise.resolve(result).catch((error: unknown) => {
-          
-          
           seen.delete(dedupKey);
           reportError(onError, error);
         });
@@ -116,4 +105,3 @@ function reportError(onError: LivenessSinkOptions['onError'], error: unknown): v
     // Even reporting may not take the request down.
   }
 }
-

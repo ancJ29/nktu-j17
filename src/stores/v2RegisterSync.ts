@@ -1,5 +1,3 @@
-
-
 export type SyncedRegister =
   | 'products'
   | 'materials'
@@ -15,9 +13,8 @@ export type SyncableStore = {
 };
 
 export type RegisterEntry = {
-  
   store: () => SyncableStore;
-  
+
   enabled: () => boolean;
 };
 
@@ -34,7 +31,6 @@ export function createRegisterSync(
 ) {
   const names = Object.keys(registers) as SyncedRegister[];
 
-  
   const read = (clientCode: string): Set<SyncedRegister> => {
     const stored = cache.read();
     if (!stored || stored.c !== clientCode) return new Set();
@@ -51,7 +47,7 @@ export function createRegisterSync(
   return {
     read,
     record,
-    
+
     watch(clientCode: string): () => void {
       const stops = names.flatMap((name) => {
         const entry = registers[name];
@@ -70,7 +66,7 @@ export function createRegisterSync(
       });
       return () => stops.forEach((stop) => stop());
     },
-    
+
     async tick(clientCode: string): Promise<void> {
       const wanted = read(clientCode);
       await Promise.all(

@@ -16,7 +16,7 @@ type ListCardListProps<T extends Row> = {
   readonly detailRoute?: string;
   readonly onRowClick?: (item: T) => void;
   readonly getRowBg?: (item: T) => string | undefined;
-  
+
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;

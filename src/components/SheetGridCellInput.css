@@ -83,8 +83,14 @@
 .crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
 .crop-sheet-grid .sheet-grid-row > td.sheet-grid-stage,
 .crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage,
-[data-mantine-color-scheme='dark'] .crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-day,
-[data-mantine-color-scheme='dark'] .crop-sheet-grid .sheet-grid-row:nth-of-type(odd) > td.sheet-grid-stage {
+[data-mantine-color-scheme='dark']
+  .crop-sheet-grid
+  .sheet-grid-row:nth-of-type(odd)
+  > td.sheet-grid-day,
+[data-mantine-color-scheme='dark']
+  .crop-sheet-grid
+  .sheet-grid-row:nth-of-type(odd)
+  > td.sheet-grid-stage {
   background-color: var(--mantine-color-body);
 }
 

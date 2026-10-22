@@ -1,4 +1,3 @@
-
 import { useCallback, useEffect, useMemo } from 'react';
 import type { FuelNormRow, TransportRouteRow } from '@/types';
 import { useFuelNormStore } from '@/stores/useFuelNormStore';
@@ -18,11 +17,10 @@ export function buildFuelNormMap(rows: readonly FuelNormRow[]): Map<string, numb
 }
 
 export type RouteCostingContext = {
-  
   fuelPricePerLiter: number | undefined;
-  
+
   norms: Map<string, number>;
-  
+
   costOf: (
     route: Parameters<typeof computeRouteCosting>[0] & Pick<TransportRouteRow, 'truckType'>,
   ) => RouteCosting;
@@ -41,9 +39,6 @@ export function useRouteCosting(): RouteCostingContext {
     if (!pricesInit) void loadPrices();
   }, [normsInit, loadNorms, pricesInit, loadPrices]);
 
-  
-  
-  
   const today = todayInVnDateString();
   const norms = useMemo(() => buildFuelNormMap(normItems), [normItems]);
   const currentPrice = useMemo(

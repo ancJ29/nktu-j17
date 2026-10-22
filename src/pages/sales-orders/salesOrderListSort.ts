@@ -7,13 +7,13 @@ import { isOpenUrgentSalesOrder } from './urgencyRowBg';
 
 export type SalesOrderListSortLookups = {
   readonly resolveStatus: (value: string | undefined) => Pick<ResolvedStatusOption, 'stage'>;
-  
+
   readonly statusOrder: readonly string[];
-  
+
   readonly cancellationTargetStatus: string | undefined;
   readonly getCustomerByCode: (code: string) => Customer | undefined;
   readonly getEmployeeName: (id: string) => string | undefined;
-  
+
   readonly showPrice: boolean;
   readonly vatRate: number;
 };
@@ -63,7 +63,7 @@ export function compareSalesOrdersForList(
   lookups: SalesOrderListSortLookups,
 ) {
   const [field, dir] = sortField.split('_');
-  
+
   const mult = dir === 'asc' ? 1 : -1;
   const leads = (o: SalesOrder) =>
     isOpenUrgentSalesOrder(o.extra?.isUrgent === true, lookups.resolveStatus(o.extra?.status).stage)
@@ -78,9 +78,7 @@ export function compareSalesOrdersForList(
     if (field === 'deliveryDate') {
       const aMs = getDeliveryMs(a);
       const bMs = getDeliveryMs(b);
-      
-      
-      
+
       if (aMs === undefined || bMs === undefined) {
         if (aMs === bMs) return 0;
         return aMs === undefined ? 1 : -1;
@@ -91,7 +89,7 @@ export function compareSalesOrdersForList(
     if (readCell) {
       const aV = readCell(a);
       const bV = readCell(b);
-      
+
       if (aV === undefined || bV === undefined) {
         if (aV !== bV) return aV === undefined ? 1 : -1;
       } else {
@@ -105,16 +103,11 @@ export function compareSalesOrdersForList(
     }
 
     if (internalDeliveryFirst) {
-      
-      
-      
       const aExternal = a.extra?.isInternalDelivery === false ? 1 : 0;
       const bExternal = b.extra?.isInternalDelivery === false ? 1 : 0;
       if (aExternal !== bExternal) return aExternal - bExternal;
     }
-    
-    
-    
+
     return (getSalesOrderReadyMs(a) - getSalesOrderReadyMs(b)) * mult;
   };
 }

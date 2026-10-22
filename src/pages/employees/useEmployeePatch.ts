@@ -1,5 +1,3 @@
-
-
 import { useCallback } from 'react';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +9,7 @@ import { logActivity } from '@/utils/activityLogger';
 export type PatchEmployeeOptions = {
   verb?: string;
   memo?: Record<string, unknown>;
-  
+
   rethrow?: boolean;
 };
 
@@ -51,8 +49,7 @@ export function useEmployeePatch(
             message: t('employees.notifications.updateSuccess'),
           });
         }
-        
-        
+
         if (meta?.loginPassword) {
           notifications.show({
             color: 'teal',

@@ -1,17 +1,16 @@
-
 import type { SheetColumnKind } from '@/types';
 
 export const SHEET_GRID_W = {
   day: 54,
-  
+
   dayDate: 92,
-  
+
   stage: 150,
-  
+
   column: 110,
-  
+
   ratioColumn: 80,
-  
+
   activityColumn: 500,
 } as const;
 
@@ -39,11 +38,7 @@ export const SHEET_STICKY = {
     position: 'sticky',
     left: SHEET_GRID_W.dayDate,
     zIndex: 1,
-    
-    
-    
-    
-    
+
     boxShadow: '1px 0 0 var(--mantine-color-default-border)',
   },
 } as const satisfies Record<string, React.CSSProperties>;

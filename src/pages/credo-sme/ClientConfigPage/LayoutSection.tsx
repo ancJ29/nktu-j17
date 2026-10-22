@@ -1,5 +1,3 @@
-
-
 import { Box, Group, SegmentedControl, SimpleGrid, Switch, Text } from '@mantine/core';
 import { NumberField } from '@/components/NumberField';
 import { layoutDefaults, type LayoutForm, type Variant } from './layoutFields';

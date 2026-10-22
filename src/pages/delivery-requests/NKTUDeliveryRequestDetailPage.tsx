@@ -1,5 +1,3 @@
-
-
 import { DeliveryRequestDetail } from './DeliveryRequestDetail';
 import { NKTU_DELIVERY_REQUEST_VARIANT } from './deliveryRequestVariant';
 

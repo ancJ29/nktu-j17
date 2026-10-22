@@ -93,7 +93,6 @@ export const MATERIAL_V2_SPEC: MasterDataSpec<MaterialV2Row, MaterialV2FormValue
     ],
   },
 
-  
   mobile: { Card: MaterialV2MobileCard },
 
   useHeaderText: useMaterialV2HeaderText,

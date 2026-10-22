@@ -36,7 +36,6 @@ export function createMasterDataModule(config: MasterDataModuleConfig) {
   async function loadCurrent(
     scope: string,
   ): Promise<{ data: Record<EntityName, unknown[]>; hashes: MasterDataHashes }> {
-    
     const [cached, currentHashes] = (await storage.getRecordsByKeys(serviceCode, [
       cacheKey(scope),
       versionKey(scope),
@@ -44,8 +43,6 @@ export function createMasterDataModule(config: MasterDataModuleConfig) {
 
     const hashes = currentHashes ?? {};
 
-    
-    
     if (cached && isCacheValid(cached.hashes, hashes)) {
       const data = {} as Record<EntityName, unknown[]>;
       for (const prefix of ENTITY_PREFIXES) {
@@ -54,13 +51,11 @@ export function createMasterDataModule(config: MasterDataModuleConfig) {
       return { data, hashes: cached.hashes };
     }
 
-    
     const entityEnvelopes = await storage.getRecordsByKeys<RecordEnvelope<unknown>>(
       serviceCode,
       entityKeys(scope),
     );
 
-    
     const masterData = {} as Record<EntityName, unknown[]>;
     const freshHashes: MasterDataHashes = {};
     ENTITY_PREFIXES.forEach((prefix, i) => {
@@ -97,9 +92,6 @@ export function createMasterDataModule(config: MasterDataModuleConfig) {
         return { changed: false, hashes };
       }
 
-      
-      
-      
       const updated: Partial<Record<EntityName, unknown[]>> = {};
       for (const name of ENTITY_PREFIXES) {
         if (!hashEqual(clientHashes?.[name], hashes[name])) {
@@ -110,7 +102,6 @@ export function createMasterDataModule(config: MasterDataModuleConfig) {
       return { changed: true, updated, hashes };
     },
 
-    
     async resync(scope: string, trackedStorage: StorageAdapter): Promise<EntityName[]> {
       const versions =
         (await storage.getRecord<MasterDataHashes>(serviceCode, versionKey(scope))) ?? {};

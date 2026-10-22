@@ -1,5 +1,3 @@
-
-
 import type {
   Employee,
   OdometerFuelPayment,
@@ -60,15 +58,15 @@ function clearsFor(resets: OdometerFuelReset[], employeeId: string): OdometerFue
 export type FuelLedgerRow = {
   employeeId: string;
   employeeName: string;
-  
+
   from: string;
-  
+
   spent: number;
-  
+
   paid: number;
-  
+
   remaining: number;
-  
+
   paidThrough?: string;
 };
 
@@ -165,42 +163,40 @@ export type PaybackLine = { date: string; amount: number; balance: number } & (
 );
 
 export type PaybackPeriod = {
-  
   from: string;
-  
+
   through?: string;
-  
+
   to?: string;
-  
+
   carryIn: number;
-  
+
   spent: number;
-  
+
   paid: number;
-  
+
   balance: number;
-  
+
   lines: PaybackLine[];
 };
 
 export type EarlierCount = {
-  
   from: string;
-  
+
   to: string;
-  
+
   clear: OdometerFuelReset;
-  
+
   dropped: number;
-  
+
   periods: PaybackPeriod[];
 };
 
 export type PaybackHistory = {
   row: FuelLedgerRow;
-  
+
   periods: PaybackPeriod[];
-  
+
   earlier: EarlierCount[];
 };
 
@@ -335,17 +331,16 @@ function periodsFor(
 }
 
 export type DayStatement = {
-  
   spent: number;
   fuel: number;
   other: number;
-  
+
   paid: number;
-  
+
   paidThrough?: string;
-  
+
   balance: number;
-  
+
   closed?: { clear: OdometerFuelReset; dropped: number; nextFrom: string };
 };
 
@@ -406,7 +401,7 @@ export function buildDayStatements(
     let carried = 0;
     for (const d of days) {
       const day = byDay.get(d)!;
-      
+
       if (!touched.has(d)) day.balance = carried;
       carried = day.balance;
       out.set(dayKey(employeeId, d), day);

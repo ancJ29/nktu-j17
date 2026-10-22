@@ -1,5 +1,3 @@
-
-
 import { useEffect, useRef } from 'react';
 import type { DateRangeValue } from '@/types/date-range';
 
@@ -14,18 +12,6 @@ export function useTransactionalRangeRefetch({
   setStoreRange,
   forceRefresh,
 }: TransactionalRangeRefetchOptions): void {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const prevRangeKeyRef = useRef<string | null>(null);
 
   useEffect(() => {
@@ -35,8 +21,6 @@ export function useTransactionalRangeRefetch({
     const previous = prevRangeKeyRef.current;
     prevRangeKeyRef.current = rangeKey;
 
-    
-    
     if (previous === null || previous === rangeKey) return;
 
     forceRefresh();

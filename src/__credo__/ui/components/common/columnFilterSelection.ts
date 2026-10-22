@@ -1,11 +1,8 @@
-
-
 export type ColumnFilterSelectionState = 'all' | 'some' | 'none';
 
 export type ColumnFilterSelection = {
-  
   readonly selected: readonly string[];
-  
+
   readonly cleared: boolean;
 };
 

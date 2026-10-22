@@ -59,11 +59,11 @@ export type EmployeeFormValues = {
   position: string;
   department: string;
   isActive: boolean;
-  
+
   startDate: string | null;
   address: string;
   dateOfBirth: string | null;
-  
+
   idCardNumber: string;
   idCardIssueDate: string | null;
   idCardIssuePlace: string;
@@ -94,13 +94,8 @@ export function SingleEmployeeForm({
   const { departmentOptions, positionOptions } = useEmployeeFieldOptions();
   const isRootUser = useIsRoot();
 
-  
-  
   const isDriver = driverProfileEnabled && isDriverDepartment(form.values.department);
 
-  
-  
-  
   const truckAssets = useTruckAssetStore((s) => s.items);
   const loadTrucks = useTruckAssetStore((s) => s.loadAll);
   useEffect(() => {
@@ -114,9 +109,6 @@ export function SingleEmployeeForm({
     [truckAssets],
   );
 
-  
-  
-  
   const positionField = hasPosition ? (
     positionOptions.length > 0 ? (
       <Select
@@ -155,11 +147,6 @@ export function SingleEmployeeForm({
     )
   ) : null;
 
-  
-  
-  
-  
-
   const personalCard = (
     <SectionCard icon={<IconUser size={14} />} title={t('common.labels.basicInfo')}>
       <Stack gap="md">
@@ -169,7 +156,7 @@ export function SingleEmployeeForm({
             placeholder={t('employees.form.namePlaceholder')}
             withAsterisk
             {...form.getInputProps('name')}
-            
+
             rightSection={
               isInternal ? (
                 <ActionIcon
@@ -194,11 +181,6 @@ export function SingleEmployeeForm({
           />
         </SimpleGrid>
         {hasEmail && (
-          
-          
-          
-          
-          
           <TextInput
             label={t('common.labels.email')}
             placeholder={t('employees.form.emailPlaceholder')}
@@ -222,12 +204,6 @@ export function SingleEmployeeForm({
               />
             )}
             {hasDateOfBirth && (
-              
-              
-              
-              
-              
-              
               <DateField
                 label={t('employees.fields.dateOfBirth')}
                 {...form.getInputProps('dateOfBirth')}
@@ -242,9 +218,6 @@ export function SingleEmployeeForm({
     </SectionCard>
   );
 
-  
-  
-  
   const driverCard = isDriver ? (
     <SectionCard icon={<IconLicense size={14} />} title={t('employees.driver.sectionTitle')}>
       <Stack gap="md">

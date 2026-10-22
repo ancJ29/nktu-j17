@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 
 import { ONE_DAY, ONE_HOUR, ONE_MINUTE } from '../../utils';
@@ -41,40 +39,28 @@ const defaultStorage: AuthStorage = {
 };
 
 type CreateCredoAuthStoreOptions<TProfile extends BaseProfile = BaseProfile> = {
-  
   serviceCode: string;
 
-  
   deviceIdPrefix?: string;
 
-  
   tokenDuration?: number;
 
-  
   rememberRefreshDuration?: number;
 
-  
   sessionRefreshDuration?: number;
 
-  
   persistKey?: string;
 
-  
   isDev?: boolean;
 
-  
   devProfile?: TProfile;
 
-  
   storage?: AuthStorage;
 
-  
   storageKeys?: AuthStorageKeys;
 
-  
   persistStorage?: PersistStorage;
 
-  
   getProfile?: AuthApi<TProfile>['getProfile'];
 };
 
@@ -96,12 +82,8 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     getProfile,
   } = options;
 
-  
   const authApi: AuthApi<TProfile> = {
     login: async ({ email, password, tokenExpiration, refreshTokenExpiration, deviceId }) => {
-      
-      
-      
       const params = {
         serviceCode,
         email,
@@ -133,22 +115,9 @@ export function createCredoAuthStore<TProfile extends BaseProfile = BaseProfile>
     getProfile:
       getProfile ??
       (async ({ token }) => {
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         return cMngtConnector.getMe<TProfile>(token);
       }),
 
-    
     register: async ({ username, email }) => {
       console.info('Register attempt:', { username, email });
       return { success: true };

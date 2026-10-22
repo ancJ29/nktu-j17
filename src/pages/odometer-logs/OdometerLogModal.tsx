@@ -63,13 +63,13 @@ const missingHalf = (values: FormValues, path: string) => {
 type OdometerLogModalProps = {
   readonly opened: boolean;
   readonly onClose: () => void;
-  
+
   readonly employee: Pick<Employee, 'id' | 'name'>;
-  
+
   readonly existing?: OdometerLog | undefined;
-  
+
   readonly initialDate?: string;
-  
+
   readonly canEditAny?: boolean;
   readonly onSaved?: (log: OdometerLog) => void;
 };
@@ -105,11 +105,10 @@ function OdometerLogForm({
   const today = todayInVnDateString();
 
   const [photos, setPhotos] = useState<PhotoEntry[]>(() => existing?.extra?.photos ?? []);
-  
+
   const [entry, setEntry] = useState<OdometerLog | undefined>(existing);
   const [loadingDay, setLoadingDay] = useState(false);
-  
-  
+
   const [dayUnknown, setDayUnknown] = useState(false);
   const latestDay = useRef('');
   const [saving, setSaving] = useState(false);
@@ -145,10 +144,6 @@ function OdometerLogForm({
   const dayTotal =
     (form.values.fuelCost ?? 0) + otherCosts.reduce((sum, line) => sum + (line.amount ?? 0), 0);
 
-  
-  
-  
-  
   const imageDirectory = useMemo(
     () =>
       buildUploadDirectory({ type: 'odometer-log', id: `${employee.id}-${date}`, noDate: true }),
@@ -159,7 +154,6 @@ function OdometerLogForm({
   const savable = canSaveEntry(form.values.km, photos);
   const photoCount = visibleLogPhotos(photos).length;
 
-  
   const handleDateChange = async (next: string | null) => {
     if (!next) return;
     form.setFieldValue('recordDate', next);
@@ -194,12 +188,9 @@ function OdometerLogForm({
   };
 
   const handlePhotosChange = useCallback(async (next: PhotoEntry[]) => {
-    
-    
     setPhotos(next);
   }, []);
 
-  
   const handleCaptured = useCallback(
     async (result: CaptureResult): Promise<boolean> => {
       const fileName = `odometer-${Date.now()}.jpg`;
@@ -268,9 +259,6 @@ function OdometerLogForm({
         onSaved?.(saved);
         onClose();
       } catch (err) {
-        
-        
-        
         logger.error('Odometer log save failed:', err);
         notifications.show({
           color: 'red',
@@ -425,7 +413,6 @@ function OdometerLogForm({
               )}
             </>
           ) : (
-            
             <ImageUploadPanel
               images={photos}
               onChange={handlePhotosChange}

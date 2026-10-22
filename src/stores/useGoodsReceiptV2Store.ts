@@ -20,7 +20,7 @@ export async function createGoodsReceiptV2(input: {
   reference?: string;
   notes?: string;
   items: GoodsReceiptV2LineInput[];
-  
+
   extra?: Record<string, unknown>;
 }): Promise<GoodsReceiptV2> {
   const written = await partition.write(() => credoSmeConnector.createGoodsReceipt(input));
@@ -37,7 +37,7 @@ export async function updateGoodsReceiptV2(
     reference?: string;
     notes?: string;
     items?: GoodsReceiptV2LineInput[];
-    
+
     extra?: Record<string, unknown>;
   },
 ): Promise<GoodsReceiptV2> {

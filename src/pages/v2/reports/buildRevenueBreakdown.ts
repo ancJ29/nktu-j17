@@ -1,5 +1,3 @@
-
-
 import type { SalesOrderV2 } from '@/types/sales-order-v2';
 import { filterRevenueOrders, type RevenueScope } from './buildRevenueReport';
 
@@ -13,17 +11,15 @@ export interface BreakdownEntry {
 }
 
 export interface RevenueBreakdown {
-  
   entries: BreakdownEntry[];
   totals: { revenue: number; orders: number; pricedOrders: number; unpricedOrders: number };
-  
+
   unknownStatusOrders: number;
 }
 
 export function buildRevenueBreakdown(
   rows: ReadonlyArray<SalesOrderV2>,
   input: RevenueScope & {
-    
     dimensionOf: (order: SalesOrderV2) => { key: string; label: string };
   },
 ): RevenueBreakdown {

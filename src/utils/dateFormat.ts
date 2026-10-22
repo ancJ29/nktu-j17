@@ -1,4 +1,3 @@
-
 import { appConfig } from '@/config';
 import type { CMngtDisplaySettings, DateTimeInput, NullableDateTimeInput } from '@credo/kits/types';
 

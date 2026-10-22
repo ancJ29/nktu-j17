@@ -3,23 +3,23 @@ import type { SheetRow } from '@/utils/cropSheetModel';
 
 export type SheetGridRowProps = {
   readonly row: SheetRow;
-  
+
   readonly stageSpan: number;
   readonly isToday: boolean;
   readonly rowRef?: Ref<HTMLTableRowElement>;
   readonly editable: boolean;
-  
+
   readonly dayLabel: string;
-  
+
   readonly materialsWord: string;
-  
+
   readonly logMaterialsLabel: string;
   readonly onCellChange: (day: number, key: string, raw: string) => void;
-  
+
   readonly onOpenMaterials: (day: number, columnKey: string) => void;
-  
+
   readonly onOpenDay: (day: number) => void;
-  
+
   readonly openLabel: string;
 };
 
@@ -54,15 +54,8 @@ export function sameSheetRow(a: SheetGridRowProps, b: SheetGridRowProps): boolea
       cell.column === other.column &&
       cell.value === other.value &&
       cell.changed === other.changed &&
-      
-      
-      
       cell.scale === other.scale &&
       cell.planned === other.planned &&
-      
-      
-      
-      
       cell.materials === other.materials
     );
   });

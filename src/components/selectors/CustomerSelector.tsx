@@ -5,7 +5,7 @@ import type { Customer } from '@/types';
 
 export type CustomerSelectorChange = {
   id: string;
-  
+
   name: string;
   customer: Customer;
 };
@@ -13,7 +13,7 @@ export type CustomerSelectorChange = {
 export type CustomerSelectorProps = Omit<SelectProps, 'data' | 'value' | 'onChange' | 'filter'> & {
   value: string | null;
   onChange: (selection: CustomerSelectorChange | null) => void;
-  
+
   filter?: (c: Customer) => boolean;
 };
 
@@ -29,8 +29,6 @@ export function CustomerSelector({
 }: CustomerSelectorProps) {
   const customers = useCustomerStore((s) => s.items);
 
-  
-  
   const data = useMemo(
     () =>
       customers.filter(filter).map((c) => ({

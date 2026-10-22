@@ -1,5 +1,3 @@
-
-
 import { useMemo, useState } from 'react';
 import { Box, Group, Image, Modal, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
@@ -11,18 +9,16 @@ const IMAGE_FALLBACK =
 type Props = {
   opened: boolean;
   onClose: () => void;
-  
+
   productCode: string;
-  
+
   productName?: string;
 };
 
 export function ProductPhotoModal({ opened, onClose, productCode, productName }: Props) {
   const { t } = useTranslation();
   const products = useProductStore((s) => s.items);
-  
-  
-  
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   const images = useMemo(() => {

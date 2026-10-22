@@ -1,5 +1,3 @@
-
-
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -22,12 +20,8 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  
-  
-  
   const [updatedEmployee, setUpdatedEmployee] = useState<Employee | null>(null);
 
-  
   const surfaceConflict = useCallback(
     (latest: Employee) => {
       setUpdatedEmployee(latest);
@@ -41,7 +35,6 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
     [t],
   );
 
-  
   const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
     useDisclosure(false);
   const [deleting, setDeleting] = useState(false);
@@ -50,18 +43,9 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
     if (!id || !employee) return;
     setDeleting(true);
     try {
-      
-      
-      
       const { item: updated, meta } = await archiveEmployee(employee);
       logActivity('employee.delete', id);
 
-      
-      
-      
-      
-      
-      
       if (meta?.ssoWarning) {
         setUpdatedEmployee(updated);
         notifications.show({
@@ -93,13 +77,10 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
     }
   }, [id, employee, t, navigate, closeDeleteModal, surfaceConflict]);
 
-  
   const [passwordModalOpened, { open: openPasswordModal, close: closePasswordModal }] =
     useDisclosure(false);
   const [changingPassword, setChangingPassword] = useState(false);
-  
-  
-  
+
   const [savedPassword, setSavedPassword] = useState<string | null>(null);
 
   const passwordForm = useForm({
@@ -123,9 +104,6 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
 
   const handlePasswordChange = useCallback(
     async (values: { newPassword: string; confirmPassword: string }) => {
-      
-      
-      
       if (!id || !employee) return;
       setChangingPassword(true);
       try {
@@ -136,13 +114,6 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
         });
         logActivity('employee.passwordChange', id);
 
-        
-        
-        
-        
-        
-        
-        
         if (res.ssoWarning) {
           notifications.show({
             color: 'yellow',
@@ -156,7 +127,7 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
             message: t('__new__.07-entities.employees.dangerZone.passwordChangeSuccess'),
           });
         }
-        
+
         setSavedPassword(values.newPassword);
       } catch {
         notifications.show({
@@ -167,8 +138,7 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
         setChangingPassword(false);
       }
     },
-    
-    
+
     [id, employee, t],
   );
 
@@ -178,7 +148,6 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
     setSavedPassword(null);
   }, [closePasswordModal, passwordForm]);
 
-  
   const [toggleStatusOpened, { open: openToggleStatus, close: closeToggleStatus }] =
     useDisclosure(false);
   const [togglingStatus, setTogglingStatus] = useState(false);
@@ -200,11 +169,6 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
       );
       setUpdatedEmployee(updated);
 
-      
-      
-      
-      
-      
       if (meta?.ssoWarning) {
         notifications.show({
           color: 'yellow',
@@ -223,8 +187,6 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
         });
       }
 
-      
-      
       if (meta?.loginPassword) {
         setSavedPassword(meta.loginPassword);
         openPasswordModal();
@@ -247,28 +209,27 @@ export function useEmployeeDangerZone(id: string | undefined, employee: Employee
   }, [id, employee, t, closeToggleStatus, surfaceConflict, openPasswordModal]);
 
   return {
-    
     deleteModalOpened,
     openDeleteModal,
     closeDeleteModal,
     deleting,
     handleDelete,
-    
+
     passwordModalOpened,
     openPasswordModal,
     closePasswordModalAndReset,
     changingPassword,
     passwordForm,
     handlePasswordChange,
-    
+
     savedPassword,
-    
+
     toggleStatusOpened,
     openToggleStatus,
     closeToggleStatus,
     togglingStatus,
     handleToggleStatus,
-    
+
     updatedEmployee,
   };
 }

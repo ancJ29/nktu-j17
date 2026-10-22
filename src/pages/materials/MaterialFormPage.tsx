@@ -72,12 +72,9 @@ export function MaterialFormPage() {
   const [loading, setLoading] = useState(false);
   const snapshotRef = useRef<Material | null>(null);
 
-  
-  
   const unitOptions = useLookupV2Options(unitCategory);
   const categoryOptions = useLookupV2Options(MATERIAL_CATEGORY_LOOKUP);
 
-  
   const [activeTab, setActiveTab] = useState<string | null>('single');
   const [isBulkLoading, setIsBulkLoading] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -108,15 +105,13 @@ export function MaterialFormPage() {
       name: (v) => (v.trim() ? null : t('common.validation.nameRequired')),
       code: (v) => {
         if (!v.trim()) return t('common.validation.codeRequired');
-        
+
         if (/\s/.test(v)) return t('common.validation.codeNoWhitespace');
-        
+
         if (!CODE_PATTERN.test(v)) return t('common.validation.codeSpecialCharacters');
         return null;
       },
       unitConversions: (conversions, values) => {
-        
-        
         if (!multiUnit || values.units.length < 2) return null;
         const result = validateUnitConversions(values.units, conversions);
         if (result === 'conflict') return t('products.validation.unitConversionConflict');
@@ -158,14 +153,13 @@ export function MaterialFormPage() {
   const handleSubmit = useCallback(
     async (values: MaterialFormValues) => {
       setLoading(true);
-      
-      
+
       const buildExtra = (base?: MaterialExtra): MaterialExtra => {
         const extra: MaterialExtra = { ...(base ?? {}) };
         extra.units = values.units;
         if (values.category) extra.category = values.category;
         else delete extra.category;
-        
+
         const validConversions =
           multiUnit && values.units.length >= 2
             ? values.unitConversions.filter(
@@ -174,9 +168,7 @@ export function MaterialFormPage() {
             : [];
         if (validConversions.length > 0) extra.unitConversions = validConversions;
         else delete extra.unitConversions;
-        
-        
-        
+
         if (hasDescription) {
           if (values.description.trim()) extra.description = values.description.trim();
           else delete extra.description;
@@ -235,10 +227,7 @@ export function MaterialFormPage() {
             patch,
           });
           snapshotRef.current = updated as Material;
-          
-          
-          
-          
+
           const diff = deepDiff(before, patch);
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           if (onlyIsActive) {
@@ -252,8 +241,6 @@ export function MaterialFormPage() {
           });
           navigate(ROUTES.MATERIALS.DETAIL.replace(':id', id));
         } else {
-          
-          
           const created = await useMaterialStore.getState().createSafely({
             patch: {
               name: values.name.trim(),
@@ -295,20 +282,12 @@ export function MaterialFormPage() {
 
   const navigateToList = useCallback(() => navigate(ROUTES.MATERIALS.LIST), [navigate]);
 
-  
-
   const handleDownloadSample = useCallback(async () => {
     setIsDownloading(true);
     try {
-      
-      
-      
-      
       const categoryLabels = Object.fromEntries(categoryOptions.map((o) => [o.value, o.label]));
       const unitLabels = Object.fromEntries(unitOptions.map((o) => [o.value, o.label]));
-      
-      
-      
+
       if (!useMaterialStore.getState().initialized) {
         await useMaterialStore.getState().loadAll();
       }
@@ -365,11 +344,6 @@ export function MaterialFormPage() {
         return;
       }
 
-      
-      
-      
-      
-      
       const unitLabelToValue = new Map<string, string>();
       for (const o of unitOptions) unitLabelToValue.set(o.label.trim().toLowerCase(), o.value);
       const catLabelToValue = new Map<string, string>();
@@ -411,28 +385,13 @@ export function MaterialFormPage() {
         return;
       }
 
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       await useMaterialStore.getState().forceRefresh();
       const {
         items: liveMaterials,
         error: refreshError,
         initialized,
       } = useMaterialStore.getState();
-      
-      
-      
-      
-      
+
       if (refreshError || !initialized) {
         notifications.show({
           color: 'red',
@@ -442,8 +401,7 @@ export function MaterialFormPage() {
         });
         return;
       }
-      
-      
+
       const existingCodes = new Set(liveMaterials.map((m) => m.code?.trim()).filter(Boolean));
 
       const errorLines: string[] = [];
@@ -451,7 +409,7 @@ export function MaterialFormPage() {
       const seenCodes = new Set<string>();
       const items: Array<Pick<Material, 'name' | 'code' | 'isActive'> & { extra: MaterialExtra }> =
         [];
-      
+
       const itemLabels: string[] = [];
 
       for (const [index, row] of rows.entries()) {
@@ -473,20 +431,15 @@ export function MaterialFormPage() {
         }
         seenCodes.add(code);
 
-        
         const resolvedUnits = (row.units ?? [])
           .map((raw) => unitLabelToValue.get(raw.trim().toLowerCase()))
           .filter((v): v is string => Boolean(v));
-        
-        
+
         const units = [...new Set(multiUnit ? resolvedUnits : resolvedUnits.slice(0, 1))];
         const category = row.category?.trim()
           ? catLabelToValue.get(row.category.trim().toLowerCase())
           : undefined;
 
-        
-        
-        
         const extra: MaterialExtra = {
           units,
           ...(category && { category }),
@@ -522,12 +475,8 @@ export function MaterialFormPage() {
         return;
       }
 
-      
-      
       const res = await useMaterialStore.getState().bulkUpsertSafely({ items });
 
-      
-      
       const created = res.created.length + res.updated.length;
       const serverErrors = res.errors.map(
         (e) =>
@@ -542,8 +491,6 @@ export function MaterialFormPage() {
         ...(allErrors.length > 0 && { errors: allErrors }),
       });
 
-      
-      
       if (failed === 0 && skippedLines.length === 0) {
         notifications.show({
           color: 'green',
@@ -558,7 +505,6 @@ export function MaterialFormPage() {
       }
     } catch (err) {
       if (err instanceof ExcelParseError) {
-        
         const labels: Record<string, string> = {
           name: t('common.labels.name'),
           code: t('common.labels.code'),
@@ -581,7 +527,7 @@ export function MaterialFormPage() {
   const validateFileType = useCallback((f: File) => {
     const validTypes = [
       'text/csv',
-      
+
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ];

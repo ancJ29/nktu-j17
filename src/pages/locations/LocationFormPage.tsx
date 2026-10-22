@@ -96,13 +96,6 @@ export function LocationFormPage() {
     },
   });
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isEdit) return;
     form.setFieldValue('code', buildNextLocationCode(totalLocations + 1));
@@ -171,8 +164,7 @@ export function LocationFormPage() {
             extra,
             ...(expectedListHash && { expectedListHash }),
           });
-          
-          
+
           forceRefresh();
           notifications.show({
             color: 'green',
@@ -190,10 +182,6 @@ export function LocationFormPage() {
             autoClose: 8000,
           });
         } else if (!isEdit && isListVersionConflict(err)) {
-          
-          
-          
-          
           await useLocationStore.getState().forceRefresh();
           const newCode = buildNextLocationCode(useLocationStore.getState().items.length + 1);
           form.setFieldValue('code', newCode);

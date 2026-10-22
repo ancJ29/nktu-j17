@@ -1,5 +1,3 @@
-
-
 import type { CredoAppConfig } from '../schema';
 import { mergeFeature } from './featureMerge';
 

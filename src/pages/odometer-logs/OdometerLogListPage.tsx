@@ -82,7 +82,7 @@ const RANGE_DAYS = 30;
 
 export function OdometerLogListPage() {
   const { t } = useTranslation();
-  
+
   const tr = useCallback<TFn>((key, options) => t(key as never, options), [t]);
   const me = useMyEmployee();
   const canViewAll = perms.odometerLog.canViewAll();
@@ -117,19 +117,15 @@ export function OdometerLogListPage() {
 
   const applyDateRange = useCallback(
     (next: DateRangeValue) => {
-      
       const effective = ensureValidDateRange(next, defaultLastNDaysRange(RANGE_DAYS));
       setDateRange(effective);
-      
-      
-      
+
       odometerLogBundle.setRange(effective.from, effective.to);
       forceRefresh();
     },
     [forceRefresh],
   );
 
-  
   const roster = useMemo<Employee[]>(
     () =>
       employees.filter(
@@ -138,8 +134,6 @@ export function OdometerLogListPage() {
     [employees],
   );
 
-  
-  
   const ledger = useFuelLedgerData(canViewAll && tab !== 'compliance');
   const dayStatements = useMemo(() => {
     if (!ledger.data) return undefined;
@@ -152,8 +146,7 @@ export function OdometerLogListPage() {
     if (canViewAll) {
       return driverFilter ? live.filter((l) => readEmployeeId(l) === driverFilter) : live;
     }
-    
-    
+
     return me && perms.odometerLog.canViewSelf()
       ? live.filter((l) => readEmployeeId(l) === me.id)
       : [];
@@ -167,8 +160,7 @@ export function OdometerLogListPage() {
   const days = useMemo<DayRange>(
     () => ({
       from: dateRange.from ? toDateString(dateRange.from) : today,
-      
-      
+
       to: dateRange.to && toDateString(dateRange.to) < today ? toDateString(dateRange.to) : today,
     }),
     [dateRange, today],
@@ -190,7 +182,6 @@ export function OdometerLogListPage() {
     <LogPhotoCell photos={log.extra?.photos} onOpen={() => setGalleryLog(log)} t={tr} />
   );
 
-  
   const canEditLog = (log: OdometerLog) =>
     (canEditAny || (!!me && readEmployeeId(log) === me.id)) &&
     canWriteDate(log.recordDate, today, { canEditAny, hasEntry: true });
@@ -200,9 +191,6 @@ export function OdometerLogListPage() {
     openEdit();
   };
 
-  
-  
-  
   const filterRow = (
     <Group gap="sm" wrap="wrap" align="flex-end">
       <DateRangeFilterField
@@ -316,9 +304,6 @@ export function OdometerLogListPage() {
           </Table.Thead>
           <Table.Tbody>
             {rows.map((log) => {
-              
-              
-              
               const delta = distanceSincePrevious(scoped, log);
               if (canViewAll) {
                 return (
@@ -493,8 +478,6 @@ export function OdometerLogListPage() {
       </StickyListChrome>
 
       {canViewAll ? (
-        
-        
         <Tabs value={tab} onChange={(v) => setTab(v ?? 'compliance')} keepMounted={false}>
           <Tabs.List>
             <Tabs.Tab value="compliance" leftSection={<IconCalendarStats size={14} />}>
@@ -630,8 +613,6 @@ function ReadingCell({
   readonly logs: OdometerLog[];
   readonly onOpenPhotos: (log: OdometerLog) => void;
 }) {
-  
-  
   const { t } = useTranslation();
   const km = readKm(log);
   const previous = previousReading(logs, log);

@@ -56,7 +56,7 @@ function buildRateGraph(conversions: UnitConversion[]): Map<string, Map<string, 
     if (!c.unit || !c.baseUnit || !c.quantity || c.quantity <= 0) continue;
     ensure(c.unit);
     ensure(c.baseUnit);
-    g.get(c.unit)!.set(c.baseUnit, c.quantity); 
+    g.get(c.unit)!.set(c.baseUnit, c.quantity);
     g.get(c.baseUnit)!.set(c.unit, 1 / c.quantity); // inverse
   }
   return g;

@@ -1,5 +1,3 @@
-
-
 import { Alert, Button, Card, Grid, Group, Stack, Table, Text, Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import {
@@ -55,18 +53,15 @@ export function GoodsReceiptV2DetailPage() {
     loading,
   } = useRecordById<GoodsReceiptV2>(id, getGoodsReceiptV2ById);
   const [acting, setActing] = useState(false);
-  
-  
+
   const loadProducts = useProductV2Store((s) => s.loadAll);
   const loadMaterials = useMaterialV2Store((s) => s.loadAll);
   const loadVendors = useVendorV2Store((s) => s.loadAll);
-  
-  
+
   const [confirmTarget, setConfirmTarget] = useState<GoodsReceiptFlowStatus | null>(null);
   const [cancelTarget, setCancelTarget] = useState<GoodsReceiptFlowStatus | null>(null);
   const [retrying, setRetrying] = useState(false);
-  
-  
+
   const department = useCurrentDepartment();
   const customFields = useGoodsReceiptCustomFields();
 
@@ -76,7 +71,6 @@ export function GoodsReceiptV2DetailPage() {
     if (featureFlags.materialsV2.enabled) void loadMaterials();
   }, [loadProducts, loadVendors, loadMaterials]);
 
-  
   const runTransition = useCallback(
     async (to: string) => {
       if (!receipt) return;
@@ -86,8 +80,6 @@ export function GoodsReceiptV2DetailPage() {
         setReceipt(next);
         const toStage = goodsReceiptStageOf(to);
         if (toStage === 'received' && next.derivativesPending) {
-          
-          
           notifications.show({
             color: 'orange',
             autoClose: false,
@@ -120,7 +112,6 @@ export function GoodsReceiptV2DetailPage() {
     [receipt, day, t, setReceipt],
   );
 
-  
   const handleCopy = useCallback(() => {
     if (!receipt) return;
     const copyFrom: GoodsReceiptV2CopyFrom = {
@@ -137,10 +128,7 @@ export function GoodsReceiptV2DetailPage() {
         ...(line.note ? { note: line.note } : {}),
       })),
       sourceReceiptNumber: receipt.receiptNumber,
-      
-      
-      
-      
+
       extra: Object.fromEntries(
         customFields.flatMap((field) => {
           const value = readCustomFieldValue(receipt.extra, field);
@@ -166,19 +154,15 @@ export function GoodsReceiptV2DetailPage() {
 
   const stage = goodsReceiptStageOf(receipt.status);
   const isDraftStage = stage === 'draft';
-  
+
   const filledCustomFields = customFields.flatMap((field) => {
     const value = readCustomFieldValue(receipt.extra, field);
     return value === undefined ? [] : [{ field, text: String(value) }];
   });
   const pending = receipt.derivativesPending === true;
-  
-  
+
   const canEdit = isDraftStage && perms.goodsReceipt.canEdit();
 
-  
-  
-  
   const flagFor = (targetStage: string | undefined) =>
     targetStage === 'received'
       ? perms.goodsReceipt.canConfirmReceived()
@@ -186,13 +170,8 @@ export function GoodsReceiptV2DetailPage() {
         ? perms.goodsReceipt.canCancel()
         : perms.goodsReceipt.canEdit();
 
-  
-  
-  
   const canRetry = pending && !isDraftStage && flagFor(stage);
-  
-  
-  
+
   const postingTarget = retrying ? receipt.status : (confirmTarget?.value ?? receipt.status);
   const reachable =
     pending && !isDraftStage ? [] : goodsReceiptTransitionTargets(receipt.status, department);

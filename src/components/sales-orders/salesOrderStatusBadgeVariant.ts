@@ -1,19 +1,16 @@
-
-
 export type SalesOrderStatusBadgeVariant = {
-  
   freightIsExternal: boolean;
-  
+
   showCancelledFallback: boolean;
-  
+
   showDeliveryKindBadge: boolean;
-  
+
   deliveryMethodBadge: 'outline' | 'externalOnly' | 'none';
-  
+
   showBillingBadges: boolean;
-  
+
   showTags: boolean;
-  
+
   statusBadgeSize?: 'xs' | 'sm' | 'md';
 };
 

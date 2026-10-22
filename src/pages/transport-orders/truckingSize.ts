@@ -1,4 +1,3 @@
-
 import type { LookupOption } from '@/hooks/useLookupV2Options';
 
 export const TRUCKING_SIZE_CATEGORY = 'trucking-size';

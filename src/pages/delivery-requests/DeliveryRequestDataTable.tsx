@@ -20,7 +20,7 @@ type DeliveryRequestDataTableProps = {
   readonly isLoading?: boolean;
   readonly resolveStatus: (value: string | undefined | null) => ResolvedStatusOption;
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly pendingSyncIds?: Set<string>;
 };
 
@@ -34,9 +34,6 @@ export function DeliveryRequestDataTable({
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-  
-  
-  
   const customers = useCustomerStore((s) => s.items);
   const getVendorByCode = useVendorStore((s) => s.getByCode);
   const resolveCustomerShortName = useMemo(
@@ -63,7 +60,7 @@ export function DeliveryRequestDataTable({
       {
         key: 'party',
         header: t('deliveryRequests.columns.party'),
-        
+
         render: (item: DeliveryRequest) => {
           if (!deliveryRequestPartyIsCustomer(item)) {
             const vendor = item.vendorCode ? getVendorByCode(item.vendorCode) : undefined;
@@ -71,15 +68,13 @@ export function DeliveryRequestDataTable({
               vendor?.extra?.shortName?.trim() || vendor?.name || item.vendorName || '-';
             return <Text fz="md">{display}</Text>;
           }
-          
-          
+
           const drExtra = (item.extra ?? {}) as DeliveryRequestExtra;
           const display = resolveCustomerShortName(item.customerName, drExtra.customerCode) || '-';
           return <Text fz="md">{display}</Text>;
         },
       },
       {
-        
         key: 'scheduledDate',
         header: t('deliveryRequests.columns.scheduledDate'),
         render: (item: DeliveryRequest) => (
@@ -87,9 +82,6 @@ export function DeliveryRequestDataTable({
         ),
       },
       {
-        
-        
-        
         key: 'completedDate',
         header: t('deliveryRequests.columns.completedDate'),
         render: (item: DeliveryRequest) => {
@@ -101,17 +93,6 @@ export function DeliveryRequestDataTable({
           );
         },
       },
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
 
       {
         key: 'driver',
@@ -167,8 +148,6 @@ export function DeliveryRequestDataTable({
     navigate(ROUTES.DELIVERY.DETAIL.replace(':id', item.id));
   };
 
-  
-  
   const getRowBg = useCallback(
     (item: DeliveryRequest & Record<string, unknown>) =>
       resolveDeliveryRequestRowBg(

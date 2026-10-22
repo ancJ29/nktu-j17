@@ -1,5 +1,3 @@
-
-
 import type { ProductInventoryRow, ProductInventorySummary } from '@/types/product-inventory';
 import type { Product } from '@/types/product';
 import type { InboundEntry } from '@/hooks/useOpenInboundByProduct';
@@ -12,9 +10,8 @@ import { getCurrentPeriodKey } from './periodKey';
 import { getItemBaseUnit } from './unitConversion';
 
 type SummaryOptions = {
-  
   readonly locationFilter?: string | null;
-  
+
   readonly inboundByCode?: ReadonlyMap<string, InboundEntry>;
 };
 
@@ -57,9 +54,7 @@ export function buildProductInventorySummaries(
         }
       }
       totalOnHand += r.onHand;
-      
-      
-      
+
       if (needsInventoryRecheck(r)) needsRecheck = true;
       const rowDrift = readDrift(r.extra);
       driftCounter += rowDrift.counter;
@@ -81,14 +76,10 @@ export function buildProductInventorySummaries(
         totalByUnit[u] = (totalByUnit[u] ?? 0) + q;
       }
     }
-    
-    
-    
+
     const incoming = inboundByCode?.get(p.code)?.totalBase ?? 0;
     const availability = summarizeProductAvailability(p, matching, { incoming });
-    
-    
-    
+
     const forecasted = totalOnHand + incoming - availability.totalReserved;
     const secondaryStatus = deriveSecondaryStatus(
       totalOnHand,

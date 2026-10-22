@@ -39,8 +39,8 @@ export type SalesOrderV2CopyFrom = Pick<
   | 'notes'
 > & {
   items: SalesOrderV2CopyLine[];
-  
+
   sourceOrderNumber: string;
-  
+
   extra: Record<string, string | number>;
 };

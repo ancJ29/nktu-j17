@@ -1,5 +1,3 @@
-
-
 import type { CustomerV2Row } from '@/types';
 
 export const CUSTOMER_TYPE_CATEGORY = 'customer-type';

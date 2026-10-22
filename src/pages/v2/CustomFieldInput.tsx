@@ -1,5 +1,3 @@
-
-
 import { Select, TextInput } from '@mantine/core';
 import { DateField } from '@/components/DateField';
 import type { ViewerCustomField } from '@/utils/customFields';

@@ -12,14 +12,14 @@ export type {
 
 export interface CreateDeliveryRequestInput<TExtra = Record<string, unknown>> {
   requestNumber: string;
-  
+
   direction?: DeliveryRequestDirection;
-  
+
   salesOrderId?: string;
   salesOrderNumber?: string;
-  
+
   customerName?: string;
-  
+
   vendorCode?: string;
   vendorName?: string;
   items: DeliveryRequestItem[];
@@ -29,7 +29,6 @@ export interface CreateDeliveryRequestInput<TExtra = Record<string, unknown>> {
 }
 
 export interface UpdateDeliveryRequestInput<TExtra = Record<string, unknown>> {
-  
   version?: string;
   customerName?: string;
   vendorCode?: string;

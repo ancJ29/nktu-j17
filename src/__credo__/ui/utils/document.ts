@@ -2,10 +2,10 @@ import type { MantineColorsTuple } from '@mantine/core';
 import { getColorPalette } from './palettes';
 
 function buildFaviconSvg(palette: MantineColorsTuple): string {
-  const bg = palette[8]; 
-  const fg = palette[0]; 
-  const accent = palette[9]; 
-  const line = palette[7]; 
+  const bg = palette[8];
+  const fg = palette[0];
+  const accent = palette[9];
+  const line = palette[7];
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
   <rect x="1" y="1" width="30" height="30" rx="7" fill="${bg}"/>
@@ -24,7 +24,6 @@ function buildFaviconSvg(palette: MantineColorsTuple): string {
 }
 
 export function setDynamicFavicon(mainColor: string, faviconUrl?: string): void {
-  
   let link = document.querySelector<HTMLLinkElement>('link[rel="icon"][type="image/svg+xml"]');
   if (!link) {
     link = document.createElement('link');
@@ -50,7 +49,7 @@ export function setDynamicDocumentTitle(appName?: string): void {
 
 export function setDynamicThemeColor(mainColor: string): void {
   const palette = getColorPalette(mainColor);
-  const color = palette[8]; 
+  const color = palette[8];
 
   let meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (!meta) {
@@ -65,18 +64,17 @@ export function setDynamicManifest(options: {
   name: string;
   description?: string;
   mainColor: string;
-  
+
   pwaIcon192Url?: string;
-  
+
   pwaIcon512Url?: string;
-  
+
   pwaIconMaskableUrl?: string;
 }): void {
   const palette = getColorPalette(options.mainColor);
   const themeColor = palette[8];
   const backgroundColor = palette[0];
 
-  
   const origin = window.location.origin;
   const toAbsolute = (path: string) =>
     path.startsWith('http') ? path : `${origin}/${path.replace(/^\//, '')}`;
@@ -109,7 +107,6 @@ export function setDynamicManifest(options: {
 
   const existingLink = document.querySelector<HTMLLinkElement>('link[rel="manifest"]');
   if (existingLink) {
-    
     if (existingLink.href.startsWith('blob:')) {
       URL.revokeObjectURL(existingLink.href);
     }
@@ -121,8 +118,6 @@ export function setDynamicManifest(options: {
     document.head.appendChild(link);
   }
 
-  
-  
   let appleTitleMeta = document.querySelector<HTMLMetaElement>(
     'meta[name="apple-mobile-web-app-title"]',
   );
@@ -133,7 +128,6 @@ export function setDynamicManifest(options: {
   }
   appleTitleMeta.content = options.name;
 
-  
   let appleIcon = document.querySelector<HTMLLinkElement>('link[rel="apple-touch-icon"]');
   if (!appleIcon) {
     appleIcon = document.createElement('link');

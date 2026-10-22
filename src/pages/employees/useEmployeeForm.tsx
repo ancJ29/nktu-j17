@@ -1,5 +1,3 @@
-
-
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
@@ -55,16 +53,6 @@ function buildProfileExtra(values: EmployeeFormValues): Partial<EmployeeExtra> {
     ? useTruckAssetStore.getState().items.find((a) => a.id === values.truckAssetId)
     : undefined;
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const truckAssetCode: Partial<EmployeeExtra> = truck
     ? { truckAssetCode: truck.extra?.plateNumber || truck.code }
     : values.truckAssetId
@@ -132,9 +120,9 @@ export type EmployeeFormParts =
       ready: true;
       isEdit: boolean;
       pageTitle: string;
-      
+
       single: ReactNode;
-      
+
       bulk: ReactNode;
       onCancel: () => void;
     };
@@ -147,11 +135,9 @@ export function useEmployeeForm(): EmployeeFormParts {
   const isEdit = !!id;
   const forceRefresh = useEmployeeStore((s) => s.forceRefresh);
   const totalEmployees = useEmployeeStore((s) => s.items.length);
-  
-  
+
   const reconcileTruckLink = useDriverTruckReconcile();
 
-  
   useEffect(() => {
     if (isMobile || (isEdit && !canEdit) || (!isEdit && !perms.employee.canCreate())) {
       navigate(ROUTES.EMPLOYEES.LIST, { replace: true });
@@ -160,10 +146,8 @@ export function useEmployeeForm(): EmployeeFormParts {
 
   const [loading, setLoading] = useState(false);
 
-  
   const bulkNavTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  
   useEffect(() => () => clearTimeout(bulkNavTimer.current), []);
 
   const [isBulkLoading, setIsBulkLoading] = useState(false);
@@ -207,21 +191,12 @@ export function useEmployeeForm(): EmployeeFormParts {
     },
   });
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (isEdit) return;
     form.setFieldValue('code', buildNextEmployeeCode(totalEmployees + 1));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEdit, totalEmployees]);
 
-  
-  
   const snapshotRef = useRef<Employee | null>(null);
 
   const resetFormFromEmployee = useCallback(
@@ -246,8 +221,6 @@ export function useEmployeeForm(): EmployeeFormParts {
     form,
     id,
     async (id) => {
-      
-      
       const emp = await fetchEmployeeById(id);
       snapshotRef.current = emp;
       return {
@@ -276,9 +249,7 @@ export function useEmployeeForm(): EmployeeFormParts {
       setLoading(true);
       try {
         const { personalPhoneNumber } = values;
-        
-        
-        
+
         const rest = {
           name: values.name,
           code: values.code,
@@ -289,39 +260,21 @@ export function useEmployeeForm(): EmployeeFormParts {
           isActive: values.isActive,
         };
         if (isEdit && id) {
-          
-          
-          
           const snapshot = snapshotRef.current;
           if (!snapshot) {
-            
             throw new Error('Employee snapshot missing');
           }
-          
-          
-          
-          
-          
-          
+
           const extra: EmployeeExtra = {
             ...snapshot.extra,
             personalPhoneNumber: personalPhoneNumber || undefined,
             ...buildProfileExtra(values),
           };
-          
-          
-          
-          
-          
-          
+
           const emailLocked = !getCurrentIsRoot();
           const { email: _lockedEmail, ...restSansEmail } = rest;
           const patchFields = emailLocked ? restSansEmail : rest;
-          
-          
-          
-          
-          
+
           const { meta } = await useEmployeeStore.getState().updateSafelyWithMeta({
             id,
             version: snapshot.version,
@@ -339,14 +292,10 @@ export function useEmployeeForm(): EmployeeFormParts {
           };
           const after = { ...rest, ...(emailLocked && { email: snapshot.email }), extra };
           const diff = deepDiff(before, after);
-          
-          
-          
+
           const onlyIsActive = Object.keys(diff).length === 1 && 'isActive' in diff;
           logActivity(onlyIsActive ? 'employee.toggleStatus' : 'employee.update', id, diff);
-          
-          
-          
+
           if (meta?.ssoWarning) {
             notifications.show({
               color: 'yellow',
@@ -360,8 +309,7 @@ export function useEmployeeForm(): EmployeeFormParts {
               message: t('employees.notifications.updateSuccess'),
             });
           }
-          
-          
+
           if (meta?.loginPassword) {
             notifications.show({
               color: 'teal',
@@ -374,11 +322,6 @@ export function useEmployeeForm(): EmployeeFormParts {
           await reconcileTruckLink(values, id, snapshot.extra?.truckAssetId);
           navigate(ROUTES.EMPLOYEES.DETAIL.replace(':id', id));
         } else {
-          
-          
-          
-          
-          
           const email = rest.email?.trim() || generateLoginEmail(rest.code);
           const extra: EmployeeExtra = {
             allowLogin: true,
@@ -388,11 +331,9 @@ export function useEmployeeForm(): EmployeeFormParts {
           };
           const res = await createEmployee({ ...rest, email, extra });
           logActivity('employee.create', res.employee.id);
-          
-          
+
           forceRefresh();
-          
-          
+
           if (res.ssoWarning) {
             notifications.show({
               color: 'yellow',
@@ -419,10 +360,6 @@ export function useEmployeeForm(): EmployeeFormParts {
             autoClose: 8000,
           });
         } else if (!isEdit && isListVersionConflict(err)) {
-          
-          
-          
-          
           await useEmployeeStore.getState().forceRefresh();
           const newCode = buildNextEmployeeCode(useEmployeeStore.getState().items.length + 1);
           form.setFieldValue('code', newCode);
@@ -449,7 +386,6 @@ export function useEmployeeForm(): EmployeeFormParts {
 
   const navigateToList = useCallback(() => navigate(ROUTES.EMPLOYEES.LIST), [navigate]);
 
-  
   const handleDownloadSample = useCallback(async () => {
     setIsDownloading(true);
     try {
@@ -504,7 +440,6 @@ export function useEmployeeForm(): EmployeeFormParts {
         return;
       }
 
-      
       let nextCodeNum = totalEmployees + 1;
       const items = employees.map((emp) => {
         const code = emp.code?.trim() || buildNextEmployeeCode(nextCodeNum++);
@@ -545,11 +480,6 @@ export function useEmployeeForm(): EmployeeFormParts {
         errors: errorNames.length > 0 ? errorNames : undefined,
       });
 
-      
-      
-      
-      
-      
       const ssoFailed = res.ssoFailed ?? 0;
 
       if (failed === 0 && ssoFailed === 0) {
@@ -559,8 +489,6 @@ export function useEmployeeForm(): EmployeeFormParts {
         });
         bulkNavTimer.current = setTimeout(() => navigate(ROUTES.EMPLOYEES.LIST), 2000);
       } else if (failed === 0) {
-        
-        
         notifications.show({
           color: 'yellow',
           title: t('employees.bulkImport.ssoWarningTitle'),
@@ -578,7 +506,6 @@ export function useEmployeeForm(): EmployeeFormParts {
       }
     } catch (err) {
       if (err instanceof ExcelParseError) {
-        
         const labels: Record<string, string> = {
           name: t('employees.columns.name'),
           code: t('common.labels.code'),
@@ -604,7 +531,7 @@ export function useEmployeeForm(): EmployeeFormParts {
   const validateFileType = useCallback((f: File) => {
     const validTypes = [
       'text/csv',
-      
+
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
       'application/vnd.ms-excel',
     ];

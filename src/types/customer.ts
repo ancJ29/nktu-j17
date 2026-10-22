@@ -12,7 +12,7 @@ export type CustomerShippingAddress = {
   id: string;
   address: string;
   googleMapUrl?: string;
-  
+
   deliveryHours?: string;
 };
 
@@ -20,28 +20,23 @@ export type CustomerNote = {
   id: string;
   text: string;
   createdAt: number;
-  
+
   createdBy: string;
-  
+
   createdByName?: string;
 };
 
 export type CustomerExtra = {
-  
   isDeleted?: boolean;
   shortName?: string;
-  
+
   taxCode?: string;
 
-  
-  
   addressGoogleMapUrl?: string;
   shippingAddresses?: CustomerShippingAddress[];
 
-  
   contacts?: CustomerContact[];
 
-  
   notes?: CustomerNote[];
 
   [key: string]: unknown;
@@ -59,11 +54,6 @@ export type Customer = SingleRecordRow & {
   createdAt: number;
   updatedAt: number;
 
-  
-  
-  
-  
-  
   legacyId?: string;
   legacyCreatedAt?: number | string;
   legacyUpdatedAt?: number | string;

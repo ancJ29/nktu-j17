@@ -94,9 +94,7 @@ export function CustomerDetailPage() {
     useDisclosure(false);
   const [toggling, setToggling] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('details');
-  
-  
-  
+
   const canSeeSales = useCanAccessReports();
 
   useEffect(() => {
@@ -107,7 +105,7 @@ export function CustomerDetailPage() {
         navigate(ROUTES.CUSTOMERS.LIST, { replace: true });
         return;
       }
-      
+
       setCustomer(cached);
       setLoading(false);
       return;
@@ -209,9 +207,6 @@ export function CustomerDetailPage() {
     }
   }, [id, customer, t, closeToggleModal, forceRefresh]);
 
-  
-  
-  
   const writeNotes = useCallback(
     async (nextNotes: CustomerNote[]) => {
       if (!id || !customer) return;
@@ -242,10 +237,7 @@ export function CustomerDetailPage() {
   const handleAddNote = useCallback(
     async (text: string) => {
       if (!customer) return;
-      
-      
-      
-      
+
       const user = useAuthStore.getState().user;
       const newNote: CustomerNote = {
         id: newNoteId(),
@@ -300,14 +292,12 @@ export function CustomerDetailPage() {
   const extra = customer.extra ?? ({} as CustomerExtra);
   const shortName = extra.shortName || customer.code;
   const contacts: CustomerContact[] = extra.contacts ?? [];
-  
-  
+
   const shippingAddresses: CustomerShippingAddress[] = hasShippingAddress
     ? (extra.shippingAddresses ?? [])
     : [];
   const notes: CustomerNote[] = Array.isArray(extra.notes) ? extra.notes : [];
 
-  
   const topActions = isMobile ? null : (
     <Group justify="space-between">
       <Button
@@ -347,7 +337,6 @@ export function CustomerDetailPage() {
     </Group>
   );
 
-  
   const headerRow = (
     <Group justify="space-between" align="flex-start" wrap="nowrap" gap="md">
       <Group gap="md" wrap="nowrap" align="flex-start" style={{ flex: 1, minWidth: 0 }}>
@@ -393,7 +382,6 @@ export function CustomerDetailPage() {
     </Group>
   );
 
-  
   const basicInfoCard = (
     <SectionCard
       icon={<IconInfoCircle size={14} />}
@@ -413,7 +401,6 @@ export function CustomerDetailPage() {
     </SectionCard>
   );
 
-  
   const contactsCard = (
     <SectionCard
       icon={<IconAddressBook size={14} />}
@@ -493,7 +480,6 @@ export function CustomerDetailPage() {
     </SectionCard>
   );
 
-  
   const addressesCard = (
     <SectionCard icon={<IconMapPin size={14} />} title={t('common.labels.addresses')} padding="md">
       <Stack gap="sm">
@@ -541,7 +527,6 @@ export function CustomerDetailPage() {
     </SectionCard>
   );
 
-  
   const notesCard = (
     <NotesSection
       notes={notes}
@@ -551,7 +536,6 @@ export function CustomerDetailPage() {
     />
   );
 
-  
   const dangerZone =
     !isMobile && (canEdit || canDelete) ? (
       <DangerZoneCard title={t('__new__.01-common.dangerZone.title')}>
@@ -591,12 +575,8 @@ export function CustomerDetailPage() {
       </DangerZoneCard>
     ) : null;
 
-  
-  
   const salesTabVisible = canSeeSales && !!customer.code;
 
-  
-  
   const body = (
     <Grid gutter="md">
       <Grid.Col span={{ base: 12, md: 7 }}>
@@ -615,7 +595,6 @@ export function CustomerDetailPage() {
     </Grid>
   );
 
-  
   const mobileContent = (
     <Accordion defaultValue="info" variant="separated">
       <Accordion.Item value="info">

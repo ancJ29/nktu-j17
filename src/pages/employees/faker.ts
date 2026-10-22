@@ -1,4 +1,3 @@
-
 export type Gender = 'M' | 'F';
 type FirstNameEntry = readonly [string, Gender];
 type LastNameWeight = readonly [string, number];

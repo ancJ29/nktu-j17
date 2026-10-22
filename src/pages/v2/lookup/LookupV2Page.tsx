@@ -1,5 +1,3 @@
-
-
 import {
   Button,
   Card,
@@ -77,19 +75,12 @@ function NoCategoriesConfigured() {
 function LookupV2Manager() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  
-  
-  
+
   const { hash } = useLocation();
   const category = hash.startsWith('#') ? hash.slice(1) : hash;
   const registered =
     (category ? getLookupV2Category(category) : undefined) ?? enabledCategories[0]!;
 
-  
-  
-  
-  
   const { items, initialized, loading, loadAll } = useLookupV2Store(
     useShallow((s) => ({
       items: s.items,
@@ -111,9 +102,6 @@ function LookupV2Manager() {
     [items, registered],
   );
 
-  
-  
-  
   const itemsRef = useRef(categoryItems);
   useEffect(() => {
     itemsRef.current = categoryItems;
@@ -124,10 +112,6 @@ function LookupV2Manager() {
   );
   const [reordering, setReordering] = useState(false);
 
-  
-  
-  
-  
   const persistReorder = useCallback(
     async (sourceId: string, targetId: string, pos: 'before' | 'after') => {
       const list = itemsRef.current;
@@ -158,10 +142,6 @@ function LookupV2Manager() {
           notifications.show({ color: 'green', message: t('lookups.notifications.updateSuccess') });
         }
       } catch (err) {
-        
-        
-        
-        
         if (err instanceof EntityConflictError) {
           notifications.show({
             color: 'yellow',
@@ -252,7 +232,7 @@ function LookupV2Manager() {
       form.setValues({ value: entry.value, label: entry.label, sortOrder: entry.sortOrder });
       openForm();
     },
-    
+
     [openForm],
   );
 
@@ -269,18 +249,14 @@ function LookupV2Manager() {
         autoClose: 8000,
       });
     },
-    
+
     [t],
   );
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
       const nextValue = values.value.trim().toUpperCase();
-      
-      
-      
-      
-      
+
       const duplicate = items.find(
         (l) =>
           l.category === registered.id &&
@@ -325,12 +301,6 @@ function LookupV2Manager() {
         if (err instanceof EntityConflictError) {
           onConflict(err.latest as LookupV2Row | undefined);
         } else if (validationFieldsOf(err)) {
-          
-          
-          
-          
-          
-          
           form.setFieldError('value', t('lookups.validation.valueDuplicateHidden'));
         } else {
           notifications.show({ color: 'red', message: t('lookups.notifications.writeError') });

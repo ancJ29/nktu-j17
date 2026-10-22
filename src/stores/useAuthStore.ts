@@ -1,5 +1,3 @@
-
-
 import { appConfig } from '@/config';
 import { resolveClientCode, resolveServiceCode } from '@/config/client-code';
 import { AUTH_STORAGE_KEYS, encodedAuthStorage, encodedPersistStorage } from '@/stores/authStorage';
@@ -24,7 +22,7 @@ import { ONE_DAY, ONE_MINUTE } from '@credo/base-ui/utils';
 
 type Profile = BaseProfile & {
   isRoot?: boolean;
-  
+
   myInformation?: CredoSmeMyInformation | null;
 };
 
@@ -33,9 +31,6 @@ const serviceCode = resolveServiceCode();
 credoSmeConnector.setClientCode(resolveClientCode());
 
 const smeAuthApi: AuthApi<Profile> = {
-  
-  
-  
   login: async ({ email, password, tokenExpiration, refreshTokenExpiration, deviceId }) => {
     const response = await credoSmeConnector.login({
       serviceCode,
@@ -55,23 +50,10 @@ const smeAuthApi: AuthApi<Profile> = {
   },
 
   refreshToken: () => {
-    
-    
-    
-    
-    
-    
-    
-    
     throw new Error('credo-sme serves no refresh route — the session handle renews server-side');
   },
 
   getProfile: () => {
-    
-    
-    
-    
-    
     throw new Error('credo-sme profiles load through loadProfile() — this slot is token-shaped');
   },
 
@@ -106,25 +88,8 @@ export function isSignedIn(): boolean {
 }
 
 export async function loadProfile(): Promise<void> {
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const handle = await ensureAuthId({ serviceCode, deviceId });
   if (!handle) {
-    
-    
-    
     useAuthStore.setState({ isProfileLoaded: true });
     return;
   }
@@ -156,10 +121,6 @@ async function fetchProfile(
   try {
     const me = await credoSmeConnector.getMe(cached?.profileHash);
     if ('noChange' in me) {
-      
-      
-      
-      
       freshServerPermissions = cached?.permissions ?? null;
       return;
     }
@@ -172,20 +133,13 @@ async function fetchProfile(
       useAuthStore.getState().logout('profile-rejected');
       return;
     }
-    
-    
-    
+
     logger.warn('[auth] profile read failed, keeping the session', { error });
     if (fatal) useAuthStore.setState({ isProfileLoaded: true });
   }
 }
 
 function isSessionEnded(error: unknown): boolean {
-  
-  
-  
-  
-  
   return error instanceof CallApiError && (error.status === 401 || error.status === 403);
 }
 
@@ -202,7 +156,7 @@ export const SESSION_EXPIRED_NOTICE_KEY = 'sessionExpiredNotice';
 
 export type SessionExpiredNotice = {
   reason: string;
-  
+
   at: number;
 };
 
@@ -245,8 +199,6 @@ useAuthStore.setState({
 
 function readDeviceId(): string {
   try {
-    
-    
     const getter = (useAuthStore.getState() as { getDeviceId?: () => string }).getDeviceId;
     if (typeof getter !== 'function') {
       logger.warn(
@@ -256,8 +208,6 @@ function readDeviceId(): string {
     }
     return getter();
   } catch (error) {
-    
-    
     logger.warn('[auth] could not resolve a device id; x-device-id will not be sent', { error });
     return '';
   }
@@ -266,24 +216,8 @@ function readDeviceId(): string {
 export const deviceId = readDeviceId();
 if (deviceId) {
   credoSmeConnector.setDeviceId(deviceId);
-  
-  
-  
-  
-  
-  
+
   cMngtConnector.setDeviceId(deviceId);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   adoptSessionIfNeeded({ serviceCode, deviceId });
 }

@@ -1,5 +1,3 @@
-
-
 type NumericTest = (value: number) => boolean;
 
 const NUMBER = String.raw`-?[\d.,]+`;

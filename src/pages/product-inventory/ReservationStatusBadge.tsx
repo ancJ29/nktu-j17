@@ -1,5 +1,3 @@
-
-
 import type { ReactNode } from 'react';
 import { Badge } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +26,7 @@ export function ReservationStatusBadge({
       </Badge>
     );
   }
-  
+
   if (state.cancelled) {
     return (
       <Badge size={size} variant="filled" color="red" tt="none">

@@ -54,17 +54,11 @@ export function CropDiaryTemplateDetailPage() {
   const [template, setTemplate] = useState<CropDiaryTemplate | null>(null);
   const [loading, setLoading] = useState(true);
 
-  
-  
-  
-  
-
   useEffect(() => {
     if (!id) return;
     const cached = useCropDiaryTemplateStore.getState().getById(id) as
       CropDiaryTemplate | undefined;
     if (cached) {
-      
       setTemplate(cached);
       setLoading(false);
       return;
@@ -117,9 +111,6 @@ export function CropDiaryTemplateDetailPage() {
     </Group>
   );
 
-  
-  
-  
   const handleCopy = () => {
     const copyFrom: CropDiaryTemplateCopyFrom = {
       name: template.name,

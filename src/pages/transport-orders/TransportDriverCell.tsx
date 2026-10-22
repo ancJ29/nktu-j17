@@ -20,9 +20,7 @@ export function TransportDriverCell({ order }: { order: TransportOrder }) {
             key={i}
             index={i}
             trip={trip}
-            
-            
-            
+
             plate={trip.truckId ? plateOf(trip.truckId) : trip.truckPlate?.trim()}
           />
         ))}

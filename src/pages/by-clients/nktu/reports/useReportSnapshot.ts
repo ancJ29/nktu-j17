@@ -9,21 +9,21 @@ import type { NktuReport, NktuReportKind } from './types';
 export interface UseReportSnapshotParams {
   kind: NktuReportKind;
   periodKey: string;
-  
+
   aggregate: (periodKey: string) => Promise<{ data: NktuReport['data']; sourceHash: string }>;
-  
+
   auto?: boolean;
 }
 
 export interface ReportSnapshotState {
   snapshot: NktuReport | undefined;
-  
+
   working: boolean;
-  
+
   error: boolean;
-  
+
   initialized: boolean;
-  
+
   refresh: () => void;
 }
 
@@ -116,12 +116,10 @@ export function useReportSnapshot({
   useEffect(() => {
     latestKeyRef.current = periodKey;
     if (!auto) {
-      
-      
       void loadAll();
       return;
     }
-    
+
     void runEnsure(periodKey, false);
   }, [auto, loadAll, periodKey, runEnsure]);
 

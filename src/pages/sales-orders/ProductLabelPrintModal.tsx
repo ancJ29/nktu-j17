@@ -70,8 +70,6 @@ export function ProductLabelPrintModal({
 }: ProductLabelPrintModalProps) {
   const { t } = useTranslation();
 
-  
-  
   const lines = items.filter((it) => it.role !== 'set-component');
   const itemOptions = lines.map((it, i) => ({
     value: String(i),
@@ -92,8 +90,7 @@ export function ProductLabelPrintModal({
   const [size, setSize] = useState<ProductLabelSize>('small');
   const [template, setTemplate] = useState<ProductLabelTemplate>('template1');
   const [fields, setFields] = useState<ProductLabelFields>(() => seedFields(itemIndex));
-  
-  
+
   const [alignOpen, setAlignOpen] = useState(false);
   const [onPrinterPaper, setOnPrinterPaper] = useState(printerPaper !== undefined);
   const [offset, setOffset] = useState<ProductLabelOffset>({ xMm: 0, yMm: 0 });

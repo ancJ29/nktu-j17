@@ -1,5 +1,3 @@
-
-
 import { Divider } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -25,7 +23,7 @@ const canDelete = perms.truck.canDelete();
 
 type TruckDangerZoneProps = {
   truck: TruckAssetRow;
-  
+
   onUpdated: (truck: TruckAssetRow) => void;
 };
 
@@ -108,9 +106,6 @@ export function TruckDangerZone({ truck, onUpdated }: TruckDangerZoneProps) {
     }
   }, [truck, t, navigate, forceRefresh, surfaceConflict, closeDelete]);
 
-  
-  
-  
   if (isMobile || (!canEdit && !canDelete)) return null;
 
   return (

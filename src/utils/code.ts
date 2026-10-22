@@ -12,7 +12,7 @@ export function buildDailySequentialCode(
 ): string {
   const padLength = options.padLength ?? 3;
   const date = options.date ?? businessDateString();
-  const datePart = date.slice(2).replace(/-/g, ''); 
+  const datePart = date.slice(2).replace(/-/g, '');
   const dayPrefix = `${prefix}${datePart}-`;
 
   let maxCounter = 0;

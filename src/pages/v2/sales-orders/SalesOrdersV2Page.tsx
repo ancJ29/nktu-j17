@@ -1,5 +1,3 @@
-
-
 import { Group, Stack, Text } from '@mantine/core';
 import type { DataTableColumn } from '@credo/base-ui/components';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -63,8 +61,6 @@ export function SalesOrdersV2Page() {
 
   const scrollViewportRef = useListScrollRestoration(ROUTES.SALES_ORDERS_V2.LIST);
 
-  
-  
   const filters = useTransactionalV2ListFilters({
     cacheKey: 'cmngt:sales-order-v2-filters',
     defaultStatuses: salesOrderDefaultListStatuses,
@@ -87,7 +83,6 @@ export function SalesOrdersV2Page() {
     void loadCustomers();
   }, [loadCustomers]);
 
-  
   const matches = useCallback(
     (order: SalesOrderV2, needle: string) =>
       [order.orderNumber, order.customerName, order.reference, order.notes]
@@ -96,28 +91,21 @@ export function SalesOrdersV2Page() {
     [],
   );
 
-  
-  
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
     return orders.filter(
       (order) =>
-        
-        
-        
         (order.derivativesPending === true ||
           statuses.length === 0 ||
           statuses.includes(order.status)) &&
         (customerIds.length === 0 ||
           (order.customerId !== undefined && customerIds.includes(order.customerId))) &&
         (itemIds.length === 0 || order.items.some((line) => itemIds.includes(line.itemId))) &&
-        
         inDayRange(anchorDayOf(order.orderDate, order.createdAt), anchorRange) &&
         (needle === '' || matches(order, needle)),
     );
   }, [orders, statuses, customerIds, itemIds, anchorRange, search, matches]);
 
-  
   const itemLabel = useCallback(
     (itemId: string) => {
       for (const order of orders) {
@@ -129,14 +117,11 @@ export function SalesOrdersV2Page() {
     [orders],
   );
 
-  
   const { paginated, totalItems, hasMore, loadMore } = useListFilter(filtered, {
     shouldPagination: false,
     lazyKey: ROUTES.SALES_ORDERS_V2.LIST,
   });
 
-  
-  
   const customFields = useSalesOrderCustomFields();
   const listFields = useMemo(
     () => customFields.filter((field) => field.showInList === true),
@@ -176,15 +161,11 @@ export function SalesOrdersV2Page() {
         render: (row) => formatNumber(row.totalQuantity),
       },
       {
-        
-        
         key: 'totalAmount',
         header: t('salesOrdersV2.columns.totalAmount'),
         render: (row) => (row.totalAmount === undefined ? '—' : formatNumber(row.totalAmount)),
       },
-      
-      
-      
+
       ...(paymentTrackingOn
         ? [
             {
@@ -213,9 +194,7 @@ export function SalesOrdersV2Page() {
           </Group>
         ),
       },
-      
-      
-      
+
       ...listFields.map((field) => ({
         key: customFieldColumnKey(field.key),
         header: field.label,
@@ -230,8 +209,6 @@ export function SalesOrdersV2Page() {
     [navigate],
   );
 
-  
-  
   const customerOptions = useMemo(
     () => customers.map((customer) => ({ value: customer.id, label: customer.name })),
     [customers],
@@ -271,8 +248,7 @@ export function SalesOrdersV2Page() {
         t('salesOrdersV2.columns.customer'),
         t('common.filters.customerCount', { count: customerIds.length }),
       ),
-      
-      
+
       visible: customerOptions.length > 0 || customerIds.length > 0,
       searchable: true,
       w: 220,

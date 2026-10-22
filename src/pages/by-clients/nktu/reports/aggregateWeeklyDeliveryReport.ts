@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
@@ -13,7 +11,7 @@ const LOOKAHEAD_DAYS = 14;
 export interface WeekRequests {
   week: ResolvedWeek;
   requests: DeliveryRequest[];
-  
+
   sourceHash: string;
 }
 

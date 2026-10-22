@@ -1,5 +1,3 @@
-
-
 import { ActionIcon, type ActionIconProps } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -9,12 +7,11 @@ import { useTranslation } from 'react-i18next';
 const COPY_TOAST_MS = 2000;
 
 type CopyValueButtonProps = {
-  
   readonly value: string;
-  
+
   readonly copiedMessage: string;
   readonly size?: ActionIconProps['size'];
-  
+
   readonly ariaLabel?: string;
 };
 
@@ -34,8 +31,6 @@ export function CopyValueButton({
       color={clipboard.copied ? 'teal' : 'gray'}
       aria-label={ariaLabel ?? t('common.actions.copy')}
       onClick={(e) => {
-        
-        
         e.stopPropagation();
         e.preventDefault();
         clipboard.copy(value);

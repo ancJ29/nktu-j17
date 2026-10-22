@@ -1,5 +1,3 @@
-
-
 import { Box, Button, Divider, Group, Stack, Title } from '@mantine/core';
 import { IconArrowLeft, IconFileSpreadsheet, IconUserPlus } from '@tabler/icons-react';
 import { useState } from 'react';

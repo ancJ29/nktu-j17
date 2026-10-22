@@ -1,5 +1,3 @@
-
-
 import type { CredoAppConfig } from '../schema';
 
 export const PERMISSION_MODULES = [
@@ -36,15 +34,11 @@ export const PERMISSION_MODULES = [
     actions: [
       { key: 'canTransitionStatus', label: 'Change status' },
       { key: 'canCancel', label: 'Cancel' },
-      
-      
-      
+
       { key: 'canManagePayment', label: 'Record payments' },
     ],
   },
   {
-    
-    
     key: 'deliveryRequest',
     label: 'Delivery Note',
     actions: [
@@ -160,7 +154,6 @@ const stripGrants = (
     const module: Record<string, unknown> = {};
 
     for (const [key, value] of Object.entries(raw as Record<string, unknown>)) {
-      
       if (typeof value === 'object' && value !== null) {
         const group: Record<string, unknown> = {};
         for (const [flag, flagValue] of Object.entries(value as Record<string, unknown>)) {

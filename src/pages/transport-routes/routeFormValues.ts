@@ -1,15 +1,13 @@
-
 import type { TransportRouteCostItem, TransportRouteSegment } from '@/types';
 import type { TransportRouteWriteLeg } from './transportRouteWrite';
 
 export type LegRow = TransportRouteWriteLeg;
 
 export type RouteFormValues = {
-  
   code: string;
-  
+
   name: string;
-  
+
   isMultiTrip: boolean;
   trips: LegRow[];
   pickup: string;
@@ -18,7 +16,7 @@ export type RouteFormValues = {
   truckType: string;
   truckingSize: string;
   freightAmount: number;
-  
+
   basePay: number;
   allowance: number;
   segments: TransportRouteSegment[];
@@ -54,14 +52,11 @@ export function blankRouteFormValues(): RouteFormValues {
     freightAmount: 0,
     basePay: 0,
     allowance: 0,
-    
-    
-    
+
     segments: [blankSegment()],
     costItems: [blankCostItem()],
     markupPercent: 0,
-    
-    
+
     isActive: true,
     notes: '',
   };

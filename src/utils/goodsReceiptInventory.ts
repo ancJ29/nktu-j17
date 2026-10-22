@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
@@ -61,11 +59,11 @@ export type InventoryEffectResult = {
   attempted: number;
   succeeded: number;
   failed: number;
-  
+
   alreadyPosted: number;
-  
+
   skipped: number;
-  
+
   complete: boolean;
   errors: string[];
 };
@@ -111,10 +109,7 @@ export async function clearGoodsReceiptMarkers(
     try {
       const next = { ...row.extra?.receivedByGoodsReceipt };
       delete next[receipt.id];
-      
-      
-      
-      
+
       await useProductInventoryStore.getState().updateSafely({
         id: row.id,
         version: row.version,
@@ -158,10 +153,6 @@ async function applyForKind(
 
   const totals = aggregateByCode(items, sign);
 
-  
-  
-  
-  
   let entityPool: readonly Product[];
   if (kind === 'product') {
     const s = useProductStore.getState();
@@ -172,44 +163,17 @@ async function applyForKind(
   }
   const findEntity = (code: string): Product | undefined => findProductByCode(entityPool, code);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   let rows: ProductInventoryRow[];
   if (kind === 'product') {
     const snap = await cMngtConnector.getAllProductInventory<ProductInventoryExtra>();
     rows = snap.changed ? snap.productInventory : useProductInventoryStore.getState().items;
   } else {
-    
     rows = [];
   }
 
-  
-  
-  
-  
   const lastUpdatedBy =
     getCurrentEmployeeId() ?? useAuthStore.getState().user?.email ?? 'goods-receipt';
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
   const activitySource = {
     kind: 'GR' as const,
     id: receipt.id,
@@ -220,9 +184,7 @@ async function applyForKind(
 
   for (const [itemCode, rawDeltas] of totals) {
     const deltas = pruneZeros(rawDeltas);
-    
-    
-    
+
     if (Object.keys(deltas).length === 0) {
       result.skipped += 1;
       continue;
@@ -235,19 +197,11 @@ async function applyForKind(
       result.errors.push(`${kind}:${itemCode} — master-data record not found`);
       continue;
     }
-    
-    
-    
-    
-    
+
     if (kind === 'product' && isNoInventoryProduct(entity as Product)) {
       result.attempted -= 1;
       result.skipped += 1;
-      
-      
-      
-      
-      
+
       if (sign > 0) {
         const staleRow = rows.find(
           (r) => r.itemCode === itemCode && sameLocation(r.locationCode, locationCode),
@@ -282,12 +236,6 @@ async function applyForKind(
       (r) => r.itemCode === itemCode && sameLocation(r.locationCode, locationCode),
     );
 
-    
-    
-    
-    
-    
-    
     if (sign > 0 && existing && isPostedOnRow(existing, receipt.id)) {
       result.attempted -= 1;
       result.alreadyPosted += 1;
@@ -296,23 +244,6 @@ async function applyForKind(
 
     try {
       if (existing) {
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         const breakdown = readRowBreakdown(existing, baseUnit);
         const applied = applyDelta(entity, breakdown, deltas, { allowNegative: true });
         if (!applied.ok) {
@@ -325,16 +256,6 @@ async function applyForKind(
           continue;
         }
 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         const nextExpected =
           sign > 0
             ? dropExpectedForReceipt(existing.extra?.expectedFromGoodsReceipt, receipt.id)
@@ -362,11 +283,7 @@ async function applyForKind(
         } else {
           // skip material inventory
         }
-        
-        
-        
-        
-        
+
         logActivity(
           kind === 'product' ? 'productInventory.adjust' : 'materialInventory.adjust',
           entity.id,
@@ -379,9 +296,6 @@ async function applyForKind(
           },
         );
       } else {
-        
-        
-        
         if (sign < 0) {
           result.failed += 1;
           result.errors.push(
@@ -390,11 +304,8 @@ async function applyForKind(
           continue;
         }
 
-        
-        
         const seed = positiveOnly(deltas);
         if (Object.keys(seed).length === 0) {
-          
           result.failed += 1;
           result.errors.push(`${kind}:${itemCode} — no positive quantity to seed inventory`);
           continue;
@@ -408,9 +319,6 @@ async function applyForKind(
           continue;
         }
 
-        
-        
-        
         const newExtra = {
           unit: baseUnit,
           onHandByUnit: applied.onHandByUnit,
@@ -450,11 +358,6 @@ async function applyForKind(
     }
   }
 
-  
-  
-  
-  
-  
   if (kind === 'product') {
     await useProductInventoryStore.getState().forceRefresh();
   } else {
@@ -474,8 +377,6 @@ export async function applyGoodsReceiptInventoryEffect(
 
   await applyForKind('product', productItems, sign, receipt, result);
 
-  
-  
   result.complete = isPostingComplete(result, requestedCodes);
   return result;
 }
@@ -483,9 +384,8 @@ export async function applyGoodsReceiptInventoryEffect(
 export type LinePostingState = 'posted' | 'missing' | 'skipped' | 'orphaned';
 
 export type GoodsReceiptPostingStatus = {
-  
   byItemCode: Map<string, LinePostingState>;
-  
+
   missingCount: number;
 };
 
@@ -500,13 +400,6 @@ export async function getGoodsReceiptPostingStatus(
   await ensureLoaded(productStore.initialized, productStore.loadAll);
   const products = useProductStore.getState().items;
 
-  
-  
-  
-  
-  
-  
-  
   const flagged = receipt.extra?.inventoryPosted === true;
   const rows = flagged
     ? []
@@ -550,7 +443,7 @@ type RowContribution = {
   kind: GoodsReceiptKind;
   itemCode: string;
   locationCode: string;
-  
+
   byUnit: Record<string, number>;
 };
 
@@ -575,7 +468,7 @@ function buildContributionsByRow(
       });
     }
   }
-  
+
   for (const [k, v] of out) {
     for (const u of Object.keys(v.byUnit)) {
       if (v.byUnit[u] === 0) delete v.byUnit[u];
@@ -596,13 +489,6 @@ export async function syncDraftIncomingToInventory(
   const receiptId = ref.id;
   const receiptNumber = ref.receiptNumber;
 
-  
-  
-  
-  
-  
-  
-  
   const productStore = useProductStore.getState();
   await ensureLoaded(productStore.initialized, productStore.loadAll);
   const products = useProductStore.getState().items;
@@ -621,8 +507,6 @@ export async function syncDraftIncomingToInventory(
   const allKeys = new Set<string>([...prevMap.keys(), ...currMap.keys()]);
   if (allKeys.size === 0) return result;
 
-  
-  
   const touchedKinds = new Set<GoodsReceiptKind>();
   for (const k of allKeys) touchedKinds.add(k.split('|')[0] as GoodsReceiptKind);
 
@@ -647,12 +531,6 @@ export async function syncDraftIncomingToInventory(
 
     try {
       if (!row) {
-        
-        
-        
-        
-        
-        
         if (!currC) {
           result.succeeded += 1;
           continue;
@@ -684,7 +562,6 @@ export async function syncDraftIncomingToInventory(
         next = { ...(prior ?? {}), [receiptId]: { receiptNumber, byUnit: { ...currC.byUnit } } };
       } else {
         if (!prior || !(receiptId in prior)) {
-          
           result.succeeded += 1;
           continue;
         }
@@ -712,8 +589,6 @@ export async function syncDraftIncomingToInventory(
     }
   }
 
-  
-  
   if (touchedKinds.has('product')) {
     await useProductInventoryStore.getState().forceRefresh();
   }

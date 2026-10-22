@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
@@ -45,8 +43,7 @@ type DeliveryRequestUrlState = {
 
 function compactState(state: DeliveryRequestUrlState): DeliveryRequestUrlState {
   const r: DeliveryRequestUrlState = {};
-  
-  
+
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.o) r.o = state.o;
   if (state.dv) r.dv = state.dv;
@@ -59,7 +56,7 @@ function compactState(state: DeliveryRequestUrlState): DeliveryRequestUrlState {
 
 export function useDeliveryRequestListFilters(
   storeRequests: DeliveryRequest[],
-  
+
   driverCodeById?: ReadonlyMap<string, string>,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<DeliveryRequestUrlState>({
@@ -67,9 +64,6 @@ export function useDeliveryRequestListFilters(
     compactState,
   });
 
-  
-  
-  
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const salesOrderFilter = state.o ?? null;
   const driverFilter = state.dv ?? null;
@@ -81,9 +75,6 @@ export function useDeliveryRequestListFilters(
   );
   const page = state.pg ?? DEFAULT_PAGE;
 
-  
-  
-  
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
@@ -114,7 +105,6 @@ export function useDeliveryRequestListFilters(
     [updateState],
   );
 
-  
   const allRequests = useMemo(() => {
     const filtered = storeRequests.filter((r) => {
       const status = (r.extra as { status?: string })?.status ?? '';
@@ -124,18 +114,7 @@ export function useDeliveryRequestListFilters(
       if (salesOrderFilter && r.salesOrderNumber !== salesOrderFilter) return false;
       if (driverFilter && assignedDriverId !== driverFilter) return false;
       if (partyFilter && partyKey(r) !== partyFilter) return false;
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
+
       if (scheduledDateRange.preset) {
         const filterDate =
           (r.extra as DeliveryRequestExtra | undefined)?.deliveryTimestamp ?? r.scheduledDate;
@@ -144,22 +123,12 @@ export function useDeliveryRequestListFilters(
       return true;
     });
 
-    
-    
-    
-    
-    
-    
-    
     return [...filtered].sort((a, b) => {
       const aExtra = (a.extra ?? {}) as DeliveryRequestExtra;
       const bExtra = (b.extra ?? {}) as DeliveryRequestExtra;
       const aDon = aExtra.displayOrderNumber ?? '';
       const bDon = bExtra.displayOrderNumber ?? '';
 
-      
-      
-      
       const aDay = deliveryDayKey(a, aDon);
       const bDay = deliveryDayKey(b, bDon);
       if (aDay !== bDay) {
@@ -168,12 +137,10 @@ export function useDeliveryRequestListFilters(
         return aDay > bDay ? -1 : 1;
       }
 
-      
       const aUrgent = aExtra.isUrgent === true;
       const bUrgent = bExtra.isUrgent === true;
       if (aUrgent !== bUrgent) return aUrgent ? -1 : 1;
 
-      
       const aCode = driverCodeById?.get(aExtra.assignedDriverId ?? '') ?? '';
       const bCode = driverCodeById?.get(bExtra.assignedDriverId ?? '') ?? '';
       if (aCode !== bCode) {
@@ -182,7 +149,6 @@ export function useDeliveryRequestListFilters(
         return aCode < bCode ? -1 : 1;
       }
 
-      
       if (aDon && bDon) return aDon < bDon ? -1 : aDon > bDon ? 1 : 0;
       if (aDon) return -1;
       if (bDon) return 1;
@@ -198,8 +164,6 @@ export function useDeliveryRequestListFilters(
     driverCodeById,
   ]);
 
-  
-  
   const statusFilterIsDefault = useMemo(
     () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
@@ -215,10 +179,9 @@ export function useDeliveryRequestListFilters(
   );
 
   return {
-    
     statusFilter,
     setStatusFilter,
-    
+
     statusFilterIsDefault,
     salesOrderFilter,
     driverFilter,
@@ -232,11 +195,9 @@ export function useDeliveryRequestListFilters(
     page,
     setPage,
 
-    
     allRequests,
     hasActiveFilters,
 
-    
     clearFilters,
   };
 }

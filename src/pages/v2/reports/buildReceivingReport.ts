@@ -1,22 +1,19 @@
-
-
 import type { GoodsReceiptStage } from '@credo/connectors/status-flow';
 import type { GoodsReceiptV2 } from '@/types/goods-receipt-v2';
 import { anchorDayOf } from '../anchorDay';
 
 export interface ReceivingVendorRow {
-  
   key: string;
-  
+
   label: string;
   receipts: number;
-  
+
   lines: number;
 }
 
 export interface ReceivingReport {
   totals: { receipts: number; lines: number };
-  
+
   byVendor: ReceivingVendorRow[];
   unknownStatusReceipts: number;
 }
@@ -26,7 +23,7 @@ export function buildReceivingReport(
   input: {
     fromDay: string;
     toDay: string;
-    
+
     resolveStage: (status: string) => GoodsReceiptStage | undefined;
   },
 ): ReceivingReport {

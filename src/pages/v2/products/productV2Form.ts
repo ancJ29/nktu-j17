@@ -1,5 +1,3 @@
-
-
 import { featureFlags } from '@/utils/features';
 import { perms } from '@/utils/permission';
 import type { ProductV2Attribute, ProductV2Row } from '@/types';
@@ -26,13 +24,13 @@ export type ProductV2FormValues = {
   name: string;
   category: string;
   unit: string;
-  
+
   price: number | '';
-  
+
   minStock: number | '';
-  
+
   ignoreStockAlert: boolean;
-  
+
   attributes: ProductV2Attribute[];
   isActive: boolean;
 };
@@ -83,21 +81,18 @@ export const patchOf = (
     extra: {
       ...(editing?.extra ?? {}),
       category: category || undefined,
-      
-      
-      
+
       ...(showInventory
         ? {
             minimumInventory:
               values.minStock === ''
                 ? undefined
                 : { value: values.minStock, ...(unit ? { unit } : {}) },
-            
+
             ignoreStockAlert: values.ignoreStockAlert ? true : undefined,
           }
         : {}),
-      
-      
+
       attributes: attributes.length > 0 ? attributes : undefined,
     },
   };

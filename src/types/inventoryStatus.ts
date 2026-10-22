@@ -1,4 +1,3 @@
-
 export type InventorySecondaryStatus = 'outOfStock' | 'mustOrder' | 'ok';
 
 export function deriveSecondaryStatus(

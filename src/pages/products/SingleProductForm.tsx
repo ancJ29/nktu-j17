@@ -51,32 +51,32 @@ export type ProductFormValues = {
   name: string;
   code: string;
   description: string;
-  
+
   units: string[];
-  
+
   price: number;
   isActive: boolean;
   alternativeNames: string[];
-  
+
   sku: string;
   barcode: string;
   basePrice: number;
-  
+
   suggestedPrice: number;
   category: string;
   attributes: Array<{ key: string; value: string }>;
-  
+
   warehouseMemo: string;
   minInventoryValue: number | '';
   minInventoryUnit: string;
-  
+
   noInventory: boolean;
-  
+
   hiddenFromInventoryList: boolean;
   unitConversions: UnitConversion[];
-  
+
   setItems: ProductSetItem[];
-  
+
   setMode: 'bundle' | 'breakdown';
 };
 
@@ -87,11 +87,11 @@ const canManagePrice = perms.product.canManagePrice();
 
 type SingleProductFormProps = {
   readonly form: UseFormReturnType<ProductFormValues>;
-  
+
   readonly variant: ProductFormVariant;
   readonly isLoading: boolean;
   readonly isEditMode: boolean;
-  
+
   readonly onSkuChange: (value: string) => void;
   readonly onSubmit: (values: ProductFormValues) => void;
   readonly onCancel: () => void;
@@ -200,17 +200,9 @@ function SetCompositionEditor({
   const { t } = useTranslation();
   const products = useProductStore((s) => s.items);
   const items = form.values.setItems;
-  
-  
-  
-  
+
   const unitLabels = useLookupV2Labels('product-unit');
 
-  
-  
-  
-  
-  
   const componentFilter = useMemo(
     () => (p: (typeof products)[number]) =>
       !p.extra?.isDeleted && p.code !== selfCode && !isProductSet(p),
@@ -305,8 +297,7 @@ function SetCompositionEditor({
                   updateRow(idx, { productCode: '', unit: '' });
                   return;
                 }
-                
-                
+
                 updateRow(idx, {
                   productCode: sel.code,
                   unit: row.unit && sel.units.includes(row.unit) ? row.unit : (sel.units[0] ?? ''),
@@ -375,7 +366,7 @@ function BarcodePreview({ value }: { value: string }) {
         displayValue: false,
         margin: 0,
       });
-      
+
       setValid(true);
     } catch {
       setValid(false);
@@ -507,9 +498,6 @@ export function SingleProductForm({
 }: SingleProductFormProps) {
   const { t } = useTranslation();
 
-  
-  
-  
   const categoryOptions = useLookupV2Options('product-category');
   const unitOptions = useLookupV2Options('product-unit');
   const categoryData = useMemo(
@@ -520,10 +508,7 @@ export function SingleProductForm({
     () => unitOptions.map((o) => ({ value: o.value, label: o.label })),
     [unitOptions],
   );
-  
 
-  
-  
   const selectedUnitData = useMemo(
     () =>
       form.values.units.map((v) => ({
@@ -532,11 +517,6 @@ export function SingleProductForm({
       })),
     [form.values.units, unitOptions],
   );
-
-  
-  
-  
-  
 
   const primaryCard = (
     <SectionCard icon={<IconPackage size={14} />} title={t('products.form.primaryDetails')}>
@@ -553,12 +533,7 @@ export function SingleProductForm({
             placeholder={t('products.form.skuPlaceholder')}
             description={isEditMode ? undefined : t('products.form.skuCreateDescription')}
             styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
-            
-            
-            
-            
-            
-            
+
             disabled={isEditMode}
             {...form.getInputProps('sku')}
             {...(!isEditMode && {
@@ -666,10 +641,7 @@ export function SingleProductForm({
   ) : null;
 
   const noInventory = form.values.noInventory;
-  
-  
-  
-  
+
   const showNoInventoryToggle = variant.showNoInventoryToggle || noInventory;
   const inventoryCard = (
     <SectionCard icon={<IconPlus size={14} />} title={t('common.columns.minStock')} padding="xs">
@@ -717,9 +689,6 @@ export function SingleProductForm({
     </SectionCard>
   );
 
-  
-  
-  
   const warehouseMemoCard = (
     <SectionCard
       icon={<IconBuildingWarehouse size={14} />}
@@ -750,10 +719,6 @@ export function SingleProductForm({
     </SectionCard>
   ) : null;
 
-  
-  
-  
-  
   return (
     <Form form={form} onSubmit={onSubmit}>
       <Stack gap="md">

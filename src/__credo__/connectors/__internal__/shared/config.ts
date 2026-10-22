@@ -2,7 +2,6 @@ import { getEnvVar, isBrowser, setEnvVar } from '@credo/kits/misc';
 
 export const configs: Record<string, Record<string, string>> = {
   '1796e4': {
-    
     activityLogger: 'https://inst-1796e4.api-bridge.work',
     credoSso: 'https://inst-1796e4.api-bridge.work/$default',
     cCredoSme: 'https://inst-1796e4.api-bridge.work/$default',
@@ -10,14 +9,12 @@ export const configs: Record<string, Record<string, string>> = {
     cStorage: 'https://inst-1796e4.api-bridge.work',
   },
   '49a092': {
-    
     credoSso: 'https://inst-10618c.api-bridge.work/$default',
     cCredoSme: 'https://inst-10618c.api-bridge.work/$default',
     cMngt: 'https://inst-10618c.api-bridge.work/$default',
     cStorage: 'https://inst-10618c.api-bridge.work',
   },
   '10618c': {
-    
     credoSso: 'https://inst-10618c.api-bridge.work/$default',
     cCredoSme: 'https://inst-10618c.api-bridge.work/$default',
     cMngt: 'https://inst-10618c.api-bridge.work/$default',
@@ -27,9 +24,6 @@ export const configs: Record<string, Record<string, string>> = {
 
 export const targetConfigs: Record<string, Record<string, string>> = {
   '1796e4': {
-    
-    
-    
     activityLogger: 'activity-logger',
     credoSso: 'credo-sso',
     cCredoSme: 'credo-sme',
@@ -54,12 +48,9 @@ export const CREDO_GROUP_STORAGE_KEY = 'a1e42';
 
 export function setCredoGroup(group: string): void {
   if (group === '1786e4') {
-    return setCredoGroup('1796e4')
+    return setCredoGroup('1796e4');
   }
-  
-  
-  
-  
+
   if (!group) return;
 
   const current = getEnvVar(CREDO_GROUP_STORAGE_KEY) || '-';
@@ -68,23 +59,11 @@ export function setCredoGroup(group: string): void {
   setEnvVar(CREDO_GROUP_STORAGE_KEY, group);
 
   if (isBrowser()) {
-    [
-      'a8e41',
-      'a8e42',
-      'a8e43',
-      'a8e44',
-      'a8e45',
-      'a9c55',
-      'a9c56',
-      '19c55230d1',
-    ].forEach(el => localStorage.removeItem(el))
+    ['a8e41', 'a8e42', 'a8e43', 'a8e44', 'a8e45', 'a9c55', 'a9c56', '19c55230d1'].forEach((el) =>
+      localStorage.removeItem(el),
+    );
   }
 
-  
-  
-  
-  
-  
   if (isBrowser() && group !== credoGroup) {
     setTimeout(() => {
       window.location.reload();

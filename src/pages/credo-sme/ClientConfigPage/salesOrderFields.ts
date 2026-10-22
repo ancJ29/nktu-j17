@@ -1,5 +1,3 @@
-
-
 import {
   SALES_ORDER_DEFAULT_STATUS_FLOW,
   SALES_ORDER_STAGE_CATALOGUE,
@@ -29,7 +27,7 @@ export type SalesOrdersV2Form = {
   codePadLength: number;
   statusFlow: StatusFlowDraft | null;
   defaultListStatuses: string[];
-  
+
   customFields: CustomFieldDef[];
   listColumns: string[];
   hiddenColumns: string[];
@@ -63,10 +61,7 @@ export const readSalesOrdersV2 = (config: CredoAppConfig | null): SalesOrdersV2F
     codePadLength: v2?.codePadLength ?? DEFAULTS.codePadLength,
     statusFlow: readStatusFlowDraft(v2?.statusFlow).draft,
     defaultListStatuses: [...(v2?.defaultListStatuses ?? DEFAULTS.defaultListStatuses)],
-    
-    
-    
-    
+
     customFields: readCustomFieldDrafts(v2?.customFields),
     listColumns: [...(v2?.listColumns ?? [])],
     hiddenColumns: [...(v2?.hiddenColumns ?? [])],
@@ -170,8 +165,7 @@ export const applySalesOrdersV2 = (
   return mergeFeature(storedFeatures, 'salesOrdersV2', {
     ...rest,
     statusFlow: statusFlow === null ? undefined : assembleStatusFlow(statusFlow),
-    
-    
+
     customFields: customFields.length > 0 ? customFields.map(assembleCustomField) : undefined,
   });
 };
@@ -184,7 +178,6 @@ const assembleCustomField = (field: CustomFieldDef): CustomFieldDef => ({
   ...((field.viewDepartments ?? []).length > 0 ? { viewDepartments: field.viewDepartments } : {}),
   ...((field.editDepartments ?? []).length > 0 ? { editDepartments: field.editDepartments } : {}),
   ...(field.showInList === true ? { showInList: true } : {}),
-  
-  
+
   ...(field.width !== undefined && field.width !== 'full' ? { width: field.width } : {}),
 });

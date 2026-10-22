@@ -1,5 +1,3 @@
-
-
 import { Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -87,11 +85,8 @@ export function EmployeeV2ListPage() {
     }
   }, [error, t]);
 
-  
   const live = useMemo(() => items.filter((e) => !e.extra?.isDeleted), [items]);
 
-  
-  
   const shouldPagination = LIST_PAGINATION_DEFAULT && live.length >= LIST_PAGINATION_MIN_ROWS;
 
   const {
@@ -121,8 +116,6 @@ export function EmployeeV2ListPage() {
     [filterState.status, filterState.department, filterState.position],
   );
 
-  
-  
   const searchFields = useCallback(
     (e: (typeof live)[number]) => [
       e.name,
@@ -159,16 +152,13 @@ export function EmployeeV2ListPage() {
       if (f.position && e.position !== f.position) return false;
       return true;
     },
-    
-    
-    
+
     searchFields,
     search: filterState.search,
     onSearchChange,
     page: filterState.page,
     onPageChange,
-    
-    
+
     lazyKey: ROUTES.EMPLOYEES.LIST,
   });
 
@@ -178,7 +168,6 @@ export function EmployeeV2ListPage() {
     filterState.department !== null ||
     filterState.position !== null;
 
-  
   const inactiveCount = useMemo(() => live.filter((e) => !e.isActive).length, [live]);
   const chips = useMemo<QuickFilterChip[]>(() => {
     const showing = filterState.status === 'inactive';
@@ -230,9 +219,6 @@ export function EmployeeV2ListPage() {
     ],
   );
 
-  
-  
-  
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = useMemo(
     () => [
       ...(hasDepartment && departmentOptions.length > 0
@@ -333,10 +319,6 @@ export function EmployeeV2ListPage() {
       </StickyListChrome>
 
       {isMobile ? (
-        
-        
-        
-        
         <EmployeeCardList
           employees={paginated}
           isLoading={loading && !initialized}

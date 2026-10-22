@@ -1,23 +1,20 @@
 import { logger } from './logger';
 
 export type JWTPayload = {
-  exp?: number; 
-  iat?: number; 
+  exp?: number;
+  iat?: number;
   [key: string]: unknown;
 };
 
 export function decodeJWT(token: string): JWTPayload | null {
   try {
-    
     const parts = token.split('.');
     if (parts.length !== 3) {
       return null;
     }
 
-    
     const payload = parts[1];
 
-    
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
@@ -42,10 +39,8 @@ export function isTokenExpired(token: string, bufferSeconds = 300): boolean {
 
   logger.debug('payload.exp', payload.exp, new Date(payload.exp * 1000).toLocaleString());
 
-  
   const currentTime = Math.floor(Date.now() / 1000);
 
-  
   return payload.exp < currentTime + bufferSeconds;
 }
 

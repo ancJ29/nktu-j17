@@ -35,7 +35,7 @@ type ProductDataTableProps = {
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;
-  
+
   readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
 };
 
@@ -52,10 +52,7 @@ export function ProductDataTable({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const unitLabels = useLookupV2Labels('product-unit');
-  
-  
-  
-  
+
   const categoryLabels = useLookupV2Labels('product-category');
 
   const columns = useMemo(

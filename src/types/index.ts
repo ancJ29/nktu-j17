@@ -39,4 +39,3 @@ export type {
   CMngtGoodsReceiptStatus as GoodsReceiptStatus,
   CMngtGoodsReceiptItemType as GoodsReceiptItemType,
 } from '@credo/connectors/types';
-

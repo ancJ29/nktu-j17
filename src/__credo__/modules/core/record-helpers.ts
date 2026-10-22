@@ -71,9 +71,7 @@ export async function saveItemsWithMeta<T>(
   if (isNaN(version)) {
     version = 1;
   }
-  
-  
-  
+
   const hash = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
   const envelope: RecordEnvelope<T> = {
     items,

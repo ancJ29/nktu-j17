@@ -15,9 +15,9 @@ import { formatPlannedDate } from '@/utils/cropSchedule';
 type GreenhouseCardListProps = {
   readonly greenhouses: Greenhouse[];
   readonly isLoading?: boolean;
-  
+
   readonly occupancyByGreenhouse?: Map<string, GreenhouseOccupancy>;
-  
+
   readonly activeCropCounts?: Map<string, number>;
 };
 
@@ -71,10 +71,7 @@ export function GreenhouseCardList({
         const extraCrops = (activeCropCounts?.get(item.code) ?? 0) - 1;
         const tone = occupancyTone(occupancy);
         const freeFrom = freeFromDate(occupancy);
-        
-        
-        
-        
+
         const progress =
           occupancy.state === 'growing' && occupancy.dayOfCycle && occupancy.totalDays
             ? Math.min(100, (occupancy.dayOfCycle / occupancy.totalDays) * 100)

@@ -5,14 +5,13 @@ export interface CreateProductInventoryInput<TExtra = Record<string, unknown>> {
   locationCode: string;
   onHand: number;
   extra?: TExtra;
-  
+
   expectedListHash?: string;
 }
 
 export interface UpdateProductInventoryInput<TExtra = Record<string, unknown>> {
-  
   version?: string;
-  
+
   expectedListHash?: string;
   onHand?: number;
   extra?: TExtra;

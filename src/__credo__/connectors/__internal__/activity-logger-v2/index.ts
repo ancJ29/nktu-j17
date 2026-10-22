@@ -48,11 +48,6 @@ const writeApi = createApiGroup({
 });
 
 export const activityLoggerV2Connector = {
-  
-  
-  
-
-  
   setBaseUrl: (baseUrl: string) => {
     readTarget.baseUrl = baseUrl;
     return activityLoggerV2Connector;
@@ -70,20 +65,13 @@ export const activityLoggerV2Connector = {
       queryParams: buildListQuery({ clientId, cursor, limit }),
     }),
 
-  
-  
-  
-
-  
   setWriteBaseUrl: (baseUrl: string) => {
     writeStorages.baseUrl = baseUrl;
     return activityLoggerV2Connector;
   },
 
-  
   setInternalAccessKey: (internalAccessKey: string) => {
     if (isBrowser()) {
-      
       console.warn(
         '[activityLoggerV2Connector] the write key is server-side only. Use credoSmeConnector.logActivities from a browser.',
       );

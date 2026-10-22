@@ -6,7 +6,6 @@ export type GroupedNumberInputProps = Omit<
   NumberInputProps,
   'thousandSeparator' | 'decimalSeparator'
 > & {
-  
   ref?: Ref<HTMLInputElement>;
 };
 

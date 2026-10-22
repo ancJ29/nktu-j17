@@ -1,5 +1,3 @@
-
-
 import { useCallback, useRef, useState } from 'react';
 import { Alert, Badge, Button, FileButton, Group, Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -23,7 +21,7 @@ import {
 type ExistingRow = Omit<InventoryExportRow, 'extra'> & {
   readonly id: string;
   readonly version: string;
-  
+
   readonly extra?: {
     readonly unit?: string;
     readonly beginOfPeriod?: Readonly<Record<string, number>>;
@@ -46,16 +44,16 @@ type MasterItem = {
 
 type Props = {
   readonly entityType: 'product' | 'material';
-  
+
   readonly rows: ReadonlyArray<ExistingRow>;
-  
+
   readonly items: ReadonlyArray<MasterItem>;
-  
+
   readonly unitLabels?: ReadonlyMap<string, string>;
-  
+
   readonly canImport: boolean;
   readonly canExport: boolean;
-  
+
   readonly onAfterImport: () => Promise<void> | void;
 };
 
@@ -80,14 +78,10 @@ export function InventoryImportExportActions({
 
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [isImporting, setIsImporting] = useState(false);
-  
-  
-  
+
   const fileButtonResetRef = useRef<() => void>(null);
 
   const handleExport = useCallback(() => {
-    
-    
     const activeItemCount = items.filter((it) => it.isActive && !it.extra?.isDeleted).length;
     if (activeItemCount === 0) {
       notifications.show({
@@ -182,25 +176,8 @@ export function InventoryImportExportActions({
     if (!parseResult) return;
     setIsImporting(true);
     try {
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
-      
       const periodKey = getCurrentPeriodKey();
-      
-      
-      
-      
+
       const verifiedAt = entityType === 'product' ? Date.now() : null;
       const existingExtraByPair = new Map<string, ExistingRow['extra']>();
       for (const row of rows) {
@@ -238,14 +215,6 @@ export function InventoryImportExportActions({
       const failed = res.summary?.errors ?? 0;
       const total = res.summary?.total ?? payload.length;
 
-      
-      
-      
-      
-      
-      
-      
-      
       const idByItemCode = new Map(items.map((it) => [it.code, it.id]));
       for (const row of [...res.created, ...res.updated]) {
         const targetId = idByItemCode.get(row.itemCode);
@@ -256,10 +225,6 @@ export function InventoryImportExportActions({
         });
       }
 
-      
-      
-      
-      
       await onAfterImport();
 
       if (failed === 0) {
@@ -271,7 +236,6 @@ export function InventoryImportExportActions({
           }),
         });
       } else {
-        
         const errorPreview = (res.errors ?? [])
           .slice(0, 3)
           .map((e) => `#${e.index + 1}: ${e.message}`)

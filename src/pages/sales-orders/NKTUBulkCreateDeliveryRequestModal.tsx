@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo, useState } from 'react';
 import { Button, Group, Modal, Stack, Switch, Textarea } from '@mantine/core';
 import { DateField } from '@/components/DateField';
@@ -21,10 +19,10 @@ const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriv
 type NKTUBulkCreateDeliveryRequestModalProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   salesOrders: SalesOrder[];
   getCustomerByCode: (code: string) => Customer | undefined;
-  
+
   onCreated?: () => void;
   t: TFunction;
 };

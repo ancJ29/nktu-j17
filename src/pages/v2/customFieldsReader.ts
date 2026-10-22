@@ -1,12 +1,10 @@
-
-
 import { useMemo } from 'react';
 import { fieldsForViewer, resolveCustomFields, type ViewerCustomField } from '@/utils/customFields';
 import { useCurrentDepartment } from './statusFlowReader';
 
 export type CustomFieldsReader = {
   errors: string[];
-  
+
   useForViewer: () => ViewerCustomField[];
 };
 

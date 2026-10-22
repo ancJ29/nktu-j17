@@ -1,5 +1,3 @@
-
-
 import type { Product } from '@/types';
 
 export function findProductByCode(products: readonly Product[], code: string): Product | undefined {

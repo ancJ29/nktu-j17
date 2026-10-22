@@ -99,11 +99,11 @@ type FormValues = {
   vendorName: string;
   locationCode: string;
   locationName: string;
-  
+
   receivedDate: string | null;
   reference: string;
   notes: string;
-  
+
   assignedTo: string;
   items: ItemFormValues[];
 };
@@ -130,7 +130,7 @@ function isEmptyRow(row: ItemFormValues): boolean {
 
 type ItemRowProps = ItemFormValues & {
   idx: number;
-  
+
   itemUnits: readonly string[] | undefined;
   unitLabels: Map<string, string>;
   itemCodeError: ReactNode;
@@ -155,10 +155,7 @@ const ItemRow = memo(function ItemRow({
   removeListItem,
 }: ItemRowProps) {
   const { t } = useTranslation();
-  
-  
-  
-  
+
   const unitOptions = Array.from(new Set([...(itemUnits ?? []), ...(unit ? [unit] : [])])).map(
     (u) => ({ value: u, label: lookupLabelOf(unitLabels, u) }),
   );
@@ -264,13 +261,6 @@ export function GoodsReceiptFormPage() {
   const { id } = useParams<{ id: string }>();
   const isEdit = !!id;
 
-  
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!isMobile) return;
     notifications.show({
@@ -284,9 +274,7 @@ export function GoodsReceiptFormPage() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  
-  
-  
+
   const copyFrom = !isEdit
     ? (location.state as { copyFrom?: GoodsReceiptCopyFrom } | null)?.copyFrom
     : undefined;
@@ -295,20 +283,8 @@ export function GoodsReceiptFormPage() {
 
   const [loading, setLoading] = useState(false);
 
-  
-  
-  
   const unitLabels = useLookupV2Labels('product-unit');
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const {
     items: locations,
     initialized: locationsInitialized,
@@ -323,13 +299,9 @@ export function GoodsReceiptFormPage() {
   const loadVendors = useVendorStore((s) => s.loadAll);
 
   useEffect(() => {
-    
-    
     if (isMobile) return;
     if (!vendorsInitialized) loadVendors();
-    
-    
-    
+
     if (!locationsInitialized) loadLocations();
     if (!productsInitialized) loadProducts();
   }, [
@@ -341,9 +313,6 @@ export function GoodsReceiptFormPage() {
     loadProducts,
   ]);
 
-  
-  
-  
   const currentEmployeeId = useMyEmployee()?.id ?? '';
 
   const locationSelectData = useMemo(
@@ -356,10 +325,6 @@ export function GoodsReceiptFormPage() {
     return m;
   }, [locationSelectData]);
 
-  
-  
-  
-  
   const productUnitsByCode = useMemo(() => {
     const m = new Map<string, string[]>();
     for (const p of products) {
@@ -368,8 +333,6 @@ export function GoodsReceiptFormPage() {
     return m;
   }, [products]);
 
-  
-  
   const validate = useMemo<FormValidateInput<FormValues>>(
     () => ({
       vendorCode: (v) => (!v ? t('goodsReceipts.validation.vendorRequired') : null),
@@ -378,11 +341,6 @@ export function GoodsReceiptFormPage() {
       }),
       receivedDate: (v) => (!v ? t('goodsReceipts.validation.receivedDateRequired') : null),
       items: {
-        
-        
-        
-        
-        
         itemCode: (v, vals, path) => {
           const m = path.match(/^items\.(\d+)\./);
           if (!m) return null;
@@ -408,22 +366,16 @@ export function GoodsReceiptFormPage() {
 
   const form = useForm<FormValues>({
     initialValues: {
-      
-      
       receiptNumber: '',
       vendorCode: '',
       vendorName: '',
-      
-      
-      
-      
+
       locationCode: locationsEnabled ? '' : DEFAULT_LOCATION_CODE,
       locationName: '',
       receivedDate: todayInVnDateString(),
       reference: '',
       notes: '',
-      
-      
+
       assignedTo: currentEmployeeId,
       items: [{ ...emptyItem }],
     },
@@ -437,12 +389,7 @@ export function GoodsReceiptFormPage() {
       const res = await cMngtConnector.getGoodsReceiptById({ id });
       const r = res.goodsReceipt as GoodsReceipt;
       snapshotRef.current = r;
-      
-      
-      
-      
-      
-      
+
       if (r.status !== 'draft' || r.extra?.inventoryPosted === true) {
         navigate(ROUTES.GOODS_RECEIPTS.DETAIL.replace(':id', id), { replace: true });
         return null;
@@ -456,9 +403,7 @@ export function GoodsReceiptFormPage() {
         receivedDate: isoToVnDateString(r.receivedDate),
         reference: r.reference || '',
         notes: r.notes || '',
-        
-        
-        
+
         assignedTo: r.extra?.assignedTo ?? '',
         items: r.items.map((item) => ({
           itemType: item.itemType,
@@ -479,9 +424,6 @@ export function GoodsReceiptFormPage() {
     },
   );
 
-  
-  
-  
   useEffect(() => {
     if (isEdit) return;
     if (!currentEmployeeId) return;
@@ -490,14 +432,10 @@ export function GoodsReceiptFormPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEmployeeId, isEdit]);
 
-  
-  
-  
-  
   useEffect(() => {
     if (!copyFrom) return;
     form.setValues({
-      receiptNumber: '', 
+      receiptNumber: '',
       vendorCode: copyFrom.vendorCode,
       vendorName: copyFrom.vendorName,
       locationCode: copyFrom.locationCode,
@@ -526,17 +464,10 @@ export function GoodsReceiptFormPage() {
       form.setFieldValue('locationCode', code ?? '');
       form.setFieldValue('locationName', code ? (locationMap.get(code)?.name ?? '') : '');
     },
-    
+
     [locationMap],
   );
 
-  
-  
-  
-  
-  
-  
-  
   const handleDownloadTemplate = useCallback(() => {
     const sampleItems: Array<{ sku: string; unit: string; name: string }> = [];
     const pickFrom = (
@@ -558,11 +489,6 @@ export function GoodsReceiptFormPage() {
     generateGoodsReceiptItemsTemplate({ language: i18n.language, sampleItems });
   }, [products, i18n.language]);
 
-  
-  
-  
-  
-  
   const handleImportItems = useCallback(
     async (file: File | null) => {
       if (!file) return;
@@ -576,10 +502,6 @@ export function GoodsReceiptFormPage() {
           return;
         }
 
-        
-        
-        
-        
         type SkuHit = {
           itemType: GoodsReceiptItemType;
           code: string;
@@ -588,7 +510,7 @@ export function GoodsReceiptFormPage() {
         };
         const skuMap = new Map<string, SkuHit>();
         for (const p of products) {
-          if (!isReceivableProduct(p)) continue; 
+          if (!isReceivableProduct(p)) continue;
           const sku = p.extra?.sku?.trim();
           if (!sku) continue;
           skuMap.set(sku.toLowerCase(), {
@@ -607,10 +529,7 @@ export function GoodsReceiptFormPage() {
             unmatched.push(row.sku);
             continue;
           }
-          
-          
-          
-          
+
           const typedUnit = row.unit?.toLowerCase();
           const unit =
             (typedUnit && hit.units.find((u) => u.toLowerCase() === typedUnit)) ??
@@ -639,10 +558,6 @@ export function GoodsReceiptFormPage() {
           return;
         }
 
-        
-        
-        
-        
         const current = form.getValues().items;
         const allEmpty = current.every(isEmptyRow);
         form.setFieldValue('items', allEmpty ? matched : [...current, ...matched]);
@@ -682,7 +597,7 @@ export function GoodsReceiptFormPage() {
         }
       }
     },
-    
+
     [products, t],
   );
 
@@ -695,10 +610,7 @@ export function GoodsReceiptFormPage() {
         });
         return;
       }
-      
-      
-      
-      
+
       let locationCode = values.locationCode.trim();
       let locationName = values.locationName.trim();
       if (!locationsEnabled) {
@@ -724,11 +636,6 @@ export function GoodsReceiptFormPage() {
         ...(item.note.trim() ? { note: item.note.trim() } : {}),
       }));
 
-      
-      
-      
-      
-      
       const actor = getCurrentActorId();
 
       try {
@@ -739,9 +646,7 @@ export function GoodsReceiptFormPage() {
             ...snapshot.extra,
             createdBy: snapshot.extra?.createdBy ?? actor,
             lastUpdatedBy: actor,
-            
-            
-            
+
             assignedTo: values.assignedTo.trim() || undefined,
           };
           const updated = await useGoodsReceiptStore.getState().updateSafely({
@@ -759,13 +664,7 @@ export function GoodsReceiptFormPage() {
               extra: nextExtra,
             },
           });
-          
-          
-          
-          
-          
-          
-          
+
           const incomingEffect = await syncDraftIncomingToInventory(snapshot, updated);
           if (incomingEffect.failed > 0) {
             notifications.show({
@@ -778,10 +677,7 @@ export function GoodsReceiptFormPage() {
               autoClose: 8000,
             });
           }
-          
-          
-          
-          
+
           const itemDiff = diffItems(snapshot.items, items);
           const vendorDiff = diffVendor(snapshot, updated);
           snapshotRef.current = updated;
@@ -801,18 +697,12 @@ export function GoodsReceiptFormPage() {
           const newExtra: GoodsReceiptExtra = {
             createdBy: actor,
             lastUpdatedBy: actor,
-            
-            
+
             assignedTo: values.assignedTo.trim() || undefined,
-            
-            
-            
+
             ...(copyFrom ? { copyFromId: copyFrom.sourceId } : {}),
           };
-          
-          
-          
-          
+
           const today = businessDateString();
           const todaysReceipts = await cMngtConnector.queryGoodsReceipts<GoodsReceiptExtra>({
             fromPeriod: today,
@@ -836,10 +726,7 @@ export function GoodsReceiptFormPage() {
             extra: newExtra,
           });
           invalidateCache();
-          
-          
-          
-          
+
           const incomingEffect = await syncDraftIncomingToInventory(null, res.goodsReceipt);
           if (incomingEffect.failed > 0) {
             notifications.show({
@@ -852,8 +739,7 @@ export function GoodsReceiptFormPage() {
               autoClose: 8000,
             });
           }
-          
-          
+
           logActivity('goodsReceipt.create', res.goodsReceipt.id, {
             receiptNumber: res.goodsReceipt.receiptNumber,
             ...vendorMemo(res.goodsReceipt),
@@ -892,8 +778,7 @@ export function GoodsReceiptFormPage() {
   );
 
   if (fetching) return null;
-  
-  
+
   if (isMobile) return null;
 
   const pageTitle = isEdit ? t('goodsReceipts.editItem') : t('goodsReceipts.addItem');

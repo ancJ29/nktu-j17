@@ -1,5 +1,3 @@
-
-
 export type PasteClipboard = {
   getData(type: string): string;
   files?: ArrayLike<File> | null;
@@ -35,9 +33,7 @@ export function clipboardImageFiles(
   if (intoTextEntry && clipboard.getData('text/plain').trim() !== '') return [];
 
   const fromFiles = Array.from(clipboard.files ?? []);
-  
-  
-  
+
   const candidates = fromFiles.length
     ? fromFiles
     : Array.from(clipboard.items ?? [])

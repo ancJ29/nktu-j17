@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
@@ -49,15 +47,13 @@ function readCustomerCodes(c: string[] | string | undefined): string[] {
 type TransportOrderUrlState = {
   q?: string;
   s?: string[];
-  
+
   c?: string[];
   tk?: string;
-  
+
   tt?: string;
   dv?: string;
-  
-  
-  
+
   sh?: TransportOrderShipmentType;
   cz?: string;
   hc?: boolean;
@@ -70,11 +66,9 @@ type TransportOrderUrlState = {
 function compactState(state: TransportOrderUrlState): TransportOrderUrlState {
   const r: TransportOrderUrlState = {};
   if (state.q) r.q = state.q;
-  
-  
+
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
-  
-  
+
   const customerCodes = readCustomerCodes(state.c);
   if (customerCodes.length > 0) r.c = customerCodes;
   if (state.tk) r.tk = state.tk;
@@ -92,7 +86,7 @@ function compactState(state: TransportOrderUrlState): TransportOrderUrlState {
 
 export function useTransportOrderListFilters(
   storeOrders: TransportOrder[],
-  
+
   defaultDateRangeDays: number,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<TransportOrderUrlState>({
@@ -100,22 +94,12 @@ export function useTransportOrderListFilters(
     compactState,
   });
 
-  
-  
-  
-  
-  
-  
-  
   const truckTypeOf = useTruckTypeOf();
 
-  
   const search = state.q ?? '';
-  
-  
+
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
-  
-  
+
   const customerFilter = useMemo(() => readCustomerCodes(state.c), [state.c]);
   const truckFilter = state.tk ?? null;
   const truckTypeFilter = state.tt ?? null;
@@ -131,13 +115,11 @@ export function useTransportOrderListFilters(
   );
   const entryDateRange = useMemo(() => restoreDateRange(state.ed, EMPTY_DATE_RANGE), [state.ed]);
 
-  
   const setSearch = useCallback(
     (v: string) => updateState({ q: v || undefined, pg: undefined }),
     [updateState],
   );
-  
-  
+
   const setStatusFilter = useCallback(
     (v: string[]) => updateState({ s: v, pg: undefined }),
     [updateState],
@@ -180,9 +162,6 @@ export function useTransportOrderListFilters(
     [updateState],
   );
 
-  
-  
-  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({ cd: serializeDateRange(ensureValidDateRange(next)), pg: undefined }),
@@ -193,14 +172,12 @@ export function useTransportOrderListFilters(
     [updateState],
   );
 
-  
   const allOrders = useMemo(() => {
     const filtered = storeOrders.filter((o) => {
       if (o.extra?.isDeleted) return false;
       if (hideCancelled && o.extra?.cancellation) return false;
       if (statusFilter.length > 0 && !statusFilter.includes(o.status)) return false;
-      
-      
+
       if (customerFilter.length > 0 && !(o.customerCode && customerFilter.includes(o.customerCode)))
         return false;
       if (truckFilter && !usesTruck(o, truckFilter)) return false;
@@ -217,15 +194,6 @@ export function useTransportOrderListFilters(
     const [field, dir] = sortField.split('_') as [string, string];
     const mult = dir === 'asc' ? 1 : -1;
     return filtered.sort((a, b) => {
-      
-      
-      
-      
-      
-      
-      
-      
-      
       if (field === 'entryDate') {
         const diff = orderPlanSortKey(a) - orderPlanSortKey(b);
         return diff === 0 ? 0 : diff < 0 ? -mult : mult;
@@ -248,15 +216,11 @@ export function useTransportOrderListFilters(
     sortField,
   ]);
 
-  
-  
   const statusFilterIsDefault = useMemo(
     () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
   );
 
-  
-  
   const hasActiveFilters = !!(
     !statusFilterIsDefault ||
     customerFilter.length > 0 ||
@@ -275,7 +239,7 @@ export function useTransportOrderListFilters(
     setSearch,
     statusFilter,
     setStatusFilter,
-    
+
     statusFilterIsDefault,
     customerFilter,
     setCustomerFilter,

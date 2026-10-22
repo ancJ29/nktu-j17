@@ -1,5 +1,3 @@
-
-
 import type { Employee, OdometerLog, OdometerOtherCost } from '@/types';
 import type { PhotoEntry } from '@/components/ImageUploadPanel';
 
@@ -136,9 +134,9 @@ export type ComplianceRow = {
   employeeId: string;
   employeeName: string;
   cells: ComplianceCell[];
-  
+
   missingCount: number;
-  
+
   spentTotal: number;
 };
 
@@ -186,11 +184,7 @@ export function previousReading(logs: OdometerLog[], log: OdometerLog): Odometer
   return liveLogs(logs)
     .filter(
       (l) =>
-        readEmployeeId(l) === owner &&
-        l.recordDate < log.recordDate &&
-        
-        
-        readKm(l) !== undefined,
+        readEmployeeId(l) === owner && l.recordDate < log.recordDate && readKm(l) !== undefined,
     )
     .sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
 }

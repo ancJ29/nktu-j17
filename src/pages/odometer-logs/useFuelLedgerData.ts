@@ -11,7 +11,6 @@ import { dayToDate, FUEL_LEDGER_FLOOR } from './fuelLedgerModel';
 export type LedgerData = { logs: OdometerLog[]; payments: OdometerFuelPayment[] };
 
 export type FuelLedgerSource = {
-  
   data: LedgerData | null;
   resets: OdometerFuelReset[];
   resetsError: boolean;
@@ -35,12 +34,9 @@ export function useFuelLedgerData(enabled: boolean): FuelLedgerSource {
   }, [enabled, resetsInitialized, resetsError, loadResets]);
 
   useEffect(() => {
-    
-    
     if (!enabled || !resetsInitialized) return;
     let cancelled = false;
-    
-    
+
     const from = dayToDate(FUEL_LEDGER_FLOOR);
     const to = new Date();
     Promise.all([

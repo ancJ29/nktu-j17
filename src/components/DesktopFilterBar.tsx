@@ -14,15 +14,15 @@ export type SelectFilter = {
   onChange: (value: string | null) => void;
   data: ComboboxData;
   placeholder: string;
-  
+
   title?: string;
-  
+
   visible?: boolean;
-  
+
   searchable?: boolean;
-  
+
   w?: number;
-  
+
   multi?: false;
 };
 
@@ -41,19 +41,19 @@ type DesktopFilterBarProps = {
   search: string;
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
-  
+
   status?: FilterStatus;
   onStatusChange?: (value: FilterStatus) => void;
-  
+
   statusLabels?: { all: string; active: string; inactive: string };
-  
+
   hideStatus?: boolean;
-  
+
   filters?: (SelectFilter | MultiSelectFilter)[];
-  
+
   moreSection?: ReactNode;
   onClear: () => void;
-  
+
   hasActiveFilters?: boolean;
 };
 
@@ -76,16 +76,11 @@ export function DesktopFilterBar({
   const hasActiveFilters =
     hasActiveFiltersProp ??
     (!!search ||
-      
-      
-      
       (!hideStatus && (status ?? 'all') !== 'all') ||
       filters?.some((f) =>
         f.multi ? f.value.length > 0 : f.value !== null && f.value !== 'all',
       ) === true);
 
-  
-  
   const handleCopyLink = useCopyLink();
 
   const [counter, setCounter] = useState(0);
@@ -96,13 +91,6 @@ export function DesktopFilterBar({
           of a wide screen is cheap, and the input is what anchors this bar's
           layout (`flex: 1`) — dropping it would leave the selects adrift. */}
       <SearchInput
-        
-        
-        
-        
-        
-        
-        
         key={counter}
         placeholder={searchPlaceholder}
         leftSection={<IconSearch size={16} />}

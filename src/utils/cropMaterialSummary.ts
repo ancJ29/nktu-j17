@@ -2,11 +2,11 @@ import type { CropDiaryEntry, MaterialLine } from '@/types';
 
 export type CropMaterialTotal = {
   materialCode: string;
-  
+
   unit?: string;
-  
+
   quantity?: number;
-  
+
   lineCount: number;
 };
 

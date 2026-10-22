@@ -1,5 +1,3 @@
-
-
 import { Group, Stack, Text, Tooltip } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { formatNumber } from '@/utils/number';
@@ -10,13 +8,11 @@ export function LineStockCell({
   orderedQuantity,
 }: {
   readonly stock: LineStock | null;
-  
+
   readonly orderedQuantity?: number;
 }) {
   const { t } = useTranslation();
 
-  
-  
   if (!stock) {
     return (
       <Text size="sm" ta="right" c="dimmed" title={t('salesOrdersV2.form.availableUnknown')}>
@@ -26,7 +22,7 @@ export function LineStockCell({
   }
 
   const short = orderedQuantity === undefined ? 0 : orderedQuantity - stock.available;
-  
+
   const hasMovements = stock.incoming !== 0 || stock.outgoing !== 0;
 
   return (

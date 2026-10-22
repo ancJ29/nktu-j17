@@ -1,5 +1,3 @@
-
-
 import { SimpleGrid, Stack, Text, TextInput } from '@mantine/core';
 import { LOGO_FIELDS, type LogoField } from './logoFields';
 

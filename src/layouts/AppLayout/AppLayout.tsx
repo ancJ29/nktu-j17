@@ -7,16 +7,10 @@ import { MobileAppLayout } from './MobileAppLayout';
 import { PCAppLayout } from './PCAppLayout';
 
 export function AppLayout() {
-  
-  
-  
   useInventoryAutoRevalidate();
-  
-  
+
   useV2RegisterSync();
 
-  
-  
   useProfileLoadWatchdog();
 
   return (

@@ -1,5 +1,3 @@
-
-
 import { Alert, Badge, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +10,6 @@ export type ConfigErrorBlock = {
 };
 
 export type ModuleChrome<Status extends string> = {
-  
   StatusBadge: (props: { readonly status: Status }) => React.ReactNode;
   ConfigAlerts: () => React.ReactNode;
 };

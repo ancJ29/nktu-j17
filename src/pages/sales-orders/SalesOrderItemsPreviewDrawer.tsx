@@ -1,5 +1,3 @@
-
-
 import {
   Anchor,
   Card,
@@ -33,16 +31,15 @@ const deliveryEnabled = isDeliveryRequestsEnabled();
 const { resolveStatus, resolveDeliveryMethod, tagOptions } = salesOrderFieldOptions;
 
 type SalesOrderItemsPreviewDrawerProps = {
-  
   readonly order: SalesOrder | null;
   readonly onClose: () => void;
-  
+
   readonly customerName: string | undefined;
-  
+
   readonly linkedDRs: readonly DeliveryRequest[];
-  
+
   readonly drsLoaded: boolean;
-  
+
   readonly statusBadgeVariant: SalesOrderStatusBadgeVariant;
 };
 

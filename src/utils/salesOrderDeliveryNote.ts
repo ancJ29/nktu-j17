@@ -1,5 +1,3 @@
-
-
 import type { CompanyInfo } from '@/config/companyInfo';
 import type { SalesOrderPayment } from './salesOrderPricing';
 
@@ -10,7 +8,7 @@ export type DeliveryNoteOrientation = 'portrait' | 'landscape';
 export type DeliveryNotePrintOptions = {
   paperSize: DeliveryNotePaperSize;
   orientation: DeliveryNoteOrientation;
-  
+
   includePrice: boolean;
 };
 
@@ -21,9 +19,8 @@ export const DEFAULT_PRINT_OPTIONS: DeliveryNotePrintOptions = {
 };
 
 export type DeliveryNoteLine = {
-  
   name: string;
-  
+
   unit: string;
   quantity: number;
   unitPrice: number;
@@ -32,9 +29,9 @@ export type DeliveryNoteLine = {
 
 export type DeliveryNoteData = {
   seller: CompanyInfo;
-  
+
   orderNumber: string;
-  
+
   dateText: string;
   customer: {
     name: string;
@@ -42,23 +39,23 @@ export type DeliveryNoteData = {
     taxCode: string;
     phone: string;
   };
-  
+
   customerPONumber: string;
   payment: SalesOrderPayment;
   lines: DeliveryNoteLine[];
-  
+
   subtotal: number;
-  
+
   vatPercent: number;
-  
+
   vatAmount: number;
-  
+
   shippingFee: number;
-  
+
   grandTotal: number;
-  
+
   amountInWords: string;
-  
+
   note?: string;
 };
 
@@ -97,14 +94,11 @@ export function buildDeliveryNoteParts(
   const { paperSize, orientation, includePrice } = options;
   const docTitle = 'PHIẾU GIAO HÀNG';
 
-  
-  
   const isA5 = paperSize === 'A5';
   const marginMm = isA5 ? 10 : 12;
   const verticalMarginMm = isA5 ? 10 : 14;
   const baseFontPx = isA5 ? 11 : 13;
-  
-  
+
   const [shortSide, longSide] = PAPER_MM[paperSize];
   const pageWidthMm = orientation === 'landscape' ? longSide : shortSide;
   const contentWidthMm = pageWidthMm - marginMm * 2;
@@ -127,10 +121,6 @@ export function buildDeliveryNoteParts(
     )
     .join('');
 
-  
-  
-  
-  
   const shippingRow =
     includePrice && data.shippingFee > 0
       ? `

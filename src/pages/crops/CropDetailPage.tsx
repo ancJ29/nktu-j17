@@ -61,15 +61,12 @@ export function CropDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
-  
+
   const employees = useEmployeeStore((s) => s.items);
   const templates = useCropDiaryTemplateStore((s) => s.items);
   const templatesInitialized = useCropDiaryTemplateStore((s) => s.initialized);
   const loadTemplates = useCropDiaryTemplateStore((s) => s.loadAll);
 
-  
-  
-  
   const location = useLocation();
   const navState = location.state as {
     backTo?: string;
@@ -80,18 +77,12 @@ export function CropDetailPage() {
   const [crop, setCrop] = useState<Crop | null>(null);
   const [loading, setLoading] = useState(true);
   const [transitioning, setTransitioning] = useState(false);
-  
-  
+
   const [materialSummary, setMaterialSummary] = useState<CropMaterialTotal[]>([]);
-  
-  
+
   const [sheetTotals, setSheetTotals] = useState<SheetColumnTotal[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>('details');
 
-  
-  
-  
-  
   useEffect(() => {
     if (crop?.extra?.diaryTemplateCode && !templatesInitialized) void loadTemplates();
   }, [crop, templatesInitialized, loadTemplates]);
@@ -99,7 +90,7 @@ export function CropDetailPage() {
   useEffect(() => {
     if (!id) return;
     let cancelled = false;
-    
+
     setLoading(true);
     void fetchCropById(id)
       .then((c) => {
@@ -127,7 +118,7 @@ export function CropDetailPage() {
         } else {
           const archived = await harvestCrop(crop);
           notifications.show({ color: 'green', message: t('crops.notifications.harvestSuccess') });
-          
+
           navigate(ROUTES.CROPS.DETAIL.replace(':id', archived.id), { replace: true });
         }
       } catch (err) {
@@ -175,10 +166,6 @@ export function CropDetailPage() {
   const canPlant = canEdit && crop.status === 'planned';
   const canHarvest = canEdit && crop.status === 'growing';
 
-  
-  
-  
-  
   const diaryCropId = cropDiaryPartitionId(crop);
 
   const picEmployee = extra.picId ? employees.find((e) => e.id === extra.picId) : undefined;
@@ -187,7 +174,6 @@ export function CropDetailPage() {
     : undefined;
   const hasSeeds = typeof extra.numberOfSeeds === 'number';
 
-  
   const statbook = (
     <Group gap="xs" wrap={isMobile ? 'wrap' : 'nowrap'} style={{ flexShrink: 0 }}>
       <StatPill
@@ -200,7 +186,6 @@ export function CropDetailPage() {
     </Group>
   );
 
-  
   const infoCard = (
     <SectionCard icon={<IconInfoCircle size={14} />} title={t('crops.detail.infoTitle')}>
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
@@ -307,9 +292,6 @@ export function CropDetailPage() {
     </Grid>
   );
 
-  
-  
-  
   const tabbedBody = canViewDiary ? (
     <Tabs value={activeTab} onChange={setActiveTab}>
       <Tabs.List>

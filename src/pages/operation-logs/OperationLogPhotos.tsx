@@ -29,8 +29,7 @@ export function LogPhotoField({ photos, onChange, directory, label, marker, t }:
         uploadControl="button"
         uploadButtonLabel={t('operationLogs.photos.add')}
         images={photos}
-        
-        
+
         onChange={async (next) => onChange(next as OperationLogPhoto[])}
         imageDirectory={directory}
         buildFileName={buildUploadFileName}

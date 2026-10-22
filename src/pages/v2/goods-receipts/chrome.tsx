@@ -1,5 +1,3 @@
-
-
 import type { GoodsReceiptV2Status } from '@/types/goods-receipt-v2';
 import { createModuleChrome } from '../moduleChrome';
 import { goodsReceiptCustomFieldErrors } from './customFields';

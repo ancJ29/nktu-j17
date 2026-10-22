@@ -50,7 +50,6 @@ export function createGoodsReceiptModule(config: GoodsReceiptModuleConfig) {
   const { storage, serviceCode, keyPrefix = 'goods-receipts' } = config;
 
   return {
-    
     async getById(scope: string, id: string): Promise<GoodsReceipt | null> {
       const period = extractPeriodFromId(id);
       if (!period) return null;
@@ -65,7 +64,6 @@ export function createGoodsReceiptModule(config: GoodsReceiptModuleConfig) {
       return items.find((r) => r.id === id) ?? null;
     },
 
-    
     async create(scope: string, input: CreateGoodsReceiptInput): Promise<GoodsReceipt> {
       validateCreateInput(input);
       const period = getCurrentPeriod();
@@ -85,7 +83,6 @@ export function createGoodsReceiptModule(config: GoodsReceiptModuleConfig) {
       return receipt;
     },
 
-    
     async update(scope: string, id: string, input: UpdateGoodsReceiptInput): Promise<GoodsReceipt> {
       const period = extractPeriodFromId(id);
       if (!period) throw new NotFoundError('GoodsReceipt', id);
@@ -117,7 +114,6 @@ export function createGoodsReceiptModule(config: GoodsReceiptModuleConfig) {
       return updated;
     },
 
-    
     async query(scope: string, filter: GoodsReceiptFilter): Promise<GoodsReceipt[]> {
       let allReceipts: GoodsReceipt[];
 
@@ -144,7 +140,6 @@ export function createGoodsReceiptModule(config: GoodsReceiptModuleConfig) {
       return filterReceipts(allReceipts, filter);
     },
 
-    
     async querySync(
       scope: string,
       params: { fromPeriod: string; toPeriod: string; partitionHashes?: Record<string, string> },

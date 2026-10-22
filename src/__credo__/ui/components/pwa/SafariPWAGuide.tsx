@@ -36,7 +36,6 @@ export type SafariPWAGuideLabels = {
 };
 
 export type SafariPWAGuideProps = {
-  
   color?: string;
   labels?: Partial<SafariPWAGuideLabels>;
 };
@@ -71,7 +70,6 @@ export function SafariPWAGuide({ color, labels }: SafariPWAGuideProps) {
     }
   }, [dismissed]);
 
-  
   useEffect(() => {
     const handleToggle = () => {
       if (isSafari() && !isStandalone()) {

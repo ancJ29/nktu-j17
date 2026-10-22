@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -64,10 +62,9 @@ const buildChiHoSummarySheet = (
     customer,
     resolveFeeName,
   }: Pick<CustomerReportInput, 'seller' | 'customer' | 'resolveFeeName'>,
-  
+
   bucketOf: (label: string) => Type4Bucket,
 ): { ws: XLSX.WorkSheet; rowCount: number } => {
-  
   const entries = rows
     .map((order) => {
       const fees = readFeeLines(order).filter(
@@ -85,7 +82,6 @@ const buildChiHoSummarySheet = (
     })
     .filter((e) => e.count > 0);
 
-  
   const D_STT = 0;
   const D_DECL = 1;
   const D_SUPPLIER = 2;
@@ -96,51 +92,42 @@ const buildChiHoSummarySheet = (
   const D_DATE = 7;
   const colCount = D_DATE + 1;
   const lastCol = colCount - 1;
-  
+
   const MANUAL_COLS = [D_SUPPLIER, D_GOODS, D_DATE];
 
   const { aoa, merges, blankRow, banner } = createSheetWriter(colCount);
 
-  
   const rSeller = banner(seller.name);
   banner(seller.address);
   banner(`MST: ${seller.taxCode}`);
   const rDivider = banner('----------------o0o----------------');
   const rTitle = banner('TỔNG HỢP CHI PHÍ CHI HỘ');
-  
+
   const rNumber = banner(`Số:  - VH/${batchYear(rows)}`);
   blankRow();
   const rDear = banner(`Kính gửi: ${customer.name}`);
   blankRow();
 
-  
   const rHead = aoa.length;
   const head: CellValue[] = new Array(colCount).fill('');
   head[D_STT] = 'Số TT';
   head[D_DECL] = 'Số tờ khai';
   head[D_SUPPLIER] = 'Tên hàng/ Nhà cung cấp';
-  
-  
+
   head[D_QTY] = "Số lượng (Cont 20')";
   head[D_PRICE] = 'Đơn giá (VND)';
   head[D_DESC] = 'Diễn giải';
   head[D_GOODS] = 'Tên hàng';
-  
-  
+
   aoa.push(head);
 
-  
   let total = 0;
   const rFirstData = aoa.length;
   entries.forEach(({ order, amount, labels }, i) => {
     const row: CellValue[] = new Array(colCount).fill('');
     row[D_STT] = i + 1;
     row[D_DECL] = order.declarationNumber ?? '';
-    
-    
-    
-    
-    
+
     row[D_QTY] = 1;
     row[D_PRICE] = amount;
     row[D_DESC] = labels;
@@ -149,7 +136,6 @@ const buildChiHoSummarySheet = (
   });
   const rLastData = aoa.length - 1;
 
-  
   const rSubtotal = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -165,7 +151,6 @@ const buildChiHoSummarySheet = (
     aoa.push(row);
   }
 
-  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = [
@@ -185,8 +170,6 @@ const buildChiHoSummarySheet = (
   setStyle(rDivider, 0, { alignment: { horizontal: 'center' } });
   setStyle(rNumber, 0, { alignment: { horizontal: 'center' } });
 
-  
-  
   styleHeaderBand([rHead], lastCol, (c) => (MANUAL_COLS.includes(c) ? MANUAL_FILL : HEADER_FILL));
 
   for (let r = rFirstData; r <= rLastData; r++) {
@@ -213,10 +196,7 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   {
     seller,
     customer,
-    
-    
-    
-    
+
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -226,12 +206,11 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
 
   const bucketOf = feeBucketReader(resolveFeeName);
 
-  
   const splitMoney = (o: TransportOrder) => {
     let freight = 0;
     let surcharge = 0;
     for (const f of readFeeLines(o)) {
-      if (!isBillableFee(f)) continue; 
+      if (!isBillableFee(f)) continue;
       const amount = (f as TransportOrderFee).amount || 0;
       const bucket = bucketOf(f.label);
       if (bucket === 'freight') freight += amount;
@@ -240,7 +219,6 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     return { freight, surcharge, total: freight + surcharge };
   };
 
-  
   const C_STT = 0;
   const C_DATE = 1;
   const C_TRUCK = 2;
@@ -259,14 +237,12 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   const sheet = createSheetWriter(colCount);
   const { aoa, merges } = sheet;
 
-  
   const letterheadRows = sheet.letterhead(
     seller,
     customer,
     bangKeTitle(titleSuffix, bangKePeriodLabel(rows)),
   );
 
-  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
 
   leaf(C_STT, 'STT');
@@ -282,7 +258,6 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   leaf(C_SURCHARGE, 'PHỤ PHÍ');
   leaf(C_TOTAL, 'TỔNG THÀNH TIỀN');
 
-  
   const truckLabel = truckLabeler(getTruckPlate);
 
   let sumFreight = 0;
@@ -294,15 +269,11 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     row[C_STT] = i + 1;
     row[C_DATE] = formatDate(orderPlanDate(o));
     row[C_TRUCK] = joinedPlates(o, truckLabel);
-    
-    
+
     row[C_FROM] = o.route?.pickup ?? '';
     row[C_TO] = o.route?.stuffing ?? '';
     row[C_DROP] = o.route?.dropoff ?? '';
-    
-    
-    
-    
+
     row[C_DECL] = o.declarationNumber ?? '';
     row[C_CONT] = o.containerNumber ?? '';
     const s = sizeBucketIndex(readTruckingSize(o));
@@ -322,7 +293,6 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   });
   const rLastData = aoa.length - 1;
 
-  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -336,10 +306,8 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
     aoa.push(row);
   }
 
-  
   const signature = sheet.signatureRow(customer.name, seller.name);
 
-  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -378,7 +346,6 @@ export const buildCustomerReportType4: CustomerReportBuilder = (
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, ws, 'BẢNG KÊ');
 
-  
   const chiHo = buildChiHoSummarySheet(rows, { seller, customer, resolveFeeName }, bucketOf);
   if (chiHo.rowCount > 0) {
     XLSX.utils.book_append_sheet(workbook, chiHo.ws, 'TỔNG HỢP CHI PHÍ CHI HỘ');

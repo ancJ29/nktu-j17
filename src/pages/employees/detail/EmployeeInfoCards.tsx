@@ -1,5 +1,3 @@
-
-
 import { Box, Group, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core';
 import { IconClock, IconNote, IconPhone, IconUser } from '@tabler/icons-react';
 import {
@@ -61,10 +59,6 @@ export function EmployeePersonalCard({
 }: PersonalCardProps) {
   const { t } = useTranslation();
 
-  
-  
-  
-  
   const loginIdentifier = employee.email ?? '';
   const loginIdentifierField = (
     <InlineTextField

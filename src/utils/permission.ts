@@ -422,18 +422,18 @@ export function createOptionLabelResolver(options: { value: string; label: strin
 export type ResolvedStatusOption = {
   value: string;
   label: string;
-  
+
   actionLabel: string;
   color: string;
-  
+
   icon?: string;
-  
+
   stage?: 'DRAFT' | 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'EXCEPTIONAL';
-  
+
   capabilities?: { id: string; config?: unknown }[];
-  
+
   allowedDepartments?: string[];
-  
+
   isInitial?: boolean;
   terminal?: boolean;
   locked?: boolean;
@@ -576,17 +576,13 @@ export const perms = {
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
   })(),
-  
-  
-  
+
   quotation: (() => {
     let cached: ModulePermissions | undefined;
     const resolve = () => (cached ??= getModulePermissions('quotation'));
     return {
       ...createModulePerms('quotation'),
-      
-      
-      
+
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
@@ -598,10 +594,7 @@ export const perms = {
       ...createModulePerms('deliveryRequest'),
       canManagePhotos: () => resolve().actions?.canManagePhotos ?? false,
       canReorder: () => resolve().actions?.canReorder ?? false,
-      
-      
-      
-      
+
       canConfirmDelivered: () => resolve().actions?.canConfirmDelivered ?? false,
       canCancel: () => resolve().actions?.canCancel ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
@@ -624,18 +617,14 @@ export const perms = {
       ...createModulePerms('transportOrder'),
       canTransitionStatus: () => resolve().actions?.canTransitionStatus ?? false,
       canCancel: () => resolve().actions?.canCancel ?? false,
-      
-      
-      
+
       canViewPrice: () => resolve().actions?.canViewPrice ?? false,
       canExport: () => resolve().actions?.canExport ?? false,
     };
   })(),
-  
-  
+
   transportRoute: createModulePerms('transportRoute'),
-  
-  
+
   costNorm: createModulePerms('costNorm'),
   location: createModulePerms('location'),
   warehouseReceipt: createModulePerms('warehouseReceipt'),
@@ -645,13 +634,9 @@ export const perms = {
     const resolve = () => (cached ??= getModulePermissions('truck'));
     return {
       ...createModulePerms('truck'),
-      
-      
+
       canExport: () => resolve().actions?.canExport ?? false,
-      
-      
-      
-      
+
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
@@ -676,14 +661,13 @@ export const perms = {
     return {
       ...createModulePerms('odometerLog'),
       canManagePayment: () => resolve().actions?.canManagePayment ?? false,
-      
-      
+
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
   })(),
   lookupV2: createModulePerms('lookupV2'),
-  
+
   report: createModulePerms('report'),
   permissionManagement: (() => {
     let cached: ModulePermissions | undefined;
@@ -704,7 +688,6 @@ export function buildEffectivePermissions(
   employeePerms: PartialPermissions | undefined | null,
   versions: { cfg?: string; emp?: string },
 ): Permissions {
-  
   const deptOption = departmentValue
     ? departmentOptions.find((d) => d.value === departmentValue)
     : undefined;
@@ -716,7 +699,6 @@ export function buildEffectivePermissions(
     employee: employeePerms,
   });
 
-  
   cacheSet('prm', effective);
   cacheSet('prv', versions);
 

@@ -9,7 +9,7 @@ export const CROP_RECORD_TARGET = { entity: 'crop', uniqueField: 'code' } as con
 
 export const useCropStore = createSingleRecordsStore<Crop>({
   ...CROP_RECORD_TARGET,
-  
+
   cacheKey: 'crp2.b3d9e1',
   cacheTTL: 10 * ONE_MINUTE,
 });
@@ -30,7 +30,7 @@ function enumerateMonths(fromPeriod: string, toPeriod: string): string[] {
   const keys: string[] = [];
   let y = fy;
   let m = fm;
-  
+
   while ((y < ty || (y === ty && m <= tm)) && keys.length < 240) {
     keys.push(`${y}-${String(m).padStart(2, '0')}`);
     m += 1;
@@ -51,8 +51,7 @@ export async function queryHarvestedCrops(
   const res = await cMngtConnector.queryPartitionedRecordsSync(CROP_ARCHIVE_TARGET, {
     partitionKeys: keys,
   });
-  
-  
+
   let crops: Crop[] = res.changed ? (Object.values(res.updated).flat() as Crop[]) : [];
   if (opts?.greenhouseCode) {
     crops = crops.filter((c) => c.greenhouseCode === opts.greenhouseCode);
@@ -65,7 +64,7 @@ export async function queryHarvestedCrops(
       );
     }
   }
-  
+
   return crops.sort((a, b) => (b.harvestedAt ?? 0) - (a.harvestedAt ?? 0));
 }
 
@@ -136,9 +135,6 @@ export async function harvestCrop(crop: Crop): Promise<Crop> {
     const r = await cMngtConnector.createPartitionedRecord(CROP_ARCHIVE_TARGET, { item });
     archived = r.item as Crop;
   } catch (err) {
-    
-    
-    
     if (!isDuplicateCropCodeError(err)) throw err;
   }
 

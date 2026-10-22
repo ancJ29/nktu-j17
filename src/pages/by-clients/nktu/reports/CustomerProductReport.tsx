@@ -123,9 +123,9 @@ function RankBar({ pct }: { pct: number }) {
 interface BreakdownRow {
   key: string;
   name: string;
-  
+
   sub?: string;
-  
+
   unit?: string;
   qty: number;
   amount: number;
@@ -142,10 +142,7 @@ export default function CustomerProductReport({ data }: { data: CustomerProductR
 
   const entries: (CustomerEntry | ProductEntry)[] =
     pivot === 'customer' ? data.customers : data.products;
-  
-  
-  
-  
+
   const selected = entries.find((e) => e.key === picked[pivot]) ?? entries[0];
   const selectedKey = selected?.key ?? null;
 

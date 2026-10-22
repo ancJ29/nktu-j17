@@ -1,5 +1,3 @@
-
-
 import type { CredoAppConfig } from '../schema';
 
 export const LOGO_FIELDS = [
@@ -49,9 +47,7 @@ export const applyLogos = (
 ): CredoAppConfig['app'] => {
   const app = {
     ...(storedApp ?? {}),
-    
-    
-    
+
     name: storedApp?.name ?? fallbackName,
   } satisfies CredoAppConfig['app'];
   for (const field of LOGO_FIELDS) {

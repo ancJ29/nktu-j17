@@ -1,12 +1,9 @@
-
-
 import { entityCacheClear, entityCacheGet, entityCacheSet } from '@/utils/entityCache';
 import type { CredoSmeGetMeResponse } from '@credo/connectors/types';
 
 const CACHE_KEY = 'prf';
 
 type CachedProfile = {
-  
   a: string;
   d: CredoSmeGetMeResponse;
   t: number;
@@ -19,8 +16,6 @@ export async function readCachedProfile(handle: string): Promise<CredoSmeGetMeRe
     if (!entry || entry.a !== handle) return null;
     return entry.d ?? null;
   } catch {
-    
-    
     return null;
   }
 }

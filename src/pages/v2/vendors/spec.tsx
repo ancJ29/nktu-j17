@@ -105,7 +105,6 @@ export const VENDOR_V2_SPEC: MasterDataSpec<VendorV2Row, VendorV2FormValues> = {
     ],
   },
 
-  
   mobile: { Card: VendorV2MobileCard },
 
   useHeaderText: useVendorV2HeaderText,

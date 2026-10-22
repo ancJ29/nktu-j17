@@ -23,7 +23,7 @@ export function useVendorV2Columns(
               key: 'vendorType',
               width: '160px',
               header: t('vendorsV2.form.vendorType'),
-              
+
               render: (item: VendorV2Row) => (
                 <ColorBadge label={lookupLabelOf(typeLabels, item.extra?.vendorType)} size="sm" />
               ),

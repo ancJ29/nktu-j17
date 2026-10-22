@@ -1,5 +1,3 @@
-
-
 import { useMemo } from 'react';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -14,19 +12,9 @@ export function useMyEmployee(): Employee | undefined {
   return useMemo(() => {
     const id = myInformation?.id;
     if (id) {
-      
       return (employees.find((e) => e.id === id) ?? myInformation) as Employee;
     }
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
     return email ? findEmployeeByLoginEmail(employees, email) : undefined;
   }, [myInformation, email, employees]);
 }

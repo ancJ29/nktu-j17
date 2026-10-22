@@ -1,4 +1,3 @@
-
 import type { TransportOrder } from '@/types';
 
 export type TruckTypeResolver = (truckId: string | undefined | null) => string | undefined;

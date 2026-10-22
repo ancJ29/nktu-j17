@@ -1,24 +1,22 @@
 import { useEffect, useRef, useState } from 'react';
 
 type UsePullToRefreshOptions = {
-  
   onRefresh: () => void | Promise<void>;
-  
+
   enabled?: boolean;
-  
+
   threshold?: number;
-  
+
   maxPull?: number;
-  
+
   resistance?: number;
 };
 
 type UsePullToRefreshState = {
-  
   pullDistance: number;
-  
+
   isRefreshing: boolean;
-  
+
   isPulling: boolean;
 };
 
@@ -32,7 +30,6 @@ export function usePullToRefresh({
   const [pullDistance, setPullDistance] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  
   const onRefreshRef = useRef(onRefresh);
   useEffect(() => {
     onRefreshRef.current = onRefresh;
@@ -40,7 +37,7 @@ export function usePullToRefresh({
 
   useEffect(() => {
     if (!enabled) return;
-    
+
     if (typeof window === 'undefined' || !('ontouchstart' in window)) return;
 
     let startY: number | null = null;
@@ -76,8 +73,6 @@ export function usePullToRefresh({
       if (startY == null || refreshing) return;
       const dy = e.touches[0].clientY - startY;
 
-      
-      
       if (dy <= 0 || !atTop()) {
         if (pulling) {
           distance = 0;
@@ -89,7 +84,7 @@ export function usePullToRefresh({
       }
 
       pulling = true;
-      
+
       if (e.cancelable) e.preventDefault();
       distance = Math.min(maxPull, dy * resistance);
       schedule();
@@ -100,7 +95,7 @@ export function usePullToRefresh({
       startY = e.touches[0].clientY;
       distance = 0;
       pulling = false;
-      
+
       window.addEventListener('touchmove', onTouchMove, { passive: false });
     };
 
@@ -112,15 +107,13 @@ export function usePullToRefresh({
         refreshing = true;
         startY = null;
         pulling = false;
-        distance = threshold; 
+        distance = threshold;
         setIsRefreshing(true);
         setPullDistance(threshold);
         Promise.resolve()
           .then(() => onRefreshRef.current())
           .catch(() => {})
           .finally(() => {
-            
-            
             refreshing = false;
             setIsRefreshing(false);
             reset();

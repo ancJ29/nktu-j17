@@ -1,5 +1,3 @@
-
-
 import {
   Alert,
   Button,
@@ -25,7 +23,7 @@ type EditProps = {
   readonly note: DeliveryNoteV2;
   readonly day: string;
   readonly onClose: () => void;
-  
+
   readonly onSaved: (next: DeliveryNoteV2) => void;
 };
 
@@ -39,10 +37,7 @@ export function DeliveryNoteV2EditModal({
     <Modal
       opened={opened}
       onClose={rest.onClose}
-      
-      
-      
-      
+
       title={`${t('deliveryNotesV2.editItem')} · ${note.noteNumber}`}
       centered
       size="lg"
@@ -75,9 +70,6 @@ function EditForm({ note, day, onClose, onSaved }: EditProps) {
     void loadEmployees();
   }, [loadEmployees]);
 
-  
-  
-  
   const linesFrozen = note.items.some((line) => line.reducedQuantity > 0);
 
   const employeeOptions = useMemo(
@@ -90,9 +82,6 @@ function EditForm({ note, day, onClose, onSaved }: EditProps) {
   const save = async () => {
     setSaving(true);
     try {
-      
-      
-      
       const next = await updateDeliveryNoteV2(note, day, {
         deliveryType,
         assignedTo: deliveryType === 'internal' ? (assignedTo ?? null) : null,

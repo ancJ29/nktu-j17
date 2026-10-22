@@ -29,7 +29,7 @@ type EmployeeDataTableProps = {
   readonly isLoading?: boolean;
   readonly resolveDepartment?: (value: string | undefined | null) => string;
   readonly resolvePosition?: (value: string | undefined | null) => string;
-  
+
   readonly viewportRef?: React.Ref<HTMLDivElement>;
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
@@ -119,9 +119,7 @@ export function EmployeeDataTable({
             const work = emp.phone?.trim() || '';
             const personal = emp.extra?.personalPhoneNumber?.trim() || '';
             if (!work && !personal) return <Text size="sm">-</Text>;
-            
-            
-            
+
             const showLabels = !!work && !!personal;
             return (
               <Stack gap={2}>

@@ -1,12 +1,10 @@
-
-
 import { LOOKUP_V2_CATEGORIES } from '@/pages/v2/lookup/categoryRegistry';
 import type { CredoAppConfig } from '../schema';
 import { mergeFeature } from './featureMerge';
 
 export type LookupsV2Form = {
   enabled: boolean;
-  
+
   enabledCategories: string[];
 };
 

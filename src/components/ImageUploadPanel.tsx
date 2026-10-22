@@ -59,39 +59,38 @@ export type PhotoEntry = {
   latitude?: number;
   longitude?: number;
   isDeleted?: boolean;
-  
+
   takenAtDelivery?: boolean;
 };
 
 type ImageUploadPanelProps = {
-  
   images: PhotoEntry[];
-  
+
   onChange: (images: PhotoEntry[]) => Promise<void>;
-  
+
   imageDirectory: string;
-  
+
   editable?: boolean;
-  
+
   maxFileSizeMB?: number;
-  
+
   compressTargetKB?: number;
-  
+
   marker: string;
-  
+
   currentUserId?: string;
   currentUserName?: string;
-  
+
   externalCamera?: boolean;
-  
+
   section?: 'all' | 'upload' | 'grid';
-  
+
   buildFileName?: (originalName: string) => string;
-  
+
   uploadControl?: 'auto' | 'button';
-  
+
   uploadButtonLabel?: string;
-  
+
   onRetryPending?: () => void | Promise<void>;
 };
 
@@ -101,8 +100,7 @@ const pasteStack: symbol[] = [];
 
 function usePendingPhotoPreviews(photos: PhotoEntry[]): Record<string, string> {
   const [previews, setPreviews] = useState<Record<string, string>>({});
-  
-  
+
   const pendingKey = photos
     .map((photo) => photo.url)
     .filter(isPendingPhotoUrl)
@@ -200,11 +198,7 @@ export function ImageUploadPanel({
       if (!validFiles.length) return;
 
       setUploading(true);
-      
-      
-      
-      
-      
+
       const newEntries: PhotoEntry[] = [];
       try {
         for (const rawFile of validFiles) {
@@ -233,7 +227,6 @@ export function ImageUploadPanel({
               ...(currentUserName && { userName: currentUserName }),
             });
           } catch {
-            
             notifications.show({
               color: 'red',
               message: t('photos.uploadError', { name: rawFile.name }),
@@ -249,9 +242,6 @@ export function ImageUploadPanel({
               message: t('photos.uploadSuccess', { count: newEntries.length }),
             });
           } catch {
-            
-            
-            
             notifications.show({
               color: 'red',
               title: t('photos.saveFailedTitle'),
@@ -278,7 +268,6 @@ export function ImageUploadPanel({
     ],
   );
 
-  
   const handleCapturedPhoto = useCallback(
     async (result: CaptureResult): Promise<boolean> => {
       const fileName = `photo-${Date.now()}.jpg`;
@@ -326,8 +315,7 @@ export function ImageUploadPanel({
             message: t('photos.saveFailed', { count: 1 }),
             autoClose: 10000,
           });
-          
-          
+
           return false;
         }
 
@@ -357,18 +345,13 @@ export function ImageUploadPanel({
       setDeleting(photo.url);
       try {
         const updated = images.map((p) => (p.url === photo.url ? { ...p, isDeleted: true } : p));
-        
-        
+
         await onChange(updated);
         const queueId = pendingPhotoId(photo.url);
-        
-        
-        
+
         if (queueId) void removePendingPhoto(queueId);
         else deleteMedia(photo.url);
       } catch {
-        
-        
         notifications.show({ color: 'red', message: t('photos.deleteError') });
       } finally {
         setDeleting(null);
@@ -377,7 +360,6 @@ export function ImageUploadPanel({
     [images, onChange, t],
   );
 
-  
   const visiblePhotos = images.filter((p) => !p.isDeleted);
   const pendingCount = visiblePhotos.filter((p) => isPendingPhotoUrl(p.url)).length;
   const pendingPreviews = usePendingPhotoPreviews(visiblePhotos);
@@ -401,9 +383,7 @@ export function ImageUploadPanel({
         notifications.show({ color: 'red', message: t('photos.saveToDeviceFailed') });
         return;
       }
-      
-      
-      
+
       const safeMarker = marker.replace(/[^a-zA-Z0-9._-]/g, '_') || 'photo';
       const result = await shareOrDownloadFile(
         entry.blob,
@@ -417,10 +397,6 @@ export function ImageUploadPanel({
     [marker, t],
   );
 
-  
-  
-  
-  
   const pasteActionRef = useRef<((files: File[]) => void) | null>(null);
   useEffect(() => {
     pasteActionRef.current = uploading ? null : (files: File[]) => void handleUpload(files);
@@ -438,9 +414,7 @@ export function ImageUploadPanel({
         intoTextEntry: isTextEntryTarget(event.target),
       });
       if (!files.length) return;
-      
-      
-      
+
       const upload = pasteActionRef.current;
       if (!upload) return;
       event.preventDefault();
@@ -455,8 +429,6 @@ export function ImageUploadPanel({
     };
   }, [pasteEnabled]);
 
-  
-  
   const handlePreview = (photo: PhotoEntry, src?: string) => {
     setPreviewUrl(src ?? photo.url);
     openPreview();
@@ -806,14 +778,14 @@ export type CaptureResult = {
 type CameraCaptureProps = {
   opened: boolean;
   onClose: () => void;
-  
+
   onCapture: (result: CaptureResult) => Promise<boolean>;
   uploading: boolean;
   marker: string;
   userName?: string;
-  
+
   compressTargetKB?: number;
-  
+
   t: (key: any) => string;
 };
 
@@ -867,7 +839,6 @@ function drawOverlay(ctx: CanvasRenderingContext2D, canvas: HTMLCanvasElement, l
   const maxWidth = Math.max(...lines.map((l) => ctx.measureText(l).width));
   const totalHeight = lines.length * lineHeight + padding * 2;
 
-  
   const x = padding;
   const y = canvas.height - totalHeight - padding;
 
@@ -896,11 +867,7 @@ function compressImage(
 ): Promise<string> {
   return new Promise((resolve) => {
     const img = document.createElement('img');
-    
-    
-    
-    
-    
+
     let settled = false;
     const finish = (value: string) => {
       if (settled) return;
@@ -918,7 +885,6 @@ function compressImage(
         return;
       }
 
-      
       let { width, height } = img;
       const max = Math.max(width, height);
       if (max > maxDim) {
@@ -931,12 +897,10 @@ function compressImage(
       canvas.height = height;
       ctx.drawImage(img, 0, 0, width, height);
 
-      
       const targetBytes = targetKB * 1024;
       let quality = 0.85;
       let result = canvas.toDataURL('image/jpeg', quality);
 
-      
       while (result.length * 0.75 > targetBytes && quality > minQuality) {
         quality -= 0.05;
         result = canvas.toDataURL('image/jpeg', quality);
@@ -1022,10 +986,8 @@ export function CameraCapture({
     }
   }, [stream]);
 
-  
   useEffect(() => {
     if (opened && viewMode === 'camera') {
-      
       startCamera();
     }
     return () => {
@@ -1034,7 +996,6 @@ export function CameraCapture({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, viewMode]);
 
-  
   const captureMetaRef = useRef<Omit<CaptureResult, 'base64'>>({ timestamp: 0 });
 
   const capturePhoto = useCallback(async () => {
@@ -1052,13 +1013,11 @@ export function CameraCapture({
     const now = new Date();
     const timestamp = now.getTime();
 
-    
     const overlayLines: string[] = [];
     if (marker) overlayLines.push(marker);
     if (userName) overlayLines.push(userName);
     overlayLines.push(now.toLocaleString());
 
-    
     let location: string | undefined;
     let latitude: number | undefined;
     let longitude: number | undefined;
@@ -1070,7 +1029,7 @@ export function CameraCapture({
         latitude = coords.latitude;
         longitude = coords.longitude;
         location = await reverseGeocode(latitude, longitude);
-        
+
         if (location) {
           let line = '';
           let count = 0;
@@ -1097,7 +1056,6 @@ export function CameraCapture({
     const base64 =
       compressTargetKB > 0 ? await compressImage(raw, { targetKB: compressTargetKB }) : raw;
 
-    
     captureMetaRef.current = { timestamp, location, latitude, longitude };
 
     setCapturedPhoto(base64);
@@ -1142,11 +1100,9 @@ export function CameraCapture({
         ...captureMetaRef.current,
       });
     } catch {
-      
       accepted = false;
     }
-    
-    
+
     if (!accepted) return;
     setCapturedPhoto(null);
     setViewMode('camera');

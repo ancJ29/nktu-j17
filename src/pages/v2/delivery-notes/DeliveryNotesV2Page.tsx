@@ -1,5 +1,3 @@
-
-
 import { Group, Stack, Text } from '@mantine/core';
 import type { DataTableColumn } from '@credo/base-ui/components';
 import { useCallback, useMemo, useState } from 'react';
@@ -54,7 +52,6 @@ export function DeliveryNotesV2Page() {
   const forceRefresh = useDeliveryNoteV2Store((s) => s.forceRefresh);
   const cachedAt = useDeliveryNoteV2Store((s) => s.cachedAt);
 
-  
   const myEmployeeId = useAuthStore((s) => s.user?.myInformation?.id ?? '');
 
   const scrollViewportRef = useListScrollRestoration(ROUTES.DELIVERY_NOTES_V2.LIST);
@@ -77,10 +74,8 @@ export function DeliveryNotesV2Page() {
     [setMulti],
   );
 
-  
   const [mineOnly, setMineOnly] = useState(false);
 
-  
   const matches = useCallback(
     (note: DeliveryNoteV2, needle: string) =>
       [
@@ -101,9 +96,6 @@ export function DeliveryNotesV2Page() {
     const needle = search.trim().toLowerCase();
     return notes.filter(
       (note) =>
-        
-        
-        
         (note.derivativesPending === true ||
           statuses.length === 0 ||
           statuses.includes(note.status)) &&
@@ -111,7 +103,6 @@ export function DeliveryNotesV2Page() {
         (!mineOnly || (myEmployeeId !== '' && note.assignedTo === myEmployeeId)) &&
         (assigneeIds.length === 0 ||
           (note.assignedTo !== undefined && assigneeIds.includes(note.assignedTo))) &&
-        
         inDayRange(anchorDayOf(note.deliveryDate, note.createdAt), anchorRange) &&
         (needle === '' || matches(note, needle)),
     );
@@ -127,13 +118,11 @@ export function DeliveryNotesV2Page() {
     matches,
   ]);
 
-  
   const assigneeLabel = useCallback(
     (id: string) => notes.find((note) => note.assignedTo === id)?.assignedToName ?? id,
     [notes],
   );
 
-  
   const { paginated, totalItems, hasMore, loadMore } = useListFilter(filtered, {
     shouldPagination: false,
     lazyKey: ROUTES.DELIVERY_NOTES_V2.LIST,
@@ -168,9 +157,6 @@ export function DeliveryNotesV2Page() {
         render: (row) => t(`deliveryNotesV2.deliveryType.${row.deliveryType}`),
       },
       {
-        
-        
-        
         key: 'assignedToName',
         header: t('deliveryNotesV2.columns.assignedTo'),
         render: (row) => row.assignedToName ?? row.carrier ?? '—',
@@ -287,7 +273,6 @@ export function DeliveryNotesV2Page() {
     mineOnly ||
     !dateIsDefault;
 
-  
   const clearAll = useCallback(() => {
     filters.clearFilters();
     setMineOnly(false);

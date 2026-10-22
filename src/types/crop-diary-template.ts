@@ -2,13 +2,12 @@ import type { SingleRecordRow } from '@/stores/createSingleRecordsStore';
 import type { CropProcessPlan } from './crop-sheet';
 
 export type CropDiaryTemplateExtra = {
-  
   description?: string;
-  
+
   plan?: CropProcessPlan;
-  
+
   isDeleted?: boolean;
-  
+
   copyFromId?: string;
   [key: string]: unknown;
 };
@@ -24,8 +23,8 @@ export type CropDiaryTemplate = SingleRecordRow & {
 export type CropDiaryTemplateCopyFrom = Pick<CropDiaryTemplate, 'name'> & {
   description?: string;
   plan: CropProcessPlan;
-  
+
   sourceId: string;
-  
+
   sourceCode: string;
 };

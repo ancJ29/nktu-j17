@@ -1,5 +1,3 @@
-
-
 export { activityLoggerConnector } from './__internal__/activity-logger';
 export { activityLoggerV2Connector } from './__internal__/activity-logger-v2';
 export { cMngtConnector } from './__internal__/c-mngt';

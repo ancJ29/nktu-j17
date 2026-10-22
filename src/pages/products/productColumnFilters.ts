@@ -1,13 +1,10 @@
-
-
 import type { ColumnFilterDef, DataTableColumnFilterLabels } from '@credo/base-ui/hooks';
 
 import type { Product } from '@/types';
 
 type BuildArgs = {
-  
   readonly onHandByCode?: ReadonlyMap<string, number>;
-  
+
   readonly priceVisible: boolean;
   readonly inventoryEnabled: boolean;
   readonly labels: DataTableColumnFilterLabels;
@@ -32,9 +29,7 @@ export function buildProductColumnFilterDefs({
   return [
     {
       key: 'name',
-      
-      
-      
+
       getValue: (p) => p.name,
       labels,
     },
@@ -49,8 +44,7 @@ export function buildProductColumnFilterDefs({
       ? [
           {
             key: 'onHand',
-            
-            
+
             getValue: (p: Product) => numeric(onHandByCode?.get(p.code) ?? 0),
             getLabel: formatNumber,
             labels,

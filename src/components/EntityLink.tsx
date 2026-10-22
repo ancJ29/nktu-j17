@@ -12,16 +12,16 @@ export function EntityDash({ size }: { size: LinkSize }) {
 
 type EntityChipProps = {
   size: LinkSize;
-  
+
   lead?: ReactNode;
   label: ReactNode;
-  
+
   color?: string;
-  
+
   gap?: number;
-  
+
   monospace?: boolean;
-  
+
   sub?: ReactNode;
 };
 
@@ -51,7 +51,7 @@ export function EntityChip({ size, lead, label, color, gap = 6, monospace, sub }
 type EntityAnchorProps = {
   to: string;
   size: LinkSize;
-  
+
   anchorColor?: string;
   children: ReactNode;
 };

@@ -1,4 +1,3 @@
-
 import {
   ActionIcon,
   Alert,
@@ -62,7 +61,7 @@ type NormRow = {
   truckType: string;
   label: string;
   norm: FuelNormRow | undefined;
-  
+
   orphaned: boolean;
 };
 
@@ -82,9 +81,6 @@ export function CostNormPage() {
   const loadPrices = useFuelPriceStore((s) => s.loadAll);
   const createPrice = useFuelPriceStore((s) => s.createSafely);
 
-  
-  
-  
   const routesInit = useTransportRouteStore((s) => s.initialized);
   const loadRoutes = useTransportRouteStore((s) => s.loadAll);
 
@@ -97,7 +93,6 @@ export function CostNormPage() {
   const truckTypeOptions = useTruckTypeOptions();
   const today = todayInVnDateString();
 
-  
   const history = useMemo(() => sortFuelPriceHistory(priceItems), [priceItems]);
   const current = useMemo(() => resolveCurrentFuelPrice(priceItems, today), [priceItems, today]);
 
@@ -113,7 +108,6 @@ export function CostNormPage() {
     },
   });
 
-  
   const affectedRouteCodes = useCallback((): string[] => {
     const normByType = new Map(
       useFuelNormStore
@@ -129,9 +123,6 @@ export function CostNormPage() {
   }, []);
 
   const openPriceModal = useCallback(() => {
-    
-    
-    
     priceForm.setValues({ price: current?.price ?? 0, effectiveDate: today, notes: '' });
     priceForm.resetDirty();
     priceModalHandlers.open();
@@ -142,9 +133,6 @@ export function CostNormPage() {
     async (values: PriceFormValues) => {
       setSaving(true);
       try {
-        
-        
-        
         const stamp = buildUpdatedByStamp(getCurrentEmployeeStamp(), useAuthStore.getState().user);
         const notes = values.notes.trim();
         const affected = affectedRouteCodes();
@@ -155,19 +143,14 @@ export function CostNormPage() {
             extra: {
               ...stamp,
               ...(notes ? { notes } : {}),
-              
-              
-              
+
               affectedRouteCodes: affected,
             },
           },
         });
         notifications.show({
           color: 'green',
-          
-          
-          
-          
+
           message: affected.length
             ? t('costNorms.notifications.priceSavedAffecting', { count: affected.length })
             : t('costNorms.notifications.priceSaved'),
@@ -183,7 +166,6 @@ export function CostNormPage() {
     [createPrice, t, priceModalHandlers, affectedRouteCodes],
   );
 
-  
   const normRows = useMemo<NormRow[]>(() => {
     const live = normItems.filter((n) => !n.extra?.isDeleted);
     const byType = new Map(live.map((n) => [n.truckType, n]));
@@ -193,8 +175,7 @@ export function CostNormPage() {
       norm: byType.get(opt.value),
       orphaned: false,
     }));
-    
-    
+
     const known = new Set(rows.map((r) => r.truckType));
     for (const norm of live) {
       if (known.has(norm.truckType)) continue;
@@ -203,7 +184,6 @@ export function CostNormPage() {
     return rows;
   }, [normItems, truckTypeOptions]);
 
-  
   const [editingType, setEditingType] = useState<string | null>(null);
   const [draftNorm, setDraftNorm] = useState<number>(0);
 
@@ -221,8 +201,7 @@ export function CostNormPage() {
           await updateNorm({
             id: row.norm.id,
             version: row.norm.version,
-            
-            
+
             patch: {
               litersPer100km: value,
               extra: { ...row.norm.extra, ...stamp },

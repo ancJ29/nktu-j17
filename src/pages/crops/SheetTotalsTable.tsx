@@ -30,7 +30,6 @@ export function SheetTotalsTable({ totals }: Props) {
     return (code: string) => byCode.get(code) ?? code;
   }, [materials]);
 
-  
   const splitColumns = useMemo(() => {
     const seen = new Set<string>();
     const split = new Set<string>();

@@ -193,8 +193,6 @@ export function VendorForm({ variant }: VendorFormProps) {
             ...(p.deliveryHours.trim() ? { deliveryHours: p.deliveryHours.trim() } : {}),
           }));
 
-        
-        
         const extra: VendorExtra = {
           ...prevExtra,
           shortName: values.shortName.trim() || undefined,
@@ -241,9 +239,6 @@ export function VendorForm({ variant }: VendorFormProps) {
           });
           navigate(ROUTES.VENDORS.DETAIL.replace(':id', id));
         } else {
-          
-          
-          
           const created = await useVendorStore.getState().createSafely({
             patch: { ...basePatch, extra },
           });
@@ -280,8 +275,6 @@ export function VendorForm({ variant }: VendorFormProps) {
 
   if (fetching) return null;
 
-  
-  
   const topActions = isMobile ? null : (
     <Group gap="sm">
       <Button
@@ -330,8 +323,6 @@ export function VendorForm({ variant }: VendorFormProps) {
     </SectionCard>
   );
 
-  
-  
   const statusCard = (
     <SectionCard
       icon={<IconAdjustments size={14} />}
@@ -340,9 +331,6 @@ export function VendorForm({ variant }: VendorFormProps) {
     >
       <Stack gap="md">
         {variant.originField.kind === 'select' ? (
-          
-          
-          
           <Select
             label={t('vendors.form.originLabel')}
             allowDeselect={false}

@@ -31,7 +31,7 @@ export function useMaterialV2Columns(
               key: 'category',
               width: '160px',
               header: t('materialsV2.form.category'),
-              
+
               render: (item: MaterialV2Row) => (
                 <ColorBadge label={lookupLabelOf(categoryLabels, item.extra?.category)} size="sm" />
               ),
@@ -44,7 +44,7 @@ export function useMaterialV2Columns(
               byItemId,
               header: t('inventoryV2.columnHeader'),
               forecastLabel: t('inventoryV2.forecastTooltip'),
-              
+
               unitOf: (m) =>
                 m.extra?.units?.[0] ? lookupLabelOf(unitLabels, m.extra.units[0]) : undefined,
             }),

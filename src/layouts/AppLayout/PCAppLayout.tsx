@@ -44,27 +44,17 @@ const logoSrc =
 export function PCAppLayout() {
   const { t, i18n } = useTranslation();
   const { user, loadProfile, isProfileLoaded } = useAuthStore();
-  
-  
-  
-  
+
   const signedIn = isSignedIn();
-  
-  
+
   const employee = useMyEmployee();
   const name = employee?.name || user?.name || '';
   const profileImage = hasAvatar ? employee?.extra?.profileImage : undefined;
 
-  
-  
   useLanguageSync({ isProfileLoaded });
   const { isRoot } = useCurrentEmployee({ isProfileLoaded, email: user?.email });
   const { navbarOpened, toggleNavbar } = useNavbarSync({ isProfileLoaded });
 
-  
-  
-  
-  
   const pcNavigation = useMemo(
     () =>
       stripNavItemsForViewer(
@@ -75,9 +65,6 @@ export function PCAppLayout() {
     [isRoot, employee?.department, employee?.id],
   );
 
-  
-  
-  
   const avatarNode = useMemo(() => {
     const inner = <EmployeeAvatar name={name} imageUrl={profileImage} />;
     if (!isRoot) return inner;
@@ -88,8 +75,6 @@ export function PCAppLayout() {
     );
   }, [isRoot, name, profileImage]);
 
-  
-  
   const handleLanguageChange = useCallback(
     async (languageCode: string) => {
       sharedUserStorage.set(SharedStorageKey.LANGUAGE, languageCode);
@@ -111,15 +96,11 @@ export function PCAppLayout() {
     }
   }, [signedIn, isProfileLoaded, loadProfile]);
 
-  
-  
-  
   const handleRefresh = useCallback(() => {
     cacheFlush();
     reloadPage('manual refresh');
   }, []);
 
-  
   const showInstallApp = useMemo(
     () => !window.matchMedia('(display-mode: standalone)').matches,
     [],
@@ -129,15 +110,10 @@ export function PCAppLayout() {
     window.dispatchEvent(new Event('toggle-pwa-guide'));
   }, []);
 
-  
-  
   const clearCache = useClearCacheConfirm();
 
   return (
     <PCAppLayoutUI
-      
-      
-      
       navigation={pcNavigation as CredoNavigationItem[]}
       getNavLabel={getNavLabel}
       appName={appBrand.name}

@@ -11,22 +11,20 @@ export type { DataTableColumnFilterConfig, DataTableColumnFilterLabels };
 export const COLUMN_FILTER_BLANK = '\u0000blank';
 
 export type ColumnFilterDef<T> = {
-  
   key: string;
-  
+
   getValue: (item: T) => string | string[] | null | undefined;
-  
+
   getLabel?: (value: string) => string;
-  
+
   blankLabel?: string;
-  
+
   labels?: DataTableColumnFilterLabels;
 };
 
 export type ColumnFilterValues = Record<string, string[]>;
 
 type UseColumnFiltersOptions = {
-  
   value?: ColumnFilterValues;
   onChange?: (next: ColumnFilterValues) => void;
 };
@@ -67,9 +65,6 @@ export function useColumnFilters<T>(
     for (const def of defs) {
       const counts = new Map<string, number>();
       for (const item of source) {
-        
-        
-        
         const passesOthers = defs.every(
           (other) => other.key === def.key || matches(other, item, values[other.key] ?? EMPTY),
         );
@@ -79,8 +74,6 @@ export function useColumnFilters<T>(
         }
       }
 
-      
-      
       for (const value of values[def.key] ?? EMPTY) {
         if (!counts.has(value)) counts.set(value, 0);
       }
@@ -95,9 +88,7 @@ export function useColumnFilters<T>(
         .sort((a, b) => {
           if (a.value === COLUMN_FILTER_BLANK) return 1;
           if (b.value === COLUMN_FILTER_BLANK) return -1;
-          
-          
-          
+
           const left = Number(a.value);
           const right = Number(b.value);
           if (Number.isFinite(left) && Number.isFinite(right)) return left - right;
@@ -111,8 +102,7 @@ export function useColumnFilters<T>(
   const setColumnValues = useCallback(
     (key: string, next: string[]) => {
       const merged = { ...values };
-      
-      
+
       if (next.length > 0) merged[key] = next;
       else delete merged[key];
       setValues(merged);
@@ -166,7 +156,6 @@ export function parseColumnFilters(raw: string | undefined | null): ColumnFilter
     }
     return result;
   } catch {
-    
     return {};
   }
 }

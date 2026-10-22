@@ -1,5 +1,3 @@
-
-
 import { DeliveryRequestForm } from './DeliveryRequestForm';
 import { DEFAULT_DELIVERY_REQUEST_VARIANT } from './deliveryRequestVariant';
 

@@ -1,5 +1,3 @@
-
-
 import { Badge } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { InventorySecondaryStatus } from '@/types';
@@ -12,7 +10,7 @@ const STATUS_COLOR: Record<InventorySecondaryStatus, string> = {
 
 type Props = {
   readonly status: InventorySecondaryStatus;
-  
+
   readonly size?: 'xs' | 'sm' | 'md';
 };
 

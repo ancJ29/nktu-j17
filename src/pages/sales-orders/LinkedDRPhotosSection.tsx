@@ -9,7 +9,6 @@ import { ROUTES } from '@/constants/routes';
 import { ImageUploadPanel } from '@/components/ImageUploadPanel';
 
 type Props = {
-  
   ids: ReadonlyArray<string>;
 };
 
@@ -20,13 +19,10 @@ export function LinkedDRPhotosSection({ ids }: Props) {
   const [drs, setDRs] = useState<DeliveryRequest[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  
-  
   const idsKey = useMemo(() => Array.from(new Set(ids)).sort().join(','), [ids]);
 
   useEffect(() => {
     if (!idsKey) {
-      
       setDRs([]);
       return;
     }

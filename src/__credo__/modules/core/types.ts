@@ -1,4 +1,3 @@
-
 export interface StorageAdapter {
   getRecord<T = unknown>(serviceCode: string, key: string): Promise<T | null>;
 

@@ -7,14 +7,13 @@ export interface CreateProductInput<TExtra = Record<string, unknown>> {
   unit: string;
   price: number;
   extra?: TExtra;
-  
+
   expectedListHash?: string;
 }
 
 export interface UpdateProductInput<TExtra = Record<string, unknown>> {
-  
   version?: string;
-  
+
   expectedListHash?: string;
   name?: string;
   code?: string;

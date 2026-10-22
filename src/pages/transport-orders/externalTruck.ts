@@ -1,5 +1,3 @@
-
-
 type VehicleRef = {
   truckId?: string | null;
   truckPlate?: string | null;

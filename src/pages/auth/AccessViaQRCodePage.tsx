@@ -1,5 +1,3 @@
-
-
 import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -39,9 +37,6 @@ export function AccessViaQRCodePage() {
       setIsLoading(true);
       setError(undefined);
 
-      
-      
-      
       const unwrapped = unwrapLoginToken(rawToken);
       if (!unwrapped || unwrapped.expired) {
         setError(unwrapped ? t('auth.magicLink.linkExpired') : t('auth.magicLink.invalidQrCode'));
@@ -57,7 +52,7 @@ export function AccessViaQRCodePage() {
         if (result.success) {
           markPendingLogin('qr');
           markPostLoginReloads();
-          
+
           cacheFlush();
           sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
           setVerificationSuccess(true);
@@ -72,9 +67,7 @@ export function AccessViaQRCodePage() {
       }
 
       sessionStorage.removeItem(MAGIC_LINK_STORAGE_KEY);
-      
-      
-      
+
       navigate(ROUTES.AUTH.LOGIN_VIA_QR_CODE, { replace: true });
       setIsLoading(false);
       verificationInProgress.current = false;
@@ -82,15 +75,13 @@ export function AccessViaQRCodePage() {
     [loginWithToken, navigate, t],
   );
 
-  
-  
   useEffect(() => {
     if (verificationInProgress.current) return;
 
     const tokenFromUrl = searchParams.get('token');
     if (tokenFromUrl) {
       sessionStorage.setItem(MAGIC_LINK_STORAGE_KEY, JSON.stringify({ token: tokenFromUrl }));
-      
+
       void verifyToken(tokenFromUrl);
       return;
     }

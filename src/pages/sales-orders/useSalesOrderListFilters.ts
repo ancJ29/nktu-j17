@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { serializeColumnFilters, type ColumnFilterValues } from '@credo/base-ui/hooks';
 import { type DateRangeValue } from '@/types/date-range';
@@ -63,8 +61,7 @@ const KEEP_ON_CLEAR: readonly (keyof SalesOrderUrlState)[] = ['v'];
 
 function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   const r: SalesOrderUrlState = {};
-  
-  
+
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.c) r.c = state.c;
   if (state.f) r.f = state.f;
@@ -82,9 +79,9 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
 
 export function useSalesOrderListFilters(
   storeOrders: SalesOrder[],
-  
+
   defaultDateRangeDays?: number,
-  
+
   internalDeliveryFirstSort = false,
 ) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<SalesOrderUrlState>({
@@ -92,8 +89,7 @@ export function useSalesOrderListFilters(
     compactState,
     keepOnClear: KEEP_ON_CLEAR,
   });
-  
-  
+
   const customers = useCustomerStore((s) => s.items);
   const employees = useEmployeeStore((s) => s.items);
   const sortLookups = useMemo(() => {
@@ -112,9 +108,6 @@ export function useSalesOrderListFilters(
     };
   }, [customers, employees]);
 
-  
-  
-  
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
@@ -131,10 +124,6 @@ export function useSalesOrderListFilters(
   const page = state.pg ?? DEFAULT_PAGE;
   const view: SalesOrderListView = state.v ?? 'ops';
 
-  
-  
-  
-  
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
@@ -169,10 +158,6 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
-  
-  
-  
-  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({
@@ -193,8 +178,6 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
-  
-  
   const setColumnFilters = useCallback(
     (values: ColumnFilterValues) =>
       updateState({ cf: serializeColumnFilters(values) || undefined, pg: undefined }),
@@ -206,24 +189,18 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
-  
   const setView = useCallback(
     (value: SalesOrderListView) => updateState({ v: value === 'ops' ? undefined : value }),
     [updateState],
   );
 
-  
   const allOrders = useMemo(() => {
     const filtered = storeOrders.filter((o) => {
       if (statusFilter.length > 0 && !statusFilter.includes(o.extra?.status ?? '')) return false;
       if (customerFilter && o.extra?.customerCode !== customerFilter) return false;
       if (staffFilter && o.extra?.assignedStaff !== staffFilter) return false;
       if (urgentOnly && !o.extra?.isUrgent) return false;
-      
-      
-      
-      
-      
+
       if (!isInDateRange(getSalesOrderReadyDate(o), createdDateRange)) return false;
       if (
         deliveryDateRange.preset &&
@@ -231,10 +208,7 @@ export function useSalesOrderListFilters(
         !isInDateRange(o.extra.deliveryDate, deliveryDateRange)
       )
         return false;
-      
-      
-      
-      
+
       if (deliveryKind === 'internal' && o.extra?.isInternalDelivery === false) return false;
       if (deliveryKind === 'external' && o.extra?.isInternalDelivery !== false) return false;
       return true;
@@ -257,9 +231,6 @@ export function useSalesOrderListFilters(
     sortLookups,
   ]);
 
-  
-  
-  
   const statusFilterIsDefault = useMemo(
     () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
@@ -277,10 +248,9 @@ export function useSalesOrderListFilters(
   );
 
   return {
-    
     statusFilter,
     setStatusFilter,
-    
+
     statusFilterIsDefault,
     customerFilter,
     setCustomerFilter,
@@ -298,20 +268,18 @@ export function useSalesOrderListFilters(
     setDeliveryDateRange,
     deliveryKind,
     setDeliveryKind,
-    
+
     columnFilters,
     setColumnFilters,
     page,
     setPage,
-    
+
     view,
     setView,
 
-    
     allOrders,
     hasActiveFilters,
 
-    
     clearFilters,
   };
 }

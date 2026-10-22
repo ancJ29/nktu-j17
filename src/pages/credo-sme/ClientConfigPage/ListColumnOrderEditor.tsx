@@ -1,5 +1,3 @@
-
-
 import { ActionIcon, Badge, Button, Card, Group, Input, Stack, Text } from '@mantine/core';
 import { IconChevronDown, IconChevronUp, IconPlus, IconX } from '@tabler/icons-react';
 

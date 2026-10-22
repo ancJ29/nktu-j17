@@ -1,5 +1,3 @@
-
-
 import type { GoodsReceiptItem } from '@/types';
 
 export type DeltaByUnit = Record<string, number>;

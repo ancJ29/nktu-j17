@@ -1,5 +1,3 @@
-
-
 import * as XLSX from 'xlsx-js-style';
 import type { TransportOrder, TransportOrderFee } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
@@ -89,7 +87,7 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
     seller,
     customer,
     resolveShipmentType,
-    
+
     resolveFeeName,
     getTruckPlate,
     titleSuffix,
@@ -102,7 +100,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
   const isMooc = (label: string) =>
     moocKeys.has(feeKey(label)) || moocKeys.has(feeKey(resolveFeeName(label)));
 
-  
   const readMoney = (o: TransportOrder) => {
     const service = new Map<Type10FeeColumn, number>();
     const chiHo: TransportOrderFee[] = [];
@@ -134,7 +131,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
   const vatHeader =
     uniformRate && uniformRate > 0 ? `VAT ${Number((uniformRate * 100).toFixed(2))}%` : 'VAT';
 
-  
   const C_STT = 0;
   const C_DATE = 1;
   const C_PICKUP_DATE = 2;
@@ -171,7 +167,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
   const sheet = createSheetWriter(colCount);
   const { aoa, merges, blankRow, banner } = sheet;
 
-  
   const rSeller = banner(seller.name);
   banner(seller.address);
   banner(`MST: ${seller.taxCode}`);
@@ -182,7 +177,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
   banner(`MST: ${customer.taxCode ?? ''}`);
   blankRow();
 
-  
   const { rHead1, rHead2, leaf, group } = sheet.headerBand();
   leaf(C_STT, 'STT');
   leaf(C_DATE, 'NGÀY V/C');
@@ -207,7 +201,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
     Array.from({ length: groups }, () => [...CHI_HO_GROUP_HEADERS]).flat(),
   );
 
-  
   const sums = new Map<number, number>();
   const sizeCounts = SIZE_BUCKETS.map(() => 0);
 
@@ -226,7 +219,7 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
       row[C_PICKUP_DATE] = formatDate(requestedPickupDate);
     }
     if (typeof dropoffDate === 'string' && dropoffDate) row[C_DROP_DATE] = formatDate(dropoffDate);
-    
+
     if (typeof moocStorageDays === 'number') row[C_MOOC_DAYS] = moocStorageDays;
     row[C_ORDER_NO] = o.extra?.customerOrderNumber ?? '';
     row[C_TRUCK] = joinedPlates(o, truckLabel);
@@ -260,7 +253,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
   });
   const rLastData = aoa.length - 1;
 
-  
   const rTotalRow = aoa.length;
   {
     const row: CellValue[] = new Array(colCount).fill('');
@@ -273,14 +265,13 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
     merges.push({ s: { r: rTotalRow, c: C_STT }, e: { r: rTotalRow, c: C_CONT } });
   }
 
-  
   blankRow();
   const C_SUMMARY_LABEL = C_VAT - 1;
   const C_NOTE_END = C_SUMMARY_LABEL - 1;
   const service = sums.get(C_TOTAL) ?? 0;
   const chiHo = chiHoAmountCols.reduce((sum, c) => sum + (sums.get(c) ?? 0), 0);
   const mooc = sums.get(C_MOOC) ?? 0;
-  
+
   const summary = [
     { label: 'Số tiền cước vận chuyển:', value: service, note: '(Đã bao gồm VAT)' },
     { label: 'Số tiền chi hộ', value: chiHo, note: '(Đã bao gồm VAT)' },
@@ -313,7 +304,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
 
   const signature = sheet.signatureRow(customer.name, seller.name);
 
-  
   const ws = XLSX.utils.aoa_to_sheet(aoa);
   ws['!merges'] = merges;
   ws['!cols'] = Array.from({ length: colCount }, (_, c) => {
@@ -361,8 +351,6 @@ export const buildCustomerReportType10: CustomerReportBuilder = (
   for (const c of chiHoAmountCols) setStyle(rTotalRow, c, { fill: CHI_HO_TOTAL_FILL });
   setStyle(rFooter, C_DATE, { font: { bold: true, italic: true } });
 
-  
-  
   const ref = (r: number, c: number) => XLSX.utils.encode_cell({ r, c });
   const formulas = [
     ref(rTotalRow, C_TOTAL),

@@ -1,5 +1,3 @@
-
-
 import { activityLoggerV2Connector } from '@credo/connectors/connector';
 import { resolveClientCode } from '@/config/client-code';
 import { logActivity } from '@/utils/activityLogger';
@@ -80,11 +78,10 @@ export function shipRowsAt(
 }
 
 export type FoundEntries = {
-  
   status: ReadonlySet<number>;
-  
+
   ship: ReadonlySet<string>;
-  
+
   untimedShip: ReadonlySet<string>;
 };
 
@@ -96,9 +93,8 @@ type Resend = {
 };
 
 export type PlatformLogSweepPlan = {
-  
   extra: SalesOrderExtra;
-  
+
   resend: Resend[];
 };
 
@@ -194,7 +190,7 @@ function createHistoryReader(): HistoryReader {
       state = { entries: [], reached: Infinity, done: false };
       read.set(targetId, state);
     }
-    
+
     while (!state.done && !(state.reached < since)) {
       const page = await activityLoggerV2Connector.getByTarget({
         targetId,

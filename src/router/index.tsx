@@ -651,9 +651,7 @@ const truckAssetDetailRoutes: RouteObject[] = [
 const odometerLogRoutes: RouteObject[] = [
   {
     path: ROUTES.ODOMETER_LOGS.LIST,
-    
-    
-    
+
     element: gatedComponent(
       { enabled: odometerLogEnabled, requires: odometerLogGate.view },
       OdometerLogListPage,
@@ -926,8 +924,7 @@ const deliveryRequestDetailRoutes: RouteObject[] = [
     element: gatedComponent(
       {
         enabled: deliveryRequestsEnabled,
-        
-        
+
         requires: byClient({ nktu: () => true }, deliveryRequestGate.view),
       },
       DeliveryRequestDetailPage,
@@ -1076,12 +1073,9 @@ const transportOrderDetailRoutes: RouteObject[] = [
 const router = createBrowserRouter([
   {
     element: <BaseLayout />,
-    
-    
-    
+
     errorElement: <RouteErrorState />,
     children: [
-      
       {
         element: <AppLayout />,
         children: [
@@ -1095,12 +1089,6 @@ const router = createBrowserRouter([
           ...transportRouteRoutes,
           ...costNormRoutes,
           {
-            
-            
-            
-            
-            
-            
             path: ROUTES.LOOKUPS_V2.LIST,
             element: gatedComponent(
               { enabled: lookupV2Enabled, requires: lookupV2Gate.view },
@@ -1108,18 +1096,13 @@ const router = createBrowserRouter([
             ),
           },
           {
-            
-            
             path: ROUTES.VENDORS_V2.LIST,
             element: gatedComponent(
               { enabled: vendorsV2Enabled, requires: vendorGate.view },
               VendorsV2Page,
             ),
           },
-          
-          
-          
-          
+
           {
             path: ROUTES.VENDORS_V2.NEW,
             element: gatedComponent(
@@ -1141,8 +1124,7 @@ const router = createBrowserRouter([
               VendorV2DetailPage,
             ),
           },
-          
-          
+
           {
             path: ROUTES.CUSTOMERS_V2.LIST,
             element: gatedComponent(
@@ -1283,8 +1265,7 @@ const router = createBrowserRouter([
               SalesOrderV2DetailPage,
             ),
           },
-          
-          
+
           {
             path: ROUTES.DELIVERY_NOTES_V2.LIST,
             element: gatedComponent(
@@ -1339,7 +1320,7 @@ const router = createBrowserRouter([
           },
         ],
       },
-      
+
       {
         element: <AppDetailLayout />,
         children: [
@@ -1364,9 +1345,7 @@ const router = createBrowserRouter([
           ...goodsReceiptDetailRoutes,
         ],
       },
-      
-      
-      
+
       { path: ROUTES.AUTH.LOGOUT, element: <LogoutPage /> },
       {
         element: <GuestLayout />,
@@ -1379,18 +1358,11 @@ const router = createBrowserRouter([
       },
     ],
   },
-  
-  
+
   { path: ROUTES.SYSTEM_ADMIN, element: <SystemAdminPage /> },
-  
-  
-  
-  
-  
-  
-  
+
   { path: ROUTES.CREDO_SME.CLIENT_CONFIG, element: <ClientConfigPage /> },
-  
+
   { path: ROUTES.ERROR, element: <ErrorPage /> },
   { path: ROUTES.FORBIDDEN, element: <ForbiddenPage /> },
   { path: ROUTES.NOT_FOUND, element: <NotFoundPage /> },

@@ -9,21 +9,21 @@ import { forecastOf, stockLevelOf } from './stockLevel';
 export function inventoryV2Column<Row extends { id: string }>(config: {
   readonly byItemId: ReadonlyMap<string, InventoryV2Row>;
   readonly header: string;
-  
+
   readonly forecastLabel: string;
-  
+
   readonly minOf?: (row: Row) => number | undefined;
-  
+
   readonly alertsOffOf?: (row: Row) => boolean;
-  
+
   readonly alertsOffTooltip?: string;
-  
+
   readonly unitOf?: (row: Row) => string | undefined;
 }): DataTableColumn<Row> {
   const { byItemId, header, forecastLabel, minOf, alertsOffOf, alertsOffTooltip, unitOf } = config;
   return {
     key: 'onHand',
-    
+
     width: '160px',
     ta: 'right' as const,
     header,

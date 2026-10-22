@@ -66,7 +66,6 @@ export function reconcileTransitions<T extends { value: string }>(
 ): Record<string, string[]> {
   let working = transitions;
 
-  
   if (prevOpts.length === nextOpts.length) {
     const changed: number[] = [];
     for (let i = 0; i < nextOpts.length; i++) {
@@ -86,7 +85,6 @@ export function reconcileTransitions<T extends { value: string }>(
     }
   }
 
-  
   const valid = new Set(nextOpts.map((o) => o.value).filter(Boolean));
   const pruned: Record<string, string[]> = {};
   for (const [from, tos] of Object.entries(working)) {

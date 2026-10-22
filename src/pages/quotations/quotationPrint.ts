@@ -1,5 +1,3 @@
-
-
 import { byClient } from '@/config/client';
 import type { CompanyInfo } from '@/config/companyInfo';
 import type { Orientation, PaperSize } from '@/utils/printDocument';
@@ -20,24 +18,23 @@ export const DEFAULT_QUOTATION_PRINT_OPTIONS: QuotationPrintOptions = {
 };
 
 export type QuotationPrintLine = {
-  
   name: string;
-  
+
   unit: string;
   quantity: number;
   unitPrice: number;
   lineTotal: number;
-  
+
   photoUrl?: string;
-  
+
   priceTiers?: { minQuantity: number; unitPrice: number }[];
 };
 
 export type QuotationPrintData = {
   seller: CompanyInfo;
-  
+
   code: string;
-  
+
   dateText: string;
   customer: {
     name: string;
@@ -46,21 +43,21 @@ export type QuotationPrintData = {
     phone: string;
   };
   lines: QuotationPrintLine[];
-  
+
   subtotal: number;
-  
+
   vatPercent: number;
-  
+
   vatAmount: number;
-  
+
   grandTotal: number;
-  
+
   amountInWords: string;
-  
+
   note?: string;
-  
+
   showPhoto?: boolean;
-  
+
   showVat?: boolean;
 };
 

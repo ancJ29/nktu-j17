@@ -8,18 +8,16 @@ type Option = {
 };
 
 type MobileFilterSelectCommonProps = {
-  
   showTitleInBar?: boolean;
-  
+
   displayValue?: string;
 };
 
 type MobileFilterSelectProps = MobileFilterSelectCommonProps & {
-  
   title: string;
-  
+
   value: string;
-  
+
   options: Option[];
   onChange: (value: string) => void;
   multi?: false;
@@ -65,10 +63,6 @@ export function MobileFilterSelect(props: MobileFilterSelectProps | MobileFilter
       : (options.find((o) => o.value === (props.value as string))?.label ??
         (props.value as string)));
 
-  
-  
-  
-  
   const isNarrowing = multi
     ? (props.value as string[]).length > 0
     : !!props.value && props.value !== 'all';
@@ -81,28 +75,22 @@ export function MobileFilterSelect(props: MobileFilterSelectProps | MobileFilter
     return optionValue === (props.value as string);
   };
 
-  
   const rows = Math.ceil(options.length / 2);
   const BUTTON_H = 36;
   const GAP = 12;
   const HEADER = 52;
-  const PADDING = 16 + 24; 
+  const PADDING = 16 + 24;
   const drawerHeight = HEADER + PADDING + rows * BUTTON_H + (rows - 1) * GAP;
 
   return (
     <>
       <Button
-        
-        
-        
-        
         variant={showTitleInBar && !isNarrowing ? 'default' : 'filled'}
         size="compact-sm"
         rightSection={<IconChevronDown size={14} opacity={0.6} />}
         onClick={open}
         style={{ flex: 1, minWidth: 0 }}
-        
-        
+
         styles={{ label: { flex: 1, minWidth: 0, overflow: 'hidden' } }}
       >
         {showTitleInBar ? (

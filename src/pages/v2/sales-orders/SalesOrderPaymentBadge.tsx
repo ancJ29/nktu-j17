@@ -1,5 +1,3 @@
-
-
 import { Badge } from '@mantine/core';
 import type { SalesOrderV2 } from '@/types/sales-order-v2';
 import { PAYMENT_COLORS, paymentStatusOf, useSalesOrderPaymentLabel } from './payment';

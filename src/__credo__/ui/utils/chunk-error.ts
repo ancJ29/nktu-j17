@@ -61,7 +61,6 @@ function recover(event: Event): boolean {
 
   logger.warn('[chunk-reload] dynamic import failed (stage', stage, ')', event);
 
-  
   const soon = (fn: () => void) => setTimeout(fn, 100);
 
   if (stage === 0) {
@@ -77,17 +76,11 @@ function recover(event: Event): boolean {
   }
 
   if (stage === 2) {
-    
-    
-    
     writeState({ stage: 3, at: now });
     soon(reloadCacheBusted);
     return true;
   }
 
-  
-  
-  
   logger.error('[chunk-reload] gave up after soft + hard + cache-busted reload; surfacing error');
   return false;
 }
@@ -100,9 +93,9 @@ export function isChunkLoadError(error: unknown): boolean {
         ? error
         : String(error ?? '');
   return (
-    /Failed to fetch dynamically imported module/i.test(message) || 
-    /error loading dynamically imported module/i.test(message) || 
-    /Importing a module script failed/i.test(message) || 
+    /Failed to fetch dynamically imported module/i.test(message) ||
+    /error loading dynamically imported module/i.test(message) ||
+    /Importing a module script failed/i.test(message) ||
     /Unable to preload CSS/i.test(message) // Vite's CSS preload helper
   );
 }
@@ -118,13 +111,6 @@ export function clearChunkReloadParam(): void {
 export function installChunkErrorReload(): void {
   if (typeof window === 'undefined') return;
   window.addEventListener('vite:preloadError', (event) => {
-    
-    
-    
-    
-    
-    
-    
     if (recover(event)) event.preventDefault();
   });
 }

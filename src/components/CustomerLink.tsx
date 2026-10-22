@@ -4,11 +4,10 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { EntityAnchor, EntityChip, EntityDash, LINK_ICON_SIZE, type LinkSize } from './EntityLink';
 
 type CustomerLinkProps = {
-  
   code?: string | null;
-  
+
   name?: string | null;
-  
+
   fallbackLabel?: string | null;
   size?: LinkSize;
 };
@@ -18,8 +17,7 @@ export function CustomerLink({ code, name, fallbackLabel, size = 'sm' }: Custome
 
   let displayName = name?.trim() || undefined;
   let detailId: string | undefined;
-  
-  
+
   if (!displayName && code) {
     const customer = getCustomerByCode(code);
     if (customer) {
@@ -27,8 +25,7 @@ export function CustomerLink({ code, name, fallbackLabel, size = 'sm' }: Custome
       detailId = customer.id;
     }
   }
-  
-  
+
   displayName ??= fallbackLabel?.trim() || undefined;
 
   if (!displayName) return <EntityDash size={size} />;

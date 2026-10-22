@@ -1,5 +1,3 @@
-
-
 import type { ResolvedStatusOption } from '@/utils/permission';
 import type { SalesOrder } from '@/types';
 import { businessDateString } from '@/utils/code';
@@ -20,13 +18,12 @@ const viNum = new Intl.NumberFormat('vi-VN');
 const METHOD_COLORS = ['primary', 'orange', 'teal', 'yellow', 'grape', 'cyan'];
 
 export interface SalesBuildDeps {
-  
   statusOptions: ResolvedStatusOption[];
-  
+
   employeeName: (id: string | undefined) => string | undefined;
-  
+
   methodLabel: (code: string | undefined) => string;
-  
+
   customerOf: (order: SalesOrder) => CustomerIdentity;
 }
 
@@ -72,8 +69,6 @@ export function buildSalesReport(
   const isCompleted = (o: SalesOrder) =>
     !isCancelled(o) && (o.isClosed || stageOf.get(o.extra?.status ?? '') === 'COMPLETED');
 
-  
-  
   const statusCounts = new Map<string, number>();
   let cancelledCount = 0;
   for (const o of orders) {
@@ -103,14 +98,12 @@ export function buildSalesReport(
       count: cancelledCount,
     });
 
-  
   const revenueOrders = orders.filter(isCompleted);
   const revenueOf = new Map(revenueOrders.map((o) => [o.id, orderRevenue(o)]));
   const totalRevenue = revenueOrders.reduce((a, o) => a + (revenueOf.get(o.id) ?? 0), 0);
   const orderCount = revenueOrders.length;
   const distinctCustomers = new Set(revenueOrders.map((o) => deps.customerOf(o).key)).size;
 
-  
   const perBucket = new Array<number>(period.buckets.length).fill(0);
   for (const o of revenueOrders) {
     const idx = period.bucketOf(salesOrderAnchorDate(o));
@@ -121,7 +114,6 @@ export function buildSalesReport(
     value: Math.round(perBucket[i] ?? 0),
   }));
 
-  
   const staff = rankOrders(
     revenueOrders,
     revenueOf,
@@ -131,13 +123,10 @@ export function buildSalesReport(
     },
     'Chưa gán NV',
   );
-  
-  
-  
+
   const customers = rankOrders(revenueOrders, revenueOf, (o) => deps.customerOf(o), 'Không rõ');
   const products = rankProducts(revenueOrders);
 
-  
   const methodCounts = new Map<string, number>();
   for (const o of revenueOrders) {
     const label = deps.methodLabel(o.extra?.deliveryMethod) || 'Khác';

@@ -58,20 +58,20 @@ export type MaterialFormValues = {
   name: string;
   code: string;
   isActive: boolean;
-  
+
   units: string[];
-  
+
   category: string;
-  
+
   unitConversions: UnitConversion[];
-  
+
   description: string;
   specification: string;
   memo: string;
   costPrice: number | '';
-  
+
   minimumStock: number | '';
-  
+
   tags: string[];
   attributes: Array<{ key: string; value: string }>;
 };
@@ -237,12 +237,9 @@ export function SingleMaterialForm({
 }: SingleMaterialFormProps) {
   const { t } = useTranslation();
 
-  
-  
   const unitOptions = useLookupV2Options(unitCategory);
   const categoryOptions = useLookupV2Options(MATERIAL_CATEGORY_LOOKUP);
 
-  
   const selectedUnitData = useMemo(
     () =>
       form.values.units.map((v) => ({
@@ -280,7 +277,7 @@ export function SingleMaterialForm({
                     label={t('common.labels.code')}
                     leftSection={<IconHash size={14} />}
                     withAsterisk
-                    
+
                     styles={{ input: { fontFamily: 'var(--mantine-font-family-monospace)' } }}
                     {...form.getInputProps('code')}
                   />

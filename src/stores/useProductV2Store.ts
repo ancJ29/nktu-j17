@@ -8,9 +8,7 @@ type FlatUpdateBody = { version: string; expectedListHash?: string } & Record<st
 type FlatCreateBody = { expectedListHash?: string } & Record<string, unknown>;
 
 export const useProductV2Store = createEntityStore<ProductV2Row, FlatUpdateBody, FlatCreateBody>({
-  
-  
-  cacheKey: 'prdv2.5c81df', 
+  cacheKey: 'prdv2.5c81df',
   cacheTTL: 10 * ONE_MINUTE,
 
   fetchAll: (hash) =>

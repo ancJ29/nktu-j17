@@ -1,5 +1,3 @@
-
-
 import { notifications } from '@mantine/notifications';
 import type { TFunction } from 'i18next';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
@@ -45,14 +43,9 @@ async function advanceLinkedSoIfFullyDelivered(
   currentEmployee: { id: string; name: string } | undefined,
   t: TFunction,
 ): Promise<void> {
-  
-  
   if (closedDr.direction === 'inbound') return;
   if (!closedDr.salesOrderId) return;
-  
-  
-  
-  
+
   const soStore = useSalesOrderStore.getState();
   if (!soStore.initialized) await soStore.loadAll();
   const so = useSalesOrderStore.getState().getById(closedDr.salesOrderId) as SalesOrder | undefined;
@@ -68,8 +61,6 @@ async function advanceLinkedSoOnDispatch(
   if (transitionedDr.direction === 'inbound') return;
   if (!transitionedDr.salesOrderId) return;
 
-  
-  
   await ensureReconcileStoresLoaded();
   const so = useSalesOrderStore.getState().getById(transitionedDr.salesOrderId) as
     SalesOrder | undefined;
@@ -86,9 +77,6 @@ async function advanceLinkedSoOnDispatch(
   const productsByCode = indexProductsByCode(products);
   const inventoryByProduct = indexInventoryByProduct(useProductInventoryStore.getState().items);
 
-  
-  
-  
   const result = await runSoTransition({
     order: so,
     toStatusValue: targetStatus,
@@ -98,8 +86,6 @@ async function advanceLinkedSoOnDispatch(
   });
 
   if (result.ok) {
-    
-    
     logActivity(
       'salesOrder.statusChange',
       so.id,
@@ -118,8 +104,7 @@ async function advanceLinkedSoOnDispatch(
         status: targetStatus,
       }),
     });
-    
-    
+
     if (result.pendingShip) {
       await runShipRecovery({ so: result.updated, actor: currentEmployee, productsByCode, t });
     }
@@ -154,9 +139,6 @@ export async function runDrTransitionEffects({
 }): Promise<DeliveryRequest> {
   let record = updated;
 
-  
-  
-  
   logActivity('deliveryRequest.statusChange', updated.id, {
     requestNumber: updated.requestNumber,
     fromStatus: priorStatus,
@@ -164,16 +146,6 @@ export async function runDrTransitionEffects({
     ...(note ? { note } : {}),
   });
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const updatedExtra = (updated.extra ?? {}) as DeliveryRequestExtra;
   const toStage = getDeliveryRequestStatusOptions().find((o) => o.value === toStatusValue)?.stage;
   if (
@@ -212,10 +184,6 @@ export async function runDrTransitionEffects({
     }
   }
 
-  
-  
-  
-  
   for (const followUp of followUps) {
     await dispatchDrFollowUp(followUp, updated, actor, t);
   }

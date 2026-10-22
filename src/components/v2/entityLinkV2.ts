@@ -1,15 +1,14 @@
 import type { LinkSize } from '../EntityLink';
 
 export type EntityLinkV2Props = {
-  
   id: string | undefined | null;
-  
+
   fallbackLabel?: string | undefined | null;
-  
+
   fallbackCode?: string | undefined | null;
-  
+
   codeBelow?: boolean;
-  
+
   withoutIcon?: boolean;
   size?: LinkSize;
 };

@@ -1,46 +1,30 @@
-
-
 import { createAppCache } from '@credo/base-ui/utils';
 import type { CMngtMasterDataHashes } from '@credo/connectors/types';
 import type { PartialPermissions } from '@/types/permissions';
 
 export type AppCacheData = {
-  
-  
-  
-  
-  
-
-  
-  
-  
-  
-  
-  
-
-  
   cfg?: unknown;
-  
+
   crt?: number;
-  
+
   auth?: Record<string, unknown>;
-  
+
   zap?: unknown;
-  
+
   prm?: unknown;
-  
+
   prv?: { cfg?: string; emp?: string };
-  
+
   emo?: { o?: PartialPermissions; v?: string };
-  
+
   usr?: {
     shared?: Record<string, unknown>;
     pc?: Record<string, unknown>;
     mobile?: Record<string, unknown>;
   };
-  
+
   mdh?: { c: string; h: CMngtMasterDataHashes };
-  
+
   v2s?: { c: string; r: string[] };
   // `vmg` / `cmg` (vendors-/customers-migrated flags) lived here 2026-07-14 only
   // — both one-time migration runtimes were retired with their dedicated

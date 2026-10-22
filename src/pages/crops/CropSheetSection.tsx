@@ -53,17 +53,16 @@ import type {
 } from '@/types';
 
 type Props = {
-  
   readonly cropId: string;
   readonly cropCode: string;
-  
+
   readonly startDate?: string;
   readonly templateCode?: string;
-  
+
   readonly templateId?: string;
-  
+
   readonly fallbackPlantCount?: number;
-  
+
   readonly onTotalsChange?: (totals: SheetColumnTotal[]) => void;
 };
 
@@ -89,10 +88,10 @@ export function CropSheetSection({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
-  
+
   const [openDay, setOpenDay] = useState<number | null>(null);
   const [materialsOpen, setMaterialsOpen] = useState(false);
-  
+
   const [openMaterialsCell, setOpenMaterialsCell] = useState<{
     day: number;
     columnKey: string;
@@ -106,10 +105,7 @@ export function CropSheetSection({
       const partition = await queryCropPartition(cropId);
       setSheet(partition.sheet ?? null);
       setDraft(partition.sheet?.extra ? structuredClone(partition.sheet.extra) : null);
-      
-      
-      
-      
+
       setEvents(partition.events);
       setDirty(false);
     } catch {
@@ -120,7 +116,6 @@ export function CropSheetSection({
   }, [cropId, t]);
 
   useEffect(() => {
-    
     void load();
   }, [load]);
 
@@ -142,21 +137,16 @@ export function CropSheetSection({
     [draft, plantCount],
   );
 
-  
-  
   useEffect(() => {
     onTotalsChange?.(totals);
   }, [totals, onTotalsChange]);
 
-  
   const stageSpans = useMemo(() => sheetStageSpans(rows), [rows]);
 
   const dayLabel = t('cropDiaryTemplates.plan.day');
   const today = todayInVnDateString();
   const todayDay = useMemo(() => rows.find((r) => r.date === today)?.day, [rows, today]);
 
-  
-  
   useEffect(() => {
     if (anchoredRef.current || !todayRowRef.current) return;
     anchoredRef.current = true;
@@ -169,8 +159,7 @@ export function CropSheetSection({
       const days = current.days.map((d) => {
         if (d.day !== day) return d;
         const values = { ...d.values };
-        
-        
+
         const next = sheetCellValue(raw);
         if (next === undefined) delete values[key];
         else values[key] = next;
@@ -181,7 +170,6 @@ export function CropSheetSection({
     setDirty(true);
   }, []);
 
-  
   const setCellMaterials = useCallback((day: number, key: string, lines: MaterialLine[]) => {
     setDraft((current) => {
       if (!current) return current;
@@ -229,10 +217,6 @@ export function CropSheetSection({
     if (!sheet || !draft) return;
     setSaving(true);
     try {
-      
-      
-      
-      
       const days = draft.days.map((d) => {
         if (!d.materials) return d;
         const materials: Record<string, MaterialLine[]> = {};
@@ -255,8 +239,6 @@ export function CropSheetSection({
       notifications.show({ color: 'green', message: t('crops.sheet.saveSuccess') });
     } catch (err) {
       if (err instanceof CropSheetConflictError) {
-        
-        
         notifications.show({
           color: 'red',
           title: t('crops.sheet.conflictTitle'),
@@ -272,7 +254,6 @@ export function CropSheetSection({
     }
   }, [sheet, draft, cropId, load, t]);
 
-  
   const handleExport = useCallback(() => {
     if (!draft) return;
     exportCropSheet(
@@ -290,26 +271,22 @@ export function CropSheetSection({
     );
   }, [draft, cropCode, plantCount, startDate, t]);
 
-  
   const dayView = useMemo(() => {
     if (openDay === null || !draft) return null;
     const row = rows[openDay - 1];
     return row ? sheetDayView(row, draft.plan.totalDays, draft) : null;
   }, [openDay, rows, draft]);
 
-  
   const dayEvents = useMemo(() => {
     const date = dayView?.date;
     return date ? events.filter((e) => String(e.entryDate).slice(0, 10) === date) : [];
   }, [events, dayView]);
 
-  
   const handleResetDay = useCallback((day: number) => {
     setDraft((current) => (current ? { ...current, days: resetDayToPlan(current, day) } : current));
     setDirty(true);
   }, []);
 
-  
   const setColumnMaterials = useCallback((columnMaterials: Record<string, CropColumnChoice>) => {
     setDraft((current) => (current ? { ...current, columnMaterials } : current));
     setDirty(true);
@@ -345,9 +322,7 @@ export function CropSheetSection({
 
   const columns = draft.plan.columns;
   const hasGroups = sheetHasGroups(columns);
-  
-  
-  
+
   const columnHeaderCells = (
     <SheetColumnHeadCells columns={columns} unitOf={(column) => columnUnit(column, draft)} />
   );

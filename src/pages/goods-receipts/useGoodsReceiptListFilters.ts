@@ -1,5 +1,3 @@
-
-
 import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
@@ -37,8 +35,7 @@ type GoodsReceiptUrlState = {
 
 function compactState(state: GoodsReceiptUrlState): GoodsReceiptUrlState {
   const r: GoodsReceiptUrlState = {};
-  
-  
+
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.v) r.v = state.v;
   if (state.f) r.f = state.f;
@@ -56,9 +53,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     compactState,
   });
 
-  
-  
-  
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const vendorFilter = state.v ?? null;
   const staffFilter = state.f ?? null;
@@ -71,11 +65,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
   const receivedDateRange = useMemo(() => restoreDateRange(state.rd, EMPTY_DATE_RANGE), [state.rd]);
   const page = state.pg ?? DEFAULT_PAGE;
 
-  
-  
-  
-  
-  
   const setStatusFilter = useCallback(
     (values: string[]) => updateState({ s: values, pg: undefined }),
     [updateState],
@@ -101,8 +90,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     [updateState],
   );
 
-  
-  
   const setCreatedDateRange = useCallback(
     (next: DateRangeValue) =>
       updateState({
@@ -122,7 +109,6 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     [updateState],
   );
 
-  
   const allReceipts = useMemo(() => {
     const filtered = storeReceipts.filter((r) => {
       if (statusFilter.length > 0 && !statusFilter.includes(r.status)) return false;
@@ -146,15 +132,11 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     receivedDateRange,
   ]);
 
-  
-  
   const statusFilterIsDefault = useMemo(
     () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
     [statusFilter],
   );
 
-  
-  
   const hasActiveFilters = !!(
     !statusFilterIsDefault ||
     vendorFilter ||
@@ -165,10 +147,9 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
   );
 
   return {
-    
     statusFilter,
     setStatusFilter,
-    
+
     statusFilterIsDefault,
     vendorFilter,
     setVendorFilter,
@@ -185,11 +166,9 @@ export function useGoodsReceiptListFilters(storeReceipts: GoodsReceipt[]) {
     page,
     setPage,
 
-    
     allReceipts,
     hasActiveFilters,
 
-    
     clearFilters,
   };
 }

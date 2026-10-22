@@ -71,9 +71,6 @@ export function QuotationList() {
   const employeesInitialized = useEmployeeStore((s) => s.initialized);
   const loadEmployees = useEmployeeStore((s) => s.loadAll);
 
-  
-  
-  
   const [preview, setPreview] = useState<Quotation | null>(null);
 
   const [dateRange, setDateRange] = useState<DateRangeValue>(() =>
@@ -99,8 +96,6 @@ export function QuotationList() {
     }
   }, [error, t]);
 
-  
-  
   const applyDateRange = useCallback(
     (next: DateRangeValue) => {
       const effective = next.from && next.to ? next : defaultLastNDaysRange(RANGE_DAYS);
@@ -111,9 +106,6 @@ export function QuotationList() {
     [forceRefresh],
   );
 
-  
-  
-  
   const rows = useMemo(() => {
     const live = items.filter((r) => !r.extra.isDeleted);
     let scoped = live;
@@ -210,10 +202,6 @@ export function QuotationList() {
 
   const allLabel = t('common.filters.all');
 
-  
-  
-  
-  
   const mobileFilters: MobileFilterDef[] = [
     allOptionFilter<'' | QuotationStatus>({
       title: t('__new__.01-common.labels.status'),
@@ -253,7 +241,6 @@ export function QuotationList() {
     },
   ];
 
-  
   const isFirstLoad = loading && !initialized;
 
   const columns = useMemo(
@@ -308,8 +295,7 @@ export function QuotationList() {
         width: '150px',
         render: (row: Quotation) => <QuotationDate row={row} />,
       },
-      
-      
+
       {
         key: '__preview',
         header: '',
@@ -343,11 +329,6 @@ export function QuotationList() {
   const hasActiveFilters =
     !!search || !!statusFilter || !!customerFilter || !!staffFilter || !dateIsDefault;
 
-  
-  
-  
-  
-  
   const showSelectPills = !isMobile;
   const hasPills =
     (showSelectPills && (!!statusFilter || !!customerFilter || !!staffFilter)) || !dateIsDefault;

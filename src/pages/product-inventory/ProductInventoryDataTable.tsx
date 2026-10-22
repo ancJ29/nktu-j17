@@ -34,19 +34,19 @@ type Props = {
   readonly locations: Location[];
   readonly isLoading?: boolean;
   readonly onRowClick: (product: Product) => void;
-  
+
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
-  
+
   readonly resolveCustomerName?: CustomerShortNameResolver;
-  
+
   readonly orderStatus?: ReservationOrderStatusSource;
-  
+
   readonly onOutgoingClick?: (summary: ProductInventorySummary) => void;
-  
+
   readonly maxHeight?: number | string;
-  
+
   readonly viewportRef?: Ref<HTMLDivElement>;
-  
+
   readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
 };
 
@@ -228,9 +228,6 @@ function OutgoingDropdown({
       </Text>
       <Stack gap={4}>
         {shown.map((r) => {
-          
-          
-          
           const customer = resolveCustomerName?.(r.customerName, r.customerCode);
           return (
             <Group key={r.id} gap={8} wrap="nowrap" justify="space-between" align="flex-start">
@@ -241,10 +238,7 @@ function OutgoingDropdown({
                     <ReservationStatusBadge
                       state={orderStatus.resolve(r.id)}
                       size="xs"
-                      
-                      
-                      
-                      
+
                       fallback={orderStatus.firstLoad ? <Loader size={10} color="gray" /> : null}
                     />
                   )}
@@ -432,8 +426,6 @@ export function ProductInventoryDataTable({
           ),
           ta: 'right' as const,
           render: (s: ProductInventorySummary) => {
-            
-            
             if (!s.hasBeginOfPeriod) return <PlaceholderCell />;
             const baseUnit = getItemBaseUnit(s.product);
             return (
@@ -590,9 +582,7 @@ export function ProductInventoryDataTable({
                 )}
               </Stack>
             );
-            
-            
-            
+
             if (reservations.length === 0) return cell;
             const drillDown = onOutgoingClick;
             return (
@@ -602,17 +592,13 @@ export function ProductInventoryDataTable({
                 withArrow
                 position="top"
                 openDelay={120}
-                
-                
+
                 onOpen={orderStatus?.hydrate}
               >
                 <HoverCard.Target>
                   <Box
                     style={{ cursor: drillDown ? 'pointer' : 'help' }}
-                    
-                    
-                    
-                    
+
                     onClick={
                       drillDown
                         ? (event) => {

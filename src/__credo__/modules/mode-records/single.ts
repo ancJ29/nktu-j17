@@ -30,8 +30,7 @@ export interface SingleModeRecordsModuleConfig {
 export function createSingleModeRecordsModule(config: SingleModeRecordsModuleConfig) {
   const { storage, serviceCode, descriptor } = config;
   const entityName = descriptor.entity;
-  
-  
+
   const key = (scope: string): string => `${scope}:single:${entityName}`;
 
   const load = (scope: string) => loadEnvelope<ModeRecordItem>(storage, serviceCode, key(scope));
@@ -81,7 +80,6 @@ export function createSingleModeRecordsModule(config: SingleModeRecordsModuleCon
       return { item, listHash: meta.hash };
     },
 
-    
     async createMany(
       scope: string,
       items: Array<Record<string, unknown>>,

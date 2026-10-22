@@ -67,9 +67,6 @@ export function OilTankFormPage() {
   const [loading, setLoading] = useState(false);
   const snapshotRef = useRef<OilTankRow | null>(null);
 
-  
-  
-  
   const tanks = useOilTankStore((s) => s.items);
   const initialized = useOilTankStore((s) => s.initialized);
   const loadAll = useOilTankStore((s) => s.loadAll);
@@ -77,8 +74,6 @@ export function OilTankFormPage() {
     if (!initialized) loadAll();
   }, [initialized, loadAll]);
 
-  
-  
   const nextCode = useMemo(
     () => buildNextOilTankCode((tanks as OilTankRow[]).map((row) => row.code)),
     [tanks],
@@ -134,9 +129,7 @@ export function OilTankFormPage() {
   const handleSubmit = useCallback(
     async (values: OilTankFormValues) => {
       setLoading(true);
-      
-      
-      
+
       const buildExtra = (base?: OilTankExtra): OilTankExtra => {
         const extra: OilTankExtra = { ...(base ?? {}) };
         for (const key of ['fuelType', 'location', 'note'] as const) {
@@ -144,8 +137,7 @@ export function OilTankFormPage() {
           if (raw) extra[key] = raw;
           else delete extra[key];
         }
-        
-        
+
         if (values.capacity === '' || !Number.isFinite(Number(values.capacity))) {
           delete extra.capacity;
         } else {
@@ -164,8 +156,7 @@ export function OilTankFormPage() {
           const updated = await useOilTankStore.getState().updateSafely({
             id,
             version: snapshot.version,
-            
-            
+
             patch: { ...core, extra: patchExtra },
           });
           snapshotRef.current = updated as OilTankRow;
@@ -173,8 +164,7 @@ export function OilTankFormPage() {
             { name: snapshot.name, isActive: snapshot.isActive, ...(snapshot.extra ?? {}) },
             { name: core.name, isActive: core.isActive, ...patchExtra },
           );
-          
-          
+
           const onlyIsActive = Object.keys(diff ?? {}).length === 1 && 'isActive' in (diff ?? {});
           logActivity(onlyIsActive ? 'oilTank.toggleStatus' : 'oilTank.update', id, diff);
           notifications.show({
@@ -183,9 +173,6 @@ export function OilTankFormPage() {
           });
           navigate(ROUTES.OIL_TANKS.DETAIL.replace(':id', id));
         } else {
-          
-          
-          
           const opening =
             values.openingLevel === '' || !Number.isFinite(Number(values.openingLevel))
               ? 0
@@ -195,10 +182,6 @@ export function OilTankFormPage() {
           extra.openingDate = values.openingDate || todayInVnDateString();
           extra.currentLevel = opening;
 
-          
-          
-          
-          
           const created = await useOilTankStore.getState().createSafely({
             patch: { ...core, code: nextCode, isActive: true, extra },
           });

@@ -25,8 +25,8 @@ export type GoodsReceiptV2CopyLine = GoodsReceiptV2LineInput & {
 
 export type GoodsReceiptV2CopyFrom = Pick<GoodsReceiptV2, 'vendorId' | 'reference' | 'notes'> & {
   items: GoodsReceiptV2CopyLine[];
-  
+
   sourceReceiptNumber: string;
-  
+
   extra: Record<string, string | number>;
 };

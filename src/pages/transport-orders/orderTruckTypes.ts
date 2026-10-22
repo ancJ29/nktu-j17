@@ -1,4 +1,3 @@
-
 import type { LookupOption } from '@/hooks/useLookupV2Options';
 
 export function narrowTruckTypeOptions(

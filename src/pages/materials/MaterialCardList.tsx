@@ -25,7 +25,7 @@ const minStockEnabled = hasMaterialMinimumStock();
 type MaterialCardListProps = {
   readonly materials: Material[];
   readonly isLoading?: boolean;
-  
+
   readonly invByCode?: ReadonlyMap<string, MaterialInventoryRow>;
 };
 

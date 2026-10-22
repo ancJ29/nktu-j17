@@ -88,19 +88,12 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     forceRefresh,
   } = useDeliveryRequestStore();
 
-  
-  
   const {
     items: employees,
     loadAll: loadEmployees,
     initialized: employeesInit,
   } = useEmployeeStore();
 
-  
-  
-  
-  
-  
   const {
     items: customers,
     loadAll: loadCustomers,
@@ -116,39 +109,19 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     [customers],
   );
 
-  
-  
   const salesOrders = useSalesOrderStore((s) => s.items);
   const salesOrdersInit = useSalesOrderStore((s) => s.initialized);
   const refreshSalesOrders = useSalesOrderStore((s) => s.forceRefresh);
 
-  
-  
-  
-  
-  
   const currentEmployee = useMyEmployee();
   const nktuConfig = variant.clientSpecific?.NKTU;
   const salesDeptScoped =
     !!nktuConfig?.salesDeptScopedView &&
     currentEmployee?.department === nktuConfig.salesDepartmentCode;
 
-  
-  
-  
-  
-  
-  
-  
-  
   const visibleStoreRequests = useMemo(() => {
-    
     const live = storeRequests.filter((r) => !r.extra?.isDeleted);
 
-    
-    
-    
-    
     if (salesDeptScoped) {
       const me = getCurrentEmployeeId();
       if (!me) return [];
@@ -170,9 +143,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     );
   }, [storeRequests, salesDeptScoped, salesOrders]);
 
-  
-  
-  
   const driverCodeById = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.code ?? '');
@@ -208,10 +178,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     }
   }, [error, t]);
 
-  
-  
-  
-  
   const fetchRange = useMemo(() => defaultLastNDaysRange(FETCH_WINDOW_DAYS), []);
   useTransactionalRangeRefetch({
     range: fetchRange,
@@ -219,23 +185,12 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     forceRefresh,
   });
 
-  
-  
-  
-  
-  
-  
   useEffect(() => {
     if (!salesDeptScoped) return;
     setSalesOrderQueryRange(fetchRange.from, fetchRange.to);
     refreshSalesOrders();
   }, [salesDeptScoped, fetchRange.from, fetchRange.to, refreshSalesOrders]);
 
-  
-  
-  
-  
-  
   const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
     useListFilter(filters.allRequests, {
       filters: { _: 'noop' },
@@ -257,35 +212,22 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
   const clearAll = filters.clearFilters;
   const hasActiveFilters = filters.hasActiveFilters || !!search;
 
-  
-
   const statusFilterData = useMemo(
     () => statusOptions.map((s) => ({ value: s.value, label: s.label })),
     [],
   );
 
-  
-  
   const driverFilterData = useMemo(
     () => employees.filter(driverEmployeeFilter).map((e) => ({ value: e.id, label: e.name })),
     [employees],
   );
 
-  
-  
-  
   const employeeNames = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.name);
     return m;
   }, [employees]);
 
-  
-  
-  
-  
-  
-  
   const partyFilterData = useMemo(() => {
     const byValue = new Map<string, string>();
     for (const r of visibleStoreRequests) {
@@ -305,8 +247,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       .sort((a, b) => a.label.localeCompare(b.label));
   }, [visibleStoreRequests, getVendorByCode, resolveCustomerShortName]);
 
-  
-  
   const partyLabel = useMemo(() => {
     if (!filters.partyFilter) return '';
     return (
@@ -314,9 +254,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     );
   }, [filters.partyFilter, partyFilterData]);
 
-  
-
-  
   const allLabel = t('common.filters.all');
 
   const statusPlaceholder = useMemo(() => {
@@ -324,8 +261,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
   }, [filters.statusFilter, t]);
-
-  
 
   const presetLabels: Partial<Record<DateRangePreset, string>> = {
     today: t('common.datePreset.today'),
@@ -337,11 +272,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     custom: t('deliveryRequests.datePreset.custom'),
   };
 
-  
-  
-  
-  
-  
   const scheduledDatePresets: DateRangePreset[] = [
     'today',
     'tomorrow',
@@ -379,8 +309,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       onChange: filters.setDriverFilter,
       data: driverFilterData,
       placeholder: t('deliveryRequests.filterDriver'),
-      
-      
+
       visible: canViewAll && driverFilterData.length > 0,
       searchable: true,
       w: 220,
@@ -408,10 +337,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       : []),
   ];
 
-  
-  
-  
-  
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
     multiOptionFilter({
       title: t('__new__.01-common.labels.status'),
@@ -447,11 +372,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     },
   ];
 
-  
-  
-  
-  
-  
   const mobileScheduledDateFilter: MoreFilterDef[] = variant.showScheduledDateInBar
     ? [
         {
@@ -466,7 +386,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     : dateAndExtraFilters;
 
   const mobileMoreFilters: MoreFilterDef[] = [
-    
     ...(canViewAll
       ? ([
           {
@@ -496,40 +415,15 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     ...mobileScheduledDateFilter,
   ];
 
-  
-  
-  
-  
   const [reorderOpen, setReorderOpen] = useState(false);
 
-  
-  
-  
   const [createOpen, setCreateOpen] = useState(false);
-  
-  
-  
-  
+
   const showQuickCreate =
     variant.quickCreateMode === 'modal' && (!isMobile || variant.mobileQuickCreate);
 
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   const showStatusPills = !isMobile && !filters.statusFilterIsDefault;
-  
-  
+
   const dateShownOnChip =
     isMobile && variant.showScheduledDateInBar && scheduledDatePreset !== null;
   const showDatePill = !!filters.scheduledDateRange.preset && !dateShownOnChip;
@@ -541,9 +435,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     showDatePill
   );
 
-  
-  
-  
   const loadingInitial = (loading && !initialized) || (salesDeptScoped && !salesOrdersInit);
 
   return (
@@ -567,12 +458,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             ) : null
           }
           createCta={
-            
-            
-            
-            
-            
-            
             variant.quickCreateMode === 'modal'
               ? showQuickCreate
                 ? {

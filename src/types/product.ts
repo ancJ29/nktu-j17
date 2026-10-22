@@ -20,53 +20,44 @@ export type ProductMinimumInventory = {
   value: number;
   unit: string;
   configBy: 'system' | 'user';
-  
+
   updatedAt: number;
-  
+
   updatedBy: string;
 };
 
 export type ProductExtra = {
-  
   units?: string[];
   alternativeNames?: string[];
   isDeleted?: boolean;
   images?: ProductImageEntry[];
 
-  
   sku?: string;
-  
+
   barcode?: string;
-  
+
   basePrice?: number;
-  
+
   suggestedPrice?: number;
 
   category?: string;
-  
+
   attributes?: Array<{ key: string; value: string }>;
 
-  
   warehouseMemo?: string;
 
   minimumInventory?: ProductMinimumInventory;
 
-  
   noInventory?: boolean;
 
-  
   hiddenFromInventoryList?: boolean;
 
-  
   unitConversions?: UnitConversion[];
 
-  
   techSpecs?: Array<{ key: string; value: string }>;
 
-  
   setItems?: ProductSetItem[];
 
-  
   setMode?: 'bundle' | 'breakdown';
 
   [key: string]: unknown;

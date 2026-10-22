@@ -14,7 +14,7 @@ const locationsEnabled = isLocationsEnabled();
 type Props = {
   readonly receipts: GoodsReceipt[];
   readonly isLoading?: boolean;
-  
+
   readonly onShowItems?: (receipt: GoodsReceipt) => void;
 };
 
@@ -37,8 +37,7 @@ function CardSkeleton() {
 export function GoodsReceiptCardList({ receipts, isLoading, onShowItems }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
-  
+
   const employees = useEmployeeStore((s) => s.items);
 
   if (isLoading) {
@@ -64,9 +63,7 @@ export function GoodsReceiptCardList({ receipts, isLoading, onShowItems }: Props
       {receipts.map((r) => {
         const totalQuantity = r.items.reduce((acc, curr) => acc + curr.quantity, 0);
         const status = findStatus(r.status);
-        
-        
-        
+
         const hasReceivedAt = !!r.receivedAt;
         const dateText = hasReceivedAt ? formatDateTime(r.receivedAt!) : formatDate(r.receivedDate);
         const dateLabel = t(
@@ -80,9 +77,6 @@ export function GoodsReceiptCardList({ receipts, isLoading, onShowItems }: Props
           ? (employees.find((e) => e.id === assignedId)?.name ?? null)
           : null;
 
-        
-        
-        
         const metaLine = [`${dateLabel} ${dateText}`, locationsEnabled ? r.locationName : null]
           .filter(Boolean)
           .join(' · ');

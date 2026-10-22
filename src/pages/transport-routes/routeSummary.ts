@@ -1,4 +1,3 @@
-
 import type { TransportRouteRow } from '@/types';
 import type { RouteStop } from '../transport-orders/TransportRouteCell';
 import { readTruckingSize } from '../transport-orders/truckingSize';

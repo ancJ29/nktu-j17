@@ -22,20 +22,17 @@ export function DevClientCodeModal() {
   const handleSubmit = () => {
     let needsReload = false;
 
-    
     const trimmed = value.trim();
     if (trimmed && trimmed !== resolveClientCode()) {
-      setClientCode(trimmed); 
+      setClientCode(trimmed);
       return;
     }
 
-    
     if (apiGroup && apiGroup !== appApiGroup) {
       setAppApiGroup(apiGroup);
       needsReload = true;
     }
 
-    
     const currentValue = getAdminConfigValue();
     if (adminConfig && adminConfigValue.trim()) {
       if (adminConfigValue.trim() !== currentValue) {

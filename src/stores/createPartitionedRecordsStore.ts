@@ -1,5 +1,3 @@
-
-
 import { cMngtConnector } from '@credo/connectors/connector';
 import type {
   CMngtPartitionedRecordTarget,
@@ -26,19 +24,18 @@ export type PartitionedRecordRow = { id: string; version: string } & Record<stri
 type Range = { from: string; to: string };
 
 export type PartitionedRecordsStoreConfig = {
-  
   entity: string;
-  
+
   partitionLocate: CMngtRecordPartitionLocate;
-  
+
   uniqueField?: string | string[];
-  
+
   cacheKey: string;
   cacheTTL?: number;
   staleTime?: number;
-  
+
   defaultRangeDays?: number;
-  
+
   keysForRange?: (from: string, to: string) => string[];
 };
 
@@ -56,7 +53,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     keysForRange = enumerateDates,
   } = config;
 
-  
   const target: CMngtPartitionedRecordTarget = {
     entity,
     partitionLocate,
@@ -70,16 +66,12 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     return { from: fmt(from), to: fmt(to) };
   }
 
-  
-  
   let currentRange: Range = defaultRange();
 
-  
   const partitionHashes = new Map<string, string>();
 
   let lastCombinedHash: string | null = null;
 
-  
   async function syncPartitions(keys: string[]): Promise<{
     merged: T[];
     hashes: Record<string, string>;
@@ -97,8 +89,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
       partitionHashes: cachedHashes,
     });
 
-    
-    
     const { merged, writes, clears, missing } = reconcilePartitionSync<T>(keys, cached, {
       changed: res.changed,
       ...(res.changed && { updated: res.updated as Record<string, T[]> }),
@@ -114,7 +104,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     return { merged, hashes: res.hashes, emptyKeys: res.emptyKeys };
   }
 
-  
   async function fetchAll(): Promise<FetchAllResult<T>> {
     const { from, to } = currentRange;
     const keys = keysForRange(from, to);
@@ -125,7 +114,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
 
     const { merged, hashes, emptyKeys } = await syncPartitions(keys);
 
-    
     for (const key of keys) {
       const hash = hashes[key];
       if (hash) partitionHashes.set(key, hash);
@@ -145,7 +133,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     fetchAll,
   });
 
-  
   async function resyncPartition(key: string): Promise<void> {
     const res = await cMngtConnector.queryPartitionedRecordsSync(target, {
       partitionKeys: [key],
@@ -160,7 +147,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     }
   }
 
-  
   async function settleWrite(
     affectedKeys: ReadonlyArray<string | undefined>,
     landedKey: string | undefined,
@@ -172,24 +158,23 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     if (landedKey && listHash) partitionHashes.set(landedKey, listHash);
     await persistPartitions(cacheKey, [], keys);
     apply();
-    lastCombinedHash = null; 
+    lastCombinedHash = null;
     void useStore.getState().revalidate();
   }
 
-  
   function surfaceWriteError(err: unknown): never {
     if (isListVersionConflict(err)) {
       void useStore.getState().revalidate();
       throw err;
     }
-    const conflict = toEntityConflictError<T>(err); 
+    const conflict = toEntityConflictError<T>(err);
     void useStore.getState().revalidate();
     throw conflict;
   }
 
   async function createSafely(args: {
     item: Record<string, unknown>;
-    
+
     partitionKey?: string;
   }): Promise<T> {
     let attempt = 0;
@@ -227,9 +212,9 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     id: string;
     version: string;
     patch: Record<string, unknown>;
-    
+
     partitionKey?: string;
-    
+
     newPartitionKey?: string;
   }): Promise<T> {
     let attempt = 0;
@@ -248,8 +233,7 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
           expectedListHash,
         });
         const updated = res.item as T;
-        
-        
+
         await settleWrite(
           [args.partitionKey, res.partitionKey],
           res.partitionKey,
@@ -274,7 +258,7 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
   async function deleteSafely(args: {
     id: string;
     version: string;
-    
+
     partitionKey?: string;
   }): Promise<void> {
     let attempt = 0;
@@ -290,8 +274,7 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
           partitionKey: args.partitionKey,
           expectedListHash,
         });
-        
-        
+
         const removedFrom = res.partitionKey ?? args.partitionKey;
         await settleWrite([removedFrom], undefined, undefined, () =>
           useStore.getState().removeItem(args.id),
@@ -314,16 +297,14 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
   return {
     useStore,
 
-    
     setRange(from: Date | null, to: Date | null): void {
       currentRange = !from || !to ? defaultRange() : { from: fmt(from), to: fmt(to) };
     },
-    
+
     getRange(): Range {
       return currentRange;
     },
 
-    
     async queryRange(from: Date, to: Date): Promise<T[]> {
       const keys = keysForRange(fmt(from), fmt(to));
       if (keys.length === 0) return [];
@@ -331,7 +312,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
       return merged;
     },
 
-    
     async queryPartition(key: string): Promise<T[]> {
       const res = await cMngtConnector.queryPartitionedRecordsSync(target, {
         partitionKeys: [key],
@@ -339,7 +319,6 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
       return res.changed ? ((res.updated[key] as T[] | undefined) ?? []) : [];
     },
 
-    
     fetchById(id: string, partitionKey?: string): Promise<{ item: T; partitionKey: string }> {
       return cMngtConnector
         .getPartitionedRecordById(target, { id, partitionKey })

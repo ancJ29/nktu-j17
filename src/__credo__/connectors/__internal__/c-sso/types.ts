@@ -1,5 +1,3 @@
-
-
 type BaseResponse = {
   success: boolean;
   error?: string;
@@ -104,7 +102,6 @@ export type OperatorAddUserRequest = {
   serviceCode: string;
 };
 export type OperatorAddUserResponse = BaseResponse & {
-  
   userUuid?: string;
 };
 

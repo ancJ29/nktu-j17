@@ -16,7 +16,6 @@ export function createTrackedStorageAdapter(
     async pushRecord<T>(sc: string, key: string, data: T): Promise<void> {
       await storage.pushRecord(sc, key, data);
 
-      
       const dotIndex = key.indexOf('.');
       if (dotIndex <= 0) return;
 
@@ -27,7 +26,6 @@ export function createTrackedStorageAdapter(
       const hash = (data as { meta?: RecordMeta })?.meta?.hash;
       if (!hash) return;
 
-      
       const versionKey = buildKey(versionKeyPrefix, scope);
       const current = (await storage.getRecord<MasterDataHashes>(sc, versionKey)) ?? {};
       current[prefix as keyof MasterDataHashes] = hash;

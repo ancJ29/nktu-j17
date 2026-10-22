@@ -13,7 +13,6 @@ export function useLanguageSync({ isProfileLoaded }: UseLanguageSyncOptions) {
   const hasAppliedSettings = useRef(false);
   const lastSavedLanguage = useRef<string | null>(null);
 
-  
   useEffect(() => {
     if (!isProfileLoaded || hasAppliedSettings.current) return;
     hasAppliedSettings.current = true;
@@ -28,14 +27,11 @@ export function useLanguageSync({ isProfileLoaded }: UseLanguageSyncOptions) {
       }
       lastSavedLanguage.current = savedLanguage;
     } else {
-      
-      
       sharedUserStorage.set(SharedStorageKey.LANGUAGE, i18n.language);
       lastSavedLanguage.current = i18n.language;
     }
   }, [isProfileLoaded, i18n]);
 
-  
   useEffect(() => {
     if (!hasAppliedSettings.current || lastSavedLanguage.current === i18n.language) {
       return;

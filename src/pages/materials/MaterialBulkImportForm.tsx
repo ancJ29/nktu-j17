@@ -16,16 +16,16 @@ import { useTranslation } from 'react-i18next';
 export type MaterialImportResult = {
   summary: {
     total: number;
-    
+
     created: number;
-    
+
     skipped: number;
-    
+
     failed: number;
   };
-  
+
   skipped?: string[];
-  
+
   errors?: string[];
 };
 

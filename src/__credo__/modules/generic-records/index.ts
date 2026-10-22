@@ -34,11 +34,9 @@ export interface GenericRecordModuleConfig {
 export function createGenericRecordModule(config: GenericRecordModuleConfig) {
   const { storage, serviceCode, keyPrefix = 'generic-records' } = config;
 
-  
   const partScope = (scope: string, recordType: string): string => `${scope}.${recordType}`;
 
   return {
-    
     async query(scope: string, filter: GenericRecordQueryFilter): Promise<GenericRecord[]> {
       const scoped = partScope(scope, filter.recordType);
       if (filter.fromPeriod && filter.toPeriod) {
@@ -54,7 +52,6 @@ export function createGenericRecordModule(config: GenericRecordModuleConfig) {
       );
     },
 
-    
     async querySync(
       scope: string,
       params: {
@@ -75,7 +72,6 @@ export function createGenericRecordModule(config: GenericRecordModuleConfig) {
       );
     },
 
-    
     async create(scope: string, input: CreateGenericRecordInput): Promise<GenericRecord> {
       validateCreateInput(input);
       const scoped = partScope(scope, input.recordType.trim());
@@ -95,7 +91,6 @@ export function createGenericRecordModule(config: GenericRecordModuleConfig) {
       return record;
     },
 
-    
     async update(
       scope: string,
       id: string,
@@ -122,7 +117,6 @@ export function createGenericRecordModule(config: GenericRecordModuleConfig) {
         return updated;
       }
 
-      
       items.splice(index, 1);
       await savePartition(storage, serviceCode, keyPrefix, scoped, sourcePart, items);
 
@@ -138,7 +132,6 @@ export function createGenericRecordModule(config: GenericRecordModuleConfig) {
       return updated;
     },
 
-    
     async remove(
       scope: string,
       recordType: string,

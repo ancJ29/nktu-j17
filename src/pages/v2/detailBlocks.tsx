@@ -1,5 +1,3 @@
-
-
 import { Button, Stack, Text, Title, type MantineStyleProp } from '@mantine/core';
 import type { ReactNode } from 'react';
 

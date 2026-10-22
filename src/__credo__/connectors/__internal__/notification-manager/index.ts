@@ -53,9 +53,6 @@ export const notificationManagerConnector = {
     return notificationManagerConnector;
   },
   setInternalAccessKey: (internalAccessKey: string) => {
-    
-    
-    
     storages.internalAccessKey = internalAccessKey;
     return notificationManagerConnector;
   },

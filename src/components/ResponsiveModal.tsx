@@ -9,9 +9,9 @@ type ResponsiveModalProps = {
   onClose: () => void;
   title?: ReactNode;
   children: ReactNode;
-  
+
   size?: string;
-  
+
   drawerHeight?: string;
 };
 

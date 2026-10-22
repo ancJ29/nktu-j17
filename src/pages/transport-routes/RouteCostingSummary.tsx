@@ -1,4 +1,3 @@
-
 import { Alert, Divider, Group, Stack, Text } from '@mantine/core';
 import { IconAlertTriangle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
@@ -7,9 +6,9 @@ import type { RouteCosting } from './routeCosting';
 
 type Props = {
   readonly costing: RouteCosting;
-  
+
   readonly litersPer100km: number | undefined;
-  
+
   readonly fuelPricePerLiter: number | undefined;
 };
 

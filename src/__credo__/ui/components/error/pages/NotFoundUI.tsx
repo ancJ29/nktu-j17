@@ -1,4 +1,3 @@
-
 import type { MantineColor } from '@mantine/core';
 import { Box, Stack, Text, Title, useMantineTheme } from '@mantine/core';
 import { AuthButton, AuthCard, AuthLayout } from '../../auth';

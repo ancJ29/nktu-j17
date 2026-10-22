@@ -1,5 +1,3 @@
-
-
 import {
   Alert,
   Button,
@@ -82,8 +80,7 @@ export function AddClientModal({
         domains,
         rootEmail: rootEmail.trim(),
         rootPassword: rootPassword.trim() || undefined,
-        
-        
+
         ssoAdminAccessKey: ssoAdminKey.trim(),
       });
 

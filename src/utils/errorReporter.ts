@@ -1,5 +1,3 @@
-
-
 import { notifications } from '@mantine/notifications';
 import { buildHash } from '@/config/build-version';
 
@@ -32,14 +30,11 @@ function report(error: unknown, origin: string): void {
       color: 'red',
       title: `${origin} · ${buildHash}`,
       message: description,
-      
-      
+
       autoClose: false,
       withCloseButton: true,
     });
   } catch {
-    
-    
     console.error('[uncaught]', origin, description);
   }
 }
@@ -48,8 +43,6 @@ export function installErrorReporter(): void {
   if (typeof window === 'undefined') return;
 
   window.addEventListener('error', (event) => {
-    
-    
     if (!event.error) return;
     report(event.error, 'error');
   });

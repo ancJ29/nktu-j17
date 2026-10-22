@@ -1,5 +1,3 @@
-
-
 import type { TFunction } from 'i18next';
 import type { Product } from '@/types/product';
 import type { PlanFailure } from '@/utils/inventoryReservation';
@@ -83,9 +81,6 @@ export function formatPlanFailures(
             to: f.to,
           });
         case 'diff-underflow':
-          
-          
-          
           return t('salesOrders.notifications.planFailureDiffUnderflow', {
             sku: idOf(f.productCode),
             unit: f.unit,

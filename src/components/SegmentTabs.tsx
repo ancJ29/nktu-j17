@@ -3,13 +3,13 @@ import { Box, Group, Stack, Text, UnstyledButton } from '@mantine/core';
 
 export type SegmentTabOption<T extends string = string> = {
   value: T;
-  
+
   label: ReactNode;
-  
+
   icon?: ReactNode;
-  
+
   title?: ReactNode;
-  
+
   description?: ReactNode;
 };
 
@@ -17,7 +17,7 @@ type SegmentTabsProps<T extends string> = {
   data: SegmentTabOption<T>[];
   value: T;
   onChange: (value: T) => void;
-  
+
   disabled?: boolean;
 };
 
@@ -63,7 +63,7 @@ export function SegmentTabs<T extends string>({
                   : 'var(--mantine-color-default-hover)',
                 border: '1px solid',
                 borderColor: isActive ? 'var(--mantine-primary-color-filled)' : 'transparent',
-                
+
                 borderBottomColor: isActive ? 'var(--mantine-color-body)' : 'transparent',
                 borderTopLeftRadius: 'var(--mantine-radius-md)',
                 borderTopRightRadius: 'var(--mantine-radius-md)',
