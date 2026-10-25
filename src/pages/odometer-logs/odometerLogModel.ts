@@ -75,6 +75,7 @@ export const OTHER_COST_CONTENTS = [
   'Sửa Xe',
   'Thay Nhớt',
   'Mua Hàng Cty',
+  'Anh Danh',
   'Cp Khác',
 ] as const;
 
