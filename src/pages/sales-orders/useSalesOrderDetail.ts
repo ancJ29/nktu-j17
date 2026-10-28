@@ -81,6 +81,7 @@ import { dispatchSoFollowUp } from './followUps';
 import { advanceSoIfFullyDelivered, resolveActualDeliveryDate } from './reconcileFromDeliveries';
 import { sweepSalesOrderPlatformLog } from './platformLogSweep';
 import { runShipRecovery } from './shipRecovery';
+import { diffWarehouseStaff, readWarehouseStaff } from './salesOrderWarehouseStaff';
 import { softDeleteLinkedDeliveryRequests } from '@/pages/delivery-requests/deliveryRequestDelete';
 import type { Stage } from './capabilities/types';
 import { device } from '@credo/base-ui/utils';
@@ -989,6 +990,13 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
               ...(before.assignedStaff && { from: before.assignedStaff }),
               ...(patch.extra.assignedStaff && { to: patch.extra.assignedStaff }),
             };
+          }
+          if ('warehouseStaff' in patch.extra) {
+            const warehouseStaffDiff = diffWarehouseStaff(
+              readWarehouseStaff(before),
+              readWarehouseStaff(patch.extra),
+            );
+            if (warehouseStaffDiff) fields.warehouseStaff = warehouseStaffDiff;
           }
           if (
             'deliveryMethod' in patch.extra &&

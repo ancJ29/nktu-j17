@@ -20,7 +20,9 @@ import { SalesOrderStatusBadgeBase } from '@/components/sales-orders/SalesOrderS
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 import type { DeliveryRequest, SalesOrder } from '@/types';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { isDeliveryRequestsEnabled } from '@/utils/permission';
+import { isDeliveryRequestsEnabled, isWarehouseStaffAllowed } from '@/utils/permission';
+import { WarehouseStaffLinks } from '@/components/sales-orders/WarehouseStaffLinks';
+import { readWarehouseStaff } from './salesOrderWarehouseStaff';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
 import { OrderItemsTable } from './OrderItemsTable';
 import { SalesOrderDeliveryRequestInfo } from './SalesOrderDeliveryRequestInfo';
@@ -28,6 +30,7 @@ import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 
 const isMobile = device.isMobile;
 const deliveryEnabled = isDeliveryRequestsEnabled();
+const warehouseStaffAllowed = isWarehouseStaffAllowed();
 const { resolveStatus, resolveDeliveryMethod, tagOptions } = salesOrderFieldOptions;
 
 type SalesOrderItemsPreviewDrawerProps = {
@@ -103,6 +106,11 @@ export function SalesOrderItemsPreviewDrawer({
                 <DetailField label={t('salesOrders.detail.assignedStaff')}>
                   {extra.assignedStaff ? <EmployeeLink id={extra.assignedStaff} /> : null}
                 </DetailField>
+                {warehouseStaffAllowed && (
+                  <DetailField label={t('salesOrders.detail.warehouseStaff')}>
+                    <WarehouseStaffLinks ids={readWarehouseStaff(extra)} />
+                  </DetailField>
+                )}
                 {/* Ready date, not `createdAt` — the list sorts and filters by
                     it, so the drawer must show the same date the row does. */}
                 <DetailField label={t('__new__.01-common.labels.orderDate')}>

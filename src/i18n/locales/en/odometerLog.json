@@ -163,7 +163,7 @@
     "dateRequired": "Pick the shift date",
     "kmInvalid": "The reading must be above 0",
     "otherCostAmountRequired": "Enter the amount",
-    "otherCostContentRequired": "Pick what it was for"
+    "otherCostContentRequired": "Enter what it was for"
   },
   "viewSelf": "My readings"
 }

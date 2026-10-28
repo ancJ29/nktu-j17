@@ -143,6 +143,17 @@
     "updateError": "Cập nhật phiếu thất bại.",
     "updateSuccess": "Đã cập nhật phiếu."
   },
+  "print": {
+    "action": "In đơn đặt hàng",
+    "includeExpectedDelivery": "In ngày giao dự kiến",
+    "landscape": "Ngang",
+    "optionsTitle": "Tùy chọn in",
+    "orientation": "Hướng giấy",
+    "paperSize": "Khổ giấy",
+    "popupBlocked": "Cửa sổ bật lên bị chặn. Cho phép pop-up cho trang này rồi thử lại.",
+    "portrait": "Dọc",
+    "submit": "In"
+  },
   "stats": {
     "total": "Tổng"
   },

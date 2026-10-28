@@ -13,6 +13,7 @@ import {
   Grid,
   Group,
   Modal,
+  MultiSelect,
   SegmentedControl,
   SimpleGrid,
   Stack,
@@ -65,8 +66,10 @@ import {
   getPricingVatRate,
   getSalesOrderDeliveryPackageSizeOptions,
   getSalesOrderPicDepartments,
+  getSalesOrderWarehouseStaffDepartments,
   isPdfSharingEnabled,
   isPricingManagementEnabled,
+  isWarehouseStaffAllowed,
   makeEmployeeDepartmentFilter,
   perms,
 } from '@/utils/permission';
@@ -118,6 +121,12 @@ import { StatusChangeModal } from './StatusChangeModal';
 import { CreateDeliveryRequestModal } from '@/pages/delivery-requests/CreateDeliveryRequestModal';
 import { CreateReturnShipmentModal } from '@/pages/delivery-requests/CreateReturnShipmentModal';
 import { OrderItemsTable } from './OrderItemsTable';
+import { WarehouseStaffLinks } from '@/components/sales-orders/WarehouseStaffLinks';
+import {
+  buildWarehouseStaffOptions,
+  diffWarehouseStaff,
+  readWarehouseStaff,
+} from './salesOrderWarehouseStaff';
 import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import { LinkedDRPhotosSection } from './LinkedDRPhotosSection';
@@ -146,6 +155,10 @@ const deliveryPackageSizeOptions = getSalesOrderDeliveryPackageSizeOptions();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
+const warehouseStaffAllowed = isWarehouseStaffAllowed();
+const warehouseStaffEmployeeFilter = makeEmployeeDepartmentFilter(
+  getSalesOrderWarehouseStaffDepartments(),
+);
 
 const soDriverDepartments = getDeliveryRequestDriverDepartments();
 
@@ -486,6 +499,42 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       renderValueDisplay={(v) => <EmployeeLink id={v} />}
     />
   );
+
+  const warehouseStaffIds = readWarehouseStaff(extra);
+  const warehouseStaffField = (
+    <InlineEditField<string[]>
+      canEdit={canEditMeta}
+      value={warehouseStaffIds}
+      equals={(a, b) => !diffWarehouseStaff(a, b)}
+      onSave={async (next) =>
+        handleMetaPatch({ extra: { warehouseStaff: next.length > 0 ? next : undefined } })
+      }
+      labels={inlineEditLabels}
+      renderDisplay={(v) =>
+        v.length > 0 ? (
+          <WarehouseStaffLinks ids={v} />
+        ) : (
+          <Text size="sm" c="dimmed" fs="italic">
+            —
+          </Text>
+        )
+      }
+      renderEditor={({ value: v, onChange }) => (
+        <MultiSelect
+          data={buildWarehouseStaffOptions(employees, warehouseStaffEmployeeFilter, v)}
+          value={v}
+          onChange={onChange}
+          placeholder={t('salesOrders.form.warehouseStaffPlaceholder')}
+          searchable
+          clearable
+          autoFocus
+        />
+      )}
+    />
+  );
+  const warehouseStaffDetailField = warehouseStaffAllowed ? (
+    <DetailField label={t('salesOrders.detail.warehouseStaff')}>{warehouseStaffField}</DetailField>
+  ) : null;
 
   const deliveryMethodField = (
     <InlineSelectField
@@ -1538,6 +1587,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         <DetailField label={t('salesOrders.detail.assignedStaff')}>
           {assignedStaffField}
         </DetailField>
+        {warehouseStaffDetailField}
         <DetailField label={t('salesOrders.detail.createdBy')}>
           <EmployeeLink id={extra.createdBy} size="xs" />
         </DetailField>
@@ -1574,6 +1624,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         <DetailField label={t('salesOrders.detail.assignedStaff')}>
           {assignedStaffField}
         </DetailField>
+        {warehouseStaffDetailField}
         <DetailField label={t('salesOrders.detail.deliveryDate')}>{deliveryDateField}</DetailField>
         <DetailField label={t('salesOrders.detail.deliveryMethod')}>
           {deliveryMethodField}
@@ -1652,6 +1703,7 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
         <DetailField label={t('salesOrders.detail.assignedStaff')}>
           {assignedStaffField}
         </DetailField>
+        {warehouseStaffDetailField}
         <DetailField label={t('salesOrders.detail.deliveryDate')}>{deliveryDateField}</DetailField>
         <DetailField label={t('salesOrders.detail.deliveryMethod')}>
           {deliveryMethodField}

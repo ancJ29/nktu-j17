@@ -41,8 +41,10 @@ import { appConfig } from '@/config';
 import {
   hasBarcodeForProducts,
   hasHideFromInventoryListForProducts,
+  isGoodsReceiptPrintEnabled,
   perms,
 } from '@/utils/permission';
+import { showsPurchaseOrderNames } from '@/utils/productPurchaseOrderNames';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
 import { GroupedNumberInput } from '@/components/GroupedNumberInput';
@@ -57,6 +59,9 @@ export type ProductFormValues = {
   price: number;
   isActive: boolean;
   alternativeNames: string[];
+
+  nameZh: string;
+  nameEn: string;
 
   sku: string;
   barcode: string;
@@ -82,6 +87,7 @@ export type ProductFormValues = {
 
 const barcodeEnabled = hasBarcodeForProducts();
 const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
+const purchaseOrderPrintEnabled = isGoodsReceiptPrintEnabled();
 
 const canManagePrice = perms.product.canManagePrice();
 
@@ -527,6 +533,25 @@ export function SingleProductForm({
           withAsterisk
           {...form.getInputProps('name')}
         />
+        {showsPurchaseOrderNames(
+          { nameZh: form.values.nameZh, nameEn: form.values.nameEn },
+          purchaseOrderPrintEnabled,
+        ) && (
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+            <TextInput
+              label={t('products.form.nameZhLabel')}
+              description={t('products.form.purchaseOrderNameDescription')}
+              lang="zh-Hans"
+              {...form.getInputProps('nameZh')}
+            />
+            <TextInput
+              label={t('products.form.nameEnLabel')}
+              description={t('products.form.purchaseOrderNameDescription')}
+              lang="en"
+              {...form.getInputProps('nameEn')}
+            />
+          </SimpleGrid>
+        )}
         <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           <TextInput
             label={t('common.labels.sku')}

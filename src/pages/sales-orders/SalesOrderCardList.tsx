@@ -25,7 +25,13 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
-import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
+import {
+  getPricingVatRate,
+  isPricingManagementEnabled,
+  isWarehouseStaffAllowed,
+  perms,
+} from '@/utils/permission';
+import { formatWarehouseStaffNames, readWarehouseStaff } from './salesOrderWarehouseStaff';
 import {
   computeSalesOrderTotals,
   isSalesOrderBillingExempt,
@@ -34,6 +40,7 @@ import {
 import type { SalesOrderListView } from './salesOrderListVariant';
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
+const warehouseStaffAllowed = isWarehouseStaffAllowed();
 
 type SalesOrderCardListProps = {
   readonly orders: SalesOrder[];
@@ -133,6 +140,11 @@ export function SalesOrderCardList({
       {orders.map((order) => {
         const extra = order.extra ?? {};
         const staffName = extra.assignedStaff ? employeeMap.get(extra.assignedStaff) : undefined;
+
+        const warehouseStaffNames =
+          warehouseStaffAllowed && !financeMode
+            ? formatWarehouseStaffNames(readWarehouseStaff(extra), (id) => employeeMap.get(id))
+            : '';
         const createdByName = extra.createdBy ? employeeMap.get(extra.createdBy) : undefined;
 
         return (
@@ -219,6 +231,12 @@ export function SalesOrderCardList({
                 )}
                 {staffName && (
                   <FieldRow label={t('salesOrders.detail.assignedStaff')} value={staffName} />
+                )}
+                {warehouseStaffNames && (
+                  <FieldRow
+                    label={t('salesOrders.detail.warehouseStaff')}
+                    value={warehouseStaffNames}
+                  />
                 )}
                 {extra.orderDate && (
                   <FieldRow

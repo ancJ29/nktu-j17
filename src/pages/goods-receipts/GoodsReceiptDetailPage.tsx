@@ -11,13 +11,17 @@ import {
   Group,
   Modal,
   rem,
+  SegmentedControl,
   SimpleGrid,
   Stack,
+  Switch,
   Text,
   ThemeIcon,
   Title,
   Tooltip,
 } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
 import { useEffect, useState } from 'react';
 import {
   IconAlertTriangle,
@@ -32,6 +36,7 @@ import {
   IconHistory,
   IconNote,
   IconPackage,
+  IconPrinter,
   IconRefresh,
   IconTrendingUp,
   IconTruckDelivery,
@@ -47,10 +52,19 @@ import { EmployeeLink } from '@/components/EmployeeLink';
 import { ProductLink } from '@/components/ProductLink';
 import { SectionCard } from '@/components/SectionCard';
 import { VendorLink } from '@/components/VendorLink';
+import { getCompanyInfo } from '@/config/companyInfo';
+import { PURCHASE_ORDER_PALETTE } from '@/config/printDefaults';
 import { useProductStore } from '@/stores/useProductStore';
+import { useVendorStore } from '@/stores/useVendorStore';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
-import { isActivityLoggingEnabled, isLocationsEnabled } from '@/utils/permission';
+import { lookupLabelOf, useLookupV2Labels, useProductPhotoByCode } from '@/hooks';
+import {
+  hasImagesForProducts,
+  isActivityLoggingEnabled,
+  isLocationsEnabled,
+} from '@/utils/permission';
+import type { Orientation, PaperSize } from '@/utils/printDocument';
+import { indexProductsByCode } from '@/utils/productByCode';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import type { GoodsReceipt, GoodsReceiptItem } from '@/types';
 import { useGoodsReceiptDetail } from './useGoodsReceiptDetail';
@@ -59,11 +73,17 @@ import {
   GoodsReceiptItemsTableDesktop,
 } from './GoodsReceiptItemsTable';
 import { resolveBaseUnitDisplay } from './goodsReceiptUnitDisplay';
+import {
+  DEFAULT_PURCHASE_ORDER_PRINT_OPTIONS,
+  printPurchaseOrder,
+  toPurchaseOrderPrintData,
+} from './purchaseOrderPrint';
 import type { DateTimeInput, NullableDateTimeInput } from '@credo/kits/types';
 import { NumberField } from '@/components/NumberField';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
+const showProductPhoto = hasImagesForProducts();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
 
@@ -229,6 +249,7 @@ export function GoodsReceiptDetailPage() {
     showCancelCta,
     showEditCta,
     showCopyCta,
+    showPrintCta,
     canEditItems,
     stockPostedOnDraft,
     confirmAction,
@@ -256,7 +277,42 @@ export function GoodsReceiptDetailPage() {
 
   const products = useProductStore((s) => s.items);
 
+  const photoByCode = useProductPhotoByCode();
+  const [printOpened, printHandlers] = useDisclosure(false);
+  const [paperSize, setPaperSize] = useState<PaperSize>(
+    DEFAULT_PURCHASE_ORDER_PRINT_OPTIONS.paperSize,
+  );
+  const [orientation, setOrientation] = useState<Orientation>(
+    DEFAULT_PURCHASE_ORDER_PRINT_OPTIONS.orientation,
+  );
+  const [includeExpectedDelivery, setIncludeExpectedDelivery] = useState(
+    DEFAULT_PURCHASE_ORDER_PRINT_OPTIONS.includeExpectedDelivery,
+  );
+
   if (loading || !receipt || !status) return null;
+
+  const handlePrintPurchaseOrder = () => {
+    const ok = printPurchaseOrder(
+      toPurchaseOrderPrintData({
+        receipt,
+        vendor: useVendorStore.getState().getByCode(receipt.vendorCode),
+        buyer: getCompanyInfo(),
+        unitLabelOf: (unit) => lookupLabelOf(unitLabels, unit),
+        photoByCode,
+        productByCode: indexProductsByCode(products),
+        showPhoto: showProductPhoto,
+      }),
+      { paperSize, orientation, includeExpectedDelivery, palette: PURCHASE_ORDER_PALETTE },
+    );
+    printHandlers.close();
+    if (!ok) {
+      notifications.show({
+        color: 'red',
+        message: t('goodsReceipts.print.popupBlocked'),
+        autoClose: 8000,
+      });
+    }
+  };
 
   const unitTotals = new Map<string, number>();
   for (const it of receipt.items) {
@@ -416,6 +472,16 @@ export function GoodsReceiptDetailPage() {
             onClick={handleCopyReceipt}
           >
             {t('common.actions.copy')}
+          </Button>
+        )}
+        {showPrintCta && (
+          <Button
+            variant="subtle"
+            size="compact-sm"
+            leftSection={<IconPrinter size={14} />}
+            onClick={printHandlers.open}
+          >
+            {t('goodsReceipts.print.action')}
           </Button>
         )}
         {showEditCta && (
@@ -879,6 +945,61 @@ export function GoodsReceiptDetailPage() {
       </Stack>
 
       {stickyBar}
+
+      <Modal
+        opened={printOpened}
+        onClose={printHandlers.close}
+        title={t('goodsReceipts.print.optionsTitle')}
+        size="sm"
+      >
+        <Stack gap="md">
+          <Stack gap={6}>
+            <Text size="sm" fw={500}>
+              {t('goodsReceipts.print.paperSize')}
+            </Text>
+            <SegmentedControl
+              fullWidth
+              value={paperSize}
+              onChange={(v) => setPaperSize(v as PaperSize)}
+              data={[
+                { value: 'A4', label: 'A4' },
+                { value: 'A5', label: 'A5' },
+              ]}
+            />
+          </Stack>
+          <Stack gap={6}>
+            <Text size="sm" fw={500}>
+              {t('goodsReceipts.print.orientation')}
+            </Text>
+            <SegmentedControl
+              fullWidth
+              value={orientation}
+              onChange={(v) => setOrientation(v as Orientation)}
+              data={[
+                { value: 'portrait', label: t('goodsReceipts.print.portrait') },
+                { value: 'landscape', label: t('goodsReceipts.print.landscape') },
+              ]}
+            />
+          </Stack>
+          <Switch
+            label={t('goodsReceipts.print.includeExpectedDelivery')}
+            checked={includeExpectedDelivery}
+            onChange={(e) => setIncludeExpectedDelivery(e.currentTarget.checked)}
+          />
+          <Group justify="flex-end" gap="sm">
+            <Button variant="default" size="sm" onClick={printHandlers.close}>
+              {t('common.actions.cancel')}
+            </Button>
+            <Button
+              size="sm"
+              leftSection={<IconPrinter size={14} />}
+              onClick={handlePrintPurchaseOrder}
+            >
+              {t('goodsReceipts.print.submit')}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
 
       {/* Locked shut while the action runs: the status flip is followed by a
           sequential inventory write per line, and letting the operator dismiss

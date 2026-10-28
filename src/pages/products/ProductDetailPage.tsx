@@ -36,6 +36,7 @@ import {
   IconEdit,
   IconFileDescription,
   IconHistory,
+  IconLanguage,
   IconListDetails,
   IconPhoto,
   IconPlus,
@@ -73,11 +74,17 @@ import {
   hasImagesForProducts,
   hasTechnicalSpecsForProducts,
   isActivityLoggingEnabled,
+  isGoodsReceiptPrintEnabled,
   isLocationsEnabled,
   isPriceManagementEnabled,
   isProductInventoryEnabled,
   perms,
 } from '@/utils/permission';
+import {
+  purchaseOrderNamesOf,
+  showsPurchaseOrderNames,
+  type PurchaseOrderNames,
+} from '@/utils/productPurchaseOrderNames';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
 import type { Product, ProductExtra, ProductImageEntry } from '@/types';
@@ -106,6 +113,7 @@ const technicalSpecsEnabled = hasTechnicalSpecsForProducts();
 const barcodeEnabled = hasBarcodeForProducts();
 const imagesEnabled = hasImagesForProducts();
 const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
+const purchaseOrderPrintEnabled = isGoodsReceiptPrintEnabled();
 
 type ClassificationDraft = {
   category: string;
@@ -190,6 +198,7 @@ export function ProductDetailPage() {
   const descEdit = useCardEdit<string>();
   const specsEdit = useCardEdit<Array<{ key: string; value: string }>>();
   const warehouseMemoEdit = useCardEdit<string>();
+  const poNamesEdit = useCardEdit<PurchaseOrderNames>();
   const classEdit = useCardEdit<ClassificationDraft>();
 
   const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
@@ -1170,6 +1179,53 @@ export function ProductDetailPage() {
     </SectionCard>
   );
 
+  const poNames = purchaseOrderNamesOf(extra);
+  const poNamesDraft = poNamesEdit.draft;
+  const poNameSlot = (key: keyof PurchaseOrderNames, label: string, lang: string) => (
+    <Stack gap={6}>
+      <FieldLabel>{label}</FieldLabel>
+      {poNamesEdit.editing && poNamesDraft ? (
+        <TextInput
+          value={poNamesDraft[key]}
+          onChange={(e) => poNamesEdit.setDraft({ ...poNamesDraft, [key]: e.currentTarget.value })}
+          lang={lang}
+          autoFocus={key === 'zh'}
+        />
+      ) : poNames[key] ? (
+        <Text size="sm" lang={lang}>
+          {poNames[key]}
+        </Text>
+      ) : (
+        emptyDash
+      )}
+    </Stack>
+  );
+  const purchaseOrderNamesCard = showsPurchaseOrderNames(extra, purchaseOrderPrintEnabled) ? (
+    <SectionCard
+      icon={<IconLanguage size={14} />}
+      title={t('products.detail.purchaseOrderNamesTitle')}
+      editable={canEdit && !isMobile}
+      editing={poNamesEdit.editing}
+      saving={poNamesEdit.saving}
+      labels={editLabels}
+      onEdit={() => poNamesEdit.begin(poNames)}
+      onCancel={poNamesEdit.cancel}
+      onSave={() =>
+        poNamesEdit.save((next) =>
+          patchExtra(
+            { nameZh: next.zh.trim() || undefined, nameEn: next.en.trim() || undefined },
+            'product.updatePurchaseOrderNames',
+          ),
+        )
+      }
+    >
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
+        {poNameSlot('zh', t('products.form.nameZhLabel'), 'zh-Hans')}
+        {poNameSlot('en', t('products.form.nameEnLabel'), 'en')}
+      </SimpleGrid>
+    </SectionCard>
+  ) : null;
+
   const minInventoryCard = minInv ? (
     <SectionCard
       icon={<IconPlus size={14} />}
@@ -1325,6 +1381,7 @@ export function ProductDetailPage() {
       <Grid.Col span={{ base: 12, md: 5 }}>
         <Stack gap="md">
           {warehouseMemoCard}
+          {purchaseOrderNamesCard}
           {minInventoryCard}
           {currentInventoryCard}
           {dangerZone}
@@ -1344,6 +1401,7 @@ export function ProductDetailPage() {
     <Stack gap="md">
       {descriptionCard}
       {warehouseMemoCard}
+      {purchaseOrderNamesCard}
       {setCompositionCard}
       {techSpecsCard}
       {classificationCard}

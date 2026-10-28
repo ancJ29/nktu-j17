@@ -202,6 +202,7 @@ export const DEFAULT_GOODS_RECEIPT_FEATURES: GoodsReceiptFeatures = {
   picDepartments: [],
   allowNoInventoryProducts: false,
   defaultListStatuses: [],
+  printNote: false,
 };
 
 export const DEFAULT_DELIVERY_REQUEST_FEATURES: CMngtDeliveryRequestFeatures = {

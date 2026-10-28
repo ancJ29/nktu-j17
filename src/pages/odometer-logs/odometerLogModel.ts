@@ -79,9 +79,6 @@ export const OTHER_COST_CONTENTS = [
   'Cp Khác',
 ] as const;
 
-export const pickableContent = (content: string): string =>
-  (OTHER_COST_CONTENTS as readonly string[]).includes(content) ? content : '';
-
 export function readOtherCosts(log: OdometerLog | undefined): OdometerOtherCost[] {
   const raw: unknown = log?.extra?.otherCosts;
   if (!Array.isArray(raw)) return [];
@@ -95,6 +92,12 @@ export function readOtherCosts(log: OdometerLog | undefined): OdometerOtherCost[
   }
   return lines;
 }
+
+export const costLines = (log: OdometerLog | undefined) =>
+  readOtherCosts(log).map(({ amount, content }) => ({
+    amount: amount as number | undefined,
+    content,
+  }));
 
 export function missingCostHalf(line: {
   amount: number | undefined;

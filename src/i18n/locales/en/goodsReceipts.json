@@ -143,6 +143,17 @@
     "updateError": "Failed to update receipt.",
     "updateSuccess": "Receipt updated."
   },
+  "print": {
+    "action": "Print purchase order",
+    "includeExpectedDelivery": "Print expected delivery date",
+    "landscape": "Landscape",
+    "optionsTitle": "Print options",
+    "orientation": "Orientation",
+    "paperSize": "Paper size",
+    "popupBlocked": "Pop-up blocked. Allow pop-ups for this site, then try again.",
+    "portrait": "Portrait",
+    "submit": "Print"
+  },
   "stats": {
     "total": "Total"
   },

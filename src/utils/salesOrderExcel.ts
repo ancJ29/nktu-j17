@@ -3,6 +3,10 @@ import type { Customer, SalesOrder } from '@/types';
 import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission';
 import { formatDate } from '@/utils/dateFormat';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
+import {
+  formatWarehouseStaffNames,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
 
 export type SalesOrderExportOptions = {
   language?: string;
@@ -15,6 +19,8 @@ export type SalesOrderExportOptions = {
   tagOptions: ReadonlyArray<ResolvedTagOption>;
 
   pricingEnabled?: boolean;
+
+  warehouseStaffEnabled?: boolean;
 };
 
 export const exportSalesOrdersToExcel = (
@@ -27,6 +33,7 @@ export const exportSalesOrdersToExcel = (
     tagOptions,
     getCustomerByCode,
     pricingEnabled = true,
+    warehouseStaffEnabled = false,
   }: SalesOrderExportOptions,
 ): void => {
   const isVietnamese = language === 'vi';
@@ -39,6 +46,7 @@ export const exportSalesOrdersToExcel = (
     | 'deliveryDate'
     | 'deliveryMethod'
     | 'assignedStaff'
+    | 'warehouseStaff'
     | 'totalAmount'
     | 'urgent'
     | 'tags'
@@ -55,6 +63,7 @@ export const exportSalesOrdersToExcel = (
         deliveryDate: 'Ngày giao',
         deliveryMethod: 'Phương thức giao',
         assignedStaff: 'Nhân viên phụ trách',
+        warehouseStaff: 'Nhân viên kho',
         totalAmount: 'Tổng tiền',
         urgent: 'Khẩn',
         tags: 'Thẻ',
@@ -69,6 +78,7 @@ export const exportSalesOrdersToExcel = (
         deliveryDate: 'Delivery Date',
         deliveryMethod: 'Delivery Method',
         assignedStaff: 'Assigned Staff',
+        warehouseStaff: 'Warehouse Staff',
         totalAmount: 'Total Amount',
         urgent: 'Urgent',
         tags: 'Tags',
@@ -84,6 +94,9 @@ export const exportSalesOrdersToExcel = (
     { key: 'deliveryDate', header: labels.deliveryDate, width: 12 },
     { key: 'deliveryMethod', header: labels.deliveryMethod, width: 16 },
     { key: 'assignedStaff', header: labels.assignedStaff, width: 22 },
+    ...(warehouseStaffEnabled
+      ? [{ key: 'warehouseStaff' as const, header: labels.warehouseStaff, width: 28 }]
+      : []),
     ...(pricingEnabled
       ? [{ key: 'totalAmount' as const, header: labels.totalAmount, width: 14 }]
       : []),
@@ -109,6 +122,9 @@ export const exportSalesOrdersToExcel = (
       deliveryDate: e.deliveryDate ? formatDate(e.deliveryDate) : '',
       deliveryMethod: resolveDeliveryMethod(e.deliveryMethod) || '',
       assignedStaff: e.assignedStaff ? (employeeNames.get(e.assignedStaff) ?? '') : '',
+      warehouseStaff: formatWarehouseStaffNames(readWarehouseStaff(e), (id) =>
+        employeeNames.get(id),
+      ),
       totalAmount: typeof o.totalAmount === 'number' ? o.totalAmount : 0,
       urgent: e.isUrgent ? yes : no,
       tags: (e.tags ?? []).map((v) => tagLabelByValue.get(v) ?? v).join('; '),

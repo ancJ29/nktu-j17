@@ -3,6 +3,7 @@ import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import type { ResolvedStatusOption } from '@/utils/permission';
 import { computeSalesOrderTotals } from '@/utils/salesOrderPricing';
 import { getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
+import { formatWarehouseStaffNames, readWarehouseStaff } from './salesOrderWarehouseStaff';
 import { isOpenUrgentSalesOrder } from './urgencyRowBg';
 
 export type SalesOrderListSortLookups = {
@@ -41,6 +42,10 @@ function cellValueReader(
         const id = o.extra?.assignedStaff;
         return (id && lookups.getEmployeeName(id)) || undefined;
       };
+    case 'warehouseStaff':
+      return (o) =>
+        formatWarehouseStaffNames(readWarehouseStaff(o.extra), lookups.getEmployeeName) ||
+        undefined;
     case 'grandTotal':
       if (!lookups.showPrice) return undefined;
       return (o) => computeSalesOrderTotals(o, lookups.vatRate).grandTotal;

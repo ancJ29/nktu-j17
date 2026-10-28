@@ -50,7 +50,8 @@
     "deliveryDate": "Ngày giao",
     "labels": "Nhãn",
     "orderDate": "Ngày đặt",
-    "orderNumber": "Số đơn hàng"
+    "orderNumber": "Số đơn hàng",
+    "warehouseStaff": "Nhân viên kho"
   },
   "configErrors": {
     "description": "Module Đơn hàng đã bị tắt do cấu hình không hợp lệ. Vui lòng sửa các lỗi sau trong Cấu hình ứng dụng rồi tải lại:",
@@ -205,7 +206,8 @@
     "tabProductPhotos": "Ảnh sản phẩm",
     "viewItems": "Xem sản phẩm",
     "viewProductPhotos": "Xem ảnh sản phẩm",
-    "warehouseNote": "Ghi chú cho kho"
+    "warehouseNote": "Ghi chú cho kho",
+    "warehouseStaff": "Nhân viên kho"
   },
   "editItem": "Điều chỉnh đơn hàng",
   "filterStaff": "Nhân viên",
@@ -289,7 +291,9 @@
     "totalQuantityLabel": "Tổng số lượng",
     "updateButton": "Cập nhật đơn hàng",
     "warehouseNoteLabel": "Ghi chú cho kho",
-    "warehouseNotePlaceholder": "Ghi chú cho nhân viên kho"
+    "warehouseNotePlaceholder": "Ghi chú cho nhân viên kho",
+    "warehouseStaffLabel": "Nhân viên kho",
+    "warehouseStaffPlaceholder": "Chọn nhân viên kho"
   },
   "inventoryLinkage": {
     "stateReleased": "Đã giải phóng",

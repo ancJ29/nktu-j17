@@ -50,7 +50,8 @@
     "deliveryDate": "Delivery Date",
     "labels": "Labels",
     "orderDate": "Order Date",
-    "orderNumber": "Order Number"
+    "orderNumber": "Order Number",
+    "warehouseStaff": "Warehouse Staff"
   },
   "configErrors": {
     "description": "The Sales Orders module has been disabled because its configuration is invalid. Fix these issues in App Config and reload:",
@@ -205,7 +206,8 @@
     "tabProductPhotos": "Product Photos",
     "viewItems": "View items",
     "viewProductPhotos": "View product photos",
-    "warehouseNote": "Warehouse note"
+    "warehouseNote": "Warehouse note",
+    "warehouseStaff": "Warehouse Staff"
   },
   "editItem": "Edit Order",
   "filterStaff": "Assigned Staff",
@@ -289,7 +291,9 @@
     "totalQuantityLabel": "Total quantity",
     "updateButton": "Update Order",
     "warehouseNoteLabel": "Warehouse note",
-    "warehouseNotePlaceholder": "Note for warehouse staff"
+    "warehouseNotePlaceholder": "Note for warehouse staff",
+    "warehouseStaffLabel": "Warehouse Staff",
+    "warehouseStaffPlaceholder": "Select warehouse staff"
   },
   "inventoryLinkage": {
     "stateReleased": "Stock released",

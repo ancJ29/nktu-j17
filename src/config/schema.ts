@@ -498,6 +498,10 @@ const SalesOrderFeaturesSchema = z
 
     picDepartments: z.array(z.string()).default([]),
 
+    allowWarehouseStaff: z.boolean().default(false),
+
+    warehouseStaffDepartments: z.array(z.string()).default([]),
+
     allowInternalDelivery: z.boolean().default(true),
 
     allowAdditionalDR: z.boolean().default(true),
@@ -521,6 +525,8 @@ const SalesOrderFeaturesSchema = z
     deliveryPackageSizeOptions: [],
     defaultListStatuses: [],
     picDepartments: [],
+    allowWarehouseStaff: false,
+    warehouseStaffDepartments: [],
     allowInternalDelivery: true,
     allowAdditionalDR: true,
     allowSkipInitialStage: false,
@@ -571,6 +577,8 @@ const GoodsReceiptFeaturesSchema = z
     allowNoInventoryProducts: z.boolean().default(false),
 
     defaultListStatuses: z.array(z.string()).default([]),
+
+    printNote: z.boolean().default(false),
   })
   .default({
     enabled: false,
@@ -579,6 +587,7 @@ const GoodsReceiptFeaturesSchema = z
     picDepartments: [],
     allowNoInventoryProducts: false,
     defaultListStatuses: [],
+    printNote: false,
   });
 
 export type GoodsReceiptFeatures = z.infer<typeof GoodsReceiptFeaturesSchema>;

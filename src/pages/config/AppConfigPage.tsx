@@ -1947,6 +1947,46 @@ export function ConfigEditor({
                     clearable
                     nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
                   />
+                  {/* Warehouse staff. Schema-only fields (not in the kits
+                      `CMngtSalesOrderFeatures` mirror), so read/written via a
+                      local cast like `allowExtraDeliveryQuantity`; consumed via
+                      `isWarehouseStaffAllowed()` / `getSalesOrderWarehouseStaffDepartments()`. */}
+                  <FeatureToggleRow
+                    label="Warehouse staff on orders"
+                    description="Lets an order name the warehouse staff who handle it: a picker on the order form and the desktop detail page (read-only on phones), a column, sort and filter on the list, and a column in the list export."
+                    checked={
+                      (salesOrdersFeatures as { allowWarehouseStaff?: boolean })
+                        .allowWarehouseStaff ?? false
+                    }
+                    onChange={(checked) =>
+                      setSalesOrdersFeatures({
+                        ...salesOrdersFeatures,
+                        allowWarehouseStaff: checked,
+                      } as CMngtSalesOrderFeatures)
+                    }
+                  />
+                  {(salesOrdersFeatures as { allowWarehouseStaff?: boolean })
+                    .allowWarehouseStaff && (
+                    <MultiSelect
+                      label="Warehouse Staff Departments"
+                      description="Restrict the warehouse-staff picker to employees in these departments. Leave empty to allow any active employee."
+                      placeholder="Any active employee (no restriction)"
+                      data={departmentMultiSelectData}
+                      value={
+                        (salesOrdersFeatures as { warehouseStaffDepartments?: string[] })
+                          .warehouseStaffDepartments ?? []
+                      }
+                      onChange={(v) =>
+                        setSalesOrdersFeatures({
+                          ...salesOrdersFeatures,
+                          warehouseStaffDepartments: v,
+                        } as CMngtSalesOrderFeatures)
+                      }
+                      searchable
+                      clearable
+                      nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
+                    />
+                  )}
                   <TagsInput
                     label="Delivery Package Size Options"
                     description="Preset sizes suggested in the SO detail 'Package Size' field (editing gated by the salesOrder.canEditDeliveryPackageSize permission). Free text is still allowed — these are only suggestions. Press Enter to add."
@@ -2156,6 +2196,15 @@ export function ConfigEditor({
                     ...goodsReceiptsFeatures,
                     allowNoInventoryProducts: checked,
                   })
+                }
+              />
+
+              <FeatureToggleRow
+                label="Print purchase order"
+                description="Adds a Print button on a draft receipt's desktop detail page: the order to the vendor, every label in Vietnamese, Chinese and English, with each line's code, photo, name, unit and quantity. No prices, totals, signatures or internal note. Off by default."
+                checked={goodsReceiptsFeatures.printNote}
+                onChange={(checked) =>
+                  setGoodsReceiptsFeatures({ ...goodsReceiptsFeatures, printNote: checked })
                 }
               />
 

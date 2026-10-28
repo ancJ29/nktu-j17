@@ -26,6 +26,7 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import type { Customer, SalesOrder } from '@/types';
 import { compareSalesOrdersForList } from './salesOrderListSort';
+import { hasWarehouseStaffMember } from './salesOrderWarehouseStaff';
 import { getCancellationTargetStatusValue } from './transitionEngine';
 import type { SalesOrderListView } from './salesOrderListVariant';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
@@ -46,6 +47,7 @@ type SalesOrderUrlState = {
   s?: string[];
   c?: string;
   f?: string;
+  ws?: string;
   u?: boolean;
   sr?: string;
   q?: string;
@@ -65,6 +67,7 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.c) r.c = state.c;
   if (state.f) r.f = state.f;
+  if (state.ws) r.ws = state.ws;
   if (state.u) r.u = true;
   if (state.sr && state.sr !== DEFAULT_SORT) r.sr = state.sr;
   if (state.q) r.q = state.q;
@@ -111,6 +114,7 @@ export function useSalesOrderListFilters(
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
+  const warehouseStaffFilter = state.ws ?? null;
   const urgentOnly = state.u ?? false;
   const sortField = state.sr ?? DEFAULT_SORT;
   const search = state.q ?? '';
@@ -136,6 +140,11 @@ export function useSalesOrderListFilters(
 
   const setStaffFilter = useCallback(
     (value: string | null) => updateState({ f: value || undefined, pg: undefined }),
+    [updateState],
+  );
+
+  const setWarehouseStaffFilter = useCallback(
+    (value: string | null) => updateState({ ws: value || undefined, pg: undefined }),
     [updateState],
   );
 
@@ -199,6 +208,7 @@ export function useSalesOrderListFilters(
       if (statusFilter.length > 0 && !statusFilter.includes(o.extra?.status ?? '')) return false;
       if (customerFilter && o.extra?.customerCode !== customerFilter) return false;
       if (staffFilter && o.extra?.assignedStaff !== staffFilter) return false;
+      if (warehouseStaffFilter && !hasWarehouseStaffMember(o, warehouseStaffFilter)) return false;
       if (urgentOnly && !o.extra?.isUrgent) return false;
 
       if (!isInDateRange(getSalesOrderReadyDate(o), createdDateRange)) return false;
@@ -222,6 +232,7 @@ export function useSalesOrderListFilters(
     statusFilter,
     customerFilter,
     staffFilter,
+    warehouseStaffFilter,
     urgentOnly,
     createdDateRange,
     deliveryDateRange,
@@ -240,6 +251,7 @@ export function useSalesOrderListFilters(
     !statusFilterIsDefault ||
     customerFilter ||
     staffFilter ||
+    warehouseStaffFilter ||
     urgentOnly ||
     !isDefaultLastNDaysRange(createdDateRange) ||
     deliveryDateRange.preset ||
@@ -256,6 +268,8 @@ export function useSalesOrderListFilters(
     setCustomerFilter,
     staffFilter,
     setStaffFilter,
+    warehouseStaffFilter,
+    setWarehouseStaffFilter,
     urgentOnly,
     setUrgentOnly,
     sortField,

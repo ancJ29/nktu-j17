@@ -22,7 +22,7 @@ import { logActivity } from '@/utils/activityLogger';
 import { isProductSet } from '@/utils/productSet';
 import { buildBreakdownParentIndex } from '@/utils/breakdownSet';
 import { rebalanceForSetStockChange } from '@/utils/setRebalance';
-import { perms } from '@/utils/permission';
+import { isGoodsReceiptPrintEnabled, perms } from '@/utils/permission';
 import type { GoodsReceipt, GoodsReceiptCopyFrom } from '@/types';
 import { findStatus, type GoodsReceiptStatusOption } from './goodsReceiptStatuses';
 import type { GoodsReceiptInlineFields } from './activityMemo';
@@ -33,6 +33,7 @@ const canEdit = perms.goodsReceipt.canEdit();
 const canConfirmReceived = perms.goodsReceipt.canConfirmReceived();
 const canCancel = perms.goodsReceipt.canCancel();
 const canCreate = perms.goodsReceipt.canCreate();
+const printEnabled = isGoodsReceiptPrintEnabled();
 
 export type ConfirmAction = 'confirmReceived' | 'cancel';
 
@@ -50,6 +51,8 @@ export type UseGoodsReceiptDetailReturn = {
   showCancelCta: boolean;
   showEditCta: boolean;
   showCopyCta: boolean;
+
+  showPrintCta: boolean;
 
   canEditItems: boolean;
 
@@ -538,6 +541,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
 
   const showCopyCta = !!receipt && canCreate && !isMobile;
 
+  const showPrintCta = !!receipt && printEnabled && isDraft && !isMobile;
+
   const canEditItems = !!receipt && canEdit && isDraft && !stockPostedOnDraft;
 
   const showRepostCta =
@@ -555,6 +560,7 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
     showCancelCta,
     showEditCta,
     showCopyCta,
+    showPrintCta,
     canEditItems,
     stockPostedOnDraft,
     confirmAction,

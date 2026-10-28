@@ -45,6 +45,7 @@ import { cMngtConnector } from '@credo/connectors/connector';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
 import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
@@ -63,11 +64,13 @@ import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import {
   getDeliveryRequestDriverDepartments,
   getSalesOrderPicDepartments,
+  getSalesOrderWarehouseStaffDepartments,
   hasImagesForProducts,
   isDeliveryRequestsEnabled,
   isInternalDeliveryAllowed,
   isLocationsEnabled,
   isPricingManagementEnabled,
+  isWarehouseStaffAllowed,
   makeEmployeeDepartmentFilter,
   perms,
 } from '@/utils/permission';
@@ -137,6 +140,12 @@ import {
   toMemoItem,
 } from './activityMemo';
 import type { SalesOrderFormVariant } from './salesOrderFormVariant';
+import { mergeFormEditExtra } from './salesOrderFormEditExtra';
+import {
+  buildWarehouseStaffOptions,
+  diffWarehouseStaff,
+  readWarehouseStaff,
+} from './salesOrderWarehouseStaff';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { isBundleSet, isProductSet, isNoInventoryProduct, newSetGroupId } from '@/utils/productSet';
 import {
@@ -162,6 +171,10 @@ const pricingEnabled = isPricingManagementEnabled();
 
 const canViewSetComponentInventory = perms.salesOrder.canViewSetComponentInventory();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
+const warehouseStaffAllowed = isWarehouseStaffAllowed();
+const warehouseStaffEmployeeFilter = makeEmployeeDepartmentFilter(
+  getSalesOrderWarehouseStaffDepartments(),
+);
 const salesOrderCodePrefix = appConfig.features.salesOrders.codePrefix;
 
 const soDriverDepartments = getDeliveryRequestDriverDepartments();
@@ -218,6 +231,8 @@ type SalesOrderFormValues = {
   deliveryDate: Date | null;
   deliveryMethod: string;
   assignedStaff: string;
+
+  warehouseStaff: string[];
   isUrgent: boolean;
   tags: string[];
 
@@ -403,6 +418,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
   );
 
   const currentEmployee = useMyEmployee();
+
+  const employees = useEmployeeStore((s) => s.items);
   const currentEmployeeId = currentEmployee?.id ?? '';
 
   const productSelectData = useMemo(
@@ -487,6 +504,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       deliveryDate: null,
       deliveryMethod: variant.defaultDeliveryMethod,
       assignedStaff: currentEmployeeId,
+      warehouseStaff: [],
       isUrgent: false,
       tags: [],
       needVAT: true,
@@ -601,6 +619,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       deliveryDate: null,
       deliveryMethod: (copyFrom.deliveryMethod as string) ?? '',
       assignedStaff: (copyFrom.assignedStaff as string) ?? currentEmployeeId,
+
+      warehouseStaff: [],
       isUrgent: (copyFrom.isUrgent as boolean) ?? false,
       tags: (copyFrom.tags as string[]) ?? [],
 
@@ -1216,6 +1236,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         deliveryDate: extra?.deliveryDate ? new Date(extra.deliveryDate) : null,
         deliveryMethod: extra?.deliveryMethod ?? '',
         assignedStaff: extra?.assignedStaff ?? '',
+        warehouseStaff: readWarehouseStaff(extra),
         isUrgent: extra?.isUrgent ?? false,
         tags: extra?.tags ?? [],
         needVAT: extra?.needVAT ?? true,
@@ -1373,7 +1394,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
       const productWarehouseMemos = buildSalesOrderWarehouseMemo(items, productByCode);
 
-      const extra: SalesOrderExtra = {
+      const extra = {
         ...(productWarehouseMemos && { productWarehouseMemos }),
         ...(values.isIndividualCustomer
           ? { isIndividualCustomer: true, customerName: values.customerName.trim() }
@@ -1393,6 +1414,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
         ...(values.deliveryDate && { deliveryDate: new Date(values.deliveryDate).getTime() }),
         ...(values.deliveryMethod && { deliveryMethod: values.deliveryMethod }),
         ...(values.assignedStaff && { assignedStaff: values.assignedStaff }),
+        ...(values.warehouseStaff.length > 0 && { warehouseStaff: values.warehouseStaff }),
         ...(values.isUrgent && { isUrgent: true }),
         ...(values.tags.length > 0 && { tags: values.tags }),
 
@@ -1423,7 +1445,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
             },
           },
         }),
-      };
+      } satisfies SalesOrderExtra;
 
       try {
         if (isEdit && id) {
@@ -1556,25 +1578,12 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           }
 
           const mergedExtra: SalesOrderExtra = {
-            ...(snapshotExtra.createdBy !== undefined && { createdBy: snapshotExtra.createdBy }),
-            ...(snapshotExtra.status !== undefined && { status: snapshotExtra.status }),
-            ...(snapshotExtra.readyAt !== undefined && { readyAt: snapshotExtra.readyAt }),
-            ...(snapshotExtra.cancellation !== undefined && {
-              cancellation: snapshotExtra.cancellation,
+            ...mergeFormEditExtra(snapshotExtra, extra, {
+              pricing: pricingEnabled,
+              deliveryRequests: deliveryRequestsEnabled,
+              splitNotes: !!splitNotesCfg,
             }),
             ...(nextLinkage !== undefined && { inventoryLinkage: nextLinkage }),
-            ...(snapshotExtra.activityLog !== undefined && {
-              activityLog: snapshotExtra.activityLog,
-            }),
-            ...(snapshotExtra.chatHistory !== undefined && {
-              chatHistory: snapshotExtra.chatHistory,
-            }),
-            ...(snapshotExtra.photos !== undefined && { photos: snapshotExtra.photos }),
-
-            ...(snapshotExtra.billingNotRequired !== undefined && {
-              billingNotRequired: snapshotExtra.billingNotRequired,
-            }),
-            ...extra,
           };
           let updated: SalesOrder;
           try {
@@ -1616,11 +1625,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
           const itemDiff = diffItems(snapshot.items, items);
           const customerDiff = diffCustomer(snapshotExtra, mergedExtra);
+          const warehouseStaffDiff = diffWarehouseStaff(
+            readWarehouseStaff(snapshotExtra),
+            readWarehouseStaff(mergedExtra),
+          );
           logActivity('salesOrder.update', id, {
             orderNumber: updated.orderNumber,
             lineCount: items.length,
             itemDiff,
             ...(customerDiff && { customerDiff }),
+            ...(warehouseStaffDiff && { warehouseStaffDiff }),
             ...(linkageActive && {
               reservationDiff: {
                 affectedRows: appliedInventoryOps.length,
@@ -1994,6 +2008,20 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   onChange={(v) => form.setFieldValue('assignedStaff', v?.id ?? '')}
                 />
               );
+              const warehouseStaffField = warehouseStaffAllowed && (
+                <MultiSelect
+                  label={t('salesOrders.form.warehouseStaffLabel')}
+                  placeholder={t('salesOrders.form.warehouseStaffPlaceholder')}
+                  data={buildWarehouseStaffOptions(
+                    employees,
+                    warehouseStaffEmployeeFilter,
+                    form.getValues().warehouseStaff,
+                  )}
+                  searchable
+                  clearable
+                  {...form.getInputProps('warehouseStaff')}
+                />
+              );
               const deliveryMethodField = deliveryMethodOptions.length > 0 && (
                 <Select
                   label={t('salesOrders.form.deliveryMethodLabel')}
@@ -2030,14 +2058,24 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
               return variant.headerLayout === 'compactFourColumn' ? (
                 <SimpleGrid cols={COMPACT_FORM_COLS}>
                   {staffField}
+                  {warehouseStaffField}
                   {deliveryMethodField}
                   {orderDateField}
                   {deliveryDateField}
                 </SimpleGrid>
               ) : (
                 <>
-                  <SimpleGrid cols={{ base: 1, sm: deliveryMethodOptions.length > 0 ? 2 : 1 }}>
+                  <SimpleGrid
+                    cols={{
+                      base: 1,
+                      sm:
+                        1 +
+                        (warehouseStaffAllowed ? 1 : 0) +
+                        (deliveryMethodOptions.length > 0 ? 1 : 0),
+                    }}
+                  >
                     {staffField}
+                    {warehouseStaffField}
                     {deliveryMethodField}
                   </SimpleGrid>
                   <SimpleGrid cols={{ base: 1, sm: 2 }}>

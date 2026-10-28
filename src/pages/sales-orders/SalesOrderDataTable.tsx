@@ -12,6 +12,7 @@ import type { ResolvedStatusOption, ResolvedTagOption } from '@/utils/permission
 import {
   getPricingVatRate,
   isPricingManagementEnabled,
+  isWarehouseStaffAllowed,
   perms,
   tableDensity,
 } from '@/utils/permission';
@@ -28,11 +29,13 @@ import {
   resolveSalesOrderPaymentState,
 } from '@/utils/salesOrderPricing';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
+import { formatWarehouseStaffNames, readWarehouseStaff } from './salesOrderWarehouseStaff';
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 import type { SalesOrderListVariant, SalesOrderListView } from './salesOrderListVariant';
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 const vatRate = getPricingVatRate();
+const warehouseStaffAllowed = isWarehouseStaffAllowed();
 
 function getDeliveryDateColor(order: SalesOrder): string | undefined {
   if (order.isClosed || order.extra?.cancellation != null) return undefined;
@@ -262,6 +265,31 @@ export function SalesOrderDataTable({
         return <Text size="sm">{staffId ? (employeeMap.get(staffId) ?? '-') : '-'}</Text>;
       },
     };
+
+    const warehouseStaffColumns: DataTableColumn<SalesOrder>[] = warehouseStaffAllowed
+      ? [
+          {
+            key: 'warehouseStaff',
+            width: '170px',
+            header: (
+              <SortHeader
+                label={t('salesOrders.columns.warehouseStaff')}
+                field="warehouseStaff"
+                current={sortField}
+                onChange={onSortChange}
+                firstDir="asc"
+              />
+            ),
+            render: (item: SalesOrder) => (
+              <Text size="sm">
+                {formatWarehouseStaffNames(readWarehouseStaff(item.extra), (id) =>
+                  employeeMap.get(id),
+                ) || '-'}
+              </Text>
+            ),
+          },
+        ]
+      : [];
     const labelsColumn: DataTableColumn<SalesOrder> = {
       key: 'labels',
 
@@ -433,6 +461,7 @@ export function SalesOrderDataTable({
         },
         labelsColumn,
         assignedStaffColumn,
+        ...warehouseStaffColumns,
         orderNumberColumn,
         ...itemsColumns,
       ];
@@ -442,6 +471,7 @@ export function SalesOrderDataTable({
       ...leadColumns,
       customerColumn,
       assignedStaffColumn,
+      ...warehouseStaffColumns,
       ...(dateColumns === 'combinedReady'
         ? [
             {

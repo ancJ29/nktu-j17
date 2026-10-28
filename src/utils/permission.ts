@@ -247,6 +247,14 @@ export function getSalesOrderPicDepartments(): string[] {
   );
 }
 
+export function isWarehouseStaffAllowed(): boolean {
+  return featureFlags?.salesOrders?.allowWarehouseStaff ?? false;
+}
+
+export function getSalesOrderWarehouseStaffDepartments(): string[] {
+  return featureFlags?.salesOrders?.warehouseStaffDepartments ?? [];
+}
+
 export function getGoodsReceiptPicDepartments(): string[] {
   return (
     (
@@ -259,6 +267,10 @@ export function getGoodsReceiptPicDepartments(): string[] {
 
 export function allowsNoInventoryProductsForGoodsReceipts(): boolean {
   return featureFlags?.goodsReceipts?.allowNoInventoryProducts ?? false;
+}
+
+export function isGoodsReceiptPrintEnabled(): boolean {
+  return featureFlags?.goodsReceipts?.printNote ?? false;
 }
 
 const GOODS_RECEIPT_STATUS_VALUES = [

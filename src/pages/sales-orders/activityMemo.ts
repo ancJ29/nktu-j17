@@ -52,8 +52,11 @@ export function capActivityText(value: string | undefined): string | undefined {
   return value.length <= ACTIVITY_TEXT_CAP ? value : `${value.slice(0, ACTIVITY_TEXT_CAP)}…`;
 }
 
+export type SalesOrderWarehouseStaffDiff = { from?: string[]; to?: string[] };
+
 export type SalesOrderInlineFields = {
   assignedStaff?: { from?: string; to?: string };
+  warehouseStaff?: SalesOrderWarehouseStaffDiff;
   deliveryMethod?: { from?: string; to?: string };
   deliveryDate?: { from?: number; to?: number };
   notes?: { changed: true };

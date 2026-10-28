@@ -16,6 +16,26 @@ export function contentWidthMm(
   return pageWidthMm - marginMm * 2;
 }
 
+export type SheetPalette = {
+  accent: string;
+
+  panel: string;
+
+  panelBorder: string;
+
+  grid: string;
+
+  stripe: string;
+};
+
+export const ORANGE_SHEET: SheetPalette = {
+  accent: '#dd7a2e',
+  panel: '#fdf6ef',
+  panelBorder: '#f0e2d4',
+  grid: '#eaddcf',
+  stripe: '#fdfaf6',
+};
+
 export function formatVndMoney(n: number): string {
   return Math.round(n).toLocaleString('vi-VN');
 }

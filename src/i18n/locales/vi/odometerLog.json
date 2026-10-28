@@ -163,7 +163,7 @@
     "dateRequired": "Chọn ngày làm việc",
     "kmInvalid": "Số km phải lớn hơn 0",
     "otherCostAmountRequired": "Nhập số tiền",
-    "otherCostContentRequired": "Chọn nội dung khoản chi"
+    "otherCostContentRequired": "Nhập nội dung khoản chi"
   },
   "viewSelf": "Số km của tôi"
 }

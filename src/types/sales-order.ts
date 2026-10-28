@@ -209,6 +209,8 @@ export type SalesOrderExtra = {
 
   productWarehouseMemos?: string;
   assignedStaff?: string;
+
+  warehouseStaff?: string[];
   createdBy?: string;
   isUrgent?: boolean;
   tags?: string[];

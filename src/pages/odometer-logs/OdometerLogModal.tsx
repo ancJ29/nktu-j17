@@ -1,4 +1,13 @@
-import { ActionIcon, Alert, Button, Group, Select, Stack, Text, Textarea } from '@mantine/core';
+import {
+  ActionIcon,
+  Alert,
+  Autocomplete,
+  Button,
+  Group,
+  Stack,
+  Text,
+  Textarea,
+} from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -29,11 +38,10 @@ import {
   canSaveEntry,
   canWriteDate,
   missingCostHalf,
-  pickableContent,
+  costLines,
   readEmployeeId,
   readFuelCost,
   readKm,
-  readOtherCosts,
   visibleLogPhotos,
 } from './odometerLogModel';
 
@@ -48,12 +56,6 @@ type FormValues = {
   otherCosts: CostLine[];
   note: string;
 };
-
-const costLines = (log: OdometerLog | undefined): CostLine[] =>
-  readOtherCosts(log).map(({ amount, content }) => ({
-    amount,
-    content: pickableContent(content),
-  }));
 
 const missingHalf = (values: FormValues, path: string) => {
   const line = values.otherCosts[Number(path.split('.')[1])];
@@ -251,7 +253,7 @@ function OdometerLogForm({
           fuelCost: values.fuelCost,
           otherCosts: values.otherCosts.map((line) => ({
             amount: line.amount ?? 0,
-            content: line.content,
+            content: line.content.trim(),
           })),
           note: values.note.trim(),
         });
@@ -322,11 +324,10 @@ function OdometerLogForm({
           </div>
           {otherCosts.map((line, i) => (
             <Group key={i} gap="xs" wrap="nowrap" align="flex-start">
-              <Select
+              <Autocomplete
                 placeholder={t('odometerLog.form.otherCostContent')}
                 aria-label={t('odometerLog.form.otherCostContent')}
                 data={[...OTHER_COST_CONTENTS]}
-                allowDeselect={false}
                 style={{ flex: 1 }}
                 {...form.getInputProps(`otherCosts.${i}.content`)}
               />

@@ -31,6 +31,7 @@ import {
   IconEyeOff,
   IconFileText,
   IconKey,
+  IconLanguage,
   IconLock,
   IconLockOpen,
   IconNote,
@@ -52,6 +53,7 @@ import { device } from '@credo/base-ui/utils';
 import { CustomerLink } from '@/components/CustomerLink';
 import { DeliveryRequestLink } from '@/components/DeliveryRequestLink';
 import { EmployeeLink } from '@/components/EmployeeLink';
+import { WarehouseStaffLinks } from '@/components/sales-orders/WarehouseStaffLinks';
 import { MaterialLink } from '@/components/MaterialLink';
 import { ProductLink } from '@/components/ProductLink';
 import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
@@ -80,6 +82,7 @@ import type {
   SalesOrderItemDiff,
   SalesOrderMemoItem,
   SalesOrderReleasedRow,
+  SalesOrderWarehouseStaffDiff,
 } from '@/pages/sales-orders/activityMemo';
 import type {
   DeliveryRequestInlineFields,
@@ -216,6 +219,7 @@ type ProductVerbKey =
   | SimpleVerbKey
   | 'updateDescription'
   | 'updateWarehouseMemo'
+  | 'updatePurchaseOrderNames'
   | 'updateTechSpecs'
   | 'updateClassification'
   | 'updateImages'
@@ -366,6 +370,13 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     icon: <IconFileText size={16} />,
     color: 'blue',
     i18nKey: 'products.detail.activityVerbs.updateWarehouseMemo',
+    targetType: 'product',
+    showDiff: true,
+  },
+  'product.updatePurchaseOrderNames': {
+    icon: <IconLanguage size={16} />,
+    color: 'blue',
+    i18nKey: 'products.detail.activityVerbs.updatePurchaseOrderNames',
     targetType: 'product',
     showDiff: true,
   },
@@ -1568,6 +1579,7 @@ type SalesOrderMemo = {
   // update (form) — item-level + customer + reservation
   itemDiff?: SalesOrderItemDiff;
   customerDiff?: SalesOrderCustomerDiff;
+  warehouseStaffDiff?: SalesOrderWarehouseStaffDiff;
   reservationDiff?: { affectedRows?: number; fullyReleased?: boolean };
   // update (inline) — per-field {from, to}; legacy entries may carry
   // `editedKeys` only (renderer falls back gracefully).
@@ -1785,6 +1797,7 @@ function SalesOrderFormUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
   const hasItemChanges =
     !!diff && (diff.added.length > 0 || diff.removed.length > 0 || diff.changed.length > 0);
   const hasCustomerChange = !!memo.customerDiff;
+  const hasWarehouseStaffChange = !!memo.warehouseStaffDiff;
   const hasReservation =
     !!memo.reservationDiff &&
     typeof memo.reservationDiff.affectedRows === 'number' &&
@@ -1792,6 +1805,7 @@ function SalesOrderFormUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
   if (
     !hasItemChanges &&
     !hasCustomerChange &&
+    !hasWarehouseStaffChange &&
     !hasReservation &&
     typeof memo.lineCount !== 'number'
   ) {
@@ -1800,6 +1814,7 @@ function SalesOrderFormUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
   return (
     <Stack gap={4} pl={36}>
       {hasCustomerChange && <CustomerDiffRow diff={memo.customerDiff!} />}
+      {hasWarehouseStaffChange && <WarehouseStaffDiffRow diff={memo.warehouseStaffDiff!} />}
       {hasItemChanges && <ItemDiffSection diff={diff!} />}
       {!hasItemChanges && typeof memo.lineCount === 'number' && (
         <Text size="xs" c="dimmed">
@@ -1817,6 +1832,31 @@ function SalesOrderFormUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
         </Text>
       )}
     </Stack>
+  );
+}
+
+/** Shared by the form and the inline update bodies — both log the same shape. */
+function WarehouseStaffDiffRow({ diff }: { readonly diff: SalesOrderWarehouseStaffDiff }) {
+  const { t } = useTranslation();
+  const side = (ids: readonly string[] | undefined) =>
+    ids && ids.length > 0 ? (
+      <WarehouseStaffLinks ids={ids} size="xs" noAvatar />
+    ) : (
+      <Text size="xs" c="dimmed">
+        —
+      </Text>
+    );
+  return (
+    <Group gap={6} wrap="nowrap" align="baseline">
+      <Text size="xs" c="dimmed">
+        {t('salesOrders.detail.warehouseStaff')}:
+      </Text>
+      {side(diff.from)}
+      <Text size="xs" c="dimmed">
+        →
+      </Text>
+      {side(diff.to)}
+    </Group>
   );
 }
 
@@ -1945,6 +1985,7 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
   const f = memo.fields;
   if (
     !f.assignedStaff &&
+    !f.warehouseStaff &&
     !f.deliveryMethod &&
     !f.deliveryDate &&
     !f.notes &&
@@ -1981,6 +2022,7 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
           )}
         </Group>
       )}
+      {f.warehouseStaff && <WarehouseStaffDiffRow diff={f.warehouseStaff} />}
       {f.deliveryMethod && (
         <Group gap={6} wrap="nowrap" align="baseline">
           <Text size="xs" c="dimmed">

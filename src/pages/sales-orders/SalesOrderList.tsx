@@ -53,9 +53,11 @@ import {
 import {
   getPricingVatRate,
   getSalesOrderPicDepartments,
+  getSalesOrderWarehouseStaffDepartments,
   isDeliveryRequestsEnabled,
   isInternalDeliveryAllowed,
   isPricingManagementEnabled,
+  isWarehouseStaffAllowed,
   makeEmployeeDepartmentFilter,
   perms,
 } from '@/utils/permission';
@@ -101,6 +103,10 @@ const internalDeliveryAllowed = isInternalDeliveryAllowed();
 
 const deliveryKindFilterEnabled = deliveryEnabled && internalDeliveryAllowed;
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
+const warehouseStaffAllowed = isWarehouseStaffAllowed();
+const warehouseStaffEmployeeFilter = makeEmployeeDepartmentFilter(
+  getSalesOrderWarehouseStaffDepartments(),
+);
 const { statusOptions, resolveStatus, resolveDeliveryMethod, tagOptions } = salesOrderFieldOptions;
 
 export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) {
@@ -283,6 +289,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       status: filters.statusFilter,
       customer: filters.customerFilter,
       staff: filters.staffFilter,
+      warehouseStaff: filters.warehouseStaffFilter,
       columnFilters: appliedColumnFilters,
     },
     filterFn: columnFilters.predicate,
@@ -402,6 +409,16 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     [employees],
   );
 
+  const warehouseStaffFilterData = useMemo(
+    () =>
+      warehouseStaffAllowed
+        ? employees
+            .filter(warehouseStaffEmployeeFilter)
+            .map((e) => ({ value: e.id, label: e.name }))
+        : [],
+    [employees],
+  );
+
   const employeeNames = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.name);
@@ -475,6 +492,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
         getCustomerByCode,
         tagOptions,
         pricingEnabled: showPrice,
+        warehouseStaffEnabled: warehouseStaffAllowed,
       });
       notifications.show({
         color: 'green',
@@ -558,6 +576,16 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       visible: canViewAll && staffFilterData.length > 0,
       searchable: true,
       w: 250,
+    },
+    {
+      value: filters.warehouseStaffFilter,
+      onChange: filters.setWarehouseStaffFilter,
+      data: warehouseStaffFilterData,
+      placeholder: t('salesOrders.columns.warehouseStaff'),
+
+      visible: warehouseStaffFilterData.length > 0 || !!filters.warehouseStaffFilter,
+      searchable: true,
+      w: 220,
     },
   ];
 
@@ -649,6 +677,19 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             value: filters.staffFilter,
             options: staffFilterData,
             onChange: filters.setStaffFilter,
+          },
+        ] satisfies MoreFilterDef[])
+      : []),
+    ...(warehouseStaffFilterData.length > 0 || filters.warehouseStaffFilter
+      ? ([
+          {
+            type: 'select',
+            key: 'warehouseStaff',
+            title: t('salesOrders.columns.warehouseStaff'),
+            placeholder: t('salesOrders.columns.warehouseStaff'),
+            value: filters.warehouseStaffFilter,
+            options: warehouseStaffFilterData,
+            onChange: filters.setWarehouseStaffFilter,
           },
         ] satisfies MoreFilterDef[])
       : []),
@@ -823,6 +864,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
               {staffFilterData.find((e) => e.value === filters.staffFilter)?.label ??
                 employeeNames.get(filters.staffFilter) ??
                 filters.staffFilter}
+            </FilterPill>
+          )}
+          {filters.warehouseStaffFilter && (
+            <FilterPill onClose={() => filters.setWarehouseStaffFilter(null)}>
+              {t('salesOrders.columns.warehouseStaff')}:{' '}
+              {employeeNames.get(filters.warehouseStaffFilter) ?? filters.warehouseStaffFilter}
             </FilterPill>
           )}
           {showUrgentPill && filters.urgentOnly && (

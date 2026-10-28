@@ -29,6 +29,9 @@ export type ProductMinimumInventory = {
 export type ProductExtra = {
   units?: string[];
   alternativeNames?: string[];
+
+  nameZh?: string;
+  nameEn?: string;
   isDeleted?: boolean;
   images?: ProductImageEntry[];
 

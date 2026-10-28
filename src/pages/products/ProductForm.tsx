@@ -130,6 +130,8 @@ export function ProductForm({ variant }: ProductFormProps) {
       price: 0,
       isActive: true,
       alternativeNames: [],
+      nameZh: '',
+      nameEn: '',
 
       sku: isEdit ? '' : buildNextProductCode(totalProducts + 1),
 
@@ -235,6 +237,8 @@ export function ProductForm({ variant }: ProductFormProps) {
       price: p.price || 0,
       isActive: p.isActive,
       alternativeNames: p.extra?.alternativeNames ?? [],
+      nameZh: p.extra?.nameZh ?? '',
+      nameEn: p.extra?.nameEn ?? '',
       sku: p.extra?.sku ?? '',
       barcode: p.extra?.barcode ?? '',
       basePrice: p.extra?.basePrice ?? 0,
@@ -361,6 +365,8 @@ export function ProductForm({ variant }: ProductFormProps) {
           ...(values.alternativeNames.length > 0 && {
             alternativeNames: values.alternativeNames,
           }),
+          ...(values.nameZh.trim() && { nameZh: values.nameZh.trim() }),
+          ...(values.nameEn.trim() && { nameEn: values.nameEn.trim() }),
           ...(images.length > 0 && { images }),
 
           ...((isEdit ? values.sku.trim() : values.code.trim()) && {
