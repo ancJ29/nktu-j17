@@ -9,8 +9,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
 process.env.VITE_APP_BUILD_TIMESTAMP = Date.now().toString()
 
-function requireEnv(env: Record<string, string>, key: string): string {
-  const value = env[key];
+console.log(process.env)
+
+function requireEnv(env: Record<string, string>, key: string, _default?: string): string {
+  const value = env[key] ?? _default;
   if (!value) throw new Error(`Missing required env var: ${key}`);
   return value;
 }
@@ -103,11 +105,11 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
         manifest: {
-          name: requireEnv(env, 'VITE_APP_NAME'),
-          short_name: requireEnv(env, 'VITE_APP_NAME'),
-          description: requireEnv(env, 'VITE_APP_DESCRIPTION'),
-          theme_color: requireEnv(env, 'VITE_APP_THEME_COLOR'),
-          background_color: requireEnv(env, 'VITE_APP_BG_COLOR'),
+          name: requireEnv(env, 'VITE_APP_NAME', 'C-Mngt'),
+          short_name: requireEnv(env, 'VITE_APP_NAME', 'C-Mngt'),
+          description: requireEnv(env, 'VITE_APP_DESCRIPTION', 'C-Mngt Management System'),
+          theme_color: requireEnv(env, 'VITE_APP_THEME_COLOR', '#ced4da'),
+          background_color: requireEnv(env, 'VITE_APP_BG_COLOR', '#c1c1c1'),
           display: 'standalone',
           orientation: 'portrait',
           scope: '/',
