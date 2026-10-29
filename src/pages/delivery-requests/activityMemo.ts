@@ -1,4 +1,5 @@
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
+import type { SalesOrderWarehouseStaffDiff } from '@/pages/sales-orders/activityMemo';
 import type { CMngtDeliveryRequestDirection as DeliveryRequestDirection } from '@credo/connectors/types';
 import type {
   DeliveryRequest,
@@ -48,6 +49,8 @@ export type DeliveryRequestPartyMemo = {
 
 export type DeliveryRequestInlineFields = {
   assignedDriverId?: { from?: string; to?: string };
+
+  warehouseStaff?: SalesOrderWarehouseStaffDiff;
   scheduledDate?: { from?: number; to?: number };
   deliveryAddress?: { changed: true };
   googleMapUrl?: { changed: true };

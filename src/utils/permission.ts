@@ -237,6 +237,14 @@ export function getDeliveryRequestDriverDepartments(): string[] {
   );
 }
 
+export function isDeliveryRequestWarehouseStaffAllowed(): boolean {
+  return featureFlags?.deliveryRequests?.allowWarehouseStaff ?? false;
+}
+
+export function getDeliveryRequestWarehouseStaffDepartments(): string[] {
+  return featureFlags?.deliveryRequests?.warehouseStaffDepartments ?? [];
+}
+
 export function getSalesOrderPicDepartments(): string[] {
   return (
     (
@@ -609,6 +617,7 @@ export const perms = {
 
       canConfirmDelivered: () => resolve().actions?.canConfirmDelivered ?? false,
       canCancel: () => resolve().actions?.canCancel ?? false,
+      canAssignWarehouseStaff: () => resolve().actions?.canAssignWarehouseStaff ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };

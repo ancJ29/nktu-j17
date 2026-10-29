@@ -4,6 +4,7 @@ import { Badge, Group, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { useCustomerStore } from '@/stores/useCustomerStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
 import { DeliveryRequestKindBadge } from './DeliveryRequestKindBadge';
@@ -11,9 +12,19 @@ import { deliveryRequestPartyIsCustomer } from './deliveryRequestParty';
 import { DataTable } from '@credo/base-ui/components';
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
-import { tableDensity, type ResolvedStatusOption } from '@/utils/permission';
+import {
+  isDeliveryRequestWarehouseStaffAllowed,
+  tableDensity,
+  type ResolvedStatusOption,
+} from '@/utils/permission';
+import {
+  formatWarehouseStaffNames,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { hasPendingPhotoUpload } from '@/utils/photoQueue';
 import { resolveDeliveryRequestRowBg } from './urgencyRowBg';
+
+const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
 
 type DeliveryRequestDataTableProps = {
   readonly requests: DeliveryRequest[];
@@ -40,6 +51,8 @@ export function DeliveryRequestDataTable({
     () => createCustomerShortNameResolver(customers),
     [customers],
   );
+  const employees = useEmployeeStore((s) => s.items);
+  const employeeNames = useMemo(() => new Map(employees.map((e) => [e.id, e.name])), [employees]);
 
   const columns = useMemo(
     () => [
@@ -102,6 +115,21 @@ export function DeliveryRequestDataTable({
           return <Text fz="sm">{extra.assignedDriverName || '-'}</Text>;
         },
       },
+      ...(warehouseStaffAllowed
+        ? [
+            {
+              key: 'warehouseStaff',
+              header: t('deliveryRequests.detail.warehouseStaffLabel'),
+              render: (item: DeliveryRequest) => {
+                const extra = (item.extra ?? {}) as DeliveryRequestExtra;
+                const names = formatWarehouseStaffNames(readWarehouseStaff(extra), (id) =>
+                  employeeNames.get(id),
+                );
+                return <Text fz="sm">{names || '-'}</Text>;
+              },
+            },
+          ]
+        : []),
       {
         key: 'status',
         header: t('__new__.01-common.labels.status'),
@@ -141,7 +169,7 @@ export function DeliveryRequestDataTable({
         },
       },
     ],
-    [t, resolveStatus, resolveCustomerShortName, getVendorByCode, pendingSyncIds],
+    [t, resolveStatus, resolveCustomerShortName, getVendorByCode, employeeNames, pendingSyncIds],
   );
 
   const handleRowClick = (item: DeliveryRequest) => {

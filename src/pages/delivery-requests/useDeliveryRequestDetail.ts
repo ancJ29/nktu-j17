@@ -45,6 +45,10 @@ import { logActivity } from '@/utils/activityLogger';
 import { unlinkDRFromSalesOrder } from './linkToSalesOrder';
 import { inlineEditSnapshot, type DeliveryRequestInlineFields } from './activityMemo';
 import {
+  diffWarehouseStaff,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
+import {
   getAllowedTransitions,
   getInitialStatusValue,
   getStatusFlowOrder,
@@ -475,6 +479,13 @@ export function useDeliveryRequestDetail(
               ...(before.assignedDriverId && { from: before.assignedDriverId }),
               ...(patch.extra.assignedDriverId && { to: patch.extra.assignedDriverId }),
             };
+          }
+          if ('warehouseStaff' in patch.extra) {
+            const warehouseStaffDiff = diffWarehouseStaff(
+              readWarehouseStaff(before),
+              readWarehouseStaff(patch.extra),
+            );
+            if (warehouseStaffDiff) fields.warehouseStaff = warehouseStaffDiff;
           }
           if (
             'deliveryAddress' in patch.extra &&

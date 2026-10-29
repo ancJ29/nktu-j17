@@ -64,6 +64,7 @@ import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import {
   getDeliveryRequestDriverDepartments,
   isActivityLoggingEnabled,
+  isDeliveryRequestWarehouseStaffAllowed,
   isPricingManagementEnabled,
   makeEmployeeDepartmentFilter,
   perms,
@@ -75,6 +76,12 @@ import { useDeliveryRequestDetail } from './useDeliveryRequestDetail';
 import { StatusChangeModal } from './StatusChangeModal';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { EditDeliveryRequestModal } from './EditDeliveryRequestModal';
+import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
+import { WarehouseStaffLinks } from '@/components/sales-orders/WarehouseStaffLinks';
+import {
+  diffWarehouseStaff,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { DeliveryRequestKindBadge } from './DeliveryRequestKindBadge';
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
 import { NumberField } from '@/components/NumberField';
@@ -82,10 +89,13 @@ import { NumberField } from '@/components/NumberField';
 const isMobile = device.isMobile;
 const canEdit = perms.deliveryRequest.canEdit();
 const canManagePhotos = perms.deliveryRequest.canManagePhotos();
+
+const canAssignWarehouseStaff = perms.deliveryRequest.canAssignWarehouseStaff();
 const pricingEnabled = isPricingManagementEnabled();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
+const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
 const { resolveStatus } = deliveryRequestStatusOptions;
 
 type DeliveryRequestDetailProps = {
@@ -186,6 +196,9 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
   const canEditMeta = canEdit && !request.isClosed && !isMobile;
 
+  const canEditWarehouseStaff =
+    (canEdit || canAssignWarehouseStaff) && !request.isClosed && !isMobile;
+
   const resolvedVendor =
     !partyIsCustomer && request.vendorCode ? getVendorByCode(request.vendorCode) : undefined;
   const resolvedCustomer = !partyIsCustomer
@@ -258,6 +271,32 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
       renderValueDisplay={(v) => <EmployeeLink id={v} />}
     />
   );
+
+  const warehouseStaffDetailField = warehouseStaffAllowed ? (
+    <DetailField label={t('deliveryRequests.detail.warehouseStaffLabel')}>
+      <InlineEditField<string[]>
+        canEdit={canEditWarehouseStaff}
+        value={readWarehouseStaff(drExtra)}
+        equals={(a, b) => !diffWarehouseStaff(a, b)}
+        onSave={async (next) =>
+          handleMetaPatch({ extra: { warehouseStaff: next.length > 0 ? next : undefined } })
+        }
+        labels={inlineEditLabels}
+        renderDisplay={(v) =>
+          v.length > 0 ? (
+            <WarehouseStaffLinks ids={v} />
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              —
+            </Text>
+          )
+        }
+        renderEditor={({ value: v, onChange }) => (
+          <DeliveryRequestWarehouseStaffSelect value={v} onChange={onChange} inline />
+        )}
+      />
+    </DetailField>
+  ) : null;
 
   const scheduledDateForEditor: string | null = request.scheduledDate
     ? new Date(request.scheduledDate).toISOString().slice(0, 10)
@@ -471,6 +510,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
       <SimpleGrid cols={1} spacing="xs">
         <DetailField label={t('deliveryRequests.detail.driverLabel')}>{driverField}</DetailField>
+        {warehouseStaffDetailField}
         <DetailField label={t('deliveryRequests.columns.scheduledDate')}>
           {scheduledDateField}
         </DetailField>
@@ -520,6 +560,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
       <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
         <DetailField label={t('deliveryRequests.detail.driverLabel')}>{driverField}</DetailField>
+        {warehouseStaffDetailField}
         <DetailField label={t('deliveryRequests.columns.scheduledDate')}>
           {scheduledDateField}
         </DetailField>

@@ -50,6 +50,11 @@ export type DeliveryRequestFormValues = {
   items: ItemFormValues[];
   /** Assigned driver — usually an employee. Optional on create. */
   assignedDriverId: string;
+  /**
+   * Employee ids. Loaded and saved even while the switch hides the picker — the
+   * update writer then writes back what it loaded; a create drops it.
+   */
+  warehouseStaff: string[];
   /** High-priority flag — red highlight on the list. */
   isUrgent: boolean;
 };

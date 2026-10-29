@@ -42,6 +42,7 @@ import { getCurrentActorId, lookupLabelOf, useInitFormFromFetch, useLookupV2Labe
 import {
   allowsNoInventoryProductsForGoodsReceipts,
   getGoodsReceiptPicDepartments,
+  isGoodsReceiptPrintEnabled,
   isLocationsEnabled,
   isProductsEnabled,
   makeEmployeeDepartmentFilter,
@@ -50,6 +51,7 @@ import { logActivity } from '@/utils/activityLogger';
 import { syncDraftIncomingToInventory } from '@/utils/goodsReceiptInventory';
 import { isNoInventoryProduct } from '@/utils/productSet';
 import { diffItems, diffVendor, toMemoItem, vendorMemo } from './activityMemo';
+import { packageCountOf, showsPackageCount } from './goodsReceiptPackageCount';
 import { EmployeeSelector, ProductSelector, VendorSelector } from '@/components/selectors';
 import {
   ExcelParseError,
@@ -83,6 +85,7 @@ const defaultItemType: GoodsReceiptItemType = 'product';
 const allowNoInventoryProducts = allowsNoInventoryProductsForGoodsReceipts();
 const isReceivableProduct = (p: Product) =>
   !p.extra?.isDeleted && (allowNoInventoryProducts || !isNoInventoryProduct(p));
+const purchaseOrderPrintEnabled = isGoodsReceiptPrintEnabled();
 
 type ItemFormValues = {
   itemType: GoodsReceiptItemType;
@@ -90,6 +93,8 @@ type ItemFormValues = {
   itemName: string;
   quantity: number;
   unit: string;
+
+  packageCount: number | undefined;
   note: string;
 };
 
@@ -114,6 +119,7 @@ const emptyItem: ItemFormValues = {
   itemName: '',
   quantity: 1,
   unit: '',
+  packageCount: undefined,
   note: '',
 };
 
@@ -122,6 +128,7 @@ function isEmptyRow(row: ItemFormValues): boolean {
     !row.itemCode &&
     !row.itemName &&
     !row.note &&
+    row.packageCount === undefined &&
     row.quantity === emptyItem.quantity &&
     row.unit === emptyItem.unit &&
     row.itemType === emptyItem.itemType
@@ -133,6 +140,8 @@ type ItemRowProps = ItemFormValues & {
 
   itemUnits: readonly string[] | undefined;
   unitLabels: Map<string, string>;
+
+  showPackageCount: boolean;
   itemCodeError: ReactNode;
   removable: boolean;
   setFieldValue: UseFormReturnType<FormValues>['setFieldValue'];
@@ -146,9 +155,11 @@ const ItemRow = memo(function ItemRow({
   itemName,
   quantity,
   unit,
+  packageCount,
   note,
   itemUnits,
   unitLabels,
+  showPackageCount,
   itemCodeError,
   removable,
   setFieldValue,
@@ -231,6 +242,17 @@ const ItemRow = memo(function ItemRow({
           allowDeselect={false}
         />
       </Table.Td>
+      {showPackageCount && (
+        <Table.Td>
+          <NumberField
+            size="xs"
+            min={0}
+            allowDecimal={false}
+            value={packageCount}
+            onChange={(next) => setFieldValue(`items.${idx}.packageCount`, next)}
+          />
+        </Table.Td>
+      )}
       <Table.Td>
         <TextInput
           size="xs"
@@ -411,6 +433,7 @@ export function GoodsReceiptFormPage() {
           itemName: item.itemName,
           quantity: item.quantity,
           unit: item.unit,
+          packageCount: packageCountOf(item) ?? undefined,
           note: item.note ?? '',
         })),
       };
@@ -452,6 +475,7 @@ export function GoodsReceiptFormPage() {
               itemName: item.itemName,
               quantity: item.quantity,
               unit: item.unit,
+              packageCount: packageCountOf(item) ?? undefined,
               note: item.note ?? '',
             }))
           : [{ ...emptyItem }],
@@ -541,6 +565,7 @@ export function GoodsReceiptFormPage() {
             itemName: hit.name,
             quantity: row.quantity,
             unit,
+            packageCount: undefined,
             note: row.memo ?? '',
           });
         }
@@ -627,14 +652,18 @@ export function GoodsReceiptFormPage() {
       }
 
       setLoading(true);
-      const items: GoodsReceiptItem[] = values.items.map((item) => ({
-        itemType: item.itemType,
-        itemCode: item.itemCode.trim(),
-        itemName: item.itemName.trim(),
-        quantity: item.quantity,
-        unit: item.unit.trim(),
-        ...(item.note.trim() ? { note: item.note.trim() } : {}),
-      }));
+      const items: GoodsReceiptItem[] = values.items.map((item) => {
+        const packageCount = packageCountOf(item);
+        return {
+          itemType: item.itemType,
+          itemCode: item.itemCode.trim(),
+          itemName: item.itemName.trim(),
+          quantity: item.quantity,
+          unit: item.unit.trim(),
+          ...(item.note.trim() ? { note: item.note.trim() } : {}),
+          ...(packageCount !== null ? { packageCount } : {}),
+        };
+      });
 
       const actor = getCurrentActorId();
 
@@ -782,6 +811,7 @@ export function GoodsReceiptFormPage() {
   if (isMobile) return null;
 
   const pageTitle = isEdit ? t('goodsReceipts.editItem') : t('goodsReceipts.addItem');
+  const showPackageCount = showsPackageCount(form.getValues().items, purchaseOrderPrintEnabled);
 
   return (
     <Stack gap="lg">
@@ -924,6 +954,9 @@ export function GoodsReceiptFormPage() {
                       <Table.Th>{t('common.labels.name')}</Table.Th>
                       <Table.Th w={120}>{t('common.labels.quantity')}</Table.Th>
                       <Table.Th w={120}>{t('common.labels.unit')}</Table.Th>
+                      {showPackageCount && (
+                        <Table.Th w={100}>{t('goodsReceipts.columns.packageCount')}</Table.Th>
+                      )}
                       <Table.Th>{t('__new__.01-common.labels.note')}</Table.Th>
                       <Table.Th w={48} />
                     </Table.Tr>
@@ -938,9 +971,11 @@ export function GoodsReceiptFormPage() {
                         itemName={row.itemName}
                         quantity={row.quantity}
                         unit={row.unit}
+                        packageCount={row.packageCount}
                         note={row.note}
                         itemUnits={row.itemCode ? productUnitsByCode.get(row.itemCode) : undefined}
                         unitLabels={unitLabels}
+                        showPackageCount={showPackageCount}
                         itemCodeError={form.errors[`items.${idx}.itemCode`]}
                         removable={items.length > 1}
                         setFieldValue={form.setFieldValue}

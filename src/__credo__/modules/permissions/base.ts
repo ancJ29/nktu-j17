@@ -85,6 +85,8 @@ export const BASE_PERMISSIONS: Permissions = {
 
       canConfirmDelivered: false,
       canCancel: false,
+
+      canAssignWarehouseStaff: false,
     },
     query: {
       canViewAll: false,

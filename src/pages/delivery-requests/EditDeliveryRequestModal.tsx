@@ -17,6 +17,8 @@ import {
 } from '@/utils/permission';
 import type { DeliveryRequest, DeliveryRequestExtra, Vendor } from '@/types';
 import { updateDeliveryRequestRecord } from './createDeliveryRequest';
+import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
+import { readWarehouseStaff } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import {
   resolveCustomerPickupAddress,
   resolveVendorInboundAddress,
@@ -127,6 +129,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
       scheduledDate: request.scheduledDate ? new Date(request.scheduledDate) : null,
       notes: request.notes ?? '',
       assignedDriverId: drExtra.assignedDriverId ?? '',
+      warehouseStaff: readWarehouseStaff(drExtra),
       isUrgent: drExtra.isUrgent ?? false,
     },
   });
@@ -157,6 +160,7 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
         items: request.items,
         assignedDriverId: values.assignedDriverId,
         assignedDriverName: driver?.name,
+        warehouseStaff: values.warehouseStaff,
         isUrgent: values.isUrgent,
       });
       onUpdated(updated);
@@ -325,6 +329,10 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
           filter={driverEmployeeFilter}
           value={form.getValues().assignedDriverId || null}
           onChange={(sel) => form.setFieldValue('assignedDriverId', sel?.id ?? '')}
+        />
+        <DeliveryRequestWarehouseStaffSelect
+          value={form.getValues().warehouseStaff}
+          onChange={(v) => form.setFieldValue('warehouseStaff', v)}
         />
 
         <Textarea

@@ -29,6 +29,7 @@ import {
   createDeliveryRequestRecord,
 } from './createDeliveryRequest';
 import { toDateTimeInputOrUndefined } from './deliveryRequestFormShared';
+import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
@@ -51,6 +52,7 @@ type ReturnFormValues = {
   scheduledDate: Date | string | null;
   notes: string;
   assignedDriverId: string;
+  warehouseStaff: string[];
   isUrgent: boolean;
   updateInventory: boolean;
   lines: ReturnLine[];
@@ -96,6 +98,7 @@ export function CreateReturnShipmentModal({
       scheduledDate: null,
       notes: '',
       assignedDriverId: '',
+      warehouseStaff: [],
       isUrgent: false,
       updateInventory: false,
       lines: [],
@@ -127,6 +130,7 @@ export function CreateReturnShipmentModal({
       scheduledDate: null,
       notes: '',
       assignedDriverId: '',
+      warehouseStaff: [],
       isUrgent: false,
       updateInventory: false,
       lines,
@@ -184,6 +188,7 @@ export function CreateReturnShipmentModal({
         items,
         assignedDriverId: values.assignedDriverId,
         assignedDriverName: driver?.name,
+        warehouseStaff: values.warehouseStaff,
         isUrgent: values.isUrgent,
         currentEmployee: currentEmployee
           ? { id: currentEmployee.id, name: currentEmployee.name }
@@ -321,6 +326,10 @@ export function CreateReturnShipmentModal({
             filter={driverEmployeeFilter}
             value={form.getValues().assignedDriverId || null}
             onChange={(v) => form.setFieldValue('assignedDriverId', v?.id ?? '')}
+          />
+          <DeliveryRequestWarehouseStaffSelect
+            value={form.getValues().warehouseStaff}
+            onChange={(v) => form.setFieldValue('warehouseStaff', v)}
           />
           <Textarea
             label={t('__new__.01-common.labels.note')}

@@ -29,6 +29,8 @@ import {
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
 import { RESOLVED_DELIVERY_REQUEST_VARIANT } from './deliveryRequestVariant';
+import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
+import { readWarehouseStaff } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
 
@@ -105,6 +107,7 @@ export function CreateDeliveryRequestModal({
       notes: '',
       items: [],
       assignedDriverId: '',
+      warehouseStaff: [],
       isUrgent: false,
     },
     validate: {
@@ -150,6 +153,8 @@ export function CreateDeliveryRequestModal({
       notes: '',
       items: buildRemainingItemsFromSalesOrder(salesOrder.items, salesOrder.id, allDRs),
       assignedDriverId: '',
+
+      warehouseStaff: readWarehouseStaff(soExtra),
       isUrgent: false,
     });
     form.resetDirty();
@@ -200,6 +205,7 @@ export function CreateDeliveryRequestModal({
         items,
         assignedDriverId: values.assignedDriverId,
         assignedDriverName: driver?.name,
+        warehouseStaff: values.warehouseStaff,
         isUrgent: values.isUrgent,
         currentEmployee: currentEmployee
           ? { id: currentEmployee.id, name: currentEmployee.name }
@@ -273,6 +279,10 @@ export function CreateDeliveryRequestModal({
             filter={driverEmployeeFilter}
             value={form.getValues().assignedDriverId || null}
             onChange={(v) => form.setFieldValue('assignedDriverId', v?.id ?? '')}
+          />
+          <DeliveryRequestWarehouseStaffSelect
+            value={form.getValues().warehouseStaff}
+            onChange={(v) => form.setFieldValue('warehouseStaff', v)}
           />
           <Textarea
             label={t('__new__.01-common.labels.note')}

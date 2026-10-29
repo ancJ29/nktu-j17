@@ -948,6 +948,8 @@ export type GoodsReceiptItem = {
   quantity: number;
   unit: string;
   note?: string;
+
+  packageCount?: number;
 };
 
 export type GoodsReceiptStatus = 'draft' | 'received' | 'cancelled';

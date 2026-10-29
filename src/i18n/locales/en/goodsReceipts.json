@@ -9,6 +9,7 @@
     "itemsCount_one": "{{count}} line",
     "itemsCount_other": "{{count}} lines",
     "locationName": "Location",
+    "packageCount": "Packages",
     "receiptNumber": "Receipt #",
     "receivedDate": "Received Date",
     "reference": "Reference"

@@ -5,6 +5,7 @@ import { FieldLabel } from '@credo/base-ui/components';
 import { ProductLink } from '@/components/ProductLink';
 import { lookupLabelOf, type useLookupV2Labels } from '@/hooks';
 import type { GoodsReceiptItem } from '@/types';
+import { packageCountOf } from './goodsReceiptPackageCount';
 import { resolveBaseUnitDisplay, type PackagingAwareEntity } from './goodsReceiptUnitDisplay';
 
 export type GoodsReceiptItemsProps = {
@@ -27,6 +28,7 @@ export function GoodsReceiptItemsTableDesktop(props: GoodsReceiptItemsProps) {
     }
   }
   const subtotalEntries = Array.from(unitTotals.entries()).filter(([u]) => u);
+  const showPackageCount = props.items.some((it) => packageCountOf(it) !== null);
 
   return (
     <Box style={{ overflowX: 'auto' }}>
@@ -38,6 +40,11 @@ export function GoodsReceiptItemsTableDesktop(props: GoodsReceiptItemsProps) {
             <Table.Th w={140} style={{ textAlign: 'right' }}>
               {t('common.labels.quantity')}
             </Table.Th>
+            {showPackageCount && (
+              <Table.Th w={110} style={{ textAlign: 'right' }}>
+                {t('goodsReceipts.columns.packageCount')}
+              </Table.Th>
+            )}
             <Table.Th ta="right">{t('__new__.01-common.labels.note')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -73,6 +80,11 @@ export function GoodsReceiptItemsTableDesktop(props: GoodsReceiptItemsProps) {
                     )}
                   </Stack>
                 </Table.Td>
+                {showPackageCount && (
+                  <Table.Td style={{ textAlign: 'right' }}>
+                    <Text size="sm">{packageCountOf(item)?.toLocaleString() ?? ''}</Text>
+                  </Table.Td>
+                )}
                 <Table.Td ta="right">
                   {item.note ? (
                     <Text size="sm">{item.note}</Text>
@@ -107,6 +119,7 @@ export function GoodsReceiptItemsTableDesktop(props: GoodsReceiptItemsProps) {
                   ))}
                 </Stack>
               </Table.Td>
+              {showPackageCount && <Table.Td />}
               <Table.Td />
             </Table.Tr>
           </Table.Tfoot>
@@ -117,11 +130,13 @@ export function GoodsReceiptItemsTableDesktop(props: GoodsReceiptItemsProps) {
 }
 
 export function GoodsReceiptItemsListMobile(props: GoodsReceiptItemsProps) {
+  const { t } = useTranslation();
   const tappable = !!props.onItemTap;
   return (
     <Stack gap="xs">
       {props.items.map((item, idx) => {
         const baseTail = resolveBaseUnitDisplay(item, props.products, props.unitLabels);
+        const packageCount = packageCountOf(item);
         const onTap = props.onItemTap;
         return (
           <Card
@@ -151,6 +166,11 @@ export function GoodsReceiptItemsListMobile(props: GoodsReceiptItemsProps) {
                   {baseTail && (
                     <Text size="xs" c="dimmed">
                       · {baseTail}
+                    </Text>
+                  )}
+                  {packageCount !== null && (
+                    <Text size="xs" c="dimmed">
+                      · {t('goodsReceipts.columns.packageCount')} {packageCount.toLocaleString()}
                     </Text>
                   )}
                 </Group>

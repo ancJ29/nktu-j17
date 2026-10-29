@@ -9,7 +9,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 process.env.VITE_APP_VERSION = process.env.npm_package_version;
 process.env.VITE_APP_BUILD_TIMESTAMP = Date.now().toString()
 
-console.log(process.env)
+// console.log(process.env)
 
 function requireEnv(env: Record<string, string>, key: string, _default?: string): string {
   const value = env[key] ?? _default;

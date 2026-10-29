@@ -6,10 +6,12 @@ import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { logActivity } from '@/utils/activityLogger';
 import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
+import { isDeliveryRequestWarehouseStaffAllowed } from '@/utils/permission';
 import { statusHasCapability as soStatusHasCapability } from '@/pages/sales-orders/transitionEngine';
 import { getInitialStatusValue, getInitialStatusValueForCreate } from './transitionEngine';
 import { partyMemo } from './activityMemo';
 import {
+  initialWarehouseStaff,
   mergeSalesOrderDriverNote,
   salesOrderHasLinkedDeliveryRequest,
 } from './createDeliveryRequest';
@@ -64,6 +66,7 @@ export async function bulkCreateOutboundDeliveryRequests(
   const allocated = todays.deliveryRequests.map((r) => r.requestNumber);
 
   const defaultStatus = getInitialStatusValue() ?? '';
+  const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
   const created: BulkDrCreateResult['created'] = [];
   const failures: BulkDrFailure[] = [];
   let linkFailures = 0;
@@ -94,6 +97,12 @@ export async function bulkCreateOutboundDeliveryRequests(
         soExtra.googleMapUrl,
       );
 
+      const warehouseStaff = initialWarehouseStaff({
+        allowed: warehouseStaffAllowed,
+        direction: 'outbound',
+        sourceOrder: so,
+      });
+
       const extra: DeliveryRequestExtra = {
         status: initialStatus,
         activityLog: [createdEntry],
@@ -102,6 +111,7 @@ export async function bulkCreateOutboundDeliveryRequests(
         ...(googleMapUrl && { googleMapUrl }),
         assignedDriverId: driver.id,
         assignedDriverName: driver.name,
+        ...(warehouseStaff.length > 0 && { warehouseStaff }),
         ...(input.isUrgent && { isUrgent: true }),
 
         ...(salesOrderHasLinkedDeliveryRequest(so.id) && { isAdditional: true }),

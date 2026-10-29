@@ -13,6 +13,7 @@
     "disableAll": "Tắt tất cả",
     "enableAll": "Bật tất cả",
     "flags": {
+      "canAssignWarehouseStaff": "Phân công nhân viên kho",
       "canBulkImport": "Nhập hàng loạt qua Excel",
       "canConfirmDelivered": "Xác nhận giao hàng",
       "canConfirmReceived": "Xác nhận nhập kho",

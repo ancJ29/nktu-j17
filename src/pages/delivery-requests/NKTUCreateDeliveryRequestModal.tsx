@@ -43,6 +43,7 @@ import type { CMngtDeliveryRequestDirection } from '@credo/connectors/types';
 import type { Customer, SalesOrder, Vendor } from '@/types';
 import { bulkCreateOutboundDeliveryRequests } from './bulkCreateDeliveryRequests';
 import { createDeliveryRequestRecord } from './createDeliveryRequest';
+import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
 import {
   resolveCustomerPickupAddress,
   resolveVendorInboundAddress,
@@ -93,6 +94,8 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const [date, setDate] = useState<Date | null>(null);
   const [notes, setNotes] = useState('');
   const [isUrgent, setIsUrgent] = useState(false);
+
+  const [warehouseStaff, setWarehouseStaff] = useState<string[]>([]);
 
   const selection = useRowSelection();
   const { selectedKeys: selectedIds, toggle: toggleOne } = selection;
@@ -322,6 +325,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
         items: [],
         assignedDriverId: driver.id,
         assignedDriverName: driver.name,
+        warehouseStaff,
         isUrgent,
         currentEmployee: currentEmployee
           ? { id: currentEmployee.id, name: currentEmployee.name }
@@ -364,6 +368,7 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     date,
     notes,
     isUrgent,
+    warehouseStaff,
     currentEmployee,
     t,
     onClose,
@@ -499,6 +504,11 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
           onChange={(v) => setDate(typeof v === 'string' ? (v ? new Date(v) : null) : v)}
         />
       </DriverAndDateLayout>
+
+      {/* Read-only on every phone, as on the order: assigning happens on a PC. */}
+      {isInbound && !isMobile && (
+        <DeliveryRequestWarehouseStaffSelect value={warehouseStaff} onChange={setWarehouseStaff} />
+      )}
 
       {/* Outbound: pick a customer first, then its open sales orders show as a
           batch checklist (SOs without a DR yet). No orders are listed until a

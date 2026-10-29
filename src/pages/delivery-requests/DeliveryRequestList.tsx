@@ -43,6 +43,8 @@ import {
 } from '@/utils/listFilterDateRange';
 import {
   getDeliveryRequestDriverDepartments,
+  getDeliveryRequestWarehouseStaffDepartments,
+  isDeliveryRequestWarehouseStaffAllowed,
   makeEmployeeDepartmentFilter,
   perms,
 } from '@/utils/permission';
@@ -67,6 +69,10 @@ const canReorder = perms.deliveryRequest.canReorder();
 const canViewAll = perms.deliveryRequest.canViewAll();
 const canViewSelf = perms.deliveryRequest.canViewSelf();
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
+const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
+const warehouseStaffEmployeeFilter = makeEmployeeDepartmentFilter(
+  getDeliveryRequestWarehouseStaffDepartments(),
+);
 const { statusOptions, resolveStatus } = deliveryRequestStatusOptions;
 
 type DeliveryRequestListProps = {
@@ -222,6 +228,16 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     [employees],
   );
 
+  const warehouseStaffFilterData = useMemo(
+    () =>
+      warehouseStaffAllowed
+        ? employees
+            .filter(warehouseStaffEmployeeFilter)
+            .map((e) => ({ value: e.id, label: e.name }))
+        : [],
+    [employees],
+  );
+
   const employeeNames = useMemo(() => {
     const m = new Map<string, string>();
     for (const e of employees) m.set(e.id, e.name);
@@ -315,6 +331,16 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       w: 220,
     },
     {
+      value: filters.warehouseStaffFilter,
+      onChange: filters.setWarehouseStaffFilter,
+      data: warehouseStaffFilterData,
+      placeholder: t('deliveryRequests.filterWarehouseStaff'),
+
+      visible: warehouseStaffFilterData.length > 0 || !!filters.warehouseStaffFilter,
+      searchable: true,
+      w: 220,
+    },
+    {
       value: filters.partyFilter,
       onChange: filters.setPartyFilter,
       data: partyFilterData,
@@ -399,6 +425,19 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           },
         ] satisfies MoreFilterDef[])
       : []),
+    ...(warehouseStaffFilterData.length > 0 || filters.warehouseStaffFilter
+      ? ([
+          {
+            type: 'select',
+            key: 'warehouseStaff',
+            title: t('deliveryRequests.filterWarehouseStaff'),
+            placeholder: t('deliveryRequests.filterWarehouseStaff'),
+            value: filters.warehouseStaffFilter,
+            options: warehouseStaffFilterData,
+            onChange: filters.setWarehouseStaffFilter,
+          },
+        ] satisfies MoreFilterDef[])
+      : []),
     ...(partyFilterData.length > 0
       ? ([
           {
@@ -431,6 +470,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     (showStatusPills && filters.statusFilter.length > 0) ||
     filters.salesOrderFilter ||
     (canViewAll && filters.driverFilter) ||
+    filters.warehouseStaffFilter ||
     filters.partyFilter ||
     showDatePill
   );
@@ -543,6 +583,12 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
                 {driverFilterData.find((e) => e.value === filters.driverFilter)?.label ??
                   employeeNames.get(filters.driverFilter) ??
                   filters.driverFilter}
+              </FilterPill>
+            )}
+            {filters.warehouseStaffFilter && (
+              <FilterPill onClose={() => filters.setWarehouseStaffFilter(null)}>
+                {t('deliveryRequests.filterWarehouseStaff')}:{' '}
+                {employeeNames.get(filters.warehouseStaffFilter) ?? filters.warehouseStaffFilter}
               </FilterPill>
             )}
             {filters.partyFilter && (

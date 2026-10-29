@@ -2127,6 +2127,47 @@ export function ConfigEditor({
                     clearable
                     nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
                   />
+                  {/* Warehouse staff. Schema-only fields (not in the kits
+                      `CMngtDeliveryRequestFeatures` mirror), so read/written via
+                      a local cast like `defaultListStatuses`; consumed via
+                      `isDeliveryRequestWarehouseStaffAllowed()` /
+                      `getDeliveryRequestWarehouseStaffDepartments()`. */}
+                  <FeatureToggleRow
+                    label="Warehouse staff on delivery requests"
+                    description="Lets a delivery request name the warehouse staff who handle it: a picker on the delivery request forms and the desktop detail page (read-only on phones), a column and a filter on the list. A delivery made from a sales order starts with the order's warehouse staff."
+                    checked={
+                      (deliveryRequestsFeatures as { allowWarehouseStaff?: boolean })
+                        .allowWarehouseStaff ?? false
+                    }
+                    onChange={(checked) =>
+                      setDeliveryRequestsFeatures({
+                        ...deliveryRequestsFeatures,
+                        allowWarehouseStaff: checked,
+                      } as CMngtDeliveryRequestFeatures)
+                    }
+                  />
+                  {(deliveryRequestsFeatures as { allowWarehouseStaff?: boolean })
+                    .allowWarehouseStaff && (
+                    <MultiSelect
+                      label="Warehouse Staff Departments"
+                      description="Restrict the delivery-request warehouse-staff picker to employees in these departments. Leave empty to allow any active employee."
+                      placeholder="Any active employee (no restriction)"
+                      data={departmentMultiSelectData}
+                      value={
+                        (deliveryRequestsFeatures as { warehouseStaffDepartments?: string[] })
+                          .warehouseStaffDepartments ?? []
+                      }
+                      onChange={(v) =>
+                        setDeliveryRequestsFeatures({
+                          ...deliveryRequestsFeatures,
+                          warehouseStaffDepartments: v,
+                        } as CMngtDeliveryRequestFeatures)
+                      }
+                      searchable
+                      clearable
+                      nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
+                    />
+                  )}
 
                   {/* Return shipment — generic DR type (inbound, SO-linked). */}
                   <FeatureToggleRow

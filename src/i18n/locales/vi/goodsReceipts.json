@@ -9,6 +9,7 @@
     "itemsCount_one": "{{count}} vật tư",
     "itemsCount_other": "{{count}} vật tư",
     "locationName": "Kho",
+    "packageCount": "Số kiện",
     "receiptNumber": "Mã phiếu",
     "receivedDate": "Ngày nhận",
     "reference": "Tham chiếu"

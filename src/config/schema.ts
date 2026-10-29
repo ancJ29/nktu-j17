@@ -548,6 +548,10 @@ const DeliveryRequestFeaturesSchema = z
 
     driverDepartments: z.array(z.string()).default([]),
 
+    allowWarehouseStaff: z.boolean().default(false),
+
+    warehouseStaffDepartments: z.array(z.string()).default([]),
+
     returnShipment: z
       .object({
         enabled: z.boolean().default(false),
@@ -563,6 +567,8 @@ const DeliveryRequestFeaturesSchema = z
     statusTransitions: {},
     defaultListStatuses: [],
     driverDepartments: [],
+    allowWarehouseStaff: false,
+    warehouseStaffDepartments: [],
     returnShipment: { enabled: false, autoRestockOnComplete: false },
   });
 

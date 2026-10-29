@@ -14,6 +14,7 @@ import {
 } from '@/utils/listFilterStatusDefault';
 import { getDeliveryRequestDefaultListStatuses } from '@/utils/permission';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
+import { readWarehouseStaff } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { deliveryRequestPartyKey } from './deliveryRequestParty';
 import { formatYYMMDD_GMT7 } from './displayOrderNumber';
 
@@ -35,6 +36,7 @@ type DeliveryRequestUrlState = {
   s?: string[];
   o?: string;
   dv?: string;
+  ws?: string;
   pt?: string;
   q?: string;
   sd?: SerializedDateRange;
@@ -47,6 +49,7 @@ function compactState(state: DeliveryRequestUrlState): DeliveryRequestUrlState {
   if (shouldEncodeStatusSelection(state.s, DEFAULT_STATUS)) r.s = state.s;
   if (state.o) r.o = state.o;
   if (state.dv) r.dv = state.dv;
+  if (state.ws) r.ws = state.ws;
   if (state.pt) r.pt = state.pt;
   if (state.q) r.q = state.q;
   if (state.sd?.preset) r.sd = state.sd;
@@ -67,6 +70,7 @@ export function useDeliveryRequestListFilters(
   const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const salesOrderFilter = state.o ?? null;
   const driverFilter = state.dv ?? null;
+  const warehouseStaffFilter = state.ws ?? null;
   const partyFilter = state.pt ?? null;
   const search = state.q ?? '';
   const scheduledDateRange = useMemo(
@@ -82,6 +86,11 @@ export function useDeliveryRequestListFilters(
 
   const setDriverFilter = useCallback(
     (value: string | null) => updateState({ dv: value || undefined, pg: undefined }),
+    [updateState],
+  );
+
+  const setWarehouseStaffFilter = useCallback(
+    (value: string | null) => updateState({ ws: value || undefined, pg: undefined }),
     [updateState],
   );
 
@@ -113,6 +122,14 @@ export function useDeliveryRequestListFilters(
       if (statusFilter.length > 0 && !statusFilter.includes(status)) return false;
       if (salesOrderFilter && r.salesOrderNumber !== salesOrderFilter) return false;
       if (driverFilter && assignedDriverId !== driverFilter) return false;
+      if (
+        warehouseStaffFilter &&
+        !readWarehouseStaff(r.extra as DeliveryRequestExtra | undefined).includes(
+          warehouseStaffFilter,
+        )
+      ) {
+        return false;
+      }
       if (partyFilter && partyKey(r) !== partyFilter) return false;
 
       if (scheduledDateRange.preset) {
@@ -159,6 +176,7 @@ export function useDeliveryRequestListFilters(
     statusFilter,
     salesOrderFilter,
     driverFilter,
+    warehouseStaffFilter,
     partyFilter,
     scheduledDateRange,
     driverCodeById,
@@ -173,6 +191,7 @@ export function useDeliveryRequestListFilters(
     !statusFilterIsDefault ||
     salesOrderFilter ||
     driverFilter ||
+    warehouseStaffFilter ||
     partyFilter ||
     scheduledDateRange.preset ||
     undefined // search handled externally by useListFilter
@@ -186,6 +205,8 @@ export function useDeliveryRequestListFilters(
     salesOrderFilter,
     driverFilter,
     setDriverFilter,
+    warehouseStaffFilter,
+    setWarehouseStaffFilter,
     partyFilter,
     setPartyFilter,
     search,

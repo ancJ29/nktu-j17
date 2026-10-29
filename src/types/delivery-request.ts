@@ -66,6 +66,8 @@ export type DeliveryRequestExtra = {
   assignedDriverId?: string;
   assignedDriverName?: string;
 
+  warehouseStaff?: string[];
+
   pickupTimestamp?: NullableDateTimeInput;
 
   deliveryTimestamp?: NullableDateTimeInput;

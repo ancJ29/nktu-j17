@@ -13,6 +13,7 @@
     "disableAll": "Disable all",
     "enableAll": "Enable all",
     "flags": {
+      "canAssignWarehouseStaff": "Assign Warehouse Staff",
       "canBulkImport": "Bulk Import via Excel",
       "canConfirmDelivered": "Confirm Delivered",
       "canConfirmReceived": "Confirm Received",

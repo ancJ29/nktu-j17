@@ -1814,7 +1814,12 @@ function SalesOrderFormUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
   return (
     <Stack gap={4} pl={36}>
       {hasCustomerChange && <CustomerDiffRow diff={memo.customerDiff!} />}
-      {hasWarehouseStaffChange && <WarehouseStaffDiffRow diff={memo.warehouseStaffDiff!} />}
+      {hasWarehouseStaffChange && (
+        <WarehouseStaffDiffRow
+          label={t('salesOrders.detail.warehouseStaff')}
+          diff={memo.warehouseStaffDiff!}
+        />
+      )}
       {hasItemChanges && <ItemDiffSection diff={diff!} />}
       {!hasItemChanges && typeof memo.lineCount === 'number' && (
         <Text size="xs" c="dimmed">
@@ -1835,9 +1840,14 @@ function SalesOrderFormUpdateBody({ memo }: { readonly memo: SalesOrderMemo }) {
   );
 }
 
-/** Shared by the form and the inline update bodies — both log the same shape. */
-function WarehouseStaffDiffRow({ diff }: { readonly diff: SalesOrderWarehouseStaffDiff }) {
-  const { t } = useTranslation();
+/** Shared by the order's and the DR's form and inline bodies — all log the same shape. */
+function WarehouseStaffDiffRow({
+  label,
+  diff,
+}: {
+  readonly label: string;
+  readonly diff: SalesOrderWarehouseStaffDiff;
+}) {
   const side = (ids: readonly string[] | undefined) =>
     ids && ids.length > 0 ? (
       <WarehouseStaffLinks ids={ids} size="xs" noAvatar />
@@ -1849,7 +1859,7 @@ function WarehouseStaffDiffRow({ diff }: { readonly diff: SalesOrderWarehouseSta
   return (
     <Group gap={6} wrap="nowrap" align="baseline">
       <Text size="xs" c="dimmed">
-        {t('salesOrders.detail.warehouseStaff')}:
+        {label}:
       </Text>
       {side(diff.from)}
       <Text size="xs" c="dimmed">
@@ -2022,7 +2032,12 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
           )}
         </Group>
       )}
-      {f.warehouseStaff && <WarehouseStaffDiffRow diff={f.warehouseStaff} />}
+      {f.warehouseStaff && (
+        <WarehouseStaffDiffRow
+          label={t('salesOrders.detail.warehouseStaff')}
+          diff={f.warehouseStaff}
+        />
+      )}
       {f.deliveryMethod && (
         <Group gap={6} wrap="nowrap" align="baseline">
           <Text size="xs" c="dimmed">
@@ -2305,8 +2320,9 @@ type DeliveryRequestMemo = {
   fromStatus?: string;
   toStatus?: string;
   note?: string;
-  // update (form) — item-level
+  // update (form) — item-level + warehouse staff
   itemDiff?: DeliveryRequestItemDiff;
+  warehouseStaffDiff?: SalesOrderWarehouseStaffDiff;
   // update (inline)
   inlineEdit?: boolean;
   fields?: DeliveryRequestInlineFields;
@@ -2495,9 +2511,18 @@ function DeliveryRequestFormUpdateBody({ memo }: { readonly memo: DeliveryReques
   const diff = memo.itemDiff;
   const hasItemChanges =
     !!diff && (diff.added.length > 0 || diff.removed.length > 0 || diff.changed.length > 0);
-  if (!hasItemChanges && typeof memo.lineCount !== 'number') return null;
+  const hasWarehouseStaffChange = !!memo.warehouseStaffDiff;
+  if (!hasItemChanges && !hasWarehouseStaffChange && typeof memo.lineCount !== 'number') {
+    return null;
+  }
   return (
     <Stack gap={4} pl={36}>
+      {hasWarehouseStaffChange && (
+        <WarehouseStaffDiffRow
+          label={t('deliveryRequests.detail.warehouseStaffLabel')}
+          diff={memo.warehouseStaffDiff!}
+        />
+      )}
       {hasItemChanges && <DeliveryRequestItemDiffSection diff={diff!} />}
       {!hasItemChanges && typeof memo.lineCount === 'number' && (
         <Text size="xs" c="dimmed">
@@ -2608,6 +2633,7 @@ function DeliveryRequestInlineUpdateBody({ memo }: { readonly memo: DeliveryRequ
   if (!f) return null;
   if (
     !f.assignedDriverId &&
+    !f.warehouseStaff &&
     !f.scheduledDate &&
     !f.deliveryAddress &&
     !f.googleMapUrl &&
@@ -2640,6 +2666,12 @@ function DeliveryRequestInlineUpdateBody({ memo }: { readonly memo: DeliveryRequ
             </Text>
           )}
         </Group>
+      )}
+      {f.warehouseStaff && (
+        <WarehouseStaffDiffRow
+          label={t('deliveryRequests.detail.warehouseStaffLabel')}
+          diff={f.warehouseStaff}
+        />
       )}
       {f.scheduledDate && (
         <Group gap={6} wrap="nowrap" align="baseline">

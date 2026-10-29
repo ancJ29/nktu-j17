@@ -16,6 +16,11 @@ import type {
 import type { CMngtDeliveryRequestDirection } from '@credo/connectors/types';
 import { getInitialStatusValueForCreate } from './transitionEngine';
 import { statusHasCapability as soStatusHasCapability } from '@/pages/sales-orders/transitionEngine';
+import {
+  diffWarehouseStaff,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
+import { isDeliveryRequestWarehouseStaffAllowed } from '@/utils/permission';
 import { diffItems, partyMemo, toMemoItem } from './activityMemo';
 import { linkDRToSalesOrder } from './linkToSalesOrder';
 
@@ -29,6 +34,18 @@ export function mergeSalesOrderDriverNote(
   const base = operatorNote.trim();
   if (base && driverNote) return `${base}\n${driverNote}`;
   return base || driverNote || '';
+}
+
+export function initialWarehouseStaff(p: {
+  allowed: boolean;
+  direction: CMngtDeliveryRequestDirection;
+  picked?: readonly string[];
+  sourceOrder?: SalesOrder | null;
+}): string[] {
+  if (!p.allowed) return [];
+  if (p.picked) return [...p.picked];
+  if (p.direction === 'inbound' || !p.sourceOrder) return [];
+  return readWarehouseStaff((p.sourceOrder.extra ?? {}) as SalesOrderExtra);
 }
 
 export type DeliveryRequestItemDraft = {
@@ -166,6 +183,8 @@ export type CreateDeliveryRequestParams = {
   items: DeliveryRequestItem[];
   assignedDriverId: string;
   assignedDriverName?: string;
+
+  warehouseStaff?: string[];
   isUrgent: boolean;
 
   currentEmployee?: { id: string; name: string };
@@ -222,6 +241,13 @@ export async function createDeliveryRequestRecord(
       : '')
   ).trim();
 
+  const warehouseStaff = initialWarehouseStaff({
+    allowed: isDeliveryRequestWarehouseStaffAllowed(),
+    direction: p.direction,
+    picked: p.warehouseStaff,
+    sourceOrder: sourceSalesOrder,
+  });
+
   const extra: DeliveryRequestExtra = {
     status: initialStatus,
     activityLog: [createdEntry],
@@ -232,6 +258,7 @@ export async function createDeliveryRequestRecord(
       assignedDriverId: p.assignedDriverId,
       ...(p.assignedDriverName && { assignedDriverName: p.assignedDriverName }),
     }),
+    ...(warehouseStaff.length > 0 && { warehouseStaff }),
     ...(p.isUrgent && { isUrgent: true }),
     ...(isAdditional && { isAdditional: true }),
 
@@ -321,6 +348,8 @@ export type UpdateDeliveryRequestParams = {
   items: DeliveryRequestItem[];
   assignedDriverId: string;
   assignedDriverName?: string;
+
+  warehouseStaff?: string[];
   isUrgent: boolean;
 };
 
@@ -339,6 +368,9 @@ export async function updateDeliveryRequestRecord(
           ...(p.assignedDriverName && { assignedDriverName: p.assignedDriverName }),
         }
       : { assignedDriverId: undefined, assignedDriverName: undefined }),
+    ...(p.warehouseStaff && {
+      warehouseStaff: p.warehouseStaff.length > 0 ? p.warehouseStaff : undefined,
+    }),
 
     isUrgent: p.isUrgent ? true : undefined,
 
@@ -360,10 +392,13 @@ export async function updateDeliveryRequestRecord(
   })) as DeliveryRequest;
 
   const itemDiff = diffItems(p.snapshot.items, p.items);
+  const warehouseStaffDiff =
+    p.warehouseStaff && diffWarehouseStaff(readWarehouseStaff(prevExtra), p.warehouseStaff);
   logActivity('deliveryRequest.update', p.id, {
     requestNumber: updated.requestNumber,
     lineCount: p.items.length,
     itemDiff,
+    ...(warehouseStaffDiff && { warehouseStaffDiff }),
   });
 
   return { deliveryRequest: updated };

@@ -71,6 +71,8 @@ import {
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
+import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
+import { readWarehouseStaff } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { Form } from '@/components/Form';
 import { GroupedNumberInput } from '@/components/GroupedNumberInput';
@@ -224,6 +226,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
 
       items: [],
       assignedDriverId: '',
+      warehouseStaff: [],
       isUrgent: false,
     },
     validate: {
@@ -270,6 +273,8 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         if (remaining.length > 0) {
           form.setFieldValue('items', remaining);
         }
+
+        form.setFieldValue('warehouseStaff', readWarehouseStaff(soExtra));
       }
     },
 
@@ -349,6 +354,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
           fromLocationCode: item.fromLocationCode,
         })),
         assignedDriverId: drExtra.assignedDriverId ?? '',
+        warehouseStaff: readWarehouseStaff(drExtra),
         isUrgent: drExtra.isUrgent ?? false,
       };
     },
@@ -404,6 +410,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
             items,
             assignedDriverId: values.assignedDriverId,
             assignedDriverName: driver?.name,
+            warehouseStaff: values.warehouseStaff,
             isUrgent: values.isUrgent,
           });
           snapshotRef.current = updated;
@@ -432,6 +439,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
             items,
             assignedDriverId: values.assignedDriverId,
             assignedDriverName: driver?.name,
+            warehouseStaff: values.warehouseStaff,
             isUrgent: values.isUrgent,
             currentEmployee: currentEmployee
               ? { id: currentEmployee.id, name: currentEmployee.name }
@@ -686,6 +694,10 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
               filter={driverEmployeeFilter}
               value={form.getValues().assignedDriverId || null}
               onChange={(v) => form.setFieldValue('assignedDriverId', v?.id ?? '')}
+            />
+            <DeliveryRequestWarehouseStaffSelect
+              value={form.getValues().warehouseStaff}
+              onChange={(v) => form.setFieldValue('warehouseStaff', v)}
             />
 
             <Textarea

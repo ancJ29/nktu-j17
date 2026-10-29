@@ -11,6 +11,7 @@ import {
   type SheetPalette,
 } from '@/utils/printDocument';
 import { purchaseOrderNamesOf } from '@/utils/productPurchaseOrderNames';
+import { packageCountOf } from './goodsReceiptPackageCount';
 
 export type PurchaseOrderPrintOptions = {
   paperSize: PaperSize;
@@ -37,6 +38,8 @@ export type PurchaseOrderPrintLine = {
 
   unit: string;
   quantity: number;
+
+  packageCount: number | null;
 
   photoUrl: string;
   note: string;
@@ -96,6 +99,7 @@ export function toPurchaseOrderPrintData(input: {
         nameEn: names.en,
         unit: unitLabelOf(it.unit),
         quantity: it.quantity,
+        packageCount: packageCountOf(it),
         photoUrl: showPhoto ? (photoByCode.get(it.itemCode) ?? '') : '',
         note: it.note?.trim() ?? '',
       };
@@ -124,6 +128,7 @@ const L = {
   colName: ['Tên hàng', '品名', 'Description'],
   colUnit: ['ĐVT', '单位', 'Unit'],
   colQty: ['Số lượng', '数量', 'Qty'],
+  colPackages: ['Số kiện', '件数', 'Packages'],
 } as const satisfies Record<string, Tri>;
 
 const ZH_FONTS = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC"';
@@ -188,15 +193,17 @@ function buildParts(
   const { buyer, supplier, showPhoto } = data;
   const { paperSize, orientation, includeExpectedDelivery, palette } = options;
 
+  const showPackages = data.lines.some((l) => l.packageCount !== null);
+
   const isA5 = paperSize === 'A5';
   const marginMm = isA5 ? 8 : 12;
   const baseFontPx = isA5 ? 10 : 12.5;
   const subFontPx = isA5 ? 8 : 10;
-  const photoPx = isA5 ? 36 : 56;
+  const photoPx = isA5 ? 96 : 144;
   const cellPadPx = isA5 ? 4 : 6;
   const w = isA5
-    ? { no: 24, code: 60, photo: photoPx + 8, unit: 44, qty: 60 }
-    : { no: 34, code: 80, photo: photoPx + 8, unit: 56, qty: 80 };
+    ? { no: 24, code: 50, photo: photoPx + 8, unit: 40, qty: 56, packages: 46 }
+    : { no: 34, code: 64, photo: photoPx + 8, unit: 56, qty: 80, packages: 64 };
   const widthMm = contentWidthMm(paperSize, orientation, marginMm);
 
   const buyerContacts = [
@@ -243,7 +250,12 @@ function buildParts(
             line.note ? `<div class="note">${escapeHtml(line.note)}</div>` : ''
           }</td>
           <td class="c">${escapeHtml(line.unit)}</td>
-          <td class="r">${quantity(line.quantity)}</td>
+          <td class="r">${quantity(line.quantity)}</td>${
+            showPackages
+              ? `
+          <td class="r packages">${line.packageCount === null ? '' : quantity(line.packageCount)}</td>`
+              : ''
+          }
         </tr>`,
     )
     .join('');
@@ -282,7 +294,7 @@ function buildParts(
   table.items thead th .zh, table.items thead th .en { font-weight: 400; font-size: ${subFontPx}px; color: #4b5563; }
   td.c { text-align: center; }
   td.r { text-align: right; white-space: nowrap; }
-  td.code { white-space: nowrap; }
+  td.code { overflow-wrap: anywhere; }
   td.name .name-zh, td.name .name-en { margin-top: 1px; }
   td.name .note { margin-top: 2px; font-style: italic; font-size: ${subFontPx}px; color: #6b7280; }
   td.photo { padding: 3px; }
@@ -319,6 +331,7 @@ ${palette ? paletteCss(palette) : ''}`;
           <th>${stacked(L.colName)}</th>
           <th style="width:${w.unit}px">${stacked(L.colUnit)}</th>
           <th style="width:${w.qty}px">${stacked(L.colQty)}</th>
+          ${showPackages ? `<th style="width:${w.packages}px">${stacked(L.colPackages)}</th>` : ''}
         </tr>
       </thead>
       <tbody>${rows}

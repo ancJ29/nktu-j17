@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { useCustomerStore } from '@/stores/useCustomerStore';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import { hasPendingPhotoUpload } from '@/utils/photoQueue';
 import type { DeliveryRequest, DeliveryRequestExtra } from '@/types';
@@ -12,7 +13,14 @@ import { DeliveryRequestKindBadge } from './DeliveryRequestKindBadge';
 import { deliveryRequestPartyIsCustomer } from './deliveryRequestParty';
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { formatDate } from '@/utils/dateFormat';
-import { type ResolvedStatusOption } from '@/utils/permission';
+import {
+  isDeliveryRequestWarehouseStaffAllowed,
+  type ResolvedStatusOption,
+} from '@/utils/permission';
+import {
+  formatWarehouseStaffNames,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { resolveDeliveryRequestRowBg } from './urgencyRowBg';
 
 type DeliveryRequestCardListProps = {
@@ -22,6 +30,8 @@ type DeliveryRequestCardListProps = {
 
   readonly pendingSyncIds?: Set<string>;
 };
+
+const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
 
 function DeliveryRequestCardSkeleton() {
   return (
@@ -52,6 +62,8 @@ export function DeliveryRequestCardList({
 
   const customers = useCustomerStore((s) => s.items);
   const getVendorByCode = useVendorStore((s) => s.getByCode);
+  const employees = useEmployeeStore((s) => s.items);
+  const employeeNames = useMemo(() => new Map(employees.map((e) => [e.id, e.name])), [employees]);
   const resolveCustomerShortName = useMemo(
     () => createCustomerShortNameResolver(customers),
     [customers],
@@ -84,6 +96,9 @@ export function DeliveryRequestCardList({
         const drExtra = (req.extra ?? {}) as DeliveryRequestExtra;
         const isUrgent = drExtra.isUrgent === true;
         const cardBg = resolveDeliveryRequestRowBg(isUrgent, status.stage);
+        const warehouseStaffNames = warehouseStaffAllowed
+          ? formatWarehouseStaffNames(readWarehouseStaff(drExtra), (id) => employeeNames.get(id))
+          : '';
         const vendor =
           !partyIsCustomer && req.vendorCode ? getVendorByCode(req.vendorCode) : undefined;
         const partyName = partyIsCustomer
@@ -133,6 +148,12 @@ export function DeliveryRequestCardList({
                   <FieldRow
                     label={t('deliveryRequests.detail.driverLabel')}
                     value={drExtra.assignedDriverName}
+                  />
+                )}
+                {warehouseStaffNames && (
+                  <FieldRow
+                    label={t('deliveryRequests.detail.warehouseStaffLabel')}
+                    value={warehouseStaffNames}
                   />
                 )}
                 {req.scheduledDate && (
