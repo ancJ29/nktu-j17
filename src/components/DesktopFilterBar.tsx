@@ -42,6 +42,8 @@ type DesktopFilterBarProps = {
   onSearchChange: (value: string) => void;
   searchPlaceholder: string;
 
+  searchMinWidth?: number;
+
   status?: FilterStatus;
   onStatusChange?: (value: FilterStatus) => void;
 
@@ -61,6 +63,7 @@ export function DesktopFilterBar({
   search,
   onSearchChange,
   searchPlaceholder,
+  searchMinWidth,
   status,
   onStatusChange,
   statusLabels,
@@ -96,7 +99,7 @@ export function DesktopFilterBar({
         leftSection={<IconSearch size={16} />}
         value={search}
         onChange={onSearchChange}
-        style={{ flex: 1 }}
+        style={{ flex: 1, minWidth: searchMinWidth }}
         rightSection={
           <ActionIcon
             variant="subtle"

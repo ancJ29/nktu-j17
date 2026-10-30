@@ -146,6 +146,13 @@ import {
   diffWarehouseStaff,
   readWarehouseStaff,
 } from './salesOrderWarehouseStaff';
+import {
+  buildSalesOrderFormExtra,
+  DEFAULT_VAT_PERCENT,
+  salesOrderFormValuesFromOrder,
+  type ItemFormValues,
+  type SalesOrderFormValues,
+} from './salesOrderFormValues';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { isBundleSet, isProductSet, isNoInventoryProduct, newSetGroupId } from '@/utils/productSet';
 import {
@@ -171,7 +178,9 @@ const pricingEnabled = isPricingManagementEnabled();
 
 const canViewSetComponentInventory = perms.salesOrder.canViewSetComponentInventory();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
-const warehouseStaffAllowed = isWarehouseStaffAllowed();
+
+const warehouseStaffPickable =
+  isWarehouseStaffAllowed() && perms.salesOrder.canAssignWarehouseStaff();
 const warehouseStaffEmployeeFilter = makeEmployeeDepartmentFilter(
   getSalesOrderWarehouseStaffDepartments(),
 );
@@ -183,8 +192,6 @@ const createSkipInitialTarget = getCreateSkipInitialTargetValue();
 
 const BILLING_ADDRESS_ID = '__billing__';
 
-const DEFAULT_VAT_PERCENT = 8;
-
 const isMobile = device.isMobile;
 
 function extractCopyFromState(state: unknown): Record<string, unknown> | undefined {
@@ -193,65 +200,6 @@ function extractCopyFromState(state: unknown): Record<string, unknown> | undefin
   if (copyFrom == null || typeof copyFrom !== 'object') return undefined;
   return copyFrom as Record<string, unknown>;
 }
-
-type ItemFormValues = {
-  productCode: string;
-  productName: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number;
-
-  fromLocationCode: string;
-
-  groupId?: string;
-
-  role?: 'set' | 'set-component';
-
-  sourceSetCode?: string;
-
-  memo?: string;
-
-  extraQuantity?: number;
-
-  isReady?: boolean;
-
-  warehouseMemo?: string;
-};
-
-type SalesOrderFormValues = {
-  orderNumber: string;
-  customerPONumber: string;
-  customerId: string;
-  customerName: string;
-  isIndividualCustomer: boolean;
-  isInternalDelivery: boolean;
-  orderDate: Date | null;
-  deliveryAddress: string;
-  googleMapUrl: string;
-  deliveryDate: Date | null;
-  deliveryMethod: string;
-  assignedStaff: string;
-
-  warehouseStaff: string[];
-  isUrgent: boolean;
-  tags: string[];
-
-  needVAT: boolean;
-  needShippingFee: boolean;
-
-  vatRatePercent: number | '';
-  vatTag: string;
-  shippingFee: number | '';
-  isPaid: boolean;
-
-  paidAmount: number | '';
-  invoiceIssued: boolean;
-  notes: string;
-
-  warehouseNote: string;
-  driverNote: string;
-  items: ItemFormValues[];
-};
 
 const emptyItem: ItemFormValues = {
   productCode: '',
@@ -1215,58 +1163,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       setOwnReservedSnapshot(extra?.inventoryLinkage?.reservedSnapshot);
       setInventoryLinkageState(extra?.inventoryLinkage?.state);
 
-      const persistedCode = extra?.customerCode ?? '';
-      const persistedCustomer = persistedCode
-        ? customers.find((c) => c.code === persistedCode)
-        : undefined;
-      const persistedId = persistedCustomer?.id ?? '';
-      const persistedCustomerName = extra?.isIndividualCustomer
-        ? (extra?.customerName ?? '')
-        : (persistedCustomer?.name ?? o.customerName);
-      return {
-        orderNumber: o.orderNumber,
-        customerPONumber: extra?.customerPONumber ?? '',
-        customerId: persistedId,
-        customerName: persistedCustomerName,
-        isIndividualCustomer: extra?.isIndividualCustomer ?? false,
-        isInternalDelivery: extra?.isInternalDelivery ?? true,
-        orderDate: extra?.orderDate ? new Date(extra.orderDate) : null,
-        deliveryAddress: extra?.deliveryAddress ?? '',
-        googleMapUrl: extra?.googleMapUrl ?? '',
-        deliveryDate: extra?.deliveryDate ? new Date(extra.deliveryDate) : null,
-        deliveryMethod: extra?.deliveryMethod ?? '',
-        assignedStaff: extra?.assignedStaff ?? '',
-        warehouseStaff: readWarehouseStaff(extra),
-        isUrgent: extra?.isUrgent ?? false,
-        tags: extra?.tags ?? [],
-        needVAT: extra?.needVAT ?? true,
-        needShippingFee: extra?.needShippingFee ?? false,
-        vatRatePercent:
-          typeof extra?.vatRate === 'number' ? extra.vatRate * 100 : DEFAULT_VAT_PERCENT,
-        vatTag: extra?.vatTag ?? '',
-        shippingFee: typeof extra?.shippingFee === 'number' ? extra.shippingFee : ('' as const),
-        isPaid: extra?.isPaid ?? false,
-        paidAmount: typeof extra?.paidAmount === 'number' ? extra.paidAmount : ('' as const),
-        invoiceIssued: extra?.invoiceIssued ?? false,
-        notes: o.notes || '',
-        warehouseNote: extra?.clientSpecific?.NKTU?.warehouseNote ?? '',
-        driverNote: extra?.clientSpecific?.NKTU?.driverNote ?? '',
-        items: o.items.map((item) => ({
-          productCode: item.productCode,
-          productName: item.productName,
-          quantity: item.quantity,
-          unit: item.unit,
-          unitPrice: item.unitPrice,
-          fromLocationCode: item.fromLocationCode || DEFAULT_LOCATION_CODE,
-          ...(item.groupId && { groupId: item.groupId }),
-          ...(item.role && { role: item.role }),
-          ...(item.sourceSetCode && { sourceSetCode: item.sourceSetCode }),
-          ...(item.memo && { memo: item.memo }),
-          ...(item.extraQuantity ? { extraQuantity: item.extraQuantity } : {}),
-          ...(item.isReady ? { isReady: true } : {}),
-          ...(item.warehouseMemo ? { warehouseMemo: item.warehouseMemo } : {}),
-        })),
-      };
+      return salesOrderFormValuesFromOrder(o, customers);
     },
     [customers, navigate],
   );
@@ -1394,58 +1291,16 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
 
       const productWarehouseMemos = buildSalesOrderWarehouseMemo(items, productByCode);
 
-      const extra = {
-        ...(productWarehouseMemos && { productWarehouseMemos }),
-        ...(values.isIndividualCustomer
-          ? { isIndividualCustomer: true, customerName: values.customerName.trim() }
-          : selectedCustomer && { customerCode: selectedCustomer.code }),
-        ...(quotationLink && {
-          quotationId: quotationLink.id,
-          ...(quotationLink.code && { quotationCode: quotationLink.code }),
-        }),
-        ...(deliveryRequestsEnabled &&
-          (!internalDeliveryAllowed || !values.isInternalDelivery) && {
-            isInternalDelivery: false,
-          }),
-        ...(values.orderDate && { orderDate: new Date(values.orderDate).getTime() }),
-        ...(values.customerPONumber.trim() && { customerPONumber: values.customerPONumber.trim() }),
-        ...(values.deliveryAddress && { deliveryAddress: values.deliveryAddress }),
-        ...(values.googleMapUrl.trim() && { googleMapUrl: values.googleMapUrl.trim() }),
-        ...(values.deliveryDate && { deliveryDate: new Date(values.deliveryDate).getTime() }),
-        ...(values.deliveryMethod && { deliveryMethod: values.deliveryMethod }),
-        ...(values.assignedStaff && { assignedStaff: values.assignedStaff }),
-        ...(values.warehouseStaff.length > 0 && { warehouseStaff: values.warehouseStaff }),
-        ...(values.isUrgent && { isUrgent: true }),
-        ...(values.tags.length > 0 && { tags: values.tags }),
-
-        ...(pricingEnabled && values.needVAT === false && { needVAT: false }),
-        ...(pricingEnabled && values.needShippingFee && { needShippingFee: true }),
-        ...(pricingEnabled &&
-          typeof values.vatRatePercent === 'number' && {
-            vatRate: values.vatRatePercent / 100,
-          }),
-        ...(pricingEnabled && values.vatTag.trim() && { vatTag: values.vatTag.trim() }),
-        ...(pricingEnabled &&
-          typeof values.shippingFee === 'number' &&
-          values.shippingFee > 0 && { shippingFee: values.shippingFee }),
-        ...(pricingEnabled && values.isPaid && { isPaid: true }),
-
-        ...(pricingEnabled &&
-          !values.isPaid &&
-          typeof values.paidAmount === 'number' &&
-          values.paidAmount > 0 && { paidAmount: values.paidAmount }),
-        ...(pricingEnabled && values.invoiceIssued && { invoiceIssued: true }),
-        ...(formAttachments.length > 0 && { attachments: formAttachments }),
-
-        ...(splitNotesCfg && {
-          clientSpecific: {
-            NKTU: {
-              ...(values.warehouseNote.trim() && { warehouseNote: values.warehouseNote.trim() }),
-              ...(values.driverNote.trim() && { driverNote: values.driverNote.trim() }),
-            },
-          },
-        }),
-      } satisfies SalesOrderExtra;
+      const extra = buildSalesOrderFormExtra(values, {
+        productWarehouseMemos,
+        selectedCustomer,
+        quotationLink,
+        formAttachments,
+        pricingEnabled,
+        deliveryRequestsEnabled,
+        internalDeliveryAllowed,
+        splitNotes: !!splitNotesCfg,
+      });
 
       try {
         if (isEdit && id) {
@@ -2008,7 +1863,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                   onChange={(v) => form.setFieldValue('assignedStaff', v?.id ?? '')}
                 />
               );
-              const warehouseStaffField = warehouseStaffAllowed && (
+              const warehouseStaffField = warehouseStaffPickable && (
                 <MultiSelect
                   label={t('salesOrders.form.warehouseStaffLabel')}
                   placeholder={t('salesOrders.form.warehouseStaffPlaceholder')}
@@ -2070,7 +1925,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                       base: 1,
                       sm:
                         1 +
-                        (warehouseStaffAllowed ? 1 : 0) +
+                        (warehouseStaffPickable ? 1 : 0) +
                         (deliveryMethodOptions.length > 0 ? 1 : 0),
                     }}
                   >

@@ -555,17 +555,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       data: statusFilterData,
       placeholder: statusPlaceholder,
       visible: statusFilterData.length > 0,
-      w: 200,
       multi: true,
-    },
-    {
-      value: filters.customerFilter,
-      onChange: filters.setCustomerFilter,
-      data: customerFilterData,
-      placeholder: t('common.labels.customer'),
-      visible: customerFilterData.length > 0,
-      searchable: true,
-      w: 250,
     },
     {
       value: filters.staffFilter,
@@ -575,7 +565,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
 
       visible: canViewAll && staffFilterData.length > 0,
       searchable: true,
-      w: 250,
     },
     {
       value: filters.warehouseStaffFilter,
@@ -585,7 +574,6 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
 
       visible: warehouseStaffFilterData.length > 0 || !!filters.warehouseStaffFilter,
       searchable: true,
-      w: 220,
     },
   ];
 
@@ -600,6 +588,16 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
       visible: statusFilterData.length > 0,
     }),
   ];
+
+  const customerMoreFilter: MoreFilterDef = {
+    type: 'select',
+    key: 'customer',
+    title: t('common.labels.customer'),
+    placeholder: t('common.labels.customer'),
+    value: filters.customerFilter,
+    options: customerFilterData,
+    onChange: filters.setCustomerFilter,
+  };
 
   const dateAndUrgentFilters: MoreFilterDef[] = [
     {
@@ -657,15 +655,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   }, [filters, t]);
 
   const mobileMoreFilters: MoreFilterDef[] = [
-    {
-      type: 'select',
-      key: 'customer',
-      title: t('common.labels.customer'),
-      placeholder: t('common.labels.customer'),
-      value: filters.customerFilter,
-      options: customerFilterData,
-      onChange: filters.setCustomerFilter,
-    },
+    customerMoreFilter,
 
     ...(canViewAll
       ? ([
@@ -822,11 +812,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.salesOrders.list.searchPlaceholder')}
+            searchMinWidth={200}
             hideStatus
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover
-                filters={dateAndUrgentFilters}
+                filters={[customerMoreFilter, ...dateAndUrgentFilters]}
                 presetLabels={presetLabels}
               />
             }

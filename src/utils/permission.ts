@@ -592,6 +592,7 @@ export const perms = {
       canEditDeliveryPackageSize: () => resolve().actions?.canEditDeliveryPackageSize ?? false,
       canEditItemWarehouseFields: () => resolve().actions?.canEditItemWarehouseFields ?? false,
       canManagePayment: () => resolve().actions?.canManagePayment ?? false,
+      canAssignWarehouseStaff: () => resolve().actions?.canAssignWarehouseStaff ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };

@@ -18,21 +18,16 @@ import {
 import type { DeliveryRequest, DeliveryRequestExtra, Vendor } from '@/types';
 import { updateDeliveryRequestRecord } from './createDeliveryRequest';
 import { DeliveryRequestWarehouseStaffSelect } from './DeliveryRequestWarehouseStaffSelect';
-import { readWarehouseStaff } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import {
+  editDeliveryRequestFormValues,
   resolveCustomerPickupAddress,
   resolveVendorInboundAddress,
   toDateTimeInputOrUndefined,
-  type DeliveryRequestFormValues,
+  type EditDeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
 import { Form } from '@/components/Form';
 
 const driverEmployeeFilter = makeEmployeeDepartmentFilter(getDeliveryRequestDriverDepartments());
-
-type EditFormValues = Omit<
-  DeliveryRequestFormValues,
-  'requestNumber' | 'salesOrderId' | 'salesOrderNumber' | 'items'
->;
 
 type EditDeliveryRequestModalProps = {
   opened: boolean;
@@ -118,23 +113,11 @@ function EditBody({ request, onClose, onUpdated, t }: EditBodyProps) {
   const drExtra = (request.extra ?? {}) as DeliveryRequestExtra;
 
   const [customerCode, setCustomerCode] = useState(() => drExtra.customerCode ?? '');
-  const form = useForm<EditFormValues>({
-    initialValues: {
-      direction,
-      customerName: request.customerName ?? '',
-      vendorCode: request.vendorCode ?? '',
-      vendorName: request.vendorName ?? '',
-      deliveryAddress: drExtra.deliveryAddress ?? '',
-      googleMapUrl: drExtra.googleMapUrl ?? '',
-      scheduledDate: request.scheduledDate ? new Date(request.scheduledDate) : null,
-      notes: request.notes ?? '',
-      assignedDriverId: drExtra.assignedDriverId ?? '',
-      warehouseStaff: readWarehouseStaff(drExtra),
-      isUrgent: drExtra.isUrgent ?? false,
-    },
+  const form = useForm<EditDeliveryRequestFormValues>({
+    initialValues: editDeliveryRequestFormValues(request),
   });
 
-  const handleSubmit = async (values: EditFormValues) => {
+  const handleSubmit = async (values: EditDeliveryRequestFormValues) => {
     setLoading(true);
 
     const customerName = partyIsCustomer ? values.customerName.trim() : '';

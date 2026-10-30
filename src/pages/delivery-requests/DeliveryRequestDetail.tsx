@@ -196,8 +196,7 @@ export function DeliveryRequestDetail({ variant }: DeliveryRequestDetailProps) {
 
   const canEditMeta = canEdit && !request.isClosed && !isMobile;
 
-  const canEditWarehouseStaff =
-    (canEdit || canAssignWarehouseStaff) && !request.isClosed && !isMobile;
+  const canEditWarehouseStaff = canAssignWarehouseStaff && !request.isClosed && !isMobile;
 
   const resolvedVendor =
     !partyIsCustomer && request.vendorCode ? getVendorByCode(request.vendorCode) : undefined;

@@ -6,9 +6,11 @@ import {
   getDeliveryRequestWarehouseStaffDepartments,
   isDeliveryRequestWarehouseStaffAllowed,
   makeEmployeeDepartmentFilter,
+  perms,
 } from '@/utils/permission';
 
-const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
+const warehouseStaffPickable =
+  isDeliveryRequestWarehouseStaffAllowed() && perms.deliveryRequest.canAssignWarehouseStaff();
 const warehouseStaffEmployeeFilter = makeEmployeeDepartmentFilter(
   getDeliveryRequestWarehouseStaffDepartments(),
 );
@@ -25,7 +27,7 @@ export function DeliveryRequestWarehouseStaffSelect({
 }) {
   const { t } = useTranslation();
   const employees = useEmployeeStore((s) => s.items);
-  if (!warehouseStaffAllowed) return null;
+  if (!warehouseStaffPickable) return null;
   return (
     <MultiSelect
       label={inline ? undefined : t('deliveryRequests.form.warehouseStaffLabel')}

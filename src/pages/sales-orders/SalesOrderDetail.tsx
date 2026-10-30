@@ -151,6 +151,8 @@ const canCreateDRPerm = perms.deliveryRequest.canCreate();
 const canEditDeliveryPackageSize = perms.salesOrder.canEditDeliveryPackageSize();
 
 const canEditItemWarehouseFields = perms.salesOrder.canEditItemWarehouseFields();
+
+const canAssignWarehouseStaff = perms.salesOrder.canAssignWarehouseStaff();
 const deliveryPackageSizeOptions = getSalesOrderDeliveryPackageSizeOptions();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
@@ -500,10 +502,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
     />
   );
 
+  const canEditWarehouseStaff =
+    canAssignWarehouseStaff && !order.isClosed && !isCancelled && !isMobile;
   const warehouseStaffIds = readWarehouseStaff(extra);
   const warehouseStaffField = (
     <InlineEditField<string[]>
-      canEdit={canEditMeta}
+      canEdit={canEditWarehouseStaff}
       value={warehouseStaffIds}
       equals={(a, b) => !diffWarehouseStaff(a, b)}
       onSave={async (next) =>

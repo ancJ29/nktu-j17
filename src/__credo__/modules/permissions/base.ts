@@ -68,6 +68,8 @@ export const BASE_PERMISSIONS: Permissions = {
       canEditItemWarehouseFields: false,
 
       canManagePayment: false,
+
+      canAssignWarehouseStaff: false,
     },
     query: {
       canViewAll: false,

@@ -7,7 +7,8 @@
 
 import type { CMngtDeliveryRequestDirection } from '@credo/connectors/types';
 import type { DateTimeInput } from '@credo/kits/types';
-import type { Customer, Vendor } from '@/types';
+import type { Customer, DeliveryRequest, DeliveryRequestExtra, Vendor } from '@/types';
+import { readWarehouseStaff } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 
 export type ItemFormValues = {
   productCode: string;
@@ -51,13 +52,46 @@ export type DeliveryRequestFormValues = {
   /** Assigned driver — usually an employee. Optional on create. */
   assignedDriverId: string;
   /**
-   * Employee ids. Loaded and saved even while the switch hides the picker — the
-   * update writer then writes back what it loaded; a create drops it.
+   * Employee ids. Loaded and saved even while the switch or a missing
+   * `canAssignWarehouseStaff` hides the picker — the update writer then writes
+   * back what it loaded; a create drops it.
    */
   warehouseStaff: string[];
   /** High-priority flag — red highlight on the list. */
   isUrgent: boolean;
 };
+
+/** The subset of the form values the header-only edit modal edits (no items). */
+export type EditDeliveryRequestFormValues = Omit<
+  DeliveryRequestFormValues,
+  'requestNumber' | 'salesOrderId' | 'salesOrderNumber' | 'items'
+>;
+
+/**
+ * The edit modal's values for a stored DR. Here, not in the modal, so a test
+ * runs the load the modal runs: an empty `warehouseStaff` here would be sent as
+ * `[]`, which the update writer reads as a clear.
+ */
+export function editDeliveryRequestFormValues(
+  request: DeliveryRequest,
+): EditDeliveryRequestFormValues {
+  const drExtra = (request.extra ?? {}) as DeliveryRequestExtra;
+  return {
+    // Legacy records persisted before the inbound/outbound split lack a
+    // `direction` — treat them as outbound (their original semantics).
+    direction: request.direction ?? 'outbound',
+    customerName: request.customerName ?? '',
+    vendorCode: request.vendorCode ?? '',
+    vendorName: request.vendorName ?? '',
+    deliveryAddress: drExtra.deliveryAddress ?? '',
+    googleMapUrl: drExtra.googleMapUrl ?? '',
+    scheduledDate: request.scheduledDate ? new Date(request.scheduledDate) : null,
+    notes: request.notes ?? '',
+    assignedDriverId: drExtra.assignedDriverId ?? '',
+    warehouseStaff: readWarehouseStaff(drExtra),
+    isUrgent: drExtra.isUrgent ?? false,
+  };
+}
 
 /** Coerce the heterogeneous `scheduledDate` form value into an ISO string for the BFF. */
 export function toDateTimeInputOrUndefined(
