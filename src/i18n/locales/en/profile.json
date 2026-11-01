@@ -34,6 +34,7 @@
       "canUploadPhoto": "Upload Photos",
       "canViewActivityLog": "View Activity Log",
       "canViewAll": "View all records",
+      "canViewAllAsWarehouse": "View all records (warehouse)",
       "canViewPrice": "View Price",
       "canViewSelf": "View own records",
       "canViewSetComponentInventory": "View component inventory of sets"

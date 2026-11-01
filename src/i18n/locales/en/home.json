@@ -7,7 +7,8 @@
     "orderNumber": "Order No.",
     "poNumber": "PO No.",
     "requestNumber": "Request No.",
-    "status": "Status"
+    "status": "Status",
+    "warehouseStaff": "Warehouse Staff"
   },
   "empty": "No data",
   "error": "Failed to load data",

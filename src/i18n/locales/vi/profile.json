@@ -34,6 +34,7 @@
       "canUploadPhoto": "Tải ảnh lên",
       "canViewActivityLog": "Xem nhật ký hoạt động",
       "canViewAll": "Xem tất cả dữ liệu",
+      "canViewAllAsWarehouse": "Xem tất cả dữ liệu (kho)",
       "canViewPrice": "Xem giá",
       "canViewSelf": "Xem dữ liệu được phân công",
       "canViewSetComponentInventory": "Xem tồn kho thành phần của bộ"

@@ -74,6 +74,8 @@ export const BASE_PERMISSIONS: Permissions = {
     query: {
       canViewAll: false,
       canViewSelf: false,
+
+      canViewAllAsWarehouse: false,
     },
   },
   deliveryRequest: {
@@ -93,6 +95,8 @@ export const BASE_PERMISSIONS: Permissions = {
     query: {
       canViewAll: false,
       canViewSelf: false,
+
+      canViewAllAsWarehouse: false,
     },
   },
   goodsReceipt: {

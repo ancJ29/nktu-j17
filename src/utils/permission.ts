@@ -595,6 +595,7 @@ export const perms = {
       canAssignWarehouseStaff: () => resolve().actions?.canAssignWarehouseStaff ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
+      canViewAllAsWarehouse: () => resolve().query?.canViewAllAsWarehouse ?? false,
     };
   })(),
 
@@ -621,6 +622,7 @@ export const perms = {
       canAssignWarehouseStaff: () => resolve().actions?.canAssignWarehouseStaff ?? false,
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
+      canViewAllAsWarehouse: () => resolve().query?.canViewAllAsWarehouse ?? false,
     };
   })(),
   goodsReceipt: (() => {

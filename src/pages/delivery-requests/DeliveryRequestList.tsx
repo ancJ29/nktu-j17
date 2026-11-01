@@ -317,7 +317,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       data: statusFilterData,
       placeholder: statusPlaceholder,
       visible: statusFilterData.length > 0,
-      w: 200,
       multi: true,
     },
     {
@@ -328,26 +327,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
 
       visible: canViewAll && driverFilterData.length > 0,
       searchable: true,
-      w: 220,
-    },
-    {
-      value: filters.warehouseStaffFilter,
-      onChange: filters.setWarehouseStaffFilter,
-      data: warehouseStaffFilterData,
-      placeholder: t('deliveryRequests.filterWarehouseStaff'),
-
-      visible: warehouseStaffFilterData.length > 0 || !!filters.warehouseStaffFilter,
-      searchable: true,
-      w: 220,
-    },
-    {
-      value: filters.partyFilter,
-      onChange: filters.setPartyFilter,
-      data: partyFilterData,
-      placeholder: t('deliveryRequests.filterParty'),
-      visible: partyFilterData.length > 0,
-      searchable: true,
-      w: 220,
     },
     ...(variant.showScheduledDateInBar
       ? ([
@@ -357,7 +336,6 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             data: scheduledDatePresetData,
             placeholder: t('deliveryRequests.columns.scheduledDate'),
             visible: scheduledDatePresetData.length > 0,
-            w: 200,
           },
         ] satisfies SelectFilter[])
       : []),
@@ -411,20 +389,7 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
       ]
     : dateAndExtraFilters;
 
-  const mobileMoreFilters: MoreFilterDef[] = [
-    ...(canViewAll
-      ? ([
-          {
-            type: 'select',
-            key: 'driver',
-            title: t('deliveryRequests.filterDriver'),
-            placeholder: t('deliveryRequests.filterDriver'),
-            value: filters.driverFilter,
-            options: driverFilterData,
-            onChange: filters.setDriverFilter,
-          },
-        ] satisfies MoreFilterDef[])
-      : []),
+  const warehouseStaffAndPartyMore: MoreFilterDef[] = [
     ...(warehouseStaffFilterData.length > 0 || filters.warehouseStaffFilter
       ? ([
           {
@@ -451,6 +416,23 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
           },
         ] satisfies MoreFilterDef[])
       : []),
+  ];
+
+  const mobileMoreFilters: MoreFilterDef[] = [
+    ...(canViewAll
+      ? ([
+          {
+            type: 'select',
+            key: 'driver',
+            title: t('deliveryRequests.filterDriver'),
+            placeholder: t('deliveryRequests.filterDriver'),
+            value: filters.driverFilter,
+            options: driverFilterData,
+            onChange: filters.setDriverFilter,
+          },
+        ] satisfies MoreFilterDef[])
+      : []),
+    ...warehouseStaffAndPartyMore,
     ...mobileScheduledDateFilter,
   ];
 
@@ -555,10 +537,14 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
             search={search}
             onSearchChange={setSearch}
             searchPlaceholder={t('__new__.07-entities.deliveryRequests.list.searchPlaceholder')}
+            searchMinWidth={200}
             hideStatus
             filters={desktopFilters}
             moreSection={
-              <DesktopFilterMorePopover filters={dateAndExtraFilters} presetLabels={presetLabels} />
+              <DesktopFilterMorePopover
+                filters={[...warehouseStaffAndPartyMore, ...dateAndExtraFilters]}
+                presetLabels={presetLabels}
+              />
             }
             hasActiveFilters={hasActiveFilters}
             onClear={clearAll}

@@ -68,4 +68,5 @@ export const PERM_FLAG_LABELS: Record<string, string> = {
   canEditItemWarehouseFields: 'Edit Warehouse Line Fields',
   canManagePayment: 'Record Payments',
   canAssignWarehouseStaff: 'Assign Warehouse Staff',
+  canViewAllAsWarehouse: 'View all records (warehouse)',
 };

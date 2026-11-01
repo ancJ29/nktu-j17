@@ -23,7 +23,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { device } from '@credo/base-ui/utils';
 import { ROUTES } from '@/constants/routes';
-import { perms } from '@/utils/permission';
+import {
+  isDeliveryRequestWarehouseStaffAllowed,
+  isWarehouseStaffAllowed,
+  perms,
+} from '@/utils/permission';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
 import { setSalesOrderQueryRange, useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import {
@@ -36,10 +40,20 @@ import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { getSalesOrderReadyMs } from '@/utils/salesOrderReadyDate';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { formatDate } from '@/utils/dateFormat';
-import type { Customer, DeliveryRequest, SalesOrder } from '@/types';
+import type { Customer, DeliveryRequest, SalesOrder, SalesOrderExtra } from '@/types';
 import { salesOrderFieldOptions } from '@/pages/sales-orders/useSalesOrderFieldOptions';
 import { deliveryRequestStatusOptions } from '@/pages/delivery-requests/useDeliveryRequestStatusOptions';
 import { sweepLoadedSalesOrdersPlatformLog } from '@/pages/sales-orders/platformLogSweep';
+import {
+  formatWarehouseStaffNames,
+  readWarehouseStaff,
+} from '@/pages/sales-orders/salesOrderWarehouseStaff';
+import {
+  READY_STATUS,
+  resolveWarehouseScope,
+  scopeWarehouseOrders,
+  scopeWarehouseRequests,
+} from './homeWarehouseScope';
 
 const WINDOW_DAYS = 90;
 const PREVIEW_LIMIT = 50;
@@ -51,12 +65,22 @@ import { OdometerLogHomeCard } from '@/pages/odometer-logs';
 const isMobile = device.isMobile;
 
 const NEW_PROCESSING_STATUSES = new Set(['new', 'confirmed']);
-const READY_STATUS = 'ready';
 
 const canViewAllOrders = perms.salesOrder.canViewAll();
 const canViewSelfOrders = perms.salesOrder.canViewSelf();
 const canViewAllRequests = perms.deliveryRequest.canViewAll();
 const canViewSelfRequests = perms.deliveryRequest.canViewSelf();
+
+const orderWarehouseStaffOn = isWarehouseStaffAllowed();
+const requestWarehouseStaffOn = isDeliveryRequestWarehouseStaffAllowed();
+const orderWarehouseGrants = {
+  warehouseStaffOn: orderWarehouseStaffOn,
+  canViewAllAsWarehouse: perms.salesOrder.canViewAllAsWarehouse(),
+};
+const requestWarehouseGrants = {
+  warehouseStaffOn: requestWarehouseStaffOn,
+  canViewAllAsWarehouse: perms.deliveryRequest.canViewAllAsWarehouse(),
+};
 
 const canSeeOrders = canViewAllOrders || canViewSelfOrders;
 
@@ -77,6 +101,12 @@ function isSameLocalDay(a: Date, b: Date): boolean {
 }
 
 const dash = (v: string | undefined | null): string => (v && v.trim() ? v : '—');
+
+const warehouseStaffNames = (
+  extra: Pick<SalesOrderExtra, 'warehouseStaff'> | undefined,
+  employeeName: Map<string, string>,
+): string =>
+  dash(formatWarehouseStaffNames(readWarehouseStaff(extra), (id) => employeeName.get(id)));
 
 export default function HomePage() {
   const { t } = useTranslation();
@@ -103,11 +133,22 @@ export default function HomePage() {
     void custStore.loadAll();
   }, [soStore, drStore, empStore, custStore]);
 
-  const salesDeptScoped = useMemo(() => {
+  const viewer = useMemo(() => {
     const me = getCurrentEmployeeId();
-    if (!me) return false;
-    return empStore.items.find((e) => e.id === me)?.department === SALES_DEPARTMENT_CODE;
+    const department = me ? empStore.items.find((e) => e.id === me)?.department : undefined;
+    return { me, department };
   }, [empStore.items]);
+
+  const salesDeptScoped = viewer.department === SALES_DEPARTMENT_CODE;
+
+  const orderWarehouseScope = useMemo(
+    () => resolveWarehouseScope(viewer, orderWarehouseGrants),
+    [viewer],
+  );
+  const requestWarehouseScope = useMemo(
+    () => resolveWarehouseScope(viewer, requestWarehouseGrants),
+    [viewer],
+  );
 
   const canSeeRequests = salesDeptScoped || canViewAllRequests || canViewSelfRequests;
 
@@ -124,12 +165,13 @@ export default function HomePage() {
 
   const visibleOrders = useMemo(() => {
     const live = soStore.items.filter((o) => !o.extra?.isDeleted);
+    if (orderWarehouseScope) return scopeWarehouseOrders(live, orderWarehouseScope);
     if (canViewAllOrders) return live;
     if (!canViewSelfOrders) return [];
     const me = getCurrentEmployeeId();
     if (!me) return [];
     return live.filter((o: SalesOrder) => o.extra?.assignedStaff === me);
-  }, [soStore.items]);
+  }, [soStore.items, orderWarehouseScope]);
 
   const newOrders = useMemo(
     () =>
@@ -156,12 +198,13 @@ export default function HomePage() {
           d.direction !== 'inbound' && d.salesOrderId != null && myOrderIds.has(d.salesOrderId),
       );
     }
+    if (requestWarehouseScope) return scopeWarehouseRequests(liveRequests, requestWarehouseScope);
     if (canViewAllRequests) return liveRequests;
     if (!canViewSelfRequests) return [];
     const me = getCurrentEmployeeId();
     if (!me) return [];
     return liveRequests.filter((d: DeliveryRequest) => d.extra?.assignedDriverId === me);
-  }, [visibleOrders, drStore.items, salesDeptScoped]);
+  }, [visibleOrders, drStore.items, salesDeptScoped, requestWarehouseScope]);
 
   const todaySchedule = useMemo(() => {
     const now = new Date();
@@ -516,6 +559,9 @@ function SalesOrderCard({
               {formatDate(o.extra?.orderDate ?? o.createdAt)}
             </Text>
           </Group>
+          {orderWarehouseStaffOn && (
+            <WarehouseStaffLine names={warehouseStaffNames(o.extra, employeeName)} />
+          )}
         </Stack>
         <StatusPill label={status.label} color={status.color} />
       </Group>
@@ -552,6 +598,9 @@ function DeliveryRequestCard({
           </Text>
           <Text size="sm">{dash(party)}</Text>
           <Text size="sm">{dash(driver)}</Text>
+          {requestWarehouseStaffOn && (
+            <WarehouseStaffLine names={warehouseStaffNames(d.extra, employeeName)} />
+          )}
         </Stack>
         <Stack gap={4} align="flex-end">
           <Badge
@@ -569,6 +618,18 @@ function DeliveryRequestCard({
         </Stack>
       </Group>
     </Paper>
+  );
+}
+
+function WarehouseStaffLine({ names }: { names: string }) {
+  const { t } = useTranslation();
+  return (
+    <Text size="sm" lineClamp={1}>
+      <Text span size="xs" c="dimmed">
+        {t('home.columns.warehouseStaff')}:{' '}
+      </Text>
+      {names}
+    </Text>
   );
 }
 
@@ -634,7 +695,7 @@ function SalesOrderTable({
   orderColHeader: string;
 }) {
   const { t } = useTranslation();
-  const COLS = 5;
+  const COLS = orderWarehouseStaffOn ? 6 : 5;
   const preview = orders.slice(0, PREVIEW_LIMIT);
 
   return (
@@ -645,6 +706,9 @@ function SalesOrderTable({
             <Table.Th {...HEAD_PROPS}>{orderColHeader}</Table.Th>
             <Table.Th {...HEAD_PROPS}>{t('home.columns.customer')}</Table.Th>
             <Table.Th {...HEAD_PROPS}>{t('home.columns.assignedStaff')}</Table.Th>
+            {orderWarehouseStaffOn && (
+              <Table.Th {...HEAD_PROPS}>{t('home.columns.warehouseStaff')}</Table.Th>
+            )}
             <Table.Th {...HEAD_PROPS}>{t('home.columns.status')}</Table.Th>
             <Table.Th {...HEAD_PROPS}>{t('home.columns.orderDate')}</Table.Th>
           </Table.Tr>
@@ -689,6 +753,11 @@ function SalesOrderTable({
                   <Table.Td>
                     <Text size="sm">{dash(employeeName.get(o.extra?.assignedStaff ?? ''))}</Text>
                   </Table.Td>
+                  {orderWarehouseStaffOn && (
+                    <Table.Td>
+                      <Text size="sm">{warehouseStaffNames(o.extra, employeeName)}</Text>
+                    </Table.Td>
+                  )}
                   <Table.Td>
                     <StatusPill label={status.label} color={status.color} />
                   </Table.Td>
@@ -721,7 +790,7 @@ function DeliveryRequestTable({
   employeeName: Map<string, string>;
 }) {
   const { t } = useTranslation();
-  const COLS = 4;
+  const COLS = requestWarehouseStaffOn ? 5 : 4;
   const preview = requests.slice(0, PREVIEW_LIMIT);
 
   return (
@@ -732,6 +801,9 @@ function DeliveryRequestTable({
             <Table.Th {...HEAD_PROPS}>{t('home.columns.requestNumber')}</Table.Th>
             <Table.Th {...HEAD_PROPS}>{t('home.columns.customer')}</Table.Th>
             <Table.Th {...HEAD_PROPS}>{t('home.columns.assignedDriver')}</Table.Th>
+            {requestWarehouseStaffOn && (
+              <Table.Th {...HEAD_PROPS}>{t('home.columns.warehouseStaff')}</Table.Th>
+            )}
             <Table.Th {...HEAD_PROPS}>{t('home.columns.status')}</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -770,6 +842,11 @@ function DeliveryRequestTable({
                   <Table.Td>
                     <Text size="sm">{dash(driver)}</Text>
                   </Table.Td>
+                  {requestWarehouseStaffOn && (
+                    <Table.Td>
+                      <Text size="sm">{warehouseStaffNames(d.extra, employeeName)}</Text>
+                    </Table.Td>
+                  )}
                   <Table.Td>
                     <Group gap={6} wrap="nowrap">
                       <Badge

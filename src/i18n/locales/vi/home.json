@@ -7,7 +7,8 @@
     "orderNumber": "Mã Đơn Hàng",
     "poNumber": "Số PO",
     "requestNumber": "Mã Yêu Cầu",
-    "status": "Trạng Thái"
+    "status": "Trạng Thái",
+    "warehouseStaff": "Nhân viên kho"
   },
   "empty": "Không có dữ liệu",
   "error": "Không tải được dữ liệu",
