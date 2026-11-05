@@ -5,6 +5,7 @@
     "emptyHint": "No additional contacts yet.",
     "section": "Contacts"
   },
+  "copyInfo": "Copy information",
   "deleteConfirm": {
     "message": "Hide this customer? It will no longer appear in lists. The record stays in the system for audit.",
     "title": "Delete Customer"
@@ -60,6 +61,7 @@
     "disableSuccess": "Customer deactivated.",
     "enableSuccess": "Customer activated.",
     "fetchError": "Failed to load customers",
+    "infoCopied": "Customer information copied",
     "toggleError": "Failed to change customer status.",
     "updateError": "Failed to update customer",
     "updateSuccess": "Customer updated successfully"

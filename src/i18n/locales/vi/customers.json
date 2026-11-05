@@ -5,6 +5,7 @@
     "emptyHint": "Chưa có người liên hệ bổ sung.",
     "section": "Người liên hệ"
   },
+  "copyInfo": "Sao chép thông tin",
   "deleteConfirm": {
     "message": "Ẩn khách hàng này? Khách hàng sẽ không xuất hiện trong các danh sách. Dữ liệu vẫn được giữ lại để tra cứu.",
     "title": "Xóa khách hàng"
@@ -60,6 +61,7 @@
     "disableSuccess": "Đã ngừng kích hoạt khách hàng.",
     "enableSuccess": "Đã kích hoạt khách hàng.",
     "fetchError": "Không thể tải danh sách khách hàng",
+    "infoCopied": "Đã sao chép thông tin khách hàng",
     "toggleError": "Không thể thay đổi trạng thái khách hàng.",
     "updateError": "Không thể cập nhật khách hàng",
     "updateSuccess": "Cập nhật khách hàng thành công"

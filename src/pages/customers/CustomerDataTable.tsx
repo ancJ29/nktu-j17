@@ -7,6 +7,8 @@ import { PhoneNumber } from '@credo/base-ui/components';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ActiveBadge } from '@/components/badges';
 import { AddressWithMapLink } from '@/components/AddressWithMapLink';
+import { CopyValueButton } from '@/components/CopyValueButton';
+import { buildCustomerInfoText } from './customerInfoText';
 
 type CustomerDataTableProps = {
   readonly customers: Customer[];
@@ -104,6 +106,20 @@ export function CustomerDataTable({
             activeLabel={t('__new__.01-common.labels.active')}
             inactiveLabel={t('__new__.01-common.labels.inactive')}
             size="sm"
+          />
+        ),
+      },
+
+      {
+        key: 'copy',
+        width: '56px',
+        ta: 'center' as const,
+        header: '',
+        render: (item: Customer) => (
+          <CopyValueButton
+            value={buildCustomerInfoText(item, t)}
+            copiedMessage={t('customers.notifications.infoCopied')}
+            ariaLabel={t('customers.copyInfo')}
           />
         ),
       },

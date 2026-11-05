@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import { PhoneNumber } from '@credo/base-ui/components';
 import { AddressWithMapLink } from '@/components/AddressWithMapLink';
+import { CopyValueButton } from '@/components/CopyValueButton';
 import { ActiveBadge } from '@/components/badges';
 import { ListCardList } from '@/components/ListCardList';
+import { buildCustomerInfoText } from './customerInfoText';
 import type { Customer } from '@/types';
 
 type CustomerCardListProps = {
@@ -81,12 +83,19 @@ export function CustomerCardList({ customers, isLoading }: CustomerCardListProps
                 />
               )}
             </Stack>
-            <ActiveBadge
-              isActive={item.isActive}
-              activeLabel={t('__new__.01-common.labels.active')}
-              inactiveLabel={t('__new__.01-common.labels.inactive')}
-              style={{ flexShrink: 0 }}
-            />
+            <Stack gap={4} align="flex-end" style={{ flexShrink: 0 }}>
+              <ActiveBadge
+                isActive={item.isActive}
+                activeLabel={t('__new__.01-common.labels.active')}
+                inactiveLabel={t('__new__.01-common.labels.inactive')}
+              />
+              <CopyValueButton
+                value={buildCustomerInfoText(item, t)}
+                copiedMessage={t('customers.notifications.infoCopied')}
+                ariaLabel={t('customers.copyInfo')}
+                size="md"
+              />
+            </Stack>
           </Group>
         );
       }}
