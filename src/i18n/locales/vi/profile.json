@@ -15,9 +15,11 @@
     "flags": {
       "canAssignWarehouseStaff": "Phân công nhân viên kho",
       "canBulkImport": "Nhập hàng loạt qua Excel",
+      "canCancel": "Hủy",
       "canConfirmDelivered": "Xác nhận giao hàng",
       "canConfirmReceived": "Xác nhận nhập kho",
       "canEditDeliveryPackageSize": "Sửa kích thước kiện hàng",
+      "canEditItemWarehouseFields": "Sửa thông tin kho của dòng hàng",
       "canExport": "Xuất Excel",
       "canIssueMagicLink": "Tạo liên kết đăng nhập",
       "canManageInventory": "Quản lý tồn kho",
@@ -65,7 +67,9 @@
       "transportOrder": "Đơn vận chuyển",
       "transportRoute": "Tuyến vận chuyển",
       "truck": "Xe tải",
-      "vendor": "Nhà cung cấp"
+      "vendor": "Nhà cung cấp",
+      "warehouseDeliveryNote": "Phiếu xuất kho",
+      "warehouseReceipt": "Phiếu nhập kho"
     },
     "noExtra": "Không có quyền bổ sung cho module này",
     "queryGroup": "Truy vấn"

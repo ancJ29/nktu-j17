@@ -1,10 +1,19 @@
-import { Stack } from '@mantine/core';
+import { Button, Stack } from '@mantine/core';
+import { IconDownload } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
+import type { Employee } from '@/types';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { appConfig } from '@/config';
+import { useIsRoot } from '@/hooks/useIsRoot';
+import { logActivity } from '@/utils/activityLogger';
+import { exportEmployeePermissionsToExcel } from '@/utils/employeePermissionsExcel';
+import type { CMngtAppConfig } from '@credo/kits/types';
 import {
+  isPermissionManagementEnabled,
+  isPermissionManagementRootUserOnly,
   hasEmailForEmployees,
   hasDepartmentForEmployees,
   hasPositionForEmployees,
@@ -34,6 +43,9 @@ const hasPosition = hasPositionForEmployees();
 const isMobile = device.isMobile;
 const canCreate = perms.employee.canCreate();
 
+const hasViewPermsRight = isPermissionManagementEnabled() && perms.permissionManagement.canView();
+const permMngtRootUserOnly = isPermissionManagementRootUserOnly();
+
 type FilterStatus = 'all' | 'active' | 'inactive';
 
 type EmployeeFilters = {
@@ -56,6 +68,9 @@ export function EmployeeListPage() {
   const { t } = useTranslation();
   const { departmentOptions, positionOptions, resolveDepartment, resolvePosition } =
     useEmployeeFieldOptions();
+
+  const isRootUser = useIsRoot();
+  const canExportPerms = !isMobile && hasViewPermsRight && (!permMngtRootUserOnly || isRootUser);
 
   const {
     items: allEmployees,
@@ -135,6 +150,42 @@ export function EmployeeListPage() {
   const handleForceRefresh = useCallback(() => {
     forceRefresh();
   }, [forceRefresh]);
+
+  const [isExporting, setIsExporting] = useState(false);
+  const handleExportPermissions = useCallback(async () => {
+    setIsExporting(true);
+    try {
+      await forceRefresh();
+      const state = useEmployeeStore.getState();
+      if (state.error) throw new Error(String(state.error));
+      const cfg = appConfig as CMngtAppConfig;
+      const employees = state.items as Employee[];
+      exportEmployeePermissionsToExcel(employees, {
+        clientPermissions: cfg.permissions,
+        departmentOptions: cfg.features?.employees?.departmentOptions ?? [],
+        departmentLabel: (v) => (v ? resolveDepartment(v) : ''),
+        labels: {
+          sheetName: t('employees.exportPermissions.sheetName'),
+          module: t('employees.exportPermissions.module'),
+          permission: t('employees.exportPermissions.permission'),
+          department: t('common.labels.department'),
+          status: t('__new__.01-common.labels.status'),
+          active: t('__new__.01-common.labels.active'),
+          inactive: t('__new__.07-entities.employees.filter.inactive'),
+          moduleName: (m) => t(`profile.perm.modules.${m}`, m),
+          crud: (k) => t(`profile.perm.${k}`),
+          flag: (k) => t(`profile.perm.flags.${k}`, k),
+        },
+      });
+      logActivity('employee.exportPermissions', undefined, {
+        count: employees.filter((e) => !e.extra?.isDeleted).length,
+      });
+    } catch {
+      notifications.show({ color: 'red', message: t('employees.exportPermissions.error') });
+    } finally {
+      setIsExporting(false);
+    }
+  }, [forceRefresh, resolveDepartment, t]);
 
   const desktopFilters: SelectFilter[] = useMemo(
     () => [
@@ -219,6 +270,20 @@ export function EmployeeListPage() {
             cachedAt={cachedAt}
             loading={loading}
             onRefresh={handleForceRefresh}
+            extraActions={
+              canExportPerms ? (
+                <Button
+                  variant="default"
+                  size="sm"
+                  leftSection={<IconDownload size={16} />}
+                  onClick={handleExportPermissions}
+                  loading={isExporting}
+                  disabled={allEmployees.length === 0}
+                >
+                  {t('employees.exportPermissions.button')}
+                </Button>
+              ) : undefined
+            }
             createCta={{
               to: ROUTES.EMPLOYEES.NEW,
               label: t('employees.addEmployee'),

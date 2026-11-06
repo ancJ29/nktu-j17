@@ -81,6 +81,13 @@
   "employeeDetails": "Employee Details",
   "emptyMessage": "Try adjusting your filters or add your first employee to get started.",
   "emptyTitle": "No employees yet",
+  "exportPermissions": {
+    "button": "Export permissions",
+    "error": "Failed to export employee permissions.",
+    "module": "Module",
+    "permission": "Permission",
+    "sheetName": "Permissions"
+  },
   "fields": {
     "address": "Address",
     "dateOfBirth": "Date of birth",

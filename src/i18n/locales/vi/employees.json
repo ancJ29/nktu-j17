@@ -81,6 +81,13 @@
   "employeeDetails": "Chi tiết nhân viên",
   "emptyMessage": "Thử điều chỉnh bộ lọc hoặc thêm nhân viên đầu tiên để bắt đầu.",
   "emptyTitle": "Chưa có nhân viên",
+  "exportPermissions": {
+    "button": "Xuất quyền hạn",
+    "error": "Không thể xuất quyền hạn nhân viên.",
+    "module": "Mô-đun",
+    "permission": "Quyền",
+    "sheetName": "Quyền hạn"
+  },
   "fields": {
     "address": "Địa chỉ",
     "dateOfBirth": "Ngày sinh",

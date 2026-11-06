@@ -15,9 +15,11 @@
     "flags": {
       "canAssignWarehouseStaff": "Assign Warehouse Staff",
       "canBulkImport": "Bulk Import via Excel",
+      "canCancel": "Cancel",
       "canConfirmDelivered": "Confirm Delivered",
       "canConfirmReceived": "Confirm Received",
       "canEditDeliveryPackageSize": "Edit Delivery Package Size",
+      "canEditItemWarehouseFields": "Edit Warehouse Line Fields",
       "canExport": "Export Excel",
       "canIssueMagicLink": "Issue Magic Link",
       "canManageInventory": "Manage Inventory",
@@ -65,7 +67,9 @@
       "transportOrder": "Transport Order",
       "transportRoute": "Transport Route",
       "truck": "Truck",
-      "vendor": "Vendor"
+      "vendor": "Vendor",
+      "warehouseDeliveryNote": "Warehouse Delivery Note",
+      "warehouseReceipt": "Warehouse Receipt"
     },
     "noExtra": "No additional permissions for this module",
     "queryGroup": "Query"
