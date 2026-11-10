@@ -32,6 +32,8 @@ export type CustomerExtra = {
 
   taxCode?: string;
 
+  paymentTermDays?: number;
+
   addressGoogleMapUrl?: string;
   shippingAddresses?: CustomerShippingAddress[];
 

@@ -70,6 +70,13 @@ export const featureFlags = {
   goodsReceipts: {
     enabled: features?.goodsReceipts?.enabled ?? false,
   },
+  purchaseOrders: {
+    enabled: features?.purchaseOrders?.enabled ?? false,
+  },
+  paymentTerms: {
+    enabled: features?.paymentTerms?.enabled ?? false,
+    defaultDays: features?.paymentTerms?.defaultDays ?? 30,
+  },
   warehouseReceipts: {
     enabled: features?.warehouseReceipts?.enabled ?? false,
   },

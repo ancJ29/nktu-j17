@@ -36,10 +36,15 @@ import {
   computeSalesOrderTotals,
   isSalesOrderBillingExempt,
   isSalesOrderMissingMoneyInfo,
+  salesOrderDeadlineDay,
 } from '@/utils/salesOrderPricing';
+import { todayInVnDateString } from '@/utils/dateTimeField';
+import { featureFlags } from '@/utils/features';
+import { SalesOrderPaymentMark } from './SalesOrderPaymentMark';
 import type { SalesOrderListView } from './salesOrderListVariant';
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
+const termsOn = featureFlags.paymentTerms.enabled && showPrice;
 const warehouseStaffAllowed = isWarehouseStaffAllowed();
 
 type SalesOrderCardListProps = {
@@ -277,6 +282,23 @@ export function SalesOrderCardList({
                               label={t('salesOrders.finance.grandTotalLabel')}
                               value={totals.grandTotal.toLocaleString()}
                             />
+                            {financeMode && termsOn && (
+                              <>
+                                <FieldRow
+                                  label={t('salesOrders.finance.dueDateLabel')}
+                                  value={
+                                    salesOrderDeadlineDay(order.extra)
+                                      ? formatDate(order.extra?.paymentDeadline)
+                                      : '—'
+                                  }
+                                />
+                                <SalesOrderPaymentMark
+                                  order={order}
+                                  vatRate={vatRate}
+                                  todayVn={todayInVnDateString()}
+                                />
+                              </>
+                            )}
                             <FieldRow
                               label={t('salesOrders.billing.invoiceLabel')}
                               value={

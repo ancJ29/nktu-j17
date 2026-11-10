@@ -10,8 +10,6 @@ import { findEmployeeByLoginEmail } from '@/utils/loginEmail';
 import { sharedUserStorage, SharedStorageKey } from '@/utils/storage';
 import { buildEffectivePermissions, usesServerPermissions } from '@/utils/permission';
 import { readFreshServerPermissions } from '@/stores/useAuthStore';
-
-import { reportPermissionMismatch } from '@/utils/reportPermissionMismatch';
 import { useEmpBootSignal } from '@/hooks/useEmpBootSignal';
 import { useIsRoot } from './useIsRoot';
 import { scheduleReload } from '@/utils/scheduleReload';
@@ -138,19 +136,13 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
       const versionChanged = !isFirstResolve && hasVersionChanged(cachedVersions, versions);
       const needsReload = isFirstResolve || versionChanged;
 
-      const effective = buildEffectivePermissions(
+      buildEffectivePermissions(
         clientPerms,
         match.department,
         deptOptions,
         extra?.permissions,
         versions,
       );
-
-      reportPermissionMismatch(effective, {
-        employeeId: match.id,
-        department: match.department,
-        versions,
-      });
       adoptServerPermissionsIfAsked('employee');
 
       cacheSet('emo', { o: extra?.permissions, v: empPermVersion });
@@ -188,9 +180,7 @@ export function useCurrentEmployee({ isProfileLoaded, email }: UseCurrentEmploye
       firePendingLoginLog();
     } else {
       const versions = { cfg: cfgVersion };
-      const effective = buildEffectivePermissions(clientPerms, null, deptOptions, null, versions);
-
-      reportPermissionMismatch(effective, { versions });
+      buildEffectivePermissions(clientPerms, null, deptOptions, null, versions);
       adoptServerPermissionsIfAsked('root');
 
       cacheClear('emo');

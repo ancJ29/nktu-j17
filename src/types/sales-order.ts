@@ -229,6 +229,8 @@ export type SalesOrderExtra = {
 
   paidAmount?: number;
 
+  paymentDeadline?: number;
+
   invoiceIssued?: boolean;
 
   billingNotRequired?: boolean;

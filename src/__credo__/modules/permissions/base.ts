@@ -259,4 +259,15 @@ export const BASE_PERMISSIONS: Permissions = {
       canViewSelf: false,
     },
   },
+
+  purchaseOrder: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+    actions: {
+      canViewPrice: false,
+      canMarkPaid: false,
+    },
+  },
 };

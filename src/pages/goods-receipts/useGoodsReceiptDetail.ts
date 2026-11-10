@@ -541,7 +541,8 @@ export function useGoodsReceiptDetail(t: TFunction): UseGoodsReceiptDetailReturn
 
   const showCopyCta = !!receipt && canCreate && !isMobile;
 
-  const showPrintCta = !!receipt && printEnabled && isDraft && !isMobile;
+  const showPrintCta =
+    !!receipt && printEnabled && isDraft && !isMobile && !receipt.extra?.purchaseOrderId;
 
   const canEditItems = !!receipt && canEdit && isDraft && !stockPostedOnDraft;
 

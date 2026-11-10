@@ -2140,3 +2140,164 @@ export const exportMaintenanceLogsToExcel = (
   const vehiclePart = vehicleLabel ? `${safeName(vehicleLabel)}_` : '';
   XLSX.writeFile(workbook, `maintenance_${vehiclePart}${fileTag}.xlsx`);
 };
+
+export type BulkPurchaseOrderItem = {
+  sku: string;
+  quantity: number;
+  unit?: string;
+  memo?: string;
+
+  unitPrice?: number;
+
+  taxAmount?: number;
+};
+
+const REQUIRED_PO_ITEM_FIELDS: ReadonlyArray<keyof BulkPurchaseOrderItem> = ['sku', 'quantity'];
+
+const PO_ITEM_HEADERS: Record<string, keyof BulkPurchaseOrderItem> = {
+  sku: 'sku',
+  quantity: 'quantity',
+  qty: 'quantity',
+  unit: 'unit',
+  memo: 'memo',
+  note: 'memo',
+  notes: 'memo',
+  'unit price': 'unitPrice',
+  price: 'unitPrice',
+  tax: 'taxAmount',
+  'tax amount': 'taxAmount',
+  'số lượng': 'quantity',
+  'đơn vị': 'unit',
+  'ghi chú': 'memo',
+  'đơn giá': 'unitPrice',
+  thuế: 'taxAmount',
+};
+
+export function parsePurchaseOrderItemsSheet(sheetData: string[][]): BulkPurchaseOrderItem[] {
+  if (sheetData.length < 2) {
+    throw new Error('File must contain at least a header row and one data row');
+  }
+  const headers = sheetData[0]!.map((h) => String(h).trim().toLowerCase());
+  const present = new Set<keyof BulkPurchaseOrderItem>();
+  for (const h of headers) {
+    const f = PO_ITEM_HEADERS[h];
+    if (f) present.add(f);
+  }
+  const missing = REQUIRED_PO_ITEM_FIELDS.filter((f) => !present.has(f));
+  if (missing.length > 0) throw new ExcelParseError(missing);
+
+  const rows: BulkPurchaseOrderItem[] = [];
+  for (let index = 1; index < sheetData.length; index++) {
+    const values = sheetData[index]!.map((v) => String(v).trim());
+    if (values.every((v) => !v)) continue;
+
+    let sku = '';
+    let quantity: number | undefined;
+    let unit: string | undefined;
+    let memo: string | undefined;
+    let unitPrice: number | undefined;
+    let taxAmount: number | undefined;
+
+    for (const [headerIndex, header] of headers.entries()) {
+      const value = values[headerIndex];
+      if (!value) continue;
+      const field = PO_ITEM_HEADERS[header];
+      if (!field) continue;
+      if (field === 'quantity') {
+        const n = Number(value.replace(/,/g, ''));
+        if (Number.isFinite(n) && n > 0) quantity = n;
+      } else if (field === 'unitPrice') {
+        const n = Number(value.replace(/,/g, ''));
+        if (Number.isFinite(n) && n >= 0) unitPrice = n;
+      } else if (field === 'taxAmount') {
+        const n = Number(value.replace(/,/g, ''));
+        if (Number.isFinite(n) && n >= 0) taxAmount = n;
+      } else if (field === 'sku') sku = value;
+      else if (field === 'unit') unit = value;
+      else if (field === 'memo') memo = value;
+    }
+
+    if (sku && typeof quantity === 'number' && quantity > 0) {
+      rows.push({
+        sku,
+        quantity,
+        ...(unit ? { unit } : {}),
+        ...(memo ? { memo } : {}),
+        ...(unitPrice !== undefined ? { unitPrice } : {}),
+        ...(taxAmount !== undefined ? { taxAmount } : {}),
+      });
+    }
+  }
+  return rows;
+}
+
+export const parsePurchaseOrderItemsExcelFile = async (
+  file: File,
+): Promise<BulkPurchaseOrderItem[]> =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.addEventListener('load', (event) => {
+      try {
+        const data = event.target?.result;
+        if (!data) {
+          reject(new Error('Failed to read file'));
+          return;
+        }
+        const workbook = XLSX.read(data, { type: 'array' });
+        const worksheet = workbook.Sheets[workbook.SheetNames[0]!]!;
+        const sheetData = XLSX.utils.sheet_to_json(worksheet, {
+          header: 1,
+          defval: '',
+        }) as string[][];
+        resolve(parsePurchaseOrderItemsSheet(sheetData));
+      } catch (error) {
+        if (error instanceof ExcelParseError) {
+          reject(error);
+          return;
+        }
+        reject(
+          new Error(
+            `Failed to parse Excel file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          ),
+        );
+      }
+    });
+    reader.addEventListener('error', () => reject(new Error('Failed to read file')));
+    reader.readAsArrayBuffer(file);
+  });
+
+export type PurchaseOrderItemsTemplateOptions = {
+  language?: string;
+
+  sampleItems?: ReadonlyArray<GoodsReceiptItemsTemplateSample>;
+
+  withPrice?: boolean;
+};
+
+export const generatePurchaseOrderItemsTemplate = ({
+  language,
+  sampleItems,
+  withPrice = true,
+}: PurchaseOrderItemsTemplateOptions = {}) => {
+  const vi = language === 'vi';
+  const header = vi
+    ? ['SKU', 'Số lượng', 'Đơn vị', ...(withPrice ? ['Đơn giá', 'Thuế'] : []), 'Ghi chú']
+    : ['SKU', 'Quantity', 'Unit', ...(withPrice ? ['Unit price', 'Tax'] : []), 'Memo'];
+  const fallback = ['SKU-COFFEE-01', 'SKU-WATER-03', 'SKU-MAT-001'];
+  const picked = (sampleItems ?? []).filter((it) => it.sku.trim()).slice(0, 3);
+  const rows = [0, 1, 2].map((i) => {
+    const it = picked[i];
+    return [
+      it?.sku.trim() ?? fallback[i]!,
+      '1',
+      it?.unit?.trim() ?? '',
+      ...(withPrice ? ['', ''] : []),
+      it?.name?.trim() ?? '',
+    ];
+  });
+  const worksheet = XLSX.utils.aoa_to_sheet([header, ...rows]);
+  worksheet['!cols'] = header.map((_, i) => ({ width: i === header.length - 1 ? 32 : 14 }));
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, vi ? 'Hàng đặt' : 'Items');
+  XLSX.writeFile(workbook, 'purchase_order_items_template.xlsx');
+};

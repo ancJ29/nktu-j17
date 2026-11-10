@@ -19,6 +19,7 @@ export * from './vendor-v2';
 export * from './sales-order';
 export * from './delivery-request';
 export * from './goods-receipt';
+export * from './purchase-order';
 export * from './transport-order';
 export * from './transport-route';
 export * from './cost-norm';

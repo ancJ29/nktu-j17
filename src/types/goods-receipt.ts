@@ -15,6 +15,8 @@ export type GoodsReceiptExtra = {
   inventoryPosted?: boolean;
 
   copyFromId?: string;
+
+  purchaseOrderId?: string;
   [key: string]: unknown;
 };
 
@@ -31,4 +33,17 @@ export type GoodsReceiptCopyFrom = Pick<
   sourceId: string;
 
   sourceReceiptNumber: string;
+};
+
+export type GoodsReceiptFromOrder = Pick<
+  GoodsReceipt,
+  'vendorCode' | 'vendorName' | 'locationCode' | 'locationName'
+> & {
+  orderId: string;
+
+  orderNumber: string;
+
+  expectedDate?: string;
+  assignedTo?: string;
+  items: GoodsReceiptItem[];
 };

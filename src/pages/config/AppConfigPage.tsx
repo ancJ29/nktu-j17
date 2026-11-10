@@ -1,4 +1,5 @@
 import { resolveClientCode } from '@/config/client-code';
+import { leadTimeTag, parseLeadTimeTag } from '@/pages/purchase-orders/purchaseOrderModel';
 import {
   DEFAULT_APP_INFO,
   DEFAULT_AUTH,
@@ -30,6 +31,8 @@ import type {
   CompanyInfoConfig,
   GoodsReceiptFeatures,
   ProductFeatures,
+  PaymentTermsFeatures,
+  PurchaseOrderFeatures,
   QuotationFeatures,
 } from '@/config/schema';
 import type { GoodsReceiptStatus } from '@/types';
@@ -87,6 +90,7 @@ import {
   Loader,
   Modal,
   MultiSelect,
+  NumberInput,
   Paper,
   ScrollArea,
   Select,
@@ -166,8 +170,10 @@ import {
   SCHEMA_DEFAULT_MATERIAL_INVENTORY_FEATURES,
   SCHEMA_DEFAULT_MODULE_FEATURES,
   SCHEMA_DEFAULT_PERM_MNGT_FEATURES,
+  SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES,
   SCHEMA_DEFAULT_PRICING_FEATURES,
   SCHEMA_DEFAULT_PRODUCT_FEATURES,
+  SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES,
   SCHEMA_DEFAULT_QUOTATION_FEATURES,
   SCHEMA_DEFAULT_SALES_ORDER_FEATURES,
   SCHEMA_DEFAULT_THEME,
@@ -347,6 +353,13 @@ export function ConfigEditor({
   const [goodsReceiptsFeatures, setGoodsReceiptsFeatures] = useState<GoodsReceiptFeatures>(
     DEFAULT_GOODS_RECEIPT_FEATURES,
   );
+  const [paymentTermsFeatures, setPaymentTermsFeatures] = useState<PaymentTermsFeatures>(
+    SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES,
+  );
+  const [purchaseOrdersFeatures, setPurchaseOrdersFeatures] = useState<PurchaseOrderFeatures>(
+    SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES,
+  );
+  const [leadTimeError, setLeadTimeError] = useState<string | null>(null);
   const [transportOrdersFeatures, setTransportOrdersFeatures] =
     useState<CMngtTransportOrderFeatures>(DEFAULT_TRANSPORT_ORDER_FEATURES);
 
@@ -411,6 +424,7 @@ export function ConfigEditor({
           permissionManagement: permMngtFeatures,
           activityLog: activityLogFeatures,
           pricing: pricingFeatures,
+          paymentTerms: paymentTermsFeatures,
           products: productsFeatures,
           customers: customersFeatures,
           vendors: vendorsFeatures,
@@ -422,6 +436,7 @@ export function ConfigEditor({
           quotations: quotationsFeatures,
           deliveryRequests: deliveryRequestsFeatures,
           goodsReceipts: goodsReceiptsFeatures,
+          purchaseOrders: purchaseOrdersFeatures,
           transportOrders: transportOrdersFeatures,
           locations: locationsFeatures,
           productInventory: productInventoryFeatures,
@@ -455,6 +470,7 @@ export function ConfigEditor({
       permMngtFeatures,
       activityLogFeatures,
       pricingFeatures,
+      paymentTermsFeatures,
       productsFeatures,
       materialsFeatures,
       materialInventoryFeatures,
@@ -466,6 +482,7 @@ export function ConfigEditor({
       quotationsFeatures,
       deliveryRequestsFeatures,
       goodsReceiptsFeatures,
+      purchaseOrdersFeatures,
       transportOrdersFeatures,
       locationsFeatures,
       productInventoryFeatures,
@@ -513,6 +530,10 @@ export function ConfigEditor({
       ...SCHEMA_DEFAULT_PRICING_FEATURES,
       ...cfg.features?.pricing,
     });
+    setPaymentTermsFeatures({
+      ...SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES,
+      ...cfg.features?.paymentTerms,
+    });
     setProductsFeatures({ ...SCHEMA_DEFAULT_PRODUCT_FEATURES, ...cfg.features?.products });
     setLocationsFeatures({ ...SCHEMA_DEFAULT_LOCATION_FEATURES, ...cfg.features?.locations });
     setProductInventoryFeatures({
@@ -557,6 +578,10 @@ export function ConfigEditor({
     setGoodsReceiptsFeatures({
       ...SCHEMA_DEFAULT_GOODS_RECEIPT_FEATURES,
       ...cfg.features?.goodsReceipts,
+    });
+    setPurchaseOrdersFeatures({
+      ...SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES,
+      ...cfg.features?.purchaseOrders,
     });
     setTransportOrdersFeatures({
       ...SCHEMA_DEFAULT_TRANSPORT_ORDER_FEATURES,
@@ -777,6 +802,7 @@ export function ConfigEditor({
     setQuotationsFeatures(SCHEMA_DEFAULT_QUOTATION_FEATURES);
     setDeliveryRequestsFeatures(DEFAULT_DELIVERY_REQUEST_FEATURES);
     setGoodsReceiptsFeatures(DEFAULT_GOODS_RECEIPT_FEATURES);
+    setPurchaseOrdersFeatures(SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES);
     setTransportOrdersFeatures(DEFAULT_TRANSPORT_ORDER_FEATURES);
     setPermissions({});
     setThemeConfig(DEFAULT_THEME);
@@ -808,6 +834,10 @@ export function ConfigEditor({
     [],
   );
   const resetPricing = useCallback(() => setPricingFeatures(SCHEMA_DEFAULT_PRICING_FEATURES), []);
+  const resetPaymentTerms = useCallback(
+    () => setPaymentTermsFeatures(SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES),
+    [],
+  );
   const resetProducts = useCallback(() => setProductsFeatures(DEFAULT_PRODUCT_FEATURES), []);
   const resetLocations = useCallback(() => setLocationsFeatures(DEFAULT_LOCATION_FEATURES), []);
   const resetProductInventory = useCallback(
@@ -850,6 +880,10 @@ export function ConfigEditor({
   );
   const resetDeliveryRequests = useCallback(
     () => setDeliveryRequestsFeatures(DEFAULT_DELIVERY_REQUEST_FEATURES),
+    [],
+  );
+  const resetPurchaseOrders = useCallback(
+    () => setPurchaseOrdersFeatures(SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES),
     [],
   );
   const resetGoodsReceipts = useCallback(
@@ -910,6 +944,7 @@ export function ConfigEditor({
     employees: eqDefault(employeeFeatures, DEFAULT_EMPLOYEE_FEATURES),
     activityLog: eqDefault(activityLogFeatures, SCHEMA_DEFAULT_ACTIVITY_LOG_FEATURES),
     pricing: eqDefault(pricingFeatures, SCHEMA_DEFAULT_PRICING_FEATURES),
+    paymentTerms: eqDefault(paymentTermsFeatures, SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES),
     products: eqDefault(productsFeatures, DEFAULT_PRODUCT_FEATURES),
     locations: eqDefault(locationsFeatures, DEFAULT_LOCATION_FEATURES),
     vendors: eqDefault(vendorsFeatures, DEFAULT_VENDOR_FEATURES),
@@ -937,6 +972,7 @@ export function ConfigEditor({
     quotations: eqDefault(quotationsFeatures, SCHEMA_DEFAULT_QUOTATION_FEATURES),
     deliveryRequests: eqDefault(deliveryRequestsFeatures, DEFAULT_DELIVERY_REQUEST_FEATURES),
     goodsReceipts: eqDefault(goodsReceiptsFeatures, DEFAULT_GOODS_RECEIPT_FEATURES),
+    purchaseOrders: eqDefault(purchaseOrdersFeatures, SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES),
     transportOrders: eqDefault(transportOrdersFeatures, DEFAULT_TRANSPORT_ORDER_FEATURES),
     navigation: eqDefault(navigation, defaultNavigation),
     translations: eqDefault(translations, DEFAULT_TRANSLATIONS),
@@ -1247,6 +1283,42 @@ export function ConfigEditor({
               checked={pricingFeatures.enabled}
               onChange={(checked) => setPricingFeatures({ ...pricingFeatures, enabled: checked })}
             />
+          </CollapsibleSection>
+          <CollapsibleSection
+            icon={IconCoin}
+            title="Payment Terms"
+            description="Days a customer or vendor is given to pay, and a due date proposed on each sales and purchase order"
+            sectionKey="paymentTerms"
+            isDefault={sectionIsDefault.paymentTerms}
+            opened={openSections.has('paymentTerms')}
+            onToggle={toggleSection}
+            onReset={resetPaymentTerms}
+          >
+            <Stack gap="sm">
+              <FeatureToggleRow
+                label="Enable Payment Terms"
+                description="Adds a term field to customers and vendors, a proposed due date on sales and purchase orders, and the payment columns on the Finance view. Off: every screen as before."
+                checked={paymentTermsFeatures.enabled}
+                onChange={(checked) =>
+                  setPaymentTermsFeatures({ ...paymentTermsFeatures, enabled: checked })
+                }
+              />
+              <NumberInput
+                label="Default term (days)"
+                description="Read for a customer or vendor with no term of its own. 0–365, counted from the order date."
+                min={0}
+                max={365}
+                allowDecimal={false}
+                value={paymentTermsFeatures.defaultDays}
+                onChange={(v) =>
+                  setPaymentTermsFeatures({
+                    ...paymentTermsFeatures,
+                    defaultDays:
+                      typeof v === 'number' ? v : SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES.defaultDays,
+                  })
+                }
+              />
+            </Stack>
           </CollapsibleSection>
           {/* Products — dedicated section (has code-format fields beyond enabled toggle) */}
           <CollapsibleSection
@@ -2291,6 +2363,73 @@ export function ConfigEditor({
                   setGoodsReceiptsFeatures({ ...goodsReceiptsFeatures, defaultListStatuses: v })
                 }
                 clearable
+              />
+            </Stack>
+          </CollapsibleSection>
+          {/* Purchase Orders — vendor orders with prices, paid mark and deadline */}
+          <CollapsibleSection
+            icon={IconPackageImport}
+            title="Purchase Orders"
+            description="Orders placed with a vendor: a receipt's lines plus prices, a paid mark and a payment deadline. Writes no stock."
+            sectionKey="purchaseOrders"
+            isDefault={sectionIsDefault.purchaseOrders}
+            opened={openSections.has('purchaseOrders')}
+            onToggle={toggleSection}
+            onReset={resetPurchaseOrders}
+          >
+            <Stack gap="sm">
+              <FeatureToggleRow
+                label="Enable Purchase Orders"
+                description="When enabled, the Purchase Orders section is available in navigation to users with purchase-order permissions. A receipt can be made from a ready order when Goods Receipts is on too."
+                checked={purchaseOrdersFeatures.enabled}
+                onChange={(checked) =>
+                  setPurchaseOrdersFeatures({ ...purchaseOrdersFeatures, enabled: checked })
+                }
+              />
+              <TextInput
+                label="Order number prefix"
+                description="Numbers read PREFIX + date + a three-digit counter, e.g. DDH-261107-001. Avoid a prefix another module already uses."
+                placeholder="DDH-"
+                value={purchaseOrdersFeatures.codePrefix}
+                onChange={(e) =>
+                  setPurchaseOrdersFeatures({
+                    ...purchaseOrdersFeatures,
+                    codePrefix: e.currentTarget.value,
+                  })
+                }
+              />
+              <MultiSelect
+                label="PIC Departments"
+                description="Restrict the purchase-order PIC picker to employees in these departments. Leave empty to allow any active employee."
+                placeholder="Any active employee (no restriction)"
+                data={departmentMultiSelectData}
+                value={purchaseOrdersFeatures.picDepartments ?? []}
+                onChange={(v) =>
+                  setPurchaseOrdersFeatures({ ...purchaseOrdersFeatures, picDepartments: v })
+                }
+                searchable
+                clearable
+                nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
+              />
+              <TagsInput
+                label="Lead time choices"
+                description="The delivery ranges offered on the order form, in whole days as min-max (e.g. 3-5). The planned arrival is the order date plus the longest day. An order keeps the range it was saved with, so editing this list moves no order."
+                placeholder="e.g. 3-5, then Enter"
+                value={(purchaseOrdersFeatures.leadTimes ?? []).map(leadTimeTag)}
+                error={leadTimeError}
+                onChange={(tags) => {
+                  const parsed = tags.map((tag) => ({ tag, lt: parseLeadTimeTag(tag) }));
+                  const bad = parsed.filter((p) => !p.lt).map((p) => p.tag);
+                  setLeadTimeError(
+                    bad.length > 0
+                      ? `Not a range: ${bad.join(', ')}. Use min-max whole days, min not above max (e.g. 3-5).`
+                      : null,
+                  );
+                  setPurchaseOrdersFeatures({
+                    ...purchaseOrdersFeatures,
+                    leadTimes: parsed.flatMap((p) => (p.lt ? [p.lt] : [])),
+                  });
+                }}
               />
             </Stack>
           </CollapsibleSection>

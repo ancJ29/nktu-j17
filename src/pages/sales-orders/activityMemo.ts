@@ -61,6 +61,10 @@ export type SalesOrderInlineFields = {
   deliveryDate?: { from?: number; to?: number };
   notes?: { changed: true };
 
+  payment?: { from?: 'unpaid' | 'partial' | 'paid'; to?: 'unpaid' | 'partial' | 'paid' };
+
+  paymentDeadline?: { from?: number; to?: number };
+
   itemMemo?: { product: string; from?: string; to?: string };
 
   itemReady?: { product: string; to: boolean };

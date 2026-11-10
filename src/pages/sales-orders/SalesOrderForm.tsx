@@ -21,6 +21,15 @@ import {
   Tooltip,
 } from '@mantine/core';
 import { DateField } from '@/components/DateField';
+import { isoToVnDateString } from '@/utils/dateTimeField';
+import { featureFlags } from '@/utils/features';
+import {
+  dateToDay,
+  dayToDate,
+  followDeadline,
+  paymentTermDaysOf,
+  proposeDeadline,
+} from '@/utils/paymentTerms';
 import { NumberField } from '@/components/NumberField';
 import { SegmentTabs } from '@/components/SegmentTabs';
 import { useForm } from '@mantine/form';
@@ -447,6 +456,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       isIndividualCustomer: false,
       isInternalDelivery: true,
       orderDate: new Date(),
+      paymentDeadline: null,
       deliveryAddress: '',
       googleMapUrl: '',
       deliveryDate: null,
@@ -558,6 +568,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       isIndividualCustomer: (copyFrom.isIndividualCustomer as boolean) ?? false,
       isInternalDelivery: (copyFrom.isInternalDelivery as boolean) ?? true,
       orderDate: new Date(),
+      paymentDeadline: null,
       deliveryAddress: copyFromAddress,
       googleMapUrl: fillMapUrlFromCustomer(
         copyFromCustomer,
@@ -1180,6 +1191,29 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       navigate(ROUTES.SALES_ORDERS.LIST);
     },
   );
+
+  const lastDeadlineProposalRef = useRef('');
+  const termsOn = featureFlags.paymentTerms.enabled && pricingEnabled;
+  const orderDateNow = dateToDay(form.values.orderDate);
+  const customerIdNow = form.values.customerId;
+  const individualNow = form.values.isIndividualCustomer;
+  const deadlineNow = dateToDay(form.values.paymentDeadline);
+  useEffect(() => {
+    if (!termsOn || fetching) return;
+    const orderDay =
+      orderDateNow ||
+      (snapshotRef.current ? (isoToVnDateString(snapshotRef.current.createdAt) ?? '') : '');
+    if (!orderDay) return;
+    const customer = !individualNow && customerIdNow ? customerMap.get(customerIdNow) : undefined;
+    const proposal = proposeDeadline(
+      orderDay,
+      paymentTermDaysOf(customer?.extra, featureFlags.paymentTerms.defaultDays),
+    );
+    const step = followDeadline(deadlineNow, lastDeadlineProposalRef.current, proposal);
+    lastDeadlineProposalRef.current = step.last;
+    if (step.value !== deadlineNow) form.setFieldValue('paymentDeadline', dayToDate(step.value));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [termsOn, fetching, orderDateNow, customerIdNow, individualNow, deadlineNow, customerMap]);
 
   const totalAmount = useMemo(
     () => form.getValues().items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0),
@@ -2200,6 +2234,14 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                       min={0}
                       {...form.getInputProps('paidAmount')}
                     />
+                    {featureFlags.paymentTerms.enabled && (
+                      <DateField
+                        label={t('salesOrders.billing.paymentDeadlineLabel')}
+                        description={t('salesOrders.billing.paymentDeadlineDescription')}
+                        value={form.getValues().paymentDeadline}
+                        {...form.getInputProps('paymentDeadline')}
+                      />
+                    )}
                   </SimpleGrid>
                   <Group gap="xl">
                     <Switch

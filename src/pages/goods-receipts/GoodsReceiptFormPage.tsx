@@ -63,6 +63,7 @@ import type {
   GoodsReceipt,
   GoodsReceiptCopyFrom,
   GoodsReceiptExtra,
+  GoodsReceiptFromOrder,
   GoodsReceiptItem,
   GoodsReceiptItemType,
   Product,
@@ -72,6 +73,10 @@ import { appConfig } from '@/config';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { NumberField } from '@/components/NumberField';
 import { Form } from '@/components/Form';
+import {
+  checkOrderReceivable,
+  linkReceiptToOrder,
+} from '@/pages/purchase-orders/purchaseOrderReceipts';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -300,6 +305,10 @@ export function GoodsReceiptFormPage() {
   const copyFrom = !isEdit
     ? (location.state as { copyFrom?: GoodsReceiptCopyFrom } | null)?.copyFrom
     : undefined;
+
+  const fromOrder = !isEdit
+    ? (location.state as { fromPurchaseOrder?: GoodsReceiptFromOrder } | null)?.fromPurchaseOrder
+    : undefined;
   const invalidateCache = useGoodsReceiptStore((s) => s.invalidate);
   const snapshotRef = useRef<GoodsReceipt | null>(null);
 
@@ -482,6 +491,36 @@ export function GoodsReceiptFormPage() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [copyFrom]);
+
+  useEffect(() => {
+    if (!fromOrder) return;
+    const today = todayInVnDateString();
+    const expected = fromOrder.expectedDate ? isoToVnDateString(fromOrder.expectedDate) : '';
+    form.setValues({
+      receiptNumber: '',
+      vendorCode: fromOrder.vendorCode,
+      vendorName: fromOrder.vendorName,
+      locationCode: fromOrder.locationCode,
+      locationName: fromOrder.locationName,
+      receivedDate: expected && expected >= today ? expected : today,
+      reference: fromOrder.orderNumber,
+      notes: '',
+      assignedTo: fromOrder.assignedTo ?? currentEmployeeId,
+      items:
+        fromOrder.items.length > 0
+          ? fromOrder.items.map((item) => ({
+              itemType: item.itemType,
+              itemCode: item.itemCode,
+              itemName: item.itemName,
+              quantity: item.quantity,
+              unit: item.unit,
+              packageCount: packageCountOf(item) ?? undefined,
+              note: item.note ?? '',
+            }))
+          : [{ ...emptyItem }],
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fromOrder]);
 
   const handleLocationSelect = useCallback(
     (code: string | null) => {
@@ -730,7 +769,28 @@ export function GoodsReceiptFormPage() {
             assignedTo: values.assignedTo.trim() || undefined,
 
             ...(copyFrom ? { copyFromId: copyFrom.sourceId } : {}),
+
+            ...(fromOrder ? { purchaseOrderId: fromOrder.orderId } : {}),
           };
+
+          if (fromOrder) {
+            const verdict = await checkOrderReceivable(fromOrder.orderId);
+            if (!verdict.ok) {
+              notifications.show({
+                color: 'red',
+                message: t(
+                  verdict.reason === 'unreadable'
+                    ? 'purchaseOrders.notifications.orderUnreadable'
+                    : 'purchaseOrders.notifications.orderNotReceivable',
+                ),
+                autoClose: 10000,
+              });
+              if (verdict.reason !== 'unreadable') {
+                navigate(ROUTES.PURCHASE_ORDERS.DETAIL.replace(':id', fromOrder.orderId));
+              }
+              return;
+            }
+          }
 
           const today = businessDateString();
           const todaysReceipts = await cMngtConnector.queryGoodsReceipts<GoodsReceiptExtra>({
@@ -755,6 +815,17 @@ export function GoodsReceiptFormPage() {
             extra: newExtra,
           });
           invalidateCache();
+
+          if (fromOrder) {
+            const linked = await linkReceiptToOrder(fromOrder.orderId, res.goodsReceipt.id);
+            if (linked === 'failed') {
+              notifications.show({
+                color: 'yellow',
+                message: t('purchaseOrders.notifications.receiptLinkPending'),
+                autoClose: false,
+              });
+            }
+          }
 
           const incomingEffect = await syncDraftIncomingToInventory(null, res.goodsReceipt);
           if (incomingEffect.failed > 0) {
@@ -803,7 +874,7 @@ export function GoodsReceiptFormPage() {
         setLoading(false);
       }
     },
-    [isEdit, id, locations, t, navigate, invalidateCache, copyFrom],
+    [isEdit, id, locations, t, navigate, invalidateCache, copyFrom, fromOrder],
   );
 
   if (fetching) return null;
@@ -833,6 +904,12 @@ export function GoodsReceiptFormPage() {
           {t('goodsReceipts.form.copyingFrom', {
             receiptNumber: copyFrom.sourceReceiptNumber,
           })}
+        </Alert>
+      )}
+
+      {fromOrder && (
+        <Alert icon={<IconCopy size={16} />} color="blue" variant="light" radius="md" py="xs">
+          {t('goodsReceipts.form.fromOrder', { orderNumber: fromOrder.orderNumber })}
         </Alert>
       )}
 

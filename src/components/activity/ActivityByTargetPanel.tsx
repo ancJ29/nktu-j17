@@ -25,6 +25,7 @@ export type ActivityPanelI18nNamespace =
   | 'salesOrders.detail'
   | 'deliveryRequests.detail'
   | 'goodsReceipts.detail'
+  | 'purchaseOrders.detail'
   | 'transportOrders.detail';
 
 type Props = {

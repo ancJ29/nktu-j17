@@ -5,6 +5,9 @@ import { IconName } from '@credo/base-ui/components';
 import { appConfig } from '@/config';
 import { featureFlags } from '@/utils/features';
 import { getModulePermissions } from '@/utils/permissionReader';
+import { isPricingManagementEnabled } from '@/utils/permission';
+import { allowedPaymentsTabs } from '@/pages/payments/paymentsAccess';
+import { readPaymentsAccess } from '@/pages/payments/readPaymentsAccess';
 import { LookupV2PageRootGuarded } from './routeGuards';
 
 import { AppDetailLayout, AppLayout, BaseLayout } from '@/layouts/AppLayout';
@@ -97,6 +100,10 @@ import {
   GoodsReceiptListPage,
   GoodsReceiptDetailPage,
   GoodsReceiptFormPage,
+  PurchaseOrderListPage,
+  PaymentsPage,
+  PurchaseOrderDetailPage,
+  PurchaseOrderFormPage,
   TransportOrderListPage,
   TransportOrderDetailPage,
   TransportOrderFormPage,
@@ -148,6 +155,7 @@ const quotationGate = gate('quotation');
 const deliveryNoteGate = gate('deliveryRequest');
 const deliveryRequestGate = gate('deliveryRequest');
 const goodsReceiptGate = gate('goodsReceipt');
+const purchaseOrderGate = gate('purchaseOrder');
 const transportOrderGate = gate('transportOrder');
 const transportRouteGate = gate('transportRoute');
 const costNormGate = gate('costNorm');
@@ -301,6 +309,16 @@ const goodsReceiptDetailNav = {
   ],
 };
 
+const purchaseOrderDetailNav = {
+  detailNav: (t: (key: string) => string) => [
+    {
+      icon: IconName.FileText,
+      label: t('purchaseOrders.title'),
+      path: ROUTES.PURCHASE_ORDERS.LIST,
+    },
+  ],
+};
+
 const transportOrderDetailNav = {
   detailNav: (t: (key: string) => string) => [
     {
@@ -345,6 +363,7 @@ const vendorsEnabled = featureFlags.vendors.enabled;
 const salesOrdersEnabled = featureFlags.salesOrders.enabled;
 const deliveryRequestsEnabled = featureFlags.deliveryRequests.enabled;
 const goodsReceiptsEnabled = featureFlags.goodsReceipts.enabled;
+const purchaseOrdersEnabled = featureFlags.purchaseOrders.enabled;
 const transportOrdersEnabled = featureFlags.transportOrders.enabled;
 const lookupV2Enabled = featureFlags.lookupV2.enabled;
 const vendorsV2Enabled = featureFlags.vendorsV2.enabled;
@@ -978,6 +997,56 @@ const goodsReceiptDetailRoutes: RouteObject[] = [
   },
 ];
 
+const purchaseOrderRoutes: RouteObject[] = [
+  {
+    path: ROUTES.PURCHASE_ORDERS.LIST,
+    element: gatedComponent(
+      { enabled: purchaseOrdersEnabled, requires: purchaseOrderGate.view },
+      PurchaseOrderListPage,
+    ),
+  },
+];
+
+const paymentsRoutes: RouteObject[] = [
+  {
+    path: ROUTES.PAYMENTS.LIST,
+    element: gatedComponent(
+      {
+        enabled: featureFlags.paymentTerms.enabled && isPricingManagementEnabled(),
+        requires: () => allowedPaymentsTabs(readPaymentsAccess()).length > 0,
+      },
+      PaymentsPage,
+    ),
+  },
+];
+
+const purchaseOrderDetailRoutes: RouteObject[] = [
+  {
+    path: ROUTES.PURCHASE_ORDERS.NEW,
+    element: gatedComponent(
+      { enabled: purchaseOrdersEnabled, requires: purchaseOrderGate.create },
+      PurchaseOrderFormPage,
+    ),
+    handle: purchaseOrderDetailNav,
+  },
+  {
+    path: ROUTES.PURCHASE_ORDERS.DETAIL,
+    element: gatedComponent(
+      { enabled: purchaseOrdersEnabled, requires: purchaseOrderGate.view },
+      PurchaseOrderDetailPage,
+    ),
+    handle: purchaseOrderDetailNav,
+  },
+  {
+    path: ROUTES.PURCHASE_ORDERS.EDIT,
+    element: gatedComponent(
+      { enabled: purchaseOrdersEnabled, requires: purchaseOrderGate.edit },
+      PurchaseOrderFormPage,
+    ),
+    handle: purchaseOrderDetailNav,
+  },
+];
+
 const transportOrderRoutes: RouteObject[] = [
   {
     path: ROUTES.TRANSPORT_ORDERS.LIST,
@@ -1085,6 +1154,8 @@ const router = createBrowserRouter([
           ...deliveryRequestRoutes,
           ...salesOrderRoutes,
           ...goodsReceiptRoutes,
+          ...purchaseOrderRoutes,
+          ...paymentsRoutes,
           ...transportOrderRoutes,
           ...transportRouteRoutes,
           ...costNormRoutes,
@@ -1343,6 +1414,7 @@ const router = createBrowserRouter([
           ...transportRouteDetailRoutes,
           ...deliveryRequestDetailRoutes,
           ...goodsReceiptDetailRoutes,
+          ...purchaseOrderDetailRoutes,
         ],
       },
 

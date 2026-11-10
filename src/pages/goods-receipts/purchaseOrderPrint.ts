@@ -1,5 +1,5 @@
 import type { CompanyInfo } from '@/config/companyInfo';
-import type { GoodsReceipt, Product, Vendor } from '@/types';
+import type { GoodsReceipt, Product, PurchaseOrder, PurchaseOrderCurrency, Vendor } from '@/types';
 import { isoToVnDateString } from '@/utils/dateTimeField';
 import {
   buildSelfPrintingHtml,
@@ -11,6 +11,15 @@ import {
   type SheetPalette,
 } from '@/utils/printDocument';
 import { purchaseOrderNamesOf } from '@/utils/productPurchaseOrderNames';
+import {
+  formatMoney,
+  lineAmount,
+  orderSubtotal,
+  plannedArrivalDay,
+  poCurrency,
+  poItems,
+  poOrderDay,
+} from '@/pages/purchase-orders/purchaseOrderModel';
 import { packageCountOf } from './goodsReceiptPackageCount';
 
 export type PurchaseOrderPrintOptions = {
@@ -20,12 +29,15 @@ export type PurchaseOrderPrintOptions = {
   includeExpectedDelivery: boolean;
 
   palette?: SheetPalette;
+
+  includePrice?: boolean;
 };
 
 export const DEFAULT_PURCHASE_ORDER_PRINT_OPTIONS: PurchaseOrderPrintOptions = {
   paperSize: 'A4',
   orientation: 'portrait',
   includeExpectedDelivery: false,
+  includePrice: false,
 };
 
 export type PurchaseOrderPrintLine = {
@@ -43,6 +55,9 @@ export type PurchaseOrderPrintLine = {
 
   photoUrl: string;
   note: string;
+
+  unitPrice?: number | null;
+  amount?: number | null;
 };
 
 export type PurchaseOrderPrintData = {
@@ -63,6 +78,10 @@ export type PurchaseOrderPrintData = {
   reference: string;
   lines: PurchaseOrderPrintLine[];
   showPhoto: boolean;
+
+  currency?: PurchaseOrderCurrency;
+
+  total?: number;
 };
 
 export function toPurchaseOrderPrintData(input: {
@@ -108,6 +127,54 @@ export function toPurchaseOrderPrintData(input: {
   };
 }
 
+export function toPurchaseOrderPrintDataFromOrder(input: {
+  order: PurchaseOrder;
+  vendor: Vendor | undefined;
+  buyer: CompanyInfo;
+  unitLabelOf: (unit: string) => string;
+  photoByCode: ReadonlyMap<string, string>;
+  productByCode: ReadonlyMap<string, Product>;
+  showPhoto: boolean;
+}): PurchaseOrderPrintData {
+  const { order, vendor, buyer, unitLabelOf, photoByCode, productByCode, showPhoto } = input;
+  const currency = poCurrency(order);
+  return {
+    buyer,
+    code: order.orderNumber,
+    orderDate: poOrderDay(order),
+    expectedDate: plannedArrivalDay(order),
+    supplier: {
+      name: order.vendorName || vendor?.name || '',
+      address: vendor?.address ?? '',
+      phone: vendor?.phone ?? '',
+      contactPerson: vendor?.contactPerson ?? '',
+      email: vendor?.email ?? '',
+    },
+    reference: order.reference?.trim() ?? '',
+    lines: poItems(order).map((it) => {
+      const names = purchaseOrderNamesOf(productByCode.get(it.itemCode)?.extra);
+      const priced = typeof it.unitPrice === 'number';
+      return {
+        code: it.itemCode,
+        name: it.itemName,
+        nameZh: names.zh,
+        nameEn: names.en,
+        unit: unitLabelOf(it.unit),
+        quantity: it.quantity,
+        packageCount: packageCountOf(it),
+        photoUrl: showPhoto ? (photoByCode.get(it.itemCode) ?? '') : '',
+        note: it.note?.trim() ?? '',
+        unitPrice: priced ? it.unitPrice! : null,
+        amount: priced ? lineAmount(it, currency) : null,
+      };
+    }),
+    showPhoto,
+    currency,
+
+    total: orderSubtotal(order),
+  };
+}
+
 type Tri = readonly [vi: string, zh: string, en: string];
 
 const L = {
@@ -129,6 +196,10 @@ const L = {
   colUnit: ['ĐVT', '单位', 'Unit'],
   colQty: ['Số lượng', '数量', 'Qty'],
   colPackages: ['Số kiện', '件数', 'Packages'],
+  colUnitPrice: ['Đơn giá', '单价', 'Unit price'],
+  colAmount: ['Thành tiền', '金额', 'Amount'],
+  total: ['Tổng cộng', '合计', 'Total'],
+  currency: ['Tiền tệ', '币种', 'Currency'],
 } as const satisfies Record<string, Tri>;
 
 const ZH_FONTS = '"PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC"';
@@ -193,6 +264,9 @@ function buildParts(
   const { buyer, supplier, showPhoto } = data;
   const { paperSize, orientation, includeExpectedDelivery, palette } = options;
 
+  const { currency } = data;
+  const showPrices = options.includePrice === true && currency !== undefined;
+
   const showPackages = data.lines.some((l) => l.packageCount !== null);
 
   const isA5 = paperSize === 'A5';
@@ -202,8 +276,26 @@ function buildParts(
   const photoPx = isA5 ? 96 : 144;
   const cellPadPx = isA5 ? 4 : 6;
   const w = isA5
-    ? { no: 24, code: 50, photo: photoPx + 8, unit: 40, qty: 56, packages: 46 }
-    : { no: 34, code: 64, photo: photoPx + 8, unit: 56, qty: 80, packages: 64 };
+    ? {
+        no: 24,
+        code: 50,
+        photo: photoPx + 8,
+        unit: 40,
+        qty: 56,
+        packages: 46,
+        price: 64,
+        amount: 76,
+      }
+    : {
+        no: 34,
+        code: 64,
+        photo: photoPx + 8,
+        unit: 56,
+        qty: 80,
+        packages: 64,
+        price: 88,
+        amount: 104,
+      };
   const widthMm = contentWidthMm(paperSize, orientation, marginMm);
 
   const buyerContacts = [
@@ -222,6 +314,7 @@ function buildParts(
       [L.email, escapeHtml(supplier.email), false],
       [L.reference, escapeHtml(data.reference), false],
       [L.expectedDelivery, expected, false],
+      [L.currency, showPrices ? escapeHtml(currency) : '', false],
     ] as const
   )
     .filter(([, html, always]) => always || html)
@@ -230,6 +323,8 @@ function buildParts(
         `<tr><th>${inline(label)}</th><td${strong ? ' class="strong"' : ''}>${html}</td></tr>`,
     )
     .join('');
+
+  const columnCount = 5 + (showPhoto ? 1 : 0) + (showPackages ? 1 : 0) + (showPrices ? 2 : 0);
 
   const rows = data.lines
     .map(
@@ -254,6 +349,12 @@ function buildParts(
             showPackages
               ? `
           <td class="r packages">${line.packageCount === null ? '' : quantity(line.packageCount)}</td>`
+              : ''
+          }${
+            showPrices
+              ? `
+          <td class="r price">${line.unitPrice == null ? '' : formatMoney(line.unitPrice, currency)}</td>
+          <td class="r amount">${line.amount == null ? '' : formatMoney(line.amount, currency)}</td>`
               : ''
           }
         </tr>`,
@@ -302,7 +403,11 @@ function buildParts(
     display: block; width: ${photoPx}px; height: ${photoPx}px; object-fit: contain;
     margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 4px; background: #fff;
   }
-  thead { display: table-header-group; }
+  thead { display: table-header-group; }${
+    showPrices
+      ? '\n  tfoot { display: table-row-group; }\n  table.items tfoot th, table.items tfoot td { font-weight: 700; background: #f9fafb; }'
+      : ''
+  }
   tbody tr { page-break-inside: avoid; }
 ${palette ? paletteCss(palette) : ''}`;
 
@@ -331,11 +436,27 @@ ${palette ? paletteCss(palette) : ''}`;
           <th>${stacked(L.colName)}</th>
           <th style="width:${w.unit}px">${stacked(L.colUnit)}</th>
           <th style="width:${w.qty}px">${stacked(L.colQty)}</th>
-          ${showPackages ? `<th style="width:${w.packages}px">${stacked(L.colPackages)}</th>` : ''}
+          ${showPackages ? `<th style="width:${w.packages}px">${stacked(L.colPackages)}</th>` : ''}${
+            showPrices
+              ? `
+          <th style="width:${w.price}px">${stacked(L.colUnitPrice)}</th>
+          <th style="width:${w.amount}px">${stacked(L.colAmount)}</th>`
+              : ''
+          }
         </tr>
       </thead>
       <tbody>${rows}
-      </tbody>
+      </tbody>${
+        showPrices
+          ? `
+      <tfoot>
+        <tr>
+          <th colspan="${columnCount - 1}" style="text-align:right">${inline(L.total)} (${escapeHtml(currency)})</th>
+          <td class="r">${formatMoney(data.total ?? 0, currency)}</td>
+        </tr>
+      </tfoot>`
+          : ''
+      }
     </table>
   </div>`;
 

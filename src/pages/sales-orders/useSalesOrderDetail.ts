@@ -23,6 +23,7 @@ import {
 import { writePhotosWithConflictRetry } from '@/utils/photoPersist';
 import { enqueuePhoto, markPendingAttached, pendingPhotoUrl } from '@/utils/photoQueue';
 import { withTimeout } from '@/utils/withTimeout';
+import { resolveSalesOrderPaymentState } from '@/utils/salesOrderPricing';
 import { flushPhotoQueue } from '@/utils/photoQueueFlush';
 import type {
   DeliveryRequest,
@@ -1023,6 +1024,30 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
             fields.deliveryDate = {
               ...(fromMs !== undefined && { from: fromMs }),
               ...(toMs !== undefined && { to: toMs }),
+            };
+          }
+
+          if ('isPaid' in patch.extra || 'paidAmount' in patch.extra) {
+            const afterExtra = { ...before, ...patch.extra };
+            if (
+              before.isPaid !== afterExtra.isPaid ||
+              before.paidAmount !== afterExtra.paidAmount
+            ) {
+              fields.payment = {
+                from: resolveSalesOrderPaymentState(before).state,
+                to: resolveSalesOrderPaymentState(afterExtra).state,
+              };
+            }
+          }
+          if (
+            'paymentDeadline' in patch.extra &&
+            patch.extra.paymentDeadline !== before.paymentDeadline
+          ) {
+            fields.paymentDeadline = {
+              ...(typeof before.paymentDeadline === 'number' && { from: before.paymentDeadline }),
+              ...(typeof patch.extra.paymentDeadline === 'number' && {
+                to: patch.extra.paymentDeadline,
+              }),
             };
           }
 

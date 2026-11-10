@@ -26,6 +26,13 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import type { Customer, SalesOrder } from '@/types';
 import { compareSalesOrdersForList } from './salesOrderListSort';
+import { todayInVnDateString } from '@/utils/dateTimeField';
+import {
+  effectiveStatusSelection,
+  matchesPaymentFilter,
+  parsePaymentFilter,
+  type SalesOrderPaymentFilter,
+} from './salesOrderPaymentFilter';
 import { hasWarehouseStaffMember } from './salesOrderWarehouseStaff';
 import { getCancellationTargetStatusValue } from './transitionEngine';
 import type { SalesOrderListView } from './salesOrderListVariant';
@@ -54,6 +61,7 @@ type SalesOrderUrlState = {
   cd?: SerializedDateRange;
   dd?: SerializedDateRange;
   dk?: 'internal' | 'external';
+  pf?: SalesOrderPaymentFilter;
   cf?: string;
   pg?: number;
   v?: Exclude<SalesOrderListView, 'ops'>;
@@ -74,6 +82,7 @@ function compactState(state: SalesOrderUrlState): SalesOrderUrlState {
   if (state.cd?.preset) r.cd = state.cd;
   if (state.dd?.preset) r.dd = state.dd;
   if (state.dk) r.dk = state.dk;
+  if (parsePaymentFilter(state.pf)) r.pf = state.pf;
   if (state.cf) r.cf = state.cf;
   if (state.pg && state.pg > DEFAULT_PAGE) r.pg = state.pg;
   if (state.v) r.v = state.v;
@@ -111,7 +120,15 @@ export function useSalesOrderListFilters(
     };
   }, [customers, employees]);
 
-  const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
+  const paymentFilter = parsePaymentFilter(state.pf);
+
+  const statusFilter = effectiveStatusSelection({
+    selection: state.s,
+    defaultSelection: DEFAULT_STATUS,
+    paymentFilter,
+    allStatuses: STATUS_ORDER,
+    cancellationTarget: CANCELLATION_TARGET_STATUS,
+  });
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
   const warehouseStaffFilter = state.ws ?? null;
@@ -135,6 +152,12 @@ export function useSalesOrderListFilters(
 
   const setCustomerFilter = useCallback(
     (value: string | null) => updateState({ c: value || undefined, pg: undefined }),
+    [updateState],
+  );
+
+  const setPaymentFilter = useCallback(
+    (value: SalesOrderPaymentFilter | null) =>
+      updateState({ pf: value ?? undefined, pg: undefined }),
     [updateState],
   );
 
@@ -203,6 +226,7 @@ export function useSalesOrderListFilters(
     [updateState],
   );
 
+  const todayVn = todayInVnDateString();
   const allOrders = useMemo(() => {
     const filtered = storeOrders.filter((o) => {
       if (statusFilter.length > 0 && !statusFilter.includes(o.extra?.status ?? '')) return false;
@@ -221,6 +245,7 @@ export function useSalesOrderListFilters(
 
       if (deliveryKind === 'internal' && o.extra?.isInternalDelivery === false) return false;
       if (deliveryKind === 'external' && o.extra?.isInternalDelivery !== false) return false;
+      if (paymentFilter && !matchesPaymentFilter(o, paymentFilter, todayVn, vatRate)) return false;
       return true;
     });
 
@@ -237,14 +262,16 @@ export function useSalesOrderListFilters(
     createdDateRange,
     deliveryDateRange,
     deliveryKind,
+    paymentFilter,
+    todayVn,
     sortField,
     internalDeliveryFirstSort,
     sortLookups,
   ]);
 
   const statusFilterIsDefault = useMemo(
-    () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
-    [statusFilter],
+    () => isDefaultStatusSelection(state.s ?? DEFAULT_STATUS, DEFAULT_STATUS),
+    [state.s],
   );
 
   const hasActiveFilters = !!(
@@ -256,6 +283,7 @@ export function useSalesOrderListFilters(
     !isDefaultLastNDaysRange(createdDateRange) ||
     deliveryDateRange.preset ||
     deliveryKind !== 'all' ||
+    paymentFilter ||
     undefined // search + the header filters are handled by the page
   );
 
@@ -282,6 +310,9 @@ export function useSalesOrderListFilters(
     setDeliveryDateRange,
     deliveryKind,
     setDeliveryKind,
+
+    paymentFilter,
+    setPaymentFilter,
 
     columnFilters,
     setColumnFilters,

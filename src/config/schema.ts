@@ -137,6 +137,15 @@ const PricingFeaturesSchema = z
   })
   .default({ enabled: true, vatRate: 0.08 });
 
+const PaymentTermsFeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    defaultDays: z.number().int().min(0).max(365).default(30),
+  })
+  .default({ enabled: false, defaultDays: 30 });
+
+export type PaymentTermsFeatures = z.infer<typeof PaymentTermsFeaturesSchema>;
+
 const QuotationFeaturesSchema = z
   .object({
     priceByMinQuantity: z.boolean().default(false),
@@ -598,6 +607,40 @@ const GoodsReceiptFeaturesSchema = z
 
 export type GoodsReceiptFeatures = z.infer<typeof GoodsReceiptFeaturesSchema>;
 
+const LeadTimeSchema = z
+  .object({
+    minDays: z.number().int().min(0).max(365),
+    maxDays: z.number().int().min(0).max(365),
+  })
+  .refine((l) => l.minDays <= l.maxDays);
+
+export const DEFAULT_PURCHASE_ORDER_LEAD_TIMES = [
+  { minDays: 1, maxDays: 2 },
+  { minDays: 3, maxDays: 5 },
+  { minDays: 5, maxDays: 7 },
+  { minDays: 7, maxDays: 14 },
+];
+
+const PurchaseOrderFeaturesSchema = z
+  .object({
+    enabled: z.boolean().default(false),
+    codePrefix: z.string().default('DDH-'),
+    picDepartments: z.array(z.string()).default([]),
+
+    leadTimes: z
+      .array(LeadTimeSchema)
+      .default(DEFAULT_PURCHASE_ORDER_LEAD_TIMES)
+      .catch(DEFAULT_PURCHASE_ORDER_LEAD_TIMES),
+  })
+  .default({
+    enabled: false,
+    codePrefix: 'DDH-',
+    picDepartments: [],
+    leadTimes: DEFAULT_PURCHASE_ORDER_LEAD_TIMES,
+  });
+
+export type PurchaseOrderFeatures = z.infer<typeof PurchaseOrderFeaturesSchema>;
+
 const warehouseDocFeatures = (codePrefix: string) =>
   z
     .object({
@@ -720,6 +763,7 @@ const FeaturesSchema = z
     permissionManagement: PermissionManagementFeaturesSchema,
     activityLog: ActivityLogFeaturesSchema,
     pricing: PricingFeaturesSchema,
+    paymentTerms: PaymentTermsFeaturesSchema,
     products: ProductFeaturesSchema,
     materials: MaterialFeaturesSchema,
     customers: CustomerFeaturesSchema,
@@ -735,6 +779,7 @@ const FeaturesSchema = z
     quotations: QuotationFeaturesSchema,
     deliveryRequests: DeliveryRequestFeaturesSchema,
     goodsReceipts: GoodsReceiptFeaturesSchema,
+    purchaseOrders: PurchaseOrderFeaturesSchema,
     warehouseReceipts: WarehouseReceiptFeaturesSchema,
     warehouseDeliveryNotes: WarehouseDeliveryNoteFeaturesSchema,
     transportOrders: TransportOrderFeaturesSchema,
@@ -757,6 +802,7 @@ const FeaturesSchema = z
     permissionManagement: PermissionManagementFeaturesSchema.parse({}),
     activityLog: ActivityLogFeaturesSchema.parse({}),
     pricing: PricingFeaturesSchema.parse({}),
+    paymentTerms: PaymentTermsFeaturesSchema.parse({}),
     products: ProductFeaturesSchema.parse({}),
     materials: MaterialFeaturesSchema.parse({}),
     locations: LocationFeaturesSchema.parse({}),
@@ -779,6 +825,7 @@ const FeaturesSchema = z
     quotations: QuotationFeaturesSchema.parse({}),
     deliveryRequests: DeliveryRequestFeaturesSchema.parse({}),
     goodsReceipts: GoodsReceiptFeaturesSchema.parse({}),
+    purchaseOrders: PurchaseOrderFeaturesSchema.parse({}),
     warehouseReceipts: WarehouseReceiptFeaturesSchema.parse({}),
     warehouseDeliveryNotes: WarehouseDeliveryNoteFeaturesSchema.parse({}),
     transportOrders: TransportOrderFeaturesSchema.parse({}),

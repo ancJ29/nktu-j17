@@ -3,7 +3,14 @@ import { IconAlertTriangle } from '@tabler/icons-react';
 import { useTranslation } from 'react-i18next';
 import type { SalesOrderFinanceSummary } from '@/utils/salesOrderPricing';
 
-export function SalesOrderFinanceTotals({ summary }: { summary: SalesOrderFinanceSummary }) {
+export function SalesOrderFinanceTotals({
+  summary,
+  showOutstanding = false,
+}: {
+  summary: SalesOrderFinanceSummary;
+
+  showOutstanding?: boolean;
+}) {
   const { t } = useTranslation();
 
   return (
@@ -32,6 +39,13 @@ export function SalesOrderFinanceTotals({ summary }: { summary: SalesOrderFinanc
             value={summary.grandTotal.toLocaleString()}
             strong
           />
+          {showOutstanding && (
+            <Cell
+              label={t('salesOrders.finance.outstandingLabel')}
+              value={summary.outstanding.toLocaleString()}
+              strong
+            />
+          )}
         </Group>
         {summary.missingCount > 0 && (
           <Group gap={6} wrap="nowrap" c="orange">

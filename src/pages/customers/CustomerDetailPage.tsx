@@ -57,6 +57,8 @@ import {
 } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
+import { featureFlags } from '@/utils/features';
+import { hasOwnPaymentTerm, paymentTermDaysOf } from '@/utils/paymentTerms';
 import type {
   Customer,
   CustomerContact,
@@ -397,6 +399,16 @@ export function CustomerDetailPage() {
           </Text>
         </DetailField>
         <DetailField label={t('common.labels.taxCode')}>{extra.taxCode || '-'}</DetailField>
+        {featureFlags.paymentTerms.enabled && (
+          <DetailField label={t('customers.form.paymentTermDaysLabel')}>
+            {t(
+              hasOwnPaymentTerm(extra)
+                ? 'customers.detail.paymentTermDays'
+                : 'customers.detail.paymentTermDaysDefault',
+              { days: paymentTermDaysOf(extra, featureFlags.paymentTerms.defaultDays) },
+            )}
+          </DetailField>
+        )}
       </SimpleGrid>
     </SectionCard>
   );

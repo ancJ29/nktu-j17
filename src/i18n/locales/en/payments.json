@@ -1,0 +1,33 @@
+{
+  "columns": {
+    "earliestDue": "Earliest due",
+    "notYetDue": "Not yet due",
+    "orders": "Unpaid orders",
+    "overdue": "Overdue",
+    "undated": "No due date"
+  },
+  "loadError": "Could not load the last {{days}} days of orders, so no figures are shown.",
+  "payable": {
+    "columns": {
+      "currency": "Currency",
+      "party": "Vendor",
+      "total": "To pay"
+    },
+    "empty": "NKTU owes no vendor anything",
+    "searchPlaceholder": "Search vendors",
+    "title": "Payables"
+  },
+  "receivable": {
+    "columns": {
+      "party": "Customer",
+      "total": "To collect"
+    },
+    "empty": "No customer owes anything",
+    "partiesLabel": "Customers",
+    "searchPlaceholder": "Search customers",
+    "title": "Receivables",
+    "walkIn": "Walk-in customers"
+  },
+  "retry": "Try again",
+  "window": "Orders created in the last {{days}} days"
+}

@@ -7,6 +7,7 @@ const ALWAYS_OWNED = [
   'quotationId',
   'quotationCode',
   'orderDate',
+  'paymentDeadline',
   'customerPONumber',
   'deliveryAddress',
   'googleMapUrl',

@@ -52,6 +52,7 @@ import { EmployeeLink } from '@/components/EmployeeLink';
 import { ProductLink } from '@/components/ProductLink';
 import { SectionCard } from '@/components/SectionCard';
 import { VendorLink } from '@/components/VendorLink';
+import { PurchaseOrderLink } from '@/components/PurchaseOrderLink';
 import { getCompanyInfo } from '@/config/companyInfo';
 import { PURCHASE_ORDER_PALETTE } from '@/config/printDefaults';
 import { useProductStore } from '@/stores/useProductStore';
@@ -62,7 +63,9 @@ import {
   hasImagesForProducts,
   isActivityLoggingEnabled,
   isLocationsEnabled,
+  perms,
 } from '@/utils/permission';
+import { featureFlags } from '@/utils/features';
 import type { Orientation, PaperSize } from '@/utils/printDocument';
 import { indexProductsByCode } from '@/utils/productByCode';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
@@ -84,6 +87,8 @@ import { NumberField } from '@/components/NumberField';
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
 const showProductPhoto = hasImagesForProducts();
+
+const orderSlotVisible = featureFlags.purchaseOrders.enabled && perms.purchaseOrder.canView();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
 
@@ -525,6 +530,7 @@ export function GoodsReceiptDetailPage() {
   const hasReference = !!receipt.reference?.trim();
   const assignedTo = receipt.extra?.assignedTo;
   const copyFromId = receipt.extra?.copyFromId;
+  const purchaseOrderId = receipt.extra?.purchaseOrderId;
   const generalInfoCard = (
     <SectionCard
       icon={<IconClipboardList size={14} />}
@@ -562,6 +568,15 @@ export function GoodsReceiptDetailPage() {
         {/* Copied-from slot — present only when this receipt was created via
             the Copy CTA. Hides entirely otherwise (absence is meaningful, no
             "—" placeholder), matching the reference-row policy. */}
+        {/* Order slot — only a receipt made from a purchase order carries one. The
+            receipt's `reference` holds the order's number, so the link reads while
+            the order itself is not in the list's window. */}
+        {orderSlotVisible && purchaseOrderId && (
+          <Stack gap={4}>
+            <FieldLabel>{t('goodsReceipts.detail.purchaseOrder')}</FieldLabel>
+            <PurchaseOrderLink id={purchaseOrderId} fallbackLabel={receipt.reference} />
+          </Stack>
+        )}
         {copyFromId && (
           <Stack gap={4}>
             <FieldLabel>{t('goodsReceipts.detail.copiedFrom')}</FieldLabel>

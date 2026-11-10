@@ -37,6 +37,16 @@ export const ROUTES = {
     DETAIL: '/goods-receipts/:id',
     EDIT: '/goods-receipts/:id/edit',
   },
+  PURCHASE_ORDERS: {
+    LIST: '/purchase-orders',
+    NEW: '/purchase-orders/new',
+    DETAIL: '/purchase-orders/:id',
+    EDIT: '/purchase-orders/:id/edit',
+  },
+
+  PAYMENTS: {
+    LIST: '/payments',
+  },
   TRANSPORT_ORDERS: {
     LIST: '/transport-orders',
     NEW: '/transport-orders/new',

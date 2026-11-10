@@ -57,6 +57,7 @@ import { WarehouseStaffLinks } from '@/components/sales-orders/WarehouseStaffLin
 import { MaterialLink } from '@/components/MaterialLink';
 import { ProductLink } from '@/components/ProductLink';
 import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
+import { PurchaseOrderLink } from '@/components/PurchaseOrderLink';
 import { SalesOrderLink } from '@/components/SalesOrderLink';
 import { TransportOrderLink } from '@/components/TransportOrderLink';
 import { TruckLink } from '@/components/TruckLink';
@@ -242,6 +243,8 @@ type DeliveryRequestVerbKey = 'create' | 'update' | 'updateInline' | 'statusChan
 type GoodsReceiptVerbKey =
   'create' | 'update' | 'updateInline' | 'confirmReceived' | 'repostInventory' | 'cancel';
 
+type PurchaseOrderVerbKey = 'create' | 'update' | 'ready' | 'cancel' | 'payment' | 'receiptLinked';
+
 type TransportOrderVerbKey =
   'create' | 'update' | 'updateInline' | 'statusChange' | 'cancel' | 'delete';
 
@@ -256,6 +259,7 @@ type EntityTargetType =
   | 'salesOrder'
   | 'deliveryRequest'
   | 'goodsReceipt'
+  | 'purchaseOrder'
   | 'transportOrder';
 type EntityVerbI18nKey =
   | `employees.detail.activityVerbs.${EmployeeVerbKey}`
@@ -270,6 +274,7 @@ type EntityVerbI18nKey =
   | `salesOrders.detail.activityVerbs.${SalesOrderVerbKey}`
   | `deliveryRequests.detail.activityVerbs.${DeliveryRequestVerbKey}`
   | `goodsReceipts.detail.activityVerbs.${GoodsReceiptVerbKey}`
+  | `purchaseOrders.detail.activityVerbs.${PurchaseOrderVerbKey}`
   | `transportOrders.detail.activityVerbs.${TransportOrderVerbKey}`;
 
 type EntityVerbConfig = {
@@ -287,6 +292,8 @@ type EntityVerbConfig = {
   readonly showDeliveryRequestMemo?: boolean;
   /** Render the GR-specific memo line under the header (vendor + items + inventory effect). */
   readonly showGoodsReceiptMemo?: boolean;
+  /** Render the purchase-order memo line (codes and quantities only, never a price). */
+  readonly showPurchaseOrderMemo?: boolean;
   /** Render the TO-specific memo line under the header (route, container, fee/total deltas). */
   readonly showTransportOrderMemo?: boolean;
 };
@@ -783,6 +790,51 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     showGoodsReceiptMemo: true,
   },
 
+  // Purchase orders. Memos carry codes and quantities, NEVER prices: `canView`
+  // alone opens the Activity tab, and the price permission is a separate flag.
+  'purchaseOrder.create': {
+    icon: <IconFileText size={16} />,
+    color: 'green',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.create',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.update': {
+    icon: <IconEdit size={16} />,
+    color: 'blue',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.update',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.ready': {
+    icon: <IconClipboardCheck size={16} />,
+    color: 'teal',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.ready',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.cancel': {
+    icon: <IconBan size={16} />,
+    color: 'red',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.cancel',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.payment': {
+    icon: <IconCircleCheck size={16} />,
+    color: 'orange',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.payment',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.receiptLinked': {
+    icon: <IconClipboardCheck size={16} />,
+    color: 'gray',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.receiptLinked',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+
   // Transport orders. No inventory and no line items, so the memo is a bounded
   // field diff rather than an item diff. `transportOrder.update` is resolved at
   // runtime (form vs inline) — same split as SO / DR / GR.
@@ -968,6 +1020,8 @@ function moduleI18nNamespace(type: EntityTargetType): string {
       return 'deliveryRequests.detail';
     case 'goodsReceipt':
       return 'goodsReceipts.detail';
+    case 'purchaseOrder':
+      return 'purchaseOrders.detail';
     case 'transportOrder':
       return 'transportOrders.detail';
   }
@@ -1026,6 +1080,9 @@ function EntityActivityCard({
         {config.showGoodsReceiptMemo && memo && (
           <GoodsReceiptMemoLine action={entry.action} memo={memo as GoodsReceiptMemo} />
         )}
+        {config.showPurchaseOrderMemo && memo && (
+          <PurchaseOrderMemoLine action={entry.action} memo={memo as PurchaseOrderMemo} />
+        )}
         {config.showTransportOrderMemo && memo && (
           <TransportOrderMemoLine action={entry.action} memo={memo as TransportOrderMemo} />
         )}
@@ -1078,6 +1135,8 @@ function EntityTargetLink({
       return <DeliveryRequestTargetLink id={id} fallbackLabel={fallbackLabel} />;
     case 'goodsReceipt':
       return <GoodsReceiptTargetLink id={id} fallbackLabel={fallbackLabel} />;
+    case 'purchaseOrder':
+      return <PurchaseOrderLink id={id} fallbackLabel={fallbackLabel} size="sm" />;
     case 'transportOrder':
       return <TransportOrderLink id={id} fallbackLabel={fallbackLabel} size="sm" />;
   }
@@ -1104,6 +1163,10 @@ function pickTargetLabelFromMemo(
     }
     case 'goodsReceipt': {
       const v = (memo as { receiptNumber?: unknown }).receiptNumber;
+      return typeof v === 'string' && v.length > 0 ? v : null;
+    }
+    case 'purchaseOrder': {
+      const v = (memo as { orderNumber?: unknown }).orderNumber;
       return typeof v === 'string' && v.length > 0 ? v : null;
     }
     case 'transportOrder': {
@@ -1998,6 +2061,8 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
     !f.warehouseStaff &&
     !f.deliveryMethod &&
     !f.deliveryDate &&
+    !f.payment &&
+    !f.paymentDeadline &&
     !f.notes &&
     !f.itemMemo &&
     !f.itemReady &&
@@ -2071,6 +2136,38 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
           </Text>
           <Text size="xs" fw={500}>
             {f.deliveryDate.to ? formatDate(f.deliveryDate.to) : '—'}
+          </Text>
+        </Group>
+      )}
+      {f.payment && (
+        <Group gap={6} wrap="nowrap" align="baseline">
+          <Text size="xs" c="dimmed">
+            {t('salesOrders.billing.paidLabel')}:
+          </Text>
+          <Text size="xs" c="dimmed">
+            {f.payment.from ? t(`salesOrders.billing.${f.payment.from}`) : '—'}
+          </Text>
+          <Text size="xs" c="dimmed">
+            →
+          </Text>
+          <Text size="xs" fw={500}>
+            {f.payment.to ? t(`salesOrders.billing.${f.payment.to}`) : '—'}
+          </Text>
+        </Group>
+      )}
+      {f.paymentDeadline && (
+        <Group gap={6} wrap="nowrap" align="baseline">
+          <Text size="xs" c="dimmed">
+            {t('salesOrders.billing.paymentDeadlineLabel')}:
+          </Text>
+          <Text size="xs" c="dimmed">
+            {f.paymentDeadline.from ? formatDate(f.paymentDeadline.from) : '—'}
+          </Text>
+          <Text size="xs" c="dimmed">
+            →
+          </Text>
+          <Text size="xs" fw={500}>
+            {f.paymentDeadline.to ? formatDate(f.paymentDeadline.to) : '—'}
           </Text>
         </Group>
       )}
@@ -2706,6 +2803,58 @@ function DeliveryRequestInlineUpdateBody({ memo }: { readonly memo: DeliveryRequ
       )}
     </Stack>
   );
+}
+
+// ── Purchase-order memo renderer ─────────────────────────────────────────
+//
+// Same bounded shapes as the goods receipt's (vendor code, line count, item
+// snapshot / diff by code and quantity), so create / update reuse its bodies.
+// The state verbs carry a few booleans; none carries a price.
+
+type PurchaseOrderMemo = GoodsReceiptMemo & {
+  orderNumber?: string;
+  isPaid?: boolean;
+  /** `YYYY-MM-DD` of the payment deadline, when one is set. */
+  deadline?: string;
+  receiptNumber?: string;
+};
+
+function PurchaseOrderMemoLine({
+  action,
+  memo,
+}: {
+  readonly action: string;
+  readonly memo: PurchaseOrderMemo;
+}) {
+  const { t } = useTranslation();
+  if (action === 'purchaseOrder.create') return <GoodsReceiptCreateBody memo={memo} />;
+  if (action === 'purchaseOrder.update') return <GoodsReceiptFormUpdateBody memo={memo} />;
+  if (action === 'purchaseOrder.payment') {
+    return (
+      <Stack gap={2} pl={36}>
+        <Text size="xs" c="dimmed">
+          {t(
+            memo.isPaid
+              ? 'purchaseOrders.detail.activityMemo.markedPaid'
+              : 'purchaseOrders.detail.activityMemo.markedUnpaid',
+          )}
+        </Text>
+        {memo.deadline && (
+          <Text size="xs" c="dimmed">
+            {t('purchaseOrders.detail.activityMemo.deadline', { date: memo.deadline })}
+          </Text>
+        )}
+      </Stack>
+    );
+  }
+  if (action === 'purchaseOrder.receiptLinked' && memo.receiptNumber) {
+    return (
+      <Text size="xs" c="dimmed" pl={36}>
+        {t('purchaseOrders.detail.activityMemo.receipt', { number: memo.receiptNumber })}
+      </Text>
+    );
+  }
+  return null;
 }
 
 // ── Goods-receipt memo renderer ──────────────────────────────────────────

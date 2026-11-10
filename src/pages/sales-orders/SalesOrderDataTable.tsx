@@ -26,8 +26,13 @@ import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import {
   computeSalesOrderTotals,
   isSalesOrderMissingMoneyInfo,
+  isSalesOrderOverdue,
   resolveSalesOrderPaymentState,
+  salesOrderDeadlineDay,
 } from '@/utils/salesOrderPricing';
+import { todayInVnDateString } from '@/utils/dateTimeField';
+import { featureFlags } from '@/utils/features';
+import { SalesOrderPaymentMark } from './SalesOrderPaymentMark';
 import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import { formatWarehouseStaffNames, readWarehouseStaff } from './salesOrderWarehouseStaff';
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
@@ -35,6 +40,8 @@ import type { SalesOrderListVariant, SalesOrderListView } from './salesOrderList
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 const vatRate = getPricingVatRate();
+
+const termsOn = featureFlags.paymentTerms.enabled && showPrice;
 const warehouseStaffAllowed = isWarehouseStaffAllowed();
 
 function getDeliveryDateColor(order: SalesOrder): string | undefined {
@@ -144,6 +151,7 @@ export function SalesOrderDataTable({
   const financeMode = view === 'finance';
 
   const columns = useMemo<DataTableColumn<SalesOrder>[]>(() => {
+    const todayVn = todayInVnDateString();
     const selectionColumns: DataTableColumn<SalesOrder>[] = selectable
       ? [
           selectionColumn<SalesOrder>({
@@ -381,6 +389,44 @@ export function SalesOrderDataTable({
             <Text size="sm">{formatDate(getSalesOrderReadyDate(item))}</Text>
           ),
         },
+
+        ...(termsOn
+          ? [
+              {
+                key: 'financeDueDate',
+                header: (
+                  <SortHeader
+                    label={t('salesOrders.finance.dueDateLabel')}
+                    field="paymentDeadline"
+                    current={sortField}
+                    onChange={onSortChange}
+                  />
+                ),
+                width: '120px',
+                render: (item: SalesOrder) => {
+                  const day = salesOrderDeadlineDay(item.extra);
+                  const overdue = isSalesOrderOverdue(item, todayVn, vatRate);
+                  return day ? (
+                    <Text size="sm" c={overdue ? 'red' : undefined} fw={overdue ? 600 : undefined}>
+                      {formatDate(item.extra?.paymentDeadline)}
+                    </Text>
+                  ) : (
+                    <Text size="sm" c="dimmed">
+                      —
+                    </Text>
+                  );
+                },
+              },
+              {
+                key: 'financePayment',
+                header: t('salesOrders.finance.paymentLabel'),
+                width: '150px',
+                render: (item: SalesOrder) => (
+                  <SalesOrderPaymentMark order={item} vatRate={vatRate} todayVn={todayVn} />
+                ),
+              },
+            ]
+          : []),
         subtotalColumn,
         vatColumn,
         {

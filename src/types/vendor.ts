@@ -32,6 +32,8 @@ export type VendorExtra = {
 
   isDomestic?: boolean;
 
+  paymentTermDays?: number;
+
   addressGoogleMapUrl?: string;
   pickupAddresses?: VendorPickupAddress[];
 

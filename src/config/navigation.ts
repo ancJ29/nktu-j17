@@ -14,6 +14,7 @@ export type NavId =
   | 'sales-orders'
   | 'quotations'
   | 'goods-receipts'
+  | 'purchase-orders'
   | 'transport-orders'
   | 'transport-routes'
   | 'cost-norms'
@@ -26,6 +27,7 @@ export type NavId =
   | 'warehouse-receipts'
   | 'warehouse-delivery-notes'
   | 'partners'
+  | 'payments'
   | 'configuration'
   | 'configuration-products'
   | 'configuration-materials'
@@ -121,6 +123,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     label: 'Goods Receipts',
     defaultIcon: IconName.PackageImport,
     mobileNavbar: true,
+  },
+
+  'purchase-orders': {
+    path: ROUTES.PURCHASE_ORDERS.LIST,
+    labelKey: 'purchaseOrders.title',
+    label: 'Purchase Orders',
+    defaultIcon: IconName.FileText,
   },
   'transport-orders': {
     path: ROUTES.TRANSPORT_ORDERS.LIST,
@@ -222,6 +231,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     labelKey: 'nav.partners',
     label: 'Partners',
     defaultIcon: IconName.Users,
+  },
+
+  payments: {
+    path: ROUTES.PAYMENTS.LIST,
+    labelKey: 'nav.payments',
+    label: 'Payments',
+    defaultIcon: IconName.ArrowsExchange,
   },
   'configuration-app-config': {
     path: ROUTES.CONFIGURATION.APP_CONFIG,
@@ -352,6 +368,7 @@ const DEFAULT_PC_STRUCTURE: NavStructureItem[] = [
   'cost-norms',
   'delivery',
   'goods-receipts',
+  'purchase-orders',
   'employees',
   'employee-org',
   {
@@ -378,6 +395,7 @@ const DEFAULT_PC_STRUCTURE: NavStructureItem[] = [
     id: 'farm',
     subs: ['greenhouses', 'crops', 'crop-diary-templates'],
   },
+  'payments',
   {
     id: 'partners',
     subs: ['configuration-customers', 'configuration-vendors'],
@@ -398,6 +416,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
   'cost-norms',
   'delivery',
   'goods-receipts',
+  'purchase-orders',
   'employees',
 
   {
@@ -416,6 +435,7 @@ const DEFAULT_MOBILE_STRUCTURE: NavStructureItem[] = [
     id: 'farm',
     subs: ['greenhouses', 'crops', 'crop-diary-templates'],
   },
+  'payments',
   {
     id: 'partners',
     subs: ['configuration-customers', 'configuration-vendors'],
@@ -433,6 +453,7 @@ type FeatureFlags = {
   salesOrders?: { enabled?: boolean };
   deliveryRequests?: { enabled?: boolean };
   goodsReceipts?: { enabled?: boolean };
+  purchaseOrders?: { enabled?: boolean };
   warehouseReceipts?: { enabled?: boolean };
   warehouseDeliveryNotes?: { enabled?: boolean };
   transportOrders?: { enabled?: boolean };
@@ -451,6 +472,8 @@ type FeatureFlags = {
   oilTanks?: { enabled?: boolean };
   nktuOdometerLog?: { enabled?: boolean };
   farm?: { enabled?: boolean };
+  paymentTerms?: { enabled?: boolean };
+  pricing?: { enabled?: boolean };
 };
 
 const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>> = {
@@ -464,8 +487,14 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'configuration-customers': (f) => f.customers?.enabled ?? false,
   'configuration-vendors': (f) => f.vendors?.enabled ?? false,
   'sales-orders': (f) => f.salesOrders?.enabled ?? false,
+
+  payments: (f) =>
+    (f.paymentTerms?.enabled ?? false) &&
+    ((f.salesOrders?.enabled ?? false) || (f.purchaseOrders?.enabled ?? false)) &&
+    (f.pricing?.enabled ?? true),
   delivery: (f) => f.deliveryRequests?.enabled ?? false,
   'goods-receipts': (f) => f.goodsReceipts?.enabled ?? false,
+  'purchase-orders': (f) => f.purchaseOrders?.enabled ?? false,
   'transport-orders': (f) => f.transportOrders?.enabled ?? false,
 
   'transport-routes': (f) => f.transportOrders?.enabled ?? false,
@@ -500,6 +529,8 @@ export const NAV_PERMISSION_MODULE: Partial<Record<NavId, string>> = {
   quotations: 'quotation',
   delivery: 'deliveryRequest',
   'goods-receipts': 'goodsReceipt',
+  'purchase-orders': 'purchaseOrder',
+
   'transport-orders': 'transportOrder',
   'transport-routes': 'transportRoute',
   'cost-norms': 'costNorm',
@@ -533,6 +564,11 @@ export const NAV_PERMISSION_MODULE: Partial<Record<NavId, string>> = {
   report: 'report',
 };
 
+function canViewOrderMoney(module: string): boolean {
+  const p = getModulePermissions(module);
+  return (p.canView ?? false) && (p.actions?.canViewPrice ?? false);
+}
+
 const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   ...(Object.fromEntries(
     Object.entries(NAV_PERMISSION_MODULE).map(([id, module]) => [
@@ -544,6 +580,8 @@ const NAV_PERMISSION_GATES: Partial<Record<NavId, () => boolean>> = {
   report: () =>
     (getModulePermissions('report').canView ?? false) ||
     sharedUserStorage.get<string>(SharedStorageKey.DEPARTMENT) === 'manager',
+
+  payments: () => canViewOrderMoney('salesOrder') || canViewOrderMoney('purchaseOrder'),
 };
 
 function resolveItem(id: NavId, iconOverride?: IconName, navbarOverride?: boolean): NavigationItem {

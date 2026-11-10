@@ -51,6 +51,8 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { perms, isActivityLoggingEnabled } from '@/utils/permission';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
+import { featureFlags } from '@/utils/features';
+import { hasOwnPaymentTerm, paymentTermDaysOf } from '@/utils/paymentTerms';
 import type { Vendor, VendorContact, VendorExtra, VendorNote, VendorPickupAddress } from '@/types';
 
 const isMobile = device.isMobile;
@@ -386,6 +388,18 @@ export function VendorDetailPage() {
             </Text>
           </DetailField>
         </Grid.Col>
+        {featureFlags.paymentTerms.enabled && (
+          <Grid.Col span={{ base: 12, sm: 4 }}>
+            <DetailField label={t('vendors.form.paymentTermDaysLabel')}>
+              {t(
+                hasOwnPaymentTerm(extra)
+                  ? 'vendors.detail.paymentTermDays'
+                  : 'vendors.detail.paymentTermDaysDefault',
+                { days: paymentTermDaysOf(extra, featureFlags.paymentTerms.defaultDays) },
+              )}
+            </DetailField>
+          </Grid.Col>
+        )}
       </Grid>
     </SectionCard>
   );

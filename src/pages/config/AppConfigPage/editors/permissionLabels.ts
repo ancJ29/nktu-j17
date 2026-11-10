@@ -21,6 +21,7 @@ export const PERM_MODULE_LABELS: Record<string, string> = {
   report: 'Report',
   quotation: 'Quotation',
   odometerLog: 'Odometer Log',
+  purchaseOrder: 'Purchase Order',
   salesOrder: 'Sales Order',
   transportOrder: 'Transport Order',
   transportRoute: 'Transport Route',
@@ -67,6 +68,7 @@ export const PERM_FLAG_LABELS: Record<string, string> = {
   canEditDeliveryPackageSize: 'Edit Delivery Package Size',
   canEditItemWarehouseFields: 'Edit Warehouse Line Fields',
   canManagePayment: 'Record Payments',
+  canMarkPaid: 'Mark paid and set deadline',
   canAssignWarehouseStaff: 'Assign Warehouse Staff',
   canViewAllAsWarehouse: 'View all records (warehouse)',
 };

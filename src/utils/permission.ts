@@ -263,6 +263,16 @@ export function getSalesOrderWarehouseStaffDepartments(): string[] {
   return featureFlags?.salesOrders?.warehouseStaffDepartments ?? [];
 }
 
+export function getPurchaseOrderPicDepartments(): string[] {
+  return (
+    (
+      appConfig as {
+        features?: { purchaseOrders?: { picDepartments?: string[] } };
+      }
+    )?.features?.purchaseOrders?.picDepartments ?? []
+  );
+}
+
 export function getGoodsReceiptPicDepartments(): string[] {
   return (
     (
@@ -688,6 +698,17 @@ export const perms = {
 
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
+    };
+  })(),
+  purchaseOrder: (() => {
+    let cached: ModulePermissions | undefined;
+    const resolve = () => (cached ??= getModulePermissions('purchaseOrder'));
+    return {
+      ...createModulePerms('purchaseOrder'),
+
+      canViewPrice: () => resolve().actions?.canViewPrice ?? false,
+
+      canMarkPaid: () => resolve().actions?.canMarkPaid ?? false,
     };
   })(),
   lookupV2: createModulePerms('lookupV2'),

@@ -1,0 +1,166 @@
+{
+  "actions": {
+    "cancel": "Hủy đơn",
+    "makeReceipt": "Tạo phiếu nhập",
+    "markReady": "Đánh dấu đã gửi"
+  },
+  "addItem": "Tạo đơn đặt hàng NCC",
+  "columns": {
+    "amount": "Thành tiền",
+    "draftReceipt": "Phiếu nhập nháp",
+    "itemsCount_one": "{{count}} dòng",
+    "itemsCount_other": "{{count}} dòng",
+    "orderNumber": "Mã đơn",
+    "packageCount": "Số kiện",
+    "payment": "Thanh toán",
+    "subtotal": "Tạm tính",
+    "tax": "Thuế",
+    "total": "Tổng tiền",
+    "unitPrice": "Đơn giá"
+  },
+  "confirm": {
+    "cancelMessage": "Hủy đơn đặt hàng này? Không thể hoàn tác.",
+    "cancelTitle": "Hủy đơn",
+    "readyMessage": "Đánh dấu đơn này đã gửi cho nhà cung cấp? Đơn sẽ chốt và khóa các dòng hàng.",
+    "readyTitle": "Đánh dấu đã gửi NCC"
+  },
+  "detail": {
+    "activitiesError": "Không tải được hoạt động.",
+    "activitiesLoadMore": "Xem thêm",
+    "activitiesNoEntries": "Chưa có hoạt động nào cho đơn này.",
+    "activityMemo": {
+      "deadline": "Hạn {{date}}",
+      "markedPaid": "Đánh dấu đã thanh toán",
+      "markedUnpaid": "Đánh dấu chưa thanh toán",
+      "receipt": "Phiếu {{number}}"
+    },
+    "activityVerbs": {
+      "cancel": "Hủy đơn",
+      "create": "Tạo đơn",
+      "payment": "Cập nhật thanh toán của",
+      "ready": "Đánh dấu đã gửi NCC",
+      "receiptLinked": "Ghi nhận phiếu nhập kho cho",
+      "update": "Sửa đơn"
+    },
+    "cardGeneral": "Thông tin chung",
+    "cardItems": "Vật tư",
+    "cardPayment": "Thanh toán",
+    "cardReceipts": "Phiếu nhập kho",
+    "noAssignedTo": "Chưa phân công",
+    "noNotes": "Không có ghi chú",
+    "noReceipt": "Chưa có phiếu nhập kho",
+    "receiptsUnreadable": "Không đọc được các phiếu nhập kho của đơn này nên nút tạo phiếu bị ẩn. Mở lại trang để thử lại.",
+    "recentActivities": "Hoạt động gần đây",
+    "severalLiveReceipts": "Đơn này có nhiều hơn một phiếu nhập kho còn hiệu lực. Hãy hủy một phiếu.",
+    "tabActivityLog": "Hoạt động",
+    "tabOrder": "Đơn hàng",
+    "to": "gửi",
+    "totalLabel": "Tổng giá trị đơn",
+    "viewItems": "Xem vật tư"
+  },
+  "detailTitle": "Đơn đặt hàng NCC",
+  "editItem": "Sửa đơn đặt hàng NCC",
+  "form": {
+    "actualArrivalLabel": "Ngày về thực tế",
+    "assignedToPlaceholder": "Người phụ trách",
+    "copyingFrom": "Sao chép từ đơn {{orderNumber}}. Mã đơn, trạng thái, thanh toán và phiếu nhập bắt đầu lại từ đầu.",
+    "createButton": "Tạo đơn",
+    "currencyLabel": "Tiền tệ",
+    "customerLabel": "Khách hàng",
+    "customerPlaceholder": "Chỉ chọn khi đặt hàng cho một khách cụ thể",
+    "downloadTemplateButton": "Tải file mẫu",
+    "importItemsButton": "Nhập từ Excel",
+    "itemsTitle": "Vật tư",
+    "leadTimeLabel": "Thời gian giao hàng",
+    "leadTimePlaceholder": "Chưa chọn",
+    "locationLabel": "Kho nhận",
+    "locationPlaceholder": "Chọn kho",
+    "notesPlaceholder": "Ghi chú nội bộ — không in trên đơn",
+    "orderDateLabel": "Ngày đặt hàng",
+    "orderNumberAutoPlaceholder": "Tự cấp khi lưu",
+    "orderNumberLabel": "Mã đơn",
+    "paymentDeadlineLabel": "Hạn thanh toán",
+    "plannedArrivalLabel": "Ngày về dự kiến",
+    "referenceLabel": "Tham chiếu",
+    "referencePlaceholder": "Số báo giá hoặc hợp đồng của NCC",
+    "totalLabel": "Tổng cộng ({{currency}})",
+    "updateButton": "Lưu thay đổi",
+    "vendorPlaceholder": "Chọn nhà cung cấp"
+  },
+  "leadTime": {
+    "range": "{{min}}~{{max}} ngày"
+  },
+  "list": {
+    "arrivalsUnreadable": "Không đọc được phiếu nhập nên chưa hiện số đơn chưa đến.",
+    "notArrived": "Tổng đơn chưa đến",
+    "ordersTotal": "Tổng đơn",
+    "searchPlaceholder": "Tìm theo mã, nhà cung cấp, tham chiếu…"
+  },
+  "noItems": "Không có đơn đặt hàng NCC trong kỳ này",
+  "notifications": {
+    "cancelReceiptFirst": "Đơn này còn phiếu nhập kho đang hiệu lực. Hãy hủy phiếu nhập trước.",
+    "cancelSuccess": "Đã hủy đơn",
+    "createError": "Không tạo được đơn đặt hàng",
+    "createSuccess": "Đã tạo đơn đặt hàng",
+    "defaultLocationMissing": "Thiếu kho mặc định",
+    "fetchError": "Không tải được đơn đặt hàng",
+    "importEmpty": "File không có dòng hợp lệ",
+    "importError": "Không đọc được file",
+    "importMissingColumn": "File cần có các cột: {{columns}}",
+    "importMissingColumnTitle": "Thiếu cột",
+    "importNoMatchTitle": "Không có SKU nào khớp",
+    "importPartialTitle": "Đã thêm {{added}} dòng",
+    "importSuccess": "Đã nhập {{count}} dòng",
+    "importUnmatched": "Không tìm thấy {{count}} SKU: {{skus}}",
+    "mobileFormBlocked": "Đơn đặt hàng NCC được soạn trên máy tính",
+    "noPriceAccess": "Bạn không có quyền xem giá nên không sửa được đơn này",
+    "orderNotReceivable": "Đơn này đã bị hủy hoặc đã có phiếu nhập kho. Chưa lưu gì.",
+    "orderUnreadable": "Không đọc được đơn đặt hàng nên chưa tạo phiếu. Thử lại.",
+    "paymentSaved": "Đã lưu thanh toán",
+    "readySuccess": "Đã đánh dấu đã gửi NCC",
+    "receiptLinkPending": "Phiếu nhập kho đã lưu, nhưng đơn chưa ghi nhận. Mở lại đơn, hệ thống sẽ tự liên kết.",
+    "receiptsUnreadable": "Không đọc được các phiếu nhập kho của đơn này nên chưa thể hủy. Mở lại trang.",
+    "updateError": "Không lưu được thay đổi",
+    "updateSuccess": "Đã cập nhật đơn đặt hàng"
+  },
+  "payment": {
+    "amount": "Đã thanh toán",
+    "amountNonNegative": "Số tiền không được âm",
+    "amountRequired": "Nhập số tiền đã trả",
+    "deadlineShort": "Hạn {{date}}",
+    "edit": "Sửa thanh toán",
+    "editTitle": "Thanh toán",
+    "leftShort": "Còn {{amount}}",
+    "overdue": "Quá hạn",
+    "paid": "Đã thanh toán",
+    "paidInFullHint": "Đã thanh toán đủ: không cần nhập số tiền.",
+    "paidRemaining": "Đã trả {{paid}} · Còn {{remaining}} {{currency}}",
+    "partial": "Thanh toán một phần",
+    "unpaid": "Chưa thanh toán",
+    "warnExceedsTotal": "Số tiền vượt quá tổng đơn. Vui lòng kiểm tra lại.",
+    "warnSettlesOrder": "Số tiền đã đủ tổng đơn — cân nhắc chọn “Đã thanh toán”."
+  },
+  "print": {
+    "includePrice": "In đơn giá, thành tiền và tổng cộng",
+    "landscapeNote": "Khi in có giá, tờ in luôn nằm ngang để cột tên hàng đủ rộng."
+  },
+  "statuses": {
+    "cancelled": "Đã hủy",
+    "draft": "Nháp",
+    "ready": "Đã gửi NCC"
+  },
+  "title": "Đặt hàng NCC",
+  "validation": {
+    "itemCodeUnitDuplicate": "Sản phẩm này đã có ở dòng khác cùng đơn vị tính",
+    "itemsRequired": "Thêm ít nhất một dòng hàng",
+    "locationRequired": "Chọn kho",
+    "orderDateRequired": "Chọn ngày đặt hàng",
+    "ready": {
+      "badQuantity": "Mỗi dòng cần số lượng lớn hơn 0",
+      "missingPrice": "Mỗi dòng cần có đơn giá trước khi đánh dấu đã gửi",
+      "noLines": "Thêm ít nhất một dòng hàng trước khi đánh dấu đã gửi",
+      "noVendor": "Chọn nhà cung cấp trước"
+    },
+    "vendorRequired": "Chọn nhà cung cấp"
+  }
+}

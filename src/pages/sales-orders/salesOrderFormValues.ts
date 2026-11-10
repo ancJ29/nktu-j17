@@ -1,6 +1,8 @@
 import type { Customer, SalesOrder, SalesOrderAttachment, SalesOrderExtra } from '@/types';
 import { DEFAULT_LOCATION_CODE } from '@/types/location';
 import { readWarehouseStaff } from './salesOrderWarehouseStaff';
+import { salesOrderDeadlineDay } from '@/utils/salesOrderPricing';
+import { dateToDay, dayToDate, dayToVnMidnightMs } from '@/utils/paymentTerms';
 
 export const DEFAULT_VAT_PERCENT = 8;
 
@@ -36,6 +38,8 @@ export type SalesOrderFormValues = {
   isIndividualCustomer: boolean;
   isInternalDelivery: boolean;
   orderDate: Date | null;
+
+  paymentDeadline: Date | null;
   deliveryAddress: string;
   googleMapUrl: string;
   deliveryDate: Date | null;
@@ -84,6 +88,7 @@ export function salesOrderFormValuesFromOrder(
     isIndividualCustomer: extra?.isIndividualCustomer ?? false,
     isInternalDelivery: extra?.isInternalDelivery ?? true,
     orderDate: extra?.orderDate ? new Date(extra.orderDate) : null,
+    paymentDeadline: dayToDate(salesOrderDeadlineDay(extra)),
     deliveryAddress: extra?.deliveryAddress ?? '',
     googleMapUrl: extra?.googleMapUrl ?? '',
     deliveryDate: extra?.deliveryDate ? new Date(extra.deliveryDate) : null,
@@ -158,6 +163,10 @@ export function buildSalesOrderFormExtra(
         isInternalDelivery: false,
       }),
     ...(values.orderDate && { orderDate: new Date(values.orderDate).getTime() }),
+
+    ...(dayToVnMidnightMs(dateToDay(values.paymentDeadline)) !== undefined && {
+      paymentDeadline: dayToVnMidnightMs(dateToDay(values.paymentDeadline)),
+    }),
     ...(values.customerPONumber.trim() && { customerPONumber: values.customerPONumber.trim() }),
     ...(values.deliveryAddress && { deliveryAddress: values.deliveryAddress }),
     ...(values.googleMapUrl.trim() && { googleMapUrl: values.googleMapUrl.trim() }),

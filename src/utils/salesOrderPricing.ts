@@ -55,6 +55,8 @@ export type SalesOrderFinanceSummary = {
   grandTotal: number;
 
   missingCount: number;
+
+  outstanding: number;
 };
 
 export function sumSalesOrderFinance(
@@ -68,6 +70,7 @@ export function sumSalesOrderFinance(
     shipping: 0,
     grandTotal: 0,
     missingCount: 0,
+    outstanding: 0,
   };
   for (const order of orders) {
     const totals = computeSalesOrderTotals(order, fallbackRate);
@@ -77,8 +80,31 @@ export function sumSalesOrderFinance(
     acc.shipping += totals.shipping;
     acc.grandTotal += totals.grandTotal;
     if (totals.grandTotal <= 0 && !isSalesOrderBillingExempt(order.extra)) acc.missingCount += 1;
+    if (order.extra?.cancellation == null && !isSalesOrderBillingExempt(order.extra)) {
+      acc.outstanding += resolveSalesOrderPaymentState(order.extra, totals.grandTotal).remaining;
+    }
   }
   return acc;
+}
+
+export function salesOrderDeadlineDay(extra: SalesOrderExtra | undefined): string {
+  const v = extra?.paymentDeadline;
+  if (typeof v !== 'number' || !Number.isFinite(v)) return '';
+  const t = v;
+  return new Date(t + 7 * 3_600_000).toISOString().slice(0, 10);
+}
+
+export function isSalesOrderOverdue(
+  order: SalesOrder,
+  todayVn: string,
+  fallbackRate: number,
+): boolean {
+  const extra = order.extra;
+  if (extra?.cancellation != null || isSalesOrderBillingExempt(extra)) return false;
+  const day = salesOrderDeadlineDay(extra);
+  if (day === '' || day >= todayVn) return false;
+  const { grandTotal } = computeSalesOrderTotals(order, fallbackRate);
+  return resolveSalesOrderPaymentState(extra, grandTotal).state !== 'paid';
 }
 
 export type SalesOrderPaymentState = 'paid' | 'partial' | 'unpaid';

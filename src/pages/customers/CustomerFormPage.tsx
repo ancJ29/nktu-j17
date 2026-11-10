@@ -5,6 +5,7 @@ import {
   Divider,
   Grid,
   Group,
+  NumberInput,
   Stack,
   Switch,
   Text,
@@ -35,6 +36,8 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { logActivity } from '@/utils/activityLogger';
 import { buildNextSequentialCode, isDuplicateUniqueFieldError } from '@/utils/code';
 import { deepDiff } from '@/utils/deepDiff';
+import { featureFlags } from '@/utils/features';
+import { hasOwnPaymentTerm, withPaymentTermDays } from '@/utils/paymentTerms';
 import { device } from '@credo/base-ui/utils';
 import { useInitFormFromFetch } from '@/hooks';
 import { perms, hasShippingAddressForCustomers } from '@/utils/permission';
@@ -80,6 +83,8 @@ type CustomerFormValues = {
   code: string;
   shortName: string;
   taxCode: string;
+
+  paymentTermDays: number | '';
   isActive: boolean;
 
   phone: string;
@@ -97,6 +102,7 @@ const EMPTY_VALUES: CustomerFormValues = {
   code: '',
   shortName: '',
   taxCode: '',
+  paymentTermDays: '',
   isActive: true,
   phone: '',
   contactPerson: '',
@@ -184,6 +190,7 @@ export function CustomerFormPage() {
         code: c.code,
         shortName: e.shortName ?? '',
         taxCode: e.taxCode ?? '',
+        paymentTermDays: hasOwnPaymentTerm(e) ? (e.paymentTermDays as number) : ('' as const),
         isActive: c.isActive,
         phone: c.phone ?? '',
         contactPerson: c.contactPerson ?? '',
@@ -236,7 +243,11 @@ export function CustomerFormPage() {
           }));
 
         const extra: CustomerExtra = {
-          ...prevExtra,
+          ...withPaymentTermDays(
+            prevExtra,
+            values.paymentTermDays,
+            featureFlags.paymentTerms.enabled,
+          ),
           shortName: values.shortName.trim() || undefined,
           taxCode: values.taxCode.trim() || undefined,
           contacts: cleanContacts.length ? cleanContacts : undefined,
@@ -420,6 +431,22 @@ export function CustomerFormPage() {
             {...form.getInputProps('taxCode')}
           />
         </Grid.Col>
+        {featureFlags.paymentTerms.enabled && (
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <NumberInput
+              label={t('customers.form.paymentTermDaysLabel')}
+              description={t('customers.form.paymentTermDaysHint', {
+                days: featureFlags.paymentTerms.defaultDays,
+              })}
+              placeholder={t('customers.form.paymentTermDaysPlaceholder')}
+              min={0}
+              max={365}
+              allowDecimal={false}
+              allowNegative={false}
+              {...form.getInputProps('paymentTermDays')}
+            />
+          </Grid.Col>
+        )}
       </Grid>
     </SectionCard>
   );

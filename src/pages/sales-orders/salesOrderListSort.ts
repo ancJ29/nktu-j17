@@ -46,6 +46,11 @@ function cellValueReader(
       return (o) =>
         formatWarehouseStaffNames(readWarehouseStaff(o.extra), lookups.getEmployeeName) ||
         undefined;
+    case 'paymentDeadline':
+      return (o) => {
+        const v = o.extra?.paymentDeadline;
+        return typeof v === 'number' && Number.isFinite(v) ? v : undefined;
+      };
     case 'grandTotal':
       if (!lookups.showPrice) return undefined;
       return (o) => computeSalesOrderTotals(o, lookups.vatRate).grandTotal;

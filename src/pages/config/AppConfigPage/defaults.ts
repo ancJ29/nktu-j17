@@ -1,7 +1,9 @@
 import {
   defaultAppConfig,
   type GoodsReceiptFeatures,
+  type PaymentTermsFeatures,
   type ProductFeatures,
+  type PurchaseOrderFeatures,
   type QuotationFeatures,
 } from '@/config/schema';
 import type {
@@ -34,6 +36,8 @@ export const SCHEMA_DEFAULT_ACTIVITY_LOG_FEATURES: CMngtActivityLogFeatures =
   defaultAppConfig.features.activityLog;
 export const SCHEMA_DEFAULT_PRICING_FEATURES: CMngtPricingFeatures =
   defaultAppConfig.features.pricing;
+export const SCHEMA_DEFAULT_PAYMENT_TERMS_FEATURES: PaymentTermsFeatures =
+  defaultAppConfig.features.paymentTerms;
 export const SCHEMA_DEFAULT_MODULE_FEATURES: CMngtModuleFeatures = { enabled: false };
 
 export const SCHEMA_DEFAULT_MATERIAL_FEATURES = defaultAppConfig.features.materials;
@@ -71,6 +75,8 @@ export const SCHEMA_DEFAULT_DELIVERY_REQUEST_FEATURES: CMngtDeliveryRequestFeatu
 };
 export const SCHEMA_DEFAULT_GOODS_RECEIPT_FEATURES: GoodsReceiptFeatures =
   defaultAppConfig.features.goodsReceipts;
+export const SCHEMA_DEFAULT_PURCHASE_ORDER_FEATURES: PurchaseOrderFeatures =
+  defaultAppConfig.features.purchaseOrders;
 
 export const SCHEMA_DEFAULT_QUOTATION_FEATURES: QuotationFeatures =
   defaultAppConfig.features.quotations;

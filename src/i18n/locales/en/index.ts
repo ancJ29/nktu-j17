@@ -32,11 +32,13 @@ import nav from './nav.json';
 import odometerLog from './odometerLog.json';
 import oilTanks from './oilTanks.json';
 import operationLogs from './operationLogs.json';
+import payments from './payments.json';
 import photos from './photos.json';
 import productInventory from './productInventory.json';
 import products from './products.json';
 import productsV2 from './productsV2.json';
 import profile from './profile.json';
+import purchaseOrders from './purchaseOrders.json';
 import pwa from './pwa.json';
 import quotations from './quotations.json';
 import report from './report.json';
@@ -85,11 +87,13 @@ export default {
   odometerLog,
   oilTanks,
   operationLogs,
+  payments,
   photos,
   productInventory,
   products,
   productsV2,
   profile,
+  purchaseOrders,
   pwa,
   quotations,
   report,

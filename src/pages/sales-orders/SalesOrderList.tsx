@@ -71,6 +71,8 @@ import { useListScrollRestoration } from '@/hooks';
 import { SalesOrderCardList } from './SalesOrderCardList';
 import { SalesOrderDataTable } from './SalesOrderDataTable';
 import { SalesOrderFinanceTotals } from './SalesOrderFinanceTotals';
+import { PAYMENT_FILTERS, parsePaymentFilter } from './salesOrderPaymentFilter';
+import { featureFlags } from '@/utils/features';
 import { SalesOrderItemsPreviewDrawer } from './SalesOrderItemsPreviewDrawer';
 import { salesOrderFieldOptions } from './useSalesOrderFieldOptions';
 import { buildSalesOrderWarehouseColumnFilterDefs } from './salesOrderWarehouseColumnFilters';
@@ -178,6 +180,8 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     ? filters.view
     : 'ops';
   const financeMode = viewMode === 'finance';
+
+  const paymentTermsOn = featureFlags.paymentTerms.enabled && financeMode;
 
   useEffect(() => {
     if (!initialized && !error) loadAll();
@@ -589,6 +593,29 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     }),
   ];
 
+  const paymentMoreFilter: MoreFilterDef[] = paymentTermsOn
+    ? [
+        {
+          type: 'select',
+          key: 'payment',
+          title: t('salesOrders.finance.filterPayment'),
+          placeholder: t('salesOrders.finance.filterPayment'),
+          value: filters.paymentFilter ?? null,
+          options: PAYMENT_FILTERS.map((value) => ({
+            value,
+            label: t(
+              value === 'unpaid'
+                ? 'salesOrders.finance.filterPaymentUnpaid'
+                : value === 'overdue'
+                  ? 'salesOrders.finance.filterPaymentOverdue'
+                  : 'salesOrders.finance.filterPaymentPaid',
+            ),
+          })),
+          onChange: (v: string | null) => filters.setPaymentFilter(parsePaymentFilter(v) ?? null),
+        },
+      ]
+    : [];
+
   const customerMoreFilter: MoreFilterDef = {
     type: 'select',
     key: 'customer',
@@ -656,6 +683,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
 
   const mobileMoreFilters: MoreFilterDef[] = [
     customerMoreFilter,
+    ...paymentMoreFilter,
 
     ...(canViewAll
       ? ([
@@ -817,7 +845,7 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
             filters={desktopFilters}
             moreSection={
               <DesktopFilterMorePopover
-                filters={[customerMoreFilter, ...dateAndUrgentFilters]}
+                filters={[customerMoreFilter, ...paymentMoreFilter, ...dateAndUrgentFilters]}
                 presetLabels={presetLabels}
               />
             }
@@ -873,6 +901,18 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
               {filters.deliveryKind === 'internal'
                 ? t('__new__.07-entities.salesOrders.list.filterInternalDelivery')
                 : t('__new__.07-entities.salesOrders.list.filterExternalDelivery')}
+            </FilterPill>
+          )}
+          {paymentTermsOn && filters.paymentFilter && (
+            <FilterPill onClose={() => filters.setPaymentFilter(null)}>
+              {t('salesOrders.finance.filterPayment')}:{' '}
+              {t(
+                filters.paymentFilter === 'unpaid'
+                  ? 'salesOrders.finance.filterPaymentUnpaid'
+                  : filters.paymentFilter === 'overdue'
+                    ? 'salesOrders.finance.filterPaymentOverdue'
+                    : 'salesOrders.finance.filterPaymentPaid',
+              )}
             </FilterPill>
           )}
           {filters.deliveryDateRange.preset && (
@@ -944,7 +984,9 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
         onPageSizeChange={setPageSize}
       />
 
-      {financeMode && <SalesOrderFinanceTotals summary={financeSummary} />}
+      {financeMode && (
+        <SalesOrderFinanceTotals summary={financeSummary} showOutstanding={paymentTermsOn} />
+      )}
 
       {canBulkCreateDeliveries &&
         (variant.bulkDrMode === 'selection' ? (

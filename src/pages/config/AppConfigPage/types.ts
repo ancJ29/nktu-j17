@@ -9,6 +9,7 @@ export type SectionKey =
   | 'permissionManagement'
   | 'activityLog'
   | 'pricing'
+  | 'paymentTerms'
   | 'products'
   | 'locations'
   | 'productInventory'
@@ -26,6 +27,7 @@ export type SectionKey =
   | 'quotations'
   | 'deliveryRequests'
   | 'goodsReceipts'
+  | 'purchaseOrders'
   | 'transportOrders'
   | 'lookupV2'
   | 'permissions'
@@ -45,6 +47,7 @@ export const ALL_SECTIONS: SectionKey[] = [
   'permissionManagement',
   'activityLog',
   'pricing',
+  'paymentTerms',
   'products',
   'locations',
   'productInventory',
@@ -62,6 +65,7 @@ export const ALL_SECTIONS: SectionKey[] = [
   'quotations',
   'deliveryRequests',
   'goodsReceipts',
+  'purchaseOrders',
   'transportOrders',
   'lookupV2',
   'permissions',

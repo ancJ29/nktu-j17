@@ -5,6 +5,7 @@ import {
   Divider,
   Grid,
   Group,
+  NumberInput,
   Select,
   Stack,
   Switch,
@@ -39,6 +40,8 @@ import { perms } from '@/utils/permission';
 import { SectionCard } from '@/components/SectionCard';
 import type { Vendor, VendorContact, VendorExtra, VendorPickupAddress } from '@/types';
 import { Form } from '@/components/Form';
+import { featureFlags } from '@/utils/features';
+import { hasOwnPaymentTerm, withPaymentTermDays } from '@/utils/paymentTerms';
 
 const isMobile = device.isMobile;
 
@@ -71,6 +74,8 @@ type VendorFormValues = {
   isActive: boolean;
   isDomestic: boolean;
 
+  paymentTermDays: number | '';
+
   phone: string;
   contactPerson: string;
 
@@ -87,6 +92,7 @@ const EMPTY_VALUES: VendorFormValues = {
   shortName: '',
   isActive: true,
   isDomestic: true,
+  paymentTermDays: '',
   phone: '',
   contactPerson: '',
   address: '',
@@ -143,6 +149,7 @@ export function VendorForm({ variant }: VendorFormProps) {
         shortName: e.shortName ?? '',
         isActive: v.isActive,
         isDomestic: e.isDomestic ?? true,
+        paymentTermDays: hasOwnPaymentTerm(e) ? (e.paymentTermDays as number) : ('' as const),
         phone: v.phone ?? '',
         contactPerson: v.contactPerson ?? '',
         address: v.address ?? '',
@@ -194,7 +201,11 @@ export function VendorForm({ variant }: VendorFormProps) {
           }));
 
         const extra: VendorExtra = {
-          ...prevExtra,
+          ...withPaymentTermDays(
+            prevExtra,
+            values.paymentTermDays,
+            featureFlags.paymentTerms.enabled,
+          ),
           shortName: values.shortName.trim() || undefined,
           isDomestic: values.isDomestic,
           contacts: cleanContacts.length ? cleanContacts : undefined,
@@ -319,6 +330,22 @@ export function VendorForm({ variant }: VendorFormProps) {
             {...form.getInputProps('code')}
           />
         </Grid.Col>
+        {featureFlags.paymentTerms.enabled && (
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <NumberInput
+              label={t('vendors.form.paymentTermDaysLabel')}
+              description={t('vendors.form.paymentTermDaysHint', {
+                days: featureFlags.paymentTerms.defaultDays,
+              })}
+              placeholder={t('vendors.form.paymentTermDaysPlaceholder')}
+              min={0}
+              max={365}
+              allowDecimal={false}
+              allowNegative={false}
+              {...form.getInputProps('paymentTermDays')}
+            />
+          </Grid.Col>
+        )}
       </Grid>
     </SectionCard>
   );

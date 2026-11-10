@@ -59,6 +59,11 @@ import { useIsRoot } from '@/hooks/useIsRoot';
 import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import { isVacuouslyCompletedSalesOrder } from './vacuousCompletionMarker';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
+import { isoToVnDateString, todayInVnDateString } from '@/utils/dateTimeField';
+import { dayToVnMidnightMs, paymentTermDaysOf, proposeDeadline } from '@/utils/paymentTerms';
+import { canRecordSalesOrderPayment } from './salesOrderPaymentGate';
+import { SalesOrderPaymentAction, type SalesOrderPaymentDraft } from './SalesOrderPaymentModal';
+import { featureFlags } from '@/utils/features';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
 import {
   canTransitionToStatus,
@@ -77,7 +82,9 @@ import {
   computeSalesOrderTotals,
   orderNeedsVAT,
   resolveOrderVatRate,
+  isSalesOrderOverdue,
   resolveSalesOrderPaymentState,
+  salesOrderDeadlineDay,
 } from '@/utils/salesOrderPricing';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useLookupV2Labels, lookupLabelOf } from '@/hooks';
@@ -1461,6 +1468,34 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
   const salesOrderTotals = computeSalesOrderTotals(order, vatRate);
   const needVat = extra.needVAT !== false;
 
+  const canRecordPayment = canRecordSalesOrderPayment({
+    showPrice,
+    canManagePayment: perms.salesOrder.canManagePayment(),
+    cancelled: isCancelled,
+  });
+  const proposedDeadlineDay = (() => {
+    const orderDay = isoToVnDateString(extra.orderDate ?? order.createdAt) ?? '';
+    const customer = extra.customerCode
+      ? customers.find((c) => c.code === extra.customerCode)
+      : undefined;
+    return proposeDeadline(
+      orderDay,
+      paymentTermDaysOf(customer?.extra, featureFlags.paymentTerms.defaultDays),
+    );
+  })();
+  const savePayment = async (draft: SalesOrderPaymentDraft) => {
+    await handleMetaPatch({
+      extra: {
+        isPaid: draft.state === 'paid' ? true : undefined,
+        paidAmount: draft.state === 'partial' ? draft.paidAmount : undefined,
+
+        ...(featureFlags.paymentTerms.enabled && {
+          paymentDeadline: draft.deadlineDay ? dayToVnMidnightMs(draft.deadlineDay) : undefined,
+        }),
+      },
+    });
+  };
+
   const billingFields = showPrice ? (
     <>
       <Divider variant="dashed" />
@@ -1543,7 +1578,39 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               </Badge>
             );
           })()}
+          {/* Any status but cancelled: an order is paid after it is delivered, when the form is gone. */}
+          <SalesOrderPaymentAction
+            canRecord={canRecordPayment}
+            state={resolveSalesOrderPaymentState(extra, salesOrderTotals.grandTotal).state}
+            paidAmount={typeof extra.paidAmount === 'number' ? extra.paidAmount : undefined}
+            grandTotal={salesOrderTotals.grandTotal}
+            storedDeadlineDay={salesOrderDeadlineDay(extra)}
+            proposedDeadlineDay={proposedDeadlineDay}
+            termsOn={featureFlags.paymentTerms.enabled}
+            onSave={savePayment}
+          />
         </DetailField>
+        {featureFlags.paymentTerms.enabled && (
+          <DetailField label={t('salesOrders.billing.paymentDeadlineLabel')}>
+            {(() => {
+              const dueDay = salesOrderDeadlineDay(extra);
+              if (!dueDay) return <Text c="dimmed">—</Text>;
+              const overdue = isSalesOrderOverdue(order, todayInVnDateString(), vatRate);
+              return (
+                <Stack gap={2}>
+                  <Text fw={600} c={overdue ? 'red' : undefined}>
+                    {formatDate(extra.paymentDeadline)}
+                  </Text>
+                  {overdue && (
+                    <Badge variant="light" color="red" size="sm" radius="sm">
+                      {t('salesOrders.billing.overdue')}
+                    </Badge>
+                  )}
+                </Stack>
+              );
+            })()}
+          </DetailField>
+        )}
         <DetailField label={t('salesOrders.billing.invoiceLabel')}>
           <Badge
             variant="light"

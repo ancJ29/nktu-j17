@@ -208,6 +208,22 @@ export type CMngtQuotationFeatures = {
   priceByMinQuantity: boolean;
 };
 
+export type CMngtPaymentTermsFeatures = {
+  enabled: boolean;
+
+  defaultDays: number;
+};
+
+export type CMngtPurchaseOrderFeatures = {
+  enabled: boolean;
+
+  codePrefix: string;
+
+  picDepartments: string[];
+
+  leadTimes?: Array<{ minDays: number; maxDays: number }>;
+};
+
 export type CMngtDeliveryRequestStage = 'NEW' | 'IN_PROGRESS' | 'COMPLETED' | 'EXCEPTIONAL';
 
 export type CMngtDeliveryRequestStatusOption = ConfigOption & {
@@ -328,6 +344,10 @@ export type CMngtAppConfig = AppConfig & {
     salesOrders: CMngtSalesOrderFeatures;
 
     quotations?: CMngtQuotationFeatures;
+
+    purchaseOrders?: CMngtPurchaseOrderFeatures;
+
+    paymentTerms?: CMngtPaymentTermsFeatures;
     deliveryRequests: CMngtDeliveryRequestFeatures;
     goodsReceipts: CMngtGoodsReceiptFeatures;
     transportOrders: CMngtTransportOrderFeatures;

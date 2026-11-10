@@ -42,17 +42,21 @@ type ListStatsCardsProps = {
   readonly visible?: boolean;
 
   readonly cols?: { base: number; sm: number };
+
+  readonly always?: boolean;
 };
 
 export function ListStatsCards({
   cells,
   visible = true,
   cols = { base: 2, sm: 4 },
+  always = false,
 }: ListStatsCardsProps) {
   const { t } = useTranslation();
   const [hidden, setHidden] = useState(readStatsHidden);
 
-  if (!statsEnabled || isMobile || !visible || cells.length === 0) return null;
+  if (!always && (!statsEnabled || isMobile)) return null;
+  if (!visible || cells.length === 0) return null;
 
   const toggle = () => {
     writeStatsHidden(!hidden);

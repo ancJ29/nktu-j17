@@ -1,0 +1,33 @@
+{
+  "columns": {
+    "earliestDue": "Hạn sớm nhất",
+    "notYetDue": "Chưa đến hạn",
+    "orders": "Đơn chưa thanh toán",
+    "overdue": "Quá hạn",
+    "undated": "Chưa có hạn"
+  },
+  "loadError": "Không tải được đơn của {{days}} ngày gần nhất nên không hiển thị số liệu.",
+  "payable": {
+    "columns": {
+      "currency": "Tiền tệ",
+      "party": "Nhà cung cấp",
+      "total": "Còn phải trả"
+    },
+    "empty": "Không có khoản phải trả",
+    "searchPlaceholder": "Tìm nhà cung cấp",
+    "title": "Phải trả NCC"
+  },
+  "receivable": {
+    "columns": {
+      "party": "Khách hàng",
+      "total": "Còn phải thu"
+    },
+    "empty": "Không có khách hàng nào còn nợ",
+    "partiesLabel": "Khách hàng",
+    "searchPlaceholder": "Tìm khách hàng",
+    "title": "Phải thu khách hàng",
+    "walkIn": "Khách lẻ"
+  },
+  "retry": "Thử lại",
+  "window": "Đơn tạo trong {{days}} ngày gần nhất"
+}

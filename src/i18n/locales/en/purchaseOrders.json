@@ -1,0 +1,166 @@
+{
+  "actions": {
+    "cancel": "Cancel order",
+    "makeReceipt": "Create goods receipt",
+    "markReady": "Mark as sent"
+  },
+  "addItem": "New purchase order",
+  "columns": {
+    "amount": "Amount",
+    "draftReceipt": "Draft receipt",
+    "itemsCount_one": "{{count}} line",
+    "itemsCount_other": "{{count}} lines",
+    "orderNumber": "Order #",
+    "packageCount": "Packages",
+    "payment": "Payment",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "total": "Total",
+    "unitPrice": "Unit price"
+  },
+  "confirm": {
+    "cancelMessage": "Cancel this purchase order? This cannot be undone.",
+    "cancelTitle": "Cancel order",
+    "readyMessage": "Mark this order as sent to the vendor? It becomes final and its lines are locked.",
+    "readyTitle": "Mark as sent"
+  },
+  "detail": {
+    "activitiesError": "Failed to load activities.",
+    "activitiesLoadMore": "Load more",
+    "activitiesNoEntries": "No activities recorded for this order yet.",
+    "activityMemo": {
+      "deadline": "Deadline {{date}}",
+      "markedPaid": "Marked paid",
+      "markedUnpaid": "Marked unpaid",
+      "receipt": "Receipt {{number}}"
+    },
+    "activityVerbs": {
+      "cancel": "Cancelled order",
+      "create": "Created order",
+      "payment": "Updated payment of",
+      "ready": "Marked as sent to vendor",
+      "receiptLinked": "Recorded a goods receipt on",
+      "update": "Edited order"
+    },
+    "cardGeneral": "General",
+    "cardItems": "Items",
+    "cardPayment": "Payment",
+    "cardReceipts": "Goods receipts",
+    "noAssignedTo": "Not assigned",
+    "noNotes": "No notes",
+    "noReceipt": "No goods receipt yet",
+    "receiptsUnreadable": "The goods receipts of this order could not be read, so the receipt button is hidden. Reopen the page to try again.",
+    "recentActivities": "Recent Activities",
+    "severalLiveReceipts": "This order has more than one live goods receipt. Cancel one of them.",
+    "tabActivityLog": "Activity",
+    "tabOrder": "Order",
+    "to": "to",
+    "totalLabel": "Order total",
+    "viewItems": "View items"
+  },
+  "detailTitle": "Purchase order",
+  "editItem": "Edit purchase order",
+  "form": {
+    "actualArrivalLabel": "Actual arrival",
+    "assignedToPlaceholder": "Person in charge",
+    "copyingFrom": "Copying from order {{orderNumber}}. The number, status, payment and receipts start fresh.",
+    "createButton": "Create order",
+    "currencyLabel": "Currency",
+    "customerLabel": "Customer",
+    "customerPlaceholder": "Only if the order is for a specific customer",
+    "downloadTemplateButton": "Download template",
+    "importItemsButton": "Import from Excel",
+    "itemsTitle": "Items",
+    "leadTimeLabel": "Lead time",
+    "leadTimePlaceholder": "Not set",
+    "locationLabel": "Receiving location",
+    "locationPlaceholder": "Select a location",
+    "notesPlaceholder": "Internal note — never printed on the order",
+    "orderDateLabel": "Order date",
+    "orderNumberAutoPlaceholder": "Assigned when saved",
+    "orderNumberLabel": "Order number",
+    "paymentDeadlineLabel": "Payment deadline",
+    "plannedArrivalLabel": "Planned arrival",
+    "referenceLabel": "Reference",
+    "referencePlaceholder": "Vendor quote or contract number",
+    "totalLabel": "Total ({{currency}})",
+    "updateButton": "Save changes",
+    "vendorPlaceholder": "Select a vendor"
+  },
+  "leadTime": {
+    "range": "{{min}}–{{max}} days"
+  },
+  "list": {
+    "arrivalsUnreadable": "The receipts could not be read, so the not-arrived figure is not shown.",
+    "notArrived": "Not arrived",
+    "ordersTotal": "Orders",
+    "searchPlaceholder": "Search number, vendor, reference…"
+  },
+  "noItems": "No purchase orders in this period",
+  "notifications": {
+    "cancelReceiptFirst": "This order has a live goods receipt. Cancel the receipt first.",
+    "cancelSuccess": "Order cancelled",
+    "createError": "Could not create the purchase order",
+    "createSuccess": "Purchase order created",
+    "defaultLocationMissing": "The default location is missing",
+    "fetchError": "Could not load the purchase order",
+    "importEmpty": "The file has no valid rows",
+    "importError": "Could not read the file",
+    "importMissingColumn": "The file needs these columns: {{columns}}",
+    "importMissingColumnTitle": "Missing columns",
+    "importNoMatchTitle": "No SKU matched",
+    "importPartialTitle": "{{added}} lines added",
+    "importSuccess": "{{count}} lines imported",
+    "importUnmatched": "{{count}} SKU not found: {{skus}}",
+    "mobileFormBlocked": "Purchase orders are written on a computer",
+    "noPriceAccess": "You may not view prices, so you cannot edit this order",
+    "orderNotReceivable": "This order was cancelled or already has a goods receipt. Nothing was saved.",
+    "orderUnreadable": "The order could not be read, so no receipt was made. Try again.",
+    "paymentSaved": "Payment saved",
+    "readySuccess": "Order marked as sent",
+    "receiptLinkPending": "The goods receipt is saved, but the order has not recorded it yet. Reopen the order and it will be linked.",
+    "receiptsUnreadable": "The goods receipts of this order could not be read, so it cannot be cancelled now. Reopen the page.",
+    "updateError": "Could not save the change",
+    "updateSuccess": "Purchase order updated"
+  },
+  "payment": {
+    "amount": "Paid so far",
+    "amountNonNegative": "The amount cannot be negative",
+    "amountRequired": "Enter the amount paid",
+    "deadlineShort": "Due {{date}}",
+    "edit": "Edit payment",
+    "editTitle": "Payment",
+    "leftShort": "Left {{amount}}",
+    "overdue": "Overdue",
+    "paid": "Paid",
+    "paidInFullHint": "Paid in full: no figure to enter.",
+    "paidRemaining": "Paid {{paid}} · Left {{remaining}} {{currency}}",
+    "partial": "Partial",
+    "unpaid": "Unpaid",
+    "warnExceedsTotal": "The amount is above the order total. Check it again.",
+    "warnSettlesOrder": "The amount covers the whole order: consider choosing Paid."
+  },
+  "print": {
+    "includePrice": "Print prices, amounts and total",
+    "landscapeNote": "With prices the sheet prints landscape, so the name column stays readable."
+  },
+  "statuses": {
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "ready": "Sent to vendor"
+  },
+  "title": "Purchase orders",
+  "validation": {
+    "itemCodeUnitDuplicate": "This product is already on another line in the same unit",
+    "itemsRequired": "Add at least one line",
+    "locationRequired": "Select a location",
+    "orderDateRequired": "Select the order date",
+    "ready": {
+      "badQuantity": "Every line needs a quantity above 0",
+      "missingPrice": "Every line needs a price before the order is marked as sent",
+      "noLines": "Add at least one line before marking the order as sent",
+      "noVendor": "Select a vendor first"
+    },
+    "vendorRequired": "Select a vendor"
+  }
+}

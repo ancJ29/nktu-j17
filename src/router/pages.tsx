@@ -268,6 +268,20 @@ export const DeliveryRequestFormPage = byClient(
   DeliveryRequestFormPageDefault,
 );
 
+export const PaymentsPage = lazy(() =>
+  import('../pages/payments').then((m) => ({ default: m.PaymentsPage })),
+);
+
+export const PurchaseOrderListPage = lazy(() =>
+  import('../pages/purchase-orders').then((m) => ({ default: m.PurchaseOrderListPage })),
+);
+export const PurchaseOrderDetailPage = lazy(() =>
+  import('../pages/purchase-orders').then((m) => ({ default: m.PurchaseOrderDetailPage })),
+);
+export const PurchaseOrderFormPage = lazy(() =>
+  import('../pages/purchase-orders').then((m) => ({ default: m.PurchaseOrderFormPage })),
+);
+
 const GoodsReceiptListPageDefault = lazy(() =>
   import('../pages/goods-receipts').then((m) => ({ default: m.GoodsReceiptListPage })),
 );
