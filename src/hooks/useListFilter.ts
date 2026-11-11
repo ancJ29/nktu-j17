@@ -1,3 +1,4 @@
+import { matchesSearchWords, splitSearchWords } from './matchesSearchWords';
 import {
   LIST_LAZY_RENDER_CHUNK,
   LIST_LAZY_RENDER_THRESHOLD,
@@ -104,10 +105,8 @@ export function useListFilter<T, F extends Record<string, unknown> = Record<stri
     }
 
     if (debouncedSearch && searchFields) {
-      const q = debouncedSearch.toLowerCase();
-      result = result.filter((item) =>
-        searchFields(item).some((field) => field?.toLowerCase().includes(q)),
-      );
+      const words = splitSearchWords(debouncedSearch);
+      result = result.filter((item) => matchesSearchWords(words, searchFields(item)));
     }
 
     return result;

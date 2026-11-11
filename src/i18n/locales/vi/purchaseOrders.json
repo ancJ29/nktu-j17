@@ -32,7 +32,9 @@
       "deadline": "Hạn {{date}}",
       "markedPaid": "Đánh dấu đã thanh toán",
       "markedUnpaid": "Đánh dấu chưa thanh toán",
-      "receipt": "Phiếu {{number}}"
+      "receipt": "Phiếu {{number}}",
+      "trackedAgain": "Theo dõi lại thanh toán",
+      "untracked": "Bỏ theo dõi thanh toán"
     },
     "activityVerbs": {
       "cancel": "Hủy đơn",
@@ -92,8 +94,11 @@
   },
   "list": {
     "arrivalsUnreadable": "Không đọc được phiếu nhập nên chưa hiện số đơn chưa đến.",
+    "cancelledTotal": "Đơn đã hủy",
     "notArrived": "Tổng đơn chưa đến",
     "ordersTotal": "Tổng đơn",
+    "receiptsLoading": "Đang tải phiếu nhập kho…",
+    "receiptsUnreadable": "Không đọc được phiếu nhập kho của đơn này. Bấm làm mới danh sách để thử lại.",
     "searchPlaceholder": "Tìm theo mã, nhà cung cấp, tham chiếu…"
   },
   "noItems": "Không có đơn đặt hàng NCC trong kỳ này",
@@ -136,7 +141,9 @@
     "paidInFullHint": "Đã thanh toán đủ: không cần nhập số tiền.",
     "paidRemaining": "Đã trả {{paid}} · Còn {{remaining}} {{currency}}",
     "partial": "Thanh toán một phần",
+    "trackAgain": "Theo dõi lại",
     "unpaid": "Chưa thanh toán",
+    "untracked": "Đã bỏ theo dõi",
     "warnExceedsTotal": "Số tiền vượt quá tổng đơn. Vui lòng kiểm tra lại.",
     "warnSettlesOrder": "Số tiền đã đủ tổng đơn — cân nhắc chọn “Đã thanh toán”."
   },

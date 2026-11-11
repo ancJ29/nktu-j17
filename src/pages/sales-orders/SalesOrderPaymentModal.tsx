@@ -32,6 +32,8 @@ export function SalesOrderPaymentAction({
   proposedDeadlineDay,
   termsOn,
   onSave,
+  initialState,
+  label,
 }: {
   readonly canRecord: boolean;
   readonly state: PaymentDraftState;
@@ -43,6 +45,10 @@ export function SalesOrderPaymentAction({
   readonly termsOn: boolean;
 
   readonly onSave: (draft: SalesOrderPaymentDraft) => Promise<void>;
+
+  readonly initialState?: PaymentDraftState;
+
+  readonly label?: string;
 }) {
   const { t } = useTranslation();
   const [opened, setOpened] = useState(false);
@@ -57,8 +63,8 @@ export function SalesOrderPaymentAction({
   const advice = salesOrderPaymentAdviceOf({ state, amount, total: grandTotal });
 
   const open = () => {
-    setState(storedState);
-    setAmount(storedAmount);
+    setState(initialState ?? storedState);
+    setAmount(initialState === 'partial' ? undefined : storedAmount);
     setDeadlineDay(storedDeadlineDay || proposedDeadlineDay);
     setError(null);
     setOpened(true);
@@ -95,7 +101,7 @@ export function SalesOrderPaymentAction({
   return (
     <>
       <Button variant="light" size="compact-sm" leftSection={<IconCash size={14} />} onClick={open}>
-        {t('salesOrders.payment.record')}
+        {label ?? t('salesOrders.payment.record')}
       </Button>
       <Modal
         opened={opened}

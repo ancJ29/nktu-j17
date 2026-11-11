@@ -2062,6 +2062,7 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
     !f.deliveryMethod &&
     !f.deliveryDate &&
     !f.payment &&
+    !f.paymentUntracked &&
     !f.paymentDeadline &&
     !f.notes &&
     !f.itemMemo &&
@@ -2152,6 +2153,18 @@ function SalesOrderInlineUpdateBody({ memo }: { readonly memo: SalesOrderMemo })
           </Text>
           <Text size="xs" fw={500}>
             {f.payment.to ? t(`salesOrders.billing.${f.payment.to}`) : '—'}
+          </Text>
+        </Group>
+      )}
+      {f.paymentUntracked && (
+        <Group gap={6} wrap="nowrap" align="baseline">
+          <Text size="xs" c="dimmed">
+            {t('salesOrders.billing.trackingLabel')}:
+          </Text>
+          <Text size="xs" fw={500}>
+            {f.paymentUntracked.to
+              ? t('salesOrders.billing.untracked')
+              : t('salesOrders.billing.trackedAgain')}
           </Text>
         </Group>
       )}
@@ -2814,6 +2827,8 @@ function DeliveryRequestInlineUpdateBody({ memo }: { readonly memo: DeliveryRequ
 type PurchaseOrderMemo = GoodsReceiptMemo & {
   orderNumber?: string;
   isPaid?: boolean;
+  /** "Bỏ theo dõi" set or undone: a tracking-only entry, not a payment edit. */
+  tracking?: 'untracked' | 'tracked';
   /** `YYYY-MM-DD` of the payment deadline, when one is set. */
   deadline?: string;
   receiptNumber?: string;
@@ -2829,6 +2844,17 @@ function PurchaseOrderMemoLine({
   const { t } = useTranslation();
   if (action === 'purchaseOrder.create') return <GoodsReceiptCreateBody memo={memo} />;
   if (action === 'purchaseOrder.update') return <GoodsReceiptFormUpdateBody memo={memo} />;
+  if (action === 'purchaseOrder.payment' && memo.tracking) {
+    return (
+      <Text size="xs" c="dimmed" pl={36}>
+        {t(
+          memo.tracking === 'untracked'
+            ? 'purchaseOrders.detail.activityMemo.untracked'
+            : 'purchaseOrders.detail.activityMemo.trackedAgain',
+        )}
+      </Text>
+    );
+  }
   if (action === 'purchaseOrder.payment') {
     return (
       <Stack gap={2} pl={36}>

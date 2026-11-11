@@ -1,16 +1,41 @@
 {
+  "bulk": {
+    "confirmPaid": "Mark {{count}} orders as paid in full? They add up to {{total}}.",
+    "confirmUntrack": "Stop tracking {{count}} orders? They add up to {{total}} and owe nothing until tracked again.",
+    "done": "{{saved}} saved, {{conflicted}} changed by someone else (still ticked), {{failed}} failed (still ticked).",
+    "doneTitle": "Marks written",
+    "exit": "Done choosing",
+    "paidAll": "Paid in full ({{count}})",
+    "progress": "{{done}}/{{total}}",
+    "select": "Select several",
+    "selectAll": "Select all markable orders",
+    "untrackAll": "Stop tracking ({{count}})"
+  },
   "columns": {
-    "earliestDue": "Earliest due",
     "notYetDue": "Not yet due",
-    "orders": "Unpaid orders",
     "overdue": "Overdue",
     "undated": "No due date"
   },
+  "filter": {
+    "all": "All",
+    "label": "Payment",
+    "overdue": "Overdue",
+    "paid": "Paid",
+    "unpaid": "Unpaid",
+    "untracked": "Not tracked"
+  },
   "loadError": "Could not load the last {{days}} days of orders, so no figures are shown.",
+  "mark": {
+    "failed": "Could not save the payment mark",
+    "paid": "Paid",
+    "paidConfirm": "Mark {{order}} as paid in full? {{left}} is left.",
+    "recordPart": "Record payment",
+    "untrack": "Stop tracking",
+    "untrackConfirm": "Stop tracking {{order}}? It will owe nothing ({{left}} left) until tracked again from its detail."
+  },
   "payable": {
     "columns": {
       "currency": "Currency",
-      "party": "Vendor",
       "total": "To pay"
     },
     "empty": "NKTU owes no vendor anything",
@@ -19,14 +44,11 @@
   },
   "receivable": {
     "columns": {
-      "party": "Customer",
       "total": "To collect"
     },
-    "empty": "No customer owes anything",
-    "partiesLabel": "Customers",
-    "searchPlaceholder": "Search customers",
-    "title": "Receivables",
-    "walkIn": "Walk-in customers"
+    "empty": "No orders to show",
+    "searchPlaceholder": "Search order number or customer",
+    "title": "Receivables"
   },
   "retry": "Try again",
   "window": "Orders created in the last {{days}} days"

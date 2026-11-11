@@ -2,6 +2,7 @@ import type { SalesOrder } from '@/types';
 import {
   computeSalesOrderTotals,
   isSalesOrderOverdue,
+  isSalesOrderPaymentUntracked,
   resolveSalesOrderPaymentState,
 } from '@/utils/salesOrderPricing';
 
@@ -21,7 +22,7 @@ export function matchesPaymentFilter(
   todayVn: string,
   fallbackRate: number,
 ): boolean {
-  if (order.extra?.cancellation != null) return false;
+  if (order.extra?.cancellation != null || isSalesOrderPaymentUntracked(order.extra)) return false;
   if (filter === 'overdue') return isSalesOrderOverdue(order, todayVn, fallbackRate);
   const { grandTotal } = computeSalesOrderTotals(order, fallbackRate);
   const paid = resolveSalesOrderPaymentState(order.extra, grandTotal).state === 'paid';

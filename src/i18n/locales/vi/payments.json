@@ -1,16 +1,41 @@
 {
+  "bulk": {
+    "confirmPaid": "Đánh dấu {{count}} đơn đã thanh toán toàn bộ? Tổng còn lại {{total}}.",
+    "confirmUntrack": "Bỏ theo dõi {{count}} đơn? Tổng {{total}} sẽ không còn tính là phải thu cho đến khi theo dõi lại.",
+    "done": "{{saved}} đã lưu, {{conflicted}} bị người khác đổi (vẫn được chọn), {{failed}} lỗi (vẫn được chọn).",
+    "doneTitle": "Đã ghi nhận",
+    "exit": "Thoát",
+    "paidAll": "Đã thanh toán toàn bộ ({{count}})",
+    "progress": "{{done}}/{{total}}",
+    "select": "Chọn nhiều",
+    "selectAll": "Chọn tất cả đơn có thể ghi nhận",
+    "untrackAll": "Bỏ theo dõi ({{count}})"
+  },
   "columns": {
-    "earliestDue": "Hạn sớm nhất",
     "notYetDue": "Chưa đến hạn",
-    "orders": "Đơn chưa thanh toán",
     "overdue": "Quá hạn",
     "undated": "Chưa có hạn"
   },
+  "filter": {
+    "all": "Tất cả",
+    "label": "Thanh toán",
+    "overdue": "Quá hạn",
+    "paid": "Đã thanh toán",
+    "unpaid": "Chưa thanh toán",
+    "untracked": "Đã bỏ theo dõi"
+  },
   "loadError": "Không tải được đơn của {{days}} ngày gần nhất nên không hiển thị số liệu.",
+  "mark": {
+    "failed": "Không lưu được thanh toán",
+    "paid": "Đã thanh toán",
+    "paidConfirm": "Đánh dấu {{order}} đã thanh toán toàn bộ, còn {{left}}?",
+    "recordPart": "Ghi nhận thanh toán",
+    "untrack": "Bỏ theo dõi",
+    "untrackConfirm": "Bỏ theo dõi {{order}}? Đơn không còn tính vào số phải thu (còn {{left}}) cho đến khi theo dõi lại ở trang chi tiết."
+  },
   "payable": {
     "columns": {
       "currency": "Tiền tệ",
-      "party": "Nhà cung cấp",
       "total": "Còn phải trả"
     },
     "empty": "Không có khoản phải trả",
@@ -19,14 +44,11 @@
   },
   "receivable": {
     "columns": {
-      "party": "Khách hàng",
       "total": "Còn phải thu"
     },
-    "empty": "Không có khách hàng nào còn nợ",
-    "partiesLabel": "Khách hàng",
-    "searchPlaceholder": "Tìm khách hàng",
-    "title": "Phải thu khách hàng",
-    "walkIn": "Khách lẻ"
+    "empty": "Không có đơn nào",
+    "searchPlaceholder": "Tìm số đơn hoặc khách hàng",
+    "title": "Phải thu khách hàng"
   },
   "retry": "Thử lại",
   "window": "Đơn tạo trong {{days}} ngày gần nhất"

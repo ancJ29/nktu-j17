@@ -38,6 +38,10 @@ export function isSalesOrderBillingExempt(extra: SalesOrderExtra | undefined): b
   return extra?.billingNotRequired === true;
 }
 
+export function isSalesOrderPaymentUntracked(extra: SalesOrderExtra | undefined): boolean {
+  return extra?.paymentUntracked === true;
+}
+
 export function isSalesOrderMissingMoneyInfo(order: SalesOrder, fallbackRate: number): boolean {
   if (isSalesOrderBillingExempt(order.extra)) return false;
   return computeSalesOrderTotals(order, fallbackRate).grandTotal <= 0;
@@ -80,7 +84,11 @@ export function sumSalesOrderFinance(
     acc.shipping += totals.shipping;
     acc.grandTotal += totals.grandTotal;
     if (totals.grandTotal <= 0 && !isSalesOrderBillingExempt(order.extra)) acc.missingCount += 1;
-    if (order.extra?.cancellation == null && !isSalesOrderBillingExempt(order.extra)) {
+    if (
+      order.extra?.cancellation == null &&
+      !isSalesOrderBillingExempt(order.extra) &&
+      !isSalesOrderPaymentUntracked(order.extra)
+    ) {
       acc.outstanding += resolveSalesOrderPaymentState(order.extra, totals.grandTotal).remaining;
     }
   }
@@ -100,7 +108,13 @@ export function isSalesOrderOverdue(
   fallbackRate: number,
 ): boolean {
   const extra = order.extra;
-  if (extra?.cancellation != null || isSalesOrderBillingExempt(extra)) return false;
+  if (
+    extra?.cancellation != null ||
+    isSalesOrderBillingExempt(extra) ||
+    isSalesOrderPaymentUntracked(extra)
+  ) {
+    return false;
+  }
   const day = salesOrderDeadlineDay(extra);
   if (day === '' || day >= todayVn) return false;
   const { grandTotal } = computeSalesOrderTotals(order, fallbackRate);

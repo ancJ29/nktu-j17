@@ -13,28 +13,20 @@ import {
   perms,
   tableDensity,
 } from '@/utils/permission';
-import { businessDateString } from '@/utils/code';
 import { findPurchaseOrderStatus } from './purchaseOrderStatuses';
 import { ArrivalText } from './ArrivalText';
+import { NO_CLAMP, PurchaseOrderPaymentState } from './PurchaseOrderPaymentState';
 import { arrivalFor, type ArrivalsState } from './purchaseOrderArrivals';
 import {
   formatMoney,
-  isOverdue,
   poCurrency,
   poExtra,
-  poIsPaid,
-  poPayment,
   plannedArrivalIso,
   poCustomer,
   poOrderDateIso,
   poStatus,
   orderTotal,
 } from './purchaseOrderModel';
-
-const NO_CLAMP = {
-  root: { maxWidth: 'none', overflow: 'visible', whiteSpace: 'nowrap' },
-  label: { overflow: 'visible', textOverflow: 'clip', whiteSpace: 'nowrap' },
-} as const;
 
 const locationsEnabled = isLocationsEnabled();
 const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
@@ -61,7 +53,6 @@ export function PurchaseOrderDataTable({
 }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const today = businessDateString();
 
   const columns = useMemo(
     () => [
@@ -131,41 +122,7 @@ export function PurchaseOrderDataTable({
         key: 'paid',
         header: t('purchaseOrders.columns.payment'),
         width: '170px',
-        render: (item: PurchaseOrder) => {
-          const overdue = isOverdue(item, today);
-          return (
-            <Stack gap={2}>
-              <Badge
-                variant="light"
-                w="max-content"
-                styles={NO_CLAMP}
-                color={poIsPaid(item) ? 'green' : overdue ? 'red' : 'orange'}
-              >
-                {poIsPaid(item)
-                  ? t('purchaseOrders.payment.paid')
-                  : overdue
-                    ? t('purchaseOrders.payment.overdue')
-                    : poPayment(item).state === 'partial'
-                      ? t('purchaseOrders.payment.partial')
-                      : t('purchaseOrders.payment.unpaid')}
-              </Badge>
-              {showPrice && poPayment(item).state === 'partial' && (
-                <Text size="xs" c="dimmed">
-                  {t('purchaseOrders.payment.leftShort', {
-                    amount: `${formatMoney(poPayment(item).remaining, poCurrency(item))} ${poCurrency(item)}`,
-                  })}
-                </Text>
-              )}
-              {item.paymentDeadline && !poIsPaid(item) && (
-                <Text size="xs" c={overdue ? 'red' : 'dimmed'}>
-                  {t('purchaseOrders.payment.deadlineShort', {
-                    date: formatDate(item.paymentDeadline),
-                  })}
-                </Text>
-              )}
-            </Stack>
-          );
-        },
+        render: (item: PurchaseOrder) => <PurchaseOrderPaymentState order={item} />,
       },
       {
         key: 'orderDate',
@@ -238,7 +195,7 @@ export function PurchaseOrderDataTable({
           ]
         : []),
     ],
-    [t, today, onShowItems, arrivals, employeeNameById],
+    [t, onShowItems, arrivals, employeeNameById],
   );
 
   return (

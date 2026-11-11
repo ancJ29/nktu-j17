@@ -63,6 +63,8 @@ export type SalesOrderInlineFields = {
 
   payment?: { from?: 'unpaid' | 'partial' | 'paid'; to?: 'unpaid' | 'partial' | 'paid' };
 
+  paymentUntracked?: { to: boolean };
+
   paymentDeadline?: { from?: number; to?: number };
 
   itemMemo?: { product: string; from?: string; to?: string };

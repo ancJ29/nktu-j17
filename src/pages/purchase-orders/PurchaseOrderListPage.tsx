@@ -1,4 +1,4 @@
-import { Drawer, Group, Stack, Text } from '@mantine/core';
+import { Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,19 +35,15 @@ import { EMPTY_DATE_RANGE, formatDateRangeLabel } from '@/utils/listFilterDateRa
 import {
   getPurchaseOrderPicDepartments,
   isLocationsEnabled,
-  isPricingManagementEnabled,
   makeEmployeeDepartmentFilter,
   perms,
 } from '@/utils/permission';
-import { useListScrollRestoration, useLookupV2Labels } from '@/hooks';
+import { useListScrollRestoration } from '@/hooks';
 import type { PurchaseOrder } from '@/types';
 import { PurchaseOrderCardList } from './PurchaseOrderCardList';
 import { PurchaseOrderDataTable } from './PurchaseOrderDataTable';
-import {
-  PurchaseOrderItemsListMobile,
-  PurchaseOrderItemsTableDesktop,
-} from './PurchaseOrderItemsTable';
 import { PURCHASE_ORDER_STATUSES, findPurchaseOrderStatus } from './purchaseOrderStatuses';
+import { PurchaseOrderPreviewDrawer } from './PurchaseOrderPreviewDrawer';
 import { poCustomer, poItems, poStatus, vnDayOf } from './purchaseOrderModel';
 import { notArrivedCount, usePurchaseOrderArrivals } from './purchaseOrderArrivals';
 import { PURCHASE_ORDER_RANGE_DAYS } from '@/stores/usePurchaseOrderStore';
@@ -59,7 +55,6 @@ import { usePurchaseOrderListFilters, type PaidFilter } from './usePurchaseOrder
 const isMobile = device.isMobile;
 const canCreate = perms.purchaseOrder.canCreate();
 const locationsEnabled = isLocationsEnabled();
-const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
 
 export function PurchaseOrderListPage() {
@@ -87,7 +82,6 @@ export function PurchaseOrderListPage() {
   } = useEmployeeStore();
   const { loadAll: loadLocations, initialized: locationsInit } = useLocationStore();
   const products = useProductStore((s) => s.items);
-  const unitLabels = useLookupV2Labels('product-unit');
   const [itemsOrder, setItemsOrder] = useState<PurchaseOrder | null>(null);
 
   const skuByItemCode = useMemo(() => {
@@ -181,6 +175,11 @@ export function PurchaseOrderListPage() {
     [filtered],
   );
   const notArrived = notArrivedCount(countedOrders, arrivals);
+
+  const cancelledOrders = useMemo(
+    () => filtered.filter((o) => poStatus(o) === 'cancelled'),
+    [filtered],
+  );
 
   const hasActiveFilters = filters.hasActiveFilters || !!search;
   const showStatusPills = !isMobile;
@@ -339,12 +338,12 @@ export function PurchaseOrderListPage() {
           }}
         />
 
-        {/* The two figures the client asked for are counts, not money (the totals are in mixed
-            currencies and cannot be summed). `always` skips the enableStats and phone gates. */}
+        {/* The three figures are counts, not money (the totals are in mixed currencies and cannot
+            be summed). `always` skips the enableStats and phone gates. */}
         <ListStatsCards
           always
           visible={initialized}
-          cols={{ base: 2, sm: 2 }}
+          cols={{ base: 3, sm: 3 }}
           cells={[
             {
               key: 'orders',
@@ -356,6 +355,11 @@ export function PurchaseOrderListPage() {
               label: t('purchaseOrders.list.notArrived'),
               value: notArrived ?? '—',
               color: notArrived ? 'orange' : undefined,
+            },
+            {
+              key: 'cancelled',
+              label: t('purchaseOrders.list.cancelledTotal'),
+              value: cancelledOrders.length,
             },
           ]}
         />
@@ -470,36 +474,12 @@ export function PurchaseOrderListPage() {
         onPageSizeChange={setPageSize}
       />
 
-      <Drawer
-        opened={itemsOrder !== null}
+      <PurchaseOrderPreviewDrawer
+        order={itemsOrder}
         onClose={() => setItemsOrder(null)}
-        position="bottom"
-        size={isMobile ? '85%' : '60%'}
-        title={
-          itemsOrder && (
-            <Group gap="xs" wrap="nowrap">
-              <Text fw={700}>{t('purchaseOrders.detail.cardItems')}</Text>
-              <Text fw={500}>{itemsOrder.orderNumber}</Text>
-              <Text c="dimmed">{itemsOrder.vendorName}</Text>
-            </Group>
-          )
-        }
-      >
-        {itemsOrder &&
-          (isMobile ? (
-            <PurchaseOrderItemsListMobile
-              order={itemsOrder}
-              unitLabels={unitLabels}
-              showPrice={showPrice}
-            />
-          ) : (
-            <PurchaseOrderItemsTableDesktop
-              order={itemsOrder}
-              unitLabels={unitLabels}
-              showPrice={showPrice}
-            />
-          ))}
-      </Drawer>
+        arrivals={arrivals}
+        employeeNameById={employeeNameById}
+      />
     </Stack>
   );
 }

@@ -4,8 +4,14 @@ import type { SalesOrder } from '@/types';
 import {
   computeSalesOrderTotals,
   isSalesOrderOverdue,
+  isSalesOrderPaymentUntracked,
   resolveSalesOrderPaymentState,
 } from '@/utils/salesOrderPricing';
+
+const NO_CLAMP = {
+  root: { maxWidth: 'none', overflow: 'visible', whiteSpace: 'nowrap' },
+  label: { overflow: 'visible', textOverflow: 'clip', whiteSpace: 'nowrap' },
+} as const;
 
 export function SalesOrderPaymentMark({
   order,
@@ -24,6 +30,13 @@ export function SalesOrderPaymentMark({
       </Text>
     );
   }
+  if (isSalesOrderPaymentUntracked(order.extra)) {
+    return (
+      <Badge variant="light" size="sm" radius="sm" color="gray" w="max-content" styles={NO_CLAMP}>
+        {t('salesOrders.billing.untracked')}
+      </Badge>
+    );
+  }
   const { grandTotal } = computeSalesOrderTotals(order, vatRate);
   const payment = resolveSalesOrderPaymentState(order.extra, grandTotal);
   const overdue = isSalesOrderOverdue(order, todayVn, vatRate);
@@ -33,6 +46,8 @@ export function SalesOrderPaymentMark({
         variant="light"
         size="sm"
         radius="sm"
+        w="max-content"
+        styles={NO_CLAMP}
         color={payment.state === 'paid' ? 'teal' : payment.state === 'partial' ? 'orange' : 'gray'}
       >
         {t(`salesOrders.billing.${payment.state}`)}
@@ -43,7 +58,7 @@ export function SalesOrderPaymentMark({
         </Text>
       )}
       {overdue && (
-        <Badge variant="filled" size="sm" radius="sm" color="red">
+        <Badge variant="filled" size="sm" radius="sm" color="red" w="max-content" styles={NO_CLAMP}>
           {t('salesOrders.billing.overdue')}
         </Badge>
       )}

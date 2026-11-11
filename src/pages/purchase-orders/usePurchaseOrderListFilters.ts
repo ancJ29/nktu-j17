@@ -14,7 +14,14 @@ import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
 import { PURCHASE_ORDER_RANGE_DAYS } from '@/stores/usePurchaseOrderStore';
 import type { PurchaseOrder } from '@/types';
 import { businessDateString } from '@/utils/code';
-import { isOverdue, poExtra, poIsPaid, poPayment, poStatus } from './purchaseOrderModel';
+import {
+  isOverdue,
+  poExtra,
+  poIsPaid,
+  poPayment,
+  poPaymentUntracked,
+  poStatus,
+} from './purchaseOrderModel';
 
 const DEFAULT_PAGE = 1;
 
@@ -112,8 +119,10 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
       if (staffFilter && poExtra(r).assignedTo !== staffFilter) return false;
       if (paidFilter === 'paid' && !poIsPaid(r)) return false;
 
-      if (paidFilter === 'unpaid' && poIsPaid(r)) return false;
-      if (paidFilter === 'partial' && poPayment(r).state !== 'partial') return false;
+      if (paidFilter === 'unpaid' && (poIsPaid(r) || poPaymentUntracked(r))) return false;
+      if (paidFilter === 'partial' && (poPayment(r).state !== 'partial' || poPaymentUntracked(r))) {
+        return false;
+      }
       if (paidFilter === 'overdue' && !isOverdue(r, today)) return false;
       if (!isInDateRange(r.createdAt, createdDateRange)) return false;
       if (deadlineDateRange.preset && !isInDateRange(r.paymentDeadline, deadlineDateRange)) {

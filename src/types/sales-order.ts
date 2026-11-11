@@ -234,6 +234,8 @@ export type SalesOrderExtra = {
   invoiceIssued?: boolean;
 
   billingNotRequired?: boolean;
+
+  paymentUntracked?: boolean;
   activityLog?: SalesOrderActivityEntry[];
   chatHistory?: SalesOrderChatEntry[];
   photos?: SalesOrderPhoto[];

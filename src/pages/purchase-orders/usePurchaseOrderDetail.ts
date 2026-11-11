@@ -7,8 +7,14 @@ import { device, logger } from '@credo/base-ui/utils';
 import { ROUTES } from '@/constants/routes';
 import { getCurrentActorId } from '@/hooks';
 import { logActivity } from '@/utils/activityLogger';
-import { paymentMemo, stateMemo } from './activityMemo';
-import { vnDayOf } from './purchaseOrderModel';
+import { stateMemo } from './activityMemo';
+import {
+  logPurchaseOrderPayment,
+  logPurchaseOrderTracking,
+  purchaseOrderPaymentPatch,
+  purchaseOrderTrackingPatch,
+  type PurchaseOrderPaymentNext,
+} from './purchaseOrderPaymentWrite';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { purchaseOrderBundle } from '@/stores/usePurchaseOrderStore';
 import { featureFlags } from '@/utils/features';
@@ -268,35 +274,11 @@ export function usePurchaseOrderDetail(t: TFunction) {
   }, [order, confirmAction, write, closeConfirm, t]);
 
   const savePayment = useCallback(
-    async (next: { isPaid: boolean; paidAmount: number; paymentDeadline: string }) => {
+    async (next: PurchaseOrderPaymentNext) => {
       if (!order) return;
-      const wasPaid = order.isPaid === true;
-      const ok = await write({
-        isPaid: next.isPaid,
-
-        paidAmount: next.isPaid ? 0 : next.paidAmount,
-
-        paymentDeadline: next.paymentDeadline,
-        paidAt: next.isPaid
-          ? wasPaid && order.paidAt
-            ? order.paidAt
-            : new Date().toISOString()
-          : '',
-        extra: {
-          ...poExtra(order),
-          paidBy: next.isPaid ? (wasPaid ? poExtra(order).paidBy : getCurrentActorId()) : undefined,
-        },
-      });
+      const ok = await write(purchaseOrderPaymentPatch(order, next));
       if (ok) {
-        logActivity(
-          'purchaseOrder.payment',
-          order.id,
-          paymentMemo(order, {
-            isPaid: next.isPaid,
-            state: next.isPaid ? 'paid' : next.paidAmount > 0 ? 'partial' : 'unpaid',
-            deadlineDay: vnDayOf(next.paymentDeadline),
-          }),
-        );
+        logPurchaseOrderPayment(order, next);
         closePayment();
         notifications.show({
           color: 'green',
@@ -306,6 +288,12 @@ export function usePurchaseOrderDetail(t: TFunction) {
     },
     [order, write, closePayment, t],
   );
+
+  const trackAgain = useCallback(async () => {
+    if (!order) return;
+    const ok = await write(purchaseOrderTrackingPatch(false));
+    if (ok) logPurchaseOrderTracking(order, false);
+  }, [order, write]);
 
   return {
     order,
@@ -318,6 +306,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
     showReadyCta,
     showCancelCta,
     canMarkPaid,
+    trackAgain,
     showMakeReceiptCta,
     handleMakeReceipt,
     showCopyCta,

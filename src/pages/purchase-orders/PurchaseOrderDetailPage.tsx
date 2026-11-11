@@ -36,15 +36,13 @@ import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { ROUTES } from '@/constants/routes';
-import { GoodsReceiptLink } from '@/components/GoodsReceiptLink';
-import { findStatus as findReceiptStatus } from '@/pages/goods-receipts/goodsReceiptStatuses';
 import { CodeLabel, FieldLabel, Tabs } from '@credo/base-ui/components';
 import { device } from '@credo/base-ui/utils';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
-import { DateField } from '@/components/DateField';
 import { EmployeeLink } from '@/components/EmployeeLink';
 import { SectionCard } from '@/components/SectionCard';
 import { ArrivalText } from './ArrivalText';
+import { PurchaseOrderPaymentForm } from './PurchaseOrderPaymentForm';
 import { CustomerLink } from '@/components/CustomerLink';
 import { VendorLink } from '@/components/VendorLink';
 import { useLookupV2Labels } from '@/hooks';
@@ -61,15 +59,14 @@ import {
   printPurchaseOrder,
   toPurchaseOrderPrintDataFromOrder,
 } from '@/pages/goods-receipts/purchaseOrderPrint';
-import { isoToVnDateString, vnDateStringToIso } from '@/utils/dateTimeField';
-import { NumberField } from '@/components/NumberField';
-import type { PurchaseOrderCurrency } from '@/types';
+import { isoToVnDateString } from '@/utils/dateTimeField';
 import {
   hasImagesForProducts,
   isActivityLoggingEnabled,
   isLocationsEnabled,
 } from '@/utils/permission';
 import { businessDateString } from '@/utils/code';
+import { PurchaseOrderReceiptsInfo } from './PurchaseOrderReceiptsInfo';
 import { PurchaseOrderStatusStrip } from './PurchaseOrderStatusStrip';
 import {
   PurchaseOrderItemsListMobile,
@@ -91,11 +88,8 @@ import {
   leadTimeLabel,
   poOrderDateIso,
   poPayment,
+  poPaymentUntracked,
 } from './purchaseOrderModel';
-import {
-  salesOrderPaymentAdviceOf,
-  type PaymentDraftState,
-} from '@/pages/sales-orders/salesOrderPaymentAdvice';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -377,15 +371,33 @@ export function PurchaseOrderDetailPage() {
         <Stack gap={4}>
           <FieldLabel>{t('purchaseOrders.columns.payment')}</FieldLabel>
           <Group gap={6}>
-            <Badge variant="light" color={poIsPaid(order) ? 'green' : overdue ? 'red' : 'orange'}>
-              {poIsPaid(order)
-                ? t('purchaseOrders.payment.paid')
-                : overdue
-                  ? t('purchaseOrders.payment.overdue')
-                  : poPayment(order).state === 'partial'
-                    ? t('purchaseOrders.payment.partial')
-                    : t('purchaseOrders.payment.unpaid')}
+            <Badge
+              variant="light"
+              color={
+                poPaymentUntracked(order)
+                  ? 'gray'
+                  : poIsPaid(order)
+                    ? 'green'
+                    : overdue
+                      ? 'red'
+                      : 'orange'
+              }
+            >
+              {poPaymentUntracked(order)
+                ? t('purchaseOrders.payment.untracked')
+                : poIsPaid(order)
+                  ? t('purchaseOrders.payment.paid')
+                  : overdue
+                    ? t('purchaseOrders.payment.overdue')
+                    : poPayment(order).state === 'partial'
+                      ? t('purchaseOrders.payment.partial')
+                      : t('purchaseOrders.payment.unpaid')}
             </Badge>
+            {poPaymentUntracked(order) && d.canMarkPaid && (
+              <Button variant="light" size="compact-sm" onClick={() => void d.trackAgain()}>
+                {t('purchaseOrders.payment.trackAgain')}
+              </Button>
+            )}
             {d.showPrice && poPayment(order).state === 'partial' && (
               <Text size="xs" c="dimmed">
                 {t('purchaseOrders.payment.paidRemaining', {
@@ -426,11 +438,6 @@ export function PurchaseOrderDetailPage() {
             {t('purchaseOrders.detail.receiptsUnreadable')}
           </Alert>
         )}
-        {d.liveCount > 1 && (
-          <Alert color="orange" variant="light" icon={<IconAlertTriangle size={16} />}>
-            {t('purchaseOrders.detail.severalLiveReceipts')}
-          </Alert>
-        )}
         {d.receipts === null && !d.receiptsUnreadable && (
           <Text size="sm" c="dimmed">
             …
@@ -441,17 +448,7 @@ export function PurchaseOrderDetailPage() {
             {t('purchaseOrders.detail.noReceipt')}
           </Text>
         )}
-        {receiptRows.map((r) => {
-          const st = findReceiptStatus(r.status);
-          return (
-            <Group key={r.id} gap="sm">
-              <GoodsReceiptLink id={r.id} fallbackLabel={r.receiptNumber} />
-              <Badge variant="light" color={st.color}>
-                {t(st.labelKey)}
-              </Badge>
-            </Group>
-          );
-        })}
+        <PurchaseOrderReceiptsInfo receipts={receiptRows} />
       </Stack>
     </SectionCard>
   ) : null;
@@ -665,7 +662,7 @@ export function PurchaseOrderDetailPage() {
         title={t('purchaseOrders.payment.editTitle')}
         centered
       >
-        <PaymentForm
+        <PurchaseOrderPaymentForm
           initialState={poPayment(order).state}
           initialAmount={poPayment(order).paid || undefined}
           total={orderTotal(order)}
@@ -696,116 +693,6 @@ function Field({
       <Text size="sm" fw={500} ff={mono ? 'monospace' : undefined}>
         {value || '-'}
       </Text>
-    </Stack>
-  );
-}
-
-function PaymentForm({
-  initialState,
-  initialAmount,
-  total,
-  currency,
-  showPrice,
-  initialDeadline,
-  loading,
-  onCancel,
-  onSave,
-}: {
-  readonly initialState: PaymentDraftState;
-  readonly initialAmount: number | undefined;
-  readonly total: number;
-  readonly currency: PurchaseOrderCurrency;
-
-  readonly showPrice: boolean;
-  readonly initialDeadline: string | null;
-  readonly loading: boolean;
-  readonly onCancel: () => void;
-  readonly onSave: (next: { isPaid: boolean; paidAmount: number; paymentDeadline: string }) => void;
-}) {
-  const { t } = useTranslation();
-
-  const [state, setState] = useState<PaymentDraftState>(
-    !showPrice && initialState === 'partial' ? 'unpaid' : initialState,
-  );
-  const [amount, setAmount] = useState<number | undefined>(initialAmount);
-  const [deadline, setDeadline] = useState<string | null>(initialDeadline);
-  const [error, setError] = useState<string | null>(null);
-  const advice = salesOrderPaymentAdviceOf({ state, amount, total });
-  const submit = () => {
-    if (advice.kind === 'blocked') {
-      setError(
-        t(
-          advice.reason === 'amountRequired'
-            ? 'purchaseOrders.payment.amountRequired'
-            : 'purchaseOrders.payment.amountNonNegative',
-        ),
-      );
-      return;
-    }
-    onSave({
-      isPaid: state === 'paid',
-      paidAmount: state === 'partial' ? (amount ?? 0) : 0,
-      paymentDeadline: deadline ? vnDateStringToIso(deadline) : '',
-    });
-  };
-  return (
-    <Stack gap="md">
-      <SegmentedControl
-        fullWidth
-        value={state}
-        onChange={(next) => {
-          setState(next as PaymentDraftState);
-          setError(null);
-        }}
-        data={[
-          { value: 'unpaid', label: t('purchaseOrders.payment.unpaid') },
-          ...(showPrice ? [{ value: 'partial', label: t('purchaseOrders.payment.partial') }] : []),
-          { value: 'paid', label: t('purchaseOrders.payment.paid') },
-        ]}
-      />
-      {state === 'paid' && (
-        <Text size="xs" c="dimmed">
-          {t('purchaseOrders.payment.paidInFullHint')}
-        </Text>
-      )}
-      {state === 'partial' && (
-        <NumberField
-          label={`${t('purchaseOrders.payment.amount')} (${currency})`}
-          value={amount}
-          onChange={(next) => {
-            setAmount(next);
-            setError(null);
-          }}
-          min={0}
-        />
-      )}
-      {advice.kind === 'warn' && (
-        <Text size="sm" c="orange">
-          {t(
-            advice.reason === 'exceedsTotal'
-              ? 'purchaseOrders.payment.warnExceedsTotal'
-              : 'purchaseOrders.payment.warnSettlesOrder',
-          )}
-        </Text>
-      )}
-      <DateField
-        label={t('purchaseOrders.form.paymentDeadlineLabel')}
-        value={deadline}
-        onChange={setDeadline}
-      />
-      {error && (
-        <Text size="sm" c="red">
-          {error}
-        </Text>
-      )}
-      <Group justify="flex-end">
-        <Button variant="default" onClick={onCancel} disabled={loading}>
-          {t('common.actions.cancel')}
-        </Button>
-        <Button loading={loading} onClick={submit}>
-          {t('common.actions.save')}
-        </Button>
-      </Group>
     </Stack>
   );
 }

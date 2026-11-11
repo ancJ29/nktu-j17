@@ -49,6 +49,7 @@ import { ProductInventoryDecomposeSetModal } from './ProductInventoryDecomposeSe
 import { ProductInventoryOutgoingModal } from './ProductInventoryOutgoingModal';
 import { rollupReservationsBySO } from './productInventoryReservations';
 import { useReservationOrderStatus } from './useReservationOrderStatus';
+import { inventoryExportInput } from './inventoryExportInput';
 import { InventoryImportExportActions } from '@/components/inventory/InventoryImportExportActions';
 import { hasHideFromInventoryListForProducts, isLocationsEnabled } from '@/utils/permission';
 import {
@@ -240,35 +241,45 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     columnFilters: filterState.columnFilters,
   };
 
-  const { search, setSearch, page, setPage, pageSize, setPageSize, paginated, totalPages } =
-    useListFilter(summaries, {
-      filters,
-      filterFn: (s, f) => {
-        if (!s.product.isActive) return false;
-        if (f.category && s.product.extra?.category !== f.category) return false;
+  const {
+    search,
+    setSearch,
+    page,
+    setPage,
+    pageSize,
+    setPageSize,
+    filtered,
+    paginated,
+    totalPages,
+  } = useListFilter(summaries, {
+    filters,
+    filterFn: (s, f) => {
+      if (!s.product.isActive) return false;
+      if (f.category && s.product.extra?.category !== f.category) return false;
 
-        const stock = f.stock === 'needsRecheck' || stockLevelFilterEnabled ? f.stock : null;
-        if (f.locationCode && s.rows.length === 0 && stock !== 'noStock') return false;
-        if (stock === 'noStock' && s.rows.length > 0) return false;
-        if (stock === 'outOfStock' && (s.rows.length === 0 || s.totalOnHand !== 0)) return false;
-        if (stock === 'negative' && s.totalOnHand >= 0) return false;
-        if (stock === 'needsRecheck' && !s.needsRecheck) return false;
-        if (stock === 'lowStock') {
-          const min = s.product.extra?.minimumInventory?.value;
-          if (typeof min !== 'number' || s.totalOnHand <= 0 || s.totalOnHand > min) return false;
-        }
-        if (secondaryFilterEnabled && f.secondary && s.secondaryStatus !== f.secondary)
-          return false;
+      const stock = f.stock === 'needsRecheck' || stockLevelFilterEnabled ? f.stock : null;
+      if (f.locationCode && s.rows.length === 0 && stock !== 'noStock') return false;
+      if (stock === 'noStock' && s.rows.length > 0) return false;
+      if (stock === 'outOfStock' && (s.rows.length === 0 || s.totalOnHand !== 0)) return false;
+      if (stock === 'negative' && s.totalOnHand >= 0) return false;
+      if (stock === 'needsRecheck' && !s.needsRecheck) return false;
+      if (stock === 'lowStock') {
+        const min = s.product.extra?.minimumInventory?.value;
+        if (typeof min !== 'number' || s.totalOnHand <= 0 || s.totalOnHand > min) return false;
+      }
+      if (secondaryFilterEnabled && f.secondary && s.secondaryStatus !== f.secondary) return false;
 
-        if (!columnFilters.predicate(s)) return false;
-        return true;
-      },
-      searchFields: (s) => [s.product.name, s.product.extra?.sku ?? '', s.product.code],
-      search: filterState.search,
-      onSearchChange,
-      page: filterState.page,
-      onPageChange,
-    });
+      if (!columnFilters.predicate(s)) return false;
+      return true;
+    },
+    searchFields: (s) => [s.product.name, s.product.extra?.sku ?? '', s.product.code],
+    search: filterState.search,
+    onSearchChange,
+    page: filterState.page,
+    onPageChange,
+  });
+
+  const exportInput = useMemo(() => inventoryExportInput(filtered), [filtered]);
 
   const {
     totalCount,
@@ -774,6 +785,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
                   entityType="product"
                   rows={allRows}
                   items={products}
+                  exportRows={exportInput.rows}
+                  exportItems={exportInput.items}
                   unitLabels={unitLabels}
                   canExport={true}
                   canImport={canBulkImport}

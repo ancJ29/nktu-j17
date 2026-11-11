@@ -52,6 +52,8 @@ export type PurchaseOrder = PartitionedRecordRow & {
   paidAmount?: number;
 
   paymentDeadline?: string;
+
+  paymentUntracked?: boolean;
   paidAt?: string;
 
   receiptIds: string[];

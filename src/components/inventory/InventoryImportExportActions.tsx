@@ -49,6 +49,9 @@ type Props = {
 
   readonly items: ReadonlyArray<MasterItem>;
 
+  readonly exportRows?: ReadonlyArray<ExistingRow>;
+  readonly exportItems?: ReadonlyArray<MasterItem>;
+
   readonly unitLabels?: ReadonlyMap<string, string>;
 
   readonly canImport: boolean;
@@ -68,6 +71,8 @@ export function InventoryImportExportActions({
   entityType,
   rows,
   items,
+  exportRows,
+  exportItems,
   unitLabels,
   canImport,
   canExport,
@@ -82,7 +87,9 @@ export function InventoryImportExportActions({
   const fileButtonResetRef = useRef<() => void>(null);
 
   const handleExport = useCallback(() => {
-    const activeItemCount = items.filter((it) => it.isActive && !it.extra?.isDeleted).length;
+    const outItems = exportItems ?? items;
+    const outRows = exportRows ?? rows;
+    const activeItemCount = outItems.filter((it) => it.isActive && !it.extra?.isDeleted).length;
     if (activeItemCount === 0) {
       notifications.show({
         color: 'yellow',
@@ -91,7 +98,7 @@ export function InventoryImportExportActions({
       return;
     }
     try {
-      exportInventoryToExcel(rows, items, {
+      exportInventoryToExcel(outRows, outItems, {
         language: i18n.language,
         entityType,
         unitLabels,
@@ -107,7 +114,7 @@ export function InventoryImportExportActions({
         message: t(`${ns}.notifications.exportError`),
       });
     }
-  }, [rows, items, entityType, unitLabels, i18n.language, t, ns]);
+  }, [rows, items, exportRows, exportItems, entityType, unitLabels, i18n.language, t, ns]);
 
   const handleFile = useCallback(
     async (file: File | null) => {

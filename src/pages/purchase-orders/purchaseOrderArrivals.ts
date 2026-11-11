@@ -3,7 +3,7 @@ import { cMngtConnector } from '@credo/connectors/connector';
 import { asyncDeduplicator, logger } from '@credo/base-ui/utils';
 import { businessDateString } from '@/utils/code';
 import type { GoodsReceipt, GoodsReceiptExtra, PurchaseOrder } from '@/types';
-import { liveReceipt } from './purchaseOrderReceipts';
+import { liveReceipt, type ReceiptsRead } from './purchaseOrderReceipts';
 import { poStatus, vnDayOf } from './purchaseOrderModel';
 
 export type Arrival =
@@ -35,7 +35,9 @@ export function arrivalOf(
   return arrivalFromReceipts(receipts.filter((r) => r.extra?.purchaseOrderId === po.id));
 }
 
-export function arrivalsByOrder(receipts: readonly GoodsReceipt[]): ReadonlyMap<string, Arrival> {
+export function receiptsByOrder(
+  receipts: readonly GoodsReceipt[],
+): ReadonlyMap<string, readonly GoodsReceipt[]> {
   const grouped = new Map<string, GoodsReceipt[]>();
   for (const r of receipts) {
     const id = r.extra?.purchaseOrderId;
@@ -44,7 +46,13 @@ export function arrivalsByOrder(receipts: readonly GoodsReceipt[]): ReadonlyMap<
     if (list) list.push(r);
     else grouped.set(id, [r]);
   }
-  return new Map([...grouped].map(([id, list]) => [id, arrivalFromReceipts(list)]));
+  return grouped;
+}
+
+export function arrivalsByOrder(receipts: readonly GoodsReceipt[]): ReadonlyMap<string, Arrival> {
+  return new Map(
+    [...receiptsByOrder(receipts)].map(([id, list]) => [id, arrivalFromReceipts(list)]),
+  );
 }
 
 export type ArrivalsState =
@@ -53,11 +61,22 @@ export type ArrivalsState =
   | {
       readonly kind: 'ok';
       readonly arrivals: ReadonlyMap<string, Arrival>;
+
+      readonly receiptsByOrder: ReadonlyMap<string, readonly GoodsReceipt[]>;
       readonly count: number;
     };
 
 export function arrivalFor(state: ArrivalsState, po: Pick<PurchaseOrder, 'id'>): Arrival | null {
   return state.kind === 'ok' ? (state.arrivals.get(po.id) ?? NONE) : null;
+}
+
+export function receiptsFor(
+  state: ArrivalsState,
+  po: Pick<PurchaseOrder, 'id'>,
+): ReceiptsRead | null {
+  if (state.kind === 'loading') return null;
+  if (state.kind === 'unreadable') return { kind: 'unreadable' };
+  return { kind: 'ok', receipts: [...(state.receiptsByOrder.get(po.id) ?? [])] };
 }
 
 export function notArrivedCount(
@@ -80,7 +99,12 @@ export async function readArrivals(fromDay: string): Promise<ArrivalsState> {
       });
       return res.goodsReceipts as GoodsReceipt[];
     });
-    return { kind: 'ok', arrivals: arrivalsByOrder(receipts), count: receipts.length };
+    return {
+      kind: 'ok',
+      arrivals: arrivalsByOrder(receipts),
+      receiptsByOrder: receiptsByOrder(receipts),
+      count: receipts.length,
+    };
   } catch (err) {
     logger.error('Reading the receipts behind the purchase-order list failed:', err);
     return { kind: 'unreadable' };

@@ -1,91 +1,107 @@
-import { encodeFilterBlob } from '@/hooks/useUrlFilterState';
-import { ROUTES } from '@/constants/routes';
 import type { SalesOrder } from '@/types';
-import { defaultLastNDaysRange, serializeDateRange } from '@/utils/listFilterDateRange';
 import {
   computeSalesOrderTotals,
   isSalesOrderBillingExempt,
   isSalesOrderOverdue,
+  isSalesOrderPaymentUntracked,
   resolveSalesOrderPaymentState,
   salesOrderDeadlineDay,
 } from '@/utils/salesOrderPricing';
 
 export const RECEIVABLES_WINDOW_DAYS = 90;
 
-export const WALK_IN_KEY = '';
+export type ReceivableBucket = 'overdue' | 'notYetDue' | 'undated';
 
-export type ReceivableRow = {
-  customerCode: string;
+export type Receivable = {
+  bucket: ReceivableBucket;
 
-  orderCount: number;
+  remaining: number;
 
-  overdue: number;
-
-  notYetDue: number;
-
-  undated: number;
-
-  total: number;
-
-  earliestDue: string;
+  dueDay: string;
 };
 
-export function groupReceivables(
+export function receivableOf(
+  order: SalesOrder,
+  todayVn: string,
+  fallbackRate: number,
+): Receivable | null {
+  const extra = order.extra;
+  if (
+    extra?.cancellation != null ||
+    isSalesOrderBillingExempt(extra) ||
+    isSalesOrderPaymentUntracked(extra)
+  ) {
+    return null;
+  }
+  const { grandTotal } = computeSalesOrderTotals(order, fallbackRate);
+  const payment = resolveSalesOrderPaymentState(extra, grandTotal);
+  if (payment.state === 'paid') return null;
+  const dueDay = salesOrderDeadlineDay(extra);
+  const bucket: ReceivableBucket =
+    dueDay === ''
+      ? 'undated'
+      : isSalesOrderOverdue(order, todayVn, fallbackRate)
+        ? 'overdue'
+        : 'notYetDue';
+  return { bucket, remaining: payment.remaining, dueDay };
+}
+
+export type ReceivableFilter = 'unpaid' | 'overdue' | 'paid' | 'untracked' | 'all';
+
+export const RECEIVABLE_FILTERS: readonly ReceivableFilter[] = [
+  'unpaid',
+  'overdue',
+  'paid',
+  'untracked',
+  'all',
+];
+export const DEFAULT_RECEIVABLE_FILTER: ReceivableFilter = 'unpaid';
+
+export function parseReceivableFilter(v: unknown): ReceivableFilter {
+  return RECEIVABLE_FILTERS.includes(v as ReceivableFilter)
+    ? (v as ReceivableFilter)
+    : DEFAULT_RECEIVABLE_FILTER;
+}
+
+export function matchesReceivableFilter(
+  order: SalesOrder,
+  filter: ReceivableFilter,
+  todayVn: string,
+  fallbackRate: number,
+): boolean {
+  const extra = order.extra;
+  if (extra?.cancellation != null) return false;
+  if (filter === 'all') return true;
+  if (isSalesOrderBillingExempt(extra)) return false;
+
+  if (filter === 'untracked') return isSalesOrderPaymentUntracked(extra);
+  if (isSalesOrderPaymentUntracked(extra)) return false;
+  if (filter === 'overdue') return isSalesOrderOverdue(order, todayVn, fallbackRate);
+  if (filter === 'unpaid') return receivableOf(order, todayVn, fallbackRate) !== null;
+  const { grandTotal } = computeSalesOrderTotals(order, fallbackRate);
+  return resolveSalesOrderPaymentState(extra, grandTotal).state === 'paid';
+}
+
+export type ReceivableSums = {
+  overdue: number;
+  notYetDue: number;
+  undated: number;
+  total: number;
+};
+
+export function sumReceivables(
   orders: readonly SalesOrder[],
   todayVn: string,
   fallbackRate: number,
-): ReceivableRow[] {
-  const rows = new Map<string, ReceivableRow>();
+): ReceivableSums {
+  const sums: ReceivableSums = { overdue: 0, notYetDue: 0, undated: 0, total: 0 };
   for (const order of orders) {
-    const extra = order.extra;
-    if (extra?.cancellation != null || isSalesOrderBillingExempt(extra)) continue;
-    const { grandTotal } = computeSalesOrderTotals(order, fallbackRate);
-    const payment = resolveSalesOrderPaymentState(extra, grandTotal);
-    if (payment.state === 'paid') continue;
-
-    const key = extra?.customerCode || WALK_IN_KEY;
-    let row = rows.get(key);
-    if (!row) {
-      row = {
-        customerCode: key,
-        orderCount: 0,
-        overdue: 0,
-        notYetDue: 0,
-        undated: 0,
-        total: 0,
-        earliestDue: '',
-      };
-      rows.set(key, row);
-    }
-    row.orderCount += 1;
-    row.total += payment.remaining;
-    const day = salesOrderDeadlineDay(extra);
-    if (day === '') row.undated += payment.remaining;
-    else if (isSalesOrderOverdue(order, todayVn, fallbackRate)) row.overdue += payment.remaining;
-    else row.notYetDue += payment.remaining;
-    if (day !== '' && (row.earliestDue === '' || day < row.earliestDue)) row.earliestDue = day;
+    const r = receivableOf(order, todayVn, fallbackRate);
+    if (!r) continue;
+    sums[r.bucket] += r.remaining;
+    sums.total += r.remaining;
   }
-  return [...rows.values()].sort(compareReceivableRows);
-}
-
-function compareReceivableRows(a: ReceivableRow, b: ReceivableRow): number {
-  if (a.overdue !== b.overdue) return b.overdue - a.overdue;
-  if (a.earliestDue !== b.earliestDue) {
-    if (a.earliestDue === '') return 1;
-    if (b.earliestDue === '') return -1;
-    return a.earliestDue < b.earliestDue ? -1 : 1;
-  }
-  return a.customerCode < b.customerCode ? -1 : a.customerCode > b.customerCode ? 1 : 0;
-}
-
-export function receivableListUrl(customerCode: string): string {
-  const blob = encodeFilterBlob({
-    v: 'finance',
-    ...(customerCode !== WALK_IN_KEY ? { c: customerCode } : {}),
-    pf: 'unpaid',
-    cd: serializeDateRange(defaultLastNDaysRange(RECEIVABLES_WINDOW_DAYS)),
-  });
-  return `${ROUTES.SALES_ORDERS.LIST}?f=${blob}`;
+  return sums;
 }
 
 export function scopeReceivableOrders(

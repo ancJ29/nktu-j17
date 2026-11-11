@@ -32,7 +32,9 @@
       "deadline": "Deadline {{date}}",
       "markedPaid": "Marked paid",
       "markedUnpaid": "Marked unpaid",
-      "receipt": "Receipt {{number}}"
+      "receipt": "Receipt {{number}}",
+      "trackedAgain": "Tracking payment again",
+      "untracked": "Stopped tracking payment"
     },
     "activityVerbs": {
       "cancel": "Cancelled order",
@@ -92,8 +94,11 @@
   },
   "list": {
     "arrivalsUnreadable": "The receipts could not be read, so the not-arrived figure is not shown.",
+    "cancelledTotal": "Cancelled",
     "notArrived": "Not arrived",
     "ordersTotal": "Orders",
+    "receiptsLoading": "Loading goods receipts…",
+    "receiptsUnreadable": "The goods receipts of this order could not be read. Refresh the list to try again.",
     "searchPlaceholder": "Search number, vendor, reference…"
   },
   "noItems": "No purchase orders in this period",
@@ -136,7 +141,9 @@
     "paidInFullHint": "Paid in full: no figure to enter.",
     "paidRemaining": "Paid {{paid}} · Left {{remaining}} {{currency}}",
     "partial": "Partial",
+    "trackAgain": "Track again",
     "unpaid": "Unpaid",
+    "untracked": "Not tracked",
     "warnExceedsTotal": "The amount is above the order total. Check it again.",
     "warnSettlesOrder": "The amount covers the whole order: consider choosing Paid."
   },

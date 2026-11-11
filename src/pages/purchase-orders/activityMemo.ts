@@ -31,12 +31,19 @@ export function stateMemo(order: Pick<PurchaseOrder, 'orderNumber' | 'vendorCode
 
 export function paymentMemo(
   order: Pick<PurchaseOrder, 'orderNumber' | 'vendorCode'>,
-  next: { isPaid: boolean; state: 'unpaid' | 'partial' | 'paid'; deadlineDay: string },
+  next: {
+    isPaid: boolean;
+    state: 'unpaid' | 'partial' | 'paid';
+    deadlineDay: string;
+
+    tracking?: 'untracked' | 'tracked';
+  },
 ) {
   return {
     ...stateMemo(order),
     isPaid: next.isPaid,
     payment: next.state,
     ...(next.deadlineDay ? { deadline: next.deadlineDay } : {}),
+    ...(next.tracking ? { tracking: next.tracking } : {}),
   };
 }

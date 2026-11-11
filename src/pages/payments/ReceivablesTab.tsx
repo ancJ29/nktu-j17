@@ -1,51 +1,83 @@
-import { Badge, Card, Group, Stack, Text, TextInput } from '@mantine/core';
+import { Button, Card, Group, Select, Stack, Text, TextInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { device } from '@credo/base-ui/utils';
 import type { DataTableColumn } from '@credo/base-ui/components';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import { LIST_LAZY_RENDER_CHUNK } from '@/config/listDefaults';
 import { ListCardList } from '@/components/ListCardList';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ListPageHeader } from '@/components/ListPageHeader';
+import { selectionColumn } from '@/components/selectionColumn';
+import { ROUTES } from '@/constants/routes';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
+import { useListFilter } from '@/hooks/useListFilter';
+import { useSelectionMode } from '@/hooks/useRowSelection';
+import { SalesOrderPaymentMark } from '@/pages/sales-orders/SalesOrderPaymentMark';
+import { salesOrderUntrackPatch } from '@/pages/sales-orders/salesOrderMetaPatch';
 import { setSalesOrderQueryRange, useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
+import type { SalesOrder } from '@/types';
+import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { formatDate } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
-import { getPricingVatRate, perms } from '@/utils/permission';
+import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
+import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
+import { computeSalesOrderTotals, isSalesOrderOverdue } from '@/utils/salesOrderPricing';
 import { PaymentsLoadError } from './PaymentsLoadError';
+import { ReceivableRowActions } from './ReceivableRowActions';
+import { bulkMark } from './bulkMarkPayments';
+import {
+  PAID_IN_FULL_PATCH,
+  isMarkable,
+  viewerMayMark,
+  writeReceivableMark,
+} from './receivableMarks';
 import { createdInWindow, usePaymentsWindowLoad } from './paymentsWindow';
+import { usePaymentsUrlState } from './paymentsUrlState';
 import {
   RECEIVABLES_WINDOW_DAYS,
-  WALK_IN_KEY,
-  groupReceivables,
-  receivableListUrl,
+  RECEIVABLE_FILTERS,
+  matchesReceivableFilter,
+  parseReceivableFilter,
+  receivableOf,
   scopeReceivableOrders,
-  type ReceivableRow,
+  sumReceivables,
 } from './receivables';
 
 const isMobile = device.isMobile;
 const canViewAll = perms.salesOrder.canViewAll();
 const canViewSelf = perms.salesOrder.canViewSelf();
 const vatRate = getPricingVatRate();
-
-type PartyRow = ReceivableRow & { id: string; name: string };
+const viewer = {
+  showPrice: isPricingManagementEnabled() && perms.salesOrder.canViewPrice(),
+  canManagePayment: perms.salesOrder.canManagePayment(),
+};
 
 const money = (n: number) => n.toLocaleString();
-const dueText = (day: string) => (day ? formatDate(Date.parse(`${day}T00:00:00+07:00`)) : '—');
+const dueText = (ms: number | undefined) => (ms ? formatDate(ms) : '—');
 
 export function ReceivablesTab() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
+  const { state, updateState } = usePaymentsUrlState();
+  const filter = parseReceivableFilter(state.rf);
+  const customerCode = state.rc ?? null;
+  const search = state.rq ?? '';
+  const selection = useSelectionMode();
+  const { selectionMode } = selection;
+  const [bulkKind, setBulkKind] = useState<'paid' | 'untrack' | null>(null);
+  const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
 
   const { items, loading, error, cachedAt, forceRefresh } = useSalesOrderStore();
   const {
     items: customers,
     loadAll: loadCustomers,
     initialized: customersInit,
+    getByCode,
   } = useCustomerStore();
 
   useEffect(() => {
@@ -72,102 +104,203 @@ export function ReceivablesTab() {
 
   const failed = ready && (load.rejected || !!error);
 
-  const customerByCode = useMemo(() => new Map(customers.map((c) => [c.code, c])), [customers]);
+  const customerOptions = useMemo(
+    () =>
+      customers
+        .filter((c) => c.isActive)
+        .map((c) => ({ value: c.code, label: c.extra?.shortName || c.name })),
+    [customers],
+  );
 
   const todayVn = todayInVnDateString();
-  const rows = useMemo<PartyRow[]>(() => {
+  const rows = useMemo<SalesOrder[]>(() => {
     const scoped = scopeReceivableOrders(ready ? createdInWindow(items, fetchRange) : [], {
       canViewAll,
       canViewSelf,
       me: getCurrentEmployeeId() ?? undefined,
     });
-    return groupReceivables(scoped, todayVn, vatRate).map((r) => {
-      const customer = customerByCode.get(r.customerCode);
-      const name =
-        r.customerCode === WALK_IN_KEY
-          ? t('payments.receivable.walkIn')
-          : customer?.extra?.shortName || customer?.name || r.customerCode;
-      return { ...r, id: r.customerCode || '__walk-in__', name };
-    });
-  }, [items, ready, fetchRange, todayVn, customerByCode, t]);
-
-  const shown = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return q ? rows.filter((r) => r.name.toLowerCase().includes(q)) : rows;
-  }, [rows, search]);
+    const kept = scoped.filter((o) => {
+      if (!matchesReceivableFilter(o, filter, todayVn, vatRate)) return false;
+      if (customerCode && o.extra?.customerCode !== customerCode) return false;
+      if (!q) return true;
+      const name = resolveSalesOrderCustomerName(o, getByCode) ?? '';
+      return (o.orderNumber ?? '').toLowerCase().includes(q) || name.toLowerCase().includes(q);
+    });
 
-  const sums = useMemo(
-    () =>
-      shown.reduce(
-        (a, r) => ({
-          overdue: a.overdue + r.overdue,
-          notYetDue: a.notYetDue + r.notYetDue,
-          undated: a.undated + r.undated,
-          total: a.total + r.total,
-        }),
-        { overdue: 0, notYetDue: 0, undated: 0, total: 0 },
-      ),
-    [shown],
+    const due = (o: SalesOrder) => receivableOf(o, todayVn, vatRate)?.dueDay ?? '';
+    return kept.sort((a, b) => {
+      const da = due(a);
+      const db = due(b);
+      if (da !== db) return da === '' ? 1 : db === '' ? -1 : da < db ? -1 : 1;
+      return (a.orderNumber ?? '').localeCompare(b.orderNumber ?? '');
+    });
+  }, [items, ready, fetchRange, todayVn, filter, customerCode, search, getByCode]);
+
+  const sums = useMemo(() => sumReceivables(rows, todayVn, vatRate), [rows, todayVn]);
+
+  const {
+    paginated: shownRows,
+    totalItems,
+    hasMore,
+    loadMore,
+  } = useListFilter(rows, { lazyKey: ROUTES.PAYMENTS.LIST, shouldPagination: false });
+  const loadingMoreLabel = t('__new__.01-common.list.loadingMore', {
+    chunk: Math.min(totalItems - shownRows.length, LIST_LAZY_RENDER_CHUNK),
+    total: totalItems,
+  });
+
+  const canBulk = !isMobile && viewer.showPrice && viewer.canManagePayment;
+  const selectable = useMemo(
+    () => rows.filter((o) => viewerMayMark(o, viewer) && isMarkable(o, todayVn, vatRate)),
+    [rows, todayVn],
   );
+  const selectableIds = useMemo(() => selectable.map((o) => o.id), [selectable]);
+  const chosen = useMemo(
+    () => selectable.filter((o) => selection.isSelected(o.id)),
+    [selectable, selection],
+  );
+  const chosenTotal = chosen.reduce(
+    (a, o) => a + (receivableOf(o, todayVn, vatRate)?.remaining ?? 0),
+    0,
+  );
+  const headerSel = selection.headerState(selectableIds);
 
-  const columns = useMemo<Array<DataTableColumn<PartyRow>>>(
+  const runBulk = async () => {
+    const kind = bulkKind;
+    if (!kind) return;
+    const patch = kind === 'paid' ? PAID_IN_FULL_PATCH : salesOrderUntrackPatch(true);
+    setProgress({ done: 0, total: chosen.length });
+
+    const result = await bulkMark(
+      chosen,
+      (o) => writeReceivableMark(o, patch),
+      (done, total) => setProgress({ done, total }),
+    );
+    setProgress(null);
+    setBulkKind(null);
+
+    const stay = new Set(
+      [...result.conflicted, ...result.failed.map((f) => f.item)].map((o) => o.id),
+    );
+    selection.clear();
+    for (const id of stay) selection.toggle(id);
+    notifications.show({
+      color: result.failed.length > 0 ? 'red' : result.conflicted.length > 0 ? 'yellow' : 'teal',
+      title: t('payments.bulk.doneTitle'),
+      message: t('payments.bulk.done', {
+        saved: result.saved.length,
+        conflicted: result.conflicted.length,
+        failed: result.failed.length,
+      }),
+      autoClose: 10000,
+    });
+  };
+
+  const customerName = (o: SalesOrder) => resolveSalesOrderCustomerName(o, getByCode) ?? '-';
+  const leftOf = (o: SalesOrder) => receivableOf(o, todayVn, vatRate)?.remaining ?? 0;
+
+  const columns = useMemo<Array<DataTableColumn<SalesOrder>>>(
     () => [
       {
-        key: 'name',
-        header: t('payments.receivable.columns.party'),
-        render: (r) => <Text fw={600}>{r.name}</Text>,
-      },
-      {
-        key: 'orderCount',
-        header: t('payments.columns.orders'),
-        ta: 'right',
-        width: '120px',
-        render: (r) => <Text>{r.orderCount}</Text>,
-      },
-      {
-        key: 'overdue',
-        header: t('payments.columns.overdue'),
-        ta: 'right',
-        width: '150px',
-        render: (r) => (
-          <Text c={r.overdue > 0 ? 'red' : 'dimmed'} fw={r.overdue > 0 ? 600 : 400}>
-            {money(r.overdue)}
+        key: 'orderNumber',
+        header: t('salesOrders.columns.orderNumber'),
+        width: '180px',
+        render: (o) => (
+          <Text fz="md" fw={500}>
+            {o.orderNumber}
           </Text>
         ),
       },
       {
-        key: 'notYetDue',
-        header: t('payments.columns.notYetDue'),
-        ta: 'right',
-        width: '150px',
-        render: (r) => <Text>{money(r.notYetDue)}</Text>,
+        key: 'orderDate',
+        header: t('__new__.01-common.labels.orderDate'),
+        width: '120px',
+        render: (o) => <Text size="sm">{formatDate(getSalesOrderReadyDate(o))}</Text>,
       },
       {
-        key: 'undated',
-        header: t('payments.columns.undated'),
-        ta: 'right',
-        width: '150px',
-        render: (r) => <Text>{money(r.undated)}</Text>,
+        key: 'customer',
+        header: t('common.labels.customer'),
+        width: '200px',
+        render: (o) => <Text fz="md">{customerName(o)}</Text>,
       },
       {
-        key: 'total',
+        key: 'grandTotal',
+        header: t('salesOrders.finance.grandTotalLabel'),
+        ta: 'right',
+        width: '150px',
+        render: (o) => (
+          <Text size="sm" ta="right">
+            {money(computeSalesOrderTotals(o, vatRate).grandTotal)}
+          </Text>
+        ),
+      },
+      {
+        key: 'left',
         header: t('payments.receivable.columns.total'),
         ta: 'right',
-        width: '160px',
-        render: (r) => <Text fw={700}>{money(r.total)}</Text>,
+        width: '150px',
+        render: (o) => (
+          <Text size="sm" fw={600} ta="right">
+            {money(leftOf(o))}
+          </Text>
+        ),
       },
       {
-        key: 'earliestDue',
-        header: t('payments.columns.earliestDue'),
-        ta: 'right',
-        width: '140px',
-        render: (r) => <Text>{dueText(r.earliestDue)}</Text>,
+        key: 'dueDate',
+        header: t('salesOrders.finance.dueDateLabel'),
+        width: '120px',
+        render: (o) => {
+          const overdue = isSalesOrderOverdue(o, todayVn, vatRate);
+          return (
+            <Text size="sm" c={overdue ? 'red' : undefined} fw={overdue ? 600 : undefined}>
+              {dueText(o.extra?.paymentDeadline)}
+            </Text>
+          );
+        },
+      },
+      {
+        key: 'payment',
+        header: t('salesOrders.finance.paymentLabel'),
+        width: '170px',
+        render: (o) => <SalesOrderPaymentMark order={o} vatRate={vatRate} todayVn={todayVn} />,
+      },
+
+      {
+        key: 'marks',
+        header: '',
+        width: '210px',
+        render: (o) =>
+          viewerMayMark(o, viewer) && isMarkable(o, todayVn, vatRate) ? (
+            <ReceivableRowActions order={o} vatRate={vatRate} left={leftOf(o)} />
+          ) : null,
       },
     ],
-    [t],
+
+    [t, todayVn, getByCode],
   );
 
-  const open = (r: PartyRow) => navigate(receivableListUrl(r.customerCode));
+  const tableColumns = useMemo(() => {
+    if (!selectionMode) return columns;
+    const sel = selectionColumn<SalesOrder>({
+      keyOf: (o) => o.id,
+      isSelected: (id) => selection.isSelected(id),
+      onToggleRow: (id) => selection.toggle(id),
+      onToggleAll: () => selection.toggleAllIn(selectableIds),
+      allSelected: headerSel.allSelected,
+      someSelected: headerSel.someSelected,
+      selectAllLabel: t('payments.bulk.selectAll'),
+      rowLabel: (o) => o.orderNumber,
+    });
+    const boxed = new Set(selectableIds);
+
+    return [
+      { ...sel, render: (o: SalesOrder) => (boxed.has(o.id) ? sel.render(o) : null) },
+      ...columns.filter((c) => c.key !== 'marks'),
+    ];
+  }, [columns, selectionMode, selection, selectableIds, headerSel, t]);
+
+  const open = (o: SalesOrder) => navigate(ROUTES.SALES_ORDERS.DETAIL.replace(':id', o.id));
 
   const header = (
     <ListPageHeader
@@ -193,7 +326,6 @@ export function ReceivablesTab() {
         <>
           <Card withBorder radius="md" padding="sm" shadow="sm">
             <Group gap="lg" wrap="wrap">
-              <Cell label={t('payments.receivable.partiesLabel')} value={String(shown.length)} />
               <Cell label={t('payments.columns.overdue')} value={money(sums.overdue)} />
               <Cell label={t('payments.columns.notYetDue')} value={money(sums.notYetDue)} />
               <Cell label={t('payments.columns.undated')} value={money(sums.undated)} />
@@ -205,49 +337,152 @@ export function ReceivablesTab() {
             </Group>
           </Card>
 
-          <TextInput
-            value={search}
-            onChange={(e) => setSearch(e.currentTarget.value)}
-            placeholder={t('payments.receivable.searchPlaceholder')}
-            aria-label={t('payments.receivable.searchPlaceholder')}
-          />
+          <Group gap="sm" wrap="wrap" align="flex-end">
+            <Select
+              aria-label={t('payments.filter.label')}
+              data={RECEIVABLE_FILTERS.map((f) => ({ value: f, label: t(`payments.filter.${f}`) }))}
+              value={filter}
+              allowDeselect={false}
+              onChange={(v) => updateState({ rf: parseReceivableFilter(v) })}
+              w={isMobile ? '100%' : 200}
+            />
+            <Select
+              aria-label={t('common.labels.customer')}
+              placeholder={t('common.labels.customer')}
+              data={customerOptions}
+              value={customerCode}
+              clearable
+              searchable
+              onChange={(v) => updateState({ rc: v ?? undefined })}
+              w={isMobile ? '100%' : 240}
+            />
+            <TextInput
+              value={search}
+              onChange={(e) => updateState({ rq: e.currentTarget.value })}
+              placeholder={t('payments.receivable.searchPlaceholder')}
+              aria-label={t('payments.receivable.searchPlaceholder')}
+              style={{ flex: 1, minWidth: 200 }}
+            />
+          </Group>
+
+          {canBulk && (
+            <Group gap="sm" wrap="wrap">
+              {selectionMode ? (
+                <>
+                  <Button
+                    color="teal"
+                    size="compact-md"
+                    disabled={chosen.length === 0 || progress !== null}
+                    onClick={() => setBulkKind('paid')}
+                  >
+                    {t('payments.bulk.paidAll', { count: chosen.length })}
+                  </Button>
+                  <Button
+                    variant="default"
+                    size="compact-md"
+                    disabled={chosen.length === 0 || progress !== null}
+                    onClick={() => setBulkKind('untrack')}
+                  >
+                    {t('payments.bulk.untrackAll', { count: chosen.length })}
+                  </Button>
+                  <Button
+                    variant="subtle"
+                    size="compact-md"
+                    disabled={progress !== null}
+                    onClick={selection.exitSelectionMode}
+                  >
+                    {t('payments.bulk.exit')}
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  variant="default"
+                  size="compact-md"
+                  disabled={selectable.length === 0}
+                  onClick={selection.enterSelectionMode}
+                >
+                  {t('payments.bulk.select')}
+                </Button>
+              )}
+            </Group>
+          )}
+
+          <ConfirmModal
+            opened={bulkKind !== null}
+            onClose={() => progress === null && setBulkKind(null)}
+            onConfirm={() => void runBulk()}
+            title={
+              bulkKind === 'paid'
+                ? t('payments.bulk.paidAll', { count: chosen.length })
+                : t('payments.bulk.untrackAll', { count: chosen.length })
+            }
+            message={t(
+              bulkKind === 'paid' ? 'payments.bulk.confirmPaid' : 'payments.bulk.confirmUntrack',
+              {
+                count: chosen.length,
+                total: money(chosenTotal),
+              },
+            )}
+            confirmLabel={
+              bulkKind === 'paid' ? t('payments.mark.paid') : t('payments.mark.untrack')
+            }
+            confirmColor={bulkKind === 'paid' ? 'teal' : 'gray'}
+            loading={progress !== null}
+          >
+            {progress && (
+              <Text size="sm" c="dimmed">
+                {t('payments.bulk.progress', { done: progress.done, total: progress.total })}
+              </Text>
+            )}
+          </ConfirmModal>
 
           {isMobile ? (
             <ListCardList
-              data={shown}
+              data={shownRows}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              loadingMoreLabel={loadingMoreLabel}
               isLoading={!ready}
               emptyMessage={t('payments.receivable.empty')}
               onRowClick={open}
-              renderCard={(r) => (
+              renderCard={(o) => (
                 <Stack gap={4}>
-                  <Group justify="space-between" wrap="nowrap">
-                    <Text fw={600}>{r.name}</Text>
-                    {r.overdue > 0 && (
-                      <Badge color="red" variant="light">
-                        {t('payments.columns.overdue')}: {money(r.overdue)}
-                      </Badge>
-                    )}
+                  <Group justify="space-between" wrap="nowrap" align="flex-start">
+                    <Text fw={700} style={{ minWidth: 0, wordBreak: 'break-word' }}>
+                      {o.orderNumber}
+                    </Text>
+                    <SalesOrderPaymentMark order={o} vatRate={vatRate} todayVn={todayVn} />
                   </Group>
+                  <Text size="sm">{customerName(o)}</Text>
                   <Group justify="space-between">
                     <Text size="sm" c="dimmed">
                       {t('payments.receivable.columns.total')}
                     </Text>
-                    <Text fw={700}>{money(r.total)}</Text>
+                    <Text fw={700}>{money(leftOf(o))}</Text>
                   </Group>
                   <Text size="xs" c="dimmed">
-                    {t('payments.columns.orders')}: {r.orderCount} ·{' '}
-                    {t('payments.columns.earliestDue')}: {dueText(r.earliestDue)}
+                    {t('salesOrders.finance.dueDateLabel')}: {dueText(o.extra?.paymentDeadline)}
                   </Text>
                 </Stack>
               )}
             />
           ) : (
             <ListDataTable
-              data={shown}
-              columns={columns}
+              data={shownRows}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              loadingMoreLabel={loadingMoreLabel}
+              columns={tableColumns}
               isLoading={!ready}
               emptyMessage={t('payments.receivable.empty')}
-              onRowClick={open}
+
+              onRowClick={
+                selectionMode
+                  ? (o) => {
+                      if (selectableIds.includes(o.id)) selection.toggle(o.id);
+                    }
+                  : open
+              }
             />
           )}
         </>
@@ -262,7 +497,7 @@ function Cell({ label, value, strong }: { label: string; value: string; strong?:
       <Text size="xs" c="dimmed">
         {label}
       </Text>
-      <Text size="md" fw={strong ? 700 : 600}>
+      <Text size="md" fw={strong ? 700 : 600} data-testid={strong ? 'strip-total' : undefined}>
         {value}
       </Text>
     </Stack>

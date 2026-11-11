@@ -60,9 +60,11 @@ import { isCheatCompletedSalesOrder } from '@/utils/salesOrderCheatMarker';
 import { isVacuouslyCompletedSalesOrder } from './vacuousCompletionMarker';
 import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { isoToVnDateString, todayInVnDateString } from '@/utils/dateTimeField';
-import { dayToVnMidnightMs, paymentTermDaysOf, proposeDeadline } from '@/utils/paymentTerms';
+import { paymentTermDaysOf, proposeDeadline } from '@/utils/paymentTerms';
 import { canRecordSalesOrderPayment } from './salesOrderPaymentGate';
 import { SalesOrderPaymentAction, type SalesOrderPaymentDraft } from './SalesOrderPaymentModal';
+import { salesOrderPaymentPatch, salesOrderUntrackPatch } from './salesOrderMetaPatch';
+import { SalesOrderUntrackedNotice } from './SalesOrderUntrackedNotice';
 import { featureFlags } from '@/utils/features';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
 import {
@@ -83,6 +85,7 @@ import {
   orderNeedsVAT,
   resolveOrderVatRate,
   isSalesOrderOverdue,
+  isSalesOrderPaymentUntracked,
   resolveSalesOrderPaymentState,
   salesOrderDeadlineDay,
 } from '@/utils/salesOrderPricing';
@@ -1483,18 +1486,8 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
       paymentTermDaysOf(customer?.extra, featureFlags.paymentTerms.defaultDays),
     );
   })();
-  const savePayment = async (draft: SalesOrderPaymentDraft) => {
-    await handleMetaPatch({
-      extra: {
-        isPaid: draft.state === 'paid' ? true : undefined,
-        paidAmount: draft.state === 'partial' ? draft.paidAmount : undefined,
-
-        ...(featureFlags.paymentTerms.enabled && {
-          paymentDeadline: draft.deadlineDay ? dayToVnMidnightMs(draft.deadlineDay) : undefined,
-        }),
-      },
-    });
-  };
+  const savePayment = (draft: SalesOrderPaymentDraft) =>
+    handleMetaPatch(salesOrderPaymentPatch(draft, featureFlags.paymentTerms.enabled));
 
   const billingFields = showPrice ? (
     <>
@@ -1578,6 +1571,12 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
               </Badge>
             );
           })()}
+          {isSalesOrderPaymentUntracked(extra) && (
+            <SalesOrderUntrackedNotice
+              canUndo={canRecordPayment}
+              onUndo={() => handleMetaPatch(salesOrderUntrackPatch(false))}
+            />
+          )}
           {/* Any status but cancelled: an order is paid after it is delivered, when the form is gone. */}
           <SalesOrderPaymentAction
             canRecord={canRecordPayment}

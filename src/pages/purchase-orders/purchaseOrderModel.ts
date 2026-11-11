@@ -195,8 +195,12 @@ export function poPayment(po: Loose): {
   };
 }
 
+export function poPaymentUntracked(po: Loose): boolean {
+  return po?.paymentUntracked === true;
+}
+
 export function isOverdue(po: Loose, todayVn: string): boolean {
-  if (poIsPaid(po) || poStatus(po) === 'cancelled') return false;
+  if (poIsPaid(po) || poStatus(po) === 'cancelled' || poPaymentUntracked(po)) return false;
   const d = poPaymentDeadlineDay(po);
   return d !== '' && d < todayVn;
 }
