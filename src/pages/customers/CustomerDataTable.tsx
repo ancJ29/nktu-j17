@@ -129,6 +129,7 @@ export function CustomerDataTable({
 
   return (
     <ListDataTable
+      columnWidthsKey="customers"
       data={customers}
       columns={columns}
       isLoading={isLoading}

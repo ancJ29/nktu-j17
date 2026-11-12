@@ -263,10 +263,14 @@ export function AttachmentPanel({
       const updated = attachments.map((a) =>
         a.url === attachment.url ? { ...a, isDeleted: true } : a,
       );
-      await onChange(updated);
-      deleteMedia(attachment.url);
+      try {
+        await onChange(updated);
+        deleteMedia(attachment.url);
+      } catch {
+        notifications.show({ color: 'red', message: t('attachments.deleteError') });
+      }
     },
-    [attachments, onChange],
+    [attachments, onChange, t],
   );
 
   return (

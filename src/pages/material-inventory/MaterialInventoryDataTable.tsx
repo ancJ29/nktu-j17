@@ -79,6 +79,7 @@ export function MaterialInventoryDataTable({
 
   return (
     <ListDataTable
+      columnWidthsKey="material-inventory"
       data={rows}
       columns={columns}
       isLoading={isLoading}

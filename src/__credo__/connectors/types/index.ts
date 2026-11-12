@@ -552,6 +552,8 @@ export type {
   PermissionMismatchEntry as CredoSmePermissionMismatchEntry,
   RemoveClientRequest as CredoSmeRemoveClientRequest,
   RemoveClientResponse as CredoSmeRemoveClientResponse,
+  ChangeMyPasswordRequest as CredoSmeChangeMyPasswordRequest,
+  ChangeMyPasswordResponse as CredoSmeChangeMyPasswordResponse,
   ReportPermissionMismatchRequest as CredoSmeReportPermissionMismatchRequest,
   ReportPermissionMismatchResponse as CredoSmeReportPermissionMismatchResponse,
   SetAppConfigRequest as CredoSmeSetAppConfigRequest,

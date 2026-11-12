@@ -171,6 +171,7 @@ export function GreenhouseDataTable({
 
   return (
     <ListDataTable
+      columnWidthsKey="greenhouses"
       data={greenhouses}
       columns={columns}
       isLoading={isLoading}

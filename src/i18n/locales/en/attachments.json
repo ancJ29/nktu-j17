@@ -1,4 +1,5 @@
 {
+  "deleteError": "Could not remove the file — check your connection and try again",
   "dropHere": "Drop files to upload",
   "empty": "No attachments yet",
   "hint": "PNG, PDF, JPG. Max {{max}}MB each.",

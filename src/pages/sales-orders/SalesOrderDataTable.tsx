@@ -37,6 +37,7 @@ import { resolveSalesOrderRowBg } from './urgencyRowBg';
 import { formatWarehouseStaffNames, readWarehouseStaff } from './salesOrderWarehouseStaff';
 import type { SalesOrderStatusBadgeVariant } from '@/components/sales-orders/salesOrderStatusBadgeVariant';
 import type { SalesOrderListVariant, SalesOrderListView } from './salesOrderListVariant';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const showPrice = isPricingManagementEnabled() && perms.salesOrder.canViewPrice();
 const vatRate = getPricingVatRate();
@@ -139,6 +140,7 @@ export function SalesOrderDataTable({
   loadingMoreLabel,
 }: SalesOrderDataTableProps) {
   const { t } = useTranslation();
+  const resizableColumns = useColumnWidths('sales-orders');
   const navigate = useNavigate();
   const { getByCode: getCustomerByCode } = useCustomerStore();
 
@@ -724,6 +726,7 @@ export function SalesOrderDataTable({
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={tableDensity()}

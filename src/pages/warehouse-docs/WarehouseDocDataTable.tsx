@@ -111,6 +111,7 @@ export function WarehouseDocDataTable({ docs, isLoading, detailRoute, showStatus
 
   return (
     <ListDataTable
+      columnWidthsKey="warehouse-docs"
       data={docs}
       columns={columns}
       isLoading={isLoading}

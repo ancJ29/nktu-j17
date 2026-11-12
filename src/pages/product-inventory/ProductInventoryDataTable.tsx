@@ -25,6 +25,8 @@ import { rollupReservationsBySO, type ReservationRollup } from './productInvento
 import { ReservationStatusBadge } from './ReservationStatusBadge';
 import type { ReservationOrderStatusSource } from './useReservationOrderStatus';
 import { hasImagesForProducts } from '@/utils/permission';
+import { SortHeader } from '@/components/SortHeader';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const imagesEnabled = hasImagesForProducts();
 const locationsEnabled = isLocationsEnabled();
@@ -48,6 +50,9 @@ type Props = {
   readonly viewportRef?: Ref<HTMLDivElement>;
 
   readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
+
+  readonly sortField?: string;
+  readonly onSortChange?: (sort: string) => void;
 };
 
 function PlaceholderCell() {
@@ -277,8 +282,11 @@ export function ProductInventoryDataTable({
   maxHeight = 'calc(100vh - 300px)',
   viewportRef,
   getColumnFilter,
+  sortField,
+  onSortChange,
 }: Props) {
   const { t } = useTranslation();
+  const resizableColumns = useColumnWidths('product-inventory');
   const unitLabels = useLookupV2Labels('product-unit');
 
   const locationByCode = useMemo(() => {
@@ -293,7 +301,15 @@ export function ProductInventoryDataTable({
         {
           key: 'product',
           filter: getColumnFilter?.('product'),
-          header: t('common.labels.product'),
+          header: (
+            <SortHeader
+              label={t('common.labels.product')}
+              field="name"
+              current={sortField}
+              onChange={onSortChange}
+              firstDir="asc"
+            />
+          ),
           width: '250px',
           render: (s: ProductInventorySummary) => {
             const product = s.product;
@@ -679,11 +695,14 @@ export function ProductInventoryDataTable({
       orderStatus,
       onOutgoingClick,
       getColumnFilter,
+      sortField,
+      onSortChange,
     ],
   );
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={tableDensity()}

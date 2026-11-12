@@ -358,6 +358,7 @@ export function DeliveryNotesV2Page() {
       </StickyListChrome>
 
       <ListDataTable
+        columnWidthsKey="delivery-notes-v2"
         data={paginated}
         columns={columns}
         isLoading={loading && !initialized}

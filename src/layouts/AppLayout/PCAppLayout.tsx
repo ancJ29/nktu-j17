@@ -31,6 +31,7 @@ import { Outlet } from 'react-router';
 import { reloadPage } from '@credo/base-ui/utils';
 import { showRefreshConfig } from '@/config/menu-access';
 import { useClearCacheConfirm } from '@/hooks/useClearCacheConfirm';
+import { useChangeMyPassword } from '@/hooks/useChangeMyPassword';
 import { EmployeeAvatar } from '@/components/EmployeeAvatar';
 
 const hasAvatar = hasAvatarForEmployees();
@@ -111,6 +112,7 @@ export function PCAppLayout() {
   }, []);
 
   const clearCache = useClearCacheConfirm();
+  const changePassword = useChangeMyPassword();
 
   return (
     <PCAppLayoutUI
@@ -135,6 +137,8 @@ export function PCAppLayout() {
       showInstallApp={showInstallApp}
       onInstallApp={handleInstallApp}
       onClearCache={clearCache.open}
+
+      onChangePassword={isRoot ? changePassword.open : undefined}
       labels={{
         languageTooltip: t('common.labels.language'),
         menuProfile: t('menu.profile'),
@@ -144,6 +148,7 @@ export function PCAppLayout() {
         menuRefreshConfig: t('menu.refreshConfig'),
         menuInstallApp: t('menu.installApp'),
         menuClearCache: t('menu.clearCache'),
+        menuChangePassword: t('menu.changePassword'),
       }}
       buildInfo={appConfig.build ?? { version: '0.0.0', buildHash: '0000', buildTimestamp: '0000' }}
       logoutPath={ROUTES.AUTH.LOGOUT}
@@ -168,6 +173,7 @@ export function PCAppLayout() {
         </Container>
       </Suspense>
       {clearCache.modal}
+      {changePassword.modal}
     </PCAppLayoutUI>
   );
 }

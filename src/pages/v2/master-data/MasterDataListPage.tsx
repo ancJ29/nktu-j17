@@ -397,6 +397,7 @@ export function MasterDataListPage<Row extends MasterDataRow, Values extends Mas
           />
         ) : (
           <ListDataTable
+            columnWidthsKey={`v2:${spec.routes.LIST}`}
             data={paginated}
             columns={columns}
             isLoading={loading && !initialized}

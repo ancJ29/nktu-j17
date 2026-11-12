@@ -1,4 +1,5 @@
 {
+  "deleteError": "Không xoá được tệp — kiểm tra kết nối và thử lại",
   "dropHere": "Thả tệp vào đây để tải lên",
   "empty": "Chưa có tệp đính kèm",
   "hint": "PNG, PDF, JPG. Tối đa {{max}}MB mỗi tệp.",

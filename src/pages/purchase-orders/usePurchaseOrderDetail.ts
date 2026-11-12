@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useNavigate, useParams } from 'react-router';
@@ -6,6 +6,7 @@ import type { TFunction } from 'i18next';
 import { device, logger } from '@credo/base-ui/utils';
 import { ROUTES } from '@/constants/routes';
 import { getCurrentActorId } from '@/hooks';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { logActivity } from '@/utils/activityLogger';
 import { stateMemo } from './activityMemo';
 import {
@@ -19,7 +20,14 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { purchaseOrderBundle } from '@/stores/usePurchaseOrderStore';
 import { featureFlags } from '@/utils/features';
 import { isPricingManagementEnabled, perms } from '@/utils/permission';
-import type { PurchaseOrder, PurchaseOrderCopyFrom } from '@/types';
+import type {
+  PurchaseOrder,
+  PurchaseOrderAttachment,
+  PurchaseOrderCopyFrom,
+  PurchaseOrderPhoto,
+} from '@/types';
+import { buildUploadDirectory } from '@/utils/uploadPath';
+import { writePurchaseOrderAttachments, writePurchaseOrderPhotos } from './purchaseOrderMediaWrite';
 import { arrivalOf, type Arrival } from './purchaseOrderArrivals';
 import { findPurchaseOrderStatus, canTransitionPurchaseOrder } from './purchaseOrderStatuses';
 import {
@@ -121,6 +129,15 @@ export function usePurchaseOrderDetail(t: TFunction) {
   const showPrice = pricingOn && perms.purchaseOrder.canViewPrice();
 
   const canAuthor = perms.purchaseOrder.canEdit() && (!pricingOn || showPrice);
+
+  const canChangeMedia = canAuthor && (status === 'draft' || status === 'ready');
+  const showMedia = !pricingOn || showPrice;
+
+  const mediaDirectory = useMemo(
+    () => buildUploadDirectory({ type: 'purchase-order', id: id ?? '' }),
+    [id],
+  );
+  const currentEmployee = useMyEmployee();
   const showEditCta = !!order && status === 'draft' && canAuthor && !isMobile;
   const showReadyCta = !!order && status === 'draft' && canAuthor;
   const showCancelCta =
@@ -295,6 +312,25 @@ export function usePurchaseOrderDetail(t: TFunction) {
     if (ok) logPurchaseOrderTracking(order, false);
   }, [order, write]);
 
+  const handlePhotosChange = useCallback(
+    async (photos: PurchaseOrderPhoto[]) => {
+      if (!order) return;
+      const { record, rebased } = await writePurchaseOrderPhotos(order, photos);
+      setOrder(record);
+      if (rebased) notifications.show({ color: 'blue', message: t('photos.updatedElsewhere') });
+    },
+    [order, t],
+  );
+  const handleAttachmentsChange = useCallback(
+    async (attachments: PurchaseOrderAttachment[]) => {
+      if (!order) return;
+      const { record, rebased } = await writePurchaseOrderAttachments(order, attachments);
+      setOrder(record);
+      if (rebased) notifications.show({ color: 'blue', message: t('photos.updatedElsewhere') });
+    },
+    [order, t],
+  );
+
   return {
     order,
     loading,
@@ -302,6 +338,12 @@ export function usePurchaseOrderDetail(t: TFunction) {
     status,
     statusOption,
     showPrice,
+    canChangeMedia,
+    showMedia,
+    mediaDirectory,
+    currentEmployee,
+    handlePhotosChange,
+    handleAttachmentsChange,
     showEditCta,
     showReadyCta,
     showCancelCta,

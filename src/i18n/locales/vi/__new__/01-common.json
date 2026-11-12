@@ -30,6 +30,7 @@
   },
   "list": {
     "loadingMore": "Đang tải thêm {{chunk}} / {{total}}…",
+    "resizeColumn": "Kéo để đổi độ rộng cột, nhấp đúp để trả về mặc định",
     "stats": "Thống kê"
   },
   "placeholders": {

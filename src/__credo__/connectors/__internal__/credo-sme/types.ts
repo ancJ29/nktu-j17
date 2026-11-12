@@ -289,6 +289,13 @@ export type ReportPermissionMismatchRequest = {
 
 export type ReportPermissionMismatchResponse = { success: boolean };
 
+export type ChangeMyPasswordRequest = {
+  currentPassword: string;
+  newPassword: string;
+};
+
+export type ChangeMyPasswordResponse = { success: boolean };
+
 export type LookupRecord = {
   id: string;
   createdAt: DateTimeInput;

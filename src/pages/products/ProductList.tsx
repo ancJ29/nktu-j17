@@ -19,6 +19,7 @@ import {
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useColumnFilterLabels } from '@/hooks/useColumnFilterLabels';
 import { useListFilter } from '@/hooks/useListFilter';
+import { sortByProductName } from '@/utils/productNameSort';
 import { useListScrollRestoration, useLookupV2Options } from '@/hooks';
 import { DesktopFilterBar, type SelectFilter } from '@/components/DesktopFilterBar';
 import { ListPageHeader } from '@/components/ListPageHeader';
@@ -62,6 +63,8 @@ type ProductFilters = {
   page: number;
 
   columnFilters: string;
+
+  sort: string;
 };
 
 type ProductFilterDimensions = Pick<
@@ -76,6 +79,7 @@ const FILTER_DEFAULTS: ProductFilters = {
   search: '',
   page: 1,
   columnFilters: '',
+  sort: '',
 };
 
 type ProductListProps = {
@@ -110,6 +114,12 @@ export function ProductList({ variant }: ProductListProps) {
 
   const inventoryDisplayFilter = filterState.inventoryDisplay;
   const setFilter = useCallback((v: FilterStatus) => updateState({ status: v }), [updateState]);
+
+  const setSort = useCallback((sort: string) => updateState({ sort, page: 1 }), [updateState]);
+  const sortedProducts = useMemo(
+    () => sortByProductName(allProducts, filterState.sort, (p) => p.name),
+    [allProducts, filterState.sort],
+  );
   const setCategoryFilter = useCallback(
     (v: string | null) => updateState({ category: v }),
     [updateState],
@@ -216,7 +226,7 @@ export function ProductList({ variant }: ProductListProps) {
     totalItems,
     hasMore,
     loadMore,
-  } = useListFilter(allProducts, {
+  } = useListFilter(sortedProducts, {
     filters,
     filterFn,
     searchFields,
@@ -441,6 +451,7 @@ export function ProductList({ variant }: ProductListProps) {
               hasActiveFilters={
                 !!search ||
                 filter !== 'all' ||
+                filterState.sort !== '' ||
                 desktopFilters.some((f) => f.value !== null) ||
                 columnFilters.hasActiveFilters
               }
@@ -467,6 +478,8 @@ export function ProductList({ variant }: ProductListProps) {
             onLoadMore={loadMore}
             loadingMoreLabel={loadingMoreLabel}
             getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}
+            sortField={filterState.sort}
+            onSortChange={setSort}
           />
         )}
 

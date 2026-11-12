@@ -73,6 +73,7 @@ export function CropDataTable({ crops, isLoading }: CropDataTableProps) {
 
   return (
     <ListDataTable
+      columnWidthsKey="crops"
       data={crops}
       columns={columns}
       isLoading={isLoading}

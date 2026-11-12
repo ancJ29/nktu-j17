@@ -23,6 +23,7 @@ import { useListScrollRestoration, useLookupV2Labels, useLookupV2Options } from 
 import { useColumnFilterLabels } from '@/hooks/useColumnFilterLabels';
 import { useCachedListFilters } from '@/hooks/useCachedListFilters';
 import { useListFilter } from '@/hooks/useListFilter';
+import { sortByProductName } from '@/utils/productNameSort';
 import { useOpenInboundByProduct } from '@/hooks/useOpenInboundByProduct';
 import { createCustomerShortNameResolver } from '@/utils/customerDisplay';
 import { seedCurrentPeriodForProductInventory } from '@/utils/inventoryPeriod';
@@ -88,6 +89,8 @@ type ProductInventoryFilters = {
   page: number;
 
   columnFilters: string;
+
+  sort: string;
 };
 const FILTER_DEFAULTS: ProductInventoryFilters = {
   location: null,
@@ -97,6 +100,7 @@ const FILTER_DEFAULTS: ProductInventoryFilters = {
   search: '',
   page: 1,
   columnFilters: '',
+  sort: '',
 };
 
 type ProductInventoryListProps = {
@@ -201,6 +205,12 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [products, allRows, locationFilter, inboundIndex],
   );
 
+  const sortedSummaries = useMemo(
+    () => sortByProductName(summaries, filterState.sort, (s) => s.product.name),
+    [summaries, filterState.sort],
+  );
+  const setSort = useCallback((sort: string) => updateState({ sort, page: 1 }), [updateState]);
+
   const columnFilterValues = useMemo(
     () => parseColumnFilters(filterState.columnFilters),
     [filterState.columnFilters],
@@ -251,7 +261,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     filtered,
     paginated,
     totalPages,
-  } = useListFilter(summaries, {
+  } = useListFilter(sortedSummaries, {
     filters,
     filterFn: (s, f) => {
       if (!s.product.isActive) return false;
@@ -864,6 +874,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
             hasActiveFilters={
               !!search ||
+              filterState.sort !== '' ||
               desktopFilters.some((f) => f.value !== null) ||
               columnFilters.hasActiveFilters ||
               (secondaryFilterEnabled && secondaryFilter !== null) ||
@@ -893,6 +904,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           onOutgoingClick={variant.showOutgoingDetailModal ? setOutgoingFor : undefined}
           viewportRef={scrollViewportRef}
           getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}
+          sortField={filterState.sort}
+          onSortChange={setSort}
         />
       )}
 

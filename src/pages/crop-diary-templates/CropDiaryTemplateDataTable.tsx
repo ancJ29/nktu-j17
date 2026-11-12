@@ -60,6 +60,7 @@ export function CropDiaryTemplateDataTable({ templates, isLoading }: Props) {
 
   return (
     <ListDataTable
+      columnWidthsKey="crop-diary-templates"
       data={templates}
       columns={columns}
       isLoading={isLoading}

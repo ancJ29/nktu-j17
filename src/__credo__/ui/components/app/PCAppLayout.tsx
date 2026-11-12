@@ -60,6 +60,7 @@ type PCAppLayoutLabels = {
   menuRefreshConfig?: string;
   menuInstallApp?: string;
   menuClearCache?: string;
+  menuChangePassword?: string;
 };
 
 type PCAppLayoutProps = {
@@ -98,6 +99,8 @@ type PCAppLayoutProps = {
   onInstallApp?: () => void;
 
   onClearCache?: () => void;
+
+  onChangePassword?: () => void;
 
   navbarOpenedProp?: boolean;
 
@@ -139,6 +142,7 @@ export function PCAppLayout({
   showInstallApp = false,
   onInstallApp,
   onClearCache,
+  onChangePassword,
   navbarOpenedProp,
   onNavbarToggle,
   navbarVariant = 'dark',
@@ -342,6 +346,15 @@ export function PCAppLayout({
                 ) : (
                   <Menu.Item leftSection={<Icon name={IconName.User} size={16} />} fz="sm">
                     {labels.menuProfile}
+                  </Menu.Item>
+                )}
+                {onChangePassword && (
+                  <Menu.Item
+                    leftSection={<Icon name={IconName.Lock} size={16} />}
+                    fz="sm"
+                    onClick={onChangePassword}
+                  >
+                    {labels.menuChangePassword || 'Change password'}
                   </Menu.Item>
                 )}
                 {settingsPath ? (

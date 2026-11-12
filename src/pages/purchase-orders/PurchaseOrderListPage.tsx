@@ -7,6 +7,7 @@ import { ROUTES } from '@/constants/routes';
 import { setPurchaseOrderQueryRange, usePurchaseOrderStore } from '@/stores/usePurchaseOrderStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useVendorStore } from '@/stores/useVendorStore';
+import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { ListPagination } from '@/components/custom/ListPagination';
@@ -76,6 +77,11 @@ export function PurchaseOrderListPage() {
 
   const { items: vendors, loadAll: loadVendors, initialized: vendorsInit } = useVendorStore();
   const {
+    items: customers,
+    loadAll: loadCustomers,
+    initialized: customersInit,
+  } = useCustomerStore();
+  const {
     items: employees,
     loadAll: loadEmployees,
     initialized: employeesInit,
@@ -107,6 +113,7 @@ export function PurchaseOrderListPage() {
   useEffect(() => {
     if (!initialized && !error) loadAll();
     if (!vendorsInit) loadVendors();
+    if (!customersInit) loadCustomers();
     if (!employeesInit) loadEmployees();
     if (locationsEnabled && !locationsInit) loadLocations();
   }, [
@@ -115,6 +122,8 @@ export function PurchaseOrderListPage() {
     loadAll,
     vendorsInit,
     loadVendors,
+    customersInit,
+    loadCustomers,
     employeesInit,
     loadEmployees,
     locationsInit,
@@ -195,6 +204,23 @@ export function PurchaseOrderListPage() {
         .map((v) => ({ value: v.code, label: v.extra?.shortName?.trim() || v.name })),
     [vendors],
   );
+
+  const customerFilterData = useMemo(
+    () =>
+      customers
+        .filter((c) => c.isActive)
+        .map((c) => ({ value: c.code, label: c.extra?.shortName || c.name })),
+    [customers],
+  );
+  const customerMoreFilter: MoreFilterDef = {
+    type: 'select',
+    key: 'customer',
+    title: t('common.labels.customer'),
+    placeholder: t('common.labels.customer'),
+    value: filters.customerFilter,
+    options: customerFilterData,
+    onChange: filters.setCustomerFilter,
+  };
   const staffFilterData = useMemo(
     () => employees.filter(picEmployeeFilter).map((e) => ({ value: e.id, label: e.name })),
     [employees],
@@ -275,6 +301,7 @@ export function PurchaseOrderListPage() {
   ];
 
   const dateAndExtraFilters: MoreFilterDef[] = [
+    customerMoreFilter,
     {
       type: 'dateRange',
       key: 'createdDate',
@@ -310,6 +337,7 @@ export function PurchaseOrderListPage() {
       options: vendorFilterData,
       onChange: filters.setVendorFilter,
     },
+    customerMoreFilter,
     {
       type: 'select',
       key: 'staff',
@@ -339,7 +367,9 @@ export function PurchaseOrderListPage() {
         />
 
         {/* The three figures are counts, not money (the totals are in mixed currencies and cannot
-            be summed). `always` skips the enableStats and phone gates. */}
+            be summed). `always` skips the enableStats and phone gates. Every figure is coloured at
+            every value (owner's ask): blue the total, orange the not-yet-arrived (its dash too),
+            red the cancelled, the cancelled pill's own colour. */}
         <ListStatsCards
           always
           visible={initialized}
@@ -349,17 +379,19 @@ export function PurchaseOrderListPage() {
               key: 'orders',
               label: t('purchaseOrders.list.ordersTotal'),
               value: countedOrders.length,
+              color: 'blue',
             },
             {
               key: 'notArrived',
               label: t('purchaseOrders.list.notArrived'),
               value: notArrived ?? '—',
-              color: notArrived ? 'orange' : undefined,
+              color: 'orange',
             },
             {
               key: 'cancelled',
               label: t('purchaseOrders.list.cancelledTotal'),
               value: cancelledOrders.length,
+              color: 'red',
             },
           ]}
         />
@@ -430,6 +462,12 @@ export function PurchaseOrderListPage() {
             <FilterPill onClose={() => filters.setVendorFilter(null)}>
               {vendorFilterData.find((v) => v.value === filters.vendorFilter)?.label ??
                 filters.vendorFilter}
+            </FilterPill>
+          )}
+          {filters.customerFilter && (
+            <FilterPill onClose={() => filters.setCustomerFilter(null)}>
+              {customerFilterData.find((c) => c.value === filters.customerFilter)?.label ??
+                filters.customerFilter}
             </FilterPill>
           )}
           {filters.staffFilter && (

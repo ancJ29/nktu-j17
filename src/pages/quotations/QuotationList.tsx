@@ -478,6 +478,7 @@ export function QuotationList() {
         )
       ) : (
         <ListDataTable
+          columnWidthsKey="quotations"
           data={paginated}
           columns={columns}
           isLoading={isFirstLoad}

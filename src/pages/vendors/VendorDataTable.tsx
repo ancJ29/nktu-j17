@@ -139,6 +139,7 @@ export function VendorDataTable({
 
   return (
     <ListDataTable
+      columnWidthsKey="vendors"
       data={vendors}
       columns={columns}
       isLoading={isLoading}

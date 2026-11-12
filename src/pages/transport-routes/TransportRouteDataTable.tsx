@@ -222,6 +222,7 @@ export function TransportRouteDataTable({ routes, isLoading, viewportRef }: Prop
 
   return (
     <ListDataTable
+      columnWidthsKey="transport-routes"
       data={routes}
       columns={columns}
       isLoading={isLoading}

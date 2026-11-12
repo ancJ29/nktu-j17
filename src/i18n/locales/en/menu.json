@@ -1,4 +1,5 @@
 {
+  "changePassword": "Change password",
   "clearCache": "Clear Cached Data",
   "clearCacheConfirm": "This wipes all locally cached data (settings, offline data, cookies) and signs you out. Use it only when the app is stuck on outdated data.",
   "installApp": "Install App",

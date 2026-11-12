@@ -67,6 +67,8 @@ import type {
   ProvisionClientResponse,
   RemoveClientRequest,
   RemoveClientResponse,
+  ChangeMyPasswordRequest,
+  ChangeMyPasswordResponse,
   ReportPermissionMismatchRequest,
   ReportPermissionMismatchResponse,
   SetAppConfigRequest,
@@ -331,6 +333,12 @@ export const credoSmeConnector = {
 
   reportPermissionMismatch: (body: ReportPermissionMismatchRequest) =>
     authApi<ReportPermissionMismatchResponse>(AUTH_ROUTES.PERMISSION_MISMATCH, {
+      body,
+      extraHeaders: sessionHeaders(),
+    }),
+
+  changeMyPassword: (body: ChangeMyPasswordRequest) =>
+    authApi<ChangeMyPasswordResponse>(AUTH_ROUTES.CHANGE_PASSWORD, {
       body,
       extraHeaders: sessionHeaders(),
     }),

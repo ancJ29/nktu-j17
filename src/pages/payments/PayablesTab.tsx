@@ -497,6 +497,7 @@ export function PayablesTab() {
             />
           ) : (
             <ListDataTable
+              columnWidthsKey="payments-payables"
               data={shownRows}
               hasMore={hasMore}
               onLoadMore={loadMore}

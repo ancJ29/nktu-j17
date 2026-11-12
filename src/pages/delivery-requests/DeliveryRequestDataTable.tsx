@@ -23,6 +23,7 @@ import {
 } from '@/pages/sales-orders/salesOrderWarehouseStaff';
 import { hasPendingPhotoUpload } from '@/utils/photoQueue';
 import { resolveDeliveryRequestRowBg } from './urgencyRowBg';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const warehouseStaffAllowed = isDeliveryRequestWarehouseStaffAllowed();
 
@@ -43,6 +44,7 @@ export function DeliveryRequestDataTable({
   pendingSyncIds,
 }: DeliveryRequestDataTableProps) {
   const { t } = useTranslation();
+  const resizableColumns = useColumnWidths('delivery-requests');
   const navigate = useNavigate();
 
   const customers = useCustomerStore((s) => s.items);
@@ -187,6 +189,7 @@ export function DeliveryRequestDataTable({
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={tableDensity()}

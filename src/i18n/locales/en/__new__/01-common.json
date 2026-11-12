@@ -30,6 +30,7 @@
   },
   "list": {
     "loadingMore": "Loading {{chunk}} more of {{total}}…",
+    "resizeColumn": "Drag to resize the column; double-click to restore its width",
     "stats": "Stats"
   },
   "placeholders": {

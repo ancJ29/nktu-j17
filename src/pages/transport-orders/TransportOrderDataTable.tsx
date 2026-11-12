@@ -13,6 +13,7 @@ import { orderPlanAt, orderPlanDate } from './planDate';
 import { TransportRouteCell } from './TransportRouteCell';
 import { TransportDriverCell } from './TransportDriverCell';
 import { tableDensity } from '@/utils/permission';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const COLUMN_WIDTHS = {
   comfortable: {
@@ -48,6 +49,7 @@ export function TransportOrderDataTable({
   readonly onSortChange?: (field: string) => void;
 }) {
   const { t, i18n } = useTranslation();
+  const resizableColumns = useColumnWidths('transport-orders');
   const navigate = useNavigate();
   const shipmentTypeLabel = useShipmentTypeLabel();
 
@@ -200,6 +202,7 @@ export function TransportOrderDataTable({
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={density}

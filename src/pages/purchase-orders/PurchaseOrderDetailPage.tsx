@@ -25,6 +25,8 @@ import {
   IconFileText,
   IconHistory,
   IconNote,
+  IconPaperclip,
+  IconPhoto,
   IconPrinter,
   IconPackageImport,
   IconSend,
@@ -41,6 +43,8 @@ import { device } from '@credo/base-ui/utils';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import { EmployeeLink } from '@/components/EmployeeLink';
 import { SectionCard } from '@/components/SectionCard';
+import { ImageUploadPanel } from '@/components/ImageUploadPanel';
+import { AttachmentPanel } from '@/components/AttachmentPanel';
 import { ArrivalText } from './ArrivalText';
 import { PurchaseOrderPaymentForm } from './PurchaseOrderPaymentForm';
 import { CustomerLink } from '@/components/CustomerLink';
@@ -50,6 +54,7 @@ import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { getCompanyInfo } from '@/config/companyInfo';
 import { PURCHASE_ORDER_PALETTE } from '@/config/printDefaults';
 import { useProductStore } from '@/stores/useProductStore';
+import { poAttachments, poPhotos } from './purchaseOrderModel';
 import { useVendorStore } from '@/stores/useVendorStore';
 import { lookupLabelOf, useProductPhotoByCode } from '@/hooks';
 import { indexProductsByCode } from '@/utils/productByCode';
@@ -497,6 +502,42 @@ export function PurchaseOrderDetailPage() {
     </SectionCard>
   );
 
+  const photosCard = (
+    <div data-testid="po-photos-card">
+      <SectionCard
+        icon={<IconPhoto size={14} />}
+        title={t('purchaseOrders.detail.cardPhotos')}
+        padding="md"
+      >
+        <ImageUploadPanel
+          images={poPhotos(order)}
+          onChange={d.handlePhotosChange}
+          imageDirectory={d.mediaDirectory}
+          editable={d.canChangeMedia}
+          marker={order.orderNumber ?? ''}
+          currentUserId={d.currentEmployee?.id}
+          currentUserName={d.currentEmployee?.name}
+          uploadControl={isMobile ? 'button' : 'auto'}
+        />
+      </SectionCard>
+    </div>
+  );
+
+  const filesCard = (
+    <div data-testid="po-files-card">
+      <SectionCard icon={<IconPaperclip size={14} />} title={t('attachments.title')} padding="md">
+        <AttachmentPanel
+          attachments={poAttachments(order)}
+          onChange={d.handleAttachmentsChange}
+          imageDirectory={d.mediaDirectory}
+          editable={d.canChangeMedia}
+          currentUserId={d.currentEmployee?.id}
+          currentUserName={d.currentEmployee?.name}
+        />
+      </SectionCard>
+    </div>
+  );
+
   const body = (
     <Stack gap={isMobile ? 'md' : 'lg'}>
       {generalCard}
@@ -504,6 +545,8 @@ export function PurchaseOrderDetailPage() {
       {receiptsCard}
       {itemsCard}
       {notesCard}
+      {d.showMedia && photosCard}
+      {d.showMedia && filesCard}
     </Stack>
   );
 

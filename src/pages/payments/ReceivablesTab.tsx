@@ -468,6 +468,7 @@ export function ReceivablesTab() {
             />
           ) : (
             <ListDataTable
+              columnWidthsKey="payments-receivables"
               data={shownRows}
               hasMore={hasMore}
               onLoadMore={loadMore}

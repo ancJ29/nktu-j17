@@ -39,6 +39,8 @@ export const CREDO_SME_ROUTES = {
       ADOPT_SESSION: { PATH: '/adopt-session', METHOD: 'POST' },
 
       PERMISSION_MISMATCH: { PATH: '/permission-mismatch', METHOD: 'POST' },
+
+      CHANGE_PASSWORD: { PATH: '/change-password', METHOD: 'POST' },
     },
 
     EMPLOYEE: {

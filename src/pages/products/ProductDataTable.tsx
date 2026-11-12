@@ -6,6 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '@/constants/routes';
 import type { Product } from '@/types';
 import { CodeLabel, ColorBadge, DataTable } from '@credo/base-ui/components';
+import type { DataTableColumn } from '@credo/base-ui/components';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
+import { SortHeader } from '@/components/SortHeader';
 import type { DataTableColumnFilterConfig } from '@credo/base-ui/hooks';
 import { lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { getItemBaseUnit } from '@/utils/unitConversion';
@@ -37,6 +40,9 @@ type ProductDataTableProps = {
   readonly loadingMoreLabel?: string;
 
   readonly getColumnFilter?: (key: string) => DataTableColumnFilterConfig | undefined;
+
+  readonly sortField?: string;
+  readonly onSortChange?: (sort: string) => void;
 };
 
 export function ProductDataTable({
@@ -48,10 +54,13 @@ export function ProductDataTable({
   onLoadMore,
   loadingMoreLabel,
   getColumnFilter,
+  sortField,
+  onSortChange,
 }: ProductDataTableProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const unitLabels = useLookupV2Labels('product-unit');
+  const resizableColumns = useColumnWidths('products');
 
   const categoryLabels = useLookupV2Labels('product-category');
 
@@ -60,7 +69,15 @@ export function ProductDataTable({
       [
         {
           key: 'name',
-          header: t('common.labels.name'),
+          header: (
+            <SortHeader
+              label={t('common.labels.name')}
+              field="name"
+              current={sortField}
+              onChange={onSortChange}
+              firstDir="asc"
+            />
+          ),
           width: '450px',
           filter: getColumnFilter?.('name'),
           render: (item: Product) => {
@@ -217,14 +234,8 @@ export function ProductDataTable({
             </Group>
           ),
         },
-      ] as {
-        key: string;
-        header: string;
-        render: (item: Product) => React.ReactNode;
-        ta?: 'left' | 'center' | 'right';
-        filter?: DataTableColumnFilterConfig;
-      }[],
-    [t, onHandByCode, unitLabels, categoryLabels, getColumnFilter],
+      ] as DataTableColumn<Product>[],
+    [t, onHandByCode, unitLabels, categoryLabels, getColumnFilter, sortField, onSortChange],
   );
 
   const handleRowClick = (item: Product) => {
@@ -234,6 +245,7 @@ export function ProductDataTable({
   return (
     <DataTable
       withIndex
+      resizableColumns={resizableColumns}
       noActions
       density={tableDensity()}
       maxHeight="calc(100vh - 250px)"

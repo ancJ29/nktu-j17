@@ -1,3 +1,4 @@
+import type { DateTimeInput } from '@credo/kits/types';
 import type { GoodsReceiptItem } from '@/types';
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 
@@ -12,6 +13,29 @@ export type PurchaseOrderItem = GoodsReceiptItem & {
 };
 
 export type PurchaseOrderLeadTime = { minDays: number; maxDays: number };
+
+export type PurchaseOrderPhoto = {
+  url: string;
+  timestamp: DateTimeInput;
+  userId?: string;
+  userName?: string;
+  fileName?: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
+  isDeleted?: boolean;
+};
+
+export type PurchaseOrderAttachment = {
+  url: string;
+  fileName: string;
+  fileSize: number;
+  contentType: string;
+  timestamp: DateTimeInput;
+  userId?: string;
+  userName?: string;
+  isDeleted?: boolean;
+};
 
 export type PurchaseOrderExtra = {
   createdBy?: string;
@@ -55,6 +79,10 @@ export type PurchaseOrder = PartitionedRecordRow & {
 
   paymentUntracked?: boolean;
   paidAt?: string;
+
+  photos?: PurchaseOrderPhoto[];
+
+  attachments?: PurchaseOrderAttachment[];
 
   receiptIds: string[];
   readyAt?: string;

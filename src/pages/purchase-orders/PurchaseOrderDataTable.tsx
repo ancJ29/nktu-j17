@@ -27,6 +27,7 @@ import {
   poStatus,
   orderTotal,
 } from './purchaseOrderModel';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const locationsEnabled = isLocationsEnabled();
 const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
@@ -52,6 +53,7 @@ export function PurchaseOrderDataTable({
   onShowItems,
 }: Props) {
   const { t } = useTranslation();
+  const resizableColumns = useColumnWidths('purchase-orders');
   const navigate = useNavigate();
 
   const columns = useMemo(
@@ -200,6 +202,7 @@ export function PurchaseOrderDataTable({
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={tableDensity()}

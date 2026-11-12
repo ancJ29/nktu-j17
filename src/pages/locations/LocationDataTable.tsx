@@ -92,6 +92,7 @@ export function LocationDataTable({ locations, isLoading }: LocationDataTablePro
 
   return (
     <ListDataTable
+      columnWidthsKey="locations"
       data={locations}
       columns={columns}
       isLoading={isLoading}

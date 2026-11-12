@@ -339,6 +339,7 @@ export function TruckListShell({ headerExtraActions }: { headerExtraActions?: Re
         />
       ) : (
         <ListDataTable
+          columnWidthsKey="trucks"
           data={paginated}
           columns={columns}
           isLoading={loading && !initialized}

@@ -21,7 +21,7 @@ export { LoadingFallback } from './LoadingFallback';
 export { PhoneNumber } from './PhoneNumber';
 export { Tabs } from './Tabs';
 export { Tooltip } from './Tooltip';
-export type { DataTableColumn, DataTableDensity } from './DataTable';
+export type { DataTableColumn, DataTableDensity, DataTableResizableColumns } from './DataTable';
 export type {
   DataTableColumnFilterConfig,
   DataTableColumnFilterLabels,

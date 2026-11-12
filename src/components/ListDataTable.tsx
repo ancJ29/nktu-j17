@@ -1,6 +1,7 @@
 import type { Ref } from 'react';
 import { useNavigate } from 'react-router';
 import { DataTable, type DataTableColumn } from '@credo/base-ui/components';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 import { tableDensity } from '@/utils/permission';
 
 type Row = { id: string };
@@ -22,6 +23,8 @@ type ListDataTableProps<T extends Row> = {
   readonly hasMore?: boolean;
   readonly onLoadMore?: () => void;
   readonly loadingMoreLabel?: string;
+
+  readonly columnWidthsKey?: string;
 };
 
 export function ListDataTable<T extends Row>({
@@ -38,8 +41,10 @@ export function ListDataTable<T extends Row>({
   hasMore,
   onLoadMore,
   loadingMoreLabel,
+  columnWidthsKey,
 }: ListDataTableProps<T>) {
   const navigate = useNavigate();
+  const resizableColumns = useColumnWidths(columnWidthsKey);
 
   const handleRowClick =
     onRowClick ??
@@ -54,6 +59,7 @@ export function ListDataTable<T extends Row>({
       withIndex={withIndex}
       noActions
       density={tableDensity()}
+      resizableColumns={resizableColumns}
       maxHeight={maxHeight}
       viewportRef={viewportRef}
       data={data as (T & Record<string, unknown>)[]}

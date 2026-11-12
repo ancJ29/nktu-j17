@@ -6,6 +6,7 @@ import {
   DataTableFilterableHeader,
   type DataTableColumnFilterConfig,
 } from './DataTableColumnFilter';
+import { DataTableColumnResize } from './DataTableColumnResize';
 import { InfiniteScrollSentinel } from './InfiniteScrollSentinel';
 
 export type DataTableColumn<T> = {
@@ -22,6 +23,13 @@ export type DataTableColumn<T> = {
   filter?: DataTableColumnFilterConfig;
 };
 
+export type DataTableResizableColumns = {
+  readonly widths: Readonly<Record<string, number>>;
+  readonly onChange: (key: string, width: number | null) => void;
+
+  readonly label?: string;
+};
+
 export type DataTableDensity = 'comfortable' | 'compact';
 
 const COMPACT_FONT_SCALE = {
@@ -36,6 +44,14 @@ const SPACING: Record<
   comfortable: { vertical: 'sm', horizontal: 'xs' },
   compact: { vertical: 6, horizontal: 8 },
 };
+
+const FALLBACK_COLUMN_PX = 100;
+
+function pxOf(width: string | number | undefined): number | undefined {
+  if (typeof width === 'number') return width;
+  const m = typeof width === 'string' ? /^(\d+(?:\.\d+)?)px$/.exec(width) : null;
+  return m ? Number(m[1]) : undefined;
+}
 
 type DataTableProps<T> = {
   readonly withIndex?: boolean;
@@ -62,6 +78,8 @@ type DataTableProps<T> = {
   readonly loadingMoreLabel?: string;
 
   readonly density?: DataTableDensity;
+
+  readonly resizableColumns?: DataTableResizableColumns;
 };
 
 export function DataTable<T extends Record<string, unknown> & { id: string }>({
@@ -84,8 +102,34 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
   onLoadMore,
   loadingMoreLabel,
   density = 'comfortable',
+  resizableColumns,
 }: DataTableProps<T>) {
   const visibleColumns = useMemo(() => columns.filter((column) => !column.hidden), [columns]);
+
+  const widths = resizableColumns?.widths;
+  const hasStored = Boolean(widths) && visibleColumns.some((c) => widths![c.key] != null);
+  const handleResize = useCallback(
+    (key: string, width: number | null, snapshot?: Record<string, number>) => {
+      if (!resizableColumns) return;
+      if (width !== null && !hasStored && snapshot) {
+        for (const c of visibleColumns) {
+          if (c.key !== key && snapshot[c.key]) resizableColumns.onChange(c.key, snapshot[c.key]!);
+        }
+      }
+      resizableColumns.onChange(key, width);
+    },
+    [resizableColumns, hasStored, visibleColumns],
+  );
+  const widthOf = (column: DataTableColumn<T>): string | number | undefined =>
+    hasStored
+      ? `${widths![column.key] ?? pxOf(column.width) ?? FALLBACK_COLUMN_PX}px`
+      : column.width;
+  const fixedTableWidth = hasStored
+    ? visibleColumns.reduce(
+        (sum, c) => sum + (widths![c.key] ?? pxOf(c.width) ?? FALLBACK_COLUMN_PX),
+        (withIndex ? 40 : 0) + (!noActions && renderActions ? 60 : 0),
+      )
+    : undefined;
 
   const showsActionsColumn = !noActions && Boolean(renderActions);
   const columnCount = visibleColumns.length + (withIndex ? 1 : 0) + (showsActionsColumn ? 1 : 0);
@@ -127,7 +171,12 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
           horizontalSpacing={SPACING[density].horizontal}
           stickyHeader={sticky}
 
-          style={density === 'compact' ? COMPACT_FONT_SCALE : undefined}
+          style={{
+            ...(density === 'compact' ? COMPACT_FONT_SCALE : null),
+            ...(fixedTableWidth != null
+              ? { tableLayout: 'fixed', width: `${fixedTableWidth}px` }
+              : null),
+          }}
         >
           <Table.Thead
             px="xs"
@@ -136,23 +185,39 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
           >
             <Table.Tr>
               {withIndex && <Table.Th w={40}>#</Table.Th>}
-              {visibleColumns.map((column) => (
-                <Table.Th
-                  key={column.key}
-                  style={column.width ? { width: column.width } : undefined}
-                  ta={column.ta ? column.ta : undefined}
-                >
-                  {column.filter ? (
-                    <DataTableFilterableHeader
-                      header={column.header}
-                      filter={column.filter}
-                      ta={column.ta}
-                    />
-                  ) : (
-                    column.header
-                  )}
-                </Table.Th>
-              ))}
+              {visibleColumns.map((column) => {
+                const width = widthOf(column);
+                return (
+                  <Table.Th
+                    key={column.key}
+                    data-column-key={resizableColumns ? column.key : undefined}
+                    style={{
+                      ...(width
+                        ? { width: typeof width === 'number' ? `${width}px` : width }
+                        : null),
+                      ...(resizableColumns ? { position: 'relative' } : null),
+                    }}
+                    ta={column.ta ? column.ta : undefined}
+                  >
+                    {column.filter ? (
+                      <DataTableFilterableHeader
+                        header={column.header}
+                        filter={column.filter}
+                        ta={column.ta}
+                      />
+                    ) : (
+                      column.header
+                    )}
+                    {resizableColumns && (
+                      <DataTableColumnResize
+                        columnKey={column.key}
+                        label={resizableColumns.label}
+                        onChange={handleResize}
+                      />
+                    )}
+                  </Table.Th>
+                );
+              })}
               {!noActions && renderActions ? <Table.Th w={60}>{actionsHeader}</Table.Th> : null}
             </Table.Tr>
           </Table.Thead>
@@ -173,7 +238,9 @@ export function DataTable<T extends Record<string, unknown> & { id: string }>({
                   {visibleColumns.map((column) => (
                     <Table.Td
                       key={column.key}
-                      style={column.width ? { width: column.width } : undefined}
+                      style={
+                        !resizableColumns && column.width ? { width: column.width } : undefined
+                      }
                       onClick={
                         column.onCellClick ? (event) => column.onCellClick!(item, event) : undefined
                       }

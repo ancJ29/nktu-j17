@@ -362,6 +362,7 @@ export function SalesOrdersV2Page() {
       </StickyListChrome>
 
       <ListDataTable
+        columnWidthsKey="sales-orders-v2"
         data={paginated}
         columns={columns}
         isLoading={loading && !initialized}

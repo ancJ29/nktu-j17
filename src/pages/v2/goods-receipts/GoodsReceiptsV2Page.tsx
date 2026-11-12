@@ -307,6 +307,7 @@ export function GoodsReceiptsV2Page() {
       </StickyListChrome>
 
       <ListDataTable
+        columnWidthsKey="goods-receipts-v2"
         data={paginated}
         columns={columns}
         isLoading={loading && !initialized}

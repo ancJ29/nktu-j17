@@ -220,6 +220,7 @@ export function OilTankListPage() {
         />
       ) : (
         <ListDataTable
+          columnWidthsKey="oil-tanks"
           data={paginated}
           columns={columns}
           isLoading={loading && !initialized}

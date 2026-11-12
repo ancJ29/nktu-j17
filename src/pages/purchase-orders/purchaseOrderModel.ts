@@ -1,10 +1,12 @@
 import { addDaysToDay, paymentTermDaysOf, proposeDeadline } from '@/utils/paymentTerms';
 import type {
   PurchaseOrder,
+  PurchaseOrderAttachment,
   PurchaseOrderCurrency,
   PurchaseOrderExtra,
   PurchaseOrderItem,
   PurchaseOrderLeadTime,
+  PurchaseOrderPhoto,
   PurchaseOrderStatus,
 } from '@/types';
 
@@ -60,6 +62,25 @@ export function poCustomer(po: Loose): { code: string; name: string } | null {
   const code = typeof po?.customerCode === 'string' ? po.customerCode.trim() : '';
   const name = typeof po?.customerName === 'string' ? po.customerName.trim() : '';
   return code || name ? { code, name } : null;
+}
+
+function urlEntries<T extends { url: string }>(v: unknown): T[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter(
+    (e): e is T =>
+      !!e &&
+      typeof e === 'object' &&
+      typeof (e as { url?: unknown }).url === 'string' &&
+      (e as { url: string }).url !== '',
+  );
+}
+
+export function poPhotos(po: Loose): PurchaseOrderPhoto[] {
+  return urlEntries<PurchaseOrderPhoto>(po?.photos);
+}
+
+export function poAttachments(po: Loose): PurchaseOrderAttachment[] {
+  return urlEntries<PurchaseOrderAttachment>(po?.attachments);
 }
 
 const isDay = (v: unknown): v is number =>

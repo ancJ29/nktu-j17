@@ -10,6 +10,7 @@ import { formatDate, formatDateTime } from '@/utils/dateFormat';
 import { findStatus } from './goodsReceiptStatuses';
 import { isLocationsEnabled, tableDensity } from '@/utils/permission';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const locationsEnabled = isLocationsEnabled();
 
@@ -23,6 +24,7 @@ type Props = {
 
 export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShowItems }: Props) {
   const { t } = useTranslation();
+  const resizableColumns = useColumnWidths('goods-receipts');
   const navigate = useNavigate();
   const employeeById = useEmployeeStore((s) => s.mapById);
 
@@ -164,6 +166,7 @@ export function GoodsReceiptDataTable({ receipts, isLoading, viewportRef, onShow
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={tableDensity()}

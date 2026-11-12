@@ -18,6 +18,7 @@ import {
   hasPositionForEmployees,
   tableDensity,
 } from '@/utils/permission';
+import { useColumnWidths } from '@/hooks/useColumnWidths';
 
 const hasEmail = hasEmailForEmployees();
 const hasPosition = hasPositionForEmployees();
@@ -47,6 +48,7 @@ export function EmployeeDataTable({
   loadingMoreLabel,
 }: EmployeeDataTableProps) {
   const { t } = useTranslation();
+  const resizableColumns = useColumnWidths('employees');
   const navigate = useNavigate();
 
   const columns = useMemo(
@@ -190,6 +192,7 @@ export function EmployeeDataTable({
 
   return (
     <DataTable
+      resizableColumns={resizableColumns}
       withIndex
       noActions
       density={tableDensity()}

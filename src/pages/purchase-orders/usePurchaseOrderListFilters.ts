@@ -16,6 +16,7 @@ import type { PurchaseOrder } from '@/types';
 import { businessDateString } from '@/utils/code';
 import {
   isOverdue,
+  poCustomer,
   poExtra,
   poIsPaid,
   poPayment,
@@ -30,6 +31,7 @@ export type PaidFilter = 'paid' | 'partial' | 'unpaid' | 'overdue';
 type PurchaseOrderUrlState = {
   s?: string[];
   v?: string;
+  c?: string;
   f?: string;
   p?: PaidFilter;
   q?: string;
@@ -42,6 +44,7 @@ function compactState(state: PurchaseOrderUrlState): PurchaseOrderUrlState {
   const r: PurchaseOrderUrlState = {};
   if (state.s && state.s.length > 0) r.s = state.s;
   if (state.v) r.v = state.v;
+  if (state.c) r.c = state.c;
   if (state.f) r.f = state.f;
   if (state.p) r.p = state.p;
   if (state.q) r.q = state.q;
@@ -59,6 +62,7 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
 
   const statusFilter = useMemo(() => state.s ?? [], [state.s]);
   const vendorFilter = state.v ?? null;
+  const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
   const paidFilter = state.p ?? null;
   const search = state.q ?? '';
@@ -75,6 +79,10 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
   );
   const setVendorFilter = useCallback(
     (value: string | null) => updateState({ v: value || undefined, pg: undefined }),
+    [updateState],
+  );
+  const setCustomerFilter = useCallback(
+    (value: string | null) => updateState({ c: value || undefined, pg: undefined }),
     [updateState],
   );
   const setStaffFilter = useCallback(
@@ -116,6 +124,8 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
       if (poExtra(r).isDeleted === true) return false;
       if (statusFilter.length > 0 && !statusFilter.includes(poStatus(r))) return false;
       if (vendorFilter && r.vendorCode !== vendorFilter) return false;
+
+      if (customerFilter && poCustomer(r)?.code !== customerFilter) return false;
       if (staffFilter && poExtra(r).assignedTo !== staffFilter) return false;
       if (paidFilter === 'paid' && !poIsPaid(r)) return false;
 
@@ -135,6 +145,7 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     storeOrders,
     statusFilter,
     vendorFilter,
+    customerFilter,
     staffFilter,
     paidFilter,
     createdDateRange,
@@ -144,6 +155,7 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
   const hasActiveFilters = !!(
     statusFilter.length > 0 ||
     vendorFilter ||
+    customerFilter ||
     staffFilter ||
     paidFilter ||
     !isDefaultLastNDaysRange(createdDateRange, PURCHASE_ORDER_RANGE_DAYS) ||
@@ -155,6 +167,8 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     setStatusFilter,
     vendorFilter,
     setVendorFilter,
+    customerFilter,
+    setCustomerFilter,
     staffFilter,
     setStaffFilter,
     paidFilter,

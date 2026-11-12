@@ -316,6 +316,7 @@ export function MaterialDataTable({
 
   return (
     <ListDataTable
+      columnWidthsKey="materials"
       data={materials}
       columns={columns}
       isLoading={isLoading}
