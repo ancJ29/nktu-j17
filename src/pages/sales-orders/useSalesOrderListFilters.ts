@@ -26,6 +26,11 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import type { Customer, SalesOrder } from '@/types';
 import { compareSalesOrdersForList } from './salesOrderListSort';
+import {
+  isPickOlderThanWindow,
+  LIST_FETCH_WINDOW_DAYS,
+  statusSelectionForPick,
+} from '@/utils/statusSelectionForPick';
 import { todayInVnDateString } from '@/utils/dateTimeField';
 import {
   effectiveStatusSelection,
@@ -121,14 +126,6 @@ export function useSalesOrderListFilters(
   }, [customers, employees]);
 
   const paymentFilter = parsePaymentFilter(state.pf);
-
-  const statusFilter = effectiveStatusSelection({
-    selection: state.s,
-    defaultSelection: DEFAULT_STATUS,
-    paymentFilter,
-    allStatuses: STATUS_ORDER,
-    cancellationTarget: CANCELLATION_TARGET_STATUS,
-  });
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
   const warehouseStaffFilter = state.ws ?? null;
@@ -140,6 +137,25 @@ export function useSalesOrderListFilters(
     [state.cd, defaultDateRangeDays],
   );
   const deliveryDateRange = useMemo(() => restoreDateRange(state.dd, EMPTY_DATE_RANGE), [state.dd]);
+
+  const fetchBase = useMemo(() => defaultLastNDaysRange(LIST_FETCH_WINDOW_DAYS), []);
+  const oldPickStatus = statusSelectionForPick({
+    selection: state.s,
+    defaultSelection: DEFAULT_STATUS,
+    allStatuses: STATUS_ORDER,
+    excluded: CANCELLATION_TARGET_STATUS,
+    pickIsOld: isPickOlderThanWindow(fetchBase, [createdDateRange, deliveryDateRange]),
+  });
+  const statusReadsAsAll = oldPickStatus.widened;
+  const statusFilter = statusReadsAsAll
+    ? oldPickStatus.selection
+    : effectiveStatusSelection({
+        selection: state.s,
+        defaultSelection: DEFAULT_STATUS,
+        paymentFilter,
+        allStatuses: STATUS_ORDER,
+        cancellationTarget: CANCELLATION_TARGET_STATUS,
+      });
   const deliveryKind: SalesOrderDeliveryKind = state.dk ?? 'all';
   const columnFilters = state.cf ?? '';
   const page = state.pg ?? DEFAULT_PAGE;
@@ -289,6 +305,8 @@ export function useSalesOrderListFilters(
 
   return {
     statusFilter,
+
+    statusReadsAsAll,
     setStatusFilter,
 
     statusFilterIsDefault,

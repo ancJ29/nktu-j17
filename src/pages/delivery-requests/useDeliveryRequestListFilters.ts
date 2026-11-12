@@ -2,11 +2,17 @@ import { useCallback, useMemo } from 'react';
 import { type DateRangeValue } from '@/types/date-range';
 import {
   EMPTY_DATE_RANGE,
+  defaultLastNDaysRange,
   type SerializedDateRange,
   isInDateRange,
   restoreDateRange,
   serializeDateRange,
 } from '@/utils/listFilterDateRange';
+import {
+  isPickOlderThanWindow,
+  LIST_FETCH_WINDOW_DAYS,
+  statusSelectionForPick,
+} from '@/utils/statusSelectionForPick';
 import { useUrlBlobFilters } from '@/hooks/useUrlBlobFilters';
 import {
   isDefaultStatusSelection,
@@ -67,7 +73,6 @@ export function useDeliveryRequestListFilters(
     compactState,
   });
 
-  const statusFilter = (state.s ?? DEFAULT_STATUS) as string[];
   const salesOrderFilter = state.o ?? null;
   const driverFilter = state.dv ?? null;
   const warehouseStaffFilter = state.ws ?? null;
@@ -77,6 +82,15 @@ export function useDeliveryRequestListFilters(
     () => restoreDateRange(state.sd, EMPTY_DATE_RANGE),
     [state.sd],
   );
+
+  const fetchBase = useMemo(() => defaultLastNDaysRange(LIST_FETCH_WINDOW_DAYS), []);
+  const oldPickStatus = statusSelectionForPick({
+    selection: state.s,
+    defaultSelection: DEFAULT_STATUS,
+    pickIsOld: isPickOlderThanWindow(fetchBase, [scheduledDateRange]),
+  });
+  const statusReadsAsAll = oldPickStatus.widened;
+  const statusFilter = oldPickStatus.selection;
   const page = state.pg ?? DEFAULT_PAGE;
 
   const setStatusFilter = useCallback(
@@ -183,8 +197,8 @@ export function useDeliveryRequestListFilters(
   ]);
 
   const statusFilterIsDefault = useMemo(
-    () => isDefaultStatusSelection(statusFilter, DEFAULT_STATUS),
-    [statusFilter],
+    () => isDefaultStatusSelection(state.s ?? DEFAULT_STATUS, DEFAULT_STATUS),
+    [state.s],
   );
 
   const hasActiveFilters = !!(
@@ -199,6 +213,8 @@ export function useDeliveryRequestListFilters(
 
   return {
     statusFilter,
+
+    statusReadsAsAll,
     setStatusFilter,
 
     statusFilterIsDefault,

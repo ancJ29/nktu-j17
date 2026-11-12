@@ -68,6 +68,8 @@ import { collectVacuouslyCompletedSalesOrderIds } from './vacuousCompletionMarke
 import { BulkCreateDeliveryRequestModal } from './BulkCreateDeliveryRequestModal';
 import { NKTUBulkCreateDeliveryRequestModal } from './NKTUBulkCreateDeliveryRequestModal';
 import { useListScrollRestoration } from '@/hooks';
+import { fetchWindowForPick } from '@/utils/fetchWindowForPick';
+import { LIST_FETCH_WINDOW_DAYS } from '@/utils/statusSelectionForPick';
 import { SalesOrderCardList } from './SalesOrderCardList';
 import { SalesOrderDataTable } from './SalesOrderDataTable';
 import { SalesOrderFinanceTotals } from './SalesOrderFinanceTotals';
@@ -84,7 +86,7 @@ import type { DeliveryRequest, SalesOrder } from '@/types';
 
 const isMobile = device.isMobile;
 
-const FETCH_WINDOW_DAYS = 90;
+const FETCH_WINDOW_DAYS = LIST_FETCH_WINDOW_DAYS;
 const canCreate = perms.salesOrder.canCreate();
 
 const canEditOrders = perms.salesOrder.canEdit();
@@ -199,7 +201,22 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     }
   }, [error, t]);
 
-  const fetchRange = useMemo(() => defaultLastNDaysRange(FETCH_WINDOW_DAYS), []);
+  const baseFetchRange = useMemo(() => defaultLastNDaysRange(FETCH_WINDOW_DAYS), []);
+
+  const createdPickFrom = filters.createdDateRange.from?.getTime() ?? null;
+  const deliveryPickFrom = filters.deliveryDateRange.from?.getTime() ?? null;
+  const fetchRange = useMemo(
+    () =>
+      fetchWindowForPick(
+        baseFetchRange,
+        [createdPickFrom, deliveryPickFrom].map((ms) => ({
+          from: ms === null ? null : new Date(ms),
+          to: null,
+          preset: null,
+        })),
+      ),
+    [baseFetchRange, createdPickFrom, deliveryPickFrom],
+  );
   useTransactionalRangeRefetch({
     range: fetchRange,
     setStoreRange: setSalesOrderQueryRange,
@@ -212,10 +229,12 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
     isRootUser ||
     (variant.showItemsPreview && itemsOrder !== null);
   const [drsReady, setDrsReady] = useState(false);
-  const drSyncStartedRef = useRef(false);
+
+  const drSyncedFromRef = useRef<number | null>(null);
   useEffect(() => {
-    if (!needDeliveryRequests || drSyncStartedRef.current) return;
-    drSyncStartedRef.current = true;
+    const fromKey = fetchRange.from?.getTime() ?? 0;
+    if (!needDeliveryRequests || drSyncedFromRef.current === fromKey) return;
+    drSyncedFromRef.current = fromKey;
     setDeliveryRequestQueryRange(fetchRange.from, fetchRange.to);
 
     void useDeliveryRequestStore
@@ -535,10 +554,11 @@ export function SalesOrderList({ variant }: { variant: SalesOrderListVariant }) 
   }, [filtered, t]);
 
   const statusPlaceholder = useMemo(() => {
+    if (filters.statusReadsAsAll) return t('common.filters.allButCancelledOldDate');
     if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
-  }, [filters.statusFilter, t]);
+  }, [filters.statusFilter, filters.statusReadsAsAll, t]);
 
   const presetLabels: Partial<Record<DateRangePreset, string>> = {
     today: t('common.datePreset.today'),

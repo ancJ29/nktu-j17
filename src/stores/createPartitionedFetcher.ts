@@ -1,6 +1,7 @@
 import type { CMngtPartitionedQuerySyncResponse } from '@credo/connectors/types';
 import { logger } from '@credo/base-ui/utils';
 import { persistPartitions, readPartitions } from '@/utils/partitionCache';
+import { querySyncInChunks } from '@/utils/querySyncInChunks';
 import { enumerateDates, reconcilePartitionSync } from '@/utils/partitionReconcile';
 import { type FetchAllResult, recordHash } from './createEntityStore';
 
@@ -41,7 +42,7 @@ export function createPartitionedSyncFetcher<T extends { id: string }>(
       if (slice) partitionHashes[date] = slice.hash;
     }
 
-    const res = await querySync({ fromPeriod: from, toPeriod: to, partitionHashes });
+    const res = await querySyncInChunks(querySync, dates, partitionHashes);
 
     const { merged, writes, clears, missing } = reconcilePartitionSync<T>(dates, cached, res);
     for (const date of missing) {

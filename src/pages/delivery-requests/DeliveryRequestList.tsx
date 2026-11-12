@@ -58,12 +58,14 @@ import { deliveryRequestPartyIsCustomer } from './deliveryRequestParty';
 import { DeliveryReorderModal } from './DeliveryReorderModal';
 import { NKTUCreateDeliveryRequestModal } from './NKTUCreateDeliveryRequestModal';
 import { deliveryRequestStatusOptions } from './useDeliveryRequestStatusOptions';
+import { fetchWindowForPick } from '@/utils/fetchWindowForPick';
+import { LIST_FETCH_WINDOW_DAYS } from '@/utils/statusSelectionForPick';
 import { useDeliveryRequestListFilters } from './useDeliveryRequestListFilters';
 import type { DeliveryRequestVariant } from './deliveryRequestVariant';
 
 const isMobile = device.isMobile;
 
-const FETCH_WINDOW_DAYS = 90;
+const FETCH_WINDOW_DAYS = LIST_FETCH_WINDOW_DAYS;
 const canCreate = perms.deliveryRequest.canCreate();
 const canReorder = perms.deliveryRequest.canReorder();
 const canViewAll = perms.deliveryRequest.canViewAll();
@@ -184,7 +186,19 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
     }
   }, [error, t]);
 
-  const fetchRange = useMemo(() => defaultLastNDaysRange(FETCH_WINDOW_DAYS), []);
+  const baseFetchRange = useMemo(() => defaultLastNDaysRange(FETCH_WINDOW_DAYS), []);
+  const scheduledPickFrom = filters.scheduledDateRange.from?.getTime() ?? null;
+  const fetchRange = useMemo(
+    () =>
+      fetchWindowForPick(baseFetchRange, [
+        {
+          from: scheduledPickFrom === null ? null : new Date(scheduledPickFrom),
+          to: null,
+          preset: null,
+        },
+      ]),
+    [baseFetchRange, scheduledPickFrom],
+  );
   useTransactionalRangeRefetch({
     range: fetchRange,
     setStoreRange: setDeliveryRequestQueryRange,
@@ -273,10 +287,11 @@ export function DeliveryRequestList({ variant }: DeliveryRequestListProps) {
   const allLabel = t('common.filters.all');
 
   const statusPlaceholder = useMemo(() => {
+    if (filters.statusReadsAsAll) return t('common.filters.allStatusesOldDate');
     if (filters.statusFilter.length === 0) return t('common.filters.all');
     if (filters.statusFilter.length === 1) return resolveStatus(filters.statusFilter[0]).label;
     return t('common.filters.statusCount', { count: filters.statusFilter.length });
-  }, [filters.statusFilter, t]);
+  }, [filters.statusFilter, filters.statusReadsAsAll, t]);
 
   const presetLabels: Partial<Record<DateRangePreset, string>> = {
     today: t('common.datePreset.today'),
