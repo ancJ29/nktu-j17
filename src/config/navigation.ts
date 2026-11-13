@@ -237,7 +237,7 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     path: ROUTES.PAYMENTS.LIST,
     labelKey: 'nav.payments',
     label: 'Payments',
-    defaultIcon: IconName.ArrowsExchange,
+    defaultIcon: IconName.Scale,
   },
   'configuration-app-config': {
     path: ROUTES.CONFIGURATION.APP_CONFIG,

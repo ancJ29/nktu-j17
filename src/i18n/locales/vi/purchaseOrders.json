@@ -25,6 +25,7 @@
     "readyTitle": "Đánh dấu đã gửi NCC"
   },
   "detail": {
+    "availableActions": "Hành động khả dụng",
     "activitiesError": "Không tải được hoạt động.",
     "activitiesLoadMore": "Xem thêm",
     "activitiesNoEntries": "Chưa có hoạt động nào cho đơn này.",

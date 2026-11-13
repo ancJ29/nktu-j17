@@ -25,6 +25,7 @@
     "readyTitle": "Mark as sent"
   },
   "detail": {
+    "availableActions": "Available actions",
     "activitiesError": "Failed to load activities.",
     "activitiesLoadMore": "Load more",
     "activitiesNoEntries": "No activities recorded for this order yet.",

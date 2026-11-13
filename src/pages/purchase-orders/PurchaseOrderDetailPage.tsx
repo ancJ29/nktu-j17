@@ -3,6 +3,9 @@ import {
   Alert,
   Badge,
   Button,
+  Card,
+  Divider,
+  Grid,
   Group,
   Modal,
   SegmentedControl,
@@ -32,7 +35,7 @@ import {
   IconSend,
   IconX,
 } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useDisclosure } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
 import { useTranslation } from 'react-i18next';
@@ -118,6 +121,14 @@ export function PurchaseOrderDetailPage() {
     DEFAULT_PURCHASE_ORDER_PRINT_OPTIONS.orientation,
   );
   const [includePrice, setIncludePrice] = useState(true);
+
+  const [activeTab, setActiveTab] = useState<string | null>('items');
+  const [visitedTabs, setVisitedTabs] = useState<ReadonlySet<string>>(() => new Set(['items']));
+  const selectTab = useCallback((value: string | null) => {
+    setActiveTab(value);
+    if (value === null) return;
+    setVisitedTabs((prev) => (prev.has(value) ? prev : new Set(prev).add(value)));
+  }, []);
 
   if (loading || !order || !status || !statusOption) return null;
 
@@ -226,69 +237,80 @@ export function PurchaseOrderDetailPage() {
     </Stack>
   ) : null;
 
-  const actions = (
-    <Group gap="xs" wrap="wrap">
-      {!isMobile && (status === 'draft' || status === 'ready') && (
+  const buttons = (size: 'compact-sm' | 'sm') => ({
+    print:
+      !isMobile && (status === 'draft' || status === 'ready') ? (
         <Button
           variant="subtle"
-          size="compact-sm"
+          size={size}
           leftSection={<IconPrinter size={14} />}
           onClick={printHandlers.open}
         >
           {t('goodsReceipts.print.action')}
         </Button>
-      )}
-      {d.showCopyCta && (
-        <Button
-          variant="subtle"
-          size="compact-sm"
-          leftSection={<IconCopy size={14} />}
-          onClick={d.handleCopy}
-        >
-          {t('common.actions.copy')}
-        </Button>
-      )}
-      {d.showMakeReceiptCta && (
-        <Button
-          size="compact-sm"
-          leftSection={<IconPackageImport size={14} />}
-          onClick={d.handleMakeReceipt}
-        >
-          {t('purchaseOrders.actions.makeReceipt')}
-        </Button>
-      )}
-      {d.showEditCta && (
-        <Button
-          component={Link}
-          to={ROUTES.PURCHASE_ORDERS.EDIT.replace(':id', order.id)}
-          variant="default"
-          size="compact-sm"
-          leftSection={<IconEdit size={14} />}
-        >
-          {t('common.actions.edit')}
-        </Button>
-      )}
-      {d.showCancelCta && (
-        <Button
-          variant="light"
-          color="red"
-          size="compact-sm"
-          leftSection={<IconX size={14} />}
-          onClick={() => d.openConfirm('cancel')}
-        >
-          {t('purchaseOrders.actions.cancel')}
-        </Button>
-      )}
-      {d.showReadyCta && (
-        <Button
-          color="blue"
-          size="compact-sm"
-          leftSection={<IconSend size={14} />}
-          onClick={() => d.openConfirm('ready')}
-        >
-          {t('purchaseOrders.actions.markReady')}
-        </Button>
-      )}
+      ) : null,
+    copy: d.showCopyCta ? (
+      <Button
+        variant="subtle"
+        size={size}
+        leftSection={<IconCopy size={14} />}
+        onClick={d.handleCopy}
+      >
+        {t('common.actions.copy')}
+      </Button>
+    ) : null,
+    makeReceipt: d.showMakeReceiptCta ? (
+      <Button
+        size={size}
+        leftSection={<IconPackageImport size={14} />}
+        onClick={d.handleMakeReceipt}
+      >
+        {t('purchaseOrders.actions.makeReceipt')}
+      </Button>
+    ) : null,
+    edit: d.showEditCta ? (
+      <Button
+        component={Link}
+        to={ROUTES.PURCHASE_ORDERS.EDIT.replace(':id', order.id)}
+        variant="default"
+        size={size}
+        leftSection={<IconEdit size={14} />}
+      >
+        {t('common.actions.edit')}
+      </Button>
+    ) : null,
+    cancel: d.showCancelCta ? (
+      <Button
+        variant="light"
+        color="red"
+        size={size}
+        leftSection={<IconX size={14} />}
+        onClick={() => d.openConfirm('cancel')}
+      >
+        {t('purchaseOrders.actions.cancel')}
+      </Button>
+    ) : null,
+    markReady: d.showReadyCta ? (
+      <Button
+        color="blue"
+        size={size}
+        leftSection={<IconSend size={14} />}
+        onClick={() => d.openConfirm('ready')}
+      >
+        {t('purchaseOrders.actions.markReady')}
+      </Button>
+    ) : null,
+  });
+
+  const phoneButtons = buttons('compact-sm');
+  const actions = (
+    <Group gap="xs" wrap="wrap">
+      {phoneButtons.print}
+      {phoneButtons.copy}
+      {phoneButtons.makeReceipt}
+      {phoneButtons.edit}
+      {phoneButtons.cancel}
+      {phoneButtons.markReady}
     </Group>
   );
 
@@ -550,55 +572,329 @@ export function PurchaseOrderDetailPage() {
     </Stack>
   );
 
+  const phonePage = (
+    <Stack gap={isMobile ? 'md' : 'lg'}>
+      {!isMobile && (
+        <Group justify="space-between">
+          <Button
+            onClick={() => window.history.back()}
+            variant="subtle"
+            size="compact-sm"
+            leftSection={<IconArrowLeft size={16} />}
+          >
+            {t('common.actions.back')}
+          </Button>
+          {actions}
+        </Group>
+      )}
+      <Group
+        align="flex-start"
+        justify="space-between"
+        wrap={isMobile ? 'wrap' : 'nowrap'}
+        gap="lg"
+      >
+        {titleBlock}
+        {hero}
+      </Group>
+      {isMobile && actions}
+      <PurchaseOrderStatusStrip order={order} compact={isMobile} />
+      {activityLogTabVisible ? (
+        <Tabs defaultValue="order" keepMounted={false}>
+          <Tabs.List>
+            <Tabs.Tab value="order" leftSection={<IconClipboardList size={16} />}>
+              {t('purchaseOrders.detail.tabOrder')}
+            </Tabs.Tab>
+            <Tabs.Tab value="activityLog" leftSection={<IconHistory size={16} />}>
+              {t('purchaseOrders.detail.tabActivityLog')}
+            </Tabs.Tab>
+          </Tabs.List>
+          <Tabs.Panel value="order" pt="md">
+            {body}
+          </Tabs.Panel>
+          {/* `keepMounted={false}` lazy-mounts this: the panel fetches on mount. */}
+          <Tabs.Panel value="activityLog" pt="md">
+            <ActivityByTargetPanel targetId={order.id} i18nNamespace="purchaseOrders.detail" />
+          </Tabs.Panel>
+        </Tabs>
+      ) : (
+        body
+      )}
+    </Stack>
+  );
+
+  const desk = buttons('sm');
+  const back = buttons('compact-sm');
+  const hasActionRow = !!(desk.markReady || desk.makeReceipt || desk.cancel);
+  const paymentBadgeColor = poPaymentUntracked(order)
+    ? 'gray'
+    : poIsPaid(order)
+      ? 'green'
+      : overdue
+        ? 'red'
+        : 'orange';
+  const paymentBadgeLabel = poPaymentUntracked(order)
+    ? t('purchaseOrders.payment.untracked')
+    : poIsPaid(order)
+      ? t('purchaseOrders.payment.paid')
+      : overdue
+        ? t('purchaseOrders.payment.overdue')
+        : poPayment(order).state === 'partial'
+          ? t('purchaseOrders.payment.partial')
+          : t('purchaseOrders.payment.unpaid');
+
+  const infoCard = (
+    <Card withBorder padding="md">
+      <Stack gap="md">
+        <Group justify="flex-start" align="flex-start" wrap="wrap" gap="xl">
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <FieldLabel>{t('common.labels.vendor')}</FieldLabel>
+            <Text size="md" fw={600} component="div">
+              <VendorLink code={order.vendorCode} name={order.vendorName} />
+              {locationsEnabled && order.locationName && (
+                <Text span size="sm" fw={600}>
+                  {' '}
+                  · {order.locationName}
+                </Text>
+              )}
+            </Text>
+          </Stack>
+          <Stack gap={2} style={{ minWidth: 0 }}>
+            <FieldLabel>{t('purchaseOrders.form.customerLabel')}</FieldLabel>
+            <Text size="md" fw={600} component="div">
+              <CustomerLink
+                code={poCustomer(order)?.code}
+                name={poCustomer(order)?.code ? undefined : poCustomer(order)?.name}
+                fallbackLabel={poCustomer(order)?.name}
+              />
+            </Text>
+          </Stack>
+        </Group>
+
+        <Divider variant="dashed" />
+
+        <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
+          <Stack gap={4}>
+            <FieldLabel>{t('common.labels.assignedTo')}</FieldLabel>
+            {extra.assignedTo ? (
+              <EmployeeLink id={extra.assignedTo} size="sm" />
+            ) : (
+              <Text size="sm" c="dimmed" fs="italic">
+                {t('purchaseOrders.detail.noAssignedTo')}
+              </Text>
+            )}
+          </Stack>
+          <Field
+            label={t('purchaseOrders.form.leadTimeLabel')}
+            value={
+              leadTime
+                ? leadTimeLabel(leadTime, (min, max) =>
+                    t('purchaseOrders.leadTime.range', { min, max }),
+                  )
+                : '—'
+            }
+          />
+          <Field
+            label={t('purchaseOrders.form.plannedArrivalLabel')}
+            value={plannedArrivalIso(order) ? formatDate(plannedArrivalIso(order)) : '—'}
+          />
+          <Stack gap={4}>
+            <FieldLabel>{t('purchaseOrders.form.actualArrivalLabel')}</FieldLabel>
+            <ArrivalText arrival={d.arrival} />
+          </Stack>
+        </SimpleGrid>
+
+        <Grid gutter="md">
+          {order.reference?.trim() && (
+            <Grid.Col span={{ base: 12, md: 6 }}>
+              <Field label={t('purchaseOrders.form.referenceLabel')} value={order.reference} mono />
+            </Grid.Col>
+          )}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Stack gap={4}>
+              <FieldLabel>{t('__new__.01-common.labels.note')}</FieldLabel>
+              {order.notes?.trim() ? (
+                <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+                  {order.notes}
+                </Text>
+              ) : (
+                <Text size="sm" c="dimmed" fs="italic">
+                  {t('purchaseOrders.detail.noNotes')}
+                </Text>
+              )}
+            </Stack>
+          </Grid.Col>
+        </Grid>
+
+        <Divider variant="dashed" />
+
+        <SimpleGrid cols={{ base: 2, md: 4 }} spacing="md">
+          <Field label={t('purchaseOrders.form.currencyLabel')} value={currency} />
+          {d.showPrice && (
+            <Stack gap={4}>
+              <FieldLabel>{t('purchaseOrders.detail.totalLabel')}</FieldLabel>
+              <Text size="sm" fw={600}>
+                {formatMoney(orderTotal(order), currency)}
+              </Text>
+            </Stack>
+          )}
+          <Stack gap={4}>
+            <FieldLabel>{t('purchaseOrders.columns.payment')}</FieldLabel>
+            <Group gap={6}>
+              <Badge variant="light" color={paymentBadgeColor}>
+                {paymentBadgeLabel}
+              </Badge>
+              {d.canMarkPaid && (
+                <Tooltip label={t('purchaseOrders.payment.edit')}>
+                  <ActionIcon
+                    variant="light"
+                    size="md"
+                    onClick={d.openPayment}
+                    aria-label={t('purchaseOrders.payment.edit')}
+                  >
+                    <IconEdit size={14} />
+                  </ActionIcon>
+                </Tooltip>
+              )}
+              {poPaymentUntracked(order) && d.canMarkPaid && (
+                <Button variant="light" size="compact-sm" onClick={() => void d.trackAgain()}>
+                  {t('purchaseOrders.payment.trackAgain')}
+                </Button>
+              )}
+              {d.showPrice && poPayment(order).state === 'partial' && (
+                <Text size="xs" c="dimmed">
+                  {t('purchaseOrders.payment.paidRemaining', {
+                    paid: formatMoney(poPayment(order).paid, currency),
+                    remaining: formatMoney(poPayment(order).remaining, currency),
+                    currency,
+                  })}
+                </Text>
+              )}
+              {poIsPaid(order) && order.paidAt && (
+                <Text size="xs" c="dimmed">
+                  {formatDateTime(order.paidAt)}
+                </Text>
+              )}
+            </Group>
+          </Stack>
+          <Stack gap={4}>
+            <FieldLabel>{t('purchaseOrders.form.paymentDeadlineLabel')}</FieldLabel>
+            <Text size="sm" fw={500} c={overdue ? 'red' : undefined}>
+              {order.paymentDeadline ? formatDate(order.paymentDeadline) : '-'}
+            </Text>
+          </Stack>
+        </SimpleGrid>
+      </Stack>
+    </Card>
+  );
+
+  const deskTabs = (
+    <Tabs value={activeTab} onChange={selectTab}>
+      <Tabs.List>
+        <Tabs.Tab value="items" leftSection={<IconPackageImport size={16} />}>
+          {t('purchaseOrders.detail.cardItems')}
+        </Tabs.Tab>
+        {showReceiptsCard && (
+          <Tabs.Tab value="receipts" leftSection={<IconPackageImport size={16} />}>
+            {t('purchaseOrders.detail.cardReceipts')}
+          </Tabs.Tab>
+        )}
+        {activityLogTabVisible && (
+          <Tabs.Tab value="activityLog" leftSection={<IconHistory size={16} />}>
+            {t('purchaseOrders.detail.tabActivityLog')}
+          </Tabs.Tab>
+        )}
+        {d.showMedia && (
+          <Tabs.Tab value="photos" leftSection={<IconPhoto size={16} />}>
+            {t('purchaseOrders.detail.cardPhotos')}
+          </Tabs.Tab>
+        )}
+        {d.showMedia && (
+          <Tabs.Tab value="files" leftSection={<IconPaperclip size={16} />}>
+            {t('attachments.title')}
+          </Tabs.Tab>
+        )}
+      </Tabs.List>
+
+      <Tabs.Panel value="items" pt="md">
+        {itemsCard}
+      </Tabs.Panel>
+      {showReceiptsCard && (
+        <Tabs.Panel value="receipts" pt="md">
+          {receiptsCard}
+        </Tabs.Panel>
+      )}
+      {activityLogTabVisible && (
+        <Tabs.Panel value="activityLog" pt="md">
+          {activeTab === 'activityLog' && (
+            <ActivityByTargetPanel targetId={order.id} i18nNamespace="purchaseOrders.detail" />
+          )}
+        </Tabs.Panel>
+      )}
+      {d.showMedia && (
+        <Tabs.Panel value="photos" pt="md">
+          {visitedTabs.has('photos') && photosCard}
+        </Tabs.Panel>
+      )}
+      {d.showMedia && (
+        <Tabs.Panel value="files" pt="md">
+          {filesCard}
+        </Tabs.Panel>
+      )}
+    </Tabs>
+  );
+
+  const desktopPage = (
+    <Stack gap="lg">
+      <Group justify="space-between">
+        <Button
+          onClick={() => window.history.back()}
+          variant="subtle"
+          size="compact-sm"
+          leftSection={<IconArrowLeft size={16} />}
+        >
+          {t('common.actions.back')}
+        </Button>
+        <Group gap="xs" wrap="wrap">
+          {back.print}
+          {back.copy}
+          {back.edit}
+        </Group>
+      </Group>
+
+      <Group justify="space-between" wrap="nowrap" align="center">
+        <Group gap="sm" wrap="nowrap" style={{ flex: 1, minWidth: 0 }}>
+          <Title order={3} ff="monospace" style={{ letterSpacing: '0.3px' }}>
+            {order.orderNumber || '—'}
+          </Title>
+          <Badge color={statusOption.color} variant="filled" size="md">
+            {t(statusOption.labelKey)}
+          </Badge>
+        </Group>
+        <Text size="sm" c="dimmed">
+          {t('purchaseOrders.form.orderDateLabel')} · {formatDate(poOrderDateIso(order)) || '—'}
+        </Text>
+      </Group>
+
+      {hasActionRow && (
+        <Group gap="xs" wrap="wrap">
+          <FieldLabel>{t('purchaseOrders.detail.availableActions')}</FieldLabel>
+          {desk.markReady}
+          {desk.makeReceipt}
+          {desk.cancel}
+        </Group>
+      )}
+
+      <PurchaseOrderStatusStrip order={order} compact={false} />
+
+      {infoCard}
+
+      {deskTabs}
+    </Stack>
+  );
+
   return (
     <>
-      <Stack gap={isMobile ? 'md' : 'lg'}>
-        {!isMobile && (
-          <Group justify="space-between">
-            <Button
-              onClick={() => window.history.back()}
-              variant="subtle"
-              size="compact-sm"
-              leftSection={<IconArrowLeft size={16} />}
-            >
-              {t('common.actions.back')}
-            </Button>
-            {actions}
-          </Group>
-        )}
-        <Group
-          align="flex-start"
-          justify="space-between"
-          wrap={isMobile ? 'wrap' : 'nowrap'}
-          gap="lg"
-        >
-          {titleBlock}
-          {hero}
-        </Group>
-        {isMobile && actions}
-        <PurchaseOrderStatusStrip order={order} compact={isMobile} />
-        {activityLogTabVisible ? (
-          <Tabs defaultValue="order" keepMounted={false}>
-            <Tabs.List>
-              <Tabs.Tab value="order" leftSection={<IconClipboardList size={16} />}>
-                {t('purchaseOrders.detail.tabOrder')}
-              </Tabs.Tab>
-              <Tabs.Tab value="activityLog" leftSection={<IconHistory size={16} />}>
-                {t('purchaseOrders.detail.tabActivityLog')}
-              </Tabs.Tab>
-            </Tabs.List>
-            <Tabs.Panel value="order" pt="md">
-              {body}
-            </Tabs.Panel>
-            {/* `keepMounted={false}` lazy-mounts this: the panel fetches on mount. */}
-            <Tabs.Panel value="activityLog" pt="md">
-              <ActivityByTargetPanel targetId={order.id} i18nNamespace="purchaseOrders.detail" />
-            </Tabs.Panel>
-          </Tabs>
-        ) : (
-          body
-        )}
-      </Stack>
+      {isMobile ? phonePage : desktopPage}
 
       <Modal
         opened={d.confirmOpened}
