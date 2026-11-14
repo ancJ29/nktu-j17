@@ -57,7 +57,7 @@ import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
-import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
+import { seedAddressFromCustomer } from '@/pages/delivery-requests/deliveryRequestFormShared';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { device, logger } from '@credo/base-ui/utils';
@@ -559,7 +559,15 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       ? customers.find((c) => c.code === copyFromCode)
       : undefined;
     const copyFromId = copyFromCustomer?.id ?? '';
-    const copyFromAddress = (copyFrom.deliveryAddress as string) ?? '';
+
+    const copyFromAddress = seedAddressFromCustomer(copyFromCustomer, {
+      deliveryAddress: copyFrom.deliveryAddress as string | undefined,
+      googleMapUrl: copyFrom.googleMapUrl as string | undefined,
+    });
+
+    setShippingAddressId(
+      copyFromAddress.isBilling ? BILLING_ADDRESS_ID : (copyFromAddress.shippingAddressId ?? ''),
+    );
     form.setValues({
       orderNumber: '',
       customerPONumber: '',
@@ -569,12 +577,8 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
       isInternalDelivery: (copyFrom.isInternalDelivery as boolean) ?? true,
       orderDate: new Date(),
       paymentDeadline: null,
-      deliveryAddress: copyFromAddress,
-      googleMapUrl: fillMapUrlFromCustomer(
-        copyFromCustomer,
-        copyFromAddress,
-        copyFrom.googleMapUrl as string | undefined,
-      ),
+      deliveryAddress: copyFromAddress.deliveryAddress,
+      googleMapUrl: copyFromAddress.googleMapUrl,
       deliveryDate: null,
       deliveryMethod: (copyFrom.deliveryMethod as string) ?? '',
       assignedStaff: (copyFrom.assignedStaff as string) ?? currentEmployeeId,

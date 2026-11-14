@@ -36,7 +36,6 @@ import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useVendorStore } from '@/stores/useVendorStore';
 import { device } from '@credo/base-ui/utils';
-import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { useInitFormFromFetch } from '@/hooks';
 import {
   getDeliveryRequestDriverDepartments,
@@ -67,6 +66,7 @@ import {
   emptyItem,
   resolveInitialScheduledDateFromSalesOrder,
   resolveVendorInboundAddress,
+  seedAddressFromCustomer,
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
@@ -263,11 +263,9 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         const customer = soExtra.customerCode
           ? useCustomerStore.getState().getByCode(soExtra.customerCode)
           : undefined;
-        form.setFieldValue('deliveryAddress', soExtra.deliveryAddress ?? '');
-        form.setFieldValue(
-          'googleMapUrl',
-          fillMapUrlFromCustomer(customer, soExtra.deliveryAddress, soExtra.googleMapUrl),
-        );
+        const seeded = seedAddressFromCustomer(customer, soExtra);
+        form.setFieldValue('deliveryAddress', seeded.deliveryAddress);
+        form.setFieldValue('googleMapUrl', seeded.googleMapUrl);
 
         const remaining = buildRemainingItemsFromSalesOrder(so.items, so.value, allDRs);
         if (remaining.length > 0) {

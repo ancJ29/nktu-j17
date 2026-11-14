@@ -1,10 +1,10 @@
 import { appConfig } from '@/config';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { cMngtConnector } from '@credo/connectors/connector';
+import { seedAddressFromCustomer } from './deliveryRequestFormShared';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { logActivity } from '@/utils/activityLogger';
-import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { getCurrentEmployeeStamp } from '@/hooks/useCurrentEmployee';
 import { isDeliveryRequestWarehouseStaffAllowed } from '@/utils/permission';
 import { statusHasCapability as soStatusHasCapability } from '@/pages/sales-orders/transitionEngine';
@@ -90,11 +90,10 @@ export async function bulkCreateOutboundDeliveryRequests(
       const customerName = resolveCustomerName(so) ?? '';
 
       const customerCode = soExtra.customerCode?.trim() ?? '';
-      const deliveryAddress = soExtra.deliveryAddress ?? '';
-      const googleMapUrl = fillMapUrlFromCustomer(
+
+      const { deliveryAddress, googleMapUrl } = seedAddressFromCustomer(
         customerCode ? useCustomerStore.getState().getByCode(customerCode) : undefined,
-        deliveryAddress,
-        soExtra.googleMapUrl,
+        soExtra,
       );
 
       const warehouseStaff = initialWarehouseStaff({

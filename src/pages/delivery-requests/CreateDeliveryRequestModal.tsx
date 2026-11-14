@@ -9,7 +9,6 @@ import { EmployeeSelector } from '@/components/selectors';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductStore } from '@/stores/useProductStore';
-import { fillMapUrlFromCustomer } from '@/utils/customerMapUrl';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import {
   getDeliveryRequestDriverDepartments,
@@ -25,6 +24,7 @@ import { DesktopItemTable } from './DeliveryRequestForm';
 import {
   emptyItem,
   resolveInitialScheduledDateFromSalesOrder,
+  seedAddressFromCustomer,
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
@@ -139,6 +139,7 @@ export function CreateDeliveryRequestModal({
     const scheduledDate = resolveInitialScheduledDateFromSalesOrder(
       seedScheduledDateFromSalesOrder ? soExtra.deliveryDate : null,
     );
+    const seededAddress = seedAddressFromCustomer(customer, soExtra);
     form.setValues({
       requestNumber: '',
       direction: 'outbound',
@@ -147,8 +148,8 @@ export function CreateDeliveryRequestModal({
       customerName: salesOrder.customerName,
       vendorCode: '',
       vendorName: '',
-      deliveryAddress: soExtra.deliveryAddress ?? '',
-      googleMapUrl: fillMapUrlFromCustomer(customer, soExtra.deliveryAddress, soExtra.googleMapUrl),
+      deliveryAddress: seededAddress.deliveryAddress,
+      googleMapUrl: seededAddress.googleMapUrl,
       scheduledDate,
       notes: '',
       items: buildRemainingItemsFromSalesOrder(salesOrder.items, salesOrder.id, allDRs),

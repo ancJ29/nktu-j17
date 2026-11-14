@@ -192,3 +192,34 @@ export function resolveCustomerPickupAddress(customer: Customer | undefined | nu
   }
   return { deliveryAddress: '', googleMapUrl: '' };
 }
+
+/**
+ * The delivery address + map link a record COPIED from another order carries:
+ * the customer's own saved entry (first shipping address, else billing) wins
+ * over the source order's text, because the register is where the address is
+ * kept up to date. A customer with nothing saved — or none at all — keeps the
+ * source's values, since a blank address is worse than an old one. Also names
+ * the saved entry (`shippingAddressId`, or `isBilling`) so a form can set its
+ * address picker the way a fresh customer pick does.
+ */
+export function seedAddressFromCustomer(
+  customer: Customer | undefined | null,
+  source: { deliveryAddress?: string; googleMapUrl?: string },
+): {
+  deliveryAddress: string;
+  googleMapUrl: string;
+  shippingAddressId: string | null;
+  isBilling: boolean;
+} {
+  const saved = resolveCustomerPickupAddress(customer);
+  if (!saved.deliveryAddress && !saved.googleMapUrl) {
+    return {
+      deliveryAddress: source.deliveryAddress ?? '',
+      googleMapUrl: source.googleMapUrl ?? '',
+      shippingAddressId: null,
+      isBilling: false,
+    };
+  }
+  const shippingAddressId = customer?.extra?.shippingAddresses?.[0]?.id ?? null;
+  return { ...saved, shippingAddressId, isBilling: shippingAddressId === null };
+}
