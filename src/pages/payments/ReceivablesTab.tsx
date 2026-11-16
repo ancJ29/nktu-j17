@@ -10,6 +10,7 @@ import { LIST_LAZY_RENDER_CHUNK } from '@/config/listDefaults';
 import { ListCardList } from '@/components/ListCardList';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ListPageHeader } from '@/components/ListPageHeader';
+import { ListStatsCards } from '@/components/ListStatsCards';
 import { selectionColumn } from '@/components/selectionColumn';
 import { ROUTES } from '@/constants/routes';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
@@ -23,12 +24,13 @@ import type { SalesOrder } from '@/types';
 import { resolveSalesOrderCustomerName } from '@/utils/customerDisplay';
 import { formatDate } from '@/utils/dateFormat';
 import { todayInVnDateString } from '@/utils/dateTimeField';
+import { OVERDUE_ROW_BG, PAYMENT_STATE_COLOR } from '@/utils/paymentStateColor';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { getPricingVatRate, isPricingManagementEnabled, perms } from '@/utils/permission';
 import { getSalesOrderReadyDate } from '@/utils/salesOrderReadyDate';
 import { computeSalesOrderTotals, isSalesOrderOverdue } from '@/utils/salesOrderPricing';
+import { PaymentNoteCell } from './PaymentNoteCell';
 import { PaymentsLoadError } from './PaymentsLoadError';
-import { ReceivableRowActions } from './ReceivableRowActions';
 import { bulkMark } from './bulkMarkPayments';
 import {
   PAID_IN_FULL_PATCH,
@@ -41,6 +43,7 @@ import { usePaymentsUrlState } from './paymentsUrlState';
 import {
   RECEIVABLES_WINDOW_DAYS,
   RECEIVABLE_FILTERS,
+  countReceivablesByFilter,
   matchesReceivableFilter,
   parseReceivableFilter,
   receivableOf,
@@ -113,20 +116,25 @@ export function ReceivablesTab() {
   );
 
   const todayVn = todayInVnDateString();
-  const rows = useMemo<SalesOrder[]>(() => {
+  const base = useMemo<SalesOrder[]>(() => {
     const scoped = scopeReceivableOrders(ready ? createdInWindow(items, fetchRange) : [], {
       canViewAll,
       canViewSelf,
       me: getCurrentEmployeeId() ?? undefined,
     });
     const q = search.trim().toLowerCase();
-    const kept = scoped.filter((o) => {
-      if (!matchesReceivableFilter(o, filter, todayVn, vatRate)) return false;
+    return scoped.filter((o) => {
       if (customerCode && o.extra?.customerCode !== customerCode) return false;
       if (!q) return true;
       const name = resolveSalesOrderCustomerName(o, getByCode) ?? '';
       return (o.orderNumber ?? '').toLowerCase().includes(q) || name.toLowerCase().includes(q);
     });
+  }, [items, ready, fetchRange, customerCode, search, getByCode]);
+
+  const counts = useMemo(() => countReceivablesByFilter(base, todayVn, vatRate), [base, todayVn]);
+
+  const rows = useMemo<SalesOrder[]>(() => {
+    const kept = base.filter((o) => matchesReceivableFilter(o, filter, todayVn, vatRate));
 
     const due = (o: SalesOrder) => receivableOf(o, todayVn, vatRate)?.dueDay ?? '';
     return kept.sort((a, b) => {
@@ -135,7 +143,7 @@ export function ReceivablesTab() {
       if (da !== db) return da === '' ? 1 : db === '' ? -1 : da < db ? -1 : 1;
       return (a.orderNumber ?? '').localeCompare(b.orderNumber ?? '');
     });
-  }, [items, ready, fetchRange, todayVn, filter, customerCode, search, getByCode]);
+  }, [base, todayVn, filter]);
 
   const sums = useMemo(() => sumReceivables(rows, todayVn, vatRate), [rows, todayVn]);
 
@@ -197,6 +205,8 @@ export function ReceivablesTab() {
     });
   };
 
+  const isOverdueRow = (o: SalesOrder) => receivableOf(o, todayVn, vatRate)?.bucket === 'overdue';
+  const rowBg = (o: SalesOrder) => (isOverdueRow(o) ? OVERDUE_ROW_BG : undefined);
   const customerName = (o: SalesOrder) => resolveSalesOrderCustomerName(o, getByCode) ?? '-';
   const leftOf = (o: SalesOrder) => receivableOf(o, todayVn, vatRate)?.remaining ?? 0;
 
@@ -265,15 +275,11 @@ export function ReceivablesTab() {
         width: '170px',
         render: (o) => <SalesOrderPaymentMark order={o} vatRate={vatRate} todayVn={todayVn} />,
       },
-
       {
-        key: 'marks',
-        header: '',
-        width: '210px',
-        render: (o) =>
-          viewerMayMark(o, viewer) && isMarkable(o, todayVn, vatRate) ? (
-            <ReceivableRowActions order={o} vatRate={vatRate} left={leftOf(o)} />
-          ) : null,
+        key: 'note',
+        header: t('payments.columns.note'),
+        width: '240px',
+        render: (o) => <PaymentNoteCell text={o.notes} />,
       },
     ],
 
@@ -296,7 +302,7 @@ export function ReceivablesTab() {
 
     return [
       { ...sel, render: (o: SalesOrder) => (boxed.has(o.id) ? sel.render(o) : null) },
-      ...columns.filter((c) => c.key !== 'marks'),
+      ...columns,
     ];
   }, [columns, selectionMode, selection, selectableIds, headerSel, t]);
 
@@ -324,6 +330,16 @@ export function ReceivablesTab() {
         <PaymentsLoadError days={RECEIVABLES_WINDOW_DAYS} onRetry={load.retry} />
       ) : (
         <>
+          <ListStatsCards
+            always
+            cols={{ base: 3, sm: 5 }}
+            cells={RECEIVABLE_FILTERS.map((f) => ({
+              key: f,
+              label: t(`payments.filter.${f}`),
+              value: counts[f],
+              color: PAYMENT_STATE_COLOR[f],
+            }))}
+          />
           <Card withBorder radius="md" padding="sm" shadow="sm">
             <Group gap="lg" wrap="wrap">
               <Cell label={t('payments.columns.overdue')} value={money(sums.overdue)} />
@@ -445,6 +461,7 @@ export function ReceivablesTab() {
               isLoading={!ready}
               emptyMessage={t('payments.receivable.empty')}
               onRowClick={open}
+              getRowBg={rowBg}
               renderCard={(o) => (
                 <Stack gap={4}>
                   <Group justify="space-between" wrap="nowrap" align="flex-start">
@@ -460,9 +477,18 @@ export function ReceivablesTab() {
                     </Text>
                     <Text fw={700}>{money(leftOf(o))}</Text>
                   </Group>
-                  <Text size="xs" c="dimmed">
+                  <Text
+                    size="xs"
+                    c={isOverdueRow(o) ? 'red' : 'dimmed'}
+                    fw={isOverdueRow(o) ? 600 : undefined}
+                  >
                     {t('salesOrders.finance.dueDateLabel')}: {dueText(o.extra?.paymentDeadline)}
                   </Text>
+                  {o.notes?.trim() && (
+                    <Text size="xs" c="dimmed" lineClamp={1}>
+                      {o.notes.trim()}
+                    </Text>
+                  )}
                 </Stack>
               )}
             />
@@ -474,6 +500,7 @@ export function ReceivablesTab() {
               onLoadMore={loadMore}
               loadingMoreLabel={loadingMoreLabel}
               columns={tableColumns}
+              getRowBg={rowBg}
               isLoading={!ready}
               emptyMessage={t('payments.receivable.empty')}
 

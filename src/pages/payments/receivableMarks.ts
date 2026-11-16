@@ -1,5 +1,3 @@
-import { notifications } from '@mantine/notifications';
-import type { TFunction } from 'i18next';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import type { SalesOrder } from '@/types';
@@ -42,18 +40,5 @@ export async function writeReceivableMark(
       useSalesOrderStore.getState().upsertItem(err.latest as SalesOrder);
     }
     throw err;
-  }
-}
-
-export function reportMarkError(err: unknown, t: TFunction): void {
-  if (err instanceof EntityConflictError) {
-    notifications.show({
-      color: 'yellow',
-      title: t('common.conflict.title'),
-      message: t('common.conflict.message'),
-      autoClose: 8000,
-    });
-  } else {
-    notifications.show({ color: 'red', title: t('payments.mark.failed'), message: '' });
   }
 }

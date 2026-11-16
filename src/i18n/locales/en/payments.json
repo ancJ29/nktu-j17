@@ -13,6 +13,7 @@
   },
   "columns": {
     "notYetDue": "Not yet due",
+    "note": "Note",
     "overdue": "Overdue",
     "undated": "No due date"
   },
@@ -26,12 +27,8 @@
   },
   "loadError": "Could not load the last {{days}} days of orders, so no figures are shown.",
   "mark": {
-    "failed": "Could not save the payment mark",
     "paid": "Paid",
-    "paidConfirm": "Mark {{order}} as paid in full? {{left}} is left.",
-    "recordPart": "Record payment",
-    "untrack": "Stop tracking",
-    "untrackConfirm": "Stop tracking {{order}}? It will owe nothing ({{left}} left) until tracked again from its detail."
+    "untrack": "Stop tracking"
   },
   "payable": {
     "columns": {

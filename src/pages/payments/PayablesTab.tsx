@@ -11,6 +11,7 @@ import { LIST_LAZY_RENDER_CHUNK } from '@/config/listDefaults';
 import { ListCardList } from '@/components/ListCardList';
 import { ListDataTable } from '@/components/ListDataTable';
 import { ListPageHeader } from '@/components/ListPageHeader';
+import { ListStatsCards } from '@/components/ListStatsCards';
 import { selectionColumn } from '@/components/selectionColumn';
 import { ROUTES } from '@/constants/routes';
 import { useListFilter } from '@/hooks/useListFilter';
@@ -32,15 +33,17 @@ import {
 import type { PurchaseOrder } from '@/types';
 import { businessDateString } from '@/utils/code';
 import { formatDate } from '@/utils/dateFormat';
+import { OVERDUE_ROW_BG, PAYMENT_STATE_COLOR } from '@/utils/paymentStateColor';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
-import { isPricingManagementEnabled, perms } from '@/utils/permission';
-import { PayableRowActions } from './PayableRowActions';
+import { perms } from '@/utils/permission';
+import { PaymentNoteCell } from './PaymentNoteCell';
 import { PaymentsLoadError } from './PaymentsLoadError';
 import { bulkMark } from './bulkMarkPayments';
 import { createdInWindow, usePaymentsWindowLoad } from './paymentsWindow';
 import { usePaymentsUrlState } from './paymentsUrlState';
 import {
   PAYABLES_WINDOW_DAYS,
+  countPayablesByFilter,
   matchesPayableFilter,
   payableOf,
   sumPayables,
@@ -51,7 +54,6 @@ import { RECEIVABLE_FILTERS, parseReceivableFilter } from './receivables';
 const isMobile = device.isMobile;
 
 const canMark = perms.purchaseOrder.canMarkPaid();
-const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
 
 const money = (n: number, c: PayableCurrency) => formatMoney(n, c);
 const deadlineText = (po: PurchaseOrder) =>
@@ -118,16 +120,21 @@ export function PayablesTab() {
   );
 
   const today = businessDateString();
-  const rows = useMemo<PurchaseOrder[]>(() => {
+  const base = useMemo<PurchaseOrder[]>(() => {
     const q = search.trim().toLowerCase();
-    const kept = (ready ? createdInWindow(items, fetchRange) : []).filter((po) => {
-      if (!matchesPayableFilter(po, filter, today)) return false;
+    return (ready ? createdInWindow(items, fetchRange) : []).filter((po) => {
       if (vendorCode && po.vendorCode !== vendorCode) return false;
       if (!q) return true;
       const v = vendorByCode.get(po.vendorCode);
       const name = v?.extra?.shortName?.trim() || v?.name || po.vendorName || '';
       return (po.orderNumber ?? '').toLowerCase().includes(q) || name.toLowerCase().includes(q);
     });
+  }, [items, ready, fetchRange, vendorCode, search, vendorByCode]);
+
+  const counts = useMemo(() => countPayablesByFilter(base, today), [base, today]);
+
+  const rows = useMemo<PurchaseOrder[]>(() => {
+    const kept = base.filter((po) => matchesPayableFilter(po, filter, today));
 
     const due = (po: PurchaseOrder) => payableOf(po, today)?.dueDay ?? '';
     return kept.sort((a, b) => {
@@ -136,7 +143,7 @@ export function PayablesTab() {
       if (da !== db) return da === '' ? 1 : db === '' ? -1 : da < db ? -1 : 1;
       return (a.orderNumber ?? '').localeCompare(b.orderNumber ?? '');
     });
-  }, [items, ready, fetchRange, today, filter, vendorCode, search, vendorByCode]);
+  }, [base, today, filter]);
 
   const totals = useMemo(() => sumPayables(rows, today), [rows, today]);
 
@@ -150,6 +157,9 @@ export function PayablesTab() {
     chunk: Math.min(totalItems - shownRows.length, LIST_LAZY_RENDER_CHUNK),
     total: totalItems,
   });
+
+  const isOverdueRow = (po: PurchaseOrder) => payableOf(po, today)?.bucket === 'overdue';
+  const rowBg = (po: PurchaseOrder) => (isOverdueRow(po) ? OVERDUE_ROW_BG : undefined);
   const leftOf = (po: PurchaseOrder) => payableOf(po, today)?.remaining ?? 0;
 
   const canBulk = !isMobile && canMark;
@@ -278,15 +288,11 @@ export function PayablesTab() {
         width: '170px',
         render: (po) => <PurchaseOrderPaymentState order={po} />,
       },
-
       {
-        key: 'marks',
-        header: '',
-        width: '210px',
-        render: (po) =>
-          canMark && payableOf(po, today) !== null ? (
-            <PayableRowActions order={po} showPrice={showPrice} />
-          ) : null,
+        key: 'note',
+        header: t('payments.columns.note'),
+        width: '240px',
+        render: (po) => <PaymentNoteCell text={po.notes} />,
       },
     ],
 
@@ -309,7 +315,7 @@ export function PayablesTab() {
 
     return [
       { ...sel, render: (po: PurchaseOrder) => (boxed.has(po.id) ? sel.render(po) : null) },
-      ...columns.filter((c) => c.key !== 'marks'),
+      ...columns,
     ];
   }, [columns, selectionMode, selection, selectableIds, headerSel, t]);
 
@@ -337,6 +343,16 @@ export function PayablesTab() {
         <PaymentsLoadError days={PAYABLES_WINDOW_DAYS} onRetry={load.retry} />
       ) : (
         <>
+          <ListStatsCards
+            always
+            cols={{ base: 3, sm: 5 }}
+            cells={RECEIVABLE_FILTERS.map((f) => ({
+              key: f,
+              label: t(`payments.filter.${f}`),
+              value: counts[f],
+              color: PAYMENT_STATE_COLOR[f],
+            }))}
+          />
           <Card withBorder radius="md" padding="sm" shadow="sm">
             <Stack gap="xs">
               {totals.length === 0 && (
@@ -472,6 +488,7 @@ export function PayablesTab() {
               isLoading={!ready}
               emptyMessage={t('payments.payable.empty')}
               onRowClick={open}
+              getRowBg={rowBg}
               renderCard={(po) => (
                 <Stack gap={4}>
                   <Group justify="space-between" wrap="nowrap" align="flex-start">
@@ -489,9 +506,18 @@ export function PayablesTab() {
                       {money(leftOf(po), poCurrency(po))} {poCurrency(po)}
                     </Text>
                   </Group>
-                  <Text size="xs" c="dimmed">
+                  <Text
+                    size="xs"
+                    c={isOverdueRow(po) ? 'red' : 'dimmed'}
+                    fw={isOverdueRow(po) ? 600 : undefined}
+                  >
                     {t('purchaseOrders.form.paymentDeadlineLabel')}: {deadlineText(po)}
                   </Text>
+                  {po.notes?.trim() && (
+                    <Text size="xs" c="dimmed" lineClamp={1}>
+                      {po.notes.trim()}
+                    </Text>
+                  )}
                 </Stack>
               )}
             />
@@ -503,6 +529,7 @@ export function PayablesTab() {
               onLoadMore={loadMore}
               loadingMoreLabel={loadingMoreLabel}
               columns={tableColumns}
+              getRowBg={rowBg}
               isLoading={!ready}
               emptyMessage={t('payments.payable.empty')}
 

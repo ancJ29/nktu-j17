@@ -231,7 +231,7 @@
     "grandTotalLabel": "Tổng tiền thanh toán",
     "leftToCollect": "Còn {{amount}}",
     "missingLabel": "Thiếu số liệu",
-    "outstandingLabel": "Còn phải thu",
+    "outstandingLabel": "Công nợ",
     "paymentLabel": "Thanh toán",
     "subtotalLabel": "Tổng tiền hàng",
     "totalsCount": "Số dòng",

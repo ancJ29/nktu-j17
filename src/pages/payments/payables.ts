@@ -1,5 +1,5 @@
 import type { PurchaseOrder } from '@/types';
-import type { ReceivableFilter } from './receivables';
+import { RECEIVABLE_FILTERS, type ReceivableFilter } from './receivables';
 import {
   isOverdue,
   poCurrency,
@@ -52,6 +52,25 @@ export function matchesPayableFilter(
   if (filter === 'overdue') return isOverdue(po, todayVn);
   if (filter === 'unpaid') return !poIsPaid(po);
   return poIsPaid(po);
+}
+
+export function countPayablesByFilter(
+  orders: readonly PurchaseOrder[],
+  todayVn: string,
+): Record<PayableFilter, number> {
+  const counts: Record<PayableFilter, number> = {
+    unpaid: 0,
+    overdue: 0,
+    paid: 0,
+    untracked: 0,
+    all: 0,
+  };
+  for (const po of orders) {
+    for (const f of RECEIVABLE_FILTERS) {
+      if (matchesPayableFilter(po, f, todayVn)) counts[f] += 1;
+    }
+  }
+  return counts;
 }
 
 export function sumPayables(orders: readonly PurchaseOrder[], todayVn: string): PayableTotals[] {

@@ -1,6 +1,7 @@
 import { Badge, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import type { SalesOrder } from '@/types';
+import { PAYMENT_STATE_COLOR } from '@/utils/paymentStateColor';
 import {
   computeSalesOrderTotals,
   isSalesOrderOverdue,
@@ -32,7 +33,14 @@ export function SalesOrderPaymentMark({
   }
   if (isSalesOrderPaymentUntracked(order.extra)) {
     return (
-      <Badge variant="light" size="sm" radius="sm" color="gray" w="max-content" styles={NO_CLAMP}>
+      <Badge
+        variant="light"
+        size="sm"
+        radius="sm"
+        color={PAYMENT_STATE_COLOR.untracked}
+        w="max-content"
+        styles={NO_CLAMP}
+      >
         {t('salesOrders.billing.untracked')}
       </Badge>
     );
@@ -48,7 +56,7 @@ export function SalesOrderPaymentMark({
         radius="sm"
         w="max-content"
         styles={NO_CLAMP}
-        color={payment.state === 'paid' ? 'teal' : payment.state === 'partial' ? 'orange' : 'gray'}
+        color={PAYMENT_STATE_COLOR[payment.state]}
       >
         {t(`salesOrders.billing.${payment.state}`)}
       </Badge>
@@ -58,7 +66,14 @@ export function SalesOrderPaymentMark({
         </Text>
       )}
       {overdue && (
-        <Badge variant="filled" size="sm" radius="sm" color="red" w="max-content" styles={NO_CLAMP}>
+        <Badge
+          variant="filled"
+          size="sm"
+          radius="sm"
+          color={PAYMENT_STATE_COLOR.overdue}
+          w="max-content"
+          styles={NO_CLAMP}
+        >
           {t('salesOrders.billing.overdue')}
         </Badge>
       )}

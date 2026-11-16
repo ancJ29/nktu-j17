@@ -82,6 +82,26 @@ export function matchesReceivableFilter(
   return resolveSalesOrderPaymentState(extra, grandTotal).state === 'paid';
 }
 
+export function countReceivablesByFilter(
+  orders: readonly SalesOrder[],
+  todayVn: string,
+  fallbackRate: number,
+): Record<ReceivableFilter, number> {
+  const counts: Record<ReceivableFilter, number> = {
+    unpaid: 0,
+    overdue: 0,
+    paid: 0,
+    untracked: 0,
+    all: 0,
+  };
+  for (const order of orders) {
+    for (const f of RECEIVABLE_FILTERS) {
+      if (matchesReceivableFilter(order, f, todayVn, fallbackRate)) counts[f] += 1;
+    }
+  }
+  return counts;
+}
+
 export type ReceivableSums = {
   overdue: number;
   notYetDue: number;

@@ -4,6 +4,7 @@ import type { PurchaseOrder } from '@/types';
 import { formatDate } from '@/utils/dateFormat';
 import { isPricingManagementEnabled, perms } from '@/utils/permission';
 import { businessDateString } from '@/utils/code';
+import { PAYMENT_STATE_COLOR } from '@/utils/paymentStateColor';
 import {
   formatMoney,
   isOverdue,
@@ -26,7 +27,12 @@ export function PurchaseOrderPaymentState({ order: item }: { readonly order: Pur
 
   if (poPaymentUntracked(item)) {
     return (
-      <Badge variant="light" w="max-content" styles={NO_CLAMP} color="gray">
+      <Badge
+        variant="light"
+        w="max-content"
+        styles={NO_CLAMP}
+        color={PAYMENT_STATE_COLOR.untracked}
+      >
         {t('purchaseOrders.payment.untracked')}
       </Badge>
     );
@@ -37,7 +43,17 @@ export function PurchaseOrderPaymentState({ order: item }: { readonly order: Pur
         variant="light"
         w="max-content"
         styles={NO_CLAMP}
-        color={poIsPaid(item) ? 'green' : overdue ? 'red' : 'orange'}
+        color={
+          PAYMENT_STATE_COLOR[
+            poIsPaid(item)
+              ? 'paid'
+              : overdue
+                ? 'overdue'
+                : poPayment(item).state === 'partial'
+                  ? 'partial'
+                  : 'unpaid'
+          ]
+        }
       >
         {poIsPaid(item)
           ? t('purchaseOrders.payment.paid')
