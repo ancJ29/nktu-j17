@@ -99,6 +99,13 @@ export type InventoryLinkageSnapshotEntry = {
 export type InventoryLinkageVia =
   | { kind: 'capability'; capabilityId: string; statusValue: string }
   | { kind: 'cancel-auto-release' }
+  /**
+   * Cancelling an order that had shipped (delivered) put its shipped stock back on the shelf,
+   * net of what restocked customer returns already returned. Marks the linkage so a return
+   * completed AFTER the cancel does not restock the same goods again
+   * (`gaveShippedStockBackOnCancel`). See `cancelStockRollback.ts`.
+   */
+  | { kind: 'cancel-unship' }
   | { kind: 'manual-release' }
   /**
    * The transition engine synthesised a ship when an order entered a

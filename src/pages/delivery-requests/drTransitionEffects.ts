@@ -4,6 +4,7 @@ import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
+import { gaveShippedStockBackOnCancel } from '@/utils/cancelStockRollback';
 import { applyReturnRestock } from '@/utils/deliveryRequestReturnInventory';
 import { logActivity } from '@/utils/activityLogger';
 import { indexInventoryByProduct } from '@/utils/inventoryCommitment';
@@ -156,8 +157,21 @@ export async function runDrTransitionEffects({
     !updatedExtra.returnRestockedAt &&
     toStage === 'COMPLETED'
   ) {
-    const restock = await applyReturnRestock(updated);
-    if (restock.failed > 0) {
+    await useSalesOrderStore.getState().forceRefresh();
+    const returnedOrder = useSalesOrderStore.getState().getById(updated.salesOrderId ?? '') as
+      SalesOrder | undefined;
+    const alreadyBack = gaveShippedStockBackOnCancel(returnedOrder);
+    if (alreadyBack) {
+      notifications.show({
+        color: 'yellow',
+        message: t('deliveryRequests.return.restockSkippedCancelled'),
+        autoClose: 10000,
+      });
+    }
+    const restock = alreadyBack ? null : await applyReturnRestock(updated);
+    if (!restock) {
+      // skipped above: nothing to tally
+    } else if (restock.failed > 0) {
       notifications.show({
         color: 'red',
         title: t('deliveryRequests.return.restockFailedTitle'),

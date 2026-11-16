@@ -83,10 +83,13 @@ import { sweepSalesOrderPlatformLog } from './platformLogSweep';
 import { runShipRecovery } from './shipRecovery';
 import { patchSalesOrderMeta, type SalesOrderMetaPatch } from './salesOrderMetaPatch';
 import { softDeleteLinkedDeliveryRequests } from '@/pages/delivery-requests/deliveryRequestDelete';
+import { netRestockedReturns, restockedReturnsOf } from '@/utils/returnRestockNetting';
+import { planCancelRollback } from '@/utils/cancelStockRollback';
 import type { Stage } from './capabilities/types';
 import { device } from '@credo/base-ui/utils';
 import { getCurrentEmployeeId } from '@/hooks/useCurrentEmployee';
 import {
+  getDeliveryRequestStatusOptions,
   getSalesOrderCompletionEvidence,
   isAdditionalDRAllowed,
   isProductInventoryEnabled,
@@ -210,6 +213,16 @@ type UseSalesOrderDetailOptions = {
     };
   };
 };
+
+async function restockedReturnsOfOrder(orderId: string) {
+  await useDeliveryRequestStore.getState().forceRefresh();
+  const stages = getDeliveryRequestStatusOptions();
+  return restockedReturnsOf(
+    useDeliveryRequestStore.getState().items,
+    orderId,
+    (d) => stages.find((o) => o.value === d.extra?.status)?.stage === 'COMPLETED',
+  );
+}
 
 export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
   const { t } = useTranslation();
@@ -440,39 +453,60 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       const log: SalesOrderActivityEntry[] = currentExtra.activityLog ?? [];
 
       const linkage = currentExtra.inventoryLinkage;
-      const shouldAutoRelease =
-        linkage?.state === 'reserved' &&
-        linkage.reservedSnapshot != null &&
-        linkage.reservedSnapshot.length > 0;
+      const mayRollBack =
+        linkage?.state === 'shipped' ||
+        (linkage?.state === 'reserved' && (linkage.reservedSnapshot?.length ?? 0) > 0);
 
       let nextLinkage: InventoryLinkage | undefined = linkage;
       let autoReleaseFailed = false;
+      let rollbackKind: 'release' | 'unship' | null = null;
       let appliedInventoryOps: readonly AppliedOp[] = [];
 
-      if (shouldAutoRelease) {
+      if (mayRollBack) {
         await useProductInventoryStore.getState().revalidate();
         const freshInventoryByProduct = indexInventoryByProduct(
           useProductInventoryStore.getState().items,
         );
-        const planResult = planReleaseFromLinkage({
-          snapshot: linkage!.reservedSnapshot!,
+        const rollback = planCancelRollback({
+          linkage,
           so: order,
           productsByCode: productByCode,
           inventoryByProduct: freshInventoryByProduct,
+          returns: linkage?.state === 'shipped' ? await restockedReturnsOfOrder(order.id) : [],
         });
-        if (!planResult.ok) {
+        if (rollback.kind === 'fail' && linkage?.state === 'shipped') {
+          notifications.show({
+            color: 'red',
+            title: t('salesOrders.notifications.reservationPlanFailedTitle'),
+            message: formatPlanFailures(rollback.failures, t, productByCode),
+            autoClose: 12000,
+          });
+          setActionLoading(false);
+          closeCancel();
+          return;
+        }
+        if (rollback.kind === 'fail') {
           autoReleaseFailed = true;
-        } else if (planResult.plan.ops.length > 0) {
-          const exec = await executeReservationPlan(planResult.plan.ops);
-          if (!exec.ok) {
-            autoReleaseFailed = true;
-            useProductInventoryStore.getState().forceRefresh();
-          } else {
-            appliedInventoryOps = exec.applied;
+        } else if (rollback.kind === 'release' || rollback.kind === 'unship') {
+          rollbackKind = rollback.kind;
+          let applied = true;
+          if (rollback.plan.ops.length > 0) {
+            const exec = await executeReservationPlan(rollback.plan.ops);
+            if (!exec.ok) {
+              applied = false;
+              autoReleaseFailed = true;
+              useProductInventoryStore.getState().forceRefresh();
+            } else {
+              appliedInventoryOps = exec.applied;
+            }
+          } else if (rollback.kind === 'release') {
+            applied = false; // nothing planned: the linkage stays as it was
+          }
+          if (applied) {
             nextLinkage = buildReleasedLinkage(
               cancellation.at,
               currentEmployee ? { id: currentEmployee.id, name: currentEmployee.name } : undefined,
-              { kind: 'cancel-auto-release' },
+              { kind: rollback.kind === 'unship' ? 'cancel-unship' : 'cancel-auto-release' },
             );
           }
         }
@@ -550,7 +584,8 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
           orderNumber: order.orderNumber,
           fromStatus,
           ...(reason ? { reason } : {}),
-          inventoryReleased: shouldAutoRelease && !autoReleaseFailed,
+          inventoryReleased: rollbackKind === 'release' && !autoReleaseFailed,
+          ...(rollbackKind === 'unship' && !autoReleaseFailed && { inventoryUnshipped: true }),
           ...(autoReleaseFailed && { autoReleaseFailed: true }),
         });
       } catch (err) {
@@ -734,7 +769,30 @@ export function useSalesOrderDetail(opts: UseSalesOrderDetailOptions = {}) {
       const freshInventoryByProduct = indexInventoryByProduct(freshRows);
       const heldSnapshot = buildHoldSnapshotForSalesOrder(freshRows, order.id);
 
-      const shippedSnapshot = linkage?.state === 'shipped' ? (linkage.shippedSnapshot ?? []) : [];
+      let shippedSnapshot = linkage?.state === 'shipped' ? (linkage.shippedSnapshot ?? []) : [];
+      if (heldSnapshot.length === 0 && shippedSnapshot.length > 0) {
+        const netted = netRestockedReturns(
+          shippedSnapshot,
+          await restockedReturnsOfOrder(order.id),
+          productByCode,
+        );
+        if (!netted.ok) {
+          notifications.show({
+            color: 'red',
+            title: t('salesOrders.notifications.reservationPlanFailedTitle'),
+            message: formatPlanFailures(
+              [{ kind: 'unknown-unit', productCode: netted.productCode, unit: netted.unit }],
+              t,
+              productByCode,
+            ),
+            autoClose: 12000,
+          });
+          setActionLoading(false);
+          closeDelete();
+          return;
+        }
+        shippedSnapshot = netted.snapshot;
+      }
       rollbackKind =
         heldSnapshot.length > 0 ? 'release' : shippedSnapshot.length > 0 ? 'unship' : null;
 

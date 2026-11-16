@@ -1212,9 +1212,17 @@ export function SalesOrderDetail({ variant }: SalesOrderDetailProps) {
             {t('salesOrders.cancel.previewReleaseReserved', { count: reservedRowCount })}
           </Alert>
         )}
-        {linkageState === 'shipped' && (
+        {linkageState === 'shipped' && (linkage?.shippedSnapshot?.length ?? 0) > 0 && (
+          <Alert color="green" variant="light" icon={<IconLockOpen size={16} />}>
+            {t('salesOrders.cancel.previewUnship', {
+              count: linkage?.shippedSnapshot?.length ?? 0,
+            })}
+          </Alert>
+        )}
+        {((linkageState === 'shipped' && (linkage?.shippedSnapshot?.length ?? 0) === 0) ||
+          (linkageState !== 'shipped' && currentStatus.stage === 'COMPLETED')) && (
           <Alert color="yellow" variant="light" icon={<IconAlertTriangle size={16} />}>
-            {t('salesOrders.cancel.previewAfterShip')}
+            {t('salesOrders.cancel.previewNoShipRecord')}
           </Alert>
         )}
         <Textarea

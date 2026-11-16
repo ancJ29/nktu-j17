@@ -41,9 +41,11 @@
     "actionButton": "Cancel Order",
     "confirmMessage": "Cancel this order while in \"{{status}}\"? Inventory side-effects must be reconciled manually if any apply.",
     "confirmTitle": "Cancel Order",
-    "previewAfterShip": "This order has already shipped. Cancelling it will NOT return the stock — adjust inventory manually if a return is needed.",
+    "previewNoShipRecord": "The app has no record of this order's shipped stock, so cancelling will NOT change the stock — adjust inventory by hand if goods came back.",
     "previewReleaseReserved_one": "On cancel, {{count}} reserved row will be released automatically.",
     "previewReleaseReserved_other": "On cancel, {{count}} reserved rows will be released automatically.",
+    "previewUnship_one": "On cancel, the stock this order shipped ({{count}} row) goes back on the shelf automatically.",
+    "previewUnship_other": "On cancel, the stock this order shipped ({{count}} rows) goes back on the shelf automatically.",
     "reasonLabel": "Reason (optional)",
     "reasonPlaceholder": "Why is this order being cancelled?",
     "statusBadge": "Cancelled"

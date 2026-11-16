@@ -212,6 +212,7 @@
     "restockDone": "Stock updated for {{count}} item(s).",
     "restockFailedMessage": "{{count}} item(s) could not be added back to stock. Adjust them manually from the inventory page.",
     "restockFailedTitle": "Return completed, stock not fully updated",
+    "restockSkippedCancelled": "Stock not added again: cancelling the order already put its shipped stock back.",
     "returnAll": "Return all",
     "returnableHint": "max {{count}}",
     "scheduledDateLabel": "Expected receive date",

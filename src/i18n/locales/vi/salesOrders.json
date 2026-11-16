@@ -41,9 +41,11 @@
     "actionButton": "Hủy đơn",
     "confirmMessage": "Hủy đơn hàng này khi đang ở trạng thái \"{{status}}\"? Mọi thay đổi tồn kho cần đối soát thủ công nếu có.",
     "confirmTitle": "Hủy đơn hàng",
-    "previewAfterShip": "Đơn này đã trừ tồn kho. Hủy đơn KHÔNG hoàn lại tồn — vui lòng điều chỉnh thủ công nếu cần.",
+    "previewNoShipRecord": "Hệ thống không có ghi nhận số hàng đã xuất của đơn này, nên hủy đơn sẽ KHÔNG thay đổi tồn kho — vui lòng điều chỉnh thủ công nếu hàng đã được trả lại.",
     "previewReleaseReserved_one": "Khi hủy, {{count}} dòng tồn đang giữ sẽ tự động được giải phóng.",
     "previewReleaseReserved_other": "Khi hủy, {{count}} dòng tồn đang giữ sẽ tự động được giải phóng.",
+    "previewUnship_one": "Khi hủy, tồn kho đơn này đã xuất ({{count}} dòng) sẽ tự động được hoàn lại.",
+    "previewUnship_other": "Khi hủy, tồn kho đơn này đã xuất ({{count}} dòng) sẽ tự động được hoàn lại.",
     "reasonLabel": "Lý do (không bắt buộc)",
     "reasonPlaceholder": "Vì sao hủy đơn này?",
     "statusBadge": "Đã hủy"

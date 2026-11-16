@@ -212,6 +212,7 @@
     "restockDone": "Đã cập nhật tồn kho cho {{count}} mặt hàng.",
     "restockFailedMessage": "{{count}} mặt hàng chưa cộng lại được vào tồn kho. Vui lòng điều chỉnh thủ công ở trang tồn kho.",
     "restockFailedTitle": "Đã hoàn tất phiếu trả, tồn kho chưa cập nhật đủ",
+    "restockSkippedCancelled": "Không cộng tồn lần nữa: việc hủy đơn đã hoàn lại tồn kho đã xuất.",
     "returnAll": "Trả tất cả",
     "returnableHint": "tối đa {{count}}",
     "scheduledDateLabel": "Ngày nhận dự kiến",
