@@ -13,6 +13,7 @@ import type {
   ProductInventoryExtra,
   ProductInventoryRow,
 } from '@/types';
+import { SO_FETCH_DAYS } from './productInventoryListVariant';
 import { getCurrentActorId, lookupLabelOf, useLookupV2Labels } from '@/hooks';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { useCustomerStore } from '@/stores/useCustomerStore';
@@ -79,7 +80,7 @@ export function ProductInventoryComposeSetModal({
   const customersInitialized = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
 
-  const soFetchRange = useMemo(() => defaultLastNDaysRange(90), []);
+  const soFetchRange = useMemo(() => defaultLastNDaysRange(SO_FETCH_DAYS), []);
 
   useEffect(() => {
     if (!opened) return;

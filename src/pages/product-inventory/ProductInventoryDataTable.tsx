@@ -27,6 +27,12 @@ import type { ReservationOrderStatusSource } from './useReservationOrderStatus';
 import { hasImagesForProducts } from '@/utils/permission';
 import { SortHeader } from '@/components/SortHeader';
 import { useColumnWidths } from '@/hooks/useColumnWidths';
+import { StockMovementBadge } from './StockMovementBadge';
+import {
+  STOCK_MOVEMENT_THRESHOLDS,
+  STOCK_MOVEMENT_WINDOW_DAYS,
+} from './productInventoryListVariant';
+import type { StockMovementSource } from './useStockMovement';
 
 const imagesEnabled = hasImagesForProducts();
 const locationsEnabled = isLocationsEnabled();
@@ -43,6 +49,7 @@ type Props = {
 
   readonly orderStatus?: ReservationOrderStatusSource;
 
+  readonly movement?: StockMovementSource;
   readonly onOutgoingClick?: (summary: ProductInventorySummary) => void;
 
   readonly maxHeight?: number | string;
@@ -278,6 +285,7 @@ export function ProductInventoryDataTable({
   inboundIndex,
   resolveCustomerName,
   orderStatus,
+  movement,
   onOutgoingClick,
   maxHeight = 'calc(100vh - 300px)',
   viewportRef,
@@ -674,6 +682,35 @@ export function ProductInventoryDataTable({
             </Box>
           ),
         },
+        ...(movement
+          ? [
+              {
+                key: 'movement',
+                header: (
+                  <Tooltip
+                    label={t('productInventory.movement.columnTooltip', {
+                      days: STOCK_MOVEMENT_WINDOW_DAYS,
+                      aLot: STOCK_MOVEMENT_THRESHOLDS.aLotOrders,
+                      rarely: STOCK_MOVEMENT_THRESHOLDS.rarelyOrders,
+                    })}
+                    withArrow
+                    multiline
+                    w={260}
+                  >
+                    <Text size="sm" fw="bold" ta="center">
+                      {t('productInventory.movement.column')}
+                    </Text>
+                  </Tooltip>
+                ),
+                ta: 'center' as const,
+                render: (s: ProductInventorySummary) => (
+                  <Box ta="center">
+                    <StockMovementBadge source={movement} productCode={s.product.code} />
+                  </Box>
+                ),
+              },
+            ]
+          : []),
         {
           key: 'lastUpdated',
           ta: 'right',
@@ -693,6 +730,7 @@ export function ProductInventoryDataTable({
       inboundIndex,
       resolveCustomerName,
       orderStatus,
+      movement,
       onOutgoingClick,
       getColumnFilter,
       sortField,

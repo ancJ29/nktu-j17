@@ -9,6 +9,9 @@ import { isDefaultLocation } from '@/types';
 import { isLocationsEnabled } from '@/utils/permission';
 import { InventoryRecheckBadge } from '@/components/inventory/InventoryRecheckBadge';
 
+import { StockMovementBadge } from './StockMovementBadge';
+import type { StockMovementSource } from './useStockMovement';
+
 const locationsEnabled = isLocationsEnabled();
 
 type Props = {
@@ -17,6 +20,8 @@ type Props = {
   readonly isLoading?: boolean;
   readonly onRowClick: (product: Product) => void;
   readonly inboundIndex?: ReadonlyMap<string, InboundEntry>;
+
+  readonly movement?: StockMovementSource;
 };
 
 function CardSkeleton() {
@@ -37,6 +42,7 @@ export function ProductInventoryCardList({
   isLoading,
   onRowClick,
   inboundIndex,
+  movement,
 }: Props) {
   const { t } = useTranslation();
   const unitLabels = useLookupV2Labels('product-unit');
@@ -174,6 +180,13 @@ export function ProductInventoryCardList({
                           : 'productInventory.stockState.low',
                       )}
                     </Badge>
+                  )}
+                  {movement && (
+                    <StockMovementBadge
+                      source={movement}
+                      productCode={s.product.code}
+                      showFigures
+                    />
                   )}
                   {s.needsRecheck && (
                     <InventoryRecheckBadge

@@ -159,6 +159,17 @@
     "repack": "Đóng gói lại",
     "snapshot": "Kiểm kho (cập nhật)"
   },
+  "movement": {
+    "aLot": "Nhiều",
+    "column": "Tần suất bán",
+    "columnTooltip": "Sản phẩm này bán thường xuyên đến đâu: số đơn bán hàng đã giao trong {{days}} ngày qua. Nhiều = từ {{aLot}} đơn trong {{days}} ngày; ít = tối đa {{rarely}} đơn.",
+    "figures": "{{perMonth}} đơn một tháng · {{orders}} đơn trong {{days}} ngày qua",
+    "filterPlaceholder": "Mọi tần suất bán",
+    "filterTitle": "Tần suất bán",
+    "loading": "Đang đếm đơn…",
+    "normal": "Vừa",
+    "rarely": "Ít"
+  },
   "notifications": {
     "adjustError": "Không thể áp dụng",
     "adjustSuccess": "Đã cập nhật tồn kho",

@@ -50,6 +50,8 @@ import { ProductInventoryDecomposeSetModal } from './ProductInventoryDecomposeSe
 import { ProductInventoryOutgoingModal } from './ProductInventoryOutgoingModal';
 import { rollupReservationsBySO } from './productInventoryReservations';
 import { useReservationOrderStatus } from './useReservationOrderStatus';
+import { useStockMovement } from './useStockMovement';
+import type { StockMovementLevel } from '@/utils/stockMovement';
 import { inventoryExportInput } from './inventoryExportInput';
 import { InventoryImportExportActions } from '@/components/inventory/InventoryImportExportActions';
 import { hasHideFromInventoryListForProducts, isLocationsEnabled } from '@/utils/permission';
@@ -85,6 +87,8 @@ type ProductInventoryFilters = {
   stock: StockFilter;
 
   secondary: SecondaryFilter;
+
+  movement: StockMovementLevel | null;
   search: string;
   page: number;
 
@@ -97,6 +101,7 @@ const FILTER_DEFAULTS: ProductInventoryFilters = {
   category: null,
   stock: null,
   secondary: null,
+  movement: null,
   search: '',
   page: 1,
   columnFilters: '',
@@ -155,6 +160,8 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
 
   const orderStatus = useReservationOrderStatus();
 
+  const movement = useStockMovement(variant.showMovementLevel);
+
   const [outgoingFor, setOutgoingFor] = useState<ProductInventorySummary | null>(null);
   const outgoingReservations = useMemo(
     () => (outgoingFor ? rollupReservationsBySO(outgoingFor) : []),
@@ -170,6 +177,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
   const categoryFilter = filterState.category;
   const stockFilter = filterState.stock;
   const secondaryFilter = filterState.secondary;
+  const movementFilter = variant.showMovementLevel ? filterState.movement : null;
   const setLocationFilter = useCallback(
     (v: string | null) => updateState({ location: v }),
     [updateState],
@@ -179,6 +187,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [updateState],
   );
   const setStockFilter = useCallback((v: StockFilter) => updateState({ stock: v }), [updateState]);
+  const setMovementFilter = useCallback(
+    (v: StockMovementLevel | null) => updateState({ movement: v }),
+    [updateState],
+  );
   const setSecondaryFilter = useCallback(
     (v: SecondaryFilter) => updateState({ secondary: v }),
     [updateState],
@@ -247,6 +259,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     category: categoryFilter,
     stock: stockFilter,
     secondary: secondaryFilter,
+    movement: movementFilter,
 
     columnFilters: filterState.columnFilters,
   };
@@ -278,6 +291,9 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
         if (typeof min !== 'number' || s.totalOnHand <= 0 || s.totalOnHand > min) return false;
       }
       if (secondaryFilterEnabled && f.secondary && s.secondaryStatus !== f.secondary) return false;
+
+      if (f.movement && movement.get(s.product.code)?.level !== f.movement && movement.ready)
+        return false;
 
       if (!columnFilters.predicate(s)) return false;
       return true;
@@ -427,6 +443,15 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
     [t],
   );
 
+  const movementOptions = useMemo(
+    () => [
+      { value: 'aLot', label: t('productInventory.movement.aLot') },
+      { value: 'normal', label: t('productInventory.movement.normal') },
+      { value: 'rarely', label: t('productInventory.movement.rarely') },
+    ],
+    [t],
+  );
+
   const secondaryOptions = useMemo(
     () => [
       { value: 'outOfStock', label: secondaryStatusLabels.outOfStock },
@@ -474,6 +499,18 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
             },
           ]
         : []),
+      ...(variant.showMovementLevel
+        ? [
+            {
+              value: movementFilter,
+              onChange: (v: string | null) => setMovementFilter(v as StockMovementLevel | null),
+              data: movementOptions,
+              placeholder: t('productInventory.movement.filterPlaceholder'),
+              searchable: false,
+              w: 180,
+            },
+          ]
+        : []),
       ...(variant.showSecondaryFilter
         ? [
             {
@@ -500,6 +537,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       secondaryFilter,
       setSecondaryFilter,
       secondaryOptions,
+      movementFilter,
+      setMovementFilter,
+      movementOptions,
+      variant.showMovementLevel,
       variant.showStockFilter,
       variant.showSecondaryFilter,
       t,
@@ -534,6 +575,18 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           ]
         : []),
 
+      ...(variant.showMovementLevel
+        ? [
+            allOptionFilter<StockMovementLevel | null>({
+              title: t('productInventory.movement.filterTitle'),
+              value: movementFilter,
+              options: movementOptions,
+              onChange: setMovementFilter,
+              allLabel: t('common.filters.all'),
+              emptyValue: null,
+            }),
+          ]
+        : []),
       ...(variant.showSecondaryFilter && !(isMobile && variant.quickChipMode === 'secondary')
         ? [
             allOptionFilter<SecondaryFilter>({
@@ -557,6 +610,10 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
       secondaryFilter,
       setSecondaryFilter,
       secondaryOptions,
+      movementFilter,
+      setMovementFilter,
+      movementOptions,
+      variant.showMovementLevel,
       variant.showStockFilter,
       variant.showSecondaryFilter,
       variant.quickChipMode,
@@ -891,6 +948,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           isLoading={loadingInitial}
           onRowClick={handleRowClick}
           inboundIndex={inboundIndex}
+          movement={variant.showMovementLevel ? movement : undefined}
         />
       ) : (
         <ProductInventoryDataTable
@@ -901,6 +959,7 @@ export function ProductInventoryList({ variant }: ProductInventoryListProps) {
           inboundIndex={inboundIndex}
           resolveCustomerName={resolveCustomerName}
           orderStatus={orderStatus}
+          movement={variant.showMovementLevel ? movement : undefined}
           onOutgoingClick={variant.showOutgoingDetailModal ? setOutgoingFor : undefined}
           viewportRef={scrollViewportRef}
           getColumnFilter={variant.showColumnHeaderFilters ? columnFilters.filterFor : undefined}

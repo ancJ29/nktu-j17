@@ -7,7 +7,7 @@ import type { SalesOrder, SalesOrderExtra } from '@/types';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import type { ResolvedStatusOption } from '@/utils/permission';
 
-export const SO_FETCH_DAYS = 90;
+import { SO_FETCH_DAYS } from './productInventoryListVariant';
 
 export type ReservationOrderStatus = {
   order: SalesOrder | undefined;

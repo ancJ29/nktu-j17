@@ -159,6 +159,17 @@
     "repack": "Repack",
     "snapshot": "Stock-take (absolute)"
   },
+  "movement": {
+    "aLot": "A lot",
+    "column": "Sales pace",
+    "columnTooltip": "How often this product sells: delivered sales orders over the last {{days}} days. A lot = {{aLot}} or more orders in {{days}} days; rarely = {{rarely}} or fewer.",
+    "figures": "{{perMonth}} orders a month · {{orders}} in the last {{days}} days",
+    "filterPlaceholder": "All sales paces",
+    "filterTitle": "Sales pace",
+    "loading": "Counting orders…",
+    "normal": "Normal",
+    "rarely": "Rarely"
+  },
   "notifications": {
     "adjustError": "Failed to apply adjustment",
     "adjustSuccess": "On-hand updated",

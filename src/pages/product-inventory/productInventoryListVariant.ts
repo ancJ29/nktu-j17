@@ -14,6 +14,8 @@ export type ProductInventoryListVariant = {
   showColumnHeaderFilters: boolean;
 
   showOutgoingDetailModal: boolean;
+
+  showMovementLevel: boolean;
 };
 
 export const DEFAULT_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = {
@@ -25,6 +27,7 @@ export const DEFAULT_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant
   showBeginOfPeriod: false,
   showColumnHeaderFilters: false,
   showOutgoingDetailModal: false,
+  showMovementLevel: false,
 };
 
 export const NKTU_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = {
@@ -36,4 +39,15 @@ export const NKTU_PRODUCT_INVENTORY_LIST_VARIANT: ProductInventoryListVariant = 
   showBeginOfPeriod: true,
   showOutgoingDetailModal: true,
   showColumnHeaderFilters: true,
+  showMovementLevel: true,
 };
+
+export const STOCK_MOVEMENT_WINDOW_DAYS = 90;
+
+export const STOCK_MOVEMENT_THRESHOLDS = {
+  aLotOrders: 9,
+
+  rarelyOrders: 2,
+};
+
+export const SO_FETCH_DAYS = 150;
