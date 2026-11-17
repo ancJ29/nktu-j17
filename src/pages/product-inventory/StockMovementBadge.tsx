@@ -13,7 +13,7 @@ const fmt = (n: number) => String(Math.round(n * 10) / 10);
 export function StockMovementBadge({
   source,
   productCode,
-  showFigures = false,
+  showFigures = true,
 }: {
   readonly source: StockMovementSource;
   readonly productCode: string;
