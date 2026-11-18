@@ -93,6 +93,8 @@ export type GenerateLoginTokenResponse = BaseResponse & {
 export type LoginWithTokenRequest = {
   serviceCode: string;
   token: string;
+
+  refreshTokenExpiration?: number;
 };
 export type LoginWithTokenResponse = LoginResponse;
 

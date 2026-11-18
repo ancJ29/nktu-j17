@@ -1,4 +1,8 @@
 import type { DateTimeInput } from '@credo/kits/types';
+import type {
+  LoginRequest as CSsoLoginRequest,
+  LoginWithTokenRequest as CSsoLoginWithTokenRequest,
+} from '../c-sso/types';
 
 type BaseMutationRequest = {
   expectedListHash?: string;
@@ -176,6 +180,9 @@ export type SetAppConfigResponse = {
   success: boolean;
   config: CredoAppConfig;
 };
+
+export type LoginRequest = CSsoLoginRequest & { keepSignedIn?: boolean };
+export type LoginWithTokenRequest = CSsoLoginWithTokenRequest & { keepSignedIn?: boolean };
 
 export type AuthMintResponse = {
   success: boolean;

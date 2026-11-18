@@ -18,6 +18,8 @@ export type AppInfo = {
 
 export type AuthFeatures = {
   loginViaQRCode: boolean;
+
+  keepIPadSignedIn: boolean;
 };
 
 export type ThemeConfig = {

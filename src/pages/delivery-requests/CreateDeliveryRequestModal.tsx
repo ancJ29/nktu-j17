@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DateField } from '@/components/DateField';
 import { EmployeeSelector } from '@/components/selectors';
+import { refreshPartyRegisters } from '@/stores/refreshPartyRegisters';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useProductStore } from '@/stores/useProductStore';
@@ -131,34 +132,44 @@ export function CreateDeliveryRequestModal({
     }
     if (seededRef.current || !drsInit) return;
     seededRef.current = true;
-    const soExtra = (salesOrder.extra ?? {}) as SalesOrderExtra;
-    const customer = soExtra.customerCode
-      ? useCustomerStore.getState().getByCode(soExtra.customerCode)
-      : undefined;
-    const allDRs = useDeliveryRequestStore.getState().items;
-    const scheduledDate = resolveInitialScheduledDateFromSalesOrder(
-      seedScheduledDateFromSalesOrder ? soExtra.deliveryDate : null,
-    );
-    const seededAddress = seedAddressFromCustomer(customer, soExtra);
-    form.setValues({
-      requestNumber: '',
-      direction: 'outbound',
-      salesOrderId: salesOrder.id,
-      salesOrderNumber: salesOrder.orderNumber,
-      customerName: salesOrder.customerName,
-      vendorCode: '',
-      vendorName: '',
-      deliveryAddress: seededAddress.deliveryAddress,
-      googleMapUrl: seededAddress.googleMapUrl,
-      scheduledDate,
-      notes: '',
-      items: buildRemainingItemsFromSalesOrder(salesOrder.items, salesOrder.id, allDRs),
-      assignedDriverId: '',
+    let cancelled = false;
 
-      warehouseStaff: readWarehouseStaff(soExtra),
-      isUrgent: false,
+    void refreshPartyRegisters().then(() => {
+      if (!cancelled) seedFromOrder();
     });
-    form.resetDirty();
+    function seedFromOrder() {
+      const soExtra = (salesOrder.extra ?? {}) as SalesOrderExtra;
+      const customer = soExtra.customerCode
+        ? useCustomerStore.getState().getByCode(soExtra.customerCode)
+        : undefined;
+      const allDRs = useDeliveryRequestStore.getState().items;
+      const scheduledDate = resolveInitialScheduledDateFromSalesOrder(
+        seedScheduledDateFromSalesOrder ? soExtra.deliveryDate : null,
+      );
+      const seededAddress = seedAddressFromCustomer(customer, soExtra);
+      form.setValues({
+        requestNumber: '',
+        direction: 'outbound',
+        salesOrderId: salesOrder.id,
+        salesOrderNumber: salesOrder.orderNumber,
+        customerName: salesOrder.customerName,
+        vendorCode: '',
+        vendorName: '',
+        deliveryAddress: seededAddress.deliveryAddress,
+        googleMapUrl: seededAddress.googleMapUrl,
+        scheduledDate,
+        notes: '',
+        items: buildRemainingItemsFromSalesOrder(salesOrder.items, salesOrder.id, allDRs),
+        assignedDriverId: '',
+
+        warehouseStaff: readWarehouseStaff(soExtra),
+        isUrgent: false,
+      });
+      form.resetDirty();
+    }
+    return () => {
+      cancelled = true;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, drsInit, salesOrder]);
 

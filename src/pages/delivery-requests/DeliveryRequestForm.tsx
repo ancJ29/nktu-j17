@@ -31,6 +31,7 @@ import { ROUTES } from '@/constants/routes';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
+import { refreshPartyRegisters } from '@/stores/refreshPartyRegisters';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useSalesOrderStore } from '@/stores/useSalesOrderStore';
 import { useProductStore } from '@/stores/useProductStore';
@@ -266,6 +267,24 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         const seeded = seedAddressFromCustomer(customer, soExtra);
         form.setFieldValue('deliveryAddress', seeded.deliveryAddress);
         form.setFieldValue('googleMapUrl', seeded.googleMapUrl);
+
+        void refreshPartyRegisters().then(() => {
+          const now = form.getValues();
+          if (now.salesOrderId !== so.value) return;
+          if (
+            now.deliveryAddress !== seeded.deliveryAddress ||
+            now.googleMapUrl !== seeded.googleMapUrl
+          )
+            return;
+          const latest = seedAddressFromCustomer(
+            soExtra.customerCode
+              ? useCustomerStore.getState().getByCode(soExtra.customerCode)
+              : undefined,
+            soExtra,
+          );
+          form.setFieldValue('deliveryAddress', latest.deliveryAddress);
+          form.setFieldValue('googleMapUrl', latest.googleMapUrl);
+        });
 
         const remaining = buildRemainingItemsFromSalesOrder(so.items, so.value, allDRs);
         if (remaining.length > 0) {

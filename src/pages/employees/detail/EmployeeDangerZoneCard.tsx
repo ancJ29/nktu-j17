@@ -29,13 +29,19 @@ import {
   ThemeIcon,
   Tooltip,
 } from '@mantine/core';
-import { IconAlertTriangle, IconLock, IconLockOpen, IconTrash } from '@tabler/icons-react';
+import {
+  IconAlertTriangle,
+  IconDeviceMobileOff,
+  IconLock,
+  IconLockOpen,
+  IconTrash,
+} from '@tabler/icons-react';
 import { FieldLabel } from '@credo/base-ui/components';
 import { useTranslation } from 'react-i18next';
 
 import type { Employee } from '@/types';
 import { device } from '@credo/base-ui/utils';
-import { perms } from '@/utils/permission';
+import { hasKeepIPadSignedIn, perms } from '@/utils/permission';
 
 const isMobile = device.isMobile;
 const canDelete = perms.employee.canDelete();
@@ -45,14 +51,18 @@ type EmployeeDangerZoneCardProps = {
   readonly employee: Employee;
   readonly onToggleStatus: () => void;
   readonly onDelete: () => void;
+  readonly onEndSessions: () => void;
 };
 
 export function EmployeeDangerZoneCard({
   employee,
   onToggleStatus,
   onDelete,
+  onEndSessions,
 }: EmployeeDangerZoneCardProps) {
   const { t } = useTranslation();
+  // Same right as lock/unlock; shown only where sessions are kept (iPads).
+  const canEndSessions = canToggleStatus && hasKeepIPadSignedIn();
 
   if (isMobile) {
     if (!canToggleStatus) return null;
@@ -72,7 +82,7 @@ export function EmployeeDangerZoneCard({
     );
   }
 
-  if (!canToggleStatus && !canDelete) return null;
+  if (!canToggleStatus && !canDelete && !canEndSessions) return null;
 
   return (
     <Card
@@ -128,7 +138,34 @@ export function EmployeeDangerZoneCard({
           </Group>
         )}
 
-        {canToggleStatus && canDelete && <Divider variant="dashed" />}
+        {canEndSessions && (
+          <>
+            {canToggleStatus && <Divider variant="dashed" />}
+            <Group justify="space-between" wrap="nowrap" align="flex-start" gap="md">
+              <Stack gap={2} style={{ minWidth: 0 }}>
+                <Text fw={600} size="sm">
+                  {t('__new__.07-entities.employees.dangerZone.endSessions')}
+                </Text>
+                <Text size="xs" c="dimmed">
+                  {t('__new__.07-entities.employees.dangerZone.endSessionsDesc')}
+                </Text>
+              </Stack>
+              <Tooltip label={t('__new__.07-entities.employees.dangerZone.endSessions')} withArrow>
+                <ActionIcon
+                  variant="default"
+                  size="lg"
+                  color="orange"
+                  aria-label={t('__new__.07-entities.employees.dangerZone.endSessions')}
+                  onClick={onEndSessions}
+                >
+                  <IconDeviceMobileOff size={16} />
+                </ActionIcon>
+              </Tooltip>
+            </Group>
+          </>
+        )}
+
+        {(canToggleStatus || canEndSessions) && canDelete && <Divider variant="dashed" />}
 
         {canDelete && (
           <Group justify="space-between" wrap="nowrap" align="flex-start" gap="md">

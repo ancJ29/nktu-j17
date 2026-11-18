@@ -29,6 +29,8 @@ export type AppInfo = z.infer<typeof AppInfoSchema>;
 
 export const AuthFeaturesSchema = z.object({
   loginViaQRCode: z.boolean(),
+
+  keepIPadSignedIn: z.boolean().default(false),
 });
 
 export type AuthFeatures = z.infer<typeof AuthFeaturesSchema>;

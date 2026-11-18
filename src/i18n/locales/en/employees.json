@@ -34,6 +34,7 @@
       "delete": "Deleted",
       "disable": "Disabled",
       "enable": "Enabled",
+      "endSessions": "Signed out every device of",
       "generateLoginToken": "Issued login token for",
       "passwordChange": "Changed password for",
       "update": "Updated",

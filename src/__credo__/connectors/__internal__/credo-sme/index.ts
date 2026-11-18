@@ -2,7 +2,6 @@ import { PORTS } from '@credo/kits/port';
 
 import { createApiGroup } from '../shared/api-group';
 
-import type { LoginRequest, LoginWithTokenRequest } from '../c-sso/types';
 import { targets, urls } from '../shared/config';
 import { registerStagePrefix } from '../shared/transport-state';
 import { CREDO_SME_ROUTES } from './routes';
@@ -63,6 +62,8 @@ import type {
   ListClientsResponse,
   LogActivitiesRequest,
   LogActivitiesResponse,
+  LoginRequest,
+  LoginWithTokenRequest,
   ProvisionClientRequest,
   ProvisionClientResponse,
   RemoveClientRequest,

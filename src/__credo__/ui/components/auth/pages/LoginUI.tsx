@@ -1,4 +1,5 @@
 import { Button, Checkbox, Group, Stack } from '@mantine/core';
+import type { ReactNode } from 'react';
 import type { UseFormReturnType } from '@mantine/form';
 import type { Language } from '../../../types';
 import { Icon } from '../../common/Icon';
@@ -34,6 +35,8 @@ type LoginUIProps = {
   error: string | null;
   themeConfig: AuthThemeConfig;
   showQrLogin?: boolean;
+
+  rememberNote?: ReactNode;
   userIconName: IconName;
   lockIconName: IconName;
   qrcodeIconName: IconName;
@@ -55,6 +58,7 @@ export function LoginUI({
   error,
   themeConfig,
   showQrLogin = true,
+  rememberNote,
   branding,
   userIconName,
   lockIconName,
@@ -104,11 +108,13 @@ export function LoginUI({
           />
 
           <Group justify="space-between">
-            <Checkbox
-              label={rememberMe}
-              disabled={isLoading}
-              {...form.getInputProps('remember', { type: 'checkbox' })}
-            />
+            {rememberNote ?? (
+              <Checkbox
+                label={rememberMe}
+                disabled={isLoading}
+                {...form.getInputProps('remember', { type: 'checkbox' })}
+              />
+            )}
           </Group>
 
           <AuthButton

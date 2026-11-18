@@ -415,6 +415,10 @@ export function hasLoginViaQRCode() {
   return appConfig?.auth?.loginViaQRCode ?? false;
 }
 
+export function hasKeepIPadSignedIn() {
+  return appConfig?.auth?.keepIPadSignedIn ?? false;
+}
+
 export function getNavbarWidth() {
   return appConfig?.layout?.navbar?.width ?? 250;
 }

@@ -58,6 +58,7 @@ import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { buildSalesOrderWarehouseMemo } from '@/utils/salesOrderWarehouseMemo';
 import { seedAddressFromCustomer } from '@/pages/delivery-requests/deliveryRequestFormShared';
+import { refreshPartyRegisters } from '@/stores/refreshPartyRegisters';
 import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductInventoryStore } from '@/stores/useProductInventoryStore';
 import { device, logger } from '@credo/base-ui/utils';
@@ -535,6 +536,44 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentEmployeeId, isEdit]);
 
+  const seededCopyAddressRef = useRef<{ deliveryAddress: string; googleMapUrl: string } | null>(
+    null,
+  );
+  useEffect(() => {
+    if (isEdit) return;
+    let cancelled = false;
+    void refreshPartyRegisters().then(() => {
+      const seeded = seededCopyAddressRef.current;
+      if (cancelled || !copyFrom || !seeded) return;
+      const now = form.getValues();
+      if (
+        now.deliveryAddress !== seeded.deliveryAddress ||
+        now.googleMapUrl !== seeded.googleMapUrl
+      )
+        return;
+      const code = (copyFrom.customerCode as string) ?? '';
+      const customer = code ? useCustomerStore.getState().getByCode(code) : undefined;
+      const latest = seedAddressFromCustomer(customer, {
+        deliveryAddress: copyFrom.deliveryAddress as string | undefined,
+        googleMapUrl: copyFrom.googleMapUrl as string | undefined,
+      });
+      setShippingAddressId(
+        latest.isBilling ? BILLING_ADDRESS_ID : (latest.shippingAddressId ?? ''),
+      );
+      form.setFieldValue('customerId', customer?.id ?? now.customerId);
+      form.setFieldValue('deliveryAddress', latest.deliveryAddress);
+      form.setFieldValue('googleMapUrl', latest.googleMapUrl);
+      seededCopyAddressRef.current = {
+        deliveryAddress: latest.deliveryAddress,
+        googleMapUrl: latest.googleMapUrl,
+      };
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [copyFrom, isEdit]);
+
   useEffect(() => {
     if (!copyFrom) return;
 
@@ -568,6 +607,10 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
     setShippingAddressId(
       copyFromAddress.isBilling ? BILLING_ADDRESS_ID : (copyFromAddress.shippingAddressId ?? ''),
     );
+    seededCopyAddressRef.current = {
+      deliveryAddress: copyFromAddress.deliveryAddress,
+      googleMapUrl: copyFromAddress.googleMapUrl,
+    };
     form.setValues({
       orderNumber: '',
       customerPONumber: '',

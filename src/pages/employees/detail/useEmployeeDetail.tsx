@@ -31,6 +31,7 @@ import { EmployeeDetailHeader } from './EmployeeDetailHeader';
 import { EmployeeDriverTab } from './EmployeeDriverTab';
 import { EmployeeQuickActionsCard } from './EmployeeQuickActionsCard';
 import { EmployeeDangerZoneCard } from './EmployeeDangerZoneCard';
+import { endSessionsPatch } from './endSessions';
 import {
   EmployeeContactsCard,
   EmployeeNotesCard,
@@ -111,6 +112,10 @@ export function useEmployeeDetail(): EmployeeDetailParts {
   const [loginTokenOpened, { open: openLoginToken, close: closeLoginToken }] = useDisclosure(false);
   const [profileImageOpened, { open: openProfileImage, close: closeProfileImage }] =
     useDisclosure(false);
+
+  const [endSessionsOpened, { open: openEndSessions, close: closeEndSessions }] =
+    useDisclosure(false);
+  const [endingSessions, setEndingSessions] = useState(false);
 
   const dangerZone = useEmployeeDangerZone(id, employee);
 
@@ -204,6 +209,26 @@ export function useEmployeeDetail(): EmployeeDetailParts {
     [employee, patchEmployee],
   );
 
+  const handleEndSessions = useCallback(async () => {
+    const now = Date.now();
+    setEndingSessions(true);
+    try {
+      const ok = await patchEmployee(endSessionsPatch(employee, now), {
+        verb: 'employee.endSessions',
+        memo: { sessionsEndedAt: now },
+      });
+      if (ok) {
+        notifications.show({
+          color: 'green',
+          message: t('__new__.07-entities.employees.dangerZone.endSessionsSuccess'),
+        });
+      }
+    } finally {
+      setEndingSessions(false);
+      closeEndSessions();
+    }
+  }, [employee, patchEmployee, closeEndSessions, t]);
+
   useEffect(() => {
     if (!id) return;
     const cached = useEmployeeStore.getState().getById(id) as Employee | undefined;
@@ -285,6 +310,7 @@ export function useEmployeeDetail(): EmployeeDetailParts {
       employee={employee}
       onToggleStatus={dangerZone.openToggleStatus}
       onDelete={dangerZone.openDeleteModal}
+      onEndSessions={openEndSessions}
     />
   );
 
@@ -426,6 +452,17 @@ export function useEmployeeDetail(): EmployeeDetailParts {
         }
         confirmColor={employee?.isActive ? 'orange' : 'green'}
         loading={dangerZone.togglingStatus}
+      />
+
+      <ConfirmModal
+        opened={endSessionsOpened}
+        onClose={closeEndSessions}
+        onConfirm={handleEndSessions}
+        title={t('__new__.07-entities.employees.dangerZone.endSessions')}
+        message={t('__new__.07-entities.employees.dangerZone.endSessionsConfirm')}
+        confirmLabel={t('__new__.07-entities.employees.dangerZone.endSessions')}
+        confirmColor="orange"
+        loading={endingSessions}
       />
 
       <EmployeeLoginTokenModal

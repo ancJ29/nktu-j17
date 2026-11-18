@@ -894,6 +894,7 @@ export const defaultAppConfig = CMngtAppConfigSchema.parse({
   },
   auth: {
     loginViaQRCode: true,
+    keepIPadSignedIn: false,
   },
 
   themeConfig: { mainColor: 'terracotta' },

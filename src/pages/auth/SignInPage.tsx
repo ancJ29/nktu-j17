@@ -2,11 +2,14 @@ import { appBrand, appConfig, themeConfig } from '@/config';
 import { ROUTES } from '@/constants/routes';
 import { takeSessionExpiredNotice, useAuthStore } from '@/stores/useAuthStore';
 import { cacheFlush } from '@/utils/appCache';
+import { isIPad, isStandaloneDisplay } from '@/utils/isIPad';
 import { resolveLoginIdentifier } from '@/utils/loginEmail';
 import { markPendingLogin } from '@/utils/pendingLoginLog';
 import { markPostLoginReloads } from '@/utils/postLoginReload';
+import { hasKeepIPadSignedIn } from '@/utils/permission';
 import { Auth, IconName } from '@credo/base-ui/components';
 import { useAuthSubmit } from '@credo/base-ui/lib';
+import { Stack, Text } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { useCallback, useEffect } from 'react';
 import { notifications } from '@mantine/notifications';
@@ -76,6 +79,18 @@ export function SignInPage() {
     getErrorMessage: (err) => (err instanceof Error ? err.message : t('auth.login.error.failed')),
   });
 
+  const keepsThisIPad = hasKeepIPadSignedIn() && isIPad();
+  const rememberNote = keepsThisIPad ? (
+    <Stack gap={2}>
+      <Text size="sm">{t('auth.login.iPadStaysSignedIn')}</Text>
+      {!isStandaloneDisplay() && (
+        <Text size="xs" c="dimmed">
+          {t('auth.login.iPadAddToHomeScreen')}
+        </Text>
+      )}
+    </Stack>
+  ) : undefined;
+
   const handleQrLogin = useCallback(() => {
     navigate(ROUTES.AUTH.LOGIN_VIA_QR_CODE);
   }, [navigate]);
@@ -101,6 +116,7 @@ export function SignInPage() {
       themeConfig={themeConfig.auth}
 
       showQrLogin
+      rememberNote={rememberNote}
       branding={{
         appName: appBrand.name,
         appNameHtml: appBrand.nameHtml,

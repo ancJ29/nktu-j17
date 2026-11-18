@@ -452,6 +452,8 @@ export type {
   EffectivePermissions as CredoSmeEffectivePermissions,
   GenerateEmployeeLoginTokenRequest as CredoSmeGenerateEmployeeLoginTokenRequest,
   GenerateEmployeeLoginTokenResponse as CredoSmeGenerateEmployeeLoginTokenResponse,
+  LoginRequest as CredoSmeLoginRequest,
+  LoginWithTokenRequest as CredoSmeLoginWithTokenRequest,
   ArchiveEmployeeRequest as CredoSmeArchiveEmployeeRequest,
   ArchiveEmployeeResponse as CredoSmeArchiveEmployeeResponse,
   CreateEmployeeRequest as CredoSmeCreateEmployeeRequest,

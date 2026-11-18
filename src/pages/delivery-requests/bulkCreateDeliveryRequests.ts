@@ -1,6 +1,7 @@
 import { appConfig } from '@/config';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { cMngtConnector } from '@credo/connectors/connector';
+import { refreshPartyRegisters } from '@/stores/refreshPartyRegisters';
 import { seedAddressFromCustomer } from './deliveryRequestFormShared';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
@@ -70,6 +71,8 @@ export async function bulkCreateOutboundDeliveryRequests(
   const created: BulkDrCreateResult['created'] = [];
   const failures: BulkDrFailure[] = [];
   let linkFailures = 0;
+
+  await refreshPartyRegisters();
 
   for (const so of salesOrders) {
     try {

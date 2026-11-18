@@ -34,6 +34,7 @@
       "delete": "Đã xóa",
       "disable": "Đã vô hiệu hóa",
       "enable": "Đã kích hoạt",
+      "endSessions": "Đã đăng xuất mọi thiết bị của",
       "generateLoginToken": "Đã tạo liên kết đăng nhập cho",
       "passwordChange": "Đã đổi mật khẩu cho",
       "update": "Đã cập nhật",

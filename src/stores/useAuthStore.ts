@@ -14,6 +14,7 @@ import {
   readAuthId,
   rememberAuthId,
 } from '@/utils/authId';
+import { isIPad } from '@/utils/isIPad';
 import { clearCachedProfile, readCachedProfile, writeCachedProfile } from '@/utils/profileCache';
 import { logger } from '@credo/base-ui/utils';
 import type { AuthApi, BaseProfile } from '@credo/base-ui/lib';
@@ -30,6 +31,10 @@ const serviceCode = resolveServiceCode();
 
 credoSmeConnector.setClientCode(resolveClientCode());
 
+function keepSignedInClaim(): { keepSignedIn?: true } {
+  return appConfig.auth?.keepIPadSignedIn === true && isIPad() ? { keepSignedIn: true } : {};
+}
+
 const smeAuthApi: AuthApi<Profile> = {
   login: async ({ email, password, tokenExpiration, refreshTokenExpiration, deviceId }) => {
     const response = await credoSmeConnector.login({
@@ -39,6 +44,7 @@ const smeAuthApi: AuthApi<Profile> = {
       tokenExpiration,
       refreshTokenExpiration,
       deviceId,
+      ...keepSignedInClaim(),
     });
     rememberAuthId(response);
     return {
@@ -58,7 +64,11 @@ const smeAuthApi: AuthApi<Profile> = {
   },
 
   loginWithToken: async ({ token }) => {
-    const response = await credoSmeConnector.loginWithToken({ serviceCode, token });
+    const response = await credoSmeConnector.loginWithToken({
+      serviceCode,
+      token,
+      ...keepSignedInClaim(),
+    });
     rememberAuthId(response);
     return {
       success: true,

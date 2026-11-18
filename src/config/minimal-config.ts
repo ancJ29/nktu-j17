@@ -17,6 +17,7 @@ export const minimalAppConfig = CMngtAppConfigSchema.parse({
   },
   auth: {
     loginViaQRCode: true,
+    keepIPadSignedIn: false,
   },
   themeConfig: { mainColor: 'steel' },
   languages: [

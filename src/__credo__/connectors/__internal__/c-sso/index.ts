@@ -141,9 +141,13 @@ export const cSsoConnector = {
       storages: withAuth(token),
     }),
 
-  loginWithToken: ({ serviceCode, token }: LoginWithTokenRequest) =>
+  loginWithToken: ({ serviceCode, token, refreshTokenExpiration }: LoginWithTokenRequest) =>
     ssoApi<LoginWithTokenResponse>(SSO_ROUTES.LOGIN_WITH_TOKEN, {
-      body: { serviceCode, token },
+      body: {
+        serviceCode,
+        token,
+        ...(refreshTokenExpiration === undefined ? {} : { refreshTokenExpiration }),
+      },
     }),
 
   getPublicKey: () => ssoApi<GetPublicKeyResponse>(SSO_ROUTES.GET_PUBLIC_KEY),

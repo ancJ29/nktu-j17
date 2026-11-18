@@ -20,6 +20,7 @@ export const DEFAULT_APP_INFO: CMngtAppConfig['app'] = { name: CLIENT_NAME };
 
 export const DEFAULT_AUTH: AuthFeatures = {
   loginViaQRCode: true,
+  keepIPadSignedIn: false,
 };
 
 export const DEFAULT_THEME: ThemeConfig = { mainColor: 'steel' };

@@ -29,6 +29,7 @@ import { ResponsiveModal } from '@/components/ResponsiveModal';
 import { CustomerSelector, EmployeeSelector, VendorSelector } from '@/components/selectors';
 import { SegmentTabs } from '@/components/SegmentTabs';
 import { useRowSelection } from '@/hooks/useRowSelection';
+import { refreshPartyRegisters } from '@/stores/refreshPartyRegisters';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
@@ -120,7 +121,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
   const customersInit = useCustomerStore((s) => s.initialized);
   const loadCustomers = useCustomerStore((s) => s.loadAll);
   const getCustomerByCode = useCustomerStore((s) => s.getByCode);
-  const vendors = useVendorStore((s) => s.items);
   const vendorsInit = useVendorStore((s) => s.initialized);
   const loadVendors = useVendorStore((s) => s.loadAll);
   const employees = useEmployeeStore((s) => s.items);
@@ -299,12 +299,16 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     if ((isSample ? !sampleCustomerName.trim() : !vendorName.trim()) || !driver || !date) return;
     setLoading(true);
 
+    await refreshPartyRegisters();
     const matchedVendor =
       !isSample && vendorCode.trim()
-        ? vendors.find((v) => v.code === vendorCode.trim())
+        ? useVendorStore.getState().getByCode(vendorCode.trim())
         : undefined;
+    const latestSample = sampleCustomer
+      ? (useCustomerStore.getState().getByCode(sampleCustomer.code) ?? sampleCustomer)
+      : sampleCustomer;
     const { deliveryAddress, googleMapUrl } = isSample
-      ? resolveCustomerPickupAddress(sampleCustomer)
+      ? resolveCustomerPickupAddress(latestSample)
       : resolveVendorInboundAddress(matchedVendor);
     try {
       const { linkFailed } = await createDeliveryRequestRecord({
@@ -363,7 +367,6 @@ function CreateBody({ onClose, onCreated, t }: CreateBodyProps) {
     sampleCustomerName,
     vendorName,
     vendorCode,
-    vendors,
     driver,
     date,
     notes,

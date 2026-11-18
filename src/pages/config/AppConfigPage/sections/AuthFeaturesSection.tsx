@@ -1,6 +1,6 @@
 import type { AuthFeatures } from '@credo/kits/types';
 import { Box, Group, SimpleGrid, Switch, Text, ThemeIcon } from '@mantine/core';
-import { IconQrcode, IconShield } from '@tabler/icons-react';
+import { IconDeviceTablet, IconQrcode, IconShield } from '@tabler/icons-react';
 import { memo } from 'react';
 
 type AuthFlagDef = {
@@ -8,11 +8,17 @@ type AuthFlagDef = {
   icon: typeof IconShield;
 };
 
-const AUTH_FLAG_DEFS: AuthFlagDef[] = [{ key: 'loginViaQRCode', icon: IconQrcode }];
+const AUTH_FLAG_DEFS: AuthFlagDef[] = [
+  { key: 'loginViaQRCode', icon: IconQrcode },
+  { key: 'keepIPadSignedIn', icon: IconDeviceTablet },
+];
 
 const AUTH_LABELS: Record<string, string> = {
   authLoginViaQRCode: 'Login via QR Code',
   authLoginViaQRCodeDesc: 'Allow users to login via QR Code',
+  authKeepIPadSignedIn: 'Keep iPads signed in',
+  authKeepIPadSignedInDesc:
+    'An iPad that signs in stays signed in for a year, renewed on use; other devices keep the week',
 };
 
 export const AuthFeaturesSection = memo(function AuthFeaturesSection({

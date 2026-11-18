@@ -7,6 +7,8 @@ export type EmployeeExtra = {
   gender?: 'M' | 'F';
   isDeleted?: boolean;
   allowLogin?: boolean;
+
+  sessionsEndedAt?: number;
   phoneNumber?: string;
   personalPhoneNumber?: string;
 

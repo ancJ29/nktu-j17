@@ -214,6 +214,7 @@ type EmployeeVerbKey =
   | SimpleVerbKey
   | 'updatePermissions'
   | 'passwordChange'
+  | 'endSessions'
   | 'generateLoginToken'
   | 'updateProfileImage';
 type ProductVerbKey =
@@ -330,6 +331,12 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     icon: <IconLock size={16} />,
     color: 'gray',
     i18nKey: 'employees.detail.activityVerbs.passwordChange',
+    targetType: 'employee',
+  },
+  'employee.endSessions': {
+    icon: <IconLock size={16} />,
+    color: 'orange',
+    i18nKey: 'employees.detail.activityVerbs.endSessions',
     targetType: 'employee',
   },
   'employee.generateLoginToken': {
