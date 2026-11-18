@@ -675,6 +675,7 @@ export function ProductInventoryDataTable({
               </Text>
             </Tooltip>
           ),
+          width: '100px',
           ta: 'center' as const,
           render: (s: ProductInventorySummary) => (
             <Box ta="center">
@@ -703,6 +704,7 @@ export function ProductInventoryDataTable({
                   </Tooltip>
                 ),
                 ta: 'center' as const,
+                width: '140px',
                 render: (s: ProductInventorySummary) => (
                   <Box ta="center">
                     <StockMovementBadge source={movement} productCode={s.product.code} />

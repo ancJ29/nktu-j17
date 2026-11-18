@@ -163,7 +163,7 @@
     "aLot": "Nhiều",
     "column": "Tần suất",
     "columnTooltip": "Sản phẩm này bán thường xuyên đến đâu: số đơn bán hàng đã giao trong {{days}} ngày qua. Nhiều = từ {{aLot}} đơn trong {{days}} ngày; ít = tối đa {{rarely}} đơn.",
-    "figures": "{{perMonth}} đơn một tháng · {{orders}} đơn trong {{days}} ngày qua",
+    "figures": "{{perMonth}} đơn một tháng",
     "filterPlaceholder": "Tất cả",
     "filterTitle": "Tần suất",
     "loading": "Đang đếm đơn…",
