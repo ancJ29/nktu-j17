@@ -1,9 +1,6 @@
-import { Badge, Group, Loader, Stack, Text, Tooltip } from '@mantine/core';
+import { Badge, Loader, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
-
 import type { StockMovement, StockMovementLevel } from '@/utils/stockMovement';
-
-import { STOCK_MOVEMENT_WINDOW_DAYS } from './productInventoryListVariant';
 import type { StockMovementSource } from './useStockMovement';
 
 const COLOR: Record<StockMovementLevel, string> = { aLot: 'red', normal: 'blue', rarely: 'gray' };
@@ -13,11 +10,9 @@ const fmt = (n: number) => String(Math.round(n * 10) / 10);
 export function StockMovementBadge({
   source,
   productCode,
-  showFigures = true,
 }: {
   readonly source: StockMovementSource;
   readonly productCode: string;
-  readonly showFigures?: boolean;
 }) {
   const { t } = useTranslation();
   const m: StockMovement | undefined = source.get(productCode);
