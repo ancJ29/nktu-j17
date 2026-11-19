@@ -106,6 +106,9 @@ export const ROUTES = {
   ODOMETER_LOGS: {
     LIST: '/odometer-logs',
   },
+  CASH_BOOK: {
+    LIST: '/cash-book',
+  },
   OIL_TANKS: {
     LIST: '/oil-tanks',
     NEW: '/oil-tanks/new',

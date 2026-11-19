@@ -223,3 +223,23 @@ export function seedAddressFromCustomer(
   const shippingAddressId = customer?.extra?.shippingAddresses?.[0]?.id ?? null;
   return { ...saved, shippingAddressId, isBilling: shippingAddressId === null };
 }
+
+/**
+ * The delivery address + map link a Delivery Request made from a Sales Order
+ * starts with: the order's own pair when it holds an address or a link, else
+ * the customer's saved entry (first shipping address, else billing), else
+ * blank. Text of only spaces counts as absent. The pair comes whole from one source, since address and link describe
+ * one place.
+ */
+export function seedDeliveryAddressFromOrder(
+  customer: Customer | undefined | null,
+  order: { deliveryAddress?: string; googleMapUrl?: string },
+): { deliveryAddress: string; googleMapUrl: string } {
+  if (order.deliveryAddress?.trim() || order.googleMapUrl?.trim()) {
+    return {
+      deliveryAddress: order.deliveryAddress ?? '',
+      googleMapUrl: order.googleMapUrl ?? '',
+    };
+  }
+  return resolveCustomerPickupAddress(customer);
+}

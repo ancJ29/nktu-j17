@@ -1,3 +1,4 @@
+import { vendorCodeSearchTerms } from '@/utils/productVendorCodes';
 import { Button, Stack } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconDownload } from '@tabler/icons-react';
@@ -210,6 +211,7 @@ export function ProductList({ variant }: ProductListProps) {
       item.description,
       ...(item.extra?.alternativeNames ?? []),
       ...(item.extra?.sku ? [item.extra.sku] : []),
+      ...vendorCodeSearchTerms(item.extra),
     ],
     [],
   );

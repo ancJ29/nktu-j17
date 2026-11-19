@@ -363,6 +363,8 @@ export type CMngtAppConfig = AppConfig & {
     farm: CMngtModuleFeatures;
 
     nktuOdometerLog: CMngtModuleFeatures;
+
+    nktuCashBook: CMngtModuleFeatures;
   };
   layout: CMngtLayoutConfig;
   displaySettings: CMngtDisplaySettings;

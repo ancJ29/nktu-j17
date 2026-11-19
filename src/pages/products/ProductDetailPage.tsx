@@ -12,6 +12,7 @@ import {
   Select,
   SimpleGrid,
   Stack,
+  Table,
   Text,
   Textarea,
   TextInput,
@@ -27,6 +28,7 @@ import {
   IconBan,
   IconBarcode,
   IconBoxMultiple,
+  IconBuildingStore,
   IconBuildingWarehouse,
   IconCategory,
   IconChartBar,
@@ -87,11 +89,15 @@ import {
 } from '@/utils/productPurchaseOrderNames';
 import { logActivity } from '@/utils/activityLogger';
 import { deepDiff } from '@/utils/deepDiff';
-import type { Product, ProductExtra, ProductImageEntry } from '@/types';
+import { cleanVendorCodes, showsVendorCodes, vendorCodesOf } from '@/utils/productVendorCodes';
+import { VendorSelector } from '@/components/selectors/VendorSelector';
+import { featureFlags } from '@/utils/features';
+import type { Product, ProductExtra, ProductImageEntry, ProductVendorCode } from '@/types';
 import { ActivityByTargetPanel } from '@/components/activity/ActivityByTargetPanel';
 import EntitySalesPanel from '@/pages/reports/EntitySalesPanel';
 import { useCanAccessReports } from '@/pages/reports/reportAccess';
 import { ProductInventorySection } from './ProductInventorySection';
+import { ProductStockLogTab } from './ProductStockLogTab';
 import { ProductLink } from '@/components/ProductLink';
 import { ProductThumb } from './ProductThumb';
 import { TimestampLine } from '@/components/TimestampLine';
@@ -109,11 +115,14 @@ const inventoryEnabled = isProductInventoryEnabled();
 const locationsEnabled = isLocationsEnabled();
 
 const activityTabVisible = !isMobile && isActivityLoggingEnabled();
+
+const stockLogTabVisible = perms.productStockLog.canView();
 const technicalSpecsEnabled = hasTechnicalSpecsForProducts();
 const barcodeEnabled = hasBarcodeForProducts();
 const imagesEnabled = hasImagesForProducts();
 const hideFromInventoryListEnabled = hasHideFromInventoryListForProducts();
 const purchaseOrderPrintEnabled = isGoodsReceiptPrintEnabled();
+const purchaseOrdersEnabled = featureFlags.purchaseOrders.enabled;
 
 type ClassificationDraft = {
   category: string;
@@ -199,6 +208,8 @@ export function ProductDetailPage() {
   const specsEdit = useCardEdit<Array<{ key: string; value: string }>>();
   const warehouseMemoEdit = useCardEdit<string>();
   const poNamesEdit = useCardEdit<PurchaseOrderNames>();
+  const vendorCodesEdit = useCardEdit<ProductVendorCode[]>();
+  const [vendorCodesError, setVendorCodesError] = useState<string | null>(null);
   const classEdit = useCardEdit<ClassificationDraft>();
 
   const [deleteModalOpened, { open: openDeleteModal, close: closeDeleteModal }] =
@@ -1226,6 +1237,134 @@ export function ProductDetailPage() {
     </SectionCard>
   ) : null;
 
+  const storedVendorCodes = vendorCodesOf(extra);
+  const vendorCodesDraft = vendorCodesEdit.draft;
+  const updateVendorRow = (idx: number, patch: Partial<ProductVendorCode>) =>
+    vendorCodesDraft &&
+    vendorCodesEdit.setDraft(vendorCodesDraft.map((r, i) => (i === idx ? { ...r, ...patch } : r)));
+  const vendorCodesCard = showsVendorCodes(extra, purchaseOrdersEnabled) ? (
+    <SectionCard
+      icon={<IconBuildingStore size={14} />}
+      title={t('products.detail.vendorCodesTitle')}
+      editable={canEdit && !isMobile}
+      editing={vendorCodesEdit.editing}
+      saving={vendorCodesEdit.saving}
+      labels={editLabels}
+      onEdit={() => {
+        setVendorCodesError(null);
+        vendorCodesEdit.begin(storedVendorCodes.map((r) => ({ ...r })));
+      }}
+      onCancel={() => {
+        setVendorCodesError(null);
+        vendorCodesEdit.cancel();
+      }}
+      onSave={() =>
+        vendorCodesEdit.save(async (draft) => {
+          const cleaned = cleanVendorCodes(draft);
+          if (!cleaned.ok) {
+            setVendorCodesError(
+              t(
+                cleaned.issue === 'vendorMissing'
+                  ? 'products.detail.vendorCodesIssueVendorMissing'
+                  : cleaned.issue === 'codeMissing'
+                    ? 'products.detail.vendorCodesIssueCodeMissing'
+                    : 'products.detail.vendorCodesIssueDuplicate',
+                { row: cleaned.row + 1 },
+              ),
+            );
+            throw new Error(cleaned.issue);
+          }
+          setVendorCodesError(null);
+          await patchExtra(
+            { vendorCodes: cleaned.entries.length > 0 ? cleaned.entries : undefined },
+            'product.updateVendorCodes',
+          );
+        })
+      }
+    >
+      {vendorCodesEdit.editing && vendorCodesDraft ? (
+        <Stack gap="xs">
+          {vendorCodesDraft.map((row, idx) => (
+            <Group key={idx} gap="xs" wrap="nowrap" align="flex-start">
+              <VendorSelector
+                value={row.vendorCode || null}
+                onChange={(sel) =>
+                  updateVendorRow(idx, { vendorCode: sel?.code ?? '', vendorName: sel?.name ?? '' })
+                }
+                placeholder={t('products.detail.vendorCodesVendor')}
+                style={{ flex: 2 }}
+              />
+              <TextInput
+                placeholder={t('products.detail.vendorCodesCode')}
+                value={row.code}
+                onChange={(e) => updateVendorRow(idx, { code: e.currentTarget.value })}
+                style={{ flex: 2 }}
+              />
+              <TextInput
+                placeholder={t('products.detail.vendorCodesName')}
+                value={row.name ?? ''}
+                onChange={(e) => updateVendorRow(idx, { name: e.currentTarget.value })}
+                style={{ flex: 3 }}
+              />
+              <ActionIcon
+                variant="subtle"
+                color="red"
+                size="lg"
+                onClick={() =>
+                  vendorCodesEdit.setDraft(vendorCodesDraft.filter((_, i) => i !== idx))
+                }
+              >
+                <IconTrash size={14} />
+              </ActionIcon>
+            </Group>
+          ))}
+          <Button
+            variant="default"
+            size="compact-sm"
+            leftSection={<IconPlus size={13} />}
+            onClick={() =>
+              vendorCodesEdit.setDraft([
+                ...vendorCodesDraft,
+                { vendorCode: '', vendorName: '', code: '' },
+              ])
+            }
+            style={{ alignSelf: 'flex-start' }}
+          >
+            {t('products.detail.vendorCodesAdd')}
+          </Button>
+          {vendorCodesError && (
+            <Text size="sm" c="red" role="alert">
+              {vendorCodesError}
+            </Text>
+          )}
+        </Stack>
+      ) : storedVendorCodes.length > 0 ? (
+        <Table withRowBorders={false} verticalSpacing={4} horizontalSpacing={0}>
+          <Table.Thead>
+            <Table.Tr>
+              <Table.Th>{t('products.detail.vendorCodesVendor')}</Table.Th>
+              <Table.Th>{t('products.detail.vendorCodesCode')}</Table.Th>
+              <Table.Th>{t('products.detail.vendorCodesName')}</Table.Th>
+            </Table.Tr>
+          </Table.Thead>
+          <Table.Tbody>
+            {storedVendorCodes.map((r, idx) => (
+              <Table.Tr key={idx}>
+                <Table.Td>{r.vendorName || r.vendorCode}</Table.Td>
+                <Table.Td>{r.code}</Table.Td>
+                <Table.Td>{r.name ?? emptyDash}</Table.Td>
+              </Table.Tr>
+            ))}
+          </Table.Tbody>
+        </Table>
+      ) : (
+        <Text size="sm" c="dimmed">
+          {t('products.detail.vendorCodesEmpty')}
+        </Text>
+      )}
+    </SectionCard>
+  ) : null;
+
   const minInventoryCard = minInv ? (
     <SectionCard
       icon={<IconPlus size={14} />}
@@ -1382,6 +1521,7 @@ export function ProductDetailPage() {
         <Stack gap="md">
           {warehouseMemoCard}
           {purchaseOrderNamesCard}
+          {vendorCodesCard}
           {minInventoryCard}
           {currentInventoryCard}
           {dangerZone}
@@ -1402,6 +1542,7 @@ export function ProductDetailPage() {
       {descriptionCard}
       {warehouseMemoCard}
       {purchaseOrderNamesCard}
+      {vendorCodesCard}
       {setCompositionCard}
       {techSpecsCard}
       {classificationCard}
@@ -1521,6 +1662,11 @@ export function ProductDetailPage() {
                 {t('report.entityTab.title')}
               </Tabs.Tab>
             )}
+            {stockLogTabVisible && (
+              <Tabs.Tab value="stock-log" leftSection={<IconListDetails size={16} />}>
+                {t('products.detail.tab.stockLog')}
+              </Tabs.Tab>
+            )}
             {activityTabVisible && (
               <Tabs.Tab value="activity" leftSection={<IconHistory size={16} />}>
                 {t('products.detail.tab.activity')}
@@ -1549,6 +1695,12 @@ export function ProductDetailPage() {
                   target={{ kind: 'product', code: product.code, name: product.name }}
                 />
               )}
+            </Tabs.Panel>
+          )}
+          {stockLogTabVisible && (
+            <Tabs.Panel value="stock-log" pt="md">
+              {/* Lazy-mount, as Sales and Activity are. */}
+              {activeTab === 'stock-log' && <ProductStockLogTab product={product} />}
             </Tabs.Panel>
           )}
           {activityTabVisible && (

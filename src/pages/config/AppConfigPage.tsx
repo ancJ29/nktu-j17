@@ -228,6 +228,12 @@ const MODULE_LABELS: Record<string, string> = {
   nktuOdometerLogModuleDesc:
     "Daily end-of-shift odometer reading + photo, logged by the delivery department. Built to NKTU's practice — the client code is in the flag name deliberately.",
   nktuOdometerLogEnabled: 'Enable Odometer Log',
+  nktuCashBookModule: 'Cash Book (NKTU)',
+  nktuCashBookModuleDesc:
+    "Daily cash book: money in (Thu) and money out (Chi) by accounting date, one month at a time. Built to NKTU's practice — the client code is in the flag name deliberately.",
+  nktuCashBookEnabled: 'Enable Cash Book',
+  nktuCashBookEnabledDesc:
+    'When enabled, the Cash Book page, its menu entry and its home card are available to users granted the Cash Book permission.',
   nktuOdometerLogEnabledDesc:
     'When enabled, drivers get the daily log button and managers/accounting get the compliance view (subject to per-user permissions). Who counts as a driver comes from Delivery Requests → Driver Departments.',
 };
@@ -335,6 +341,9 @@ export function ConfigEditor({
     SCHEMA_DEFAULT_MODULE_FEATURES,
   );
   const [nktuOdometerLogFeatures, setNktuOdometerLogFeatures] = useState<CMngtModuleFeatures>(
+    SCHEMA_DEFAULT_MODULE_FEATURES,
+  );
+  const [nktuCashBookFeatures, setNktuCashBookFeatures] = useState<CMngtModuleFeatures>(
     SCHEMA_DEFAULT_MODULE_FEATURES,
   );
   const [customersFeatures, setCustomersFeatures] =
@@ -445,6 +454,7 @@ export function ConfigEditor({
           oilTanks: oilTanksFeatures,
           farm: farmFeatures,
           nktuOdometerLog: nktuOdometerLogFeatures,
+          nktuCashBook: nktuCashBookFeatures,
         },
         layout,
         displaySettings,
@@ -491,6 +501,7 @@ export function ConfigEditor({
       oilTanksFeatures,
       farmFeatures,
       nktuOdometerLogFeatures,
+      nktuCashBookFeatures,
       layout,
       displaySettings,
       companyInfo,
@@ -547,6 +558,10 @@ export function ConfigEditor({
     setNktuOdometerLogFeatures({
       ...SCHEMA_DEFAULT_MODULE_FEATURES,
       ...cfg.features?.nktuOdometerLog,
+    });
+    setNktuCashBookFeatures({
+      ...SCHEMA_DEFAULT_MODULE_FEATURES,
+      ...cfg.features?.nktuCashBook,
     });
     setCustomersFeatures({ ...SCHEMA_DEFAULT_CUSTOMER_FEATURES, ...cfg.features?.customers });
     setVendorsFeatures({ ...SCHEMA_DEFAULT_VENDOR_FEATURES, ...cfg.features?.vendors });
@@ -868,6 +883,10 @@ export function ConfigEditor({
     () => setNktuOdometerLogFeatures(SCHEMA_DEFAULT_MODULE_FEATURES),
     [],
   );
+  const resetNktuCashBook = useCallback(
+    () => setNktuCashBookFeatures(SCHEMA_DEFAULT_MODULE_FEATURES),
+    [],
+  );
   const resetVendors = useCallback(() => setVendorsFeatures(DEFAULT_VENDOR_FEATURES), []);
   const resetCustomers = useCallback(() => setCustomersFeatures(DEFAULT_CUSTOMER_FEATURES), []);
   const resetSalesOrders = useCallback(
@@ -953,6 +972,7 @@ export function ConfigEditor({
     oilTanks: eqDefault(oilTanksFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     farm: eqDefault(farmFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     nktuOdometerLog: eqDefault(nktuOdometerLogFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
+    nktuCashBook: eqDefault(nktuCashBookFeatures, SCHEMA_DEFAULT_MODULE_FEATURES),
     materials: eqDefault(materialsFeatures, SCHEMA_DEFAULT_MATERIAL_FEATURES),
     materialInventory: eqDefault(
       materialInventoryFeatures,
@@ -1503,6 +1523,13 @@ export function ConfigEditor({
                 features: nktuOdometerLogFeatures,
                 setFeatures: setNktuOdometerLogFeatures,
                 reset: resetNktuOdometerLog,
+              },
+              {
+                key: 'nktuCashBook' as const,
+                icon: IconGauge,
+                features: nktuCashBookFeatures,
+                setFeatures: setNktuCashBookFeatures,
+                reset: resetNktuCashBook,
               },
             ] as const
           ).map((mod) => (

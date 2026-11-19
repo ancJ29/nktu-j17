@@ -21,6 +21,8 @@ export const PERM_MODULE_LABELS: Record<string, string> = {
   report: 'Report',
   quotation: 'Quotation',
   odometerLog: 'Odometer Log',
+  cashBook: 'Cash Book',
+  productStockLog: 'Product Stock Log',
   purchaseOrder: 'Purchase Order',
   salesOrder: 'Sales Order',
   transportOrder: 'Transport Order',

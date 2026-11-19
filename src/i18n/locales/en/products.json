@@ -49,6 +49,7 @@
       "updateImages": "Updated images for",
       "updatePurchaseOrderNames": "Updated purchase-order names for",
       "updateTechSpecs": "Updated tech specs for",
+      "updateVendorCodes": "Updated vendor codes for",
       "updateWarehouseMemo": "Updated warehouse memo for"
     },
     "attrCardTitle": "Classification & attributes",
@@ -79,8 +80,18 @@
     "tab": {
       "activity": "Activity",
       "details": "Details",
-      "images": "Images"
+      "images": "Images",
+      "stockLog": "Stock log"
     },
+    "vendorCodesAdd": "Add vendor code",
+    "vendorCodesCode": "Vendor's code",
+    "vendorCodesEmpty": "No vendor codes yet",
+    "vendorCodesIssueCodeMissing": "Row {{row}}: the vendor's code is missing.",
+    "vendorCodesIssueDuplicate": "Row {{row}}: this vendor already has that code.",
+    "vendorCodesIssueVendorMissing": "Row {{row}}: no vendor chosen.",
+    "vendorCodesName": "Vendor's name",
+    "vendorCodesTitle": "Product codes at vendors",
+    "vendorCodesVendor": "Vendor",
     "techSpecCardTitle": "Technical specs",
     "techSpecsEmpty": "No technical specs",
     "updatedByOn": "Updated by <user/> on {{date}}",

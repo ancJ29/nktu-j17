@@ -26,9 +26,21 @@ export type ProductMinimumInventory = {
   updatedBy: string;
 };
 
+export type ProductVendorCode = {
+  vendorCode: string;
+
+  vendorName: string;
+
+  code: string;
+
+  name?: string;
+};
+
 export type ProductExtra = {
   units?: string[];
   alternativeNames?: string[];
+
+  vendorCodes?: ProductVendorCode[];
 
   nameZh?: string;
   nameEn?: string;

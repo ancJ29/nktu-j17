@@ -49,6 +49,7 @@
       "updateImages": "Đã cập nhật hình ảnh cho",
       "updatePurchaseOrderNames": "Đã cập nhật tên trên đơn đặt hàng của",
       "updateTechSpecs": "Đã cập nhật thông số kỹ thuật cho",
+      "updateVendorCodes": "Đã cập nhật mã theo nhà cung cấp của",
       "updateWarehouseMemo": "Đã cập nhật ghi chú kho của"
     },
     "attrCardTitle": "Phân loại & thuộc tính",
@@ -79,8 +80,18 @@
     "tab": {
       "activity": "Hoạt động",
       "details": "Chi tiết",
-      "images": "Hình ảnh"
+      "images": "Hình ảnh",
+      "stockLog": "Sổ nhập xuất"
     },
+    "vendorCodesAdd": "Thêm mã NCC",
+    "vendorCodesCode": "Mã của NCC",
+    "vendorCodesEmpty": "Chưa có mã theo nhà cung cấp",
+    "vendorCodesIssueCodeMissing": "Dòng {{row}}: thiếu mã của NCC.",
+    "vendorCodesIssueDuplicate": "Dòng {{row}}: NCC này đã có mã đó.",
+    "vendorCodesIssueVendorMissing": "Dòng {{row}}: chưa chọn nhà cung cấp.",
+    "vendorCodesName": "Tên của NCC",
+    "vendorCodesTitle": "Mã sản phẩm theo NCC",
+    "vendorCodesVendor": "Nhà cung cấp",
     "techSpecCardTitle": "Thông số kỹ thuật",
     "techSpecsEmpty": "Chưa có thông số kỹ thuật",
     "updatedByOn": "Cập nhật bởi <user/> vào {{date}}",

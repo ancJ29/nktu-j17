@@ -2,6 +2,7 @@ import __new__ from './__new__';
 import assets from './assets.json';
 import attachments from './attachments.json';
 import auth from './auth.json';
+import books from './books.json';
 import chat from './chat.json';
 import common from './common.json';
 import configuration from './configuration.json';
@@ -57,6 +58,7 @@ export default {
   assets,
   attachments,
   auth,
+  books,
   chat,
   common,
   configuration,

@@ -67,7 +67,7 @@ import {
   emptyItem,
   resolveInitialScheduledDateFromSalesOrder,
   resolveVendorInboundAddress,
-  seedAddressFromCustomer,
+  seedDeliveryAddressFromOrder,
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
@@ -264,7 +264,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
         const customer = soExtra.customerCode
           ? useCustomerStore.getState().getByCode(soExtra.customerCode)
           : undefined;
-        const seeded = seedAddressFromCustomer(customer, soExtra);
+        const seeded = seedDeliveryAddressFromOrder(customer, soExtra);
         form.setFieldValue('deliveryAddress', seeded.deliveryAddress);
         form.setFieldValue('googleMapUrl', seeded.googleMapUrl);
 
@@ -276,7 +276,7 @@ export function DeliveryRequestForm({ variant }: DeliveryRequestFormProps) {
             now.googleMapUrl !== seeded.googleMapUrl
           )
             return;
-          const latest = seedAddressFromCustomer(
+          const latest = seedDeliveryAddressFromOrder(
             soExtra.customerCode
               ? useCustomerStore.getState().getByCode(soExtra.customerCode)
               : undefined,

@@ -1,0 +1,66 @@
+{
+  "cashBook": {
+    "balance": "Thu − Chi",
+    "columns": {
+      "date": "Ngày hạch toán",
+      "description": "Diễn giải",
+      "in": "Thu",
+      "note": "Ghi chú",
+      "out": "Chi"
+    },
+    "empty": "Chưa có dòng nào trong tháng này.",
+    "homeCard": {
+      "open": "Mở sổ",
+      "title": "Sổ thu chi tháng này"
+    },
+    "monthLabel": "Tháng",
+    "title": "Sổ thu chi"
+  },
+  "stockLog": {
+    "allCodes": "Tất cả mã",
+    "balance": "Nhập − Xuất",
+    "columns": {
+      "date": "Ngày",
+      "description": "Diễn giải",
+      "in": "Nhập",
+      "note": "Ghi chú",
+      "out": "Xuất",
+      "vendorCode": "Mã NCC"
+    },
+    "empty": "Chưa có dòng nào.",
+    "filterAll": "Tất cả mã",
+    "filterLabel": "Mã NCC",
+    "needsCodes": "Thêm mã NCC của sản phẩm ở tab Chi tiết trước khi ghi sổ.",
+    "pickPlaceholder": "Chọn mã NCC",
+    "totalsByCode": "Tổng theo mã NCC",
+    "unit": "Đơn vị"
+  },
+  "table": {
+    "addRow": "Thêm dòng",
+    "cancel": "Hủy",
+    "confirmDelete": "Xóa dòng này? Dòng bị xóa không hiện trong sổ và không tính vào tổng.",
+    "confirmDeleteTitle": "Xóa dòng",
+    "delete": "Xóa",
+    "deleted": "Đã xóa dòng.",
+    "hint": "Bấm vào dòng để sửa; rời khỏi dòng là lưu.",
+    "issue": {
+      "bothValues": "Chỉ nhập một trong hai cột Thu / Chi.",
+      "dateMissing": "Chọn ngày.",
+      "descriptionMissing": "Nhập diễn giải.",
+      "moneyDecimals": "Số tiền là số nguyên (đồng).",
+      "notPositive": "Số phải lớn hơn 0.",
+      "pickMissing": "Chọn mã NCC của dòng.",
+      "quantityDecimals": "Tối đa 3 chữ số thập phân.",
+      "valueNeeded": "Nhập số ở cột Thu hoặc Chi."
+    },
+    "loadFailed": "Không tải được dữ liệu.",
+    "monthTotal": "Trong tháng",
+    "movedMonth": "Dòng đã chuyển sang tháng {{month}}.",
+    "next": "Tháng sau",
+    "previous": "Tháng trước",
+    "saveFailed": "Không lưu được dòng. Thử lại.",
+    "total": "Tổng",
+    "whoWhen": "Tạo bởi {{who}} lúc {{when}}",
+    "whoWhenEdited": "Sửa bởi {{who}} lúc {{when}}"
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "cashBook": {
+    "balance": "In − Out",
+    "columns": {
+      "date": "Accounting date",
+      "description": "Description",
+      "in": "In",
+      "note": "Note",
+      "out": "Out"
+    },
+    "empty": "No entries this month.",
+    "homeCard": {
+      "open": "Open the book",
+      "title": "Cash book this month"
+    },
+    "monthLabel": "Month",
+    "title": "Cash book"
+  },
+  "stockLog": {
+    "allCodes": "All codes",
+    "balance": "In − Out",
+    "columns": {
+      "date": "Date",
+      "description": "Description",
+      "in": "In",
+      "note": "Note",
+      "out": "Out",
+      "vendorCode": "Vendor code"
+    },
+    "empty": "No entries yet.",
+    "filterAll": "All codes",
+    "filterLabel": "Vendor code",
+    "needsCodes": "Add the product's vendor code on the Details tab before logging.",
+    "pickPlaceholder": "Pick a vendor code",
+    "totalsByCode": "Totals by vendor code",
+    "unit": "Unit"
+  },
+  "table": {
+    "addRow": "Add a row",
+    "cancel": "Cancel",
+    "confirmDelete": "Delete this row? A deleted row leaves the book and the totals.",
+    "confirmDeleteTitle": "Delete row",
+    "delete": "Delete",
+    "deleted": "Row deleted.",
+    "hint": "Click a row to edit it; leaving the row saves it.",
+    "issue": {
+      "bothValues": "Fill only one of In / Out.",
+      "dateMissing": "Pick a date.",
+      "descriptionMissing": "Type a description.",
+      "moneyDecimals": "An amount is a whole number (đồng).",
+      "notPositive": "The number must be above 0.",
+      "pickMissing": "Pick the row's vendor code.",
+      "quantityDecimals": "At most 3 decimal places.",
+      "valueNeeded": "Fill a number in In or Out."
+    },
+    "loadFailed": "Could not load the data.",
+    "monthTotal": "This month",
+    "movedMonth": "The row moved to {{month}}.",
+    "next": "Next month",
+    "previous": "Previous month",
+    "saveFailed": "Could not save the row. Try again.",
+    "total": "Total",
+    "whoWhen": "Created by {{who}} on {{when}}",
+    "whoWhenEdited": "Edited by {{who}} on {{when}}"
+  }
+}

@@ -46,6 +46,7 @@ export type NavId =
   | 'truck-assets'
   | 'oil-tanks'
   | 'odometer-logs'
+  | 'cash-book'
   | 'farm'
   | 'greenhouses'
   | 'crops'
@@ -320,6 +321,13 @@ export const NAV_REGISTRY: Record<NavId, NavRegistryEntry> = {
     defaultIcon: IconName.Ruler,
   },
 
+  'cash-book': {
+    path: ROUTES.CASH_BOOK.LIST,
+    labelKey: 'books.cashBook.title',
+    label: 'Cash book',
+    defaultIcon: IconName.Ruler,
+  },
+
   'oil-tanks': {
     path: ROUTES.OIL_TANKS.LIST,
     labelKey: 'oilTanks.title',
@@ -471,6 +479,7 @@ type FeatureFlags = {
   trucks?: { enabled?: boolean };
   oilTanks?: { enabled?: boolean };
   nktuOdometerLog?: { enabled?: boolean };
+  nktuCashBook?: { enabled?: boolean };
   farm?: { enabled?: boolean };
   paymentTerms?: { enabled?: boolean };
   pricing?: { enabled?: boolean };
@@ -516,6 +525,7 @@ const NAV_FEATURE_GATES: Partial<Record<NavId, (flags: FeatureFlags) => boolean>
   'truck-assets': (f) => f.trucks?.enabled ?? false,
   'oil-tanks': (f) => f.oilTanks?.enabled ?? false,
   'odometer-logs': (f) => f.nktuOdometerLog?.enabled ?? false,
+  'cash-book': (f) => f.nktuCashBook?.enabled ?? false,
   greenhouses: (f) => f.farm?.enabled ?? false,
   crops: (f) => f.farm?.enabled ?? false,
   'crop-diary-templates': (f) => f.farm?.enabled ?? false,
@@ -557,6 +567,7 @@ export const NAV_PERMISSION_MODULE: Partial<Record<NavId, string>> = {
   'truck-assets': 'truck',
   'oil-tanks': 'oilTank',
   'odometer-logs': 'odometerLog',
+  'cash-book': 'cashBook',
   greenhouses: 'greenhouse',
   crops: 'crop',
   'crop-diary-templates': 'cropDiaryTemplate',

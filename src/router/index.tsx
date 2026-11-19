@@ -52,6 +52,7 @@ import {
   TruckAssetDetailPage,
   TruckAssetFormPage,
   OdometerLogListPage,
+  CashBookPage,
   OilTankListPage,
   OilTankDetailPage,
   OilTankFormPage,
@@ -164,6 +165,7 @@ const materialGate = gate('material');
 const truckGate = gate('truck');
 const oilTankGate = gate('oilTank');
 const odometerLogGate = gate('odometerLog');
+const cashBookGate = gate('cashBook');
 const greenhouseGate = gate('greenhouse');
 const cropGate = gate('crop');
 const cropDiaryTemplateGate = gate('cropDiaryTemplate');
@@ -353,6 +355,7 @@ const materialsEnabled = featureFlags.materials.enabled;
 const trucksEnabled = featureFlags.trucks.enabled;
 const oilTanksEnabled = featureFlags.oilTanks.enabled;
 const odometerLogEnabled = featureFlags.nktuOdometerLog.enabled;
+const cashBookEnabled = featureFlags.nktuCashBook.enabled;
 const farmEnabled = featureFlags.farm.enabled;
 const productInventoryEnabled = featureFlags.productInventory.enabled;
 const materialInventoryEnabled = featureFlags.materialInventory.enabled;
@@ -674,6 +677,16 @@ const odometerLogRoutes: RouteObject[] = [
     element: gatedComponent(
       { enabled: odometerLogEnabled, requires: odometerLogGate.view },
       OdometerLogListPage,
+    ),
+  },
+];
+
+const cashBookRoutes: RouteObject[] = [
+  {
+    path: ROUTES.CASH_BOOK.LIST,
+    element: gatedComponent(
+      { enabled: cashBookEnabled, requires: cashBookGate.view },
+      CashBookPage,
     ),
   },
 ];
@@ -1359,6 +1372,7 @@ const router = createBrowserRouter([
           ...quotationRoutes,
           ...truckAssetRoutes,
           ...odometerLogRoutes,
+          ...cashBookRoutes,
           ...oilTankRoutes,
           ...greenhouseRoutes,
           ...cropRoutes,

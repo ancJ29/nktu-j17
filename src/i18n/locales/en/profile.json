@@ -58,6 +58,8 @@
       "material": "Material",
       "materialInventory": "Material Inventory",
       "odometerLog": "Odometer Log",
+      "cashBook": "Cash book",
+      "productStockLog": "Product stock log",
       "purchaseOrder": "Purchase Order",
       "oilTank": "Oil Tank",
       "permissionManagement": "Permission Management",

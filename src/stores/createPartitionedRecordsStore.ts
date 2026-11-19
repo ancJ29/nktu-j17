@@ -133,7 +133,7 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     fetchAll,
   });
 
-  async function resyncPartition(key: string): Promise<void> {
+  async function resyncPartition(key: string): Promise<T[]> {
     const res = await cMngtConnector.queryPartitionedRecordsSync(target, {
       partitionKeys: [key],
     });
@@ -142,9 +142,12 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
     else partitionHashes.delete(key);
     if (res.emptyKeys.includes(key)) {
       await persistPartitions(cacheKey, [], [key]);
-    } else if (res.changed && res.updated[key] && hash) {
+      return [];
+    }
+    if (res.changed && res.updated[key] && hash) {
       await persistPartitions<T>(cacheKey, [[key, { items: res.updated[key] as T[], hash }]], []);
     }
+    return res.changed ? ((res.updated[key] as T[] | undefined) ?? []) : [];
   }
 
   async function settleWrite(
@@ -317,6 +320,10 @@ export function createPartitionedRecordsStore<T extends PartitionedRecordRow>(
         partitionKeys: [key],
       });
       return res.changed ? ((res.updated[key] as T[] | undefined) ?? []) : [];
+    },
+
+    loadPartition(key: string): Promise<T[]> {
+      return resyncPartition(key);
     },
 
     fetchById(id: string, partitionKey?: string): Promise<{ item: T; partitionKey: string }> {

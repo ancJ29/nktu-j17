@@ -61,6 +61,7 @@ const PREVIEW_LIMIT = 50;
 const MOBILE_PREVIEW = 3;
 
 import { OdometerLogHomeCard } from '@/pages/odometer-logs';
+import { CashBookHomeCard } from '@/pages/cash-book';
 
 const isMobile = device.isMobile;
 
@@ -259,6 +260,7 @@ export default function HomePage() {
               scroll is a card nobody sees. It renders itself away for everyone
               who isn't a driver (flag + department + permission). */}
           <OdometerLogHomeCard />
+          <CashBookHomeCard />
           {canSeeOrders && (
             <MobileSection
               title={t('home.sections.newOrders')}
@@ -297,6 +299,7 @@ export default function HomePage() {
   return (
     <Box p={{ base: 'xs', md: 'lg' }}>
       <Stack gap="lg" mx="auto">
+        <CashBookHomeCard />
         {canSeeOrders && (
           <DashboardSection
             title={t('home.sections.newOrders')}

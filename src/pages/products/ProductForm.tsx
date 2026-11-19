@@ -46,6 +46,7 @@ import { markInventoryVerified } from '@/utils/inventoryDrift';
 import { SingleProductForm, type ProductFormValues } from './SingleProductForm';
 import { ProductBulkImportForm } from './ProductBulkImportForm';
 import type { ProductFormVariant } from './productFormVariant';
+import { carriedExtraOf } from './productFormCarry';
 
 const isMobile = device.isMobile;
 const hasBulkImport = hasBulkImportForProducts();
@@ -332,7 +333,7 @@ export function ProductForm({ variant }: ProductFormProps) {
           isActive: values.isActive,
         };
 
-        const images = snapshotRef.current?.extra?.images ?? [];
+        const carried = carriedExtraOf(snapshotRef.current?.extra);
 
         let minimumInventory: ProductMinimumInventory | undefined;
         if (
@@ -367,7 +368,7 @@ export function ProductForm({ variant }: ProductFormProps) {
           }),
           ...(values.nameZh.trim() && { nameZh: values.nameZh.trim() }),
           ...(values.nameEn.trim() && { nameEn: values.nameEn.trim() }),
-          ...(images.length > 0 && { images }),
+          ...carried,
 
           ...((isEdit ? values.sku.trim() : values.code.trim()) && {
             sku: isEdit ? values.sku.trim() : values.code.trim(),

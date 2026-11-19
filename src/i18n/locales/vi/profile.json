@@ -58,6 +58,8 @@
       "material": "Vật tư",
       "materialInventory": "Tồn kho vật tư",
       "odometerLog": "Nhật ký xe",
+      "cashBook": "Sổ thu chi",
+      "productStockLog": "Sổ nhập xuất (kế toán)",
       "purchaseOrder": "Đặt hàng NCC",
       "oilTank": "Bồn dầu",
       "permissionManagement": "Quản lý quyền hạn",

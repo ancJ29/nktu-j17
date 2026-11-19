@@ -795,6 +795,8 @@ const FeaturesSchema = z
     farm: ModuleFeaturesSchema,
 
     nktuOdometerLog: ModuleFeaturesSchema,
+
+    nktuCashBook: ModuleFeaturesSchema,
   })
   .default({
     common: COMMON_FEATURE_DEFAULTS,
@@ -830,6 +832,7 @@ const FeaturesSchema = z
     warehouseDeliveryNotes: WarehouseDeliveryNoteFeaturesSchema.parse({}),
     transportOrders: TransportOrderFeaturesSchema.parse({}),
     nktuOdometerLog: ModuleFeaturesSchema.parse({}),
+    nktuCashBook: ModuleFeaturesSchema.parse({}),
   });
 
 const NavbarSchema = z

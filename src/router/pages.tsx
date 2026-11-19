@@ -122,6 +122,9 @@ export const TruckAssetFormPage = lazy(() =>
 export const OdometerLogListPage = lazy(() =>
   import('../pages/odometer-logs').then((m) => ({ default: m.OdometerLogListPage })),
 );
+export const CashBookPage = lazy(() =>
+  import('../pages/cash-book').then((m) => ({ default: m.CashBookPage })),
+);
 export const OilTankListPage = lazy(() =>
   import('../pages/oil-tanks').then((m) => ({ default: m.OilTankListPage })),
 );

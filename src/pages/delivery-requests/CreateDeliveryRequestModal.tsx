@@ -25,7 +25,7 @@ import { DesktopItemTable } from './DeliveryRequestForm';
 import {
   emptyItem,
   resolveInitialScheduledDateFromSalesOrder,
-  seedAddressFromCustomer,
+  seedDeliveryAddressFromOrder,
   toDateTimeInputOrUndefined,
   type DeliveryRequestFormValues,
 } from './deliveryRequestFormShared';
@@ -146,7 +146,7 @@ export function CreateDeliveryRequestModal({
       const scheduledDate = resolveInitialScheduledDateFromSalesOrder(
         seedScheduledDateFromSalesOrder ? soExtra.deliveryDate : null,
       );
-      const seededAddress = seedAddressFromCustomer(customer, soExtra);
+      const seededAddress = seedDeliveryAddressFromOrder(customer, soExtra);
       form.setValues({
         requestNumber: '',
         direction: 'outbound',

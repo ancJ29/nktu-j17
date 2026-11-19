@@ -43,7 +43,7 @@ function persist(): void {
   }
 }
 
-function resolveActorId(): string | null {
+export function resolveActorId(): string | null {
   return getCurrentEmployeeId() ?? useAuthStore.getState().user?.email ?? null;
 }
 

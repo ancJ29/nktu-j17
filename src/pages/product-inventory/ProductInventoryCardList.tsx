@@ -182,10 +182,7 @@ export function ProductInventoryCardList({
                     </Badge>
                   )}
                   {movement && (
-                    <StockMovementBadge
-                      source={movement}
-                      productCode={s.product.code}
-                    />
+                    <StockMovementBadge source={movement} productCode={s.product.code} />
                   )}
                   {s.needsRecheck && (
                     <InventoryRecheckBadge

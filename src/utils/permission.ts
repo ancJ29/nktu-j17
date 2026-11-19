@@ -715,6 +715,8 @@ export const perms = {
       canMarkPaid: () => resolve().actions?.canMarkPaid ?? false,
     };
   })(),
+  cashBook: createModulePerms('cashBook'),
+  productStockLog: createModulePerms('productStockLog'),
   lookupV2: createModulePerms('lookupV2'),
 
   report: createModulePerms('report'),

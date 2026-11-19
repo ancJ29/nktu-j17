@@ -111,4 +111,8 @@ export const featureFlags = {
   nktuOdometerLog: {
     enabled: features?.nktuOdometerLog?.enabled ?? false,
   },
+
+  nktuCashBook: {
+    enabled: features?.nktuCashBook?.enabled ?? false,
+  },
 };

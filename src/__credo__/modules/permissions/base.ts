@@ -270,4 +270,18 @@ export const BASE_PERMISSIONS: Permissions = {
       canMarkPaid: false,
     },
   },
+
+  cashBook: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
+
+  productStockLog: {
+    canView: false,
+    canCreate: false,
+    canEdit: false,
+    canDelete: false,
+  },
 };

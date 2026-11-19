@@ -2,7 +2,7 @@ import { appConfig } from '@/config';
 import { buildDailySequentialCode, businessDateString } from '@/utils/code';
 import { cMngtConnector } from '@credo/connectors/connector';
 import { refreshPartyRegisters } from '@/stores/refreshPartyRegisters';
-import { seedAddressFromCustomer } from './deliveryRequestFormShared';
+import { seedDeliveryAddressFromOrder } from './deliveryRequestFormShared';
 import { useCustomerStore } from '@/stores/useCustomerStore';
 import { useDeliveryRequestStore } from '@/stores/useDeliveryRequestStore';
 import { logActivity } from '@/utils/activityLogger';
@@ -94,7 +94,7 @@ export async function bulkCreateOutboundDeliveryRequests(
 
       const customerCode = soExtra.customerCode?.trim() ?? '';
 
-      const { deliveryAddress, googleMapUrl } = seedAddressFromCustomer(
+      const { deliveryAddress, googleMapUrl } = seedDeliveryAddressFromOrder(
         customerCode ? useCustomerStore.getState().getByCode(customerCode) : undefined,
         soExtra,
       );
