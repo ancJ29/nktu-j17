@@ -185,7 +185,6 @@ export function ProductInventoryCardList({
                     <StockMovementBadge
                       source={movement}
                       productCode={s.product.code}
-                      showFigures
                     />
                   )}
                   {s.needsRecheck && (
