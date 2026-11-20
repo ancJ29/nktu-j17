@@ -45,7 +45,7 @@ import { PurchaseOrderCardList } from './PurchaseOrderCardList';
 import { PurchaseOrderDataTable } from './PurchaseOrderDataTable';
 import { PURCHASE_ORDER_STATUSES, findPurchaseOrderStatus } from './purchaseOrderStatuses';
 import { PurchaseOrderPreviewDrawer } from './PurchaseOrderPreviewDrawer';
-import { poCustomer, poItems, poStatus, vnDayOf } from './purchaseOrderModel';
+import { poCustomer, poItems, poStatus, poVendorNote, vnDayOf } from './purchaseOrderModel';
 import { notArrivedCount, usePurchaseOrderArrivals } from './purchaseOrderArrivals';
 import { PURCHASE_ORDER_RANGE_DAYS } from '@/stores/usePurchaseOrderStore';
 import { addDaysToDay } from '@/utils/paymentTerms';
@@ -167,6 +167,7 @@ export function PurchaseOrderListPage() {
         poCustomer(item)?.name,
         item.reference,
         item.notes,
+        poVendorNote(item),
       ];
       for (const line of poItems(item)) {
         fields.push(line.itemName, line.itemCode, skuByItemCode.get(line.itemCode));

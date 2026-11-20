@@ -38,6 +38,7 @@ import {
   poLeadTime,
   poReceiptIds,
   poStatus,
+  poVendorNote,
   readyBlockers,
 } from './purchaseOrderModel';
 import {
@@ -165,12 +166,14 @@ export function usePurchaseOrderDetail(t: TFunction) {
       currency: poCurrency(order),
       reference: order.reference ?? '',
       notes: order.notes ?? '',
+      vendorNote: poVendorNote(order),
       ...(poCustomer(order)
         ? { customerCode: poCustomer(order)!.code, customerName: poCustomer(order)!.name }
         : {}),
       items: poItems(order),
       ...(poLeadTime(order) ? { leadTime: poLeadTime(order)! } : {}),
       ...(poExtra(order).assignedTo ? { assignedTo: poExtra(order).assignedTo! } : {}),
+      ...(poExtra(order).requestedBy ? { requestedBy: poExtra(order).requestedBy! } : {}),
       sourceId: order.id,
       sourceOrderNumber: order.orderNumber,
     };

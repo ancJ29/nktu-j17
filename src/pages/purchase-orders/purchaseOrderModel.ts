@@ -27,6 +27,10 @@ export function poItems(po: Loose): PurchaseOrderItem[] {
   return items.filter((i): i is PurchaseOrderItem => !!i && typeof i === 'object');
 }
 
+export function poVendorNote(po: Loose): string {
+  return typeof po?.vendorNote === 'string' ? po.vendorNote : '';
+}
+
 export function poReceiptIds(po: Loose): string[] {
   const ids = po?.receiptIds;
   if (!Array.isArray(ids)) return [];

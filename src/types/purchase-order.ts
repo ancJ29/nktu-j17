@@ -43,6 +43,8 @@ export type PurchaseOrderExtra = {
 
   assignedTo?: string;
 
+  requestedBy?: string;
+
   copyFromId?: string;
   readyBy?: string;
   cancelledBy?: string;
@@ -69,6 +71,8 @@ export type PurchaseOrder = PartitionedRecordRow & {
   reference: string;
 
   notes: string;
+
+  vendorNote?: string;
   currency: PurchaseOrderCurrency;
   items: PurchaseOrderItem[];
   isPaid: boolean;
@@ -103,7 +107,9 @@ export type PurchaseOrderCopyFrom = Pick<
   | 'notes'
   | 'items'
 > & {
+  vendorNote?: string;
   assignedTo?: string;
+  requestedBy?: string;
   leadTime?: PurchaseOrderLeadTime | null;
   customerCode?: string;
   customerName?: string;

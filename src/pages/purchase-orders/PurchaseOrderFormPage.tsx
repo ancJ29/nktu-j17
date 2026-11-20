@@ -48,6 +48,7 @@ import { device, logger } from '@credo/base-ui/utils';
 import { lookupLabelOf, useInitFormFromFetch, useLookupV2Labels } from '@/hooks';
 import {
   getPurchaseOrderPicDepartments,
+  getSalesOrderPicDepartments,
   hasImagesForProducts,
   isLocationsEnabled,
   isPricingManagementEnabled,
@@ -97,6 +98,7 @@ import {
   poItems,
   poLeadTime,
   poOrderDay,
+  poVendorNote,
   proposePurchaseOrderDeadline,
   unitPriceDecimals,
 } from './purchaseOrderModel';
@@ -105,6 +107,8 @@ import { savePurchaseOrder } from './savePurchaseOrder';
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
+
+const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
 const pricingOn = isPricingManagementEnabled();
 
 const showPrice = pricingOn && perms.purchaseOrder.canViewPrice();
@@ -142,7 +146,9 @@ type FormValues = {
   paymentDeadline: string | null;
   reference: string;
   notes: string;
+  vendorNote: string;
   assignedTo: string;
+  requestedBy: string;
   items: ItemFormValues[];
 };
 
@@ -493,7 +499,9 @@ export function PurchaseOrderFormPage() {
       paymentDeadline: null,
       reference: '',
       notes: '',
+      vendorNote: '',
       assignedTo: currentEmployeeId,
+      requestedBy: '',
       items: [{ ...emptyItem }],
     },
     validate,
@@ -524,7 +532,9 @@ export function PurchaseOrderFormPage() {
         paymentDeadline: isoToVnDateString(r.paymentDeadline) || null,
         reference: r.reference || '',
         notes: r.notes || '',
+        vendorNote: poVendorNote(r),
         assignedTo: r.extra?.assignedTo ?? '',
+        requestedBy: r.extra?.requestedBy ?? '',
         items: poItems(r).length
           ? poItems(r).map((item) => ({
               itemCode: item.itemCode,
@@ -591,7 +601,9 @@ export function PurchaseOrderFormPage() {
       paymentDeadline: null,
       reference: copyFrom.reference,
       notes: copyFrom.notes,
+      vendorNote: copyFrom.vendorNote ?? '',
       assignedTo: copyFrom.assignedTo ?? currentEmployeeId,
+      requestedBy: copyFrom.requestedBy ?? '',
       items:
         copyFrom.items.length > 0
           ? copyFrom.items.map((item) => ({
@@ -809,12 +821,14 @@ export function PurchaseOrderFormPage() {
             locationName,
             reference: values.reference.trim(),
             notes: values.notes.trim(),
+            vendorNote: values.vendorNote.trim(),
             currency: values.currency,
             items,
             orderDate,
             leadTime,
             ...(paymentDeadline ? { paymentDeadline } : {}),
             ...(values.assignedTo.trim() ? { assignedTo: values.assignedTo.trim() } : {}),
+            ...(values.requestedBy.trim() ? { requestedBy: values.requestedBy.trim() } : {}),
           },
         });
         notifications.show({
@@ -1012,15 +1026,34 @@ export function PurchaseOrderFormPage() {
                 value={values.assignedTo || null}
                 onChange={(v) => form.setFieldValue('assignedTo', v?.id ?? '')}
               />
+              <EmployeeSelector
+                label={t('purchaseOrders.form.requestedByLabel')}
+                placeholder={t('purchaseOrders.form.requestedByPlaceholder')}
+                clearable
+                filter={requesterEmployeeFilter}
+                value={values.requestedBy || null}
+                onChange={(v) => form.setFieldValue('requestedBy', v?.id ?? '')}
+              />
             </SimpleGrid>
 
-            <Textarea
-              label={t('__new__.01-common.labels.note')}
-              placeholder={t('purchaseOrders.form.notesPlaceholder')}
-              autosize
-              minRows={2}
-              {...form.getInputProps('notes')}
-            />
+            <SimpleGrid cols={{ base: 1, md: 2 }}>
+              <Textarea
+                label={t('purchaseOrders.form.vendorNoteLabel')}
+                placeholder={t('purchaseOrders.form.vendorNotePlaceholder')}
+                autosize
+                minRows={2}
+                maxRows={4}
+                {...form.getInputProps('vendorNote')}
+              />
+              <Textarea
+                label={t('__new__.01-common.labels.note')}
+                placeholder={t('purchaseOrders.form.notesPlaceholder')}
+                autosize
+                minRows={2}
+                maxRows={4}
+                {...form.getInputProps('notes')}
+              />
+            </SimpleGrid>
 
             <Stack gap="xs">
               <Group justify="space-between" align="center" wrap="wrap">

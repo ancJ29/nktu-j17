@@ -11,10 +11,10 @@
     "empty": "Chưa có dòng nào trong tháng này.",
     "homeCard": {
       "open": "Mở sổ",
-      "title": "Sổ thu chi tháng này"
+      "title": "Chi phí tháng này"
     },
     "monthLabel": "Tháng",
-    "title": "Sổ thu chi"
+    "title": "Chi phí"
   },
   "stockLog": {
     "allCodes": "Tất cả mã",

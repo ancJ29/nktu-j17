@@ -97,6 +97,7 @@ import {
   poOrderDateIso,
   poPayment,
   poPaymentUntracked,
+  poVendorNote,
 } from './purchaseOrderModel';
 
 const isMobile = device.isMobile;
@@ -370,6 +371,16 @@ export function PurchaseOrderDetailPage() {
             </Text>
           )}
         </Stack>
+        <Stack gap={4}>
+          <FieldLabel>{t('purchaseOrders.form.requestedByLabel')}</FieldLabel>
+          {extra.requestedBy ? (
+            <EmployeeLink id={extra.requestedBy} size="sm" />
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              {t('purchaseOrders.detail.noRequestedBy')}
+            </Text>
+          )}
+        </Stack>
       </SimpleGrid>
     </SectionCard>
   );
@@ -512,15 +523,32 @@ export function PurchaseOrderDetailPage() {
       title={t('__new__.01-common.labels.note')}
       padding="md"
     >
-      {order.notes?.trim() ? (
-        <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
-          {order.notes}
-        </Text>
-      ) : (
-        <Text size="sm" c="dimmed" fs="italic">
-          {t('purchaseOrders.detail.noNotes')}
-        </Text>
-      )}
+      <Stack gap="sm">
+        <Stack gap={4}>
+          <FieldLabel>{t('purchaseOrders.form.vendorNoteLabel')}</FieldLabel>
+          {poVendorNote(order).trim() ? (
+            <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+              {poVendorNote(order)}
+            </Text>
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              {t('purchaseOrders.detail.noNotes')}
+            </Text>
+          )}
+        </Stack>
+        <Stack gap={4}>
+          <FieldLabel>{t('__new__.01-common.labels.note')}</FieldLabel>
+          {order.notes?.trim() ? (
+            <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+              {order.notes}
+            </Text>
+          ) : (
+            <Text size="sm" c="dimmed" fs="italic">
+              {t('purchaseOrders.detail.noNotes')}
+            </Text>
+          )}
+        </Stack>
+      </Stack>
     </SectionCard>
   );
 
@@ -683,6 +711,16 @@ export function PurchaseOrderDetailPage() {
               </Text>
             )}
           </Stack>
+          <Stack gap={4}>
+            <FieldLabel>{t('purchaseOrders.form.requestedByLabel')}</FieldLabel>
+            {extra.requestedBy ? (
+              <EmployeeLink id={extra.requestedBy} size="sm" />
+            ) : (
+              <Text size="sm" c="dimmed" fs="italic">
+                {t('purchaseOrders.detail.noRequestedBy')}
+              </Text>
+            )}
+          </Stack>
           <Field
             label={t('purchaseOrders.form.leadTimeLabel')}
             value={
@@ -709,6 +747,20 @@ export function PurchaseOrderDetailPage() {
               <Field label={t('purchaseOrders.form.referenceLabel')} value={order.reference} mono />
             </Grid.Col>
           )}
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Stack gap={4}>
+              <FieldLabel>{t('purchaseOrders.form.vendorNoteLabel')}</FieldLabel>
+              {poVendorNote(order).trim() ? (
+                <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>
+                  {poVendorNote(order)}
+                </Text>
+              ) : (
+                <Text size="sm" c="dimmed" fs="italic">
+                  {t('purchaseOrders.detail.noNotes')}
+                </Text>
+              )}
+            </Stack>
+          </Grid.Col>
           <Grid.Col span={{ base: 12, md: 6 }}>
             <Stack gap={4}>
               <FieldLabel>{t('__new__.01-common.labels.note')}</FieldLabel>

@@ -51,6 +51,7 @@
     "cardPhotos": "Ảnh",
     "cardReceipts": "Phiếu nhập kho",
     "noAssignedTo": "Chưa phân công",
+    "noRequestedBy": "Chưa có",
     "noNotes": "Không có ghi chú",
     "noReceipt": "Chưa có phiếu nhập kho",
     "receiptsUnreadable": "Không đọc được các phiếu nhập kho của đơn này nên nút tạo phiếu bị ẩn. Mở lại trang để thử lại.",
@@ -87,8 +88,12 @@
     "plannedArrivalLabel": "Ngày về dự kiến",
     "referenceLabel": "Tham chiếu",
     "referencePlaceholder": "Số báo giá hoặc hợp đồng của NCC",
+    "requestedByLabel": "Người yêu cầu",
+    "requestedByPlaceholder": "Người yêu cầu",
     "totalLabel": "Tổng cộng ({{currency}})",
     "updateButton": "Lưu thay đổi",
+    "vendorNoteLabel": "Ghi chú chung",
+    "vendorNotePlaceholder": "Gửi cho nhà cung cấp — in trên đơn",
     "vendorPlaceholder": "Chọn nhà cung cấp"
   },
   "leadTime": {

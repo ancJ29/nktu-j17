@@ -36,6 +36,7 @@ import {
   poOrderDateIso,
   poReceiptIds,
   poStatus,
+  poVendorNote,
 } from './purchaseOrderModel';
 import { findPurchaseOrderStatus } from './purchaseOrderStatuses';
 
@@ -62,11 +63,13 @@ export function PurchaseOrderPreviewDrawer({ order, onClose, arrivals, employeeN
       const customer = poCustomer(order);
       const leadTime = poLeadTime(order);
       const assignedTo = poExtra(order).assignedTo;
+      const requestedBy = poExtra(order).requestedBy;
       const receipts = receiptsFor(arrivals, order);
 
       const showReceipts = poStatus(order) !== 'draft' || poReceiptIds(order).length > 0;
       const reference = typeof order.reference === 'string' ? order.reference.trim() : '';
       const notes = typeof order.notes === 'string' ? order.notes : '';
+      const vendorNote = poVendorNote(order);
       return (
         <Stack gap="md">
           <Card withBorder radius="md" padding="md">
@@ -79,6 +82,9 @@ export function PurchaseOrderPreviewDrawer({ order, onClose, arrivals, employeeN
                 </DetailField>
                 <DetailField label={t('common.labels.assignedTo')}>
                   {(assignedTo && employeeNameById.get(assignedTo)) || null}
+                </DetailField>
+                <DetailField label={t('purchaseOrders.form.requestedByLabel')}>
+                  {(requestedBy && employeeNameById.get(requestedBy)) || null}
                 </DetailField>
                 <DetailField label={t('purchaseOrders.form.customerLabel')}>
                   {customer?.name || customer?.code || null}
@@ -115,6 +121,9 @@ export function PurchaseOrderPreviewDrawer({ order, onClose, arrivals, employeeN
                     {order.locationName}
                   </DetailField>
                 )}
+                <DetailField label={t('purchaseOrders.form.vendorNoteLabel')}>
+                  {vendorNote}
+                </DetailField>
                 <DetailField label={t('__new__.01-common.labels.note')}>{notes}</DetailField>
               </SimpleGrid>
             </Stack>

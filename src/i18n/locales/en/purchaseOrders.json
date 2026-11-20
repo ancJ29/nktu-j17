@@ -51,6 +51,7 @@
     "cardPhotos": "Photos",
     "cardReceipts": "Goods receipts",
     "noAssignedTo": "Not assigned",
+    "noRequestedBy": "Not set",
     "noNotes": "No notes",
     "noReceipt": "No goods receipt yet",
     "receiptsUnreadable": "The goods receipts of this order could not be read, so the receipt button is hidden. Reopen the page to try again.",
@@ -87,8 +88,12 @@
     "plannedArrivalLabel": "Planned arrival",
     "referenceLabel": "Reference",
     "referencePlaceholder": "Vendor quote or contract number",
+    "requestedByLabel": "Requested by",
+    "requestedByPlaceholder": "Person who requested",
     "totalLabel": "Total ({{currency}})",
     "updateButton": "Save changes",
+    "vendorNoteLabel": "General note",
+    "vendorNotePlaceholder": "For the vendor — printed on the order",
     "vendorPlaceholder": "Select a vendor"
   },
   "leadTime": {

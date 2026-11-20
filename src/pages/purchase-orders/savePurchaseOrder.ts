@@ -26,16 +26,19 @@ export type PurchaseOrderWrite = Pick<
   | 'currency'
   | 'items'
 > & {
+  vendorNote: string;
+
   orderDate: string;
 
   leadTime: PurchaseOrderLeadTime | null;
   paymentDeadline?: string;
   assignedTo?: string;
+  requestedBy?: string;
 };
 
 function splitWrite(write: PurchaseOrderWrite) {
-  const { assignedTo, orderDate, leadTime, paymentDeadline, ...rest } = write;
-  return { assignedTo, orderDate, leadTime, paymentDeadline, rest };
+  const { assignedTo, requestedBy, orderDate, leadTime, paymentDeadline, ...rest } = write;
+  return { assignedTo, requestedBy, orderDate, leadTime, paymentDeadline, rest };
 }
 
 export async function savePurchaseOrder(input: {
@@ -47,7 +50,9 @@ export async function savePurchaseOrder(input: {
   invalidate: () => void;
 }): Promise<PurchaseOrder> {
   const actor = getCurrentActorId();
-  const { assignedTo, orderDate, leadTime, paymentDeadline, rest } = splitWrite(input.write);
+  const { assignedTo, requestedBy, orderDate, leadTime, paymentDeadline, rest } = splitWrite(
+    input.write,
+  );
 
   if (input.id) {
     if (!input.snapshot) throw new Error('Purchase order snapshot missing');
@@ -56,6 +61,7 @@ export async function savePurchaseOrder(input: {
       createdBy: input.snapshot.extra?.createdBy ?? actor,
       lastUpdatedBy: actor,
       assignedTo,
+      requestedBy,
     };
     const updated = await purchaseOrderBundle.updateSafely({
       id: input.id,
@@ -82,6 +88,7 @@ export async function savePurchaseOrder(input: {
     createdBy: actor,
     lastUpdatedBy: actor,
     assignedTo,
+    requestedBy,
     ...(input.copyFromId ? { copyFromId: input.copyFromId } : {}),
   };
   for (let attempt = 0; attempt <= MAX_ORDER_NUMBER_RETRIES; attempt++) {

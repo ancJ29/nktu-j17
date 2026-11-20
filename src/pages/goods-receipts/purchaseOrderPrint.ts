@@ -14,11 +14,15 @@ import { purchaseOrderNamesOf } from '@/utils/productPurchaseOrderNames';
 import {
   formatMoney,
   lineAmount,
+  lineTax,
   orderSubtotal,
+  orderTax,
+  orderTotal,
   plannedArrivalDay,
   poCurrency,
   poItems,
   poOrderDay,
+  poVendorNote,
 } from '@/pages/purchase-orders/purchaseOrderModel';
 import { packageCountOf } from './goodsReceiptPackageCount';
 
@@ -54,10 +58,13 @@ export type PurchaseOrderPrintLine = {
   packageCount: number | null;
 
   photoUrl: string;
+
   note: string;
 
   unitPrice?: number | null;
   amount?: number | null;
+
+  tax?: number;
 };
 
 export type PurchaseOrderPrintData = {
@@ -73,13 +80,18 @@ export type PurchaseOrderPrintData = {
     address: string;
     phone: string;
     contactPerson: string;
-    email: string;
   };
   reference: string;
+
+  vendorNote: string;
   lines: PurchaseOrderPrintLine[];
   showPhoto: boolean;
 
   currency?: PurchaseOrderCurrency;
+
+  subtotal?: number;
+
+  tax?: number;
 
   total?: number;
 };
@@ -106,9 +118,9 @@ export function toPurchaseOrderPrintData(input: {
       address: vendor?.address ?? '',
       phone: vendor?.phone ?? '',
       contactPerson: vendor?.contactPerson ?? '',
-      email: vendor?.email ?? '',
     },
     reference: receipt.reference?.trim() ?? '',
+    vendorNote: '',
     lines: receipt.items.map((it) => {
       const names = purchaseOrderNamesOf(productByCode.get(it.itemCode)?.extra);
       return {
@@ -148,9 +160,9 @@ export function toPurchaseOrderPrintDataFromOrder(input: {
       address: vendor?.address ?? '',
       phone: vendor?.phone ?? '',
       contactPerson: vendor?.contactPerson ?? '',
-      email: vendor?.email ?? '',
     },
     reference: order.reference?.trim() ?? '',
+    vendorNote: poVendorNote(order).trim(),
     lines: poItems(order).map((it) => {
       const names = purchaseOrderNamesOf(productByCode.get(it.itemCode)?.extra);
       const priced = typeof it.unitPrice === 'number';
@@ -166,12 +178,15 @@ export function toPurchaseOrderPrintDataFromOrder(input: {
         note: it.note?.trim() ?? '',
         unitPrice: priced ? it.unitPrice! : null,
         amount: priced ? lineAmount(it, currency) : null,
+        tax: lineTax(it, currency),
       };
     }),
     showPhoto,
     currency,
 
-    total: orderSubtotal(order),
+    subtotal: orderSubtotal(order),
+    tax: orderTax(order),
+    total: orderTotal(order),
   };
 }
 
@@ -183,6 +198,7 @@ const L = {
   taxCode: ['Mã số thuế', '税号', 'Tax code'],
   tel: ['Điện thoại', '电话', 'Tel'],
   email: ['Email', '邮箱', 'Email'],
+  vendorNote: ['Ghi chú chung', '总备注', 'General note'],
   supplier: ['Nhà cung cấp', '供应商', 'Supplier'],
   address: ['Địa chỉ', '地址', 'Address'],
   phone: ['Điện thoại', '电话', 'Phone'],
@@ -198,6 +214,10 @@ const L = {
   colPackages: ['Số kiện', '件数', 'Packages'],
   colUnitPrice: ['Đơn giá', '单价', 'Unit price'],
   colAmount: ['Thành tiền', '金额', 'Amount'],
+  colTax: ['Thuế', '税额', 'Tax'],
+  colNote: ['Ghi chú', '备注', 'Note'],
+  subtotal: ['Cộng tiền hàng', '货款小计', 'Subtotal'],
+  tax: ['Tiền thuế', '税额合计', 'Tax'],
   total: ['Tổng cộng', '合计', 'Total'],
   currency: ['Tiền tệ', '币种', 'Currency'],
 } as const satisfies Record<string, Tri>;
@@ -269,33 +289,67 @@ function buildParts(
 
   const showPackages = data.lines.some((l) => l.packageCount !== null);
 
+  const showTax = showPrices && data.lines.some((l) => (l.tax ?? 0) > 0);
+  const showNote = data.lines.some((l) => l.note !== '');
+
   const isA5 = paperSize === 'A5';
+  const dense = showTax && showNote;
   const marginMm = isA5 ? 8 : 12;
-  const baseFontPx = isA5 ? 10 : 12.5;
-  const subFontPx = isA5 ? 8 : 10;
-  const photoPx = isA5 ? 96 : 144;
-  const cellPadPx = isA5 ? 4 : 6;
+  const baseFontPx = isA5 ? (dense ? 9 : 10) : dense ? 11 : 12.5;
+  const subFontPx = isA5 ? (dense ? 7 : 8) : dense ? 9 : 10;
+  const cellPadPx = isA5 || dense ? 4 : 6;
   const w = isA5
     ? {
         no: 24,
         code: 50,
-        photo: photoPx + 8,
         unit: 40,
         qty: 56,
         packages: 46,
         price: 64,
         amount: 76,
+        tax: 56,
+        note: 64,
       }
-    : {
-        no: 34,
-        code: 64,
-        photo: photoPx + 8,
-        unit: 56,
-        qty: 80,
-        packages: 64,
-        price: 88,
-        amount: 104,
-      };
+    : dense
+      ? {
+          no: 24,
+          code: 50,
+          unit: 40,
+          qty: 58,
+          packages: 46,
+          price: 68,
+          amount: 84,
+          tax: 64,
+          note: 80,
+        }
+      : {
+          no: 34,
+          code: 64,
+          unit: 56,
+          qty: 80,
+          packages: 64,
+          price: 88,
+          amount: 104,
+          tax: 80,
+          note: 100,
+        };
+  const fixedPx =
+    w.no +
+    w.code +
+    w.unit +
+    w.qty +
+    (showPackages ? w.packages : 0) +
+    (showPrices ? w.price + w.amount : 0) +
+    (showTax ? w.tax : 0) +
+    (showNote ? w.note : 0);
+  const minNamePx = isA5 ? 110 : 150;
+  const photoMaxPx = isA5 ? 96 : 144;
+  const photoMinPx = isA5 ? 40 : 56;
+  const availablePx = (contentWidthMm(paperSize, orientation, marginMm) * 96) / 25.4;
+  const photoPx = Math.round(
+    Math.max(photoMinPx, Math.min(photoMaxPx, availablePx - fixedPx - minNamePx - 8)),
+  );
+  const photoColPx = photoPx + 8;
   const widthMm = contentWidthMm(paperSize, orientation, marginMm);
 
   const buyerContacts = [
@@ -311,8 +365,8 @@ function buildParts(
       [L.address, escapeHtml(supplier.address), false],
       [L.phone, escapeHtml(supplier.phone), false],
       [L.contact, escapeHtml(supplier.contactPerson), false],
-      [L.email, escapeHtml(supplier.email), false],
       [L.reference, escapeHtml(data.reference), false],
+      [L.vendorNote, escapeHtml(data.vendorNote).replace(/\n/g, '<br />'), false],
       [L.expectedDelivery, expected, false],
       [L.currency, showPrices ? escapeHtml(currency) : '', false],
     ] as const
@@ -324,7 +378,15 @@ function buildParts(
     )
     .join('');
 
-  const columnCount = 5 + (showPhoto ? 1 : 0) + (showPackages ? 1 : 0) + (showPrices ? 2 : 0);
+  const columnCount =
+    5 +
+    (showPhoto ? 1 : 0) +
+    (showPackages ? 1 : 0) +
+    (showPrices ? 2 : 0) +
+    (showTax ? 1 : 0) +
+    (showNote ? 1 : 0);
+
+  const trailingColumns = (showTax ? 1 : 0) + (showNote ? 1 : 0);
 
   const rows = data.lines
     .map(
@@ -341,9 +403,7 @@ function buildParts(
             line.nameZh
               ? `<div class="name-zh zh" lang="zh-Hans">${escapeHtml(line.nameZh)}</div>`
               : ''
-          }${line.nameEn ? `<div class="name-en" lang="en">${escapeHtml(line.nameEn)}</div>` : ''}${
-            line.note ? `<div class="note">${escapeHtml(line.note)}</div>` : ''
-          }</td>
+          }${line.nameEn ? `<div class="name-en" lang="en">${escapeHtml(line.nameEn)}</div>` : ''}</td>
           <td class="c">${escapeHtml(line.unit)}</td>
           <td class="r">${quantity(line.quantity)}</td>${
             showPackages
@@ -355,6 +415,16 @@ function buildParts(
               ? `
           <td class="r price">${line.unitPrice == null ? '' : formatMoney(line.unitPrice, currency)}</td>
           <td class="r amount">${line.amount == null ? '' : formatMoney(line.amount, currency)}</td>`
+              : ''
+          }${
+            showTax
+              ? `
+          <td class="r tax">${line.amount == null || !line.tax ? '' : formatMoney(line.tax, currency)}</td>`
+              : ''
+          }${
+            showNote
+              ? `
+          <td class="note">${escapeHtml(line.note)}</td>`
               : ''
           }
         </tr>`,
@@ -397,7 +467,7 @@ function buildParts(
   td.r { text-align: right; white-space: nowrap; }
   td.code { overflow-wrap: anywhere; }
   td.name .name-zh, td.name .name-en { margin-top: 1px; }
-  td.name .note { margin-top: 2px; font-style: italic; font-size: ${subFontPx}px; color: #6b7280; }
+  td.note { font-style: italic; overflow-wrap: anywhere; }
   td.photo { padding: 3px; }
   td.photo img {
     display: block; width: ${photoPx}px; height: ${photoPx}px; object-fit: contain;
@@ -410,6 +480,21 @@ function buildParts(
   }
   tbody tr { page-break-inside: avoid; }
 ${palette ? paletteCss(palette) : ''}`;
+
+  const totalRow = (label: Tri, value: number) => `
+        <tr>
+          <th colspan="${columnCount - 1 - trailingColumns}" style="text-align:right">${inline(label)} (${escapeHtml(currency ?? '')})</th>
+          <td class="r">${formatMoney(value, currency ?? 'VND')}</td>${
+            trailingColumns ? `<td colspan="${trailingColumns}"></td>` : ''
+          }
+        </tr>`;
+  const footerRows = showPrices
+    ? showTax
+      ? totalRow(L.subtotal, data.subtotal ?? 0) +
+        totalRow(L.tax, data.tax ?? 0) +
+        totalRow(L.total, data.total ?? 0)
+      : totalRow(L.total, data.total ?? 0)
+    : '';
 
   const docHtml = `  <div class="doc">
     <div class="header">
@@ -432,7 +517,7 @@ ${palette ? paletteCss(palette) : ''}`;
         <tr>
           <th style="width:${w.no}px">${stacked(L.colNo)}</th>
           <th style="width:${w.code}px">${stacked(L.colCode)}</th>
-          ${showPhoto ? `<th style="width:${w.photo}px">${stacked(L.colPhoto)}</th>` : ''}
+          ${showPhoto ? `<th style="width:${photoColPx}px">${stacked(L.colPhoto)}</th>` : ''}
           <th>${stacked(L.colName)}</th>
           <th style="width:${w.unit}px">${stacked(L.colUnit)}</th>
           <th style="width:${w.qty}px">${stacked(L.colQty)}</th>
@@ -442,6 +527,8 @@ ${palette ? paletteCss(palette) : ''}`;
           <th style="width:${w.price}px">${stacked(L.colUnitPrice)}</th>
           <th style="width:${w.amount}px">${stacked(L.colAmount)}</th>`
               : ''
+          }${showTax ? `\n          <th style="width:${w.tax}px">${stacked(L.colTax)}</th>` : ''}${
+            showNote ? `\n          <th style="width:${w.note}px">${stacked(L.colNote)}</th>` : ''
           }
         </tr>
       </thead>
@@ -449,11 +536,7 @@ ${palette ? paletteCss(palette) : ''}`;
       </tbody>${
         showPrices
           ? `
-      <tfoot>
-        <tr>
-          <th colspan="${columnCount - 1}" style="text-align:right">${inline(L.total)} (${escapeHtml(currency)})</th>
-          <td class="r">${formatMoney(data.total ?? 0, currency)}</td>
-        </tr>
+      <tfoot>${footerRows}
       </tfoot>`
           : ''
       }

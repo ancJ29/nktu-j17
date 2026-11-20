@@ -1,6 +1,8 @@
 import { Badge, Loader, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
+
 import type { StockMovement, StockMovementLevel } from '@/utils/stockMovement';
+
 import type { StockMovementSource } from './useStockMovement';
 
 const COLOR: Record<StockMovementLevel, string> = { aLot: 'red', normal: 'blue', rarely: 'gray' };
