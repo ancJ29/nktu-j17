@@ -158,6 +158,15 @@ export function PurchaseOrderDataTable({
         },
       },
       {
+        key: 'requestedBy',
+        header: t('purchaseOrders.form.requestedByLabel'),
+        width: '100px',
+        render: (item: PurchaseOrder) => {
+          const id = poExtra(item).requestedBy;
+          return <Text fz="sm">{(id && employeeNameById.get(id)) || '—'}</Text>;
+        },
+      },
+      {
         key: 'status',
         header: t('__new__.01-common.labels.status'),
         ta: 'center' as const,

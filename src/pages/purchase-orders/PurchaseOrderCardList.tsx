@@ -184,6 +184,12 @@ export function PurchaseOrderCardList({
                   {employeeNameById.get(poExtra(o).assignedTo!) ?? '—'}
                 </Text>
               )}
+              {poExtra(o).requestedBy && (
+                <Text size="xs" lh={1.3} truncate>
+                  {t('purchaseOrders.form.requestedByLabel')}:{' '}
+                  {employeeNameById.get(poExtra(o).requestedBy!) ?? '—'}
+                </Text>
+              )}
               <Text size="xs" c="dimmed" lh={1.3}>
                 {meta}
               </Text>
