@@ -1,3 +1,4 @@
+import { employeeDisplayName } from '@/utils/employeeDisplayName';
 import { Stack, Text } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useEffect, useMemo, useState } from 'react';
@@ -35,6 +36,7 @@ import { type MoreFilterDef, type DateRangePreset } from '@/types/date-range';
 import { EMPTY_DATE_RANGE, formatDateRangeLabel } from '@/utils/listFilterDateRange';
 import {
   getPurchaseOrderPicDepartments,
+  getSalesOrderPicDepartments,
   isLocationsEnabled,
   makeEmployeeDepartmentFilter,
   perms,
@@ -57,6 +59,8 @@ const isMobile = device.isMobile;
 const canCreate = perms.purchaseOrder.canCreate();
 const locationsEnabled = isLocationsEnabled();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
+
+const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
 
 export function PurchaseOrderListPage() {
   const { t } = useTranslation();
@@ -107,6 +111,11 @@ export function PurchaseOrderListPage() {
   const arrivals = usePurchaseOrderArrivals(windowFromDay, cachedAt);
   const employeeNameById = useMemo(
     () => new Map(employees.map((e) => [e.id, e.name] as const)),
+    [employees],
+  );
+
+  const employeeListNameById = useMemo(
+    () => new Map(employees.map((e) => [e.id, employeeDisplayName(e, 'shortName')] as const)),
     [employees],
   );
 
@@ -226,6 +235,10 @@ export function PurchaseOrderListPage() {
     () => employees.filter(picEmployeeFilter).map((e) => ({ value: e.id, label: e.name })),
     [employees],
   );
+  const requesterFilterData = useMemo(
+    () => employees.filter(requesterEmployeeFilter).map((e) => ({ value: e.id, label: e.name })),
+    [employees],
+  );
   const paidFilterData = [
     { value: 'unpaid', label: t('purchaseOrders.payment.unpaid') },
     { value: 'partial', label: t('purchaseOrders.payment.partial') },
@@ -287,6 +300,15 @@ export function PurchaseOrderListPage() {
       searchable: true,
       w: 220,
     },
+    {
+      value: filters.requestedByFilter,
+      onChange: filters.setRequestedByFilter,
+      data: requesterFilterData,
+      placeholder: t('purchaseOrders.form.requestedByLabel'),
+      visible: requesterFilterData.length > 0,
+      searchable: true,
+      w: 220,
+    },
   ];
 
   const mobileFilters: (MobileFilterDef | MobileMultiFilterDef)[] = [
@@ -316,6 +338,13 @@ export function PurchaseOrderListPage() {
       title: t('purchaseOrders.form.paymentDeadlineLabel'),
       value: filters.deadlineDateRange,
       onChange: filters.setDeadlineDateRange,
+    },
+    {
+      type: 'dateRange',
+      key: 'orderDate',
+      title: t('purchaseOrders.form.orderDateLabel'),
+      value: filters.orderDateRange,
+      onChange: filters.setOrderDateRange,
     },
   ];
 
@@ -347,6 +376,15 @@ export function PurchaseOrderListPage() {
       value: filters.staffFilter,
       options: staffFilterData,
       onChange: filters.setStaffFilter,
+    },
+    {
+      type: 'select',
+      key: 'requestedBy',
+      title: t('purchaseOrders.form.requestedByLabel'),
+      placeholder: t('purchaseOrders.form.requestedByLabel'),
+      value: filters.requestedByFilter,
+      options: requesterFilterData,
+      onChange: filters.setRequestedByFilter,
     },
     ...dateAndExtraFilters,
   ];
@@ -477,6 +515,18 @@ export function PurchaseOrderListPage() {
                 filters.staffFilter}
             </FilterPill>
           )}
+          {filters.requestedByFilter && (
+            <FilterPill onClose={() => filters.setRequestedByFilter(null)}>
+              {requesterFilterData.find((e) => e.value === filters.requestedByFilter)?.label ??
+                filters.requestedByFilter}
+            </FilterPill>
+          )}
+          {filters.orderDateRange.preset && (
+            <FilterPill onClose={() => filters.setOrderDateRange(EMPTY_DATE_RANGE)}>
+              {t('purchaseOrders.form.orderDateLabel')}:{' '}
+              {formatDateRangeLabel(filters.orderDateRange, presetLabels)}
+            </FilterPill>
+          )}
           {filters.deadlineDateRange.preset && (
             <FilterPill onClose={() => filters.setDeadlineDateRange(EMPTY_DATE_RANGE)}>
               {t('purchaseOrders.form.paymentDeadlineLabel')}:{' '}
@@ -490,7 +540,7 @@ export function PurchaseOrderListPage() {
         <PurchaseOrderCardList
           orders={paginated}
           arrivals={arrivals}
-          employeeNameById={employeeNameById}
+          employeeListNameById={employeeListNameById}
           isLoading={loading && !initialized}
           onShowItems={setItemsOrder}
         />
@@ -499,6 +549,7 @@ export function PurchaseOrderListPage() {
           orders={paginated}
           arrivals={arrivals}
           employeeNameById={employeeNameById}
+          employeeListNameById={employeeListNameById}
           isLoading={loading && !initialized}
           viewportRef={scrollViewportRef}
           onShowItems={setItemsOrder}

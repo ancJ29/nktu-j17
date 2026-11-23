@@ -1,3 +1,4 @@
+import type { DateRangeValue } from '@/types/date-range';
 import { addDaysToDay, paymentTermDaysOf, proposeDeadline } from '@/utils/paymentTerms';
 import type {
   PurchaseOrder,
@@ -55,6 +56,24 @@ export function vnDayOf(iso: unknown): string {
 
 export function poOrderDay(po: Loose): string {
   return vnDayOf(po?.orderDate) || vnDayOf(po?.createdAt);
+}
+
+function localDayOf(d: Date): string {
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+export function poOrderDayInRange(po: Loose, range: DateRangeValue): boolean {
+  if (!range.preset) return true;
+  const day = poOrderDay(po);
+  if (!day) return false;
+  if (range.from && day < localDayOf(range.from)) return false;
+  if (range.to && day > localDayOf(range.to)) return false;
+  return true;
+}
+
+export function poRequestedByIs(po: Loose, employeeId: string): boolean {
+  return poExtra(po).requestedBy === employeeId;
 }
 
 export function poOrderDateIso(po: Loose): string {

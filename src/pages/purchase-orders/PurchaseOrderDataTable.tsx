@@ -38,6 +38,8 @@ type Props = {
   readonly arrivals: ArrivalsState;
 
   readonly employeeNameById: ReadonlyMap<string, string>;
+
+  readonly employeeListNameById: ReadonlyMap<string, string>;
   readonly isLoading?: boolean;
   readonly viewportRef?: Ref<HTMLDivElement>;
 
@@ -48,6 +50,7 @@ export function PurchaseOrderDataTable({
   orders,
   arrivals,
   employeeNameById,
+  employeeListNameById,
   isLoading,
   viewportRef,
   onShowItems,
@@ -154,7 +157,11 @@ export function PurchaseOrderDataTable({
         width: '100px',
         render: (item: PurchaseOrder) => {
           const id = poExtra(item).assignedTo;
-          return <Text fz="sm">{(id && employeeNameById.get(id)) || '—'}</Text>;
+          return (
+            <Text fz="sm" title={(id && employeeNameById.get(id)) || undefined}>
+              {(id && employeeListNameById.get(id)) || '—'}
+            </Text>
+          );
         },
       },
       {
@@ -163,7 +170,11 @@ export function PurchaseOrderDataTable({
         width: '100px',
         render: (item: PurchaseOrder) => {
           const id = poExtra(item).requestedBy;
-          return <Text fz="sm">{(id && employeeNameById.get(id)) || '—'}</Text>;
+          return (
+            <Text fz="sm" title={(id && employeeNameById.get(id)) || undefined}>
+              {(id && employeeListNameById.get(id)) || '—'}
+            </Text>
+          );
         },
       },
       {
@@ -206,7 +217,7 @@ export function PurchaseOrderDataTable({
           ]
         : []),
     ],
-    [t, onShowItems, arrivals, employeeNameById],
+    [t, onShowItems, arrivals, employeeNameById, employeeListNameById],
   );
 
   return (

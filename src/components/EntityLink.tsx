@@ -16,6 +16,8 @@ type EntityChipProps = {
   lead?: ReactNode;
   label: ReactNode;
 
+  title?: string;
+
   color?: string;
 
   gap?: number;
@@ -25,9 +27,18 @@ type EntityChipProps = {
   sub?: ReactNode;
 };
 
-export function EntityChip({ size, lead, label, color, gap = 6, monospace, sub }: EntityChipProps) {
+export function EntityChip({
+  size,
+  lead,
+  label,
+  title,
+  color,
+  gap = 6,
+  monospace,
+  sub,
+}: EntityChipProps) {
   const labelText = (
-    <Text size={size} fw={600} ff={monospace ? 'monospace' : undefined}>
+    <Text size={size} fw={600} ff={monospace ? 'monospace' : undefined} title={title}>
       {label}
     </Text>
   );

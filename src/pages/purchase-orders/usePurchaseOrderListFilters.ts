@@ -17,6 +17,8 @@ import { businessDateString } from '@/utils/code';
 import {
   isOverdue,
   poCustomer,
+  poOrderDayInRange,
+  poRequestedByIs,
   poExtra,
   poIsPaid,
   poPayment,
@@ -37,6 +39,8 @@ type PurchaseOrderUrlState = {
   q?: string;
   cd?: SerializedDateRange;
   dd?: SerializedDateRange;
+  od?: SerializedDateRange;
+  rb?: string;
   pg?: number;
 };
 
@@ -50,6 +54,8 @@ function compactState(state: PurchaseOrderUrlState): PurchaseOrderUrlState {
   if (state.q) r.q = state.q;
   if (state.cd?.preset) r.cd = state.cd;
   if (state.dd?.preset) r.dd = state.dd;
+  if (state.od?.preset) r.od = state.od;
+  if (state.rb) r.rb = state.rb;
   if (state.pg && state.pg > DEFAULT_PAGE) r.pg = state.pg;
   return r;
 }
@@ -71,6 +77,8 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     [state.cd],
   );
   const deadlineDateRange = useMemo(() => restoreDateRange(state.dd, EMPTY_DATE_RANGE), [state.dd]);
+  const orderDateRange = useMemo(() => restoreDateRange(state.od, EMPTY_DATE_RANGE), [state.od]);
+  const requestedByFilter = state.rb ?? null;
   const page = state.pg ?? DEFAULT_PAGE;
 
   const setStatusFilter = useCallback(
@@ -113,6 +121,14 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     (next: DateRangeValue) => updateState({ dd: serializeDateRange(next), pg: undefined }),
     [updateState],
   );
+  const setOrderDateRange = useCallback(
+    (next: DateRangeValue) => updateState({ od: serializeDateRange(next), pg: undefined }),
+    [updateState],
+  );
+  const setRequestedByFilter = useCallback(
+    (value: string | null) => updateState({ rb: value || undefined, pg: undefined }),
+    [updateState],
+  );
   const setPage = useCallback(
     (value: number) => updateState({ pg: value !== DEFAULT_PAGE ? value : undefined }),
     [updateState],
@@ -138,6 +154,9 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
       if (deadlineDateRange.preset && !isInDateRange(r.paymentDeadline, deadlineDateRange)) {
         return false;
       }
+
+      if (!poOrderDayInRange(r, orderDateRange)) return false;
+      if (requestedByFilter && !poRequestedByIs(r, requestedByFilter)) return false;
       return true;
     });
     return [...filtered].sort((a, b) => ((a.createdAt ?? '') < (b.createdAt ?? '') ? 1 : -1));
@@ -150,6 +169,8 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     paidFilter,
     createdDateRange,
     deadlineDateRange,
+    orderDateRange,
+    requestedByFilter,
   ]);
 
   const hasActiveFilters = !!(
@@ -159,7 +180,9 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     staffFilter ||
     paidFilter ||
     !isDefaultLastNDaysRange(createdDateRange, PURCHASE_ORDER_RANGE_DAYS) ||
-    deadlineDateRange.preset
+    deadlineDateRange.preset ||
+    orderDateRange.preset ||
+    requestedByFilter
   );
 
   return {
@@ -179,6 +202,10 @@ export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
     setCreatedDateRange,
     deadlineDateRange,
     setDeadlineDateRange,
+    orderDateRange,
+    setOrderDateRange,
+    requestedByFilter,
+    setRequestedByFilter,
     page,
     setPage,
     allOrders,

@@ -92,6 +92,7 @@
   "fields": {
     "address": "Địa chỉ",
     "dateOfBirth": "Ngày sinh",
+    "shortName": "Tên viết tắt",
     "startDate": "Ngày vào làm"
   },
   "filterDepartmentAll": "Tất cả các Bộ phận",

@@ -63,6 +63,7 @@ function buildProfileExtra(values: EmployeeFormValues): Partial<EmployeeExtra> {
     ...truckAssetCode,
     startDate: values.startDate || undefined,
     address: values.address.trim() || undefined,
+    shortName: values.shortName.trim() || undefined,
     dateOfBirth: values.dateOfBirth || undefined,
     idCardNumber: values.idCardNumber.trim() || undefined,
     idCardIssueDate: values.idCardIssueDate || undefined,
@@ -81,6 +82,7 @@ function profileFormValues(emp: Employee) {
   return {
     startDate: e.startDate ?? null,
     address: e.address ?? '',
+    shortName: e.shortName ?? '',
     dateOfBirth: e.dateOfBirth ?? null,
     idCardNumber: e.idCardNumber ?? '',
     idCardIssueDate: e.idCardIssueDate ?? null,
@@ -170,6 +172,7 @@ export function useEmployeeForm(): EmployeeFormParts {
       isActive: true,
       startDate: null,
       address: '',
+      shortName: '',
       dateOfBirth: null,
       idCardNumber: '',
       idCardIssueDate: null,

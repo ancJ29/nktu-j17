@@ -1,6 +1,7 @@
 import { ROUTES } from '@/constants/routes';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import { EmployeeAvatar } from '@/components/EmployeeAvatar';
+import { employeeDisplayName, type EmployeeNameDisplay } from '@/utils/employeeDisplayName';
 import { EntityAnchor, EntityChip, EntityDash, type LinkSize } from './EntityLink';
 
 const AVATAR_SIZE: Record<LinkSize, number> = { xs: 16, sm: 18, md: 22 };
@@ -25,6 +26,8 @@ type EmployeeLinkProps = {
   fallbackLabel?: string | null;
   size?: LinkSize;
   noAvatar?: boolean;
+
+  display?: EmployeeNameDisplay;
 };
 
 export function EmployeeLink({
@@ -33,6 +36,7 @@ export function EmployeeLink({
   fallbackLabel,
   noAvatar = false,
   size = 'sm',
+  display = 'fullName',
 }: EmployeeLinkProps) {
   const employee = useEmployeeStore((s) =>
     code
@@ -43,6 +47,7 @@ export function EmployeeLink({
   );
 
   const name = employee?.name ?? fallbackLabel ?? '';
+  const label = (employee && employeeDisplayName(employee, display)) || name;
 
   const detailId = employee?.id ?? (code ? undefined : (id ?? undefined));
 
@@ -56,7 +61,8 @@ export function EmployeeLink({
           <AvatarLead size={size} imageUrl={employee?.extra?.profileImage} name={name} />
         )
       }
-      label={name}
+      label={label}
+      title={label !== name ? name : undefined}
     />
   );
 

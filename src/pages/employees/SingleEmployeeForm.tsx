@@ -62,6 +62,7 @@ export type EmployeeFormValues = {
 
   startDate: string | null;
   address: string;
+  shortName: string;
   dateOfBirth: string | null;
 
   idCardNumber: string;
@@ -172,6 +173,7 @@ export function SingleEmployeeForm({
               ) : undefined
             }
           />
+          <TextInput label={t('employees.fields.shortName')} {...form.getInputProps('shortName')} />
           <TextInput
             label={t('common.labels.code')}
             placeholder={t('employees.form.codePlaceholder')}

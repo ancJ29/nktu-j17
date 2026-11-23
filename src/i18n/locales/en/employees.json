@@ -92,6 +92,7 @@
   "fields": {
     "address": "Address",
     "dateOfBirth": "Date of birth",
+    "shortName": "Short name",
     "startDate": "Start date"
   },
   "filterDepartmentAll": "All Departments",

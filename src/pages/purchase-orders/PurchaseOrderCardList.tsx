@@ -34,7 +34,7 @@ type Props = {
 
   readonly arrivals: ArrivalsState;
 
-  readonly employeeNameById: ReadonlyMap<string, string>;
+  readonly employeeListNameById: ReadonlyMap<string, string>;
   readonly isLoading?: boolean;
   readonly onShowItems?: (order: PurchaseOrder) => void;
 };
@@ -68,7 +68,7 @@ function CardSkeleton() {
 export function PurchaseOrderCardList({
   orders,
   arrivals,
-  employeeNameById,
+  employeeListNameById,
   isLoading,
   onShowItems,
 }: Props) {
@@ -181,13 +181,13 @@ export function PurchaseOrderCardList({
               {poExtra(o).assignedTo && (
                 <Text size="xs" lh={1.3} truncate>
                   {t('common.labels.assignedTo')}:{' '}
-                  {employeeNameById.get(poExtra(o).assignedTo!) ?? '—'}
+                  {employeeListNameById.get(poExtra(o).assignedTo!) ?? '—'}
                 </Text>
               )}
               {poExtra(o).requestedBy && (
                 <Text size="xs" lh={1.3} truncate>
                   {t('purchaseOrders.form.requestedByLabel')}:{' '}
-                  {employeeNameById.get(poExtra(o).requestedBy!) ?? '—'}
+                  {employeeListNameById.get(poExtra(o).requestedBy!) ?? '—'}
                 </Text>
               )}
               <Text size="xs" c="dimmed" lh={1.3}>

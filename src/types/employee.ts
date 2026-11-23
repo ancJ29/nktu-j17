@@ -19,6 +19,8 @@ export type EmployeeExtra = {
   profileImage?: string;
   note?: string;
 
+  shortName?: string;
+
   startDate?: string;
 
   address?: string;

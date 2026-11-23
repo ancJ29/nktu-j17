@@ -73,6 +73,9 @@ export function EmployeePersonalCard({
     <SectionCard icon={<IconUser size={14} />} title={t('common.labels.basicInfo')}>
       <SimpleGrid cols={2} spacing="md">
         <DetailField label={t('employees.columns.name')}>{employee.name}</DetailField>
+        <DetailField label={t('employees.fields.shortName')}>
+          {employee.extra?.shortName}
+        </DetailField>
         <DetailField label={t('common.labels.code')}>
           {isMobile && employee.code ? (
             <Group gap={4} wrap="nowrap">
