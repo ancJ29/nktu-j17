@@ -14,12 +14,13 @@ import {
   readAuthId,
   rememberAuthId,
 } from '@/utils/authId';
+import { keepSignedInClaim, SIGN_IN_REFRESH_MS } from '@/utils/keepSignedInClaim';
 import { isIPad } from '@/utils/isIPad';
 import { clearCachedProfile, readCachedProfile, writeCachedProfile } from '@/utils/profileCache';
 import { logger } from '@credo/base-ui/utils';
 import type { AuthApi, BaseProfile } from '@credo/base-ui/lib';
 import { createAuthStore } from '@credo/base-ui/lib';
-import { ONE_DAY, ONE_MINUTE } from '@credo/base-ui/utils';
+import { ONE_MINUTE } from '@credo/base-ui/utils';
 
 type Profile = BaseProfile & {
   isRoot?: boolean;
@@ -31,12 +32,23 @@ const serviceCode = resolveServiceCode();
 
 credoSmeConnector.setClientCode(resolveClientCode());
 
-function keepSignedInClaim(): { keepSignedIn?: true } {
-  return appConfig.auth?.keepIPadSignedIn === true && isIPad() ? { keepSignedIn: true } : {};
+function claimFor(remember: boolean): { keepSignedIn?: true } {
+  return keepSignedInClaim({
+    switchOn: appConfig.auth?.keepIPadSignedIn === true,
+    isIPad: isIPad(),
+    remember,
+  });
 }
 
 const smeAuthApi: AuthApi<Profile> = {
-  login: async ({ email, password, tokenExpiration, refreshTokenExpiration, deviceId }) => {
+  login: async ({
+    email,
+    password,
+    tokenExpiration,
+    refreshTokenExpiration,
+    deviceId,
+    remember,
+  }) => {
     const response = await credoSmeConnector.login({
       serviceCode,
       email,
@@ -44,7 +56,7 @@ const smeAuthApi: AuthApi<Profile> = {
       tokenExpiration,
       refreshTokenExpiration,
       deviceId,
-      ...keepSignedInClaim(),
+      ...claimFor(remember === true),
     });
     rememberAuthId(response);
     return {
@@ -67,7 +79,7 @@ const smeAuthApi: AuthApi<Profile> = {
     const response = await credoSmeConnector.loginWithToken({
       serviceCode,
       token,
-      ...keepSignedInClaim(),
+      ...claimFor(false),
     });
     rememberAuthId(response);
     return {
@@ -88,8 +100,8 @@ export const useAuthStore = createAuthStore<Profile>({
     deviceIdPrefix: 'C-MNGT',
     isDev: appConfig.env?.IS_DEV ?? false,
     tokenDuration: 15 * ONE_MINUTE,
-    rememberRefreshDuration: 180 * ONE_DAY,
-    sessionRefreshDuration: ONE_DAY,
+    rememberRefreshDuration: SIGN_IN_REFRESH_MS,
+    sessionRefreshDuration: SIGN_IN_REFRESH_MS,
   },
 });
 

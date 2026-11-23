@@ -18,6 +18,8 @@ export type LoginParams = {
   tokenExpiration?: number;
   refreshTokenExpiration?: number;
   deviceId: string;
+
+  remember?: boolean;
 };
 
 export type LoginResponse = {

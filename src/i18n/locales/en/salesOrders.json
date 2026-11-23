@@ -435,6 +435,7 @@
     "productCodeDuplicate": "This product is already on another line",
     "productCodeRequired": "Product code is required",
     "productNameRequired": "Product name is required",
-    "unitPriceRequired": "Unit price must not be negative"
+    "unitPriceRequired": "Unit price must not be negative",
+    "warehouseNoteRequired": "Please enter the warehouse note"
   }
 }

@@ -159,6 +159,7 @@ import {
 import {
   buildSalesOrderFormExtra,
   DEFAULT_VAT_PERCENT,
+  isWarehouseNoteMissing,
   salesOrderFormValuesFromOrder,
   type ItemFormValues,
   type SalesOrderFormValues,
@@ -488,6 +489,15 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
           ? t('salesOrders.validation.customerNameRequired')
           : null,
 
+      warehouseNote: (v) =>
+        isWarehouseNoteMissing({
+          requiredOnCreate: splitNotesCfg?.warehouseNoteRequiredOnCreate,
+          isEdit,
+          isDriverDept: isNoteDriverDept,
+          note: v,
+        })
+          ? t('salesOrders.validation.warehouseNoteRequired')
+          : null,
       items: {
         productCode: (v, vals, path) => {
           if (isEmptyRowAt(vals.items, path)) return null;
@@ -2084,6 +2094,7 @@ export function SalesOrderForm({ variant }: { variant: SalesOrderFormVariant }) 
                 {!isNoteDriverDept && (
                   <Textarea
                     label={t('salesOrders.form.warehouseNoteLabel')}
+                    withAsterisk={!!splitNotesCfg.warehouseNoteRequiredOnCreate && !isEdit}
                     autosize
                     minRows={2}
                     maxRows={4}

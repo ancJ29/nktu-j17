@@ -435,6 +435,7 @@
     "productCodeDuplicate": "Sản phẩm này đã có ở dòng khác",
     "productCodeRequired": "Vui lòng nhập mã SP",
     "productNameRequired": "Vui lòng nhập tên SP",
-    "unitPriceRequired": "Đơn giá không được âm"
+    "unitPriceRequired": "Đơn giá không được âm",
+    "warehouseNoteRequired": "Vui lòng nhập ghi chú cho kho"
   }
 }

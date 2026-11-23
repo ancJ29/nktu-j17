@@ -27,6 +27,8 @@ export type SalesOrderFormVariant = {
 
       splitNotes?: {
         warehouseDepartmentCode: string;
+
+        warehouseNoteRequiredOnCreate?: boolean;
       };
     };
   };
@@ -63,6 +65,7 @@ export const NKTU_SALES_ORDER_FORM_VARIANT: SalesOrderFormVariant = {
       deliveryMethodDrivesInternalDelivery: true,
       splitNotes: {
         warehouseDepartmentCode: 'warehouse',
+        warehouseNoteRequiredOnCreate: true,
       },
     },
   },

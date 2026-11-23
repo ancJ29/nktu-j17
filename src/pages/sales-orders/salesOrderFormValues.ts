@@ -4,6 +4,15 @@ import { readWarehouseStaff } from './salesOrderWarehouseStaff';
 import { salesOrderDeadlineDay } from '@/utils/salesOrderPricing';
 import { dateToDay, dayToDate, dayToVnMidnightMs } from '@/utils/paymentTerms';
 
+export function isWarehouseNoteMissing(args: {
+  requiredOnCreate: boolean | undefined;
+  isEdit: boolean;
+  isDriverDept: boolean;
+  note: string;
+}): boolean {
+  return !!args.requiredOnCreate && !args.isEdit && !args.isDriverDept && !args.note.trim();
+}
+
 export const DEFAULT_VAT_PERCENT = 8;
 
 export type ItemFormValues = {

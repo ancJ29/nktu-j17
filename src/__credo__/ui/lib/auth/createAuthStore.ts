@@ -191,6 +191,7 @@ export function createAuthStore<TProfile extends BaseProfile = BaseProfile>(
               tokenExpiration: tokenDuration,
               refreshTokenExpiration,
               deviceId,
+              remember,
             });
 
             const auth: AuthData = {

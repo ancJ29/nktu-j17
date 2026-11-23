@@ -54,7 +54,7 @@ export function SignInPage() {
   );
 
   const form = useForm<SignInFormValues>({
-    initialValues: { identifier: '', password: '', remember: true },
+    initialValues: { identifier: '', password: '', remember: false },
     validate: {
       identifier: (value) =>
         value.length < 1 ? t('auth.login.validation.usernameRequired') : null,
