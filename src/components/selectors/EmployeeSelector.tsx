@@ -2,6 +2,7 @@ import { Select, type SelectProps } from '@mantine/core';
 import { useMemo } from 'react';
 import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import type { Employee } from '@/types';
+import { employeeSelectorOptions } from './employeeSelectorOptions';
 
 export type EmployeeSelectorChange = {
   id: string;
@@ -31,18 +32,10 @@ export function EmployeeSelector({
 }: EmployeeSelectorProps) {
   const employees = useEmployeeStore((s) => s.items);
 
-  const data = useMemo(() => {
-    const filtered = employees.filter(filter);
-
-    if (value && !filtered.some((e) => e.id === value)) {
-      const current = employees.find((e) => e.id === value);
-      if (current) filtered.push(current);
-    }
-    return filtered.map((e) => ({
-      value: e.id,
-      label: optionLabel(e),
-    }));
-  }, [employees, filter, optionLabel, value]);
+  const data = useMemo(
+    () => employeeSelectorOptions(employees, filter, value, optionLabel),
+    [employees, filter, optionLabel, value],
+  );
 
   const employeeMap = useMemo(() => {
     const m = new Map<string, Employee>();

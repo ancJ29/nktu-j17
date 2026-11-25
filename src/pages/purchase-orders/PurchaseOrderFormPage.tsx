@@ -53,12 +53,12 @@ import {
 } from '@/hooks';
 import {
   getPricingVatRate,
-  getPurchaseOrderPicDepartments,
   getSalesOrderPicDepartments,
   hasImagesForProducts,
   isLocationsEnabled,
   isPricingManagementEnabled,
   makeEmployeeDepartmentFilter,
+  makePurchaseOrderPicFilter,
   perms,
 } from '@/utils/permission';
 import { isNoInventoryProduct } from '@/utils/productSet';
@@ -114,6 +114,7 @@ import {
   vatRateOfPercent,
   vatRatePercentOf,
 } from './purchaseOrderModel';
+import { defaultPurchaseOrderPic } from './purchaseOrderPic';
 import { savePurchaseOrder } from './savePurchaseOrder';
 import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
@@ -121,7 +122,7 @@ import { canViewPurchaseOrder, purchaseOrderViewScope } from './purchaseOrderVie
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
-const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
+const picEmployeeFilter = makePurchaseOrderPicFilter();
 
 const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
 const pricingOn = isPricingManagementEnabled();
@@ -457,7 +458,7 @@ export function PurchaseOrderFormPage() {
     loadProducts,
   ]);
 
-  const currentEmployeeId = useMyEmployee()?.id ?? '';
+  const defaultPicId = defaultPurchaseOrderPic(useMyEmployee(), picEmployeeFilter);
 
   const locationSelectData = useMemo(
     () => locations.map((l) => ({ value: l.code, label: `${l.code} — ${l.name}`, name: l.name })),
@@ -540,7 +541,7 @@ export function PurchaseOrderFormPage() {
       reference: '',
       notes: '',
       vendorNote: '',
-      assignedTo: currentEmployeeId,
+      assignedTo: defaultPicId,
       requestedBy: '',
       items: [{ ...emptyItem }],
     },
@@ -636,10 +637,10 @@ export function PurchaseOrderFormPage() {
   }, [blocked, fetching, isEdit, vendorItems, vendorCodeNow, deadlineNow, orderDateNow]);
 
   useEffect(() => {
-    if (isEdit || !currentEmployeeId || form.getValues().assignedTo) return;
-    form.setFieldValue('assignedTo', currentEmployeeId);
+    if (isEdit || !defaultPicId || form.getValues().assignedTo) return;
+    form.setFieldValue('assignedTo', defaultPicId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentEmployeeId, isEdit]);
+  }, [defaultPicId, isEdit]);
 
   useEffect(() => {
     if (!copyFrom) return;
@@ -659,7 +660,7 @@ export function PurchaseOrderFormPage() {
       reference: copyFrom.reference,
       notes: copyFrom.notes,
       vendorNote: copyFrom.vendorNote ?? '',
-      assignedTo: copyFrom.assignedTo ?? currentEmployeeId,
+      assignedTo: copyFrom.assignedTo ?? defaultPicId,
       requestedBy: copyFrom.requestedBy ?? '',
       items:
         copyFrom.items.length > 0

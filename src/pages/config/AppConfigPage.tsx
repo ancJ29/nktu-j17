@@ -38,6 +38,7 @@ import type {
 import type { GoodsReceiptStatus } from '@/types';
 import { LOOKUP_V2_CATEGORIES } from '@/pages/v2/lookup/categoryRegistry';
 import { useLookupV2Options } from '@/hooks/useLookupV2Options';
+import { useEmployeeStore } from '@/stores/useEmployeeStore';
 import {
   formatInvariantError,
   validateSalesOrderConfig,
@@ -281,6 +282,15 @@ export function ConfigEditor({
   const clientCode = useMemo(() => clientServiceCode ?? resolveClientCode(), [clientServiceCode]);
   const isExternalTarget = clientServiceCode !== undefined;
 
+  const {
+    items: employees,
+    loadAll: loadEmployees,
+    initialized: employeesInit,
+  } = useEmployeeStore();
+  useEffect(() => {
+    if (!isExternalTarget && !employeesInit) loadEmployees();
+  }, [isExternalTarget, employeesInit, loadEmployees]);
+
   const [storedConfig, setStoredConfig] = useState<CMngtAppConfig | null>(null);
   const [version, setVersion] = useState(DEFAULT_CONFIG.version);
   const [appInfo, setAppInfo] = useState<AppInfo>(DEFAULT_CONFIG.app);
@@ -391,6 +401,20 @@ export function ConfigEditor({
       }),
     [employeeFeatures.departmentOptions],
   );
+
+  const purchaseOrderPicPeopleData = useMemo(() => {
+    const stored = purchaseOrdersFeatures.picEmployeeIds ?? [];
+    const people = isExternalTarget
+      ? []
+      : employees
+          .filter((e) => e.isActive && !e.extra?.isDeleted)
+          .map((e) => ({ value: e.id, label: e.name }));
+    const known = new Set(people.map((p) => p.value));
+    return [
+      ...people,
+      ...stored.filter((id) => !known.has(id)).map((id) => ({ value: id, label: id })),
+    ];
+  }, [employees, isExternalTarget, purchaseOrdersFeatures.picEmployeeIds]);
 
   const salesOrderStatusMultiSelectData = useMemo(
     () => toStatusMultiSelectData(salesOrdersFeatures.statusOptions),
@@ -2437,6 +2461,23 @@ export function ConfigEditor({
                 searchable
                 clearable
                 nothingFoundMessage="No departments configured. Add departments under Employees → Department options."
+              />
+              <MultiSelect
+                label="PIC People"
+                description={
+                  isExternalTarget
+                    ? "Employee ids offered as the purchase-order PIC; when set, they replace PIC Departments. Another client's people cannot be listed here, so the stored ids show as they are."
+                    : 'The people the purchase-order PIC picker and the list PIC filter offer. When set, this replaces PIC Departments; leave empty to use the departments.'
+                }
+                placeholder="Use PIC Departments"
+                data={purchaseOrderPicPeopleData}
+                value={purchaseOrdersFeatures.picEmployeeIds ?? []}
+                onChange={(v) =>
+                  setPurchaseOrdersFeatures({ ...purchaseOrdersFeatures, picEmployeeIds: v })
+                }
+                searchable
+                clearable
+                nothingFoundMessage="No active employees found."
               />
               <TagsInput
                 label="Lead time choices"

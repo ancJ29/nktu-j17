@@ -629,6 +629,8 @@ const PurchaseOrderFeaturesSchema = z
     codePrefix: z.string().default('DDH-'),
     picDepartments: z.array(z.string()).default([]),
 
+    picEmployeeIds: z.array(z.string()).default([]),
+
     leadTimes: z
       .array(LeadTimeSchema)
       .default(DEFAULT_PURCHASE_ORDER_LEAD_TIMES)
@@ -638,6 +640,7 @@ const PurchaseOrderFeaturesSchema = z
     enabled: false,
     codePrefix: 'DDH-',
     picDepartments: [],
+    picEmployeeIds: [],
     leadTimes: DEFAULT_PURCHASE_ORDER_LEAD_TIMES,
   });
 

@@ -35,10 +35,10 @@ import { TransactionalFilterPillsRow } from '@/components/TransactionalFilterPil
 import { type MoreFilterDef, type DateRangePreset } from '@/types/date-range';
 import { EMPTY_DATE_RANGE, formatDateRangeLabel } from '@/utils/listFilterDateRange';
 import {
-  getPurchaseOrderPicDepartments,
   getSalesOrderPicDepartments,
   isLocationsEnabled,
   makeEmployeeDepartmentFilter,
+  makePurchaseOrderPicFilter,
   perms,
 } from '@/utils/permission';
 import { useListScrollRestoration } from '@/hooks';
@@ -63,7 +63,7 @@ const canCreate = perms.purchaseOrder.canCreate();
 const locationsEnabled = isLocationsEnabled();
 const showVendor = showPurchaseOrderVendor();
 const viewScope = purchaseOrderViewScope();
-const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
+const picEmployeeFilter = makePurchaseOrderPicFilter();
 
 const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
 

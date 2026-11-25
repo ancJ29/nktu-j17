@@ -263,13 +263,23 @@ export function getSalesOrderWarehouseStaffDepartments(): string[] {
   return featureFlags?.salesOrders?.warehouseStaffDepartments ?? [];
 }
 
-export function getPurchaseOrderPicDepartments(): string[] {
+function getPurchaseOrderPicDepartments(): string[] {
   return (
     (
       appConfig as {
         features?: { purchaseOrders?: { picDepartments?: string[] } };
       }
     )?.features?.purchaseOrders?.picDepartments ?? []
+  );
+}
+
+function getPurchaseOrderPicEmployeeIds(): string[] {
+  return (
+    (
+      appConfig as {
+        features?: { purchaseOrders?: { picEmployeeIds?: string[] } };
+      }
+    )?.features?.purchaseOrders?.picEmployeeIds ?? []
   );
 }
 
@@ -314,6 +324,24 @@ export function makeEmployeeDepartmentFilter(
     return (e) => e.isActive && !e.extra?.isDeleted;
   }
   return (e) => e.isActive && !e.extra?.isDeleted && !!e.department && allowed.has(e.department);
+}
+
+export function makeEmployeePicFilter(
+  employeeIds: readonly string[],
+  departments: readonly string[],
+): (e: {
+  id: string;
+  isActive: boolean;
+  department?: string;
+  extra?: { isDeleted?: boolean };
+}) => boolean {
+  if (employeeIds.length === 0) return makeEmployeeDepartmentFilter(departments);
+  const allowed = new Set(employeeIds);
+  return (e) => e.isActive && !e.extra?.isDeleted && allowed.has(e.id);
+}
+
+export function makePurchaseOrderPicFilter() {
+  return makeEmployeePicFilter(getPurchaseOrderPicEmployeeIds(), getPurchaseOrderPicDepartments());
 }
 
 export function getPositionOptions(): ConfigOption[] {
