@@ -31,8 +31,10 @@ import {
   IconPaperclip,
   IconPhoto,
   IconPrinter,
+  IconArrowBackUp,
   IconPackageImport,
   IconSend,
+  IconTruckDelivery,
   IconX,
 } from '@tabler/icons-react';
 import { useCallback, useState } from 'react';
@@ -80,8 +82,9 @@ import {
   PurchaseOrderItemsListMobile,
   PurchaseOrderItemsTableDesktop,
 } from './PurchaseOrderItemsTable';
-import { usePurchaseOrderDetail } from './usePurchaseOrderDetail';
+import { usePurchaseOrderDetail, type ConfirmAction } from './usePurchaseOrderDetail';
 import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
+import { printOffered } from './purchaseOrderStatuses';
 import {
   formatMoney,
   isOverdue,
@@ -102,6 +105,36 @@ import {
 } from './purchaseOrderModel';
 
 const isMobile = device.isMobile;
+
+const CONFIRM_TEXT = {
+  ready: {
+    title: 'purchaseOrders.confirm.readyTitle',
+    message: 'purchaseOrders.confirm.readyMessage',
+    button: 'purchaseOrders.actions.markReady',
+    color: 'blue',
+  },
+  cancel: {
+    title: 'purchaseOrders.confirm.cancelTitle',
+    message: 'purchaseOrders.confirm.cancelMessage',
+    button: 'purchaseOrders.actions.cancel',
+    color: 'red',
+  },
+  received: {
+    title: 'purchaseOrders.confirm.receivedTitle',
+    message: 'purchaseOrders.confirm.receivedMessage',
+    button: 'purchaseOrders.actions.markReceived',
+    color: 'green',
+  },
+  unreceive: {
+    title: 'purchaseOrders.confirm.unreceiveTitle',
+    message: 'purchaseOrders.confirm.unreceiveMessage',
+    button: 'purchaseOrders.actions.undoReceived',
+    color: 'blue',
+  },
+} as const satisfies Record<
+  ConfirmAction,
+  { title: string; message: string; button: string; color: string }
+>;
 const locationsEnabled = isLocationsEnabled();
 const showProductPhoto = hasImagesForProducts();
 const showVendor = showPurchaseOrderVendor();
@@ -170,7 +203,7 @@ export function PurchaseOrderDetailPage() {
   const currency = poCurrency(order);
   const overdue = isOverdue(order, businessDateString());
   const extra = poExtra(order);
-  const headerColor = status === 'cancelled' ? 'red' : status === 'ready' ? 'blue' : 'gray';
+  const headerColor = statusOption.color;
 
   const titleBlock = (
     <Group
@@ -246,7 +279,7 @@ export function PurchaseOrderDetailPage() {
 
   const buttons = (size: 'compact-sm' | 'sm') => ({
     print:
-      !isMobile && showVendor && (status === 'draft' || status === 'ready') ? (
+      !isMobile && printOffered(status, showVendor) ? (
         <Button
           variant="subtle"
           size={size}
@@ -307,6 +340,29 @@ export function PurchaseOrderDetailPage() {
         {t('purchaseOrders.actions.markReady')}
       </Button>
     ) : null,
+    markReceived:
+      d.receivedOffer === 'mark' ? (
+        <Button
+          color="green"
+          size={size}
+          leftSection={<IconTruckDelivery size={14} />}
+          onClick={() => d.openConfirm('received')}
+        >
+          {t('purchaseOrders.actions.markReceived')}
+        </Button>
+      ) : null,
+
+    undoReceived:
+      d.receivedOffer === 'undo' ? (
+        <Button
+          variant="default"
+          size={size}
+          leftSection={<IconArrowBackUp size={14} />}
+          onClick={() => d.openConfirm('unreceive')}
+        >
+          {t('purchaseOrders.actions.undoReceived')}
+        </Button>
+      ) : null,
   });
 
   const phoneButtons = buttons('compact-sm');
@@ -317,7 +373,9 @@ export function PurchaseOrderDetailPage() {
       {phoneButtons.makeReceipt}
       {phoneButtons.edit}
       {phoneButtons.cancel}
+      {phoneButtons.undoReceived}
       {phoneButtons.markReady}
+      {phoneButtons.markReceived}
     </Group>
   );
 
@@ -660,7 +718,13 @@ export function PurchaseOrderDetailPage() {
 
   const desk = buttons('sm');
   const back = buttons('compact-sm');
-  const hasActionRow = !!(desk.markReady || desk.makeReceipt || desk.cancel);
+  const hasActionRow = !!(
+    desk.markReady ||
+    desk.markReceived ||
+    desk.undoReceived ||
+    desk.makeReceipt ||
+    desk.cancel
+  );
   const paymentBadgeColor = poPaymentUntracked(order)
     ? 'gray'
     : poIsPaid(order)
@@ -941,7 +1005,9 @@ export function PurchaseOrderDetailPage() {
         <Group gap="xs" wrap="wrap">
           <FieldLabel>{t('purchaseOrders.detail.availableActions')}</FieldLabel>
           {desk.markReady}
+          {desk.markReceived}
           {desk.makeReceipt}
+          {desk.undoReceived}
           {desk.cancel}
         </Group>
       )}
@@ -963,34 +1029,24 @@ export function PurchaseOrderDetailPage() {
         onClose={() => {
           if (!d.actionLoading) d.closeConfirm();
         }}
-        title={
-          d.confirmAction === 'ready'
-            ? t('purchaseOrders.confirm.readyTitle')
-            : t('purchaseOrders.confirm.cancelTitle')
-        }
+        title={t(CONFIRM_TEXT[d.confirmAction].title)}
         centered
       >
         <Stack gap="md">
-          <Text size="sm">
-            {d.confirmAction === 'ready'
-              ? t('purchaseOrders.confirm.readyMessage')
-              : t('purchaseOrders.confirm.cancelMessage')}
-          </Text>
+          <Text size="sm">{t(CONFIRM_TEXT[d.confirmAction].message)}</Text>
           <Group justify="flex-end">
             <Button variant="default" onClick={d.closeConfirm} disabled={d.actionLoading}>
               {t('common.actions.cancel')}
             </Button>
             <Button
-              color={d.confirmAction === 'ready' ? 'blue' : 'red'}
+              color={CONFIRM_TEXT[d.confirmAction].color}
               loading={d.actionLoading}
               leftSection={
-                d.confirmAction === 'ready' ? <IconCheck size={14} /> : <IconX size={14} />
+                d.confirmAction === 'cancel' ? <IconX size={14} /> : <IconCheck size={14} />
               }
               onClick={d.runAction}
             >
-              {d.confirmAction === 'ready'
-                ? t('purchaseOrders.actions.markReady')
-                : t('purchaseOrders.actions.cancel')}
+              {t(CONFIRM_TEXT[d.confirmAction].button)}
             </Button>
           </Group>
         </Stack>

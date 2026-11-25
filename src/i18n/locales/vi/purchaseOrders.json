@@ -2,7 +2,9 @@
   "actions": {
     "cancel": "Hủy đơn",
     "makeReceipt": "Tạo phiếu nhập",
-    "markReady": "Đánh dấu đã gửi"
+    "markReady": "Đánh dấu đã gửi",
+    "markReceived": "Đã nhận hàng",
+    "undoReceived": "Chưa nhận hàng"
   },
   "addItem": "Tạo đơn đặt hàng NCC",
   "columns": {
@@ -22,7 +24,11 @@
     "cancelMessage": "Hủy đơn đặt hàng này? Không thể hoàn tác.",
     "cancelTitle": "Hủy đơn",
     "readyMessage": "Đánh dấu đơn này đã gửi cho nhà cung cấp? Đơn sẽ chốt và khóa các dòng hàng.",
-    "readyTitle": "Đánh dấu đã gửi NCC"
+    "readyTitle": "Đánh dấu đã gửi NCC",
+    "receivedMessage": "Đánh dấu hàng của đơn này đã về? Việc này không tạo phiếu nhập kho và không đổi tồn kho.",
+    "receivedTitle": "Đánh dấu đã nhận hàng",
+    "unreceiveMessage": "Đưa đơn về lại \"Đã gửi NCC\"? Đơn không bị hủy, chỉ bỏ dấu đã nhận hàng.",
+    "unreceiveTitle": "Bỏ đánh dấu đã nhận hàng"
   },
   "detail": {
     "availableActions": "Hành động khả dụng",
@@ -43,6 +49,8 @@
       "payment": "Cập nhật thanh toán của",
       "ready": "Đánh dấu đã gửi NCC",
       "receiptLinked": "Ghi nhận phiếu nhập kho cho",
+      "received": "Đánh dấu đã nhận hàng",
+      "unreceived": "Bỏ đánh dấu đã nhận hàng",
       "update": "Sửa đơn"
     },
     "cardGeneral": "Thông tin chung",
@@ -133,6 +141,8 @@
     "readySuccess": "Đã đánh dấu đã gửi NCC",
     "receiptLinkPending": "Phiếu nhập kho đã lưu, nhưng đơn chưa ghi nhận. Mở lại đơn, hệ thống sẽ tự liên kết.",
     "receiptsUnreadable": "Không đọc được các phiếu nhập kho của đơn này nên chưa thể hủy. Mở lại trang.",
+    "receivedSuccess": "Đã đánh dấu đã nhận hàng",
+    "unreceivedSuccess": "Đã đưa đơn về \"Đã gửi NCC\"",
     "updateError": "Không lưu được thay đổi",
     "updateSuccess": "Đã cập nhật đơn đặt hàng"
   },
@@ -162,7 +172,8 @@
   "statuses": {
     "cancelled": "Đã hủy",
     "draft": "Nháp",
-    "ready": "Đã gửi NCC"
+    "ready": "Đã gửi NCC",
+    "received": "Đã nhận hàng"
   },
   "title": "Đặt hàng NCC",
   "validation": {

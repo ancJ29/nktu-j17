@@ -1,5 +1,11 @@
 import { Box, Group, Stack, Text, ThemeIcon } from '@mantine/core';
-import { IconCheck, IconClipboardList, IconSend, IconX } from '@tabler/icons-react';
+import {
+  IconCheck,
+  IconClipboardList,
+  IconSend,
+  IconTruckDelivery,
+  IconX,
+} from '@tabler/icons-react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatDateTime } from '@/utils/dateFormat';
@@ -16,9 +22,10 @@ export function PurchaseOrderStatusStrip({
   const { t } = useTranslation();
   const status = poStatus(order);
   const isReady = status === 'ready';
+  const isReceived = status === 'received';
   const isCancelled = status === 'cancelled';
 
-  const wasReady = !!order.readyAt;
+  const wasReady = !!order.readyAt || isReceived;
 
   return (
     <Box
@@ -48,6 +55,20 @@ export function PurchaseOrderStatusStrip({
           timestamp={order.readyAt}
           compact={compact}
         />
+        {!isCancelled && (
+          <>
+            <Line done={isReceived} />
+            <Node
+              label={t('purchaseOrders.statuses.received')}
+              icon={isReceived ? <IconCheck size={14} /> : <IconTruckDelivery size={14} />}
+              color="green"
+              filled={isReceived}
+              muted={!isReceived}
+              timestamp={order.receivedAt ?? undefined}
+              compact={compact}
+            />
+          </>
+        )}
         {isCancelled && (
           <>
             <Line done={false} cancelled />

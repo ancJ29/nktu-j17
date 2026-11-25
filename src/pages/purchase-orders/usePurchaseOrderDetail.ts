@@ -33,6 +33,11 @@ import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
 import { findPurchaseOrderStatus, canTransitionPurchaseOrder } from './purchaseOrderStatuses';
 import {
+  receivedMarkOffer,
+  receivedMarkPatch,
+  receivedUndoPatch,
+} from './purchaseOrderReceivedMark';
+import {
   poCurrency,
   poCustomer,
   poExtra,
@@ -54,6 +59,29 @@ import {
 } from './purchaseOrderReceipts';
 
 const isMobile = device.isMobile;
+
+export type ConfirmAction = 'ready' | 'cancel' | 'received' | 'unreceive';
+
+const ACTION_TARGET = {
+  ready: 'ready',
+  cancel: 'cancelled',
+  received: 'received',
+  unreceive: 'ready',
+} as const;
+
+const ACTION_LOG = {
+  ready: 'purchaseOrder.ready',
+  cancel: 'purchaseOrder.cancel',
+  received: 'purchaseOrder.received',
+  unreceive: 'purchaseOrder.unreceived',
+} as const;
+
+const ACTION_SUCCESS = {
+  ready: 'purchaseOrders.notifications.readySuccess',
+  cancel: 'purchaseOrders.notifications.cancelSuccess',
+  received: 'purchaseOrders.notifications.receivedSuccess',
+  unreceive: 'purchaseOrders.notifications.unreceivedSuccess',
+} as const;
 const pricingOn = isPricingManagementEnabled();
 
 export function usePurchaseOrderDetail(t: TFunction) {
@@ -61,7 +89,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
   const navigate = useNavigate();
   const [order, setOrder] = useState<PurchaseOrder | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<'ready' | 'cancel'>('ready');
+  const [confirmAction, setConfirmAction] = useState<ConfirmAction>('ready');
   const [confirmOpened, { open: openConfirmModal, close: closeConfirm }] = useDisclosure(false);
   const [paymentOpened, { open: openPayment, close: closePayment }] = useDisclosure(false);
 
@@ -92,7 +120,8 @@ export function usePurchaseOrderDetail(t: TFunction) {
   const mayRepair = perms.goodsReceipt.canCreate();
   useEffect(() => {
     if (!order) return;
-    const isReady = poStatus(order) === 'ready';
+
+    const isReady = poStatus(order) === 'ready' || poStatus(order) === 'received';
     const hasIds = poReceiptIds(order).length > 0;
     if (!hasIds && !isReady) return;
     let cancelled = false;
@@ -123,7 +152,11 @@ export function usePurchaseOrderDetail(t: TFunction) {
   const arrival: Arrival | null =
     order && receipts?.kind === 'ok'
       ? arrivalOf(order, receipts.receipts)
-      : order && receipts === null && !poReceiptIds(order).length && poStatus(order) !== 'ready'
+      : order &&
+          receipts === null &&
+          !poReceiptIds(order).length &&
+          poStatus(order) !== 'ready' &&
+          poStatus(order) !== 'received'
         ? { kind: 'none' }
         : null;
 
@@ -134,7 +167,8 @@ export function usePurchaseOrderDetail(t: TFunction) {
 
   const canAuthor = perms.purchaseOrder.canEdit() && (!pricingOn || showPrice);
 
-  const canChangeMedia = canAuthor && (status === 'draft' || status === 'ready');
+  const canChangeMedia =
+    canAuthor && (status === 'draft' || status === 'ready' || status === 'received');
   const showMedia = !pricingOn || showPrice;
 
   const mediaDirectory = useMemo(
@@ -152,9 +186,13 @@ export function usePurchaseOrderDetail(t: TFunction) {
     !!order && (status === 'draft' || status === 'ready') && perms.purchaseOrder.canEdit();
   const canMarkPaid = !!order && perms.purchaseOrder.canMarkPaid();
 
+  const receivedOffer = order
+    ? receivedMarkOffer(status, canAuthor && showPurchaseOrderVendor())
+    : null;
+
   const showMakeReceiptCta =
     !!order &&
-    status === 'ready' &&
+    (status === 'ready' || status === 'received') &&
     !isMobile &&
     featureFlags.goodsReceipts.enabled &&
     perms.goodsReceipt.canCreate() &&
@@ -229,7 +267,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
   );
 
   const openConfirm = useCallback(
-    (action: 'ready' | 'cancel') => {
+    (action: ConfirmAction) => {
       if (!order) return;
       if (
         action === 'cancel' &&
@@ -266,37 +304,30 @@ export function usePurchaseOrderDetail(t: TFunction) {
 
   const runAction = useCallback(async () => {
     if (!order) return;
-    const target = confirmAction === 'ready' ? 'ready' : 'cancelled';
+    const target = ACTION_TARGET[confirmAction];
     if (!canTransitionPurchaseOrder(poStatus(order), target)) {
       closeConfirm();
       return;
     }
     const actor = getCurrentActorId();
     const now = new Date().toISOString();
-    const ok = await write(
-      target === 'ready'
+    const patch =
+      confirmAction === 'ready'
         ? { status: 'ready', readyAt: now, extra: { ...poExtra(order), readyBy: actor } }
-        : {
-            status: 'cancelled',
-            cancelledAt: now,
-            extra: { ...poExtra(order), cancelledBy: actor },
-          },
-    );
+        : confirmAction === 'received'
+          ? receivedMarkPatch(order, actor, now)
+          : confirmAction === 'unreceive'
+            ? receivedUndoPatch(order)
+            : {
+                status: 'cancelled',
+                cancelledAt: now,
+                extra: { ...poExtra(order), cancelledBy: actor },
+              };
+    const ok = await write(patch);
     closeConfirm();
     if (ok) {
-      logActivity(
-        target === 'ready' ? 'purchaseOrder.ready' : 'purchaseOrder.cancel',
-        order.id,
-        stateMemo(order),
-      );
-      notifications.show({
-        color: 'green',
-        message: t(
-          target === 'ready'
-            ? 'purchaseOrders.notifications.readySuccess'
-            : 'purchaseOrders.notifications.cancelSuccess',
-        ),
-      });
+      logActivity(ACTION_LOG[confirmAction], order.id, stateMemo(order));
+      notifications.show({ color: 'green', message: t(ACTION_SUCCESS[confirmAction]) });
     }
   }, [order, confirmAction, write, closeConfirm, t]);
 
@@ -357,6 +388,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
     showEditCta,
     showReadyCta,
     showCancelCta,
+    receivedOffer,
     canMarkPaid,
     trackAgain,
     showMakeReceiptCta,

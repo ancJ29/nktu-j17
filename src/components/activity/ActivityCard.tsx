@@ -245,7 +245,15 @@ type DeliveryRequestVerbKey = 'create' | 'update' | 'updateInline' | 'statusChan
 type GoodsReceiptVerbKey =
   'create' | 'update' | 'updateInline' | 'confirmReceived' | 'repostInventory' | 'cancel';
 
-type PurchaseOrderVerbKey = 'create' | 'update' | 'ready' | 'cancel' | 'payment' | 'receiptLinked';
+type PurchaseOrderVerbKey =
+  | 'create'
+  | 'update'
+  | 'ready'
+  | 'received'
+  | 'unreceived'
+  | 'cancel'
+  | 'payment'
+  | 'receiptLinked';
 
 type TransportOrderVerbKey =
   'create' | 'update' | 'updateInline' | 'statusChange' | 'cancel' | 'delete';
@@ -818,6 +826,20 @@ const ENTITY_VERB_CONFIG: Record<string, EntityVerbConfig> = {
     icon: <IconClipboardCheck size={16} />,
     color: 'teal',
     i18nKey: 'purchaseOrders.detail.activityVerbs.ready',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.received': {
+    icon: <IconClipboardCheck size={16} />,
+    color: 'green',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.received',
+    targetType: 'purchaseOrder',
+    showPurchaseOrderMemo: true,
+  },
+  'purchaseOrder.unreceived': {
+    icon: <IconClipboardCheck size={16} />,
+    color: 'gray',
+    i18nKey: 'purchaseOrders.detail.activityVerbs.unreceived',
     targetType: 'purchaseOrder',
     showPurchaseOrderMemo: true,
   },

@@ -124,7 +124,8 @@ export type ReceivableVerdict =
   | { readonly ok: false; readonly reason: 'notReady' | 'hasLiveReceipt' | 'unreadable' };
 
 export function judgeReceivable(po: PurchaseOrder, read: ReceiptsRead): ReceivableVerdict {
-  if (poStatus(po) !== 'ready') return { ok: false, reason: 'notReady' };
+  const status = poStatus(po);
+  if (status !== 'ready' && status !== 'received') return { ok: false, reason: 'notReady' };
   if (read.kind === 'unreadable') return { ok: false, reason: 'unreadable' };
   if (read.receipts.some(liveReceipt)) return { ok: false, reason: 'hasLiveReceipt' };
   return { ok: true };

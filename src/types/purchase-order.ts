@@ -2,7 +2,7 @@ import type { DateTimeInput } from '@credo/kits/types';
 import type { GoodsReceiptItem } from '@/types';
 import type { PartitionedRecordRow } from '@/stores/createPartitionedRecordsStore';
 
-export type PurchaseOrderStatus = 'draft' | 'ready' | 'cancelled';
+export type PurchaseOrderStatus = 'draft' | 'ready' | 'received' | 'cancelled';
 
 export type PurchaseOrderCurrency = 'VND' | 'CNY';
 
@@ -47,6 +47,8 @@ export type PurchaseOrderExtra = {
 
   copyFromId?: string;
   readyBy?: string;
+
+  receivedBy?: string | null;
   cancelledBy?: string;
   paidBy?: string;
   [key: string]: unknown;
@@ -92,6 +94,8 @@ export type PurchaseOrder = PartitionedRecordRow & {
 
   receiptIds: string[];
   readyAt?: string;
+
+  receivedAt?: string | null;
   cancelledAt?: string;
   createdAt: string;
   updatedAt: string;

@@ -28,11 +28,21 @@ function arrivalFromReceipts(receipts: readonly GoodsReceipt[]): Arrival {
   return live.length > 0 ? { kind: 'draft' } : NONE;
 }
 
+export function withReceivedMark(
+  arrival: Arrival | null,
+  po: Pick<PurchaseOrder, 'status' | 'receivedAt'>,
+): Arrival | null {
+  if (arrival === null || arrival.kind === 'received') return arrival;
+  const day = poStatus(po) === 'received' ? vnDayOf(po.receivedAt) : '';
+  return day ? { kind: 'received', day } : arrival;
+}
+
 export function arrivalOf(
-  po: Pick<PurchaseOrder, 'id'>,
+  po: Pick<PurchaseOrder, 'id' | 'status' | 'receivedAt'>,
   receipts: readonly GoodsReceipt[],
 ): Arrival {
-  return arrivalFromReceipts(receipts.filter((r) => r.extra?.purchaseOrderId === po.id));
+  const own = arrivalFromReceipts(receipts.filter((r) => r.extra?.purchaseOrderId === po.id));
+  return withReceivedMark(own, po) ?? own;
 }
 
 export function receiptsByOrder(
@@ -66,8 +76,11 @@ export type ArrivalsState =
       readonly count: number;
     };
 
-export function arrivalFor(state: ArrivalsState, po: Pick<PurchaseOrder, 'id'>): Arrival | null {
-  return state.kind === 'ok' ? (state.arrivals.get(po.id) ?? NONE) : null;
+export function arrivalFor(
+  state: ArrivalsState,
+  po: Pick<PurchaseOrder, 'id' | 'status' | 'receivedAt'>,
+): Arrival | null {
+  return withReceivedMark(state.kind === 'ok' ? (state.arrivals.get(po.id) ?? NONE) : null, po);
 }
 
 export function receiptsFor(

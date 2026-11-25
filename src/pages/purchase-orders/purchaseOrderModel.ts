@@ -15,7 +15,7 @@ type Loose = Partial<Record<keyof PurchaseOrder, unknown>> | null | undefined;
 
 export function poStatus(po: Loose): PurchaseOrderStatus {
   const s = po?.status;
-  return s === 'ready' || s === 'cancelled' ? s : 'draft';
+  return s === 'ready' || s === 'received' || s === 'cancelled' ? s : 'draft';
 }
 
 export function poCurrency(po: Loose): PurchaseOrderCurrency {

@@ -2,7 +2,9 @@
   "actions": {
     "cancel": "Cancel order",
     "makeReceipt": "Create goods receipt",
-    "markReady": "Mark as sent"
+    "markReady": "Mark as sent",
+    "markReceived": "Mark as received",
+    "undoReceived": "Not received yet"
   },
   "addItem": "New purchase order",
   "columns": {
@@ -22,7 +24,11 @@
     "cancelMessage": "Cancel this purchase order? This cannot be undone.",
     "cancelTitle": "Cancel order",
     "readyMessage": "Mark this order as sent to the vendor? It becomes final and its lines are locked.",
-    "readyTitle": "Mark as sent"
+    "readyTitle": "Mark as sent",
+    "receivedMessage": "Mark this order's goods as arrived? This makes no goods receipt and does not change stock.",
+    "receivedTitle": "Mark as received",
+    "unreceiveMessage": "Take this order back to \"Sent to vendor\"? It is not cancelled; only the received mark is removed.",
+    "unreceiveTitle": "Undo the received mark"
   },
   "detail": {
     "availableActions": "Available actions",
@@ -43,6 +49,8 @@
       "payment": "Updated payment of",
       "ready": "Marked as sent to vendor",
       "receiptLinked": "Recorded a goods receipt on",
+      "received": "Marked as received",
+      "unreceived": "Undid the received mark of",
       "update": "Edited order"
     },
     "cardGeneral": "General",
@@ -133,6 +141,8 @@
     "readySuccess": "Order marked as sent",
     "receiptLinkPending": "The goods receipt is saved, but the order has not recorded it yet. Reopen the order and it will be linked.",
     "receiptsUnreadable": "The goods receipts of this order could not be read, so it cannot be cancelled now. Reopen the page.",
+    "receivedSuccess": "Order marked as received",
+    "unreceivedSuccess": "Order back to \"Sent to vendor\"",
     "updateError": "Could not save the change",
     "updateSuccess": "Purchase order updated"
   },
@@ -162,7 +172,8 @@
   "statuses": {
     "cancelled": "Cancelled",
     "draft": "Draft",
-    "ready": "Sent to vendor"
+    "ready": "Sent to vendor",
+    "received": "Received"
   },
   "title": "Purchase orders",
   "validation": {
