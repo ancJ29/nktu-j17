@@ -179,9 +179,11 @@ export function usePurchaseOrderDetail(t: TFunction) {
 
   const canAuthor = perms.purchaseOrder.canEdit() && (!pricingOn || showPrice);
 
-  const canChangeMedia =
-    canAuthor && (status === 'draft' || status === 'ready' || status === 'received');
-  const showMedia = !pricingOn || showPrice;
+  const mediaStatusOpen = status === 'draft' || status === 'ready' || status === 'received';
+  const canChangePhotos =
+    mediaStatusOpen && (perms.purchaseOrder.canEdit() || perms.purchaseOrder.canTakePhoto());
+  const canChangeFiles = canAuthor && mediaStatusOpen;
+  const showFiles = !pricingOn || showPrice;
 
   const mediaDirectory = useMemo(
     () => buildUploadDirectory({ type: 'purchase-order', id: id ?? '' }),
@@ -391,8 +393,9 @@ export function usePurchaseOrderDetail(t: TFunction) {
     status,
     statusOption,
     showPrice,
-    canChangeMedia,
-    showMedia,
+    canChangePhotos,
+    canChangeFiles,
+    showFiles,
     mediaDirectory,
     currentEmployee,
     handlePhotosChange,

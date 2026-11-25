@@ -629,7 +629,7 @@ export function PurchaseOrderDetailPage() {
           images={poPhotos(order)}
           onChange={d.handlePhotosChange}
           imageDirectory={d.mediaDirectory}
-          editable={d.canChangeMedia}
+          editable={d.canChangePhotos}
           marker={order.orderNumber ?? ''}
           currentUserId={d.currentEmployee?.id}
           currentUserName={d.currentEmployee?.name}
@@ -646,7 +646,7 @@ export function PurchaseOrderDetailPage() {
           attachments={poAttachments(order)}
           onChange={d.handleAttachmentsChange}
           imageDirectory={d.mediaDirectory}
-          editable={d.canChangeMedia}
+          editable={d.canChangeFiles}
           currentUserId={d.currentEmployee?.id}
           currentUserName={d.currentEmployee?.name}
         />
@@ -661,8 +661,8 @@ export function PurchaseOrderDetailPage() {
       {receiptsCard}
       {itemsCard}
       {notesCard}
-      {d.showMedia && photosCard}
-      {d.showMedia && filesCard}
+      {photosCard}
+      {d.showFiles && filesCard}
     </Stack>
   );
 
@@ -929,12 +929,10 @@ export function PurchaseOrderDetailPage() {
             {t('purchaseOrders.detail.tabActivityLog')}
           </Tabs.Tab>
         )}
-        {d.showMedia && (
-          <Tabs.Tab value="photos" leftSection={<IconPhoto size={16} />}>
-            {t('purchaseOrders.detail.cardPhotos')}
-          </Tabs.Tab>
-        )}
-        {d.showMedia && (
+        <Tabs.Tab value="photos" leftSection={<IconPhoto size={16} />}>
+          {t('purchaseOrders.detail.cardPhotos')}
+        </Tabs.Tab>
+        {d.showFiles && (
           <Tabs.Tab value="files" leftSection={<IconPaperclip size={16} />}>
             {t('attachments.title')}
           </Tabs.Tab>
@@ -956,12 +954,10 @@ export function PurchaseOrderDetailPage() {
           )}
         </Tabs.Panel>
       )}
-      {d.showMedia && (
-        <Tabs.Panel value="photos" pt="md">
-          {visitedTabs.has('photos') && photosCard}
-        </Tabs.Panel>
-      )}
-      {d.showMedia && (
+      <Tabs.Panel value="photos" pt="md">
+        {visitedTabs.has('photos') && photosCard}
+      </Tabs.Panel>
+      {d.showFiles && (
         <Tabs.Panel value="files" pt="md">
           {filesCard}
         </Tabs.Panel>

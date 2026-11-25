@@ -268,6 +268,8 @@ export const BASE_PERMISSIONS: Permissions = {
     actions: {
       canViewPrice: false,
       canMarkPaid: false,
+
+      canTakePhoto: false,
     },
     query: {
       canViewAll: false,

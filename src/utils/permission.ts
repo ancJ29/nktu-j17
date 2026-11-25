@@ -714,6 +714,8 @@ export const perms = {
 
       canMarkPaid: () => resolve().actions?.canMarkPaid ?? false,
 
+      canTakePhoto: () => resolve().actions?.canTakePhoto ?? false,
+
       canViewAll: () => resolve().query?.canViewAll ?? false,
       canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
