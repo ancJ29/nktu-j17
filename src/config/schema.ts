@@ -619,6 +619,8 @@ export const DEFAULT_PURCHASE_ORDER_LEAD_TIMES = [
   { minDays: 3, maxDays: 5 },
   { minDays: 5, maxDays: 7 },
   { minDays: 7, maxDays: 14 },
+  { minDays: 15, maxDays: 25 },
+  { minDays: 30, maxDays: 35 },
 ];
 
 const PurchaseOrderFeaturesSchema = z
