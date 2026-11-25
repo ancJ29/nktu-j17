@@ -92,6 +92,7 @@
     "requestedByPlaceholder": "Người yêu cầu",
     "totalLabel": "Tổng cộng ({{currency}})",
     "updateButton": "Lưu thay đổi",
+    "vatRateLabel": "Thuế suất (%)",
     "vendorNoteLabel": "Ghi chú chung",
     "vendorNotePlaceholder": "Gửi cho nhà cung cấp — in trên đơn",
     "vendorPlaceholder": "Chọn nhà cung cấp"

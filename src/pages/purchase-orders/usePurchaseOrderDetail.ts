@@ -38,6 +38,7 @@ import {
   poLeadTime,
   poReceiptIds,
   poStatus,
+  poVatRate,
   poVendorNote,
   readyBlockers,
 } from './purchaseOrderModel';
@@ -171,6 +172,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
         ? { customerCode: poCustomer(order)!.code, customerName: poCustomer(order)!.name }
         : {}),
       items: poItems(order),
+      vatRate: poVatRate(order),
       ...(poLeadTime(order) ? { leadTime: poLeadTime(order)! } : {}),
       ...(poExtra(order).assignedTo ? { assignedTo: poExtra(order).assignedTo! } : {}),
       ...(poExtra(order).requestedBy ? { requestedBy: poExtra(order).requestedBy! } : {}),

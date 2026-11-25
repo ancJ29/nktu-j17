@@ -47,6 +47,7 @@ import { EntityConflictError } from '@/stores/createEntityStore';
 import { device, logger } from '@credo/base-ui/utils';
 import { lookupLabelOf, useInitFormFromFetch, useLookupV2Labels } from '@/hooks';
 import {
+  getPricingVatRate,
   getPurchaseOrderPicDepartments,
   getSalesOrderPicDepartments,
   hasImagesForProducts,
@@ -86,8 +87,10 @@ import {
   leadTimeLabel,
   leadTimeTag,
   currencyDecimals,
+  defaultPoVatRate,
   lineTax,
   lineTotal,
+  lineTypedTax,
   orderSubtotal,
   orderTax,
   orderTotal,
@@ -99,8 +102,12 @@ import {
   poLeadTime,
   poOrderDay,
   poVendorNote,
+  poVatRate,
   proposePurchaseOrderDeadline,
+  typedTaxAfterEdit,
   unitPriceDecimals,
+  vatRateOfPercent,
+  vatRatePercentOf,
 } from './purchaseOrderModel';
 import { savePurchaseOrder } from './savePurchaseOrder';
 
@@ -139,6 +146,8 @@ type FormValues = {
   locationCode: string;
   locationName: string;
   currency: PurchaseOrderCurrency;
+
+  vatRatePercent: number | undefined;
 
   orderDate: string | null;
 
@@ -179,6 +188,8 @@ function isEmptyRow(row: ItemFormValues): boolean {
 type ItemRowProps = ItemFormValues & {
   idx: number;
   currency: PurchaseOrderCurrency;
+
+  rate: number | null;
   itemUnits: readonly string[] | undefined;
   unitLabels: Map<string, string>;
   itemCodeError: ReactNode;
@@ -194,6 +205,7 @@ type ItemRowProps = ItemFormValues & {
 const ItemRow = memo(function ItemRow({
   idx,
   currency,
+  rate,
   itemCode,
   itemName,
   quantity,
@@ -276,7 +288,10 @@ const ItemRow = memo(function ItemRow({
           min={0}
           value={quantity}
           emptyValue={0}
-          onChange={(next) => setFieldValue(`items.${idx}.quantity`, next)}
+          onChange={(next) => {
+            setFieldValue(`items.${idx}.quantity`, next);
+            setFieldValue(`items.${idx}.taxAmount`, typedTaxAfterEdit(taxAmount, 'quantity', rate));
+          }}
         />
       </Table.Td>
       <Table.Td>
@@ -307,7 +322,13 @@ const ItemRow = memo(function ItemRow({
               min={0}
               decimalScale={unitPriceDecimals(currency)}
               value={unitPrice}
-              onChange={(next) => setFieldValue(`items.${idx}.unitPrice`, next)}
+              onChange={(next) => {
+                setFieldValue(`items.${idx}.unitPrice`, next);
+                setFieldValue(
+                  `items.${idx}.taxAmount`,
+                  typedTaxAfterEdit(taxAmount, 'price', rate),
+                );
+              }}
             />
           </Table.Td>
           <Table.Td>
@@ -315,7 +336,12 @@ const ItemRow = memo(function ItemRow({
               size="xs"
               min={0}
               decimalScale={currencyDecimals(currency)}
-              value={taxAmount}
+              value={
+                taxAmount ??
+                (rate === null || unitPrice === undefined
+                  ? undefined
+                  : lineTax({ quantity, unitPrice }, currency, rate))
+              }
               onChange={(next) => setFieldValue(`items.${idx}.taxAmount`, next)}
             />
           </Table.Td>
@@ -323,7 +349,10 @@ const ItemRow = memo(function ItemRow({
             <Text size="sm" ta="right">
               {unitPrice === undefined
                 ? '—'
-                : formatMoney(lineTotal({ quantity, unitPrice, taxAmount }, currency), currency)}
+                : formatMoney(
+                    lineTotal({ quantity, unitPrice, taxAmount }, currency, rate),
+                    currency,
+                  )}
             </Text>
           </Table.Td>
         </>
@@ -494,6 +523,7 @@ export function PurchaseOrderFormPage() {
       locationCode: locationsEnabled ? '' : DEFAULT_LOCATION_CODE,
       locationName: '',
       currency: 'VND',
+      vatRatePercent: vatRatePercentOf(defaultPoVatRate('VND', getPricingVatRate())),
       orderDate: todayInVnDateString(),
       leadTime: null,
       paymentDeadline: null,
@@ -527,6 +557,7 @@ export function PurchaseOrderFormPage() {
         locationCode: r.locationCode ?? '',
         locationName: r.locationName ?? '',
         currency: poCurrency(r),
+        vatRatePercent: vatRatePercentOf(poVatRate(r)),
         orderDate: poOrderDay(r) || todayInVnDateString(),
         leadTime: poLeadTime(r) ? leadTimeTag(poLeadTime(r)!) : null,
         paymentDeadline: isoToVnDateString(r.paymentDeadline) || null,
@@ -543,10 +574,7 @@ export function PurchaseOrderFormPage() {
               unit: item.unit,
               packageCount: packageCountOf(item) ?? undefined,
               unitPrice: typeof item.unitPrice === 'number' ? item.unitPrice : undefined,
-              taxAmount:
-                showPrice && lineTax(item, poCurrency(r)) > 0
-                  ? lineTax(item, poCurrency(r))
-                  : undefined,
+              taxAmount: showPrice ? lineTypedTax(item, poCurrency(r)) : undefined,
               note: item.note ?? '',
             }))
           : [{ ...emptyItem }],
@@ -596,6 +624,7 @@ export function PurchaseOrderFormPage() {
       locationCode: copyFrom.locationCode,
       locationName: copyFrom.locationName,
       currency: copyFrom.currency,
+      vatRatePercent: vatRatePercentOf(poVatRate(copyFrom)),
       orderDate: todayInVnDateString(),
       leadTime: asLeadTime(copyFrom.leadTime) ? leadTimeTag(copyFrom.leadTime!) : null,
       paymentDeadline: null,
@@ -613,10 +642,7 @@ export function PurchaseOrderFormPage() {
               unit: item.unit,
               packageCount: packageCountOf(item) ?? undefined,
               unitPrice: typeof item.unitPrice === 'number' ? item.unitPrice : undefined,
-              taxAmount:
-                showPrice && lineTax(item, copyFrom.currency) > 0
-                  ? lineTax(item, copyFrom.currency)
-                  : undefined,
+              taxAmount: showPrice ? lineTypedTax(item, copyFrom.currency) : undefined,
               note: item.note ?? '',
             }))
           : [{ ...emptyItem }],
@@ -746,8 +772,20 @@ export function PurchaseOrderFormPage() {
     [products, t],
   );
 
+  const rateTypedRef = useRef(isEdit || !!copyFrom);
+  const handleRateChange = (next: number | undefined) => {
+    form.setFieldValue('vatRatePercent', next);
+    form.getValues().items.forEach((row, idx) => {
+      const held = typedTaxAfterEdit(row.taxAmount, 'rate', vatRateOfPercent(next));
+      if (held !== row.taxAmount) form.setFieldValue(`items.${idx}.taxAmount`, held);
+    });
+  };
+
   const handleCurrencyChange = (next: PurchaseOrderCurrency) => {
     form.setFieldValue('currency', next);
+    if (!rateTypedRef.current) {
+      handleRateChange(vatRatePercentOf(defaultPoVatRate(next, getPricingVatRate())));
+    }
     const f = 10 ** unitPriceDecimals(next);
     form.getValues().items.forEach((row, idx) => {
       if (row.unitPrice !== undefined) {
@@ -793,7 +831,7 @@ export function PurchaseOrderFormPage() {
           ...(item.note.trim() ? { note: item.note.trim() } : {}),
           ...(packageCount !== null ? { packageCount } : {}),
           ...(showPrice && item.unitPrice !== undefined ? { unitPrice: item.unitPrice } : {}),
-          ...(showPrice && item.taxAmount !== undefined && item.taxAmount > 0
+          ...(showPrice && item.taxAmount !== undefined && item.taxAmount >= 0
             ? { taxAmount: roundMoney(item.taxAmount, values.currency) }
             : {}),
         };
@@ -823,6 +861,10 @@ export function PurchaseOrderFormPage() {
             notes: values.notes.trim(),
             vendorNote: values.vendorNote.trim(),
             currency: values.currency,
+
+            vatRate: showPrice
+              ? vatRateOfPercent(values.vatRatePercent)
+              : poVatRate(snapshotRef.current),
             items,
             orderDate,
             leadTime,
@@ -894,8 +936,10 @@ export function PurchaseOrderFormPage() {
       ? addDaysToDay(values.orderDate, pickedLeadTime.maxDays)
       : '';
   const plannedArrivalText = plannedDay ? formatDate(vnDateStringToIso(plannedDay)) : '—';
+  const rate = vatRateOfPercent(values.vatRatePercent);
   const priced = {
     currency: values.currency,
+    vatRate: rate,
     items: values.items.map((r) => ({
       quantity: r.quantity,
       unitPrice: r.unitPrice,
@@ -1118,6 +1162,7 @@ export function PurchaseOrderFormPage() {
                         key={idx}
                         idx={idx}
                         currency={values.currency}
+                        rate={rate}
                         itemCode={row.itemCode}
                         itemName={row.itemName}
                         quantity={row.quantity}
@@ -1152,10 +1197,29 @@ export function PurchaseOrderFormPage() {
                         <Table.Td colSpan={2} />
                       </Table.Tr>
                       <Table.Tr>
-                        <Table.Td colSpan={7} ta="right">
-                          <Text size="sm" fw={600}>
-                            {t('purchaseOrders.columns.tax')}
-                          </Text>
+                        <Table.Td colSpan={7}>
+                          <Group justify="flex-end" gap="xs" wrap="nowrap">
+                            <Text size="sm" c="dimmed">
+                              {t('purchaseOrders.form.vatRateLabel')}
+                            </Text>
+                            <NumberField
+                              size="xs"
+                              w={80}
+                              min={0}
+                              max={100}
+                              decimalScale={2}
+                              aria-label={t('purchaseOrders.form.vatRateLabel')}
+                              data-testid="po-vat-rate"
+                              value={values.vatRatePercent}
+                              onChange={(next) => {
+                                rateTypedRef.current = true;
+                                handleRateChange(next);
+                              }}
+                            />
+                            <Text size="sm" fw={600}>
+                              {t('purchaseOrders.columns.tax')}
+                            </Text>
+                          </Group>
                         </Table.Td>
                         <Table.Td ta="right" data-testid="po-tax">
                           <Text size="sm">{formatMoney(tax, values.currency)}</Text>

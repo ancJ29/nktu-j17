@@ -74,6 +74,8 @@ export type PurchaseOrder = PartitionedRecordRow & {
 
   vendorNote?: string;
   currency: PurchaseOrderCurrency;
+
+  vatRate?: number | null;
   items: PurchaseOrderItem[];
   isPaid: boolean;
 
@@ -111,6 +113,8 @@ export type PurchaseOrderCopyFrom = Pick<
   assignedTo?: string;
   requestedBy?: string;
   leadTime?: PurchaseOrderLeadTime | null;
+
+  vatRate?: number | null;
   customerCode?: string;
   customerName?: string;
 

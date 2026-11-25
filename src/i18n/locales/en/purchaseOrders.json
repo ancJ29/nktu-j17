@@ -92,6 +92,7 @@
     "requestedByPlaceholder": "Person who requested",
     "totalLabel": "Total ({{currency}})",
     "updateButton": "Save changes",
+    "vatRateLabel": "Tax rate (%)",
     "vendorNoteLabel": "General note",
     "vendorNotePlaceholder": "For the vendor — printed on the order",
     "vendorPlaceholder": "Select a vendor"

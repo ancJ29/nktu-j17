@@ -173,13 +173,63 @@ export function lineAmount(item: Partial<PurchaseOrderItem>, currency: PurchaseO
   return roundMoney(num(item.quantity) * num(item.unitPrice), currency);
 }
 
-export function lineTax(item: Partial<PurchaseOrderItem>, currency: PurchaseOrderCurrency) {
-  const v = num(item.taxAmount);
-  return v > 0 ? roundMoney(v, currency) : 0;
+export function poVatRate(po: Loose): number | null {
+  const r = po?.vatRate;
+  return typeof r === 'number' && Number.isFinite(r) && r >= 0 && r <= 1 ? r : null;
 }
 
-export function lineTotal(item: Partial<PurchaseOrderItem>, currency: PurchaseOrderCurrency) {
-  return roundMoney(lineAmount(item, currency) + lineTax(item, currency), currency);
+export function defaultPoVatRate(currency: PurchaseOrderCurrency, clientRate: number): number {
+  return currency === 'CNY' ? 0 : clientRate;
+}
+
+export function vatRatePercentOf(rate: number | null): number | undefined {
+  return rate === null ? undefined : Math.round(rate * 10_000) / 100;
+}
+
+export function vatRateOfPercent(percent: number | undefined): number | null {
+  return typeof percent === 'number' && Number.isFinite(percent) && percent >= 0 && percent <= 100
+    ? percent / 100
+    : null;
+}
+
+function typedTax(item: Partial<PurchaseOrderItem>): number | undefined {
+  const v = item.taxAmount;
+  return typeof v === 'number' && Number.isFinite(v) && v >= 0 ? v : undefined;
+}
+
+export function lineTypedTax(
+  item: Partial<PurchaseOrderItem>,
+  currency: PurchaseOrderCurrency,
+): number | undefined {
+  const v = typedTax(item);
+  return v === undefined ? undefined : roundMoney(v, currency);
+}
+
+export function typedTaxAfterEdit(
+  typed: number | undefined,
+  edit: 'quantity' | 'price' | 'rate',
+  rate: number | null,
+): number | undefined {
+  if (edit === 'rate') return undefined;
+  return rate === null ? typed : undefined;
+}
+
+export function lineTax(
+  item: Partial<PurchaseOrderItem>,
+  currency: PurchaseOrderCurrency,
+  rate: number | null,
+) {
+  const typed = typedTax(item);
+  if (typed !== undefined) return roundMoney(typed, currency);
+  return rate === null ? 0 : roundMoney(lineAmount(item, currency) * rate, currency);
+}
+
+export function lineTotal(
+  item: Partial<PurchaseOrderItem>,
+  currency: PurchaseOrderCurrency,
+  rate: number | null,
+) {
+  return roundMoney(lineAmount(item, currency) + lineTax(item, currency, rate), currency);
 }
 
 export function orderSubtotal(po: Loose): number {
@@ -192,8 +242,9 @@ export function orderSubtotal(po: Loose): number {
 
 export function orderTax(po: Loose): number {
   const currency = poCurrency(po);
+  const rate = poVatRate(po);
   return roundMoney(
-    poItems(po).reduce((sum, i) => sum + lineTax(i, currency), 0),
+    poItems(po).reduce((sum, i) => sum + lineTax(i, currency, rate), 0),
     currency,
   );
 }

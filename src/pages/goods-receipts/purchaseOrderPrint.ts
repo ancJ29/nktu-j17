@@ -20,6 +20,7 @@ import {
   orderTotal,
   plannedArrivalDay,
   poCurrency,
+  poVatRate,
   poItems,
   poOrderDay,
   poVendorNote,
@@ -178,7 +179,7 @@ export function toPurchaseOrderPrintDataFromOrder(input: {
         note: it.note?.trim() ?? '',
         unitPrice: priced ? it.unitPrice! : null,
         amount: priced ? lineAmount(it, currency) : null,
-        tax: lineTax(it, currency),
+        tax: lineTax(it, currency, poVatRate(order)),
       };
     }),
     showPhoto,
@@ -424,7 +425,7 @@ function buildParts(
           }${
             showNote
               ? `
-          <td class="note">${escapeHtml(line.note)}</td>`
+          <td class="note">${escapeHtml(line.note || 'Không có')}</td>`
               : ''
           }
         </tr>`,

@@ -19,6 +19,7 @@ import {
   orderTotal,
   poCurrency,
   poItems,
+  poVatRate,
 } from './purchaseOrderModel';
 
 export type PurchaseOrderItemsProps = {
@@ -36,6 +37,7 @@ export function PurchaseOrderItemsTableDesktop({
   const { t } = useTranslation();
   const items = poItems(order);
   const currency = poCurrency(order);
+  const rate = poVatRate(order);
   const showPackageCount = items.some((it) => packageCountOf(it) !== null);
   return (
     <Box style={{ overflowX: 'auto' }}>
@@ -108,12 +110,12 @@ export function PurchaseOrderItemsTableDesktop({
                     </Text>
                   </Table.Td>
                   <Table.Td ta="right">
-                    <Text size="sm">{formatMoney(lineTax(item, currency), currency)}</Text>
+                    <Text size="sm">{formatMoney(lineTax(item, currency, rate), currency)}</Text>
                   </Table.Td>
                   <Table.Td ta="right">
                     <Text size="sm" fw={600}>
                       {typeof item.unitPrice === 'number'
-                        ? formatMoney(lineTotal(item, currency), currency)
+                        ? formatMoney(lineTotal(item, currency, rate), currency)
                         : '—'}
                     </Text>
                   </Table.Td>
@@ -182,6 +184,7 @@ export function PurchaseOrderItemsListMobile({
 }: PurchaseOrderItemsProps) {
   const { t } = useTranslation();
   const currency = poCurrency(order);
+  const rate = poVatRate(order);
   const products = useProductStore((s) => s.items);
   const productByCode = useMemo(() => new Map(products.map((p) => [p.code, p])), [products]);
   const imagesEnabled = hasImagesForProducts();
@@ -238,14 +241,14 @@ export function PurchaseOrderItemsListMobile({
                   <Text span fw={700}>
                     {formatMoney(lineAmount(item, currency), currency)}
                   </Text>
-                  {lineTax(item, currency) > 0 && (
+                  {lineTax(item, currency, rate) > 0 && (
                     <>
                       {' '}
                       + {t('purchaseOrders.columns.tax')}{' '}
-                      {formatMoney(lineTax(item, currency), currency)}
+                      {formatMoney(lineTax(item, currency, rate), currency)}
                       {' = '}
                       <Text span fw={700}>
-                        {formatMoney(lineTotal(item, currency), currency)}
+                        {formatMoney(lineTotal(item, currency, rate), currency)}
                       </Text>
                     </>
                   )}

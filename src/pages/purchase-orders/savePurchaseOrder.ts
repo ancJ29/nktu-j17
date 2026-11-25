@@ -26,6 +26,8 @@ export type PurchaseOrderWrite = Pick<
   | 'currency'
   | 'items'
 > & {
+  vatRate: number | null;
+
   vendorNote: string;
 
   orderDate: string;
