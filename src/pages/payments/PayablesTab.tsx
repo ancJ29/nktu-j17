@@ -36,6 +36,7 @@ import { formatDate } from '@/utils/dateFormat';
 import { OVERDUE_ROW_BG, PAYMENT_STATE_COLOR } from '@/utils/paymentStateColor';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { perms } from '@/utils/permission';
+import { showPurchaseOrderVendor } from '@/pages/purchase-orders/purchaseOrderVendorAccess';
 import { PaymentNoteCell } from './PaymentNoteCell';
 import { PaymentsLoadError } from './PaymentsLoadError';
 import { bulkMark } from './bulkMarkPayments';
@@ -55,6 +56,8 @@ const isMobile = device.isMobile;
 
 const canMark = perms.purchaseOrder.canMarkPaid();
 
+const showVendor = showPurchaseOrderVendor();
+
 const money = (n: number, c: PayableCurrency) => formatMoney(n, c);
 const deadlineText = (po: PurchaseOrder) =>
   po.paymentDeadline ? formatDate(po.paymentDeadline) : '—';
@@ -64,7 +67,7 @@ export function PayablesTab() {
   const navigate = useNavigate();
   const { state, updateState } = usePaymentsUrlState();
   const filter = parseReceivableFilter(state.pf);
-  const vendorCode = state.pv ?? null;
+  const vendorCode = showVendor ? (state.pv ?? null) : null;
   const search = state.pq ?? '';
   const selection = useSelectionMode();
   const { selectionMode } = selection;
@@ -83,7 +86,7 @@ export function PayablesTab() {
   const { items: vendors, loadAll: loadVendors, initialized: vendorsInit } = useVendorStore();
 
   useEffect(() => {
-    if (!vendorsInit) loadVendors();
+    if (showVendor && !vendorsInit) loadVendors();
   }, [vendorsInit, loadVendors]);
 
   useEffect(() => {
@@ -106,6 +109,9 @@ export function PayablesTab() {
 
   const failed = ready && (load.rejected || !!error);
 
+  const searchLabel = t(
+    showVendor ? 'payments.payable.searchPlaceholder' : 'payments.payable.searchOrderPlaceholder',
+  );
   const vendorByCode = useMemo(() => new Map(vendors.map((v) => [v.code, v])), [vendors]);
   const vendorName = (po: PurchaseOrder) => {
     const v = vendorByCode.get(po.vendorCode);
@@ -126,7 +132,7 @@ export function PayablesTab() {
       if (vendorCode && po.vendorCode !== vendorCode) return false;
       if (!q) return true;
       const v = vendorByCode.get(po.vendorCode);
-      const name = v?.extra?.shortName?.trim() || v?.name || po.vendorName || '';
+      const name = showVendor ? v?.extra?.shortName?.trim() || v?.name || po.vendorName || '' : '';
       return (po.orderNumber ?? '').toLowerCase().includes(q) || name.toLowerCase().includes(q);
     });
   }, [items, ready, fetchRange, vendorCode, search, vendorByCode]);
@@ -235,12 +241,16 @@ export function PayablesTab() {
           <Text fz="sm">{poOrderDateIso(po) ? formatDate(poOrderDateIso(po)) : '—'}</Text>
         ),
       },
-      {
-        key: 'vendor',
-        header: t('common.labels.vendor'),
-        width: '200px',
-        render: (po) => <Text fz="sm">{vendorName(po)}</Text>,
-      },
+      ...(showVendor
+        ? [
+            {
+              key: 'vendor',
+              header: t('common.labels.vendor'),
+              width: '200px',
+              render: (po: PurchaseOrder) => <Text fz="sm">{vendorName(po)}</Text>,
+            },
+          ]
+        : []),
       {
         key: 'currency',
         header: t('payments.payable.columns.currency'),
@@ -394,21 +404,23 @@ export function PayablesTab() {
               onChange={(v) => updateState({ pf: parseReceivableFilter(v) })}
               w={isMobile ? '100%' : 200}
             />
-            <Select
-              aria-label={t('common.labels.vendor')}
-              placeholder={t('common.labels.vendor')}
-              data={vendorOptions}
-              value={vendorCode}
-              clearable
-              searchable
-              onChange={(v) => updateState({ pv: v ?? undefined })}
-              w={isMobile ? '100%' : 240}
-            />
+            {showVendor && (
+              <Select
+                aria-label={t('common.labels.vendor')}
+                placeholder={t('common.labels.vendor')}
+                data={vendorOptions}
+                value={vendorCode}
+                clearable
+                searchable
+                onChange={(v) => updateState({ pv: v ?? undefined })}
+                w={isMobile ? '100%' : 240}
+              />
+            )}
             <TextInput
               value={search}
               onChange={(e) => updateState({ pq: e.currentTarget.value })}
-              placeholder={t('payments.payable.searchPlaceholder')}
-              aria-label={t('payments.payable.searchPlaceholder')}
+              placeholder={searchLabel}
+              aria-label={searchLabel}
               style={{ flex: 1, minWidth: 200 }}
             />
           </Group>
@@ -497,7 +509,7 @@ export function PayablesTab() {
                     </Text>
                     <PurchaseOrderPaymentState order={po} />
                   </Group>
-                  <Text size="sm">{vendorName(po)}</Text>
+                  {showVendor && <Text size="sm">{vendorName(po)}</Text>}
                   <Group justify="space-between">
                     <Text size="sm" c="dimmed">
                       {t('payments.payable.columns.total')}

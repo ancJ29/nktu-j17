@@ -54,10 +54,12 @@ import { addDaysToDay } from '@/utils/paymentTerms';
 import { businessDateString } from '@/utils/code';
 import { ListStatsCards } from '@/components/ListStatsCards';
 import { usePurchaseOrderListFilters, type PaidFilter } from './usePurchaseOrderListFilters';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 
 const isMobile = device.isMobile;
 const canCreate = perms.purchaseOrder.canCreate();
 const locationsEnabled = isLocationsEnabled();
+const showVendor = showPurchaseOrderVendor();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
 
 const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
@@ -103,7 +105,7 @@ export function PurchaseOrderListPage() {
     return m;
   }, [products]);
 
-  const filters = usePurchaseOrderListFilters(items);
+  const filters = usePurchaseOrderListFilters(items, showVendor);
 
   const windowFromDay = filters.createdDateRange.from
     ? vnDayOf(filters.createdDateRange.from.toISOString())
@@ -121,7 +123,7 @@ export function PurchaseOrderListPage() {
 
   useEffect(() => {
     if (!initialized && !error) loadAll();
-    if (!vendorsInit) loadVendors();
+    if (showVendor && !vendorsInit) loadVendors();
     if (!customersInit) loadCustomers();
     if (!employeesInit) loadEmployees();
     if (locationsEnabled && !locationsInit) loadLocations();
@@ -172,7 +174,7 @@ export function PurchaseOrderListPage() {
     searchFields: (item) => {
       const fields: (string | undefined)[] = [
         item.orderNumber,
-        item.vendorName,
+        showVendor ? item.vendorName : undefined,
         poCustomer(item)?.name,
         item.reference,
         item.notes,
@@ -209,7 +211,7 @@ export function PurchaseOrderListPage() {
   }));
   const vendorFilterData = useMemo(
     () =>
-      vendors
+      (showVendor ? vendors : [])
         .filter((v) => !v.extra?.isDeleted)
         .map((v) => ({ value: v.code, label: v.extra?.shortName?.trim() || v.name })),
     [vendors],
@@ -358,15 +360,19 @@ export function PurchaseOrderListPage() {
       options: paidFilterData,
       onChange: filters.setPaidFilter,
     },
-    {
-      type: 'select',
-      key: 'vendor',
-      title: t('common.labels.vendor'),
-      placeholder: t('common.labels.vendor'),
-      value: filters.vendorFilter,
-      options: vendorFilterData,
-      onChange: filters.setVendorFilter,
-    },
+    ...(showVendor
+      ? [
+          {
+            type: 'select' as const,
+            key: 'vendor',
+            title: t('common.labels.vendor'),
+            placeholder: t('common.labels.vendor'),
+            value: filters.vendorFilter,
+            options: vendorFilterData,
+            onChange: filters.setVendorFilter,
+          },
+        ]
+      : []),
     customerMoreFilter,
     {
       type: 'select',

@@ -81,6 +81,7 @@ import {
   PurchaseOrderItemsTableDesktop,
 } from './PurchaseOrderItemsTable';
 import { usePurchaseOrderDetail } from './usePurchaseOrderDetail';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 import {
   formatMoney,
   isOverdue,
@@ -103,6 +104,7 @@ import {
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
 const showProductPhoto = hasImagesForProducts();
+const showVendor = showPurchaseOrderVendor();
 
 const activityLogTabVisible = isActivityLoggingEnabled();
 
@@ -210,10 +212,14 @@ export function PurchaseOrderDetailPage() {
                   ? t('purchaseOrders.payment.partial')
                   : t('purchaseOrders.payment.unpaid')}
           </Badge>
-          <Text span size="sm" c="dimmed" fs="italic">
-            {t('purchaseOrders.detail.to')}
-          </Text>
-          <VendorLink code={order.vendorCode} name={order.vendorName} size="sm" />
+          {showVendor && (
+            <>
+              <Text span size="sm" c="dimmed" fs="italic">
+                {t('purchaseOrders.detail.to')}
+              </Text>
+              <VendorLink code={order.vendorCode} name={order.vendorName} size="sm" />
+            </>
+          )}
           {locationsEnabled && order.locationName && (
             <Text span size="sm" fw={600}>
               · {order.locationName}
@@ -240,7 +246,7 @@ export function PurchaseOrderDetailPage() {
 
   const buttons = (size: 'compact-sm' | 'sm') => ({
     print:
-      !isMobile && (status === 'draft' || status === 'ready') ? (
+      !isMobile && showVendor && (status === 'draft' || status === 'ready') ? (
         <Button
           variant="subtle"
           size={size}
@@ -322,10 +328,12 @@ export function PurchaseOrderDetailPage() {
       title={t('purchaseOrders.detail.cardGeneral')}
     >
       <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-        <Stack gap={4}>
-          <FieldLabel>{t('common.labels.vendor')}</FieldLabel>
-          <VendorLink code={order.vendorCode} name={order.vendorName} size="sm" />
-        </Stack>
+        {showVendor && (
+          <Stack gap={4}>
+            <FieldLabel>{t('common.labels.vendor')}</FieldLabel>
+            <VendorLink code={order.vendorCode} name={order.vendorName} size="sm" />
+          </Stack>
+        )}
         <Field label={t('purchaseOrders.form.currencyLabel')} value={currency} />
         <Stack gap={4}>
           <FieldLabel>{t('purchaseOrders.form.customerLabel')}</FieldLabel>
@@ -674,18 +682,20 @@ export function PurchaseOrderDetailPage() {
     <Card withBorder padding="md">
       <Stack gap="md">
         <Group justify="flex-start" align="flex-start" wrap="wrap" gap="xl">
-          <Stack gap={2} style={{ minWidth: 0 }}>
-            <FieldLabel>{t('common.labels.vendor')}</FieldLabel>
-            <Text size="md" fw={600} component="div">
-              <VendorLink code={order.vendorCode} name={order.vendorName} />
-              {locationsEnabled && order.locationName && (
-                <Text span size="sm" fw={600}>
-                  {' '}
-                  · {order.locationName}
-                </Text>
-              )}
-            </Text>
-          </Stack>
+          {showVendor && (
+            <Stack gap={2} style={{ minWidth: 0 }}>
+              <FieldLabel>{t('common.labels.vendor')}</FieldLabel>
+              <Text size="md" fw={600} component="div">
+                <VendorLink code={order.vendorCode} name={order.vendorName} />
+                {locationsEnabled && order.locationName && (
+                  <Text span size="sm" fw={600}>
+                    {' '}
+                    · {order.locationName}
+                  </Text>
+                )}
+              </Text>
+            </Stack>
+          )}
           <Stack gap={2} style={{ minWidth: 0 }}>
             <FieldLabel>{t('purchaseOrders.form.customerLabel')}</FieldLabel>
             <Text size="md" fw={600} component="div">

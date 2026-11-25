@@ -39,10 +39,12 @@ import {
   poVendorNote,
 } from './purchaseOrderModel';
 import { findPurchaseOrderStatus } from './purchaseOrderStatuses';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
 const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
+const showVendor = showPurchaseOrderVendor();
 
 type Props = {
   readonly order: PurchaseOrder | null;
@@ -187,7 +189,7 @@ export function PurchaseOrderPreviewDrawer({ order, onClose, arrivals, employeeN
             >
               {order.orderNumber}
             </Anchor>
-            <Text c="dimmed">{order.vendorName}</Text>
+            {showVendor && <Text c="dimmed">{order.vendorName || '—'}</Text>}
           </Group>
         )
       }

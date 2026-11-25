@@ -37,6 +37,7 @@
     },
     "empty": "NKTU owes no vendor anything",
     "searchPlaceholder": "Search vendors",
+    "searchOrderPlaceholder": "Search order number",
     "title": "Payables"
   },
   "receivable": {

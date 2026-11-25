@@ -110,6 +110,8 @@ import {
   vatRatePercentOf,
 } from './purchaseOrderModel';
 import { savePurchaseOrder } from './savePurchaseOrder';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
+import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -119,7 +121,9 @@ const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDep
 const pricingOn = isPricingManagementEnabled();
 
 const showPrice = pricingOn && perms.purchaseOrder.canViewPrice();
-const formClosedForViewer = pricingOn && !showPrice;
+const priceBlind = isPriceBlindAuthor();
+
+const showVendor = showPurchaseOrderVendor();
 
 const isOrderableProduct = (p: Product) => !p.extra?.isDeleted && !isNoInventoryProduct(p);
 
@@ -396,12 +400,10 @@ export function PurchaseOrderFormPage() {
   const unitLabels = useLookupV2Labels('product-unit');
 
   useEffect(() => {
-    if (!isMobile && !formClosedForViewer) return;
+    if (!isMobile) return;
     notifications.show({
       color: 'yellow',
-      message: formClosedForViewer
-        ? t('purchaseOrders.notifications.noPriceAccess')
-        : t('purchaseOrders.notifications.mobileFormBlocked'),
+      message: t('purchaseOrders.notifications.mobileFormBlocked'),
       autoClose: 4000,
     });
     navigate(
@@ -411,7 +413,7 @@ export function PurchaseOrderFormPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const blocked = isMobile || formClosedForViewer;
+  const blocked = isMobile;
 
   const {
     items: locations,
@@ -432,7 +434,7 @@ export function PurchaseOrderFormPage() {
 
   useEffect(() => {
     if (blocked) return;
-    if (!vendorsInitialized) loadVendors();
+    if (showVendor && !vendorsInitialized) loadVendors();
     if (!customersInitialized) loadCustomers();
 
     if (!locationsInitialized) loadLocations();
@@ -484,7 +486,7 @@ export function PurchaseOrderFormPage() {
 
   const validate = useMemo<FormValidateInput<FormValues>>(
     () => ({
-      vendorCode: (v) => (!v ? t('purchaseOrders.validation.vendorRequired') : null),
+      vendorCode: (v) => (showVendor && !v ? t('purchaseOrders.validation.vendorRequired') : null),
       orderDate: (v) => (!v ? t('purchaseOrders.validation.orderDateRequired') : null),
       ...(locationsEnabled && {
         locationCode: (v: string) => (!v ? t('purchaseOrders.validation.locationRequired') : null),
@@ -545,6 +547,15 @@ export function PurchaseOrderFormPage() {
       snapshotRef.current = r;
 
       if (r.status !== 'draft') {
+        navigate(ROUTES.PURCHASE_ORDERS.DETAIL.replace(':id', id), { replace: true });
+        return null;
+      }
+      if (priceBlind && carriesPriceFigure(r)) {
+        notifications.show({
+          color: 'yellow',
+          message: t('purchaseOrders.notifications.noPriceAccess'),
+          autoClose: 4000,
+        });
         navigate(ROUTES.PURCHASE_ORDERS.DETAIL.replace(':id', id), { replace: true });
         return null;
       }
@@ -862,9 +873,10 @@ export function PurchaseOrderFormPage() {
             vendorNote: values.vendorNote.trim(),
             currency: values.currency,
 
-            vatRate: showPrice
-              ? vatRateOfPercent(values.vatRatePercent)
-              : poVatRate(snapshotRef.current),
+            vatRate:
+              showPrice || (priceBlind && !snapshotRef.current)
+                ? vatRateOfPercent(values.vatRatePercent)
+                : poVatRate(snapshotRef.current),
             items,
             orderDate,
             leadTime,
@@ -998,17 +1010,19 @@ export function PurchaseOrderFormPage() {
                 value={values.currency}
                 onChange={(v) => handleCurrencyChange(v === 'CNY' ? 'CNY' : 'VND')}
               />
-              <VendorSelector
-                label={t('common.labels.vendor')}
-                placeholder={t('purchaseOrders.form.vendorPlaceholder')}
-                withAsterisk
-                value={values.vendorCode || null}
-                onChange={(v) => {
-                  form.setFieldValue('vendorCode', v?.code ?? '');
-                  form.setFieldValue('vendorName', v?.name ?? '');
-                }}
-                error={form.errors.vendorCode}
-              />
+              {showVendor && (
+                <VendorSelector
+                  label={t('common.labels.vendor')}
+                  placeholder={t('purchaseOrders.form.vendorPlaceholder')}
+                  withAsterisk
+                  value={values.vendorCode || null}
+                  onChange={(v) => {
+                    form.setFieldValue('vendorCode', v?.code ?? '');
+                    form.setFieldValue('vendorName', v?.name ?? '');
+                  }}
+                  error={form.errors.vendorCode}
+                />
+              )}
               <CustomerSelector
                 label={t('purchaseOrders.form.customerLabel')}
                 placeholder={t('purchaseOrders.form.customerPlaceholder')}

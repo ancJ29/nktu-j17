@@ -37,6 +37,7 @@
     },
     "empty": "Không có công nợ",
     "searchPlaceholder": "Tìm nhà cung cấp",
+    "searchOrderPlaceholder": "Tìm số đơn",
     "title": "Công nợ NCC"
   },
   "receivable": {

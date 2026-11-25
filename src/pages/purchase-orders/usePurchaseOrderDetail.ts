@@ -29,6 +29,8 @@ import type {
 import { buildUploadDirectory } from '@/utils/uploadPath';
 import { writePurchaseOrderAttachments, writePurchaseOrderPhotos } from './purchaseOrderMediaWrite';
 import { arrivalOf, type Arrival } from './purchaseOrderArrivals';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
+import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
 import { findPurchaseOrderStatus, canTransitionPurchaseOrder } from './purchaseOrderStatuses';
 import {
   poCurrency,
@@ -140,8 +142,12 @@ export function usePurchaseOrderDetail(t: TFunction) {
     [id],
   );
   const currentEmployee = useMyEmployee();
-  const showEditCta = !!order && status === 'draft' && canAuthor && !isMobile;
-  const showReadyCta = !!order && status === 'draft' && canAuthor;
+
+  const canEditPriceless =
+    perms.purchaseOrder.canEdit() && isPriceBlindAuthor() && !!order && !carriesPriceFigure(order);
+  const showEditCta = !!order && status === 'draft' && (canAuthor || canEditPriceless) && !isMobile;
+
+  const showReadyCta = !!order && status === 'draft' && canAuthor && showPurchaseOrderVendor();
   const showCancelCta =
     !!order && (status === 'draft' || status === 'ready') && perms.purchaseOrder.canEdit();
   const canMarkPaid = !!order && perms.purchaseOrder.canMarkPaid();
@@ -155,8 +161,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
     receipts?.kind === 'ok' &&
     liveCount === 0;
 
-  const showCopyCta =
-    !!order && perms.purchaseOrder.canCreate() && !isMobile && (!pricingOn || showPrice);
+  const showCopyCta = !!order && perms.purchaseOrder.canCreate() && !isMobile;
   const handleCopy = useCallback(() => {
     if (!order) return;
     const copyFrom: PurchaseOrderCopyFrom = {

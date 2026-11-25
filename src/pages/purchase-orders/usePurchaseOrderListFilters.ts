@@ -60,14 +60,15 @@ function compactState(state: PurchaseOrderUrlState): PurchaseOrderUrlState {
   return r;
 }
 
-export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[]) {
+export function usePurchaseOrderListFilters(storeOrders: PurchaseOrder[], vendorVisible = true) {
   const { state, updateState, clearFilters } = useUrlBlobFilters<PurchaseOrderUrlState>({
     cacheKey: 'cmngt:purchase-order-filters',
     compactState,
   });
 
   const statusFilter = useMemo(() => state.s ?? [], [state.s]);
-  const vendorFilter = state.v ?? null;
+
+  const vendorFilter = vendorVisible ? (state.v ?? null) : null;
   const customerFilter = state.c ?? null;
   const staffFilter = state.f ?? null;
   const paidFilter = state.p ?? null;

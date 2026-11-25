@@ -28,9 +28,11 @@ import {
   orderTotal,
 } from './purchaseOrderModel';
 import { useColumnWidths } from '@/hooks/useColumnWidths';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 
 const locationsEnabled = isLocationsEnabled();
 const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
+const showVendor = showPurchaseOrderVendor();
 
 type Props = {
   readonly orders: PurchaseOrder[];
@@ -83,23 +85,27 @@ export function PurchaseOrderDataTable({
           </Stack>
         ),
       },
-      {
-        key: 'vendor',
-        header: t('common.labels.vendor'),
-        width: '13%',
-        render: (item: PurchaseOrder) => (
-          <Stack gap={2}>
-            <Text fz="sm" fw={500} lh={1.25}>
-              {item.vendorName || '—'}
-            </Text>
-            {locationsEnabled && item.locationName && (
-              <Text size="xs" c="dimmed" lineClamp={1}>
-                {item.locationName}
-              </Text>
-            )}
-          </Stack>
-        ),
-      },
+      ...(showVendor
+        ? [
+            {
+              key: 'vendor',
+              header: t('common.labels.vendor'),
+              width: '13%',
+              render: (item: PurchaseOrder) => (
+                <Stack gap={2}>
+                  <Text fz="sm" fw={500} lh={1.25}>
+                    {item.vendorName || '—'}
+                  </Text>
+                  {locationsEnabled && item.locationName && (
+                    <Text size="xs" c="dimmed" lineClamp={1}>
+                      {item.locationName}
+                    </Text>
+                  )}
+                </Stack>
+              ),
+            },
+          ]
+        : []),
       {
         key: 'customer',
         header: t('purchaseOrders.form.customerLabel'),

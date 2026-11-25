@@ -100,6 +100,7 @@ import { findStatus as findGoodsReceiptStatus } from '@/pages/goods-receipts/goo
 import type { GoodsReceiptStatus } from '@/types';
 import { isLocationsEnabled } from '@/utils/permission';
 import { readTruckingSize, truckingSizeFallbackLabel } from '@/pages/transport-orders/truckingSize';
+import { showPurchaseOrderVendor } from '@/pages/purchase-orders/purchaseOrderVendorAccess';
 
 const locationsEnabled = isLocationsEnabled();
 const isMobile = device.isMobile;
@@ -2849,8 +2850,17 @@ function PurchaseOrderMemoLine({
   readonly memo: PurchaseOrderMemo;
 }) {
   const { t } = useTranslation();
-  if (action === 'purchaseOrder.create') return <GoodsReceiptCreateBody memo={memo} />;
-  if (action === 'purchaseOrder.update') return <GoodsReceiptFormUpdateBody memo={memo} />;
+  // The memo keeps the vendor's code; a viewer without vendor view is shown none (past entries too).
+  if (action === 'purchaseOrder.create' || action === 'purchaseOrder.update') {
+    const shown = showPurchaseOrderVendor()
+      ? memo
+      : { ...memo, vendorCode: undefined, vendorDiff: undefined };
+    return action === 'purchaseOrder.create' ? (
+      <GoodsReceiptCreateBody memo={shown} />
+    ) : (
+      <GoodsReceiptFormUpdateBody memo={shown} />
+    );
+  }
   if (action === 'purchaseOrder.payment' && memo.tracking) {
     return (
       <Text size="xs" c="dimmed" pl={36}>

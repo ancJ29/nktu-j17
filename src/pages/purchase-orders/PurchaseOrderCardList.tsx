@@ -25,9 +25,11 @@ import {
   poOrderDateIso,
   poStatus,
 } from './purchaseOrderModel';
+import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 
 const locationsEnabled = isLocationsEnabled();
 const showPrice = isPricingManagementEnabled() && perms.purchaseOrder.canViewPrice();
+const showVendor = showPurchaseOrderVendor();
 
 type Props = {
   readonly orders: PurchaseOrder[];
@@ -156,9 +158,11 @@ export function PurchaseOrderCardList({
                   )}
                 </Group>
               </Group>
-              <Text size="sm" fw={600} lh={1.25} truncate>
-                {o.vendorName || '—'}
-              </Text>
+              {showVendor && (
+                <Text size="sm" fw={600} lh={1.25} truncate>
+                  {o.vendorName || '—'}
+                </Text>
+              )}
               {poCustomer(o) && (
                 <Text size="xs" lh={1.3} truncate>
                   {t('purchaseOrders.form.customerLabel')}:{' '}
