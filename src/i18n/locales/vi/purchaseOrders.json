@@ -125,6 +125,7 @@
     "createSuccess": "Đã tạo đơn đặt hàng",
     "defaultLocationMissing": "Thiếu kho mặc định",
     "fetchError": "Không tải được đơn đặt hàng",
+    "outOfScope": "Bạn chỉ xem được đơn đặt hàng do mình tạo, phụ trách hoặc yêu cầu",
     "importEmpty": "File không có dòng hợp lệ",
     "importError": "Không đọc được file",
     "importMissingColumn": "File cần có các cột: {{columns}}",
@@ -180,6 +181,7 @@
     "itemCodeUnitDuplicate": "Sản phẩm này đã có ở dòng khác cùng đơn vị tính",
     "itemsRequired": "Thêm ít nhất một dòng hàng",
     "locationRequired": "Chọn kho",
+    "notesRequired": "Vui lòng nhập ghi chú",
     "orderDateRequired": "Chọn ngày đặt hàng",
     "ready": {
       "badQuantity": "Mỗi dòng cần số lượng lớn hơn 0",

@@ -125,6 +125,7 @@
     "createSuccess": "Purchase order created",
     "defaultLocationMissing": "The default location is missing",
     "fetchError": "Could not load the purchase order",
+    "outOfScope": "You can only view the purchase orders you created, are in charge of or requested",
     "importEmpty": "The file has no valid rows",
     "importError": "Could not read the file",
     "importMissingColumn": "The file needs these columns: {{columns}}",
@@ -180,6 +181,7 @@
     "itemCodeUnitDuplicate": "This product is already on another line in the same unit",
     "itemsRequired": "Add at least one line",
     "locationRequired": "Select a location",
+    "notesRequired": "Please enter the note",
     "orderDateRequired": "Select the order date",
     "ready": {
       "badQuantity": "Every line needs a quantity above 0",

@@ -45,7 +45,12 @@ import { useLocationStore } from '@/stores/useLocationStore';
 import { useProductStore } from '@/stores/useProductStore';
 import { EntityConflictError } from '@/stores/createEntityStore';
 import { device, logger } from '@credo/base-ui/utils';
-import { lookupLabelOf, useInitFormFromFetch, useLookupV2Labels } from '@/hooks';
+import {
+  getCurrentEmployeeId,
+  lookupLabelOf,
+  useInitFormFromFetch,
+  useLookupV2Labels,
+} from '@/hooks';
 import {
   getPricingVatRate,
   getPurchaseOrderPicDepartments,
@@ -112,6 +117,7 @@ import {
 import { savePurchaseOrder } from './savePurchaseOrder';
 import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
 import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
+import { canViewPurchaseOrder, purchaseOrderViewScope } from './purchaseOrderViewScope';
 
 const isMobile = device.isMobile;
 const locationsEnabled = isLocationsEnabled();
@@ -488,6 +494,8 @@ export function PurchaseOrderFormPage() {
     () => ({
       vendorCode: (v) => (showVendor && !v ? t('purchaseOrders.validation.vendorRequired') : null),
       orderDate: (v) => (!v ? t('purchaseOrders.validation.orderDateRequired') : null),
+
+      notes: (v) => (!isEdit && !v.trim() ? t('purchaseOrders.validation.notesRequired') : null),
       ...(locationsEnabled && {
         locationCode: (v: string) => (!v ? t('purchaseOrders.validation.locationRequired') : null),
       }),
@@ -512,7 +520,7 @@ export function PurchaseOrderFormPage() {
         },
       },
     }),
-    [t],
+    [t, isEdit],
   );
 
   const form = useForm<FormValues>({
@@ -545,6 +553,15 @@ export function PurchaseOrderFormPage() {
     async (id) => {
       const { item: r } = await purchaseOrderBundle.fetchById(id);
       snapshotRef.current = r;
+
+      if (!canViewPurchaseOrder(r, getCurrentEmployeeId(), purchaseOrderViewScope())) {
+        notifications.show({
+          color: 'red',
+          message: t('purchaseOrders.notifications.outOfScope'),
+        });
+        navigate(ROUTES.PURCHASE_ORDERS.LIST, { replace: true });
+        return null;
+      }
 
       if (r.status !== 'draft') {
         navigate(ROUTES.PURCHASE_ORDERS.DETAIL.replace(':id', id), { replace: true });
@@ -1105,6 +1122,7 @@ export function PurchaseOrderFormPage() {
               />
               <Textarea
                 label={t('__new__.01-common.labels.note')}
+                withAsterisk={!isEdit}
                 placeholder={t('purchaseOrders.form.notesPlaceholder')}
                 autosize
                 minRows={2}

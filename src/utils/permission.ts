@@ -713,6 +713,9 @@ export const perms = {
       canViewPrice: () => resolve().actions?.canViewPrice ?? false,
 
       canMarkPaid: () => resolve().actions?.canMarkPaid ?? false,
+
+      canViewAll: () => resolve().query?.canViewAll ?? false,
+      canViewSelf: () => resolve().query?.canViewSelf ?? false,
     };
   })(),
   cashBook: createModulePerms('cashBook'),

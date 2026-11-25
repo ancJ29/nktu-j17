@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router';
 import type { TFunction } from 'i18next';
 import { device, logger } from '@credo/base-ui/utils';
 import { ROUTES } from '@/constants/routes';
-import { getCurrentActorId } from '@/hooks';
+import { getCurrentActorId, getCurrentEmployeeId } from '@/hooks';
 import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { logActivity } from '@/utils/activityLogger';
 import { stateMemo } from './activityMemo';
@@ -30,6 +30,7 @@ import { buildUploadDirectory } from '@/utils/uploadPath';
 import { writePurchaseOrderAttachments, writePurchaseOrderPhotos } from './purchaseOrderMediaWrite';
 import { arrivalOf, type Arrival } from './purchaseOrderArrivals';
 import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
+import { canViewPurchaseOrder, purchaseOrderViewScope } from './purchaseOrderViewScope';
 import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
 import { findPurchaseOrderStatus, canTransitionPurchaseOrder } from './purchaseOrderStatuses';
 import {
@@ -83,6 +84,7 @@ const ACTION_SUCCESS = {
   unreceive: 'purchaseOrders.notifications.unreceivedSuccess',
 } as const;
 const pricingOn = isPricingManagementEnabled();
+const viewScope = purchaseOrderViewScope();
 
 export function usePurchaseOrderDetail(t: TFunction) {
   const { id } = useParams<{ id: string }>();
@@ -99,7 +101,17 @@ export function usePurchaseOrderDetail(t: TFunction) {
     purchaseOrderBundle
       .fetchById(id)
       .then(({ item }) => {
-        if (!cancelled) setOrder(item);
+        if (cancelled) return;
+
+        if (!canViewPurchaseOrder(item, getCurrentEmployeeId(), viewScope)) {
+          notifications.show({
+            color: 'red',
+            message: t('purchaseOrders.notifications.outOfScope'),
+          });
+          navigate(ROUTES.PURCHASE_ORDERS.LIST, { replace: true });
+          return;
+        }
+        setOrder(item);
       })
       .catch((err) => {
         logger.error('Purchase order fetch failed:', err);

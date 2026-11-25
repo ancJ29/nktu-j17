@@ -269,6 +269,10 @@ export const BASE_PERMISSIONS: Permissions = {
       canViewPrice: false,
       canMarkPaid: false,
     },
+    query: {
+      canViewAll: false,
+      canViewSelf: false,
+    },
   },
 
   cashBook: {

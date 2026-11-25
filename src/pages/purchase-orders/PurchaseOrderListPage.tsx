@@ -55,11 +55,14 @@ import { businessDateString } from '@/utils/code';
 import { ListStatsCards } from '@/components/ListStatsCards';
 import { usePurchaseOrderListFilters, type PaidFilter } from './usePurchaseOrderListFilters';
 import { showPurchaseOrderVendor } from './purchaseOrderVendorAccess';
+import { purchaseOrderViewScope, scopePurchaseOrdersToViewer } from './purchaseOrderViewScope';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 
 const isMobile = device.isMobile;
 const canCreate = perms.purchaseOrder.canCreate();
 const locationsEnabled = isLocationsEnabled();
 const showVendor = showPurchaseOrderVendor();
+const viewScope = purchaseOrderViewScope();
 const picEmployeeFilter = makeEmployeeDepartmentFilter(getPurchaseOrderPicDepartments());
 
 const requesterEmployeeFilter = makeEmployeeDepartmentFilter(getSalesOrderPicDepartments());
@@ -105,7 +108,12 @@ export function PurchaseOrderListPage() {
     return m;
   }, [products]);
 
-  const filters = usePurchaseOrderListFilters(items, showVendor);
+  const viewerId = useMyEmployee()?.id ?? null;
+  const scopedItems = useMemo(
+    () => scopePurchaseOrdersToViewer(items, viewerId, viewScope),
+    [items, viewerId],
+  );
+  const filters = usePurchaseOrderListFilters(scopedItems, showVendor);
 
   const windowFromDay = filters.createdDateRange.from
     ? vnDayOf(filters.createdDateRange.from.toISOString())

@@ -37,6 +37,11 @@ import { OVERDUE_ROW_BG, PAYMENT_STATE_COLOR } from '@/utils/paymentStateColor';
 import { defaultLastNDaysRange } from '@/utils/listFilterDateRange';
 import { perms } from '@/utils/permission';
 import { showPurchaseOrderVendor } from '@/pages/purchase-orders/purchaseOrderVendorAccess';
+import {
+  purchaseOrderViewScope,
+  scopePurchaseOrdersToViewer,
+} from '@/pages/purchase-orders/purchaseOrderViewScope';
+import { useMyEmployee } from '@/hooks/useMyEmployee';
 import { PaymentNoteCell } from './PaymentNoteCell';
 import { PaymentsLoadError } from './PaymentsLoadError';
 import { bulkMark } from './bulkMarkPayments';
@@ -55,6 +60,7 @@ import { RECEIVABLE_FILTERS, parseReceivableFilter } from './receivables';
 const isMobile = device.isMobile;
 
 const canMark = perms.purchaseOrder.canMarkPaid();
+const viewScope = purchaseOrderViewScope();
 
 const showVendor = showPurchaseOrderVendor();
 
@@ -126,16 +132,19 @@ export function PayablesTab() {
   );
 
   const today = businessDateString();
+
+  const viewerId = useMyEmployee()?.id ?? null;
   const base = useMemo<PurchaseOrder[]>(() => {
     const q = search.trim().toLowerCase();
-    return (ready ? createdInWindow(items, fetchRange) : []).filter((po) => {
+    const inWindow = ready ? createdInWindow(items, fetchRange) : [];
+    return scopePurchaseOrdersToViewer(inWindow, viewerId, viewScope).filter((po) => {
       if (vendorCode && po.vendorCode !== vendorCode) return false;
       if (!q) return true;
       const v = vendorByCode.get(po.vendorCode);
       const name = showVendor ? v?.extra?.shortName?.trim() || v?.name || po.vendorName || '' : '';
       return (po.orderNumber ?? '').toLowerCase().includes(q) || name.toLowerCase().includes(q);
     });
-  }, [items, ready, fetchRange, vendorCode, search, vendorByCode]);
+  }, [items, ready, fetchRange, vendorCode, search, vendorByCode, viewerId]);
 
   const counts = useMemo(() => countPayablesByFilter(base, today), [base, today]);
 
