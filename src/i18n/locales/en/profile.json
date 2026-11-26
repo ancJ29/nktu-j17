@@ -25,6 +25,7 @@
       "canManageInventory": "Manage Inventory",
       "canManagePayment": "Record payments",
       "canMarkPaid": "Mark paid and set deadline",
+      "canMarkReceived": "Mark received",
       "canManagePhotos": "Manage Photos",
       "canManagePrice": "Manage Price",
       "canManualRelease": "Manual Release",

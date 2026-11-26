@@ -1,6 +1,17 @@
 import type { PurchaseOrder, PurchaseOrderStatus } from '@/types';
 import { poExtra } from './purchaseOrderModel';
 
+export function receivedMarkAllowed(p: {
+  canEdit: boolean;
+  pricingOn: boolean;
+  canViewPrice: boolean;
+  canViewVendor: boolean;
+  canMarkReceived: boolean;
+}): boolean {
+  const canAuthor = p.canEdit && (!p.pricingOn || p.canViewPrice);
+  return (canAuthor && p.canViewVendor) || p.canMarkReceived;
+}
+
 export function receivedMarkOffer(
   status: PurchaseOrderStatus | null,
   allowed: boolean,

@@ -270,6 +270,8 @@ export const BASE_PERMISSIONS: Permissions = {
       canMarkPaid: false,
 
       canTakePhoto: false,
+
+      canMarkReceived: false,
     },
     query: {
       canViewAll: false,

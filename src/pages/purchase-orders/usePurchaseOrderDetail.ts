@@ -34,6 +34,7 @@ import { canViewPurchaseOrder, purchaseOrderViewScope } from './purchaseOrderVie
 import { carriesPriceFigure, isPriceBlindAuthor } from './purchaseOrderPriceAccess';
 import { findPurchaseOrderStatus, canTransitionPurchaseOrder } from './purchaseOrderStatuses';
 import {
+  receivedMarkAllowed,
   receivedMarkOffer,
   receivedMarkPatch,
   receivedUndoPatch,
@@ -201,7 +202,16 @@ export function usePurchaseOrderDetail(t: TFunction) {
   const canMarkPaid = !!order && perms.purchaseOrder.canMarkPaid();
 
   const receivedOffer = order
-    ? receivedMarkOffer(status, canAuthor && showPurchaseOrderVendor())
+    ? receivedMarkOffer(
+        status,
+        receivedMarkAllowed({
+          canEdit: perms.purchaseOrder.canEdit(),
+          pricingOn,
+          canViewPrice: perms.purchaseOrder.canViewPrice(),
+          canViewVendor: showPurchaseOrderVendor(),
+          canMarkReceived: perms.purchaseOrder.canMarkReceived(),
+        }),
+      )
     : null;
 
   const showMakeReceiptCta =

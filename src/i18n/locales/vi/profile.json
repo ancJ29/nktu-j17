@@ -25,6 +25,7 @@
       "canManageInventory": "Quản lý tồn kho",
       "canManagePayment": "Ghi nhận thanh toán",
       "canMarkPaid": "Đánh dấu đã thanh toán và hạn thanh toán",
+      "canMarkReceived": "Đánh dấu đã nhận hàng",
       "canManagePhotos": "Quản lý ảnh",
       "canManagePrice": "Quản lý giá",
       "canManualRelease": "Giải phóng tồn kho thủ công",
