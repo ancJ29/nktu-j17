@@ -50,6 +50,8 @@ import {
   poVatRate,
   poVendorNote,
   readyBlockers,
+  readyPatch,
+  unpricedLineCount,
 } from './purchaseOrderModel';
 import {
   findReceiptsForOrder,
@@ -310,7 +312,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
         return;
       }
       if (action === 'ready') {
-        const blockers = readyBlockers(order, { requirePrice: pricingOn });
+        const blockers = readyBlockers(order);
         if (blockers.length > 0) {
           notifications.show({
             color: 'red',
@@ -337,7 +339,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
     const now = new Date().toISOString();
     const patch =
       confirmAction === 'ready'
-        ? { status: 'ready', readyAt: now, extra: { ...poExtra(order), readyBy: actor } }
+        ? readyPatch(order, actor, now, { pricingOn })
         : confirmAction === 'received'
           ? receivedMarkPatch(order, actor, now)
           : confirmAction === 'unreceive'
@@ -425,6 +427,7 @@ export function usePurchaseOrderDetail(t: TFunction) {
     receiptsUnreadable,
     arrival,
     confirmAction,
+    unpricedCount: order ? unpricedLineCount(order, pricingOn) : 0,
     confirmOpened,
     openConfirm,
     closeConfirm,

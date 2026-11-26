@@ -1030,6 +1030,11 @@ export function PurchaseOrderDetailPage() {
       >
         <Stack gap="md">
           <Text size="sm">{t(CONFIRM_TEXT[d.confirmAction].message)}</Text>
+          {d.confirmAction === 'ready' && d.unpricedCount > 0 && (
+            <Text size="sm" c="orange">
+              {t('purchaseOrders.confirm.readyUnpriced', { count: d.unpricedCount })}
+            </Text>
+          )}
           <Group justify="flex-end">
             <Button variant="default" onClick={d.closeConfirm} disabled={d.actionLoading}>
               {t('common.actions.cancel')}

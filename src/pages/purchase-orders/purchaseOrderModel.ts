@@ -300,16 +300,40 @@ export function isOverdue(po: Loose, todayVn: string): boolean {
   return d !== '' && d < todayVn;
 }
 
-export type ReadyBlocker = 'noLines' | 'badQuantity' | 'missingPrice' | 'noVendor';
+export type ReadyBlocker = 'noLines' | 'badQuantity' | 'noVendor';
 
-export function readyBlockers(po: Loose, opts: { requirePrice: boolean }): ReadyBlocker[] {
+export function readyBlockers(po: Loose): ReadyBlocker[] {
   const out: ReadyBlocker[] = [];
   const items = poItems(po);
   if (items.length === 0) out.push('noLines');
   if (items.some((i) => !(num(i.quantity) > 0))) out.push('badQuantity');
-  if (opts.requirePrice && items.some((i) => !hasPrice(i))) out.push('missingPrice');
   if (!po?.vendorCode) out.push('noVendor');
   return out;
+}
+
+export function unpricedLineCount(po: Loose, pricingOn: boolean): number {
+  return pricingOn ? poItems(po).filter((i) => !hasPrice(i)).length : 0;
+}
+
+export function readyPatch(
+  po: Loose,
+  actor: string,
+  now: string,
+  opts: { pricingOn: boolean },
+): Record<string, unknown> {
+  const patch: Record<string, unknown> = {
+    status: 'ready',
+    readyAt: now,
+    extra: { ...poExtra(po), readyBy: actor },
+  };
+  if (unpricedLineCount(po, opts.pricingOn) > 0) {
+    patch.items = (po?.items as unknown[]).map((i) =>
+      i && typeof i === 'object' && !hasPrice(i as PurchaseOrderItem)
+        ? { ...(i as object), unitPrice: 0 }
+        : i,
+    );
+  }
+  return patch;
 }
 
 export function formatMoney(value: number, currency: PurchaseOrderCurrency): string {

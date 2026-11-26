@@ -24,6 +24,8 @@
     "cancelMessage": "Cancel this purchase order? This cannot be undone.",
     "cancelTitle": "Cancel order",
     "readyMessage": "Mark this order as sent to the vendor? It becomes final and its lines are locked.",
+    "readyUnpriced_one": "{{count}} line has no price and will be sent at 0.",
+    "readyUnpriced_other": "{{count}} lines have no price and will be sent at 0.",
     "readyTitle": "Mark as sent",
     "receivedMessage": "Mark this order's goods as arrived? This makes no goods receipt and does not change stock.",
     "receivedTitle": "Mark as received",
@@ -185,7 +187,6 @@
     "orderDateRequired": "Select the order date",
     "ready": {
       "badQuantity": "Every line needs a quantity above 0",
-      "missingPrice": "Every line needs a price before the order is marked as sent",
       "noLines": "Add at least one line before marking the order as sent",
       "noVendor": "Select a vendor first"
     },

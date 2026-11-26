@@ -24,6 +24,8 @@
     "cancelMessage": "Hủy đơn đặt hàng này? Không thể hoàn tác.",
     "cancelTitle": "Hủy đơn",
     "readyMessage": "Đánh dấu đơn này đã gửi cho nhà cung cấp? Đơn sẽ chốt và khóa các dòng hàng.",
+    "readyUnpriced_one": "{{count}} dòng chưa có đơn giá sẽ gửi với đơn giá 0.",
+    "readyUnpriced_other": "{{count}} dòng chưa có đơn giá sẽ gửi với đơn giá 0.",
     "readyTitle": "Đánh dấu đã gửi NCC",
     "receivedMessage": "Đánh dấu hàng của đơn này đã về? Việc này không tạo phiếu nhập kho và không đổi tồn kho.",
     "receivedTitle": "Đánh dấu đã nhận hàng",
@@ -185,7 +187,6 @@
     "orderDateRequired": "Chọn ngày đặt hàng",
     "ready": {
       "badQuantity": "Mỗi dòng cần số lượng lớn hơn 0",
-      "missingPrice": "Mỗi dòng cần có đơn giá trước khi đánh dấu đã gửi",
       "noLines": "Thêm ít nhất một dòng hàng trước khi đánh dấu đã gửi",
       "noVendor": "Chọn nhà cung cấp trước"
     },

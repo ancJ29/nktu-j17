@@ -191,6 +191,8 @@ export function toPurchaseOrderPrintDataFromOrder(input: {
   };
 }
 
+const NO_NOTE = 'Không có';
+
 type Tri = readonly [vi: string, zh: string, en: string];
 
 const L = {
@@ -291,10 +293,9 @@ function buildParts(
   const showPackages = data.lines.some((l) => l.packageCount !== null);
 
   const showTax = showPrices && data.lines.some((l) => (l.tax ?? 0) > 0);
-  const showNote = data.lines.some((l) => l.note !== '');
 
   const isA5 = paperSize === 'A5';
-  const dense = showTax && showNote;
+  const dense = showTax;
   const marginMm = isA5 ? 8 : 12;
   const baseFontPx = isA5 ? (dense ? 9 : 10) : dense ? 11 : 12.5;
   const subFontPx = isA5 ? (dense ? 7 : 8) : dense ? 9 : 10;
@@ -342,7 +343,7 @@ function buildParts(
     (showPackages ? w.packages : 0) +
     (showPrices ? w.price + w.amount : 0) +
     (showTax ? w.tax : 0) +
-    (showNote ? w.note : 0);
+    w.note;
   const minNamePx = isA5 ? 110 : 150;
   const photoMaxPx = isA5 ? 96 : 144;
   const photoMinPx = isA5 ? 40 : 56;
@@ -359,6 +360,12 @@ function buildParts(
     buyer.email && `${inline(L.email)}: ${escapeHtml(buyer.email)}`,
   ].filter(Boolean);
 
+  const isOrder = currency !== undefined;
+  const vendorNoteHtml = data.vendorNote
+    ? escapeHtml(data.vendorNote).replace(/\n/g, '<br />')
+    : isOrder
+      ? NO_NOTE
+      : '';
   const expected = includeExpectedDelivery ? dateLine(data.expectedDate) : '';
   const partyRows = (
     [
@@ -367,7 +374,7 @@ function buildParts(
       [L.phone, escapeHtml(supplier.phone), false],
       [L.contact, escapeHtml(supplier.contactPerson), false],
       [L.reference, escapeHtml(data.reference), false],
-      [L.vendorNote, escapeHtml(data.vendorNote).replace(/\n/g, '<br />'), false],
+      [L.vendorNote, vendorNoteHtml, false],
       [L.expectedDelivery, expected, false],
       [L.currency, showPrices ? escapeHtml(currency) : '', false],
     ] as const
@@ -380,14 +387,9 @@ function buildParts(
     .join('');
 
   const columnCount =
-    5 +
-    (showPhoto ? 1 : 0) +
-    (showPackages ? 1 : 0) +
-    (showPrices ? 2 : 0) +
-    (showTax ? 1 : 0) +
-    (showNote ? 1 : 0);
+    6 + (showPhoto ? 1 : 0) + (showPackages ? 1 : 0) + (showPrices ? 2 : 0) + (showTax ? 1 : 0);
 
-  const trailingColumns = (showTax ? 1 : 0) + (showNote ? 1 : 0);
+  const trailingColumns = (showTax ? 1 : 0) + 1;
 
   const rows = data.lines
     .map(
@@ -422,12 +424,8 @@ function buildParts(
               ? `
           <td class="r tax">${line.amount == null || !line.tax ? '' : formatMoney(line.tax, currency)}</td>`
               : ''
-          }${
-            showNote
-              ? `
-          <td class="note">${escapeHtml(line.note || 'Không có')}</td>`
-              : ''
           }
+          <td class="note">${escapeHtml(line.note || NO_NOTE)}</td>
         </tr>`,
     )
     .join('');
@@ -528,9 +526,8 @@ ${palette ? paletteCss(palette) : ''}`;
           <th style="width:${w.price}px">${stacked(L.colUnitPrice)}</th>
           <th style="width:${w.amount}px">${stacked(L.colAmount)}</th>`
               : ''
-          }${showTax ? `\n          <th style="width:${w.tax}px">${stacked(L.colTax)}</th>` : ''}${
-            showNote ? `\n          <th style="width:${w.note}px">${stacked(L.colNote)}</th>` : ''
-          }
+          }${showTax ? `\n          <th style="width:${w.tax}px">${stacked(L.colTax)}</th>` : ''}
+          <th style="width:${w.note}px">${stacked(L.colNote)}</th>
         </tr>
       </thead>
       <tbody>${rows}
