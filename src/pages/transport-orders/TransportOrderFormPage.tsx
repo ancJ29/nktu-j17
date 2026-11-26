@@ -1017,14 +1017,6 @@ export function TransportOrderFormPage() {
                 error={form.errors.customerCode}
                 clearable
               />
-              {showsType2Sheet(form.values.customerCode, form.values.type2Sheet) && (
-                <Type2SheetField
-                  value={form.values.type2Sheet}
-                  onChange={(next) => form.setFieldValue('type2Sheet', next)}
-                  error={form.errors.type2Sheet}
-                  required={!isEdit}
-                />
-              )}
 
               {/* LOẠI XE — order-level, so it shows on a multi-trip job too
                   (the legs own their trucks, the order owns what it was sold
@@ -1129,6 +1121,15 @@ export function TransportOrderFormPage() {
                     />
                   )}
                 </>
+              )}
+
+              {showsType2Sheet(form.values.customerCode, form.values.type2Sheet) && (
+                <Type2SheetField
+                  value={form.values.type2Sheet}
+                  onChange={(next) => form.setFieldValue('type2Sheet', next)}
+                  error={form.errors.type2Sheet}
+                  required={!isEdit}
+                />
               )}
 
               {showsType5Fields(form.values) && (

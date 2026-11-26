@@ -81,7 +81,7 @@
       "fieldTripLaborTotal": "Tổng lương chuyến",
       "fieldTruck": "Xe",
       "fieldTruckingSize": "Loại cont / kích thước",
-      "fieldType2Sheet": "Tab bảng kê",
+      "fieldType2Sheet": "Loại",
       "fieldVatRate": "Thuế suất VAT",
       "fromTo": "{{from}} → {{to}}",
       "notesChanged": "Ghi chú đã thay đổi",
@@ -145,7 +145,7 @@
     "shipmentType": "Loại hình",
     "truckType": "Loại xe",
     "truckingSize": "Loại cont / kích thước",
-    "type2Sheet": "Tab bảng kê",
+    "type2Sheet": "Loại",
     "type2SheetCuaKhau": "HÀNG CỬA KHẨU",
     "type2SheetDieu": "HÀNG ĐIỀU"
   },
