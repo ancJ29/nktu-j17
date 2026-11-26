@@ -111,6 +111,8 @@ export type TransportOrderExtra = {
 
   type5Specific?: TransportOrderType5Specific;
 
+  type2Specific?: TransportOrderType2Specific;
+
   multiDrop?: TransportOrderMultiDrop;
   [key: string]: unknown;
 };
@@ -136,6 +138,12 @@ export type TransportOrderMultiDrop = {
   totalDays: number;
 
   goods?: string;
+};
+
+export type TransportOrderType2Sheet = 'dieu' | 'cuaKhau';
+
+export type TransportOrderType2Specific = {
+  sheet?: TransportOrderType2Sheet;
 };
 
 export type TransportOrderType5Specific = {

@@ -100,6 +100,7 @@ import { useShipmentTypeLabel } from './shipmentType';
 import { useTruckTypeLabel } from '../transport-routes/truckType';
 import { truckOptionLabel, useDriverWithPlate } from './truckDisplay';
 import { isExternalTruck } from './externalTruck';
+import { showsType2Sheet } from './type2Sheet';
 import { ExternalTruckChip } from './TransportVehicle';
 import { isValidContainerNumber, normalizeContainerNumber } from './containerNumber';
 import { reconcileTripLogs } from './tripLogSync';
@@ -572,6 +573,8 @@ export function TransportOrderDetailPage() {
     />
   );
 
+  const type2Sheet = order.extra?.type2Specific?.sheet;
+
   const type5Group = order.extra?.type5Specific;
   const showType5Fields =
     MOOC_FIELD_REPORT_TYPES.has(resolveCustomerReportType(order.customerCode ?? '')) ||
@@ -828,6 +831,18 @@ export function TransportOrderDetailPage() {
               {order.extra?.truckType &&
                 infoRow(t('transportOrders.form.truckType'), truckTypeLabel(order.extra.truckType))}
               {infoRow(t('transportOrders.columns.customerOrder'), customerOrderNumberField)}
+              {/* GIA AN's BẢNG KÊ tab — read-only like LOẠI XE: it is set on the
+              form, where a new order requires it. Same gate as the form. */}
+              {showsType2Sheet(order.customerCode ?? '', type2Sheet ?? '') &&
+                infoRow(
+                  t('transportOrders.form.type2Sheet'),
+                  type2Sheet &&
+                    t(
+                      type2Sheet === 'dieu'
+                        ? 'transportOrders.form.type2SheetDieu'
+                        : 'transportOrders.form.type2SheetCuaKhau',
+                    ),
+                )}
               {showType5Fields && (
                 <>
                   {infoRow(

@@ -54,6 +54,8 @@ import type {
 } from '@/types';
 import { useTruckTypeLabel } from '../transport-routes/truckType';
 import { isExternalTruck } from './externalTruck';
+import { showsType2Sheet, type2SheetMissing, type Type2SheetValue } from './type2Sheet';
+import { Type2SheetField } from './Type2SheetField';
 import {
   DEFAULT_VAT_PERCENT,
   feeRowsToFees,
@@ -117,6 +119,8 @@ type FormValues = FeeFormValues & {
   transportContractNo: string;
   customerCode: string;
   customerName: string;
+
+  type2Sheet: Type2SheetValue;
   status: string;
   notes: string;
 };
@@ -158,6 +162,7 @@ function blankValues(): FormValues {
     transportContractNo: '',
     customerCode: '',
     customerName: '',
+    type2Sheet: '',
     status: getInitialTransportOrderStatus(),
     notes: '',
   };
@@ -185,6 +190,8 @@ function valuesFromOrder(o: TransportOrder, copy: boolean): FormValues {
     transportContractNo: o.transportContractNo || '',
     customerCode: o.customerCode || '',
     customerName: o.customerName || '',
+
+    type2Sheet: o.extra?.type2Specific?.sheet ?? '',
     status: copy ? getInitialTransportOrderStatus() : o.status,
     notes: o.notes || '',
   };
@@ -268,6 +275,10 @@ export function TransportOrderMultiDropFormPage() {
     validate: {
       entryDate: (v) => (!v ? t('transportOrders.validation.entryDateRequired') : null),
       customerCode: (v) => (!v ? t('transportOrders.validation.customerRequired') : null),
+      type2Sheet: (v, values) =>
+        type2SheetMissing(isEdit, values.customerCode, v)
+          ? t('transportOrders.validation.type2SheetRequired')
+          : null,
       truckId: (v, values) =>
         !values.externalTruck && !v ? t('transportOrders.validation.truckRequired') : null,
       truckPlate: (v, values) =>
@@ -350,6 +361,7 @@ export function TransportOrderMultiDropFormPage() {
         truckType,
         customerOrderNumber: '',
         type5Specific: { requestedPickupDate: '', dropoffDate: '', moocStorageDays: null },
+        type2Specific: { sheet: values.type2Sheet },
         billNumber: '',
         declarationNumber: '',
         containerNumber: '',
@@ -522,6 +534,14 @@ export function TransportOrderMultiDropFormPage() {
                 error={form.errors.customerCode}
                 clearable
               />
+              {showsType2Sheet(form.values.customerCode, form.values.type2Sheet) && (
+                <Type2SheetField
+                  value={form.values.type2Sheet}
+                  onChange={(next) => form.setFieldValue('type2Sheet', next)}
+                  error={form.errors.type2Sheet}
+                  required={!isEdit}
+                />
+              )}
               <DateField
                 withAsterisk
                 label={t('transportOrders.columns.date')}

@@ -81,6 +81,7 @@
       "fieldTripLaborTotal": "Total driver pay",
       "fieldTruck": "Truck",
       "fieldTruckingSize": "Container / size",
+      "fieldType2Sheet": "Statement tab",
       "fieldVatRate": "VAT rate",
       "fromTo": "{{from}} → {{to}}",
       "notesChanged": "Note changed",
@@ -143,7 +144,10 @@
     "requestedPickupDate": "Requested pickup date",
     "shipmentType": "Type",
     "truckType": "Vehicle type",
-    "truckingSize": "Container / vehicle size"
+    "truckingSize": "Container / vehicle size",
+    "type2Sheet": "Statement tab",
+    "type2SheetCuaKhau": "HÀNG CỬA KHẨU",
+    "type2SheetDieu": "HÀNG ĐIỀU"
   },
   "locked": {
     "notice": "This order has entered a manifest and is locked — it can no longer be edited or deleted."
@@ -246,6 +250,7 @@
     "entryDateRequired": "Date is required",
     "plateRequired": "Plate number is required",
     "truckRequired": "Truck is required",
-    "truckingSizeRequired": "Container / size is required"
+    "truckingSizeRequired": "Container / size is required",
+    "type2SheetRequired": "Choose the statement tab: HÀNG ĐIỀU or HÀNG CỬA KHẨU"
   }
 }

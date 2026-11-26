@@ -13,6 +13,7 @@
  */
 
 import type { ReactNode } from 'react';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { Card, Code, Group, Stack, Text, ThemeIcon } from '@mantine/core';
 import {
@@ -3392,6 +3393,13 @@ type TransportOrderMemo = {
   reason?: string;
 };
 
+/** A stored `type2Specific.sheet` code → the tab name it prints under; unknown codes raw. */
+function type2SheetLabel(t: TFunction, code: string): string {
+  if (code === 'dieu') return t('transportOrders.form.type2SheetDieu');
+  if (code === 'cuaKhau') return t('transportOrders.form.type2SheetCuaKhau');
+  return code;
+}
+
 /** Field-key → i18n label. Keys not listed render under their raw key. */
 const TRANSPORT_ORDER_FIELD_LABEL: Record<string, string> = {
   entryDate: 'fieldEntryDate',
@@ -3403,6 +3411,7 @@ const TRANSPORT_ORDER_FIELD_LABEL: Record<string, string> = {
   requestedPickupDate: 'fieldRequestedPickupDate',
   dropoffDate: 'fieldDropoffDate',
   moocStorageDays: 'fieldMoocStorageDays',
+  type2Sheet: 'fieldType2Sheet',
   billNumber: 'fieldBillNumber',
   declarationNumber: 'fieldDeclarationNumber',
   containerNumber: 'fieldContainerNumber',
@@ -3526,14 +3535,14 @@ function TransportOrderUpdateBody({ memo }: { readonly memo: TransportOrderMemo 
         const label = labelKey
           ? t(`transportOrders.detail.activityMemo.${labelKey}` as never)
           : key;
-        return (
-          <FieldDelta
-            key={key}
-            label={label}
-            from={delta.from === undefined ? undefined : String(delta.from)}
-            to={delta.to === undefined ? undefined : String(delta.to)}
-          />
-        );
+        // The tab flag is persisted as its code; the card shows the tab's name.
+        const show = (v: string | number | undefined) =>
+          v === undefined
+            ? undefined
+            : key === 'type2Sheet'
+              ? type2SheetLabel(t, String(v))
+              : String(v);
+        return <FieldDelta key={key} label={label} from={show(delta.from)} to={show(delta.to)} />;
       })}
     </Stack>
   );

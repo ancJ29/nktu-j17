@@ -7,6 +7,8 @@ import type {
   TransportOrderTrip,
   TransportOrderTruckingSize,
   TransportOrderShipmentType,
+  TransportOrderType2Sheet,
+  TransportOrderType2Specific,
   TransportOrderType5Specific,
 } from '@/types';
 import { computeTransportOrderTotals, readFeeLines } from './transportOrderPricing';
@@ -29,6 +31,10 @@ export type TransportOrderWriteFields = {
     requestedPickupDate: string;
     dropoffDate: string;
     moocStorageDays: number | null;
+  };
+
+  type2Specific: {
+    sheet: TransportOrderType2Sheet | '';
   };
   billNumber: string;
 
@@ -60,6 +66,7 @@ const OWNED_EXTRA_KEYS: ReadonlySet<string> = new Set([
   'truckType',
   'customerOrderNumber',
   'type5Specific',
+  'type2Specific',
   'multiDrop',
 ]);
 
@@ -74,6 +81,12 @@ function compactType5Specific({
     ...(moocStorageDays !== null ? { moocStorageDays } : {}),
   };
   return Object.keys(group).length > 0 ? group : undefined;
+}
+
+function compactType2Specific({
+  sheet,
+}: TransportOrderWriteFields['type2Specific']): TransportOrderType2Specific | undefined {
+  return sheet ? { sheet } : undefined;
 }
 
 type MirroredTripFields = Pick<
@@ -111,11 +124,20 @@ export function buildTransportOrderWrite(
 
   const trips = fields.isMultiTrip ? fields.trips : [];
 
-  const { truckType, customerOrderNumber, type5Specific, multiDrop, extra, ...rest } = fields;
+  const {
+    truckType,
+    customerOrderNumber,
+    type5Specific,
+    type2Specific,
+    multiDrop,
+    extra,
+    ...rest
+  } = fields;
   const carried = Object.fromEntries(
     Object.entries(extra).filter(([key]) => !OWNED_EXTRA_KEYS.has(key)),
   ) as TransportOrderExtra;
   const type5Group = compactType5Specific(type5Specific);
+  const type2Group = compactType2Specific(type2Specific);
   return {
     ...rest,
     extra: {
@@ -123,6 +145,7 @@ export function buildTransportOrderWrite(
       ...(truckType ? { truckType } : {}),
       ...(customerOrderNumber ? { customerOrderNumber } : {}),
       ...(type5Group ? { type5Specific: type5Group } : {}),
+      ...(type2Group ? { type2Specific: type2Group } : {}),
       ...(multiDrop ? { multiDrop } : {}),
     },
     ...(fields.isMultiTrip ? deriveFromTrips(trips) : {}),

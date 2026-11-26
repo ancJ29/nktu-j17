@@ -5,6 +5,8 @@ export const DEFAULT_CUSTOMER_REPORT_TYPE = 1;
 
 export const MOOC_FIELD_REPORT_TYPES: ReadonlySet<number> = new Set([5, 10]);
 
+export const SHEET_FLAG_REPORT_TYPES: ReadonlySet<number> = new Set([2]);
+
 export type CustomerReportInput = {
   seller: { name: string; address: string; taxCode: string };
 

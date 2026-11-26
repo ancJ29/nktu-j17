@@ -81,6 +81,7 @@
       "fieldTripLaborTotal": "Tổng lương chuyến",
       "fieldTruck": "Xe",
       "fieldTruckingSize": "Loại cont / kích thước",
+      "fieldType2Sheet": "Tab bảng kê",
       "fieldVatRate": "Thuế suất VAT",
       "fromTo": "{{from}} → {{to}}",
       "notesChanged": "Ghi chú đã thay đổi",
@@ -143,7 +144,10 @@
     "requestedPickupDate": "Ngày yêu cầu lấy",
     "shipmentType": "Loại hình",
     "truckType": "Loại xe",
-    "truckingSize": "Loại cont / kích thước"
+    "truckingSize": "Loại cont / kích thước",
+    "type2Sheet": "Tab bảng kê",
+    "type2SheetCuaKhau": "HÀNG CỬA KHẨU",
+    "type2SheetDieu": "HÀNG ĐIỀU"
   },
   "locked": {
     "notice": "Đơn đã lên bảng kê và bị khóa — không thể chỉnh sửa hoặc xóa."
@@ -246,6 +250,7 @@
     "entryDateRequired": "Vui lòng chọn ngày",
     "plateRequired": "Vui lòng nhập biển số xe",
     "truckRequired": "Vui lòng chọn xe",
-    "truckingSizeRequired": "Vui lòng chọn loại cont / kích thước"
+    "truckingSizeRequired": "Vui lòng chọn loại cont / kích thước",
+    "type2SheetRequired": "Vui lòng chọn tab bảng kê: HÀNG ĐIỀU hoặc HÀNG CỬA KHẨU"
   }
 }

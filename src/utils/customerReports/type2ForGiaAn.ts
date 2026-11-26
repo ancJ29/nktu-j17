@@ -1,5 +1,5 @@
 import * as XLSX from 'xlsx-js-style';
-import type { TransportOrder } from '@/types';
+import type { TransportOrder, TransportOrderType2Sheet } from '@/types';
 import {
   feeKey,
   isBillableFee,
@@ -32,6 +32,13 @@ const carriesBorderGateFee = (
   );
 };
 
+export const type2SheetOf = (
+  order: TransportOrder,
+  resolveFeeName: (value: string) => string,
+): TransportOrderType2Sheet =>
+  order.extra?.type2Specific?.sheet ??
+  (carriesBorderGateFee(order, resolveFeeName) ? 'cuaKhau' : 'dieu');
+
 const SHEETS: ReadonlyArray<{
   tab: string;
   titleSuffix: string;
@@ -40,12 +47,12 @@ const SHEETS: ReadonlyArray<{
   {
     tab: 'HÀNG ĐIỀU',
     titleSuffix: '- ĐIỀU',
-    belongs: (o, r) => !carriesBorderGateFee(o, r),
+    belongs: (o, r) => type2SheetOf(o, r) === 'dieu',
   },
   {
     tab: 'HÀNG CỬA KHẨU',
     titleSuffix: '- HÀNG CỬA KHẨU',
-    belongs: carriesBorderGateFee,
+    belongs: (o, r) => type2SheetOf(o, r) === 'cuaKhau',
   },
 ];
 

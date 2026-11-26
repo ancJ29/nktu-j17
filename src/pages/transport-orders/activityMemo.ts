@@ -20,6 +20,8 @@ export type TransportOrderFields = {
   requestedPickupDate?: TransportOrderFieldDelta;
   dropoffDate?: TransportOrderFieldDelta;
   moocStorageDays?: TransportOrderFieldDelta;
+
+  type2Sheet?: TransportOrderFieldDelta;
   customerCode?: TransportOrderFieldDelta;
   billNumber?: TransportOrderFieldDelta;
   declarationNumber?: TransportOrderFieldDelta;
@@ -162,6 +164,7 @@ export function diffTransportOrder(
   );
   set('dropoffDate', delta(type5Before?.dropoffDate, type5After?.dropoffDate));
   set('moocStorageDays', delta(type5Before?.moocStorageDays, type5After?.moocStorageDays));
+  set('type2Sheet', delta(before.extra?.type2Specific?.sheet, after.extra?.type2Specific?.sheet));
   set('customerCode', delta(before.customerCode, after.customerCode));
   set('billNumber', delta(before.billNumber, after.billNumber));
   set('declarationNumber', delta(before.declarationNumber, after.declarationNumber));

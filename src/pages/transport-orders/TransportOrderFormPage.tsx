@@ -82,6 +82,8 @@ import {
   transportOrderStatuses,
 } from './transportOrderStatuses';
 import { buildTransportOrderWrite } from './transportOrderWrite';
+import { showsType2Sheet, type2SheetMissing, type Type2SheetValue } from './type2Sheet';
+import { Type2SheetField } from './Type2SheetField';
 import { PLACE_INPUT_STYLES, PLACE_SUGGESTION_LIMIT } from './placeSuggestions';
 import { usePlaceSuggestions } from './usePlaceSuggestions';
 import { ScheduleConflictAlert } from './ScheduleConflictAlert';
@@ -160,6 +162,8 @@ type FormValues = {
   dropoffDate: string | null;
 
   moocStorageDays: number | string;
+
+  type2Sheet: Type2SheetValue;
   billNumber: string;
   declarationNumber: string;
   containerNumber: string;
@@ -256,6 +260,7 @@ function blankValues(presetTruckType = ''): FormValues {
     requestedPickupDate: null,
     dropoffDate: null,
     moocStorageDays: '',
+    type2Sheet: '',
     billNumber: '',
     declarationNumber: '',
     containerNumber: '',
@@ -321,6 +326,8 @@ function copiedValues(src: TransportOrder): FormValues {
     requestedPickupDate: null,
     dropoffDate: null,
     moocStorageDays: '',
+
+    type2Sheet: src.extra?.type2Specific?.sheet ?? '',
     billNumber: src.billNumber || '',
     declarationNumber: src.declarationNumber || '',
     containerNumber: src.containerNumber || '',
@@ -490,6 +497,10 @@ export function TransportOrderFormPage() {
       entryDate: (v, values) =>
         !values.isMultiTrip && !v ? t('transportOrders.validation.entryDateRequired') : null,
       customerCode: (v) => (!v ? t('transportOrders.validation.customerRequired') : null),
+      type2Sheet: (v, values) =>
+        type2SheetMissing(isEdit, values.customerCode, v)
+          ? t('transportOrders.validation.type2SheetRequired')
+          : null,
 
       truckingSize: (v, values) => {
         if (v) return null;
@@ -589,6 +600,7 @@ export function TransportOrderFormPage() {
           ? isoToVnDateString(o.extra.type5Specific.dropoffDate)
           : null,
         moocStorageDays: o.extra?.type5Specific?.moocStorageDays ?? '',
+        type2Sheet: (o.extra?.type2Specific?.sheet ?? '') as Type2SheetValue,
         billNumber: o.billNumber || '',
         declarationNumber: o.declarationNumber || '',
         containerNumber: o.containerNumber || '',
@@ -667,6 +679,7 @@ export function TransportOrderFormPage() {
             moocStorageDays:
               typeof values.moocStorageDays === 'number' ? values.moocStorageDays : null,
           },
+          type2Specific: { sheet: values.type2Sheet },
           billNumber: values.billNumber.trim(),
           declarationNumber: values.declarationNumber.trim(),
           containerNumber: values.containerNumber.trim(),
@@ -1004,6 +1017,14 @@ export function TransportOrderFormPage() {
                 error={form.errors.customerCode}
                 clearable
               />
+              {showsType2Sheet(form.values.customerCode, form.values.type2Sheet) && (
+                <Type2SheetField
+                  value={form.values.type2Sheet}
+                  onChange={(next) => form.setFieldValue('type2Sheet', next)}
+                  error={form.errors.type2Sheet}
+                  required={!isEdit}
+                />
+              )}
 
               {/* LOẠI XE — order-level, so it shows on a multi-trip job too
                   (the legs own their trucks, the order owns what it was sold
